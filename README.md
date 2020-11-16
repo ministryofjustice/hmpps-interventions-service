@@ -14,6 +14,9 @@ Run:
 ./gradlew bootRun
 ```
 
+## Architecture
+
+To see where this service fits in the broader interventions (and probation) architecture, you can browse the HMPPS C4 models [here](https://structurizr.com/share/56937/diagrams#interventions-container).
 
 ## Code Style
 
