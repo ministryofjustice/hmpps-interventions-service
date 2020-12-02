@@ -65,8 +65,8 @@ class HealthCheckTest : IntegrationTestBase() {
     webTestClient.get()
       .uri("/health/db")
       .exchange()
-      .expectStatus().isEqualTo(503)
+      .expectStatus().isEqualTo(200)
       .expectBody()
-      .jsonPath("status").isEqualTo("DOWN")
+      .jsonPath("status").isEqualTo("UP")
   }
 }

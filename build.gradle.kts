@@ -17,4 +17,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("org.hibernate:hibernate-core:5.4.24.Final")
   runtimeOnly("org.postgresql:postgresql")
+
+  // api
+  implementation("io.swagger.core.v3:swagger-annotations:2.1.5")
 }
