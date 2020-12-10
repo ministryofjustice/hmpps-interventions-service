@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller
 
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.ResponseEntity
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -18,8 +19,11 @@ import java.util.UUID
 @RestController
 class ReferralController(private val repository: ReferralRepository) {
   @PostMapping("/draft-referral")
-  fun createDraftReferral(): ResponseEntity<DraftReferral> {
-    val referral = Referral()
+  fun createDraftReferral(authentication: JwtAuthenticationToken): ResponseEntity<Any> {
+    val userId = authentication.token.getClaim<String?>("user_id")
+      ?: return ResponseEntity.badRequest().body("no user_id claim in auth token")
+
+    val referral = Referral(createdByUserId = userId)
     repository.save(referral)
 
     val location = ServletUriComponentsBuilder

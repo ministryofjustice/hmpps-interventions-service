@@ -2,6 +2,11 @@ spring:
   profiles:
     include: stdout
 
+  jpa:
+    hibernate:
+      show-sql: true
+      ddl-auto: create
+
 server:
   shutdown: immediate
 
