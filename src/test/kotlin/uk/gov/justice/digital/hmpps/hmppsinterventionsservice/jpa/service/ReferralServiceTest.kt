@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DraftReferral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DraftReferralDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import java.time.LocalDate
@@ -27,7 +27,7 @@ class ReferralServiceTest @Autowired constructor(
     entityManager.persist(referral)
     entityManager.flush()
 
-    val draftReferral = DraftReferral(
+    val draftReferral = DraftReferralDTO(
       id = UUID.fromString("ce364949-7301-497b-894d-130f34a98bff"),
       created = OffsetDateTime.of(LocalDate.of(2020, 12, 1), LocalTime.MIN, ZoneOffset.UTC)
     )
@@ -43,7 +43,7 @@ class ReferralServiceTest @Autowired constructor(
     entityManager.persist(referral)
     entityManager.flush()
 
-    val draftReferral = DraftReferral(completionDeadline = null)
+    val draftReferral = DraftReferralDTO(completionDeadline = null)
 
     val updated = referralService.updateDraftReferral(referral.id!!, draftReferral)
     assertThat(updated!!.completionDeadline).isEqualTo(LocalDate.of(2021, 6, 26))
@@ -55,7 +55,7 @@ class ReferralServiceTest @Autowired constructor(
     entityManager.persist(referral)
     entityManager.flush()
 
-    val draftReferral = DraftReferral(completionDeadline = LocalDate.of(2020, 12, 1))
+    val draftReferral = DraftReferralDTO(completionDeadline = LocalDate.of(2020, 12, 1))
 
     val updated = referralService.updateDraftReferral(referral.id!!, draftReferral)
     assertThat(updated!!.completionDeadline).isEqualTo(LocalDate.of(2020, 12, 1))
@@ -67,7 +67,7 @@ class ReferralServiceTest @Autowired constructor(
     entityManager.persist(referral)
     entityManager.flush()
 
-    val draftReferral = DraftReferral(completionDeadline = LocalDate.of(2020, 12, 1))
+    val draftReferral = DraftReferralDTO(completionDeadline = LocalDate.of(2020, 12, 1))
 
     val updated = referralService.updateDraftReferral(referral.id!!, draftReferral)
     assertThat(updated!!.completionDeadline).isEqualTo(LocalDate.of(2020, 12, 1))
@@ -79,7 +79,7 @@ class ReferralServiceTest @Autowired constructor(
     entityManager.persist(referral)
     entityManager.flush()
 
-    val draftReferral = DraftReferral(completionDeadline = LocalDate.of(2020, 12, 1))
+    val draftReferral = DraftReferralDTO(completionDeadline = LocalDate.of(2020, 12, 1))
     referralService.updateDraftReferral(referral.id!!, draftReferral)
 
     val savedDraftReferral = referralService.getDraftReferral(referral.id!!)
