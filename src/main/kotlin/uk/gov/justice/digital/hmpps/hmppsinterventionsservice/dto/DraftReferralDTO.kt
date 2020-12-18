@@ -9,7 +9,7 @@ import javax.validation.constraints.Future
 data class DraftReferralDTO(
   val id: UUID? = null,
   val created: OffsetDateTime? = null,
-  val completionDeadline: LocalDate? = null,
+  @field:Future(message="referral.completion_in_past") val completionDeadline: LocalDate? = null,
 ) {
   companion object {
     fun from(referral: Referral): DraftReferralDTO {

@@ -42,7 +42,7 @@ class ReferralController(private val referralService: ReferralService) {
   }
 
   @PatchMapping("/draft-referral/{id}")
-  fun patchDraftReferralByID(@PathVariable id: String, RequestBody partialUpdate: DraftReferralDTO): DraftReferralDTO {
+  fun patchDraftReferralByID(@PathVariable id: String, @Valid @RequestBody partialUpdate: DraftReferralDTO): DraftReferralDTO {
     val uuid = parseID(id)
 
     val referralToUpdate = referralService.getDraftReferral(uuid)
