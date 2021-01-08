@@ -39,6 +39,11 @@ class ReferralController(
       .body(DraftReferralDTO.from(referral))
   }
 
+  @GetMapping("/draft-referrals")
+  fun getDraftReferrals(@RequestParam userID: String): List<DraftReferralDTO> {
+    return referralService.getDraftReferralsCreatedByUserID(userID)
+  }
+
   @GetMapping("/draft-referral/{id}")
   fun getDraftReferralByID(@PathVariable id: String): DraftReferralDTO {
     val uuid = parseID(id)
