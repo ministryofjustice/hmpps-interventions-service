@@ -12,7 +12,9 @@ class InterventionService(val repository: InterventionRepository) {
   fun getIntervention(id: UUID): Intervention? {
     return repository.findByIdOrNull(id)
   }
-
+  fun getInterventionsForServiceProvider(id: String): List<Intervention> {
+    return repository.findByDynamicFrameworkContractServiceProviderId(id)
+  }
   fun createIntervention(intervention: Intervention): Intervention {
     return repository.save(intervention)
   }
