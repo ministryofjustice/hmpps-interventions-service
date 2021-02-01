@@ -20,7 +20,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ServiceCategor
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ServiceCategoryService
-import java.util.UUID
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.utils.StringToUUIDConverter
 
 @RestController
 class ReferralController(
@@ -29,7 +29,7 @@ class ReferralController(
 ) {
   @PostMapping("/draft-referral/{id}/send")
   fun sendDraftReferral(@PathVariable id: String, authentication: JwtAuthenticationToken): ResponseEntity<SentReferralDTO> {
-    val uuid = parseID(id)
+    val uuid = StringToUUIDConverter.parseID(id)
 
     val draftReferral = referralService.getDraftReferral(uuid)
       ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "draft referral not found [id=$uuid]")
@@ -50,7 +50,7 @@ class ReferralController(
 
   @GetMapping("/sent-referral/{id}")
   fun getSentReferral(@PathVariable id: String): SentReferralDTO {
-    val uuid = parseID(id)
+    val uuid = StringToUUIDConverter.parseID(id)
     return referralService.getSentReferral(uuid)
       ?.let { SentReferralDTO.from(it) }
       ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "sent referral not found [id=$uuid]")
@@ -74,7 +74,7 @@ class ReferralController(
 
   @GetMapping("/draft-referral/{id}")
   fun getDraftReferralByID(@PathVariable id: String): DraftReferralDTO {
-    val uuid = parseID(id)
+    val uuid = StringToUUIDConverter.parseID(id)
 
     return referralService.getDraftReferral(uuid)
       ?.let { DraftReferralDTO.from(it) }
@@ -83,7 +83,7 @@ class ReferralController(
 
   @PatchMapping("/draft-referral/{id}")
   fun patchDraftReferralByID(@PathVariable id: String, @RequestBody partialUpdate: DraftReferralDTO): DraftReferralDTO {
-    val uuid = parseID(id)
+    val uuid = StringToUUIDConverter.parseID(id)
 
     val referralToUpdate = referralService.getDraftReferral(uuid)
       ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "draft referral not found [id=$uuid]")
@@ -99,19 +99,11 @@ class ReferralController(
 
   @GetMapping("/service-category/{id}")
   fun getServiceCategoryByID(@PathVariable id: String): ServiceCategoryDTO {
-    val uuid = parseID(id)
+    val uuid = StringToUUIDConverter.parseID(id)
 
     return serviceCategoryService.getServiceCategoryByID(uuid)
       ?.let { ServiceCategoryDTO.from(it) }
       ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "service category not found [id=$uuid]")
-  }
-
-  private fun parseID(id: String): UUID {
-    return try {
-      UUID.fromString(id)
-    } catch (e: IllegalArgumentException) {
-      throw ServerWebInputException("could not parse id [id=$id]")
-    }
   }
 
   private fun parseAuthUserToken(authentication: JwtAuthenticationToken): AuthUser {
