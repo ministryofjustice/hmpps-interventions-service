@@ -91,8 +91,8 @@ class InterventionServiceTest @Autowired constructor(
     // build map of service providers
     val serviceProviders = mapOf(
       "harmonyLiving" to ServiceProvider("HARMONY_LIVING", "Harmony Living", "contact@harmonyliving.com"),
-      "housingHelp" to ServiceProvider("HOUSING_HELP", "Housing Help", "manager@housinghelp.com"),
-      "shelterSP" to ServiceProvider("SHELTER", "Shelter", "contact@shelter.com")
+      "homeTrust" to ServiceProvider("HOME_TRUST", "Home Trust", "manager@hometrust.com"),
+      "liveWell" to ServiceProvider("LIVE_WELL", "Live Well", "contact@livewell.com")
     )
 
     serviceProviders.values.forEach { entityManager.persist(it) }
@@ -115,9 +115,9 @@ class InterventionServiceTest @Autowired constructor(
         endDate = LocalDate.of(2022, 10, 7),
         npsRegion = npsRegion,
       ),
-      "housingHelp" to sampleContract(
+      "homeTrust" to sampleContract(
         serviceCategory = accommodationSC,
-        serviceProvider = serviceProviders["housingHelp"]!!,
+        serviceProvider = serviceProviders["homeTrust"]!!,
         startDate = LocalDate.of(2019, 5, 12),
         endDate = LocalDate.of(2022, 5, 12),
         npsRegion = npsRegion,
@@ -130,7 +130,7 @@ class InterventionServiceTest @Autowired constructor(
     val interventions = mapOf(
       "intervention1" to sampleIntervention(dynamicFrameworkContract = contracts["harmonyLiving1"]!!),
       "intervention2" to sampleIntervention(dynamicFrameworkContract = contracts["harmonyLiving2"]!!),
-      "intervention3" to sampleIntervention(dynamicFrameworkContract = contracts["housingHelp"]!!)
+      "intervention3" to sampleIntervention(dynamicFrameworkContract = contracts["homeTrust"]!!)
     )
     interventions.values.forEach {
       interventionService.createIntervention(it)
@@ -139,10 +139,10 @@ class InterventionServiceTest @Autowired constructor(
 
     val harmonyLivingInterventions = interventionService.getInterventionsForServiceProvider("HARMONY_LIVING")
     assertThat(harmonyLivingInterventions.size).isEqualTo(2)
-    val housingHelpInterventions = interventionService.getInterventionsForServiceProvider("HOUSING_HELP")
-    assertThat(housingHelpInterventions.size).isEqualTo(1)
-    val shelterInterventions = interventionService.getInterventionsForServiceProvider("SHELTER")
-    assertThat(shelterInterventions.size).isEqualTo(0)
+    val homeTrustInterventions = interventionService.getInterventionsForServiceProvider("HOME_TRUST")
+    assertThat(homeTrustInterventions.size).isEqualTo(1)
+    val liveWellInterventions = interventionService.getInterventionsForServiceProvider("LIVE_WELL")
+    assertThat(liveWellInterventions.size).isEqualTo(0)
     val notExistInterventions = interventionService.getInterventionsForServiceProvider("DOES_NOT_EXIST")
     assertThat(notExistInterventions.size).isEqualTo(0)
   }
