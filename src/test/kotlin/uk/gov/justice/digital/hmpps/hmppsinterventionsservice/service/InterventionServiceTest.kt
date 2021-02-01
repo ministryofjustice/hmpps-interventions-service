@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.service
+package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,7 +14,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Interve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.InterventionHelper.Companion.sampleServiceProvider
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceProvider
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.InterventionService
 import java.time.LocalDate
 
 @DataJpaTest
