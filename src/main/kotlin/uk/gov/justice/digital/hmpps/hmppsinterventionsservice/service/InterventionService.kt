@@ -18,4 +18,7 @@ class InterventionService(val repository: InterventionRepository) {
   fun createIntervention(intervention: Intervention): Intervention {
     return repository.save(intervention)
   }
+  fun createInterventions(interventions: List<Intervention>): List<Intervention> {
+    return repository.saveAll(interventions).toList()
+  }
 }
