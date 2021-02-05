@@ -10,7 +10,6 @@ import javax.persistence.Column
 import javax.persistence.ElementCollection
 import javax.persistence.Entity
 import javax.persistence.FetchType
-import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.persistence.Index
 import javax.persistence.ManyToOne
@@ -53,5 +52,5 @@ data class Referral(
   @NotNull @ManyToOne(fetch = FetchType.LAZY) val intervention: Intervention,
   @NotNull val serviceUserCRN: String,
   @CreationTimestamp var createdAt: OffsetDateTime? = null,
-  @Id @GeneratedValue var id: UUID? = null,
+  @Id var id: UUID? = null,
 )

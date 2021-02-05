@@ -45,7 +45,7 @@ class SampleData {
     fun sampleReferral(
       crn: String,
       serviceProviderName: String,
-      id: UUID? = null,
+      id: UUID? = UUID.randomUUID(),
       referenceNumber: String? = null,
       completionDeadline: LocalDate? = null,
       sentAt: OffsetDateTime? = null,

@@ -50,9 +50,10 @@ class ReferralService(
     return sentReferral
   }
 
-  fun createDraftReferral(user: AuthUser, crn: String, interventionId: UUID): Referral {
+  fun createDraftReferral(user: AuthUser, crn: String, interventionId: UUID, overrideID: UUID? = null): Referral {
     return referralRepository.save(
       Referral(
+        id = overrideID ?: UUID.randomUUID(),
         serviceUserCRN = crn,
         createdBy = authUserRepository.save(user),
         intervention = interventionRepository.getOne(interventionId)
