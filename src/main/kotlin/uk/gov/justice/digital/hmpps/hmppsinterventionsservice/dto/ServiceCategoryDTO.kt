@@ -15,7 +15,7 @@ data class ServiceCategoryDTO(
     fun from(serviceCategory: ServiceCategory): ServiceCategoryDTO {
       return ServiceCategoryDTO(
         id = serviceCategory.id,
-        name = serviceCategory.name,
+        name = serviceCategory.name.toLowerCase(),
         complexityLevels = serviceCategory.complexityLevels,
         desiredOutcomes = serviceCategory.desiredOutcomes
       )
