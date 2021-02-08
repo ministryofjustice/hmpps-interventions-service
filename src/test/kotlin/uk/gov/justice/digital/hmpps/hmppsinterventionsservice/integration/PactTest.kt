@@ -140,15 +140,12 @@ class PactTest {
   @State("a referral does not exist for user with ID 123344556")
   fun `no setup required`() {}
 
-//  @State("There is an existing sent referral with ID of 81d754aa-d868-4347-9c0f-50690773014e")
-//  fun `use referral 81d754aa from the seed`() {}
-//
-//  @State("a draft referral with ID dfb64747-f658-40e0-a827-87b4b0bdcfed exists and is ready to be sent")
-//  fun `not implemented yet - additional fields`() {}
-//
-//  @State("a service provider with ID 674b47a0-39bf-4514-82ae-61885b9c0cb4 exists")
-//  fun `not implement yet - service provider`() {}
-
 //  @State("there are some existing sent referrals")
-//  fun `use referrals from seed data`() {}
+//  fun `create the sent referrals with the required fields`() {}
+
+//  @State("a draft referral with ID 2a67075a-9c77-4103-9de0-63c4cfe3e8d6 exists and is ready to be sent")
+//  fun `create a new draft referral with the required fields`() {}
+
+//  @State("There is an existing sent referral with ID of 81d754aa-d868-4347-9c0f-50690773014e")
+//  fun `create a new sent referral with the required fields`() {}
 }
