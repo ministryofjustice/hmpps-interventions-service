@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUse
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
+import java.time.OffsetDateTime
 import java.util.UUID
 
 @ExtendWith(SpringExtension::class)
@@ -61,8 +62,17 @@ class PactTest {
     )
   }
 
-//  @State("a draft referral with ID dfb64747-f658-40e0-a827-87b4b0bdcfed exists")
-//  fun `use referral dfb64747 from the seed`() {}
+  @State("a draft referral with ID dfb64747-f658-40e0-a827-87b4b0bdcfed exists")
+  fun `create a new draft referral with no additional fields set`() {
+    val referral = referralService.createDraftReferral(
+      user = deliusUser,
+      crn = "X862134",
+      interventionId = accommodationInterventionID,
+      UUID.fromString("dfb64747-f658-40e0-a827-87b4b0bdcfed"),
+    )
+    referral.createdAt = OffsetDateTime.parse("2020-12-07T20:45:21.986389+00:00")
+    referralRepository.save(referral)
+  }
 
 //  @State("a service category with ID 428ee70f-3001-4399-95a6-ad25eaaede16 exists")
 //  fun `use service category 428ee70f from the seed`() {
@@ -95,6 +105,6 @@ class PactTest {
 //  @State("a service provider with ID 674b47a0-39bf-4514-82ae-61885b9c0cb4 exists")
 //  fun `not implement yet - service provider`() {}
 
-  // @State("there are some existing sent referrals")
-  // fun `use referrals from seed data`() {}
+//  @State("there are some existing sent referrals")
+//  fun `use referrals from seed data`() {}
 }
