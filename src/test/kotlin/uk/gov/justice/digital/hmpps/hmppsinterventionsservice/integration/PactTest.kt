@@ -15,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
 import java.time.OffsetDateTime
@@ -77,9 +76,16 @@ class PactTest {
   @State("a service category with ID 428ee70f-3001-4399-95a6-ad25eaaede16 exists")
   fun `use service category 428ee70f from the real data migration`() {}
 
-//  @State("There is an existing draft referral with ID of d496e4a7-7cc1-44ea-ba67-c295084f1962, and it has had a service category selected")
-//  fun `use referral d496e4a7 from the seed`() {}
-//
+  @State("There is an existing draft referral with ID of d496e4a7-7cc1-44ea-ba67-c295084f1962, and it has had a service category selected")
+  fun `create a new draft referral with accommodation service category set (default)`() {
+    referralService.createDraftReferral(
+      user = deliusUser,
+      crn = "X123456",
+      interventionId = accommodationInterventionID,
+      UUID.fromString("d496e4a7-7cc1-44ea-ba67-c295084f1962"),
+    )
+  }
+
 //  @State("There is an existing draft referral with ID of d496e4a7-7cc1-44ea-ba67-c295084f1962, and it has had a service provider selected")
 //  fun `use referral d496e4a7 from the seed, since it also has a service provider`() {}
 //
