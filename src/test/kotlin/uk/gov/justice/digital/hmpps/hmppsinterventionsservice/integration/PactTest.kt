@@ -63,8 +63,8 @@ class PactTest {
     )
   }
 
-  @State("a draft referral with ID dfb64747-f658-40e0-a827-87b4b0bdcfed exists")
-  fun `create a new draft referral with no additional fields set`() {
+  @State("a draft referral with ID dfb64747-f658-40e0-a827-87b4b0bdcfed exists", "a single referral for user with ID 8751622134 exists")
+  fun `create a new draft referral for 'deliusUser' with a specific createdAt timestamp`() {
     val referral = referralService.createDraftReferral(
       user = deliusUser,
       crn = "X862134",
@@ -137,12 +137,9 @@ class PactTest {
     referralRepository.save(referral)
   }
 
-//  @State("a single referral for user with ID 8751622134 exists")
-//  fun `user referral dfb64747 from the seed`() {}
-//
-//  @State("a referral does not exist for user with ID 123344556")
-//  fun `no referral required for this state`() {}
-//
+  @State("a referral does not exist for user with ID 123344556")
+  fun `no setup required`() {}
+
 //  @State("There is an existing sent referral with ID of 81d754aa-d868-4347-9c0f-50690773014e")
 //  fun `use referral 81d754aa from the seed`() {}
 //
