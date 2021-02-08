@@ -74,10 +74,9 @@ class PactTest {
     referralRepository.save(referral)
   }
 
-//  @State("a service category with ID 428ee70f-3001-4399-95a6-ad25eaaede16 exists")
-//  fun `use service category 428ee70f from the seed`() {
-//  }
-//
+  @State("a service category with ID 428ee70f-3001-4399-95a6-ad25eaaede16 exists")
+  fun `use service category 428ee70f from the real data migration`() {}
+
 //  @State("There is an existing draft referral with ID of d496e4a7-7cc1-44ea-ba67-c295084f1962, and it has had a service category selected")
 //  fun `use referral d496e4a7 from the seed`() {}
 //
