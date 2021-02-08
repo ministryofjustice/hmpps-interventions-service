@@ -15,8 +15,10 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -112,9 +114,29 @@ class PactTest {
     referralRepository.save(referral)
   }
 
-//  @State("There is an existing draft referral with ID of 1219a064-709b-4b6c-a11e-10b8cb3966f6, and it has had a service user selected")
-//  fun `use referral 1219a064 from the seed`() {}
-//
+  @State("There is an existing draft referral with ID of 1219a064-709b-4b6c-a11e-10b8cb3966f6, and it has had a service user selected")
+  fun `create a new draft referral with the service user data expected`() {
+    val referral = referralService.createDraftReferral(
+      user = deliusUser,
+      crn = "X862134",
+      interventionId = accommodationInterventionID,
+      UUID.fromString("1219a064-709b-4b6c-a11e-10b8cb3966f6"),
+    )
+    referral.serviceUserData = ServiceUserData(
+      referral = referral,
+      title = "Mr",
+      firstName = "Alex",
+      lastName = "River",
+      dateOfBirth = LocalDate.of(1980, 1, 1),
+      gender = "Male",
+      preferredLanguage = "English",
+      ethnicity = "British",
+      religionOrBelief = "Agnostic",
+      disabilities = listOf("Autism spectrum condition"),
+    )
+    referralRepository.save(referral)
+  }
+
 //  @State("a single referral for user with ID 8751622134 exists")
 //  fun `user referral dfb64747 from the seed`() {}
 //
