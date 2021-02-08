@@ -86,12 +86,32 @@ class PactTest {
     )
   }
 
-//  @State("There is an existing draft referral with ID of d496e4a7-7cc1-44ea-ba67-c295084f1962, and it has had a service provider selected")
-//  fun `use referral d496e4a7 from the seed, since it also has a service provider`() {}
-//
-//  @State("There is an existing draft referral with ID of 037cc90b-beaa-4a32-9ab7-7f79136e1d27, and it has had desired outcomes selected")
-//  fun `use referral 037cc90b from the seed, since it also has desired outcomes`() {}
-//
+  @State("There is an existing draft referral with ID of d496e4a7-7cc1-44ea-ba67-c295084f1962, and it has had a service provider selected")
+  fun `create a new draft referral with HARMONY_LIVING service provider (default)`() {
+    referralService.createDraftReferral(
+      user = deliusUser,
+      crn = "X123456",
+      interventionId = accommodationInterventionID,
+      UUID.fromString("d496e4a7-7cc1-44ea-ba67-c295084f1962"),
+    )
+  }
+
+  @State("There is an existing draft referral with ID of 037cc90b-beaa-4a32-9ab7-7f79136e1d27, and it has had desired outcomes selected")
+  fun `create a new draft referral and add desired outcome IDs as specified in the contract`() {
+    val referral = referralService.createDraftReferral(
+      user = deliusUser,
+      crn = "X123456",
+      interventionId = accommodationInterventionID,
+      UUID.fromString("037cc90b-beaa-4a32-9ab7-7f79136e1d27"),
+    )
+
+    referral.desiredOutcomesIDs = listOf(
+      "301ead30-30a4-4c7c-8296-2768abfb59b5",
+      "65924ac6-9724-455b-ad30-906936291421"
+    ).map { UUID.fromString(it) }
+    referralRepository.save(referral)
+  }
+
 //  @State("There is an existing draft referral with ID of 1219a064-709b-4b6c-a11e-10b8cb3966f6, and it has had a service user selected")
 //  fun `use referral 1219a064 from the seed`() {}
 //
