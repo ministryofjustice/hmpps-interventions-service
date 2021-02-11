@@ -21,14 +21,15 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleD
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID
 
-@DataJpaTest
-@ActiveProfiles("jpa-test")
+@RepositoryTest
 class ReferralServiceTest @Autowired constructor(
   val entityManager: TestEntityManager,
   val referralRepository: ReferralRepository,
@@ -36,6 +37,7 @@ class ReferralServiceTest @Autowired constructor(
   val interventionRepository: InterventionRepository,
 ) {
 
+  private val authUserFactory = AuthUserFactory(entityManager)
   private val referralEventPublisher: ReferralEventPublisher = mock()
   private val referralService = ReferralService(
     referralRepository,
@@ -318,7 +320,8 @@ class ReferralServiceTest @Autowired constructor(
       )
     }
 
-    assertThat(referralService.getAllSentReferrals().size).isEqualTo(2)
+    // a referral gets stored in the `@BeforeEach` method of this class, so the total number is 3
+    assertThat(referralService.getAllSentReferrals().size).isEqualTo(3)
   }
 
   @Test

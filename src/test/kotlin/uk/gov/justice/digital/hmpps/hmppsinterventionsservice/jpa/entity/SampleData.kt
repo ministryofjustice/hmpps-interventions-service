@@ -1,16 +1,27 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 
+// this class contains sample data, as well as methods to persist the
 class SampleData {
   companion object {
     // there are tonnes of related tables that need to exist to successfully persist an intervention,
     // this is a helper method that persists them all
     fun persistIntervention(em: TestEntityManager, intervention: Intervention): Intervention {
-      em.persist(intervention.dynamicFrameworkContract.serviceCategory)
+      val serviceCategory = intervention.dynamicFrameworkContract.serviceCategory
+      ServiceCategoryFactory(em).create(
+        id = serviceCategory.id,
+        name = serviceCategory.name,
+        complexityLevels = serviceCategory.complexityLevels,
+        desiredOutcomes = serviceCategory.desiredOutcomes,
+        created = serviceCategory.created,
+      )
+
       em.persist(intervention.dynamicFrameworkContract.serviceProvider)
 //      em.persist(intervention.dynamicFrameworkContract.contractEligibility)
       intervention.dynamicFrameworkContract.npsRegion?.let { npsRegion ->
@@ -29,15 +40,14 @@ class SampleData {
 
     fun persistReferral(em: TestEntityManager, referral: Referral): Referral {
       persistIntervention(em, referral.intervention)
-      referral.createdBy?.let {
-        if (em.find(AuthUser::class.java, it.id) == null) {
-          em.persist(it)
-        }
-      }
+
+      // we need to ensure any users associated with the referral have been created.
+      // we can use the new-style factory class to do this; it looks a bit strange, but
+      // the rest of this code will soon be refactored to make use of these factories
+      // so it will all become neater and look more sensible.
+      AuthUserFactory(em).create(referral.createdBy.id, referral.createdBy.authSource)
       referral.sentBy?.let {
-        if (em.find(AuthUser::class.java, it.id) == null) {
-          em.persist(it)
-        }
+        AuthUserFactory(em).create(it.id, it.authSource)
       }
       return em.persistAndFlush(referral)
     }
@@ -45,15 +55,19 @@ class SampleData {
     fun sampleReferral(
       crn: String,
       serviceProviderName: String,
-      id: UUID? = UUID.randomUUID(),
+      id: UUID = UUID.randomUUID(),
       referenceNumber: String? = null,
       completionDeadline: LocalDate? = null,
       sentAt: OffsetDateTime? = null,
-      sentBy: AuthUser? = null,
+      sentBy: AuthUser = AuthUser("berny.b", "delius"),
+      createdAt: OffsetDateTime = OffsetDateTime.now(),
+      createdBy: AuthUser = AuthUser("berny.b", "delius"),
     ): Referral {
       return Referral(
         serviceUserCRN = crn,
         id = id,
+        createdAt = createdAt,
+        createdBy = createdBy,
         completionDeadline = completionDeadline,
         referenceNumber = referenceNumber,
         sentAt = sentAt,
@@ -146,8 +160,12 @@ class SampleData {
       )
     }
 
-    fun sampleDesiredOutcome(id: UUID = UUID.randomUUID(), description: String = "Outcome 1"): DesiredOutcome {
-      return DesiredOutcome(id, description)
+    fun sampleDesiredOutcome(
+      id: UUID = UUID.randomUUID(),
+      description: String = "Outcome 1",
+      serviceCategoryId: UUID = UUID.randomUUID()
+    ): DesiredOutcome {
+      return DesiredOutcome(id, description, serviceCategoryId)
     }
 
     fun persistPCCRegion(em: TestEntityManager, pccRegion: PCCRegion): PCCRegion {

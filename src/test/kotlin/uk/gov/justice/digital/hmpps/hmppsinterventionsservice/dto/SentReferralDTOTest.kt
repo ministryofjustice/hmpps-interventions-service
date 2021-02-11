@@ -17,14 +17,8 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
   @Test
   fun `sent referral requires id, reference number, and created and sent timestamps, sentBy`() {
     val referral = SampleData.sampleReferral("X123456", "Provider")
-    val id = UUID.randomUUID()
     val timestamp = OffsetDateTime.now()
 
-    assertThrows<RuntimeException> {
-      SentReferralDTO.from(referral)
-    }
-
-    referral.id = id
     assertThrows<RuntimeException> {
       SentReferralDTO.from(referral)
     }

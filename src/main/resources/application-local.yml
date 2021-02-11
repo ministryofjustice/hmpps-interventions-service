@@ -48,3 +48,5 @@ spring:
           community-api:
             client-id: interventions
             client-secret: clientsecret
+  jpa:
+    show-sql: true

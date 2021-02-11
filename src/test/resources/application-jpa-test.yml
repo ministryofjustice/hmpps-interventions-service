@@ -1,7 +1,8 @@
-spring:
-  flyway:
-    enabled: false
-  jpa:
-    hibernate:
-      show-sql: true
-      ddl-auto: create-drop
+#spring:
+#  flyway:
+#    enabled: false
+#  jpa:
+#    hibernate:
+#      dialect: H2Dialect
+#      ddl-auto: create-drop
+#    show-sql: true

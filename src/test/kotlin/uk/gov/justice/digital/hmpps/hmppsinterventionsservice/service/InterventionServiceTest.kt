@@ -15,16 +15,18 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleD
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceProvider
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.PCCRegionRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
 import java.time.LocalDate
 
-@DataJpaTest
-@ActiveProfiles("jpa-test")
+@RepositoryTest
 class InterventionServiceTest @Autowired constructor(
   val entityManager: TestEntityManager,
   val pccRegionRepository: PCCRegionRepository,
   val interventionRepository: InterventionRepository,
 ) {
   private val interventionService = InterventionService(pccRegionRepository, interventionRepository)
+  private val serviceCategoryFactory = ServiceCategoryFactory(entityManager)
 
   @Test
   fun `get an Intervention with NPS Region`() {
@@ -111,8 +113,7 @@ class InterventionServiceTest @Autowired constructor(
   }
 
   private fun saveMultipleInterventions() {
-    val accommodationSC = sampleServiceCategory()
-    entityManager.persist(accommodationSC)
+    val accommodationSC = serviceCategoryFactory.create(name = "accommodation")
 
     // build map of service providers
     val serviceProviders = mapOf(

@@ -7,9 +7,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.PCCRegionRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 
-@DataJpaTest
-@ActiveProfiles("jpa-test")
+@RepositoryTest
 class PCCRegionServiceTest @Autowired constructor(
   val entityManager: TestEntityManager,
   pccRegionRepository: PCCRegionRepository,
