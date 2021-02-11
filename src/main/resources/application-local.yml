@@ -41,6 +41,8 @@ logging:
 spring:
   flyway:
     locations: classpath:db/migration,classpath:db/local
+  jpa:
+    show-sql: true
   security:
     oauth2:
       client:
@@ -48,5 +50,3 @@ spring:
           community-api:
             client-id: interventions
             client-secret: clientsecret
-  jpa:
-    show-sql: true

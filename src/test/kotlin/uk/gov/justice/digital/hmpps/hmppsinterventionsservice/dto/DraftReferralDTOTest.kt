@@ -16,22 +16,12 @@ import java.util.UUID
 @JsonTest
 class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftReferralDTO>) {
   @Test
-  fun `a DraftReferralDTO cannot be created without createdAt field`() {
-    val referral = SampleData.sampleReferral("X123456", "Harmony Living")
-
-    assertThrows<RuntimeException> {
-      DraftReferralDTO.from(referral)
-    }
-
-    referral.createdAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
-    assertDoesNotThrow { DraftReferralDTO.from(referral) }
-  }
-
-  @Test
   fun `test serialization of newly created referral`() {
-    val referral = SampleData.sampleReferral("X123456", "Provider")
-    referral.id = UUID.fromString("3B9ED289-8412-41A9-8291-45E33E60276C")
-    referral.createdAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
+    val referral = SampleData.sampleReferral(
+      "X123456", "Provider",
+      id = UUID.fromString("3B9ED289-8412-41A9-8291-45E33E60276C"),
+      createdAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00"),
+    )
 
     val out = json.write(DraftReferralDTO.from(referral))
     assertThat(out).isEqualToJson(
@@ -52,10 +42,12 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
 
   @Test
   fun `test serialization of referral with completionDeadline`() {
-    val referral = SampleData.sampleReferral("X123456", "Provider")
-    referral.id = UUID.fromString("3B9ED289-8412-41A9-8291-45E33E60276C")
-    referral.createdAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
-    referral.completionDeadline = LocalDate.of(2021, 2, 12)
+    val referral = SampleData.sampleReferral(
+      "X123456", "Provider",
+        id = UUID.fromString("3B9ED289-8412-41A9-8291-45E33E60276C"),
+        createdAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00"),
+        completionDeadline = LocalDate.of(2021, 2, 12),
+    )
 
     val out = json.write(DraftReferralDTO.from(referral))
     assertThat(out).isEqualToJson(

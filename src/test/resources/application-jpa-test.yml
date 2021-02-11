@@ -6,3 +6,7 @@
 #      dialect: H2Dialect
 #      ddl-auto: create-drop
 #    show-sql: true
+
+spring:
+  flyway:
+    clean-on-validation-error: true

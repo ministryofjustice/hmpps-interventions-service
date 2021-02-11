@@ -35,7 +35,7 @@ class PactTest {
   @Autowired private lateinit var referralService: ReferralService
 
   private val accommodationInterventionID = UUID.fromString("98a42c61-c30f-4beb-8062-04033c376e2d")
-  private val deliusUser = AuthUser("8751622134", "delius")
+  private val deliusUser = AuthUser("8751622134", "delius", "BERNARD.BEAKS")
 
   @BeforeEach
   fun setup() {
@@ -70,9 +70,9 @@ class PactTest {
       user = deliusUser,
       crn = "X862134",
       interventionId = accommodationInterventionID,
-      UUID.fromString("dfb64747-f658-40e0-a827-87b4b0bdcfed"),
+      overrideID = UUID.fromString("dfb64747-f658-40e0-a827-87b4b0bdcfed"),
+      overrideCreatedAt = OffsetDateTime.parse("2020-12-07T20:45:21.986389+00:00"),
     )
-    referral.createdAt = OffsetDateTime.parse("2020-12-07T20:45:21.986389+00:00")
     referralRepository.save(referral)
   }
 

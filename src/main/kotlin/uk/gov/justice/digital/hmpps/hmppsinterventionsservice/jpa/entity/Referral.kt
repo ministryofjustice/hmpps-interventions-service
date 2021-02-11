@@ -51,7 +51,7 @@ data class Referral(
   // required fields
   @NotNull @ManyToOne(fetch = FetchType.LAZY) val intervention: Intervention,
   @NotNull val serviceUserCRN: String,
-  @NotNull @ManyToOne(fetch = FetchType.LAZY) var createdBy: AuthUser,
-  @NotNull var createdAt: OffsetDateTime,
-  @Id var id: UUID,
+  @NotNull @ManyToOne(fetch = FetchType.LAZY) val createdBy: AuthUser,
+  @NotNull val createdAt: OffsetDateTime,
+  @Id val id: UUID,
 )

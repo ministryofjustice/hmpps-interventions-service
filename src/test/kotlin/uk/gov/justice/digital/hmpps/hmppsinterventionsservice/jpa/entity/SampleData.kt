@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceProviderFactory
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -13,27 +14,25 @@ class SampleData {
     // there are tonnes of related tables that need to exist to successfully persist an intervention,
     // this is a helper method that persists them all
     fun persistIntervention(em: TestEntityManager, intervention: Intervention): Intervention {
-      val serviceCategory = intervention.dynamicFrameworkContract.serviceCategory
-      ServiceCategoryFactory(em).create(
-        id = serviceCategory.id,
-        name = serviceCategory.name,
-        complexityLevels = serviceCategory.complexityLevels,
-        desiredOutcomes = serviceCategory.desiredOutcomes,
-        created = serviceCategory.created,
-      )
+      intervention.dynamicFrameworkContract.serviceCategory.let {
+        ServiceCategoryFactory(em).create(
+          id = it.id,
+          name = it.name,
+          complexityLevels = it.complexityLevels,
+          desiredOutcomes = it.desiredOutcomes,
+          created = it.created,
+        )
+      }
 
-      em.persist(intervention.dynamicFrameworkContract.serviceProvider)
+      intervention.dynamicFrameworkContract.serviceProvider.let {
+        ServiceProviderFactory(em).create(
+          id = it.id,
+          name = it.name,
+          incomingReferralDistributionEmail = it.incomingReferralDistributionEmail,
+        )
+      }
+
 //      em.persist(intervention.dynamicFrameworkContract.contractEligibility)
-      intervention.dynamicFrameworkContract.npsRegion?.let { npsRegion ->
-        em.persist(npsRegion)
-      }
-      intervention.dynamicFrameworkContract.pccRegion?.let { pccRegion ->
-        em.persist(pccRegion)
-      }
-      intervention.dynamicFrameworkContract.pccRegion?.npsRegion?.let { npsRegion ->
-        em.persist(npsRegion)
-      }
-
       em.persist(intervention.dynamicFrameworkContract)
       return em.persistAndFlush(intervention)
     }
@@ -45,9 +44,11 @@ class SampleData {
       // we can use the new-style factory class to do this; it looks a bit strange, but
       // the rest of this code will soon be refactored to make use of these factories
       // so it will all become neater and look more sensible.
-      AuthUserFactory(em).create(referral.createdBy.id, referral.createdBy.authSource)
+      AuthUserFactory(em).create(
+        referral.createdBy.id, referral.createdBy.authSource, referral.createdBy.userName
+      )
       referral.sentBy?.let {
-        AuthUserFactory(em).create(it.id, it.authSource)
+        AuthUserFactory(em).create(it.id, it.authSource, it.userName)
       }
       return em.persistAndFlush(referral)
     }
@@ -58,10 +59,10 @@ class SampleData {
       id: UUID = UUID.randomUUID(),
       referenceNumber: String? = null,
       completionDeadline: LocalDate? = null,
-      sentAt: OffsetDateTime? = null,
-      sentBy: AuthUser = AuthUser("berny.b", "delius"),
       createdAt: OffsetDateTime = OffsetDateTime.now(),
-      createdBy: AuthUser = AuthUser("berny.b", "delius"),
+      createdBy: AuthUser = AuthUser("123456", "delius", "bernard.beaks"),
+      sentAt: OffsetDateTime? = null,
+      sentBy: AuthUser? = null,
     ): Referral {
       return Referral(
         serviceUserCRN = crn,
@@ -110,28 +111,6 @@ class SampleData {
         contractEligibility = contractEligibility,
         npsRegion = npsRegion,
         pccRegion = pccRegion
-      )
-    }
-
-    fun sampleNPSRegion(
-      id: Char = 'G',
-      name: String = "South West"
-    ): NPSRegion {
-      return NPSRegion(
-        id = id,
-        name = name
-      )
-    }
-
-    fun samplePCCRegion(
-      id: String = "avon-and-somerset",
-      name: String = "Avon & Somerset",
-      npsRegion: NPSRegion = sampleNPSRegion(),
-    ): PCCRegion {
-      return PCCRegion(
-        id = id,
-        name = name,
-        npsRegion = npsRegion
       )
     }
 

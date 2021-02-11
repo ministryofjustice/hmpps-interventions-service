@@ -4,10 +4,10 @@ import com.nhaarman.mockitokotlin2.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.web.server.ServerWebInputException
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.createJwtAuthenticationToken
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.CreateReferralRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ServiceCategoryService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFactory
 import java.util.UUID
 import javax.persistence.EntityNotFoundException
 
@@ -15,12 +15,13 @@ internal class ReferralControllerTest {
   private val referralService = mock<ReferralService>()
   private val serviceCategoryService = mock<ServiceCategoryService>()
   private val referralController = ReferralController(referralService, serviceCategoryService)
+  private val tokenFactory = JwtTokenFactory()
 
   @Test
   fun `createDraftReferral handles EntityNotFound exceptions from InterventionsService`() {
-    whenever(referralService.createDraftReferral(any(), any(), any(), anyOrNull())).thenThrow(EntityNotFoundException::class.java)
+    whenever(referralService.createDraftReferral(any(), any(), any(), anyOrNull(), anyOrNull())).thenThrow(EntityNotFoundException::class.java)
     assertThrows<ServerWebInputException> {
-      referralController.createDraftReferral(CreateReferralRequestDTO("CRN20", UUID.randomUUID()), createJwtAuthenticationToken())
+      referralController.createDraftReferral(CreateReferralRequestDTO("CRN20", UUID.randomUUID()), tokenFactory.create())
     }
   }
 

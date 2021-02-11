@@ -7,11 +7,11 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PCCRegi
 class PCCRegionFactory(em: TestEntityManager): EntityFactory(em) {
   private val npsRegionFactory = NPSRegionFactory(em)
 
-  fun pccRegion(
+  fun create(
     id: String = "avon-and-somerset",
     name: String = "Avon & Somerset",
     npsRegion: NPSRegion? = null)
   : PCCRegion {
-    return save(PCCRegion(id = id, name = name, npsRegion = npsRegion ?: npsRegionFactory.npsRegion()))
+    return save(PCCRegion(id = id, name = name, npsRegion = npsRegion ?: npsRegionFactory.create()))
   }
 }

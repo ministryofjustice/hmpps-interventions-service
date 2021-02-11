@@ -4,7 +4,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.test.context.ActiveProfiles
 
+// run JPA tests against the real database to avoid missing bugs arising from SQL syntax
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ActiveProfiles("jpa-test")
+@ActiveProfiles("local", "jpa-test")
 annotation class RepositoryTest
