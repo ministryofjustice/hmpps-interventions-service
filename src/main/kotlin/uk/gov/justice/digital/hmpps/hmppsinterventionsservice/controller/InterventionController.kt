@@ -18,7 +18,7 @@ class InterventionController(
   @GetMapping("/intervention/{id}")
   fun getInterventionByID(@PathVariable id: UUID): InterventionDTO {
     return interventionService.getIntervention(id)?.let {
-      InterventionDTO.from(it, interventionService.getPCCRegions(it))
+      InterventionDTO.from(it)
     } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "intervention not found [id=$id]")
   }
 
@@ -31,6 +31,6 @@ class InterventionController(
     @RequestParam(name = "maximumAge", required = false) maximumAge: Int?
   ): List<InterventionDTO> {
     return interventionService.getInterventions(pccRegionIds.orEmpty(), allowsFemale, allowsMale, minimumAge, maximumAge)
-      .map { InterventionDTO.from(it, interventionService.getPCCRegions(it)) }
+      .map { InterventionDTO.from(it) }
   }
 }

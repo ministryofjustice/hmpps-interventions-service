@@ -15,14 +15,14 @@ data class InterventionDTO(
   val eligibility: ContractEligibilityDTO,
 ) {
   companion object {
-    fun from(intervention: Intervention, pccRegions: List<PCCRegion>): InterventionDTO {
+    fun from(intervention: Intervention): InterventionDTO {
       val contract = intervention.dynamicFrameworkContract
       return InterventionDTO(
         id = intervention.id!!,
         title = intervention.title,
         description = intervention.description,
         npsRegion = contract.npsRegion?.let { NPSRegionDTO.from(it) },
-        pccRegions = pccRegions.map { PCCRegionDTO.from(it) },
+        pccRegions = contract.pccRegions.map { PCCRegionDTO.from(it) },
         serviceCategory = ServiceCategoryDTO.from(contract.serviceCategory),
         serviceProvider = ServiceProviderDTO.from(contract.serviceProvider),
         eligibility = ContractEligibilityDTO(
