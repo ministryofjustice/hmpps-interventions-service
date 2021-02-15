@@ -14,25 +14,29 @@ internal class InterventionControllerTest {
 
   @Test
   fun `getInterventions returns interventions based on filtering`() {
-    val locations = emptyList<String>()
+    val pccRegionIds = emptyList<String>()
+    val minimumAge: Int? = 18
+    val maximumAge: Int? = 24
     val interventionDTOs = emptyList<InterventionDTO>()
-    whenever(interventionService.getInterventions(locations)).thenReturn(interventionDTOs)
+    whenever(interventionService.getInterventions(pccRegionIds, minimumAge, maximumAge)).thenReturn(interventionDTOs)
 
-    val responseDTOs = interventionController.getInterventions(locations)
+    val responseDTOs = interventionController.getInterventions(pccRegionIds, minimumAge, maximumAge)
 
-    verify(interventionService).getInterventions(locations)
+    verify(interventionService).getInterventions(pccRegionIds, minimumAge, maximumAge)
     assertSame(interventionDTOs, responseDTOs)
   }
 
   @Test
   fun `getInterventions returns interventions unfiltered when no parameters supplied`() {
-    val locations: List<String>? = null
+    val pccRegionIds: List<String>? = null
+    val minimumAge: Int? = null
+    val maximumAge: Int? = null
     val interventionDTOs = emptyList<InterventionDTO>()
-    whenever(interventionService.getInterventions(emptyList())).thenReturn(interventionDTOs)
+    whenever(interventionService.getInterventions(emptyList(), minimumAge, maximumAge)).thenReturn(interventionDTOs)
 
-    val responseDTOs = interventionController.getInterventions(locations)
+    val responseDTOs = interventionController.getInterventions(pccRegionIds, minimumAge, maximumAge)
 
-    verify(interventionService).getInterventions(emptyList())
+    verify(interventionService).getInterventions(emptyList(), minimumAge, maximumAge)
     assertSame(interventionDTOs, responseDTOs)
   }
 }

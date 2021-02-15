@@ -23,6 +23,8 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
   private val dynamicFrameworkContractFactory = DynamicFrameworkContractFactory(entityManager)
   private val npsRegionFactory = NPSRegionFactory(entityManager)
   private val pccRegionFactory = PCCRegionFactory(entityManager)
+  private val minimumAge: Int? = null
+  private val maximumAge: Int? = null
 
   @BeforeEach
   fun setup() {
@@ -35,7 +37,7 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create()))
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create()), title = "test Title")
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(npsRegion = npsRegionFactory.create()))
-    val found = interventionFilterRepositoryImpl.findByCriteria(listOf())
+    val found = interventionFilterRepositoryImpl.findByCriteria(listOf(), minimumAge, maximumAge)
     assertThat(found.size).isEqualTo(3)
   }
 
@@ -44,7 +46,7 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(npsRegion = npsRegionFactory.create()))
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(npsRegion = npsRegionFactory.create()))
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(npsRegion = npsRegionFactory.create(id = 'H', name = "name")))
-    val found = interventionFilterRepositoryImpl.findByCriteria(listOf("devon-and-cornwall"))
+    val found = interventionFilterRepositoryImpl.findByCriteria(listOf("devon-and-cornwall"), minimumAge, maximumAge)
 
     assertThat(found.size).isEqualTo(2)
     found.forEach {
@@ -57,7 +59,7 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create()))
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create()))
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(id = "testID", name = "testName")))
-    val found = interventionFilterRepositoryImpl.findByCriteria(listOf("avon-and-somerset"))
+    val found = interventionFilterRepositoryImpl.findByCriteria(listOf("avon-and-somerset"), minimumAge, maximumAge)
 
     assertThat(found.size).isEqualTo(2)
     found.forEach {
@@ -70,11 +72,50 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create()))
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(npsRegion = npsRegionFactory.create()))
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(id = "testID", name = "testName")))
-    val found = interventionFilterRepositoryImpl.findByCriteria(listOf("avon-and-somerset"))
+    val found = interventionFilterRepositoryImpl.findByCriteria(listOf("avon-and-somerset"), minimumAge, maximumAge)
 
     assertThat(found.size).isEqualTo(2)
     found.forEach {
       assert(it.dynamicFrameworkContract.pccRegion?.id.equals("avon-and-somerset") || it.dynamicFrameworkContract.npsRegion?.id?.equals('G')!!)
+    }
+  }
+
+  @Test
+  fun `get interventions filtering by minimum age on exact match`() {
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(minimumAge = 28))
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(minimumAge = 29))
+    val found = interventionFilterRepositoryImpl.findByCriteria(emptyList(), 28, null)
+
+    assertThat(found.size).isEqualTo(1)
+    found.forEach {
+      assertThat(it.dynamicFrameworkContract.minimumAge).isEqualTo(28)
+    }
+  }
+
+  @Test
+  fun `get interventions filtering by maximum age on exact match`() {
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(maximumAge = 28))
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(maximumAge = 29))
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(maximumAge = null))
+    val found = interventionFilterRepositoryImpl.findByCriteria(emptyList(), null, 29)
+
+    assertThat(found.size).isEqualTo(1)
+    found.forEach {
+      assertThat(it.dynamicFrameworkContract.maximumAge).isEqualTo(29)
+    }
+  }
+
+  @Test
+  fun `get interventions filtering by minimum and maximum age on exact match and region`() {
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(minimumAge = 18, maximumAge = 29, pccRegion = pccRegionFactory.create(id = "region1", name = "name 1")))
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(minimumAge = 18, maximumAge = 29, pccRegion = pccRegionFactory.create(id = "region2", name = "name 2")))
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(minimumAge = 18, maximumAge = 30, pccRegion = pccRegionFactory.create(id = "region3", name = "name 3")))
+    val found = interventionFilterRepositoryImpl.findByCriteria(listOf("region1", "region2"), null, 29)
+
+    assertThat(found.size).isEqualTo(2)
+    found.forEach {
+      assertThat(it.dynamicFrameworkContract.minimumAge).isEqualTo(18)
+      assertThat(it.dynamicFrameworkContract.maximumAge).isEqualTo(29)
     }
   }
 }

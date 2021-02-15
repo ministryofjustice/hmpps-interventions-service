@@ -23,58 +23,56 @@ class InterventionServiceUnitTest {
   private val pccRegionRepository = mock<PCCRegionRepository>()
   private val interventionService = InterventionService(pccRegionRepository, interventionRepository)
 
+  private val pccRegionIds = emptyList<String>()
+  private val minimumAge: Int? = null
+  private val maximumAge: Int? = null
+  private val npsRegion = sampleNPSRegion()
+  private val pccRegion = samplePCCRegion()
+
   @Test
   fun `finds interventions using search criteria`() {
-    val locations = emptyList<String>()
     val interventions = emptyList<Intervention>()
-    whenever(interventionRepository.findByCriteria(locations)).thenReturn(interventions)
+    whenever(interventionRepository.findByCriteria(pccRegionIds, minimumAge, maximumAge)).thenReturn(interventions)
 
-    interventionService.getInterventions(locations)
+    interventionService.getInterventions(pccRegionIds, minimumAge, maximumAge)
 
-    verify(interventionRepository).findByCriteria(locations)
+    verify(interventionRepository).findByCriteria(pccRegionIds, minimumAge, maximumAge)
   }
 
   @Test
   fun `should not look up regions for intervention containing contract with pcc region`() {
-    val locations = emptyList<String>()
     val contract = sampleContract(serviceCategory = sampleServiceCategory(), serviceProvider = sampleServiceProvider(), npsRegion = sampleNPSRegion(), pccRegion = samplePCCRegion())
     val intervention = sampleIntervention(id = UUID.randomUUID(), dynamicFrameworkContract = contract)
     val interventions = listOf(intervention)
-    whenever(interventionRepository.findByCriteria(locations)).thenReturn(interventions)
+    whenever(interventionRepository.findByCriteria(pccRegionIds, minimumAge, maximumAge)).thenReturn(interventions)
 
-    interventionService.getInterventions(locations)
+    interventionService.getInterventions(pccRegionIds, minimumAge, maximumAge)
 
     verifyZeroInteractions(pccRegionRepository)
   }
 
   @Test
   fun `looks up regions for intervention containing contract without pcc region using nps region`() {
-    val locations = emptyList<String>()
-    val npsRegion = sampleNPSRegion()
-    val pccRegion = samplePCCRegion()
     val contract = sampleContract(serviceCategory = sampleServiceCategory(), serviceProvider = sampleServiceProvider(), npsRegion = npsRegion)
     val intervention = sampleIntervention(id = UUID.randomUUID(), dynamicFrameworkContract = contract)
     val interventions = listOf(intervention)
-    whenever(interventionRepository.findByCriteria(locations)).thenReturn(interventions)
+    whenever(interventionRepository.findByCriteria(pccRegionIds, minimumAge, maximumAge)).thenReturn(interventions)
     whenever(pccRegionRepository.findAllByNpsRegionId(npsRegion.id)).thenReturn(listOf(pccRegion))
 
-    interventionService.getInterventions(locations)
+    interventionService.getInterventions(pccRegionIds, minimumAge, maximumAge)
 
     verify(pccRegionRepository).findAllByNpsRegionId(npsRegion.id)
   }
 
   @Test
   fun `should return an intervention`() {
-    val locations = emptyList<String>()
-    val npsRegion = sampleNPSRegion()
-    val pccRegion = samplePCCRegion()
     val contract = sampleContract(serviceCategory = sampleServiceCategory(), serviceProvider = sampleServiceProvider(), npsRegion = npsRegion)
     val intervention = sampleIntervention(id = UUID.randomUUID(), dynamicFrameworkContract = contract)
     val interventions = listOf(intervention)
-    whenever(interventionRepository.findByCriteria(locations)).thenReturn(interventions)
+    whenever(interventionRepository.findByCriteria(pccRegionIds, minimumAge, maximumAge)).thenReturn(interventions)
     whenever(pccRegionRepository.findAllByNpsRegionId(npsRegion.id)).thenReturn(listOf(pccRegion))
 
-    val interventionDTOs = interventionService.getInterventions(locations)
+    val interventionDTOs = interventionService.getInterventions(pccRegionIds, minimumAge, maximumAge)
 
     assertEquals(interventionDTOs.size, interventions.size)
   }

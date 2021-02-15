@@ -23,8 +23,12 @@ class InterventionController(
   }
 
   @GetMapping("/interventions")
-  fun getInterventions(@RequestParam(name = "pccRegionIds", required = false) pccRegionIds: List<String>?): List<InterventionDTO> {
+  fun getInterventions(
+    @RequestParam(name = "pccRegionIds", required = false) pccRegionIds: List<String>?,
+    @RequestParam(name = "minimumAge", required = false) minimumAge: Int?,
+    @RequestParam(name = "maximumAge", required = false) maximumAge: Int?
+  ): List<InterventionDTO> {
 
-    return interventionService.getInterventions(pccRegionIds.orEmpty())
+    return interventionService.getInterventions(pccRegionIds.orEmpty(), minimumAge, maximumAge)
   }
 }
