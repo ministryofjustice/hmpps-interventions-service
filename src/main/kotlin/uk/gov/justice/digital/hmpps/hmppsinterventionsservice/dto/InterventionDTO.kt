@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto
 
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PCCRegion
 import java.util.UUID
 
 data class InterventionDTO(

@@ -10,6 +10,16 @@ import javax.persistence.PersistenceContext
 import javax.persistence.criteria.CriteriaBuilder
 import javax.persistence.criteria.Predicate
 import javax.persistence.criteria.Root
+import javax.persistence.TypedQuery
+
+import java.util.ArrayList
+import java.security.acl.Owner
+
+
+
+
+
+
 
 class InterventionFilterRepositoryImpl(
   private val pccRegionRepository: PCCRegionRepository
@@ -23,42 +33,58 @@ class InterventionFilterRepositoryImpl(
     val criteriaQuery = criteriaBuilder.createQuery(Intervention::class.java)
     val root = criteriaQuery.from(Intervention::class.java)
 
-    val regionPredicate: Predicate? = getRegionPredicate(criteriaBuilder, root, pccRegionIds)
+    val pccRegionPredicate: Predicate? = getPccRegionPredicate(criteriaBuilder, root, pccRegionIds)
     val allowsFemalePredicate: Predicate? = getAllowsFemalePredicate(criteriaBuilder, root, allowsFemale)
     val allowsMalePredicate: Predicate? = getAllowsMalePredicate(criteriaBuilder, root, allowsMale)
     val minimumAgePredicate: Predicate? = getMinimumAgePredicate(criteriaBuilder, root, minimumAge)
     val maximumAgePredicate: Predicate? = getMaximumAgePredicate(criteriaBuilder, root, maximumAge)
 
-    val predicates = listOfNotNull(regionPredicate, allowsFemalePredicate, allowsMalePredicate, minimumAgePredicate, maximumAgePredicate)
+    val predicates = listOfNotNull(pccRegionPredicate, allowsFemalePredicate, allowsMalePredicate, minimumAgePredicate, maximumAgePredicate)
     val finalPredicate: Predicate = criteriaBuilder.and(*predicates.toTypedArray())
 
     criteriaQuery.where(finalPredicate)
     return entityManager.createQuery(criteriaQuery).resultList
   }
 
-  private fun getRegionPredicate(criteriaBuilder: CriteriaBuilder, root: Root<Intervention>, pccRegionIds: List<PCCRegionID>): Predicate? {
+  select i.id, i.title, r.pcc_regions_id
+    from intervention i
+    left join dynamic_framework_contract_pcc_regions r on i.dynamic_framework_contract_id = r.dynamic_framework_contract_id
+    where r.pcc_regions_id in ('dorset', 'gloucestershire', 'wiltshire');
 
-    if (pccRegionIds.isNullOrEmpty()) {
-      return null
+  private fun getPccRegionPredicate(criteriaBuilder: CriteriaBuilder, root: Root<Intervention>, pccRegionIds: List<PCCRegionID>): Predicate? {
+    return if (pccRegionIds.isEmpty()) null else {
+
+//      val mm = entityManager.metamodel.entity(Intervention::class.java).getAttribute("dynamicFrameworkContract")
+//      val mmI = entityManager.metamodel.entity(DynamicFramworkContract::class.java).
+//      val pet: cq.from(Pet::class.java)
+
+      val thing = root.join
+      root.join<>("dynamic_framework_contract_pcc_regions")
+
+//      val thing = root.join(mm.getSet("pccRegions", PCCRegion::class.java))
+//      val contract = root.get<Any>("dynamicFrameworkContract")
+
+//      val thing = mm.getSet("pccRegions", PCCRegion::class.java)
+
+      val predicates = mutableListOf<Predicate>()
+//      val pccRegions = root.get<Any>("dynamicFrameworkContract")
+//      val pccRegions = root.get<DynamicFrameworkContract>("dynamicFrameworkContract").get<Set<PCCRegion>>("pccRegions")
+
+//      pccRegionIds.forEach {
+//        val predicate = criteriaBuilder.isMember(it, pccRegions.get<PCCRegionID>("id"))
+//        predicates.add(predicate)
+//      }
+
+      criteriaBuilder.or(*predicates.toTypedArray())
     }
-
-    val pccRegionPredicate = getPccRegionPredicate(root, pccRegionIds)
-    val npsRegionPredicate = getNpsRegionPredicate(root, pccRegionIds)
-    return criteriaBuilder.or(pccRegionPredicate, npsRegionPredicate)
   }
 
-  private fun getPccRegionPredicate(root: Root<Intervention>, pccRegionIds: List<PCCRegionID>): Predicate {
-
-    val expression = root.get<DynamicFrameworkContract>("dynamicFrameworkContract").get<PCCRegion>("pccRegion").get<String>("id")
-    return expression.`in`(pccRegionIds)
-  }
-
-  private fun getNpsRegionPredicate(root: Root<Intervention>, pccRegionIds: List<PCCRegionID>): Predicate {
-
-    val expression = root.get<DynamicFrameworkContract>("dynamicFrameworkContract").get<NPSRegion>("npsRegion").get<Char>("id")
-    val npsRegions = pccRegionRepository.findAllByIdIn(pccRegionIds).map { it.npsRegion.id }.distinct()
-    return expression.`in`(npsRegions)
-  }
+//  private fun getNpsRegionPredicate(root: Root<Intervention>, pccRegionIds: List<PCCRegionID>): Predicate {
+//
+//    val expression = root.get<DynamicFrameworkContract>("dynamicFrameworkContract").get<NPSRegion>("npsRegion").get<Char>("id")
+//    val npsRegions = pccRegionRepository.findAllByIdIn(pccRegionIds).map { it.npsRegion.id }.distinct()
+//    return expression.`in`(npsRegions)
+//  }
 
   private fun getAllowsFemalePredicate(criteriaBuilder: CriteriaBuilder, root: Root<Intervention>, allowsFemale: Boolean?): Predicate? {
     if (allowsFemale == null) {
