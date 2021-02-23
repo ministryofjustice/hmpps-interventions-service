@@ -31,8 +31,9 @@ class ReferralService(
     referral.assignedAt = OffsetDateTime.now()
     referral.assignedBy = authUserRepository.save(assignedBy)
     referral.assignedTo = authUserRepository.save(assignedTo)
+
     val assignedReferral = referralRepository.save(referral)
-    eventPublisher.referralSentEvent(assignedReferral)
+    eventPublisher.referralAssignedEvent(assignedReferral)
     return assignedReferral
   }
 
