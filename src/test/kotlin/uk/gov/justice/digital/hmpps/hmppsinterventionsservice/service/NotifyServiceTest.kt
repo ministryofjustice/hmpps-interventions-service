@@ -22,6 +22,7 @@ import java.util.UUID
 
 class NotifyServiceTest {
   private val notificationClient = mock<NotificationClient>()
+  private val hmppsAuthService = mock<HMPPSAuthService>()
 
   private val referralSentEvent = ReferralEvent(
     "source",
@@ -37,10 +38,12 @@ class NotifyServiceTest {
   private fun notifyService(enabled: Boolean): NotifyService {
     return NotifyService(
       enabled,
-      "templateID",
+      "referralSentTemplateID",
+      "referralAssignedTemplateID",
       "http://example.com",
       "/referral/{id}",
       notificationClient,
+      hmppsAuthService,
     )
   }
 
