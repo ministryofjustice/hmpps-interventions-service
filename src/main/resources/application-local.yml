@@ -32,6 +32,9 @@ postgres:
   username: postgres
   password: password
 
+feature:
+  schemainfo: true
+
 spring:
   security:
     oauth2:

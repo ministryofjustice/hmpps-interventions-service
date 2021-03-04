@@ -34,6 +34,11 @@ env:
   - name: COMMUNITYAPI_CONTACTNOTIFICATIONCONTEXT_TEAMCODE
     value: "{{ .Values.env.COMMUNITYAPI_CONTACTNOTIFICATIONCONTEXT_TEAMCODE }}"
 
+{{ range $key, $value := .Values.optional_env }}
+  - name: {{ $key }}
+    value: "{{ $value }}"
+{{ end }}
+
   - name: APPLICATION_INSIGHTS_IKEY
     valueFrom:
       secretKeyRef:

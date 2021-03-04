@@ -34,6 +34,8 @@ jobs:
             - gradle-{{ checksum "build.gradle.kts" }}
             - gradle-
       - run:
+          command: sudo apt update && sudo apt install graphviz
+      - run:
           command: ./gradlew check
       - save_cache:
           paths:
