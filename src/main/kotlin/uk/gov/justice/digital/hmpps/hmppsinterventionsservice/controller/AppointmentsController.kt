@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller
 
+import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.bind.annotation.GetMapping
@@ -70,6 +71,7 @@ class AppointmentsController(
     @PathVariable(name = "id") actionPlanId: UUID
   ): List<ActionPlanAppointmentDTO> {
 
+    log.info("Message for Tom")
     val actionPlanAppointments = appointmentsService.getAppointments(actionPlanId)
     return ActionPlanAppointmentDTO.from(actionPlanAppointments)
   }
@@ -82,5 +84,9 @@ class AppointmentsController(
 
     val actionPlanAppointment = appointmentsService.getAppointment(actionPlanId, sessionNumber)
     return ActionPlanAppointmentDTO.from(actionPlanAppointment)
+  }
+
+  companion object {
+    private val log = LoggerFactory.getLogger(AppointmentsController::class.java)
   }
 }

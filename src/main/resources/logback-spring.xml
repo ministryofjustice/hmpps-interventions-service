@@ -4,9 +4,8 @@
 
     <springProfile name="local">
         <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder>
-                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
-                <charset>utf8</charset>
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <customFields>{"application":"moj-interventions"}</customFields>
             </encoder>
         </appender>
         <root level="info">

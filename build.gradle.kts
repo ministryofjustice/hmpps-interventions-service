@@ -45,6 +45,9 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:3.17.0-RELEASE")
   implementation("software.amazon.awssdk:sns:2.16.9")
 
+  // logging
+  implementation("net.logstash.logback:logstash-logback-encoder")
+
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
