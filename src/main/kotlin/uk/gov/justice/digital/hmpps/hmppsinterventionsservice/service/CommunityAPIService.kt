@@ -30,6 +30,7 @@ class CommunityAPIService(
 
         val referRequest = ReferRequest(
           event.referral.intervention.dynamicFrameworkContract.serviceCategory.name,
+          event.referral.sentenceId!!,
           url,
           event.referral.sentAt!!.toLocalDate()
         )
@@ -47,6 +48,7 @@ class CommunityAPIService(
 
 data class ReferRequest(
   val serviceCategory: String,
+  val sentenceId: Long,
   val notes: String? = null,
   @JsonFormat(pattern = "yyyy-MM-dd")
   val date: LocalDate? = null
