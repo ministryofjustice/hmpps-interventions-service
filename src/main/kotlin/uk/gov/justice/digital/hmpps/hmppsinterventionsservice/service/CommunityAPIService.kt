@@ -5,23 +5,18 @@ import mu.KLogging
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Service
-import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.util.UriComponentsBuilder
-import reactor.core.publisher.Mono
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.CommunityAPIClient
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
 import java.time.LocalDate
 
 @Service
 class CommunityAPIService(
-  @Value("\${community-api.contact-notification-context.provider-code}") private val providerCode: String,
-  @Value("\${community-api.contact-notification-context.referral-type}") private val referralType: String,
-  @Value("\${community-api.contact-notification-context.staff-code}") private val staffCode: String,
-  @Value("\${community-api.contact-notification-context.team-code}") private val teamCode: String,
   @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
   @Value("\${interventions-ui.locations.sent-referral}") private val interventionsUISentReferralLocation: String,
   @Value("\${community-api.locations.sent-referral}") private val communityAPISentReferralLocation: String,
-  private val communityApiWebClient: WebClient,
+  private val communityAPIClient: CommunityAPIClient,
 ) : ApplicationListener<ReferralEvent> {
   companion object : KLogging()
 
@@ -33,11 +28,8 @@ class CommunityAPIService(
           .buildAndExpand(event.referral.id)
           .toString()
 
-        val body = ReferRequest(
-          providerCode,
-          referralType,
-          staffCode,
-          teamCode,
+        val referRequest = ReferRequest(
+          event.referral.intervention.dynamicFrameworkContract.serviceCategory.name,
           url,
           event.referral.sentAt!!.toLocalDate()
         )
@@ -46,15 +38,7 @@ class CommunityAPIService(
           .buildAndExpand(event.referral.serviceUserCRN)
           .toString()
 
-        communityApiWebClient.post().uri(communityApiSentReferralPath)
-          .body(Mono.just(body), ReferRequest::class.java)
-          .retrieve()
-          .bodyToMono(Unit::class.java)
-          .onErrorResume { e ->
-            logger.error("Call to community api to update contact log failed", e)
-            Mono.empty()
-          }
-          .subscribe()
+        communityAPIClient.makeRequest(communityApiSentReferralPath, referRequest)
       }
       else -> {}
     }
@@ -62,10 +46,7 @@ class CommunityAPIService(
 }
 
 data class ReferRequest(
-  val providerCode: String? = null,
-  val referralType: String? = null,
-  val staffCode: String? = null,
-  val teamCode: String? = null,
+  val serviceCategory: String,
   val notes: String? = null,
   @JsonFormat(pattern = "yyyy-MM-dd")
   val date: LocalDate? = null
