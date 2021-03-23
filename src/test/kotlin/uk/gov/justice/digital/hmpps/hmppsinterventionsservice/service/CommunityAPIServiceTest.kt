@@ -28,7 +28,7 @@ class CommunityAPIServiceTest {
 
     communityAPIService.onApplicationEvent(referralSentEvent)
 
-    verify(communityAPIClient).makeRequest(
+    verify(communityAPIClient).makeAsyncPostRequest(
       "secure/offenders/crn/X123456/referral/sent",
       ReferRequest(
         "Accommodation",
