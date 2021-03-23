@@ -39,7 +39,7 @@ class CommunityAPIService(
           .buildAndExpand(event.referral.serviceUserCRN)
           .toString()
 
-        communityAPIClient.makeRequest(communityApiSentReferralPath, referRequest)
+        communityAPIClient.makeAsyncPostRequest(communityApiSentReferralPath, referRequest)
       }
       else -> {}
     }

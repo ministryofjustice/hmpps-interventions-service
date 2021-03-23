@@ -64,7 +64,7 @@ class CommunityAPIClientTest {
     )
     whenever(exchangeFunction.exchange(any())).thenReturn(Mono.empty())
 
-    communityAPIClient.makeRequest("/uriValue", referralSentEvent)
+    communityAPIClient.makeAsyncPostRequest("/uriValue", referralSentEvent)
 
     verify(exchangeFunction, times(1)).exchange(any())
     val requestCaptor = argumentCaptor<ClientRequest>()
@@ -82,7 +82,7 @@ class CommunityAPIClientTest {
     )
     whenever(exchangeFunction.exchange(any())).thenThrow(RuntimeException::class.java)
 
-    communityAPIClient.makeRequest("/uriValue", referralSentEvent)
+    communityAPIClient.makeAsyncPostRequest("/uriValue", referralSentEvent)
 
     assertThat(memoryAppender.logEvents.size).isEqualTo(1)
     assertThat(memoryAppender.logEvents[0].level.levelStr).isEqualTo("ERROR")
