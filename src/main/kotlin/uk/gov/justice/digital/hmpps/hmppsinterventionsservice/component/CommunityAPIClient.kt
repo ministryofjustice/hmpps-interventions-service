@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component
 
 import mu.KLogging
+import net.logstash.logback.argument.StructuredArguments
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
@@ -17,7 +18,7 @@ class CommunityAPIClient(
       .retrieve()
       .bodyToMono(Unit::class.java)
       .onErrorResume { e ->
-        logger.error("Call to community api failed for: $requestBody", e)
+        logger.error("Call to community api failed", e, StructuredArguments.kv("requestBody", requestBody))
         Mono.empty()
       }
       .subscribe()
