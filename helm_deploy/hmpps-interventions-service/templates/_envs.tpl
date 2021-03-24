@@ -7,17 +7,10 @@ env:
   - name: SERVER_PORT
     value: "{{ .Values.image.port }}"
 
-  - name: JAVA_OPTS
-    value: "{{ .Values.env.JAVA_OPTS }}"
-
-  - name: HMPPSAUTH_BASEURL
-    value: "{{ .Values.env.HMPPSAUTH_BASEURL }}"
-
-  - name: INTERVENTIONSUI_BASEURL
-    value: "{{ .Values.env.INTERVENTIONSUI_BASEURL }}"
-
-  - name: COMMUNITYAPI_BASEURL
-    value: "{{ .Values.env.COMMUNITYAPI_BASEURL }}"
+  {{ range $key, $value := .Values.env }}
+  - name: {{ $key }}
+    value: "{{ $value }}"
+  {{ end }}
 
   - name: APPLICATIONINSIGHTS_CONNECTION_STRING
     valueFrom:
