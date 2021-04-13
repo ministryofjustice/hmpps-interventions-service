@@ -22,6 +22,7 @@ class CommunityAPIService(
   companion object : KLogging()
 
   override fun onApplicationEvent(event: ReferralEvent) {
+
     when (event.type) {
       ReferralEventType.SENT -> {
         val url = UriComponentsBuilder.fromHttpUrl(interventionsUIBaseURL)
