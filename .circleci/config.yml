@@ -251,6 +251,8 @@ workflows:
       - reset_research_db:
           requires:
             - approve_reset_research_db
+          context:
+            - hmpps-interventions-service-research
       - hmpps/deploy_env:
           name: deploy_research_manually
           env: "research"
