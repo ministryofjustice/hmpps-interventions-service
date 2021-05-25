@@ -13,7 +13,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.EndOfServic
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.EndOfServiceReportEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.AsyncEventExceptionHandling
 import java.net.URI
 import java.util.UUID
 
@@ -31,8 +30,6 @@ class NotifyActionPlanService(
   private val emailSender: EmailSender,
   private val hmppsAuthService: HMPPSAuthService,
 ) : ApplicationListener<ActionPlanEvent>, NotifyService {
-
-  @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: ActionPlanEvent) {
     when (event.type) {
       ActionPlanEventType.SUBMITTED -> {
@@ -60,8 +57,6 @@ class NotifyEndOfServiceReportService(
   private val emailSender: EmailSender,
   private val hmppsAuthService: HMPPSAuthService,
 ) : ApplicationListener<EndOfServiceReportEvent>, NotifyService {
-
-  @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: EndOfServiceReportEvent) {
     when (event.type) {
       EndOfServiceReportEventType.SUBMITTED -> {
@@ -90,7 +85,6 @@ class NotifyAppointmentService(
   private val emailSender: EmailSender,
   private val hmppsAuthService: HMPPSAuthService,
 ) : ApplicationListener<AppointmentEvent>, NotifyService {
-  @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: AppointmentEvent) {
     if (event.notifyPP) {
       val referral = event.appointment.actionPlan.referral
@@ -138,8 +132,6 @@ class NotifyReferralService(
   private val emailSender: EmailSender,
   private val hmppsAuthService: HMPPSAuthService,
 ) : ApplicationListener<ReferralEvent>, NotifyService {
-
-  @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: ReferralEvent) {
     when (event.type) {
 

@@ -10,7 +10,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.AsyncEventExceptionHandling
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 
 interface SNSService
@@ -19,8 +18,6 @@ interface SNSService
 class SNSActionPlanService(
   private val snsPublisher: SNSPublisher,
 ) : ApplicationListener<ActionPlanEvent>, SNSService {
-
-  @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: ActionPlanEvent) {
     when (event.type) {
       ActionPlanEventType.SUBMITTED -> {
@@ -41,8 +38,6 @@ class SNSActionPlanService(
 class SNSReferralService(
   private val snsPublisher: SNSPublisher,
 ) : ApplicationListener<ReferralEvent>, SNSService {
-
-  @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: ReferralEvent) {
     when (event.type) {
       ReferralEventType.SENT -> {
@@ -73,8 +68,6 @@ class SNSReferralService(
 class SNSAppointmentService(
   private val snsPublisher: SNSPublisher,
 ) : ApplicationListener<AppointmentEvent>, SNSService {
-
-  @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: AppointmentEvent) {
     when (event.type) {
       AppointmentEventType.ATTENDANCE_RECORDED -> {
