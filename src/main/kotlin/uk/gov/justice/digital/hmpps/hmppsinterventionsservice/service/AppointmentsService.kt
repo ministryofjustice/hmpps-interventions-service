@@ -6,10 +6,12 @@ import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlanAppointment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanAppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -23,6 +25,7 @@ class AppointmentsService(
   val actionPlanAppointmentRepository: ActionPlanAppointmentRepository,
   val actionPlanRepository: ActionPlanRepository,
   val authUserRepository: AuthUserRepository,
+  val appointmentRepository: AppointmentRepository,
   val appointmentEventPublisher: AppointmentEventPublisher,
   val communityAPIBookingService: CommunityAPIBookingService,
 ) {
@@ -39,10 +42,11 @@ class AppointmentsService(
     val appointment = ActionPlanAppointment(
       id = UUID.randomUUID(),
       sessionNumber = sessionNumber,
-      appointmentTime = appointmentTime,
-      durationInMinutes = durationInMinutes,
-      createdBy = authUserRepository.save(createdByUser),
-      createdAt = OffsetDateTime.now(),
+      appointment = appointmentRepository.save(Appointment(id = UUID.randomUUID(), appointmentTime = appointmentTime,
+        durationInMinutes = durationInMinutes,
+        createdBy = authUserRepository.save(createdByUser),
+        createdAt = OffsetDateTime.now())),
+
       actionPlan = actionPlan,
     )
 
@@ -65,7 +69,7 @@ class AppointmentsService(
 
     val appointment = getActionPlanAppointmentOrThrowException(actionPlanId, sessionNumber)
     communityAPIBookingService.book(appointment, appointmentTime, durationInMinutes)?.let {
-      appointment.deliusAppointmentId = it
+      appointment.appointment.deliusAppointmentId = it
     }
 
     mergeAppointment(appointment, appointmentTime, durationInMinutes)
@@ -80,7 +84,7 @@ class AppointmentsService(
   ): ActionPlanAppointment {
     val appointment = getActionPlanAppointmentOrThrowException(actionPlanId, sessionNumber)
 
-    if (appointment.sessionFeedbackSubmittedAt != null) {
+    if (appointment.appointment.sessionFeedbackSubmittedAt != null) {
       throw ResponseStatusException(HttpStatus.CONFLICT, "session feedback has already been submitted for this appointment")
     }
 
@@ -96,7 +100,7 @@ class AppointmentsService(
   ): ActionPlanAppointment {
     val appointment = getActionPlanAppointmentOrThrowException(actionPlanId, sessionNumber)
 
-    if (appointment.sessionFeedbackSubmittedAt != null) {
+    if (appointment.appointment.sessionFeedbackSubmittedAt != null) {
       throw ResponseStatusException(HttpStatus.CONFLICT, "session feedback has already been submitted for this appointment")
     }
 
@@ -107,20 +111,20 @@ class AppointmentsService(
   fun submitSessionFeedback(actionPlanId: UUID, sessionNumber: Int): ActionPlanAppointment {
     val appointment = getActionPlanAppointmentOrThrowException(actionPlanId, sessionNumber)
 
-    if (appointment.sessionFeedbackSubmittedAt != null) {
+    if (appointment.appointment.sessionFeedbackSubmittedAt != null) {
       throw ResponseStatusException(HttpStatus.CONFLICT, "session feedback has already been submitted for this appointment")
     }
 
-    if (appointment.attendanceSubmittedAt == null) {
+    if (appointment.appointment.attendanceSubmittedAt == null) {
       throw ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "can't submit session feedback unless attendance has been recorded")
     }
 
-    appointment.sessionFeedbackSubmittedAt = OffsetDateTime.now()
+    appointment.appointment.sessionFeedbackSubmittedAt = OffsetDateTime.now()
     actionPlanAppointmentRepository.save(appointment)
 
-    appointmentEventPublisher.attendanceRecordedEvent(appointment, appointment.attended == Attended.NO)
-    appointmentEventPublisher.behaviourRecordedEvent(appointment, appointment.notifyPPOfAttendanceBehaviour!!)
-    appointmentEventPublisher.sessionFeedbackRecordedEvent(appointment, appointment.notifyPPOfAttendanceBehaviour!!)
+    appointmentEventPublisher.attendanceRecordedEvent(appointment, appointment.appointment.attended == Attended.NO)
+    appointmentEventPublisher.behaviourRecordedEvent(appointment, appointment.appointment.notifyPPOfAttendanceBehaviour!!)
+    appointmentEventPublisher.sessionFeedbackRecordedEvent(appointment, appointment.appointment.notifyPPOfAttendanceBehaviour!!)
     return appointment
   }
 
@@ -137,9 +141,9 @@ class AppointmentsService(
     attended: Attended,
     additionalInformation: String?
   ) {
-    appointment.attended = attended
-    additionalInformation?.let { appointment.additionalAttendanceInformation = additionalInformation }
-    appointment.attendanceSubmittedAt = OffsetDateTime.now()
+    appointment.appointment.attended = attended
+    additionalInformation?.let { appointment.appointment.additionalAttendanceInformation = additionalInformation }
+    appointment.appointment.attendanceSubmittedAt = OffsetDateTime.now()
   }
 
   private fun setBehaviourFields(
@@ -147,9 +151,9 @@ class AppointmentsService(
     behaviour: String,
     notifyProbationPractitioner: Boolean,
   ) {
-    appointment.attendanceBehaviour = behaviour
-    appointment.attendanceBehaviourSubmittedAt = OffsetDateTime.now()
-    appointment.notifyPPOfAttendanceBehaviour = notifyProbationPractitioner
+    appointment.appointment.attendanceBehaviour = behaviour
+    appointment.appointment.attendanceBehaviourSubmittedAt = OffsetDateTime.now()
+    appointment.appointment.notifyPPOfAttendanceBehaviour = notifyProbationPractitioner
   }
 
   private fun checkAppointmentSessionIsNotDuplicate(actionPlanId: UUID, sessionNumber: Int) {
@@ -171,7 +175,7 @@ class AppointmentsService(
     appointmentTime: OffsetDateTime?,
     durationInMinutes: Int?
   ) {
-    appointmentTime?.let { appointment.appointmentTime = it }
-    durationInMinutes?.let { appointment.durationInMinutes = it }
+    appointmentTime?.let { appointment.appointment.appointmentTime = it }
+    durationInMinutes?.let { appointment.appointment.durationInMinutes = it }
   }
 }

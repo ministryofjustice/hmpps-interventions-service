@@ -45,7 +45,7 @@ class CommunityAPIBookingService(
 
       isRescheduleBooking(existingAppointment, appointmentTime, durationInMinutes) -> {
         val appointmentRequestDTO = buildAppointmentRescheduleRequestDTO(appointmentTime!!, durationInMinutes!!)
-        return makeBooking(referral.serviceUserCRN, existingAppointment.deliusAppointmentId!!, appointmentRequestDTO, communityApiRescheduleAppointmentLocation)
+        return makeBooking(referral.serviceUserCRN, existingAppointment.appointment.deliusAppointmentId!!, appointmentRequestDTO, communityApiRescheduleAppointmentLocation)
       }
 
       else -> {}
@@ -99,18 +99,18 @@ class CommunityAPIBookingService(
 
   fun isInitialBooking(existingAppointment: ActionPlanAppointment, appointmentTime: OffsetDateTime?, durationInMinutes: Int?): Boolean =
     isTimingSpecified(appointmentTime, durationInMinutes) &&
-      !isTimingSpecified(existingAppointment.appointmentTime, existingAppointment.durationInMinutes)
+      !isTimingSpecified(existingAppointment.appointment.appointmentTime, existingAppointment.appointment.durationInMinutes)
 
   fun isRescheduleBooking(existingAppointment: ActionPlanAppointment, appointmentTime: OffsetDateTime?, durationInMinutes: Int?): Boolean =
     isTimingSpecified(appointmentTime, durationInMinutes) &&
-      isTimingSpecified(existingAppointment.appointmentTime, existingAppointment.durationInMinutes) &&
+      isTimingSpecified(existingAppointment.appointment.appointmentTime, existingAppointment.appointment.durationInMinutes) &&
       isDifferentTimings(existingAppointment, appointmentTime!!, durationInMinutes!!)
 
   fun isTimingSpecified(appointmentTime: OffsetDateTime?, durationInMinutes: Int?): Boolean =
     appointmentTime != null && durationInMinutes != null
 
   fun isDifferentTimings(existingAppointment: ActionPlanAppointment, appointmentTime: OffsetDateTime, durationInMinutes: Int): Boolean =
-    !existingAppointment.appointmentTime!!.isEqual(appointmentTime) || existingAppointment.durationInMinutes != durationInMinutes
+    !existingAppointment.appointment.appointmentTime!!.isEqual(appointmentTime) || existingAppointment.appointment.durationInMinutes != durationInMinutes
 }
 
 abstract class AppointmentRequestDTO

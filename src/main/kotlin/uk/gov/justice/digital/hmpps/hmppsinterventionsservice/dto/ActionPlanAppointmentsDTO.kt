@@ -45,16 +45,16 @@ data class ActionPlanAppointmentDTO(
       return ActionPlanAppointmentDTO(
         id = appointment.id,
         sessionNumber = appointment.sessionNumber,
-        appointmentTime = appointment.appointmentTime,
-        durationInMinutes = appointment.durationInMinutes,
-        createdAt = appointment.createdAt,
-        createdBy = AuthUserDTO.from(appointment.createdBy),
+        appointmentTime = appointment.appointment.appointmentTime,
+        durationInMinutes = appointment.appointment.durationInMinutes,
+        createdAt = appointment.appointment.createdAt,
+        createdBy = AuthUserDTO.from(appointment.appointment.createdBy),
         sessionFeedback = SessionFeedbackDTO.from(
-          appointment.attended,
-          appointment.additionalAttendanceInformation,
-          appointment.attendanceBehaviour,
-          appointment.notifyPPOfAttendanceBehaviour,
-          appointment.attendanceSubmittedAt != null,
+          appointment.appointment.attended,
+          appointment.appointment.additionalAttendanceInformation,
+          appointment.appointment.attendanceBehaviour,
+          appointment.appointment.notifyPPOfAttendanceBehaviour,
+          appointment.appointment.attendanceSubmittedAt != null,
         ),
       )
     }
