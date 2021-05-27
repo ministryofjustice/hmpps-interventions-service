@@ -40,7 +40,7 @@ class ReferralConcluder(
     val hasActionPlan = nonNull(referral.actionPlan)
 
     val numberOfAttendedAppointments = referral.actionPlan?.let {
-      actionPlanAppointmentRepository.countByActionPlanIdAndAttendedIsNotNull(it.id)
+      actionPlanAppointmentRepository.countByActionPlanIdAndAppointmentAttendedIsNotNull(it.id)
     } ?: 0
     val hasAttendedNoAppointments = numberOfAttendedAppointments == 0
 
