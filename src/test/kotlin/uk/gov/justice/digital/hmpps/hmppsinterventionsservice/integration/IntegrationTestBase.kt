@@ -7,7 +7,9 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanAppointmentRepository
+
+//import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanAppointmentRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.SetupAssistant
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
@@ -21,6 +23,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.NPS
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceProviderRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SupplierAssessmentAppointmentRepository
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("test", "local")
@@ -33,7 +36,7 @@ abstract class IntegrationTestBase {
 
   @Autowired protected lateinit var referralRepository: ReferralRepository
   @Autowired protected lateinit var actionPlanRepository: ActionPlanRepository
-  @Autowired protected lateinit var actionPlanAppointmentRepository: ActionPlanAppointmentRepository
+  @Autowired protected lateinit var supplierAssessmentAppointmentRepository: SupplierAssessmentAppointmentRepository
   @Autowired protected lateinit var authUserRepository: AuthUserRepository
   @Autowired protected lateinit var interventionRepository: InterventionRepository
   @Autowired protected lateinit var serviceCategoryRepository: ServiceCategoryRepository
@@ -54,7 +57,7 @@ abstract class IntegrationTestBase {
       referralRepository,
       interventionRepository,
       actionPlanRepository,
-      actionPlanAppointmentRepository,
+      supplierAssessmentAppointmentRepository,
       serviceCategoryRepository,
       serviceProviderRepository,
       npsRegionRepository,

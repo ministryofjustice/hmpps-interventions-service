@@ -49,7 +49,7 @@ class CommunityAPIAppointmentEventServiceTest {
   private val appointmentEvent = AppointmentEvent(
     "source",
     SESSION_FEEDBACK_RECORDED,
-    SampleData.sampleActionPlanAppointment(
+    SampleData.sampleSupplierAssessmentAppointment(
       id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
       actionPlan = SampleData.sampleActionPlan(),
       sessionNumber = 1,

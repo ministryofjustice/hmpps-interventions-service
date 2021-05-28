@@ -4,7 +4,6 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
@@ -28,12 +27,12 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Cancell
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanAppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SupplierAssessmentAppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.CancellationReasonFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ContractTypeFactory
@@ -53,7 +52,7 @@ class ReferralServiceUnitTest {
   private val referralConcluder: ReferralConcluder = mock()
   private val referralReferenceGenerator: ReferralReferenceGenerator = mock()
   private val cancellationReasonRepository: CancellationReasonRepository = mock()
-  private val actionPlanAppointmentRepository: ActionPlanAppointmentRepository = mock()
+  private val supplierAssessmentAppointmentRepository: SupplierAssessmentAppointmentRepository = mock()
   private val serviceCategoryRepository: ServiceCategoryRepository = mock()
   private val referralAccessChecker: ReferralAccessChecker = mock()
   private val serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper = mock()
@@ -74,7 +73,7 @@ class ReferralServiceUnitTest {
   private val referralService = ReferralService(
     referralRepository, authUserRepository, interventionRepository, referralConcluder,
     referralEventPublisher, referralReferenceGenerator, cancellationReasonRepository,
-    actionPlanAppointmentRepository, serviceCategoryRepository, referralAccessChecker, userTypeChecker,
+    supplierAssessmentAppointmentRepository, serviceCategoryRepository, referralAccessChecker, userTypeChecker,
     serviceProviderAccessScopeMapper, referralAccessFilter, communityAPIReferralService, serviceUserAccessChecker,
     assessRisksAndNeedsService,
   )

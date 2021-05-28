@@ -18,7 +18,7 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
   val interventionRepository: InterventionRepository,
   val referralRepository: ReferralRepository,
   val actionPlanRepository: ActionPlanRepository,
-  val actionPlanAppointmentRepository: ActionPlanAppointmentRepository,
+  val supplierAssessmentAppointmentRepository: SupplierAssessmentAppointmentRepository,
   val authUserRepository: AuthUserRepository,
   val endOfServiceReportRepository: EndOfServiceReportRepository,
   val appointmentRepository: AppointmentRepository,
@@ -31,7 +31,7 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
 
   @BeforeEach
   fun setup() {
-    actionPlanAppointmentRepository.deleteAll()
+    supplierAssessmentAppointmentRepository.deleteAll()
     actionPlanRepository.deleteAll()
     endOfServiceReportRepository.deleteAll()
     referralRepository.deleteAll()

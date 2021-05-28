@@ -28,7 +28,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Desired
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanAppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
@@ -36,6 +35,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.End
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SupplierAssessmentAppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ContractTypeFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFrameworkContractFactory
@@ -57,7 +57,7 @@ class ReferralServiceTest @Autowired constructor(
   val authUserRepository: AuthUserRepository,
   val interventionRepository: InterventionRepository,
   val cancellationReasonRepository: CancellationReasonRepository,
-  val actionPlanAppointmentRepository: ActionPlanAppointmentRepository,
+  val supplierAssessmentAppointmentRepository: SupplierAssessmentAppointmentRepository,
   val actionPlanRepository: ActionPlanRepository,
   val endOfServiceReportRepository: EndOfServiceReportRepository,
   val serviceCategoryRepository: ServiceCategoryRepository,
@@ -92,7 +92,7 @@ class ReferralServiceTest @Autowired constructor(
     referralEventPublisher,
     referenceGenerator,
     cancellationReasonRepository,
-    actionPlanAppointmentRepository,
+    supplierAssessmentAppointmentRepository,
     serviceCategoryRepository,
     referralAccessChecker,
     userTypeChecker,

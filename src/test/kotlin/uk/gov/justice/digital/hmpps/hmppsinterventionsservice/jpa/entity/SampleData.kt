@@ -233,13 +233,13 @@ class SampleData {
       )
     }
 
-    fun sampleActionPlanAppointment(
+    fun sampleSupplierAssessmentAppointment(
       id: UUID = UUID.randomUUID(),
       actionPlan: ActionPlan,
       sessionNumber: Int = 1,
       appointment: Appointment = sampleAppointment(),
-    ): ActionPlanAppointment {
-      return ActionPlanAppointment(
+    ): SupplierAssessmentAppointment {
+      return SupplierAssessmentAppointment(
         id = id,
         actionPlan = actionPlan,
         sessionNumber = sessionNumber,

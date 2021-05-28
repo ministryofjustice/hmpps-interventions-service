@@ -7,13 +7,13 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData.Companion.persistIntervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData.Companion.sampleContract
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData.Companion.sampleIntervention
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanAppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.PCCRegionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SupplierAssessmentAppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ContractTypeFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.NPSRegionFactory
@@ -30,7 +30,7 @@ class InterventionServiceTest @Autowired constructor(
   val interventionRepository: InterventionRepository,
   val referralRepository: ReferralRepository,
   val actionPlanRepository: ActionPlanRepository,
-  val actionPlanAppointmentRepository: ActionPlanAppointmentRepository,
+  val supplierAssessmentAppointmentRepository: SupplierAssessmentAppointmentRepository,
   val authUserRepository: AuthUserRepository,
   val endOfServiceReportRepository: EndOfServiceReportRepository,
 ) {
@@ -44,7 +44,7 @@ class InterventionServiceTest @Autowired constructor(
 
   @BeforeEach
   fun setup() {
-    actionPlanAppointmentRepository.deleteAll()
+    supplierAssessmentAppointmentRepository.deleteAll()
     actionPlanRepository.deleteAll()
     endOfServiceReportRepository.deleteAll()
     referralRepository.deleteAll()
