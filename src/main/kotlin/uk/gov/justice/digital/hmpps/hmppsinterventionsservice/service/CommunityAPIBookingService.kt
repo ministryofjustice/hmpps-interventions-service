@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.CommunityAPIClient
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlanAppointment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessmentAppointment
 import java.time.OffsetDateTime
 import java.util.UUID
 import javax.transaction.Transactional
@@ -25,7 +25,7 @@ class CommunityAPIBookingService(
 ) : CommunityAPIService {
   companion object : KLogging()
 
-  fun book(existingAppointment: ActionPlanAppointment, appointmentTime: OffsetDateTime?, durationInMinutes: Int?): Long? {
+  fun book(existingAppointment: SupplierAssessmentAppointment, appointmentTime: OffsetDateTime?, durationInMinutes: Int?): Long? {
     if (!bookingsEnabled) {
       return null
     }
@@ -33,7 +33,7 @@ class CommunityAPIBookingService(
     return processingBooking(existingAppointment, appointmentTime, durationInMinutes)
   }
 
-  private fun processingBooking(existingAppointment: ActionPlanAppointment, appointmentTime: OffsetDateTime?, durationInMinutes: Int?): Long? {
+  private fun processingBooking(existingAppointment: SupplierAssessmentAppointment, appointmentTime: OffsetDateTime?, durationInMinutes: Int?): Long? {
 
     val referral = existingAppointment.actionPlan.referral
 
@@ -66,7 +66,7 @@ class CommunityAPIBookingService(
     return response.appointmentId
   }
 
-  private fun buildAppointmentCreateRequestDTO(appointment: ActionPlanAppointment, appointmentTime: OffsetDateTime, durationInMinutes: Int): AppointmentCreateRequestDTO {
+  private fun buildAppointmentCreateRequestDTO(appointment: SupplierAssessmentAppointment, appointmentTime: OffsetDateTime, durationInMinutes: Int): AppointmentCreateRequestDTO {
     val resourceUrl = buildReferralResourceUrl(appointment)
 
     return AppointmentCreateRequestDTO(
@@ -90,18 +90,18 @@ class CommunityAPIBookingService(
     )
   }
 
-  private fun buildReferralResourceUrl(existingAppointment: ActionPlanAppointment): String {
+  private fun buildReferralResourceUrl(existingAppointment: SupplierAssessmentAppointment): String {
     return UriComponentsBuilder.fromHttpUrl(interventionsUIBaseURL)
       .path(interventionsUIViewAppointment)
       .buildAndExpand(existingAppointment.actionPlan.referral.id)
       .toString()
   }
 
-  fun isInitialBooking(existingAppointment: ActionPlanAppointment, appointmentTime: OffsetDateTime?, durationInMinutes: Int?): Boolean =
+  fun isInitialBooking(existingAppointment: SupplierAssessmentAppointment, appointmentTime: OffsetDateTime?, durationInMinutes: Int?): Boolean =
     isTimingSpecified(appointmentTime, durationInMinutes) &&
       !isTimingSpecified(existingAppointment.appointment.appointmentTime, existingAppointment.appointment.durationInMinutes)
 
-  fun isRescheduleBooking(existingAppointment: ActionPlanAppointment, appointmentTime: OffsetDateTime?, durationInMinutes: Int?): Boolean =
+  fun isRescheduleBooking(existingAppointment: SupplierAssessmentAppointment, appointmentTime: OffsetDateTime?, durationInMinutes: Int?): Boolean =
     isTimingSpecified(appointmentTime, durationInMinutes) &&
       isTimingSpecified(existingAppointment.appointment.appointmentTime, existingAppointment.appointment.durationInMinutes) &&
       isDifferentTimings(existingAppointment, appointmentTime!!, durationInMinutes!!)
@@ -109,7 +109,7 @@ class CommunityAPIBookingService(
   fun isTimingSpecified(appointmentTime: OffsetDateTime?, durationInMinutes: Int?): Boolean =
     appointmentTime != null && durationInMinutes != null
 
-  fun isDifferentTimings(existingAppointment: ActionPlanAppointment, appointmentTime: OffsetDateTime, durationInMinutes: Int): Boolean =
+  fun isDifferentTimings(existingAppointment: SupplierAssessmentAppointment, appointmentTime: OffsetDateTime, durationInMinutes: Int): Boolean =
     !existingAppointment.appointment.appointmentTime!!.isEqual(appointmentTime) || existingAppointment.appointment.durationInMinutes != durationInMinutes
 }
 

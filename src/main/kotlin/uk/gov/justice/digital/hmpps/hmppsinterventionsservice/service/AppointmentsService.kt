@@ -5,14 +5,14 @@ import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlanAppointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanAppointmentRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessmentAppointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SupplierAssessmentAppointmentRepository
 import java.time.OffsetDateTime
 import java.util.UUID
 import javax.persistence.EntityExistsException
@@ -22,7 +22,7 @@ import javax.transaction.Transactional
 @Service
 @Transactional
 class AppointmentsService(
-  val actionPlanAppointmentRepository: ActionPlanAppointmentRepository,
+  val supplierAssessmentAppointmentRepository: SupplierAssessmentAppointmentRepository,
   val actionPlanRepository: ActionPlanRepository,
   val authUserRepository: AuthUserRepository,
   val appointmentRepository: AppointmentRepository,
@@ -35,11 +35,11 @@ class AppointmentsService(
     appointmentTime: OffsetDateTime?,
     durationInMinutes: Int?,
     createdByUser: AuthUser,
-  ): ActionPlanAppointment {
+  ): SupplierAssessmentAppointment {
     val actionPlanId = actionPlan.id
     checkAppointmentSessionIsNotDuplicate(actionPlanId, sessionNumber)
 
-    val appointment = ActionPlanAppointment(
+    val appointment = SupplierAssessmentAppointment(
       id = UUID.randomUUID(),
       sessionNumber = sessionNumber,
       appointment = appointmentRepository.save(
@@ -54,7 +54,7 @@ class AppointmentsService(
       actionPlan = actionPlan,
     )
 
-    return actionPlanAppointmentRepository.save(appointment)
+    return supplierAssessmentAppointmentRepository.save(appointment)
   }
 
   fun createUnscheduledAppointmentsForActionPlan(submittedActionPlan: ActionPlan, actionPlanSubmitter: AuthUser) {
@@ -69,7 +69,7 @@ class AppointmentsService(
     sessionNumber: Int,
     appointmentTime: OffsetDateTime?,
     durationInMinutes: Int?
-  ): ActionPlanAppointment {
+  ): SupplierAssessmentAppointment {
 
     val appointment = getActionPlanAppointmentOrThrowException(actionPlanId, sessionNumber)
     communityAPIBookingService.book(appointment, appointmentTime, durationInMinutes)?.let {
@@ -77,7 +77,7 @@ class AppointmentsService(
     }
 
     mergeAppointment(appointment, appointmentTime, durationInMinutes)
-    return actionPlanAppointmentRepository.save(appointment)
+    return supplierAssessmentAppointmentRepository.save(appointment)
   }
 
   fun recordAttendance(
@@ -85,7 +85,7 @@ class AppointmentsService(
     sessionNumber: Int,
     attended: Attended,
     additionalInformation: String?
-  ): ActionPlanAppointment {
+  ): SupplierAssessmentAppointment {
     val appointment = getActionPlanAppointmentOrThrowException(actionPlanId, sessionNumber)
 
     if (appointment.appointment.sessionFeedbackSubmittedAt != null) {
@@ -93,7 +93,7 @@ class AppointmentsService(
     }
 
     setAttendanceFields(appointment, attended, additionalInformation)
-    return actionPlanAppointmentRepository.save(appointment)
+    return supplierAssessmentAppointmentRepository.save(appointment)
   }
 
   fun recordBehaviour(
@@ -101,7 +101,7 @@ class AppointmentsService(
     sessionNumber: Int,
     behaviourDescription: String,
     notifyProbationPractitioner: Boolean,
-  ): ActionPlanAppointment {
+  ): SupplierAssessmentAppointment {
     val appointment = getActionPlanAppointmentOrThrowException(actionPlanId, sessionNumber)
 
     if (appointment.appointment.sessionFeedbackSubmittedAt != null) {
@@ -109,10 +109,10 @@ class AppointmentsService(
     }
 
     setBehaviourFields(appointment, behaviourDescription, notifyProbationPractitioner)
-    return actionPlanAppointmentRepository.save(appointment)
+    return supplierAssessmentAppointmentRepository.save(appointment)
   }
 
-  fun submitSessionFeedback(actionPlanId: UUID, sessionNumber: Int): ActionPlanAppointment {
+  fun submitSessionFeedback(actionPlanId: UUID, sessionNumber: Int): SupplierAssessmentAppointment {
     val appointment = getActionPlanAppointmentOrThrowException(actionPlanId, sessionNumber)
 
     if (appointment.appointment.sessionFeedbackSubmittedAt != null) {
@@ -124,7 +124,7 @@ class AppointmentsService(
     }
 
     appointment.appointment.sessionFeedbackSubmittedAt = OffsetDateTime.now()
-    actionPlanAppointmentRepository.save(appointment)
+    supplierAssessmentAppointmentRepository.save(appointment)
 
     appointmentEventPublisher.attendanceRecordedEvent(appointment, appointment.appointment.attended == Attended.NO)
     appointmentEventPublisher.behaviourRecordedEvent(appointment, appointment.appointment.notifyPPOfAttendanceBehaviour!!)
@@ -132,16 +132,16 @@ class AppointmentsService(
     return appointment
   }
 
-  fun getAppointments(actionPlanId: UUID): List<ActionPlanAppointment> {
-    return actionPlanAppointmentRepository.findAllByActionPlanId(actionPlanId)
+  fun getAppointments(actionPlanId: UUID): List<SupplierAssessmentAppointment> {
+    return supplierAssessmentAppointmentRepository.findAllByActionPlanId(actionPlanId)
   }
 
-  fun getAppointment(actionPlanId: UUID, sessionNumber: Int): ActionPlanAppointment {
+  fun getAppointment(actionPlanId: UUID, sessionNumber: Int): SupplierAssessmentAppointment {
     return getActionPlanAppointmentOrThrowException(actionPlanId, sessionNumber)
   }
 
   private fun setAttendanceFields(
-    appointment: ActionPlanAppointment,
+    appointment: SupplierAssessmentAppointment,
     attended: Attended,
     additionalInformation: String?
   ) {
@@ -151,7 +151,7 @@ class AppointmentsService(
   }
 
   private fun setBehaviourFields(
-    appointment: ActionPlanAppointment,
+    appointment: SupplierAssessmentAppointment,
     behaviour: String,
     notifyProbationPractitioner: Boolean,
   ) {
@@ -166,16 +166,16 @@ class AppointmentsService(
     }
   }
 
-  private fun getActionPlanAppointmentOrThrowException(actionPlanId: UUID, sessionNumber: Int): ActionPlanAppointment =
+  private fun getActionPlanAppointmentOrThrowException(actionPlanId: UUID, sessionNumber: Int): SupplierAssessmentAppointment =
 
     getActionPlanAppointment(actionPlanId, sessionNumber)
       ?: throw EntityNotFoundException("Action plan appointment not found [id=$actionPlanId, sessionNumber=$sessionNumber]")
 
   private fun getActionPlanAppointment(actionPlanId: UUID, sessionNumber: Int) =
-    actionPlanAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)
+    supplierAssessmentAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)
 
   private fun mergeAppointment(
-    appointment: ActionPlanAppointment,
+    appointment: SupplierAssessmentAppointment,
     appointmentTime: OffsetDateTime?,
     durationInMinutes: Int?
   ) {

@@ -5,17 +5,17 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanAppointmentFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAssessmentAppointmentFactory
 
 @RepositoryTest
-class ActionPlanAppointmentRepositoryTest @Autowired constructor(
+class SupplierAssessmentAppointmentRepositoryTest @Autowired constructor(
   val entityManager: TestEntityManager,
   val actionPlanRepository: ActionPlanRepository,
-  val actionPlanAppointmentRepository: ActionPlanAppointmentRepository,
+  val supplierAssessmentAppointmentRepository: SupplierAssessmentAppointmentRepository,
   val interventionRepository: InterventionRepository,
   val referralRepository: ReferralRepository,
   val authUserRepository: AuthUserRepository,
@@ -25,11 +25,11 @@ class ActionPlanAppointmentRepositoryTest @Autowired constructor(
   private val authUserFactory = AuthUserFactory(entityManager)
   private val referralFactory = ReferralFactory(entityManager)
   private val actionPlanFactory = ActionPlanFactory(entityManager)
-  private val actionPlanAppointmentFactory = ActionPlanAppointmentFactory(entityManager)
+  private val actionPlanAppointmentFactory = SupplierAssessmentAppointmentFactory(entityManager)
 
   @BeforeEach
   fun setup() {
-    actionPlanAppointmentRepository.deleteAll()
+    supplierAssessmentAppointmentRepository.deleteAll()
     actionPlanRepository.deleteAll()
     endOfServiceReportRepository.deleteAll()
     referralRepository.deleteAll()
@@ -48,7 +48,7 @@ class ActionPlanAppointmentRepositoryTest @Autowired constructor(
     entityManager.flush()
     entityManager.clear()
 
-    val savedAppointment = actionPlanAppointmentRepository.findById(actionPlanAppointment.id).get()
+    val savedAppointment = supplierAssessmentAppointmentRepository.findById(actionPlanAppointment.id).get()
 
     assertThat(savedAppointment.id).isEqualTo(actionPlanAppointment.id)
   }
@@ -62,7 +62,7 @@ class ActionPlanAppointmentRepositoryTest @Autowired constructor(
     val actionPlan2 = actionPlanFactory.create()
     actionPlanAppointmentFactory.createAttended(actionPlan = actionPlan2)
 
-    assertThat(actionPlanAppointmentRepository.countByActionPlanIdAndAppointmentAttendedIsNotNull(actionPlan1.id)).isEqualTo(4)
-    assertThat(actionPlanAppointmentRepository.countByActionPlanIdAndAppointmentAttendedIsNotNull(actionPlan2.id)).isEqualTo(1)
+    assertThat(supplierAssessmentAppointmentRepository.countByActionPlanIdAndAppointmentAttendedIsNotNull(actionPlan1.id)).isEqualTo(4)
+    assertThat(supplierAssessmentAppointmentRepository.countByActionPlanIdAndAppointmentAttendedIsNotNull(actionPlan2.id)).isEqualTo(1)
   }
 }

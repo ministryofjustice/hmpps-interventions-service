@@ -16,13 +16,13 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers
 import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEventPublisher
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlanAppointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanAppointmentRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessmentAppointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SupplierAssessmentAppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import java.time.OffsetDateTime
 import java.util.Optional.of
@@ -33,7 +33,7 @@ import javax.persistence.EntityNotFoundException
 internal class AppointmentsServiceTest {
 
   private val actionPlanRepository: ActionPlanRepository = mock()
-  private val actionPlanAppointmentRepository: ActionPlanAppointmentRepository = mock()
+  private val supplierAssessmentAppointmentRepository: SupplierAssessmentAppointmentRepository = mock()
   private val authUserRepository: AuthUserRepository = mock()
   private val appointmentRepository: AppointmentRepository = mock()
   private val appointmentEventPublisher: AppointmentEventPublisher = mock()
@@ -41,7 +41,7 @@ internal class AppointmentsServiceTest {
   private val actionPlanFactory = ActionPlanFactory()
 
   private val appointmentsService = AppointmentsService(
-    actionPlanAppointmentRepository, actionPlanRepository,
+    supplierAssessmentAppointmentRepository, actionPlanRepository,
     authUserRepository, appointmentRepository, appointmentEventPublisher,
     communityAPIBookingService
   )
@@ -56,11 +56,11 @@ internal class AppointmentsServiceTest {
     val actionPlan = SampleData.sampleActionPlan(id = actionPlanId)
     val appointment = SampleData.sampleAppointment(createdBy = createdByUser)
 
-    whenever(actionPlanAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(null)
+    whenever(supplierAssessmentAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(null)
     whenever(authUserRepository.save(createdByUser)).thenReturn(createdByUser)
     whenever(actionPlanRepository.findById(actionPlanId)).thenReturn(of(actionPlan))
-    val savedAppointment = SampleData.sampleActionPlanAppointment(actionPlan = actionPlan, appointment = appointment)
-    whenever(actionPlanAppointmentRepository.save(any())).thenReturn(savedAppointment)
+    val savedAppointment = SampleData.sampleSupplierAssessmentAppointment(actionPlan = actionPlan, appointment = appointment)
+    whenever(supplierAssessmentAppointmentRepository.save(any())).thenReturn(savedAppointment)
     whenever(appointmentRepository.save(any())).thenReturn(appointment)
 
     val createdAppointment = appointmentsService.createAppointment(
@@ -77,21 +77,21 @@ internal class AppointmentsServiceTest {
   @Test
   fun `create unscheduled appointments creates one for each action plan session`() {
     val actionPlan = actionPlanFactory.create(numberOfSessions = 3)
-    whenever(actionPlanAppointmentRepository.findByActionPlanIdAndSessionNumber(eq(actionPlan.id), any())).thenReturn(null)
+    whenever(supplierAssessmentAppointmentRepository.findByActionPlanIdAndSessionNumber(eq(actionPlan.id), any())).thenReturn(null)
     whenever(authUserRepository.save(actionPlan.createdBy)).thenReturn(actionPlan.createdBy)
-    whenever(actionPlanAppointmentRepository.save(any())).thenAnswer { it.arguments[0] }
+    whenever(supplierAssessmentAppointmentRepository.save(any())).thenAnswer { it.arguments[0] }
     whenever(appointmentRepository.save(any())).thenReturn(SampleData.sampleAppointment())
 
     appointmentsService.createUnscheduledAppointmentsForActionPlan(actionPlan, actionPlan.createdBy)
-    verify(actionPlanAppointmentRepository, times(3)).save(any())
+    verify(supplierAssessmentAppointmentRepository, times(3)).save(any())
   }
 
   @Test
   fun `create unscheduled appointments throws exception if session already exists`() {
     val actionPlan = actionPlanFactory.create(numberOfSessions = 1)
-    whenever(actionPlanAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlan.id, 1))
+    whenever(supplierAssessmentAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlan.id, 1))
       .thenReturn(
-        SampleData.sampleActionPlanAppointment(
+        SampleData.sampleSupplierAssessmentAppointment(
           actionPlan = actionPlan,
           appointment = SampleData.sampleAppointment(createdBy = actionPlan.createdBy)
         )
@@ -110,11 +110,11 @@ internal class AppointmentsServiceTest {
     val durationInMinutes = 15
     val createdByUser = SampleData.sampleAuthUser()
     val actionPlan = SampleData.sampleActionPlan()
-    val actionPlanAppointment = SampleData.sampleActionPlanAppointment(actionPlan = actionPlan)
+    val actionPlanAppointment = SampleData.sampleSupplierAssessmentAppointment(actionPlan = actionPlan)
 
-    whenever(actionPlanAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(actionPlanAppointment)
+    whenever(supplierAssessmentAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(actionPlanAppointment)
     whenever(authUserRepository.save(createdByUser)).thenReturn(createdByUser)
-    whenever(actionPlanAppointmentRepository.save(any())).thenReturn(actionPlanAppointment)
+    whenever(supplierAssessmentAppointmentRepository.save(any())).thenReturn(actionPlanAppointment)
 
     val updatedAppointment = appointmentsService.updateAppointment(
       actionPlanId,
@@ -134,12 +134,12 @@ internal class AppointmentsServiceTest {
     val durationInMinutes = 15
     val createdByUser = SampleData.sampleAuthUser()
     val actionPlan = SampleData.sampleActionPlan()
-    val actionPlanAppointment = SampleData.sampleActionPlanAppointment(actionPlan = actionPlan)
+    val actionPlanAppointment = SampleData.sampleSupplierAssessmentAppointment(actionPlan = actionPlan)
 
     whenever(communityAPIBookingService.book(actionPlanAppointment, appointmentTime, durationInMinutes)).thenReturn(999L)
-    whenever(actionPlanAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(actionPlanAppointment)
+    whenever(supplierAssessmentAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(actionPlanAppointment)
     whenever(authUserRepository.save(createdByUser)).thenReturn(createdByUser)
-    whenever(actionPlanAppointmentRepository.save(any())).thenReturn(actionPlanAppointment)
+    whenever(supplierAssessmentAppointmentRepository.save(any())).thenReturn(actionPlanAppointment)
 
     val updatedAppointment = appointmentsService.updateAppointment(
       actionPlanId,
@@ -150,7 +150,7 @@ internal class AppointmentsServiceTest {
 
     assertThat(updatedAppointment).isEqualTo(actionPlanAppointment)
     verify(communityAPIBookingService).book(actionPlanAppointment, appointmentTime, durationInMinutes)
-    verify(actionPlanAppointmentRepository).save(
+    verify(supplierAssessmentAppointmentRepository).save(
       ArgumentMatchers.argThat { (
         _, _, _, appointmentArg,
       ) ->
@@ -169,12 +169,12 @@ internal class AppointmentsServiceTest {
     val durationInMinutes = 15
     val createdByUser = SampleData.sampleAuthUser()
     val actionPlan = SampleData.sampleActionPlan()
-    val actionPlanAppointment = SampleData.sampleActionPlanAppointment(actionPlan = actionPlan)
+    val actionPlanAppointment = SampleData.sampleSupplierAssessmentAppointment(actionPlan = actionPlan)
 
     whenever(communityAPIBookingService.book(actionPlanAppointment, appointmentTime, durationInMinutes)).thenReturn(null)
-    whenever(actionPlanAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(actionPlanAppointment)
+    whenever(supplierAssessmentAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(actionPlanAppointment)
     whenever(authUserRepository.save(createdByUser)).thenReturn(createdByUser)
-    whenever(actionPlanAppointmentRepository.save(any())).thenReturn(actionPlanAppointment)
+    whenever(supplierAssessmentAppointmentRepository.save(any())).thenReturn(actionPlanAppointment)
 
     appointmentsService.updateAppointment(
       actionPlanId,
@@ -183,7 +183,7 @@ internal class AppointmentsServiceTest {
       durationInMinutes
     )
 
-    verify(actionPlanAppointmentRepository).save(
+    verify(supplierAssessmentAppointmentRepository).save(
       ArgumentMatchers.argThat { (
         _, _, _, appointmentArg
       ) ->
@@ -201,7 +201,7 @@ internal class AppointmentsServiceTest {
     val appointmentTime = OffsetDateTime.now()
     val durationInMinutes = 15
 
-    whenever(actionPlanAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(null)
+    whenever(supplierAssessmentAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(null)
 
     val exception = assertThrows(EntityNotFoundException::class.java) {
       appointmentsService.updateAppointment(
@@ -220,9 +220,9 @@ internal class AppointmentsServiceTest {
     val sessionNumber = 1
     val createdByUser = SampleData.sampleAuthUser()
     val actionPlan = SampleData.sampleActionPlan()
-    val actionPlanAppointment = SampleData.sampleActionPlanAppointment(actionPlan = actionPlan)
+    val actionPlanAppointment = SampleData.sampleSupplierAssessmentAppointment(actionPlan = actionPlan)
 
-    whenever(actionPlanAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(actionPlanAppointment)
+    whenever(supplierAssessmentAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(actionPlanAppointment)
 
     val actualAppointment = appointmentsService.getAppointment(actionPlanId, sessionNumber)
 
@@ -236,7 +236,7 @@ internal class AppointmentsServiceTest {
     val actionPlanId = UUID.randomUUID()
     val sessionNumber = 1
 
-    whenever(actionPlanAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(null)
+    whenever(supplierAssessmentAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(null)
 
     val exception = assertThrows(EntityNotFoundException::class.java) {
       appointmentsService.getAppointment(actionPlanId, sessionNumber)
@@ -248,9 +248,9 @@ internal class AppointmentsServiceTest {
   fun `gets all appointments for an action plan`() {
     val actionPlanId = UUID.randomUUID()
     val actionPlan = SampleData.sampleActionPlan()
-    val actionPlanAppointment = SampleData.sampleActionPlanAppointment(actionPlan = actionPlan)
+    val actionPlanAppointment = SampleData.sampleSupplierAssessmentAppointment(actionPlan = actionPlan)
 
-    whenever(actionPlanAppointmentRepository.findAllByActionPlanId(actionPlanId)).thenReturn(listOf(actionPlanAppointment))
+    whenever(supplierAssessmentAppointmentRepository.findAllByActionPlanId(actionPlanId)).thenReturn(listOf(actionPlanAppointment))
 
     val appointments = appointmentsService.getAppointments(actionPlanId)
 
@@ -267,17 +267,17 @@ internal class AppointmentsServiceTest {
     val additionalInformation = "extra info"
     val actionPlan = SampleData.sampleActionPlan()
 
-    val existingAppointment = SampleData.sampleActionPlanAppointment(actionPlan = actionPlan)
+    val existingAppointment = SampleData.sampleSupplierAssessmentAppointment(actionPlan = actionPlan)
 
-    whenever(actionPlanAppointmentRepository.findByActionPlanIdAndSessionNumber(appointmentId, sessionNumber))
+    whenever(supplierAssessmentAppointmentRepository.findByActionPlanIdAndSessionNumber(appointmentId, sessionNumber))
       .thenReturn(existingAppointment)
-    whenever(actionPlanAppointmentRepository.save(any())).thenReturn(existingAppointment)
+    whenever(supplierAssessmentAppointmentRepository.save(any())).thenReturn(existingAppointment)
 
     val savedAppointment = appointmentsService.recordAttendance(appointmentId, 1, attended, additionalInformation)
-    val argumentCaptor: ArgumentCaptor<ActionPlanAppointment> = ArgumentCaptor.forClass(ActionPlanAppointment::class.java)
+    val argumentCaptor: ArgumentCaptor<SupplierAssessmentAppointment> = ArgumentCaptor.forClass(SupplierAssessmentAppointment::class.java)
 
 //    verify(appointmentEventPublisher).appointmentNotAttendedEvent(existingAppointment)
-    verify(actionPlanAppointmentRepository).save(argumentCaptor.capture())
+    verify(supplierAssessmentAppointmentRepository).save(argumentCaptor.capture())
     assertThat(argumentCaptor.firstValue.appointment.attended).isEqualTo(attended)
     assertThat(argumentCaptor.firstValue.appointment.additionalAttendanceInformation).isEqualTo(additionalInformation)
     assertThat(argumentCaptor.firstValue.appointment.attendanceSubmittedAt).isNotNull
@@ -291,7 +291,7 @@ internal class AppointmentsServiceTest {
     val attended = Attended.YES
     val additionalInformation = "extra info"
 
-    whenever(actionPlanAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber))
+    whenever(supplierAssessmentAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber))
       .thenReturn(null)
 
     val exception = assertThrows(EntityNotFoundException::class.java) {
@@ -304,15 +304,15 @@ internal class AppointmentsServiceTest {
   @Test
   fun `updating session behaviour sets relevant fields`() {
     val actionPlan = SampleData.sampleActionPlan()
-    val appointment = SampleData.sampleActionPlanAppointment(
+    val appointment = SampleData.sampleSupplierAssessmentAppointment(
       actionPlan = actionPlan,
       appointment = SampleData.sampleAppointment(createdBy = actionPlan.createdBy)
     )
-    whenever(actionPlanAppointmentRepository.findByActionPlanIdAndSessionNumber(any(), any())).thenReturn(appointment)
-    whenever(actionPlanAppointmentRepository.save(any())).thenReturn(appointment)
+    whenever(supplierAssessmentAppointmentRepository.findByActionPlanIdAndSessionNumber(any(), any())).thenReturn(appointment)
+    whenever(supplierAssessmentAppointmentRepository.save(any())).thenReturn(appointment)
     val updatedAppointment = appointmentsService.recordBehaviour(appointment.id, 1, "not good", false)
 
-    verify(actionPlanAppointmentRepository, times(1)).save(appointment)
+    verify(supplierAssessmentAppointmentRepository, times(1)).save(appointment)
     assertThat(updatedAppointment).isSameAs(appointment)
     assertThat(appointment.appointment.attendanceBehaviour).isEqualTo("not good")
     assertThat(appointment.appointment.notifyPPOfAttendanceBehaviour).isFalse
@@ -321,7 +321,7 @@ internal class AppointmentsServiceTest {
 
   @Test
   fun `updating session behaviour for missing appointment throws error`() {
-    whenever(actionPlanAppointmentRepository.findByActionPlanIdAndSessionNumber(any(), any())).thenReturn(null)
+    whenever(supplierAssessmentAppointmentRepository.findByActionPlanIdAndSessionNumber(any(), any())).thenReturn(null)
 
     assertThrows(EntityNotFoundException::class.java) {
       appointmentsService.recordBehaviour(UUID.randomUUID(), 1, "not good", false)
@@ -331,12 +331,12 @@ internal class AppointmentsServiceTest {
   @Test
   fun `session feedback cant be submitted more than once`() {
     val actionPlan = SampleData.sampleActionPlan()
-    val appointment = SampleData.sampleActionPlanAppointment(
+    val appointment = SampleData.sampleSupplierAssessmentAppointment(
       actionPlan = actionPlan,
       appointment = SampleData.sampleAppointment(createdBy = actionPlan.createdBy)
     )
-    whenever(actionPlanAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlan.id, 1)).thenReturn(appointment)
-    whenever(actionPlanAppointmentRepository.save(any())).thenReturn(appointment)
+    whenever(supplierAssessmentAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlan.id, 1)).thenReturn(appointment)
+    whenever(supplierAssessmentAppointmentRepository.save(any())).thenReturn(appointment)
 
     appointmentsService.recordAttendance(actionPlan.id, 1, Attended.YES, "")
     appointmentsService.recordBehaviour(actionPlan.id, 1, "bad", false)
@@ -350,12 +350,12 @@ internal class AppointmentsServiceTest {
   @Test
   fun `session feedback cant be submitted if attendance is missing`() {
     val actionPlan = SampleData.sampleActionPlan()
-    val appointment = SampleData.sampleActionPlanAppointment(
+    val appointment = SampleData.sampleSupplierAssessmentAppointment(
       actionPlan = actionPlan,
       appointment = SampleData.sampleAppointment(createdBy = actionPlan.createdBy)
     )
-    whenever(actionPlanAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlan.id, 1)).thenReturn(appointment)
-    whenever(actionPlanAppointmentRepository.save(any())).thenReturn(appointment)
+    whenever(supplierAssessmentAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlan.id, 1)).thenReturn(appointment)
+    whenever(supplierAssessmentAppointmentRepository.save(any())).thenReturn(appointment)
 
     appointmentsService.recordBehaviour(actionPlan.id, 1, "bad", false)
 
@@ -367,21 +367,21 @@ internal class AppointmentsServiceTest {
   @Test
   fun `session feedback can be submitted and stores timestamp and emits application events`() {
     val actionPlan = SampleData.sampleActionPlan()
-    val appointment = SampleData.sampleActionPlanAppointment(
+    val appointment = SampleData.sampleSupplierAssessmentAppointment(
       actionPlan = actionPlan,
       appointment = SampleData.sampleAppointment(createdBy = actionPlan.createdBy)
     )
-    whenever(actionPlanAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlan.id, 1)).thenReturn(
+    whenever(supplierAssessmentAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlan.id, 1)).thenReturn(
       appointment
     )
-    whenever(actionPlanAppointmentRepository.save(any())).thenReturn(appointment)
+    whenever(supplierAssessmentAppointmentRepository.save(any())).thenReturn(appointment)
 
     appointmentsService.recordAttendance(actionPlan.id, 1, Attended.YES, "")
     appointmentsService.recordBehaviour(actionPlan.id, 1, "bad", true)
     appointmentsService.submitSessionFeedback(actionPlan.id, 1)
 
-    val appointmentCaptor = argumentCaptor<ActionPlanAppointment>()
-    verify(actionPlanAppointmentRepository, atLeastOnce()).save(appointmentCaptor.capture())
+    val appointmentCaptor = argumentCaptor<SupplierAssessmentAppointment>()
+    verify(supplierAssessmentAppointmentRepository, atLeastOnce()).save(appointmentCaptor.capture())
     appointmentCaptor.allValues.forEach {
       if (it == appointmentCaptor.lastValue) {
         assertThat(it.appointment.sessionFeedbackSubmittedAt != null)
@@ -398,12 +398,12 @@ internal class AppointmentsServiceTest {
   @Test
   fun `attendance can't be updated once session feedback has been submitted`() {
     val actionPlan = SampleData.sampleActionPlan()
-    val appointment = SampleData.sampleActionPlanAppointment(
+    val appointment = SampleData.sampleSupplierAssessmentAppointment(
       actionPlan = actionPlan,
       appointment = SampleData.sampleAppointment(createdBy = actionPlan.createdBy)
     )
     appointment.appointment.sessionFeedbackSubmittedAt = OffsetDateTime.now()
-    whenever(actionPlanAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlan.id, 1)).thenReturn(appointment)
+    whenever(supplierAssessmentAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlan.id, 1)).thenReturn(appointment)
 
     assertThrows(ResponseStatusException::class.java) {
       appointmentsService.recordAttendance(actionPlan.id, 1, Attended.YES, "")
@@ -413,12 +413,12 @@ internal class AppointmentsServiceTest {
   @Test
   fun `behaviour can't be updated once session feedback has been submitted`() {
     val actionPlan = SampleData.sampleActionPlan()
-    val appointment = SampleData.sampleActionPlanAppointment(
+    val appointment = SampleData.sampleSupplierAssessmentAppointment(
       actionPlan = actionPlan,
       appointment = SampleData.sampleAppointment(createdBy = actionPlan.createdBy)
     )
     appointment.appointment.sessionFeedbackSubmittedAt = OffsetDateTime.now()
-    whenever(actionPlanAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlan.id, 1)).thenReturn(appointment)
+    whenever(supplierAssessmentAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlan.id, 1)).thenReturn(appointment)
 
     assertThrows(ResponseStatusException::class.java) {
       appointmentsService.recordBehaviour(actionPlan.id, 1, "bad", false)
