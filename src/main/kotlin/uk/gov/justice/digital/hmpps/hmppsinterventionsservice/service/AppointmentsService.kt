@@ -42,10 +42,14 @@ class AppointmentsService(
     val appointment = ActionPlanAppointment(
       id = UUID.randomUUID(),
       sessionNumber = sessionNumber,
-      appointment = appointmentRepository.save(Appointment(id = UUID.randomUUID(), appointmentTime = appointmentTime,
-        durationInMinutes = durationInMinutes,
-        createdBy = authUserRepository.save(createdByUser),
-        createdAt = OffsetDateTime.now())),
+      appointment = appointmentRepository.save(
+        Appointment(
+          id = UUID.randomUUID(), appointmentTime = appointmentTime,
+          durationInMinutes = durationInMinutes,
+          createdBy = authUserRepository.save(createdByUser),
+          createdAt = OffsetDateTime.now()
+        )
+      ),
 
       actionPlan = actionPlan,
     )

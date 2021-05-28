@@ -7,7 +7,7 @@ import org.hibernate.annotations.FetchMode
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.TypeDef
 import java.time.OffsetDateTime
-import java.util.*
+import java.util.UUID
 import javax.persistence.Entity
 import javax.persistence.EnumType
 import javax.persistence.Enumerated
@@ -19,7 +19,7 @@ import javax.validation.constraints.NotNull
 @Entity
 @Table(name = "appointment")
 @TypeDef(name = "attended", typeClass = PostgreSQLEnumType::class)
-data class Appointment (
+data class Appointment(
 // Attributes
   @Type(type = "attended")
   @Enumerated(EnumType.STRING)

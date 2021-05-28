@@ -237,20 +237,30 @@ class SampleData {
       id: UUID = UUID.randomUUID(),
       actionPlan: ActionPlan,
       sessionNumber: Int = 1,
-      appointmentTime: OffsetDateTime? = null,
-      durationInMinutes: Int? = null,
-      createdAt: OffsetDateTime = OffsetDateTime.now(),
-      createdBy: AuthUser,
-      attended: Attended? = null,
-      additionalAttendanceInformation: String? = null,
-      attendanceSubmittedAt: OffsetDateTime? = null,
-      notifyPPOfAttendanceBehaviour: Boolean? = null,
-      deliusAppointmentId: Long? = null
+      appointment: Appointment = sampleAppointment(),
     ): ActionPlanAppointment {
       return ActionPlanAppointment(
         id = id,
         actionPlan = actionPlan,
         sessionNumber = sessionNumber,
+        appointment = appointment,
+      )
+    }
+
+    fun sampleAppointment(
+      id: UUID = UUID.randomUUID(),
+      appointmentTime: OffsetDateTime? = null,
+      durationInMinutes: Int? = null,
+      createdAt: OffsetDateTime = OffsetDateTime.now(),
+      createdBy: AuthUser = sampleAuthUser(),
+      attended: Attended? = null,
+      additionalAttendanceInformation: String? = null,
+      attendanceSubmittedAt: OffsetDateTime? = null,
+      notifyPPOfAttendanceBehaviour: Boolean? = null,
+      deliusAppointmentId: Long? = null
+    ): Appointment {
+      return Appointment(
+        id = id,
         appointmentTime = appointmentTime,
         durationInMinutes = durationInMinutes,
         createdAt = createdAt,

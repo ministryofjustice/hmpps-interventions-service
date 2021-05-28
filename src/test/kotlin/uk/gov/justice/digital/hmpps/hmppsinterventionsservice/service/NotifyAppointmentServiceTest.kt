@@ -37,8 +37,10 @@ class NotifyAppointmentServiceTest {
             sentAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00"),
           ),
         ),
-        createdBy = SampleData.sampleAuthUser(),
-        attended = Attended.YES,
+        appointment = SampleData.sampleAppointment(
+          createdBy = SampleData.sampleAuthUser(),
+          attended = Attended.YES,
+        )
       ),
       "http://localhost:8080/appointment/42c7d267-0776-4272-a8e8-a673bfe30d0d",
       notifyPP,
