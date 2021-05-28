@@ -12,6 +12,7 @@ import org.springframework.context.ApplicationEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.LocationMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.LATE
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanAppointmentFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
 import java.net.URI
 import java.time.OffsetDateTime
 
@@ -64,9 +65,11 @@ class AppointmentEventPublisherTest {
   @Test
   fun `builds an appointment session feedback event and publishes it`() {
     val appointment = ActionPlanAppointmentFactory().create(
-      attended = LATE,
-      additionalAttendanceInformation = "Behaviour was fine",
-      attendanceSubmittedAt = OffsetDateTime.now()
+      appointment = AppointmentFactory().create(
+        attended = LATE,
+        additionalAttendanceInformation = "Behaviour was fine",
+        attendanceSubmittedAt = OffsetDateTime.now()
+      )
     )
 
     publisher.sessionFeedbackRecordedEvent(appointment, true)

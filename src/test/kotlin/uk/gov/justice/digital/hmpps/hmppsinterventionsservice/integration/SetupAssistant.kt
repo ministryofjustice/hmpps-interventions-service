@@ -5,6 +5,7 @@ import org.springframework.data.repository.findByIdOrNull
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlanActivity
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlanAppointment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
@@ -21,6 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Service
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanAppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ContractTypeRepository
@@ -62,6 +64,7 @@ class SetupAssistant(
   private val endOfServiceReportRepository: EndOfServiceReportRepository,
   private val cancellationReasonRepository: CancellationReasonRepository,
   private val contractTypeRepository: ContractTypeRepository,
+  private val appointmentRepository: AppointmentRepository,
 ) {
   private val dynamicFrameworkContractFactory = DynamicFrameworkContractFactory()
   private val interventionFactory = InterventionFactory()
@@ -80,12 +83,11 @@ class SetupAssistant(
     actionPlanAppointmentRepository.deleteAll()
     actionPlanRepository.deleteAll()
     endOfServiceReportRepository.deleteAll()
-
     referralRepository.deleteAll()
     interventionRepository.deleteAll()
     dynamicFrameworkContractRepository.deleteAll()
-
     serviceProviderRepository.deleteAll()
+    appointmentRepository.deleteAll()
     authUserRepository.deleteAll()
   }
 
@@ -246,19 +248,32 @@ class SetupAssistant(
   fun createActionPlanAppointment(
     actionPlan: ActionPlan,
     sessionNumber: Int,
+    appointment: Appointment,
+  ): ActionPlanAppointment {
+    return actionPlanAppointmentRepository.save(
+      ActionPlanAppointment(
+        id = UUID.randomUUID(),
+        sessionNumber = sessionNumber,
+        appointment = appointment,
+        actionPlan = actionPlan,
+      )
+    )
+  }
+
+  fun createAppointment(
+    id: UUID = UUID.randomUUID(),
     duration: Int,
     appointmentTime: OffsetDateTime,
     attended: Attended? = null,
     attendanceInfo: String? = null,
     behaviour: String? = null,
     notifyPPOfBehaviour: Boolean? = null
-  ): ActionPlanAppointment {
+  ): Appointment {
     val now = OffsetDateTime.now()
     val user = createSPUser()
-    return actionPlanAppointmentRepository.save(
-      ActionPlanAppointment(
-        id = UUID.randomUUID(),
-        sessionNumber = sessionNumber,
+    return appointmentRepository.save(
+      Appointment(
+        id = id,
         attended = attended,
         additionalAttendanceInformation = attendanceInfo,
         attendanceSubmittedAt = if (attended != null) now else null,
@@ -269,7 +284,6 @@ class SetupAssistant(
         durationInMinutes = duration,
         createdBy = user,
         createdAt = now,
-        actionPlan = actionPlan,
       )
     )
   }

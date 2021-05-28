@@ -31,9 +31,11 @@ internal class SNSAppointmentServiceTest {
     AppointmentEventType.ATTENDANCE_RECORDED,
     SampleData.sampleActionPlanAppointment(
       actionPlan = actionPlan,
-      createdBy = actionPlan.createdBy,
-      attended = attendance,
-      attendanceSubmittedAt = now,
+      appointment = SampleData.sampleAppointment(
+        createdBy = actionPlan.createdBy,
+        attended = attendance,
+        attendanceSubmittedAt = now,
+      )
     ),
     "http://localhost:8080/action-plan/77df9f6c-3fcb-4ec6-8fcf-96551cd9b080/session/1",
     false,

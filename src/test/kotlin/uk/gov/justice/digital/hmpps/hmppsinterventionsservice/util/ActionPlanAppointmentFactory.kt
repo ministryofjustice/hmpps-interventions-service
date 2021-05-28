@@ -3,38 +3,25 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlanAppointment
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
-import java.time.OffsetDateTime
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import java.util.UUID
 
 class ActionPlanAppointmentFactory(em: TestEntityManager? = null) : EntityFactory(em) {
   private val actionPlanFactory = ActionPlanFactory(em)
+  private val appointmentFactory = AppointmentFactory(em)
 
   fun create(
     id: UUID = UUID.randomUUID(),
     actionPlan: ActionPlan = actionPlanFactory.create(),
     sessionNumber: Int = 1,
-    createdAt: OffsetDateTime = OffsetDateTime.now(),
-    createdBy: AuthUser = actionPlan.createdBy,
-    attended: Attended? = null,
-    additionalAttendanceInformation: String? = null,
-    attendanceSubmittedAt: OffsetDateTime? = null,
-    notifyPPOfAttendanceBehaviour: Boolean? = null,
-    sessionFeedbackSubmittedAt: OffsetDateTime? = null,
+    appointment: Appointment = appointmentFactory.create()
   ): ActionPlanAppointment {
     return save(
       ActionPlanAppointment(
         id = id,
         actionPlan = actionPlan,
         sessionNumber = sessionNumber,
-        createdAt = createdAt,
-        createdBy = createdBy,
-        attended = attended,
-        additionalAttendanceInformation = additionalAttendanceInformation,
-        attendanceSubmittedAt = attendanceSubmittedAt,
-        notifyPPOfAttendanceBehaviour = notifyPPOfAttendanceBehaviour,
-        sessionFeedbackSubmittedAt = sessionFeedbackSubmittedAt,
+        appointment = appointment,
       )
     )
   }
@@ -43,24 +30,14 @@ class ActionPlanAppointmentFactory(em: TestEntityManager? = null) : EntityFactor
     id: UUID = UUID.randomUUID(),
     actionPlan: ActionPlan = actionPlanFactory.create(),
     sessionNumber: Int = 1,
-    createdAt: OffsetDateTime = OffsetDateTime.now(),
-    createdBy: AuthUser = actionPlan.createdBy,
-    attended: Attended? = Attended.YES,
-    attendanceSubmittedAt: OffsetDateTime? = createdAt,
-    notifyPPOfAttendanceBehaviour: Boolean? = false,
-    sessionFeedbackSubmittedAt: OffsetDateTime? = attendanceSubmittedAt,
+    appointment: Appointment = appointmentFactory.createAttended()
   ): ActionPlanAppointment {
     return save(
       ActionPlanAppointment(
         id = id,
         actionPlan = actionPlan,
         sessionNumber = sessionNumber,
-        createdAt = createdAt,
-        createdBy = createdBy,
-        attended = attended,
-        attendanceSubmittedAt = attendanceSubmittedAt,
-        notifyPPOfAttendanceBehaviour = notifyPPOfAttendanceBehaviour,
-        sessionFeedbackSubmittedAt = sessionFeedbackSubmittedAt,
+        appointment = appointment,
       )
     )
   }

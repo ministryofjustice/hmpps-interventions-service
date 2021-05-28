@@ -53,14 +53,16 @@ class CommunityAPIAppointmentEventServiceTest {
       id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
       actionPlan = SampleData.sampleActionPlan(),
       sessionNumber = 1,
-      appointmentTime = OffsetDateTime.now(),
-      durationInMinutes = 60,
-      createdBy = SampleData.sampleAuthUser("userId", "auth", "me"),
-      attended = LATE,
-      additionalAttendanceInformation = "dded notes",
-      attendanceSubmittedAt = OffsetDateTime.now(),
-      notifyPPOfAttendanceBehaviour = true,
-      deliusAppointmentId = 123456L
+      appointment = SampleData.sampleAppointment(
+        appointmentTime = OffsetDateTime.now(),
+        durationInMinutes = 60,
+        createdBy = SampleData.sampleAuthUser("userId", "auth", "me"),
+        attended = LATE,
+        additionalAttendanceInformation = "dded notes",
+        attendanceSubmittedAt = OffsetDateTime.now(),
+        notifyPPOfAttendanceBehaviour = true,
+        deliusAppointmentId = 123456L
+      )
     ),
     "http://localhost:8080/url/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
     true

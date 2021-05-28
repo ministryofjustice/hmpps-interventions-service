@@ -160,10 +160,12 @@ internal class CommunityAPIBookingServiceTest {
     val referral = SampleData.sampleReferral(crn = crn, relevantSentenceId = sentenceId, sentAt = sentAt, serviceProviderName = "SPN", referenceNumber = "XX123456")
     return SampleData.sampleActionPlanAppointment(
       actionPlan = SampleData.sampleActionPlan(referral = referral),
-      createdBy = SampleData.sampleAuthUser(),
-      appointmentTime = appointmentTime,
-      durationInMinutes = durationInMinutes,
-      deliusAppointmentId = deliusAppointmentId
+      appointment = SampleData.sampleAppointment(
+        createdBy = SampleData.sampleAuthUser(),
+        appointmentTime = appointmentTime,
+        durationInMinutes = durationInMinutes,
+        deliusAppointmentId = deliusAppointmentId
+      )
     )
   }
 }

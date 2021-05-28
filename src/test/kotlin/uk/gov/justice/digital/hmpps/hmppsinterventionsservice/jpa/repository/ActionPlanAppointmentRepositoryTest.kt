@@ -20,6 +20,7 @@ class ActionPlanAppointmentRepositoryTest @Autowired constructor(
   val referralRepository: ReferralRepository,
   val authUserRepository: AuthUserRepository,
   val endOfServiceReportRepository: EndOfServiceReportRepository,
+  val appointmentRepository: AppointmentRepository,
 ) {
   private val authUserFactory = AuthUserFactory(entityManager)
   private val referralFactory = ReferralFactory(entityManager)
@@ -33,6 +34,7 @@ class ActionPlanAppointmentRepositoryTest @Autowired constructor(
     endOfServiceReportRepository.deleteAll()
     referralRepository.deleteAll()
     interventionRepository.deleteAll()
+    appointmentRepository.deleteAll()
     authUserRepository.deleteAll()
   }
 
@@ -60,7 +62,7 @@ class ActionPlanAppointmentRepositoryTest @Autowired constructor(
     val actionPlan2 = actionPlanFactory.create()
     actionPlanAppointmentFactory.createAttended(actionPlan = actionPlan2)
 
-    assertThat(actionPlanAppointmentRepository.countByActionPlanIdAndAttendedIsNotNull(actionPlan1.id)).isEqualTo(4)
-    assertThat(actionPlanAppointmentRepository.countByActionPlanIdAndAttendedIsNotNull(actionPlan2.id)).isEqualTo(1)
+    assertThat(actionPlanAppointmentRepository.countByActionPlanIdAndAppointmentAttendedIsNotNull(actionPlan1.id)).isEqualTo(4)
+    assertThat(actionPlanAppointmentRepository.countByActionPlanIdAndAppointmentAttendedIsNotNull(actionPlan2.id)).isEqualTo(1)
   }
 }

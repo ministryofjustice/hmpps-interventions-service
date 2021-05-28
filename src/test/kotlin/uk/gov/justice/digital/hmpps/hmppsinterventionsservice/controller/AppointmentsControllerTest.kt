@@ -22,9 +22,8 @@ internal class AppointmentsControllerTest {
 
   @Test
   fun `updates an appointment`() {
-    val createdByUser = SampleData.sampleAuthUser()
     val actionPlan = SampleData.sampleActionPlan()
-    val actionPlanAppointment = SampleData.sampleActionPlanAppointment(actionPlan = actionPlan, createdBy = createdByUser)
+    val actionPlanAppointment = SampleData.sampleActionPlanAppointment(actionPlan = actionPlan)
     val sessionNumber = 1
 
     val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10)
@@ -45,9 +44,8 @@ internal class AppointmentsControllerTest {
 
   @Test
   fun `gets an appointment`() {
-    val createdByUser = SampleData.sampleAuthUser()
     val actionPlan = SampleData.sampleActionPlan()
-    val actionPlanAppointment = SampleData.sampleActionPlanAppointment(actionPlan = actionPlan, createdBy = createdByUser)
+    val actionPlanAppointment = SampleData.sampleActionPlanAppointment(actionPlan = actionPlan)
     val sessionNumber = 1
 
     whenever(appointmentsService.getAppointment(actionPlan.id, sessionNumber)).thenReturn(actionPlanAppointment)
@@ -59,9 +57,8 @@ internal class AppointmentsControllerTest {
 
   @Test
   fun `gets a list of appointment`() {
-    val createdByUser = SampleData.sampleAuthUser()
     val actionPlan = SampleData.sampleActionPlan()
-    val actionPlanAppointment = SampleData.sampleActionPlanAppointment(actionPlan = actionPlan, createdBy = createdByUser)
+    val actionPlanAppointment = SampleData.sampleActionPlanAppointment(actionPlan = actionPlan)
 
     whenever(appointmentsService.getAppointments(actionPlan.id)).thenReturn(listOf(actionPlanAppointment))
 
@@ -76,12 +73,11 @@ internal class AppointmentsControllerTest {
     val actionPlanId = UUID.randomUUID()
     val sessionNumber = 1
     val update = UpdateAppointmentAttendanceDTO(Attended.YES, "more info")
-    val createdByUser = SampleData.sampleAuthUser()
     val actionPlan = SampleData.sampleActionPlan()
 
     val updatedAppointment = SampleData.sampleActionPlanAppointment(
-      actionPlan = actionPlan, createdBy = createdByUser,
-      attended = Attended.YES, additionalAttendanceInformation = "more info"
+      actionPlan = actionPlan,
+      appointment = SampleData.sampleAppointment(attended = Attended.YES, additionalAttendanceInformation = "more info")
     )
 
     whenever(
