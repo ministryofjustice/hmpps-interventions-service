@@ -52,17 +52,4 @@ class ActionPlanSessionRepositoryTest @Autowired constructor(
 
     assertThat(savedAppointment.id).isEqualTo(actionPlanAppointment.id)
   }
-
-  @Test
-  fun `count number of attended appointments`() {
-    val actionPlan1 = actionPlanFactory.create()
-    (1..4).forEach {
-      actionPlanAppointmentFactory.createAttended(actionPlan = actionPlan1, sessionNumber = it)
-    }
-    val actionPlan2 = actionPlanFactory.create()
-    actionPlanAppointmentFactory.createAttended(actionPlan = actionPlan2)
-
-    assertThat(actionPlanSessionRepository.countByActionPlanIdAndAppointmentAttendedIsNotNull(actionPlan1.id)).isEqualTo(4)
-    assertThat(actionPlanSessionRepository.countByActionPlanIdAndAppointmentAttendedIsNotNull(actionPlan2.id)).isEqualTo(1)
-  }
 }

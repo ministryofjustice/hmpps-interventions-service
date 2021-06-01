@@ -254,7 +254,7 @@ class SetupAssistant(
       ActionPlanSession(
         id = UUID.randomUUID(),
         sessionNumber = sessionNumber,
-        appointment = appointment,
+        appointments = setOf(appointment),
         actionPlan = actionPlan,
       )
     )

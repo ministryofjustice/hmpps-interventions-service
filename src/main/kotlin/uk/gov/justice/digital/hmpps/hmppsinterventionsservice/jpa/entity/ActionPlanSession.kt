@@ -6,7 +6,7 @@ import java.util.UUID
 import javax.persistence.Entity
 import javax.persistence.Id
 import javax.persistence.ManyToOne
-import javax.persistence.OneToOne
+import javax.persistence.OneToMany
 import javax.persistence.Table
 import javax.validation.constraints.NotNull
 
@@ -21,5 +21,8 @@ data class ActionPlanSession(
   @NotNull @ManyToOne val actionPlan: ActionPlan,
   @Id val id: UUID,
 
-  @NotNull @OneToOne @Fetch(FetchMode.JOIN) val appointment: Appointment,
-)
+  @NotNull @OneToMany @Fetch(FetchMode.JOIN) val appointments: Set<Appointment>,
+) {
+  val appointment: Appointment
+    get() = appointments.maxByOrNull { it.createdAt }!!
+}
