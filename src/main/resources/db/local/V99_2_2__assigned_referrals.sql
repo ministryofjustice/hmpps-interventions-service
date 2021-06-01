@@ -30,7 +30,7 @@ values  ('7b2b3165-1f3f-4884-9a90-08964102ba9e', null, null, '2021-03-12 17:51:3
         ('82e2fbbe-1bb4-4967-8ee6-81aa072fd44b' , '2021-04-07 12:00:00.000000+00', 120, '2021-03-12 18:51:34.235464+00', '608955ae-52ed-44cc-884c-011597a77949'),
         ('f6378ca0-33c5-41d8-babe-c35b95a7c39d', null, null, '2021-03-12 18:51:34.235464+00', '608955ae-52ed-44cc-884c-011597a77949');
 
-insert into session_delivery_appointment (id, action_plan_id, session_number, appointment_id)
+insert into action_plan_session (id, action_plan_id, session_number, appointment_id)
 values ('F6D6710F-8812-43D0-96F9-C0BDE9FF66F9', '21EA6AFE-C437-4018-9260-BF1A829DE464', 1, '7b2b3165-1f3f-4884-9a90-08964102ba9e'),
        ('27597A9E-68CC-43AC-96DF-DE9B92F53524', '21EA6AFE-C437-4018-9260-BF1A829DE464', 2, '0a724502-dfbc-4c35-8c2e-585dbdbff6cd'),
        ('847E253C-DC48-4914-9E5E-771694BB9C01', '2EB8B0DB-EAF1-430A-BA69-39984D501EB9', 1, '1b79fba2-42ae-4acb-89ce-571e8ff10719'),

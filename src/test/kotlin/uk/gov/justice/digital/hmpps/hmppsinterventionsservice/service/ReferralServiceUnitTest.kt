@@ -27,12 +27,12 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Cancell
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanSessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SessionDeliveryAppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.CancellationReasonFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ContractTypeFactory
@@ -52,7 +52,7 @@ class ReferralServiceUnitTest {
   private val referralConcluder: ReferralConcluder = mock()
   private val referralReferenceGenerator: ReferralReferenceGenerator = mock()
   private val cancellationReasonRepository: CancellationReasonRepository = mock()
-  private val sessionDeliveryAppointmentRepository: SessionDeliveryAppointmentRepository = mock()
+  private val actionPlanSessionRepository: ActionPlanSessionRepository = mock()
   private val serviceCategoryRepository: ServiceCategoryRepository = mock()
   private val referralAccessChecker: ReferralAccessChecker = mock()
   private val serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper = mock()
@@ -74,11 +74,15 @@ class ReferralServiceUnitTest {
     referralRepository, authUserRepository, interventionRepository, referralConcluder,
     referralEventPublisher, referralReferenceGenerator, cancellationReasonRepository,
 <<<<<<< HEAD
+<<<<<<< HEAD
     supplierAssessmentAppointmentRepository, serviceCategoryRepository, referralAccessChecker, userTypeChecker,
     serviceProviderAccessScopeMapper, referralAccessFilter, communityAPIReferralService, serviceUserAccessChecker,
     assessRisksAndNeedsService,
 =======
     sessionDeliveryAppointmentRepository, serviceCategoryRepository, referralAccessChecker, userTypeChecker,
+=======
+    actionPlanSessionRepository, serviceCategoryRepository, referralAccessChecker, userTypeChecker,
+>>>>>>> rename sessionDeliveryAppointment to ActionPlanSession
     serviceProviderAccessScopeMapper, referralAccessFilter, communityAPIReferralService, serviceUserAccessChecker
 >>>>>>> rename supplier_assessment_appointment to session_delivery_appointment
   )

@@ -5,7 +5,7 @@ import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.LocationMapper
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SessionDeliveryAppointmentDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ActionPlanSessionDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentAttendanceDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
@@ -23,13 +23,13 @@ internal class AppointmentsControllerTest {
   @Test
   fun `updates an appointment`() {
     val actionPlan = SampleData.sampleActionPlan()
-    val actionPlanAppointment = SampleData.sampleSessionDeliveryAppointment(actionPlan = actionPlan)
+    val actionPlanAppointment = SampleData.sampleActionPlanSession(actionPlan = actionPlan)
     val sessionNumber = 1
 
     val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10)
 
     whenever(
-      appointmentsService.updateAppointment(
+      appointmentsService.updateActionPlanSessionAppointment(
         actionPlan.id,
         sessionNumber,
         updateAppointmentDTO.appointmentTime,
@@ -39,33 +39,33 @@ internal class AppointmentsControllerTest {
 
     val appointmentResponse = appointmentsController.updateAppointment(actionPlan.id, sessionNumber, updateAppointmentDTO)
 
-    assertThat(appointmentResponse).isEqualTo(SessionDeliveryAppointmentDTO.from(actionPlanAppointment))
+    assertThat(appointmentResponse).isEqualTo(ActionPlanSessionDTO.from(actionPlanAppointment))
   }
 
   @Test
   fun `gets an appointment`() {
     val actionPlan = SampleData.sampleActionPlan()
-    val actionPlanAppointment = SampleData.sampleSessionDeliveryAppointment(actionPlan = actionPlan)
+    val actionPlanAppointment = SampleData.sampleActionPlanSession(actionPlan = actionPlan)
     val sessionNumber = 1
 
-    whenever(appointmentsService.getAppointment(actionPlan.id, sessionNumber)).thenReturn(actionPlanAppointment)
+    whenever(appointmentsService.getActionPlanSessionAppointment(actionPlan.id, sessionNumber)).thenReturn(actionPlanAppointment)
 
     val appointmentResponse = appointmentsController.getAppointment(actionPlan.id, sessionNumber)
 
-    assertThat(appointmentResponse).isEqualTo(SessionDeliveryAppointmentDTO.from(actionPlanAppointment))
+    assertThat(appointmentResponse).isEqualTo(ActionPlanSessionDTO.from(actionPlanAppointment))
   }
 
   @Test
   fun `gets a list of appointment`() {
     val actionPlan = SampleData.sampleActionPlan()
-    val actionPlanAppointment = SampleData.sampleSessionDeliveryAppointment(actionPlan = actionPlan)
+    val actionPlanAppointment = SampleData.sampleActionPlanSession(actionPlan = actionPlan)
 
-    whenever(appointmentsService.getAppointments(actionPlan.id)).thenReturn(listOf(actionPlanAppointment))
+    whenever(appointmentsService.getActionPlanSessionAppointments(actionPlan.id)).thenReturn(listOf(actionPlanAppointment))
 
     val appointmentsResponse = appointmentsController.getAppointments(actionPlan.id)
 
     assertThat(appointmentsResponse.size).isEqualTo(1)
-    assertThat(appointmentsResponse.first()).isEqualTo(SessionDeliveryAppointmentDTO.from(actionPlanAppointment))
+    assertThat(appointmentsResponse.first()).isEqualTo(ActionPlanSessionDTO.from(actionPlanAppointment))
   }
 
   @Test
@@ -75,13 +75,13 @@ internal class AppointmentsControllerTest {
     val update = UpdateAppointmentAttendanceDTO(Attended.YES, "more info")
     val actionPlan = SampleData.sampleActionPlan()
 
-    val updatedAppointment = SampleData.sampleSessionDeliveryAppointment(
+    val updatedAppointment = SampleData.sampleActionPlanSession(
       actionPlan = actionPlan,
       appointment = SampleData.sampleAppointment(attended = Attended.YES, additionalAttendanceInformation = "more info")
     )
 
     whenever(
-      appointmentsService.recordAttendance(
+      appointmentsService.recordActionPlanSessionAttendance(
         actionPlanId, sessionNumber, update.attended,
         update.additionalAttendanceInformation
       )

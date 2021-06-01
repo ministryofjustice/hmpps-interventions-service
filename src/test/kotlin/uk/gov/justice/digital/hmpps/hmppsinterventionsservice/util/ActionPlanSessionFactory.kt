@@ -2,11 +2,11 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlanSession
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SessionDeliveryAppointment
 import java.util.UUID
 
-class SessionDeliveryAppointmentFactory(em: TestEntityManager? = null) : EntityFactory(em) {
+class ActionPlanSessionFactory(em: TestEntityManager? = null) : EntityFactory(em) {
   private val actionPlanFactory = ActionPlanFactory(em)
   private val appointmentFactory = AppointmentFactory(em)
 
@@ -15,9 +15,9 @@ class SessionDeliveryAppointmentFactory(em: TestEntityManager? = null) : EntityF
     actionPlan: ActionPlan = actionPlanFactory.create(),
     sessionNumber: Int = 1,
     appointment: Appointment = appointmentFactory.create()
-  ): SessionDeliveryAppointment {
+  ): ActionPlanSession {
     return save(
-      SessionDeliveryAppointment(
+      ActionPlanSession(
         id = id,
         actionPlan = actionPlan,
         sessionNumber = sessionNumber,
@@ -31,9 +31,9 @@ class SessionDeliveryAppointmentFactory(em: TestEntityManager? = null) : EntityF
     actionPlan: ActionPlan = actionPlanFactory.create(),
     sessionNumber: Int = 1,
     appointment: Appointment = appointmentFactory.createAttended()
-  ): SessionDeliveryAppointment {
+  ): ActionPlanSession {
     return save(
-      SessionDeliveryAppointment(
+      ActionPlanSession(
         id = id,
         actionPlan = actionPlan,
         sessionNumber = sessionNumber,

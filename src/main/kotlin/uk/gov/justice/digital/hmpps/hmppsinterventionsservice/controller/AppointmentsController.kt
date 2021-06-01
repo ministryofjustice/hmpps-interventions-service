@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.LocationMapper
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SessionDeliveryAppointmentDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ActionPlanSessionDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentAttendanceDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentBehaviourDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentDTO
@@ -24,34 +24,34 @@ class AppointmentsController(
     @PathVariable(name = "id") actionPlanId: UUID,
     @PathVariable sessionNumber: Int,
     @RequestBody updateAppointmentDTO: UpdateAppointmentDTO,
-  ): SessionDeliveryAppointmentDTO {
+  ): ActionPlanSessionDTO {
 
-    val actionPlanAppointment = appointmentsService.updateAppointment(
+    val actionPlanAppointment = appointmentsService.updateActionPlanSessionAppointment(
       actionPlanId,
       sessionNumber,
       updateAppointmentDTO.appointmentTime,
       updateAppointmentDTO.durationInMinutes
     )
-    return SessionDeliveryAppointmentDTO.from(actionPlanAppointment)
+    return ActionPlanSessionDTO.from(actionPlanAppointment)
   }
 
   @GetMapping("/action-plan/{id}/appointments")
   fun getAppointments(
     @PathVariable(name = "id") actionPlanId: UUID
-  ): List<SessionDeliveryAppointmentDTO> {
+  ): List<ActionPlanSessionDTO> {
 
-    val actionPlanAppointments = appointmentsService.getAppointments(actionPlanId)
-    return SessionDeliveryAppointmentDTO.from(actionPlanAppointments)
+    val actionPlanAppointments = appointmentsService.getActionPlanSessionAppointments(actionPlanId)
+    return ActionPlanSessionDTO.from(actionPlanAppointments)
   }
 
   @GetMapping("/action-plan/{id}/appointments/{sessionNumber}")
   fun getAppointment(
     @PathVariable(name = "id") actionPlanId: UUID,
     @PathVariable sessionNumber: Int,
-  ): SessionDeliveryAppointmentDTO {
+  ): ActionPlanSessionDTO {
 
-    val actionPlanAppointment = appointmentsService.getAppointment(actionPlanId, sessionNumber)
-    return SessionDeliveryAppointmentDTO.from(actionPlanAppointment)
+    val actionPlanAppointment = appointmentsService.getActionPlanSessionAppointment(actionPlanId, sessionNumber)
+    return ActionPlanSessionDTO.from(actionPlanAppointment)
   }
 
   @PostMapping("/action-plan/{id}/appointment/{sessionNumber}/record-attendance")
@@ -59,21 +59,21 @@ class AppointmentsController(
     @PathVariable(name = "id") actionPlanId: UUID,
     @PathVariable sessionNumber: Int,
     @RequestBody update: UpdateAppointmentAttendanceDTO,
-  ): SessionDeliveryAppointmentDTO {
-    val updatedAppointment = appointmentsService.recordAttendance(
+  ): ActionPlanSessionDTO {
+    val updatedAppointment = appointmentsService.recordActionPlanSessionAttendance(
       actionPlanId, sessionNumber, update.attended, update.additionalAttendanceInformation
     )
 
-    return SessionDeliveryAppointmentDTO.from(updatedAppointment)
+    return ActionPlanSessionDTO.from(updatedAppointment)
   }
 
   @PostMapping("/action-plan/{actionPlanId}/appointment/{sessionNumber}/record-behaviour")
-  fun recordBehaviour(@PathVariable actionPlanId: UUID, @PathVariable sessionNumber: Int, @RequestBody update: UpdateAppointmentBehaviourDTO): SessionDeliveryAppointmentDTO {
-    return SessionDeliveryAppointmentDTO.from(appointmentsService.recordBehaviour(actionPlanId, sessionNumber, update.behaviourDescription, update.notifyProbationPractitioner))
+  fun recordBehaviour(@PathVariable actionPlanId: UUID, @PathVariable sessionNumber: Int, @RequestBody update: UpdateAppointmentBehaviourDTO): ActionPlanSessionDTO {
+    return ActionPlanSessionDTO.from(appointmentsService.recordActionPlanSessionBehaviour(actionPlanId, sessionNumber, update.behaviourDescription, update.notifyProbationPractitioner))
   }
 
   @PostMapping("/action-plan/{actionPlanId}/appointment/{sessionNumber}/submit")
-  fun submitSessionFeedback(@PathVariable actionPlanId: UUID, @PathVariable sessionNumber: Int): SessionDeliveryAppointmentDTO {
-    return SessionDeliveryAppointmentDTO.from(appointmentsService.submitSessionFeedback(actionPlanId, sessionNumber))
+  fun submitSessionFeedback(@PathVariable actionPlanId: UUID, @PathVariable sessionNumber: Int): ActionPlanSessionDTO {
+    return ActionPlanSessionDTO.from(appointmentsService.submitActionPlanSessionFeedback(actionPlanId, sessionNumber))
   }
 }
