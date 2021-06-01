@@ -26,9 +26,10 @@ COPY (
     ap.submitted_at         AS date_first_action_plan_submitted,
     'coming-later'          AS date_of_first_action_plan_approval,
     (
-      select min(app.appointment_time)
-      from action_plan_appointment app
-      where app.action_plan_id = ap.id and attended in ('YES', 'LATE')
+        select min(app.appointment_time)
+        from supplier_assessment_appointment sup
+        join appointment app on sup.appointment_id = app.id
+        where sup.action_plan_id = ap.id and app.attended in ('YES', 'LATE')
     )                       AS date_of_first_session,
     (
       select count(o.desired_outcome_id)
