@@ -13,15 +13,15 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTes
 
 @RepositoryTest
 class InterventionFilterRepositoryImplTest @Autowired constructor(
-  val entityManager: TestEntityManager,
-  val interventionFilterRepositoryImpl: InterventionFilterRepository,
-  val interventionRepository: InterventionRepository,
-  val referralRepository: ReferralRepository,
-  val actionPlanRepository: ActionPlanRepository,
-  val supplierAssessmentAppointmentRepository: SupplierAssessmentAppointmentRepository,
-  val authUserRepository: AuthUserRepository,
-  val endOfServiceReportRepository: EndOfServiceReportRepository,
-  val appointmentRepository: AppointmentRepository,
+        val entityManager: TestEntityManager,
+        val interventionFilterRepositoryImpl: InterventionFilterRepository,
+        val interventionRepository: InterventionRepository,
+        val referralRepository: ReferralRepository,
+        val actionPlanRepository: ActionPlanRepository,
+        val sessionDeliveryAppointmentRepository: SessionDeliveryAppointmentRepository,
+        val authUserRepository: AuthUserRepository,
+        val endOfServiceReportRepository: EndOfServiceReportRepository,
+        val appointmentRepository: AppointmentRepository,
 ) {
 
   private val interventionFactory = InterventionFactory(entityManager)
@@ -31,7 +31,7 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
 
   @BeforeEach
   fun setup() {
-    supplierAssessmentAppointmentRepository.deleteAll()
+    sessionDeliveryAppointmentRepository.deleteAll()
     actionPlanRepository.deleteAll()
     endOfServiceReportRepository.deleteAll()
     referralRepository.deleteAll()

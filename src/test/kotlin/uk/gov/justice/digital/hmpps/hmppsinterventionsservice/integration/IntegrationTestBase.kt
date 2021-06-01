@@ -23,7 +23,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.NPS
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceProviderRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SupplierAssessmentAppointmentRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SessionDeliveryAppointmentRepository
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("test", "local")
@@ -36,7 +36,7 @@ abstract class IntegrationTestBase {
 
   @Autowired protected lateinit var referralRepository: ReferralRepository
   @Autowired protected lateinit var actionPlanRepository: ActionPlanRepository
-  @Autowired protected lateinit var supplierAssessmentAppointmentRepository: SupplierAssessmentAppointmentRepository
+  @Autowired protected lateinit var sessionDeliveryAppointmentRepository: SessionDeliveryAppointmentRepository
   @Autowired protected lateinit var authUserRepository: AuthUserRepository
   @Autowired protected lateinit var interventionRepository: InterventionRepository
   @Autowired protected lateinit var serviceCategoryRepository: ServiceCategoryRepository
@@ -57,7 +57,7 @@ abstract class IntegrationTestBase {
       referralRepository,
       interventionRepository,
       actionPlanRepository,
-      supplierAssessmentAppointmentRepository,
+      sessionDeliveryAppointmentRepository,
       serviceCategoryRepository,
       serviceProviderRepository,
       npsRegionRepository,

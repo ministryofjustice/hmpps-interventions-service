@@ -8,11 +8,11 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionP
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessmentAppointment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SessionDeliveryAppointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SupplierAssessmentAppointmentRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SessionDeliveryAppointmentRepository
 import java.time.OffsetDateTime
 import java.util.UUID
 import javax.persistence.EntityExistsException
@@ -22,7 +22,7 @@ import javax.transaction.Transactional
 @Service
 @Transactional
 class AppointmentsService(
-  val supplierAssessmentAppointmentRepository: SupplierAssessmentAppointmentRepository,
+  val sessionDeliveryAppointmentRepository: SessionDeliveryAppointmentRepository,
   val actionPlanRepository: ActionPlanRepository,
   val authUserRepository: AuthUserRepository,
   val appointmentRepository: AppointmentRepository,
@@ -35,11 +35,11 @@ class AppointmentsService(
     appointmentTime: OffsetDateTime?,
     durationInMinutes: Int?,
     createdByUser: AuthUser,
-  ): SupplierAssessmentAppointment {
+  ): SessionDeliveryAppointment {
     val actionPlanId = actionPlan.id
     checkAppointmentSessionIsNotDuplicate(actionPlanId, sessionNumber)
 
-    val appointment = SupplierAssessmentAppointment(
+    val appointment = SessionDeliveryAppointment(
       id = UUID.randomUUID(),
       sessionNumber = sessionNumber,
       appointment = appointmentRepository.save(
@@ -54,7 +54,7 @@ class AppointmentsService(
       actionPlan = actionPlan,
     )
 
-    return supplierAssessmentAppointmentRepository.save(appointment)
+    return sessionDeliveryAppointmentRepository.save(appointment)
   }
 
   fun createUnscheduledAppointmentsForActionPlan(submittedActionPlan: ActionPlan, actionPlanSubmitter: AuthUser) {
@@ -69,7 +69,7 @@ class AppointmentsService(
     sessionNumber: Int,
     appointmentTime: OffsetDateTime?,
     durationInMinutes: Int?
-  ): SupplierAssessmentAppointment {
+  ): SessionDeliveryAppointment {
 
     val appointment = getActionPlanAppointmentOrThrowException(actionPlanId, sessionNumber)
     communityAPIBookingService.book(appointment, appointmentTime, durationInMinutes)?.let {
@@ -77,7 +77,7 @@ class AppointmentsService(
     }
 
     mergeAppointment(appointment, appointmentTime, durationInMinutes)
-    return supplierAssessmentAppointmentRepository.save(appointment)
+    return sessionDeliveryAppointmentRepository.save(appointment)
   }
 
   fun recordAttendance(
@@ -85,7 +85,7 @@ class AppointmentsService(
     sessionNumber: Int,
     attended: Attended,
     additionalInformation: String?
-  ): SupplierAssessmentAppointment {
+  ): SessionDeliveryAppointment {
     val appointment = getActionPlanAppointmentOrThrowException(actionPlanId, sessionNumber)
 
     if (appointment.appointment.sessionFeedbackSubmittedAt != null) {
@@ -93,7 +93,7 @@ class AppointmentsService(
     }
 
     setAttendanceFields(appointment, attended, additionalInformation)
-    return supplierAssessmentAppointmentRepository.save(appointment)
+    return sessionDeliveryAppointmentRepository.save(appointment)
   }
 
   fun recordBehaviour(
@@ -101,7 +101,7 @@ class AppointmentsService(
     sessionNumber: Int,
     behaviourDescription: String,
     notifyProbationPractitioner: Boolean,
-  ): SupplierAssessmentAppointment {
+  ): SessionDeliveryAppointment {
     val appointment = getActionPlanAppointmentOrThrowException(actionPlanId, sessionNumber)
 
     if (appointment.appointment.sessionFeedbackSubmittedAt != null) {
@@ -109,10 +109,10 @@ class AppointmentsService(
     }
 
     setBehaviourFields(appointment, behaviourDescription, notifyProbationPractitioner)
-    return supplierAssessmentAppointmentRepository.save(appointment)
+    return sessionDeliveryAppointmentRepository.save(appointment)
   }
 
-  fun submitSessionFeedback(actionPlanId: UUID, sessionNumber: Int): SupplierAssessmentAppointment {
+  fun submitSessionFeedback(actionPlanId: UUID, sessionNumber: Int): SessionDeliveryAppointment {
     val appointment = getActionPlanAppointmentOrThrowException(actionPlanId, sessionNumber)
 
     if (appointment.appointment.sessionFeedbackSubmittedAt != null) {
@@ -124,7 +124,7 @@ class AppointmentsService(
     }
 
     appointment.appointment.sessionFeedbackSubmittedAt = OffsetDateTime.now()
-    supplierAssessmentAppointmentRepository.save(appointment)
+    sessionDeliveryAppointmentRepository.save(appointment)
 
     appointmentEventPublisher.attendanceRecordedEvent(appointment, appointment.appointment.attended == Attended.NO)
     appointmentEventPublisher.behaviourRecordedEvent(appointment, appointment.appointment.notifyPPOfAttendanceBehaviour!!)
@@ -132,18 +132,18 @@ class AppointmentsService(
     return appointment
   }
 
-  fun getAppointments(actionPlanId: UUID): List<SupplierAssessmentAppointment> {
-    return supplierAssessmentAppointmentRepository.findAllByActionPlanId(actionPlanId)
+  fun getAppointments(actionPlanId: UUID): List<SessionDeliveryAppointment> {
+    return sessionDeliveryAppointmentRepository.findAllByActionPlanId(actionPlanId)
   }
 
-  fun getAppointment(actionPlanId: UUID, sessionNumber: Int): SupplierAssessmentAppointment {
+  fun getAppointment(actionPlanId: UUID, sessionNumber: Int): SessionDeliveryAppointment {
     return getActionPlanAppointmentOrThrowException(actionPlanId, sessionNumber)
   }
 
   private fun setAttendanceFields(
-    appointment: SupplierAssessmentAppointment,
-    attended: Attended,
-    additionalInformation: String?
+          appointment: SessionDeliveryAppointment,
+          attended: Attended,
+          additionalInformation: String?
   ) {
     appointment.appointment.attended = attended
     additionalInformation?.let { appointment.appointment.additionalAttendanceInformation = additionalInformation }
@@ -151,9 +151,9 @@ class AppointmentsService(
   }
 
   private fun setBehaviourFields(
-    appointment: SupplierAssessmentAppointment,
-    behaviour: String,
-    notifyProbationPractitioner: Boolean,
+          appointment: SessionDeliveryAppointment,
+          behaviour: String,
+          notifyProbationPractitioner: Boolean,
   ) {
     appointment.appointment.attendanceBehaviour = behaviour
     appointment.appointment.attendanceBehaviourSubmittedAt = OffsetDateTime.now()
@@ -166,18 +166,18 @@ class AppointmentsService(
     }
   }
 
-  private fun getActionPlanAppointmentOrThrowException(actionPlanId: UUID, sessionNumber: Int): SupplierAssessmentAppointment =
+  private fun getActionPlanAppointmentOrThrowException(actionPlanId: UUID, sessionNumber: Int): SessionDeliveryAppointment =
 
     getActionPlanAppointment(actionPlanId, sessionNumber)
       ?: throw EntityNotFoundException("Action plan appointment not found [id=$actionPlanId, sessionNumber=$sessionNumber]")
 
   private fun getActionPlanAppointment(actionPlanId: UUID, sessionNumber: Int) =
-    supplierAssessmentAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)
+    sessionDeliveryAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)
 
   private fun mergeAppointment(
-    appointment: SupplierAssessmentAppointment,
-    appointmentTime: OffsetDateTime?,
-    durationInMinutes: Int?
+          appointment: SessionDeliveryAppointment,
+          appointmentTime: OffsetDateTime?,
+          durationInMinutes: Int?
   ) {
     appointmentTime?.let { appointment.appointment.appointmentTime = it }
     durationInMinutes?.let { appointment.appointment.durationInMinutes = it }

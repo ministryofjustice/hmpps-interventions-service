@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto
 
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessmentAppointment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SessionDeliveryAppointment
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -31,7 +31,7 @@ data class UpdateAppointmentBehaviourDTO(
   val notifyProbationPractitioner: Boolean,
 )
 
-data class SupplierAssessmentAppointmentDTO(
+data class SessionDeliveryAppointmentDTO(
   val id: UUID,
   val sessionNumber: Int,
   override val appointmentTime: OffsetDateTime?,
@@ -41,8 +41,8 @@ data class SupplierAssessmentAppointmentDTO(
   val sessionFeedback: SessionFeedbackDTO,
 ) : BaseAppointmentDTO(appointmentTime, durationInMinutes) {
   companion object {
-    fun from(appointment: SupplierAssessmentAppointment): SupplierAssessmentAppointmentDTO {
-      return SupplierAssessmentAppointmentDTO(
+    fun from(appointment: SessionDeliveryAppointment): SessionDeliveryAppointmentDTO {
+      return SessionDeliveryAppointmentDTO(
         id = appointment.id,
         sessionNumber = appointment.sessionNumber,
         appointmentTime = appointment.appointment.appointmentTime,
@@ -58,7 +58,7 @@ data class SupplierAssessmentAppointmentDTO(
         ),
       )
     }
-    fun from(appointments: List<SupplierAssessmentAppointment>): List<SupplierAssessmentAppointmentDTO> {
+    fun from(appointments: List<SessionDeliveryAppointment>): List<SessionDeliveryAppointmentDTO> {
       return appointments.map { from(it) }
     }
   }

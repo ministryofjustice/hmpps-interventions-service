@@ -9,7 +9,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.CommunityAPIClient
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessmentAppointment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SessionDeliveryAppointment
 import java.time.OffsetDateTime
 import java.time.OffsetDateTime.now
 
@@ -156,9 +156,9 @@ internal class CommunityAPIBookingServiceTest {
     verifyZeroInteractions(communityAPIClient)
   }
 
-  private fun makeAppointment(sentAt: OffsetDateTime, appointmentTime: OffsetDateTime?, durationInMinutes: Int?, deliusAppointmentId: Long? = null): SupplierAssessmentAppointment {
+  private fun makeAppointment(sentAt: OffsetDateTime, appointmentTime: OffsetDateTime?, durationInMinutes: Int?, deliusAppointmentId: Long? = null): SessionDeliveryAppointment {
     val referral = SampleData.sampleReferral(crn = crn, relevantSentenceId = sentenceId, sentAt = sentAt, serviceProviderName = "SPN", referenceNumber = "XX123456")
-    return SampleData.sampleSupplierAssessmentAppointment(
+    return SampleData.sampleSessionDeliveryAppointment(
       actionPlan = SampleData.sampleActionPlan(referral = referral),
       appointment = SampleData.sampleAppointment(
         createdBy = SampleData.sampleAuthUser(),

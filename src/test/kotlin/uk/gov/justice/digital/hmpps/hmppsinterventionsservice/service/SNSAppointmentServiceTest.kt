@@ -28,7 +28,7 @@ internal class SNSAppointmentServiceTest {
   private fun attendanceRecordedEvent(attendance: Attended) = AppointmentEvent(
     "source",
     AppointmentEventType.ATTENDANCE_RECORDED,
-    SampleData.sampleSupplierAssessmentAppointment(
+    SampleData.sampleSessionDeliveryAppointment(
       actionPlan = actionPlan,
       appointment = SampleData.sampleAppointment(
         createdBy = actionPlan.createdBy,
