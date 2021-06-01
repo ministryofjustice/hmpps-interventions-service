@@ -155,7 +155,7 @@ internal class AppointmentsServiceTest {
         _, _, _, appointmentArg,
       ) ->
         (
-          appointmentArg.deliusAppointmentId == 999L
+          appointmentArg.first().deliusAppointmentId == 999L
           )
       }
     )
@@ -188,7 +188,7 @@ internal class AppointmentsServiceTest {
         _, _, _, appointmentArg
       ) ->
         (
-          appointmentArg.deliusAppointmentId == null
+          appointmentArg.first().deliusAppointmentId == null
           )
       }
     )

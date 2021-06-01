@@ -21,7 +21,7 @@ class ActionPlanSessionFactory(em: TestEntityManager? = null) : EntityFactory(em
         id = id,
         actionPlan = actionPlan,
         sessionNumber = sessionNumber,
-        appointment = appointment,
+        appointments = setOf(appointment),
       )
     )
   }
@@ -37,7 +37,7 @@ class ActionPlanSessionFactory(em: TestEntityManager? = null) : EntityFactory(em
         id = id,
         actionPlan = actionPlan,
         sessionNumber = sessionNumber,
-        appointment = appointment,
+        appointments = setOf(appointment),
       )
     )
   }
