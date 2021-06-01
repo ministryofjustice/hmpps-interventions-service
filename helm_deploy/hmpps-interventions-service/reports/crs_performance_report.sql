@@ -16,9 +16,9 @@ COPY (
     r.assigned_to_id        AS caseworker_id,
     (
         select min(app.appointment_time)
-        from session_delivery_appointment ses
-        join appointment app on ses.appointment_id = app.id
-        where ses.action_plan_id = ap.id and app.attended in ('YES', 'LATE')
+        from action_plan_session act
+        join appointment app on act.appointment_id = app.id
+        where act.action_plan_id = ap.id and app.attended in ('YES', 'LATE')
     )                       AS date_of_first_session,
     (
       select count(o.desired_outcome_id)
@@ -29,9 +29,9 @@ COPY (
     ap.number_of_sessions   AS count_of_sessions_expected,
     (
         select count(app.id)
-        from session_delivery_appointment ses
-        join appointment app on ses.appointment_id = app.id
-        where ses.action_plan_id = ap.id and app.attended in ('YES', 'LATE')
+        from action_plan_session act
+        join appointment app on act.appointment_id = app.id
+        where act.action_plan_id = ap.id and app.attended in ('YES', 'LATE')
     )                       AS count_of_sessions_attended,
     r.concluded_at          AS date_intervention_ended,
     eosr.submitted_at       AS date_end_of_service_report_submitted

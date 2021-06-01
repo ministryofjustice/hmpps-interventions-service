@@ -6,16 +6,16 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanSessionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SessionDeliveryAppointmentFactory
 
 @RepositoryTest
-class SessionDeliveryAppointmentRepositoryTest @Autowired constructor(
+class ActionPlanSessionRepositoryTest @Autowired constructor(
   val entityManager: TestEntityManager,
   val actionPlanRepository: ActionPlanRepository,
-  val sessionDeliveryAppointmentRepository: SessionDeliveryAppointmentRepository,
+  val actionPlanSessionRepository: ActionPlanSessionRepository,
   val interventionRepository: InterventionRepository,
   val referralRepository: ReferralRepository,
   val authUserRepository: AuthUserRepository,
@@ -25,11 +25,11 @@ class SessionDeliveryAppointmentRepositoryTest @Autowired constructor(
   private val authUserFactory = AuthUserFactory(entityManager)
   private val referralFactory = ReferralFactory(entityManager)
   private val actionPlanFactory = ActionPlanFactory(entityManager)
-  private val actionPlanAppointmentFactory = SessionDeliveryAppointmentFactory(entityManager)
+  private val actionPlanAppointmentFactory = ActionPlanSessionFactory(entityManager)
 
   @BeforeEach
   fun setup() {
-    sessionDeliveryAppointmentRepository.deleteAll()
+    actionPlanSessionRepository.deleteAll()
     actionPlanRepository.deleteAll()
     endOfServiceReportRepository.deleteAll()
     referralRepository.deleteAll()
@@ -48,7 +48,7 @@ class SessionDeliveryAppointmentRepositoryTest @Autowired constructor(
     entityManager.flush()
     entityManager.clear()
 
-    val savedAppointment = sessionDeliveryAppointmentRepository.findById(actionPlanAppointment.id).get()
+    val savedAppointment = actionPlanSessionRepository.findById(actionPlanAppointment.id).get()
 
     assertThat(savedAppointment.id).isEqualTo(actionPlanAppointment.id)
   }
@@ -62,7 +62,7 @@ class SessionDeliveryAppointmentRepositoryTest @Autowired constructor(
     val actionPlan2 = actionPlanFactory.create()
     actionPlanAppointmentFactory.createAttended(actionPlan = actionPlan2)
 
-    assertThat(sessionDeliveryAppointmentRepository.countByActionPlanIdAndAppointmentAttendedIsNotNull(actionPlan1.id)).isEqualTo(4)
-    assertThat(sessionDeliveryAppointmentRepository.countByActionPlanIdAndAppointmentAttendedIsNotNull(actionPlan2.id)).isEqualTo(1)
+    assertThat(actionPlanSessionRepository.countByActionPlanIdAndAppointmentAttendedIsNotNull(actionPlan1.id)).isEqualTo(4)
+    assertThat(actionPlanSessionRepository.countByActionPlanIdAndAppointmentAttendedIsNotNull(actionPlan2.id)).isEqualTo(1)
   }
 }

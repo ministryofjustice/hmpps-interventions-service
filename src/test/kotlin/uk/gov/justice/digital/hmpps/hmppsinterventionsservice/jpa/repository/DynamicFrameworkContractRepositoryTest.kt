@@ -11,21 +11,21 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceProvid
 
 @RepositoryTest
 class DynamicFrameworkContractRepositoryTest @Autowired constructor(
-        val entityManager: TestEntityManager,
-        val actionPlanRepository: ActionPlanRepository,
-        val sessionDeliveryAppointmentRepository: SessionDeliveryAppointmentRepository,
-        val interventionRepository: InterventionRepository,
-        val referralRepository: ReferralRepository,
-        val authUserRepository: AuthUserRepository,
-        val endOfServiceReportRepository: EndOfServiceReportRepository,
-        val dynamicFrameworkContractRepository: DynamicFrameworkContractRepository,
+  val entityManager: TestEntityManager,
+  val actionPlanRepository: ActionPlanRepository,
+  val actionPlanSessionRepository: ActionPlanSessionRepository,
+  val interventionRepository: InterventionRepository,
+  val referralRepository: ReferralRepository,
+  val authUserRepository: AuthUserRepository,
+  val endOfServiceReportRepository: EndOfServiceReportRepository,
+  val dynamicFrameworkContractRepository: DynamicFrameworkContractRepository,
 ) {
   private val dynamicFrameworkContractFactory = DynamicFrameworkContractFactory(entityManager)
   private val serviceProviderFactory = ServiceProviderFactory(entityManager)
 
   @BeforeEach
   fun setup() {
-    sessionDeliveryAppointmentRepository.deleteAll()
+    actionPlanSessionRepository.deleteAll()
     actionPlanRepository.deleteAll()
     endOfServiceReportRepository.deleteAll()
     referralRepository.deleteAll()

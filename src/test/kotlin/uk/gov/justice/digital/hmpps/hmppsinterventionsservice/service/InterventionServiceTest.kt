@@ -8,12 +8,12 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleD
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData.Companion.sampleContract
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData.Companion.sampleIntervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanSessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.PCCRegionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SessionDeliveryAppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ContractTypeFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.NPSRegionFactory
@@ -25,14 +25,14 @@ import java.time.LocalDate
 
 @RepositoryTest
 class InterventionServiceTest @Autowired constructor(
-        val entityManager: TestEntityManager,
-        val pccRegionRepository: PCCRegionRepository,
-        val interventionRepository: InterventionRepository,
-        val referralRepository: ReferralRepository,
-        val actionPlanRepository: ActionPlanRepository,
-        val sessionDeliveryAppointmentRepository: SessionDeliveryAppointmentRepository,
-        val authUserRepository: AuthUserRepository,
-        val endOfServiceReportRepository: EndOfServiceReportRepository,
+  val entityManager: TestEntityManager,
+  val pccRegionRepository: PCCRegionRepository,
+  val interventionRepository: InterventionRepository,
+  val referralRepository: ReferralRepository,
+  val actionPlanRepository: ActionPlanRepository,
+  val actionPlanSessionRepository: ActionPlanSessionRepository,
+  val authUserRepository: AuthUserRepository,
+  val endOfServiceReportRepository: EndOfServiceReportRepository,
 ) {
   private val interventionService = InterventionService(pccRegionRepository, interventionRepository)
   private val contractTypeFactory = ContractTypeFactory(entityManager)
@@ -44,7 +44,7 @@ class InterventionServiceTest @Autowired constructor(
 
   @BeforeEach
   fun setup() {
-    sessionDeliveryAppointmentRepository.deleteAll()
+    actionPlanSessionRepository.deleteAll()
     actionPlanRepository.deleteAll()
     endOfServiceReportRepository.deleteAll()
     referralRepository.deleteAll()

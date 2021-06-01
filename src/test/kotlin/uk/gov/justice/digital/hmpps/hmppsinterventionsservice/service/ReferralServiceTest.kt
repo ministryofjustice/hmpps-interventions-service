@@ -29,13 +29,13 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Interve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanSessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SessionDeliveryAppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ContractTypeFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFrameworkContractFactory
@@ -52,15 +52,15 @@ import java.util.UUID
 
 @RepositoryTest
 class ReferralServiceTest @Autowired constructor(
-        val entityManager: TestEntityManager,
-        val referralRepository: ReferralRepository,
-        val authUserRepository: AuthUserRepository,
-        val interventionRepository: InterventionRepository,
-        val cancellationReasonRepository: CancellationReasonRepository,
-        val sessionDeliveryAppointmentRepository: SessionDeliveryAppointmentRepository,
-        val actionPlanRepository: ActionPlanRepository,
-        val endOfServiceReportRepository: EndOfServiceReportRepository,
-        val serviceCategoryRepository: ServiceCategoryRepository,
+  val entityManager: TestEntityManager,
+  val referralRepository: ReferralRepository,
+  val authUserRepository: AuthUserRepository,
+  val interventionRepository: InterventionRepository,
+  val cancellationReasonRepository: CancellationReasonRepository,
+  val actionPlanSessionRepository: ActionPlanSessionRepository,
+  val actionPlanRepository: ActionPlanRepository,
+  val endOfServiceReportRepository: EndOfServiceReportRepository,
+  val serviceCategoryRepository: ServiceCategoryRepository,
 ) {
 
   private val userFactory = AuthUserFactory(entityManager)
@@ -92,7 +92,7 @@ class ReferralServiceTest @Autowired constructor(
     referralEventPublisher,
     referenceGenerator,
     cancellationReasonRepository,
-    sessionDeliveryAppointmentRepository,
+    actionPlanSessionRepository,
     serviceCategoryRepository,
     referralAccessChecker,
     userTypeChecker,

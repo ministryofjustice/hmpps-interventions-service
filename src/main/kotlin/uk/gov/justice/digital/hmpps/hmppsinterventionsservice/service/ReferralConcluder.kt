@@ -8,8 +8,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType.COMPLETED
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType.PREMATURELY_ENDED
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanSessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SessionDeliveryAppointmentRepository
 import java.time.OffsetDateTime
 import java.util.Objects.nonNull
 import javax.transaction.Transactional
@@ -17,9 +17,9 @@ import javax.transaction.Transactional
 @Service
 @Transactional
 class ReferralConcluder(
-        val referralRepository: ReferralRepository,
-        val sessionDeliveryAppointmentRepository: SessionDeliveryAppointmentRepository,
-        val referralEventPublisher: ReferralEventPublisher,
+  val referralRepository: ReferralRepository,
+  val actionPlanSessionRepository: ActionPlanSessionRepository,
+  val referralEventPublisher: ReferralEventPublisher,
 ) {
   companion object {
     private val logger = KotlinLogging.logger {}
@@ -40,7 +40,7 @@ class ReferralConcluder(
     val hasActionPlan = nonNull(referral.actionPlan)
 
     val numberOfAttendedAppointments = referral.actionPlan?.let {
-      sessionDeliveryAppointmentRepository.countByActionPlanIdAndAppointmentAttendedIsNotNull(it.id)
+      actionPlanSessionRepository.countByActionPlanIdAndAppointmentAttendedIsNotNull(it.id)
     } ?: 0
     val hasAttendedNoAppointments = numberOfAttendedAppointments == 0
 

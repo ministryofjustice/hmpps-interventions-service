@@ -4,6 +4,7 @@ import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.R
 import org.springframework.data.repository.findByIdOrNull
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlanActivity
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlanSession
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
@@ -19,8 +20,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SelectedDesiredOutcomesMapping
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SessionDeliveryAppointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanSessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
@@ -33,7 +34,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.NPS
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceProviderRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SessionDeliveryAppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ContractTypeFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFrameworkContractFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportFactory
@@ -55,7 +55,7 @@ class SetupAssistant(
   private val referralRepository: ReferralRepository,
   private val interventionRepository: InterventionRepository,
   private val actionPlanRepository: ActionPlanRepository,
-  private val sessionDeliveryAppointmentRepository: SessionDeliveryAppointmentRepository,
+  private val actionPlanSessionRepository: ActionPlanSessionRepository,
   private val serviceCategoryRepository: ServiceCategoryRepository,
   private val serviceProviderRepository: ServiceProviderRepository,
   private val npsRegionRepository: NPSRegionRepository,
@@ -80,7 +80,7 @@ class SetupAssistant(
 
   fun cleanAll() {
     // order of cleanup is important here to avoid breaking foreign key constraints
-    sessionDeliveryAppointmentRepository.deleteAll()
+    actionPlanSessionRepository.deleteAll()
     actionPlanRepository.deleteAll()
     endOfServiceReportRepository.deleteAll()
     referralRepository.deleteAll()
@@ -249,9 +249,9 @@ class SetupAssistant(
     actionPlan: ActionPlan,
     sessionNumber: Int,
     appointment: Appointment,
-  ): SessionDeliveryAppointment {
-    return sessionDeliveryAppointmentRepository.save(
-      SessionDeliveryAppointment(
+  ): ActionPlanSession {
+    return actionPlanSessionRepository.save(
+      ActionPlanSession(
         id = UUID.randomUUID(),
         sessionNumber = sessionNumber,
         appointment = appointment,

@@ -11,8 +11,8 @@ import javax.persistence.Table
 import javax.validation.constraints.NotNull
 
 @Entity
-@Table(name = "session_delivery_appointment")
-data class SessionDeliveryAppointment(
+@Table(name = "action_plan_session")
+data class ActionPlanSession(
 
   // Attributes
   @NotNull val sessionNumber: Int,
