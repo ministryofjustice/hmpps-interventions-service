@@ -44,4 +44,4 @@ alter table action_plan_appointment
     add constraint fk_action_plan_app_id foreign key (appointment_id) references appointment;
 
 alter table action_plan_appointment
-rename to supplier_assessment_appointment
+rename to session_delivery_appointment

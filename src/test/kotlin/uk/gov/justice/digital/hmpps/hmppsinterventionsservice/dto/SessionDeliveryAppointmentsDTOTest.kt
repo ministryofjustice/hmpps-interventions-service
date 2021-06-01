@@ -4,14 +4,14 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
 
-internal class SupplierAssessmentAppointmentsDTOTest {
+internal class SessionDeliveryAppointmentsDTOTest {
 
   @Test
   fun `Maps from an appointment`() {
     val actionPlan = SampleData.sampleActionPlan()
-    val actionPlanAppointment = SampleData.sampleSupplierAssessmentAppointment(actionPlan = actionPlan)
+    val actionPlanAppointment = SampleData.sampleSessionDeliveryAppointment(actionPlan = actionPlan)
 
-    val appointmentDTO = SupplierAssessmentAppointmentDTO.from(actionPlanAppointment)
+    val appointmentDTO = SessionDeliveryAppointmentDTO.from(actionPlanAppointment)
 
     assertThat(appointmentDTO.id).isEqualTo(actionPlanAppointment.id)
     assertThat(appointmentDTO.sessionNumber).isEqualTo(actionPlanAppointment.sessionNumber)
@@ -24,9 +24,9 @@ internal class SupplierAssessmentAppointmentsDTOTest {
   @Test
   fun `Maps from a list of appointments`() {
     val actionPlan = SampleData.sampleActionPlan()
-    val actionPlanAppointment = SampleData.sampleSupplierAssessmentAppointment(actionPlan = actionPlan)
+    val actionPlanAppointment = SampleData.sampleSessionDeliveryAppointment(actionPlan = actionPlan)
 
-    val appointmentsDTO = SupplierAssessmentAppointmentDTO.from(listOf(actionPlanAppointment))
+    val appointmentsDTO = SessionDeliveryAppointmentDTO.from(listOf(actionPlanAppointment))
 
     assertThat(appointmentsDTO.size).isEqualTo(1)
     assertThat(appointmentsDTO.first().id).isEqualTo(actionPlanAppointment.id)

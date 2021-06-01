@@ -12,7 +12,7 @@ import org.springframework.context.ApplicationEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.LocationMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.LATE
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAssessmentAppointmentFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SessionDeliveryAppointmentFactory
 import java.net.URI
 import java.time.OffsetDateTime
 
@@ -30,7 +30,7 @@ class AppointmentEventPublisherTest {
 
   @Test
   fun `builds an appointment attendance recorded event and publishes it`() {
-    val appointment = SupplierAssessmentAppointmentFactory().create()
+    val appointment = SessionDeliveryAppointmentFactory().create()
 
     publisher.attendanceRecordedEvent(appointment, false)
 
@@ -47,7 +47,7 @@ class AppointmentEventPublisherTest {
 
   @Test
   fun `builds an appointment behaviour recorded event and publishes it`() {
-    val appointment = SupplierAssessmentAppointmentFactory().create()
+    val appointment = SessionDeliveryAppointmentFactory().create()
 
     publisher.behaviourRecordedEvent(appointment, true)
 
@@ -64,7 +64,7 @@ class AppointmentEventPublisherTest {
 
   @Test
   fun `builds an appointment session feedback event and publishes it`() {
-    val appointment = SupplierAssessmentAppointmentFactory().create(
+    val appointment = SessionDeliveryAppointmentFactory().create(
       appointment = AppointmentFactory().create(
         attended = LATE,
         additionalAttendanceInformation = "Behaviour was fine",

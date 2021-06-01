@@ -3,10 +3,10 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessmentAppointment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SessionDeliveryAppointment
 import java.util.UUID
 
-class SupplierAssessmentAppointmentFactory(em: TestEntityManager? = null) : EntityFactory(em) {
+class SessionDeliveryAppointmentFactory(em: TestEntityManager? = null) : EntityFactory(em) {
   private val actionPlanFactory = ActionPlanFactory(em)
   private val appointmentFactory = AppointmentFactory(em)
 
@@ -15,9 +15,9 @@ class SupplierAssessmentAppointmentFactory(em: TestEntityManager? = null) : Enti
     actionPlan: ActionPlan = actionPlanFactory.create(),
     sessionNumber: Int = 1,
     appointment: Appointment = appointmentFactory.create()
-  ): SupplierAssessmentAppointment {
+  ): SessionDeliveryAppointment {
     return save(
-      SupplierAssessmentAppointment(
+      SessionDeliveryAppointment(
         id = id,
         actionPlan = actionPlan,
         sessionNumber = sessionNumber,
@@ -31,9 +31,9 @@ class SupplierAssessmentAppointmentFactory(em: TestEntityManager? = null) : Enti
     actionPlan: ActionPlan = actionPlanFactory.create(),
     sessionNumber: Int = 1,
     appointment: Appointment = appointmentFactory.createAttended()
-  ): SupplierAssessmentAppointment {
+  ): SessionDeliveryAppointment {
     return save(
-      SupplierAssessmentAppointment(
+      SessionDeliveryAppointment(
         id = id,
         actionPlan = actionPlan,
         sessionNumber = sessionNumber,

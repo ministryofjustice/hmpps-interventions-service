@@ -27,7 +27,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Can
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SupplierAssessmentAppointmentRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SessionDeliveryAppointmentRepository
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -43,7 +43,7 @@ class ReferralService(
   val eventPublisher: ReferralEventPublisher,
   val referenceGenerator: ReferralReferenceGenerator,
   val cancellationReasonRepository: CancellationReasonRepository,
-  val supplierAssessmentAppointmentRepository: SupplierAssessmentAppointmentRepository,
+  val sessionDeliveryAppointmentRepository: SessionDeliveryAppointmentRepository,
   val serviceCategoryRepository: ServiceCategoryRepository,
   val referralAccessChecker: ReferralAccessChecker,
   val userTypeChecker: UserTypeChecker,
