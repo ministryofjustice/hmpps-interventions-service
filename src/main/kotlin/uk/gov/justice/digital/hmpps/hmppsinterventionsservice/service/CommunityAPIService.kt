@@ -105,7 +105,7 @@ class CommunityAPIReferralEventService(
       .buildAndExpand(event.referral.serviceUserCRN, integrationContext)
       .toString()
 
-    communityAPIClient.makeAsyncPostRequest(communityApiSentReferralPath, referralEndRequest)
+    communityAPIClient.makeFireAndForgetPostRequest(communityApiSentReferralPath, referralEndRequest)
   }
 }
 
@@ -149,7 +149,7 @@ class CommunityAPIEndOfServiceReportEventService(
       .buildAndExpand(referral.serviceUserCRN, referral.relevantSentenceId!!, integrationContext)
       .toString()
 
-    communityAPIClient.makeAsyncPostRequest(communityApiSentReferralPath, request)
+    communityAPIClient.makeFireAndForgetPostRequest(communityApiSentReferralPath, request)
   }
 }
 
@@ -193,7 +193,7 @@ class CommunityAPIActionPlanEventService(
       .buildAndExpand(referral.serviceUserCRN, referral.relevantSentenceId!!, integrationContext)
       .toString()
 
-    communityAPIClient.makeAsyncPostRequest(communityApiSentReferralPath, request)
+    communityAPIClient.makeFireAndForgetPostRequest(communityApiSentReferralPath, request)
   }
 }
 @Service
@@ -224,7 +224,7 @@ class CommunityAPIAppointmentEventService(
           .buildAndExpand(event.appointment.actionPlan.referral.serviceUserCRN, event.appointment.deliusAppointmentId, integrationContext)
           .toString()
 
-        communityAPIClient.makeAsyncPostRequest(communityApiSentReferralPath, request)
+        communityAPIClient.makeFireAndForgetPostRequest(communityApiSentReferralPath, request)
       }
       else -> {}
     }

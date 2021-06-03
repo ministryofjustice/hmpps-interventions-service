@@ -46,7 +46,7 @@ class CommunityAPIReferralEventServiceTest {
     val event = getEvent(ReferralEventType.CANCELLED, concludedAtDefault)
     communityAPIService.onApplicationEvent(event)
 
-    verify(communityAPIClient).makeAsyncPostRequest(
+    verify(communityAPIClient).makeFireAndForgetPostRequest(
       "secure/offenders/crn/X123456/referral/end/context/commissioned-rehabilitation-services",
       ReferralEndRequest(
         "ACC",
@@ -67,7 +67,7 @@ class CommunityAPIReferralEventServiceTest {
     val event = getEvent(ReferralEventType.PREMATURELY_ENDED, concludedAtDefault, endOfServiceReport)
     communityAPIService.onApplicationEvent(event)
 
-    verify(communityAPIClient).makeAsyncPostRequest(
+    verify(communityAPIClient).makeFireAndForgetPostRequest(
       "secure/offenders/crn/X123456/referral/end/context/commissioned-rehabilitation-services",
       ReferralEndRequest(
         "ACC",
@@ -88,7 +88,7 @@ class CommunityAPIReferralEventServiceTest {
     val event = getEvent(ReferralEventType.COMPLETED, concludedAtDefault, endOfServiceReport)
     communityAPIService.onApplicationEvent(event)
 
-    verify(communityAPIClient).makeAsyncPostRequest(
+    verify(communityAPIClient).makeFireAndForgetPostRequest(
       "secure/offenders/crn/X123456/referral/end/context/commissioned-rehabilitation-services",
       ReferralEndRequest(
         "ACC",

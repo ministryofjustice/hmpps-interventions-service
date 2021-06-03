@@ -40,7 +40,7 @@ class CommunityAPIClientTest {
     )
     whenever(exchangeFunction.exchange(any())).thenReturn(Mono.just(ClientResponse.create(OK).build()))
 
-    communityAPIClient.makeAsyncPostRequest("/uriValue", referralSentEvent)
+    communityAPIClient.makeFireAndForgetPostRequest("/uriValue", referralSentEvent)
 
     verify(exchangeFunction, times(1)).exchange(any())
     val requestCaptor = argumentCaptor<ClientRequest>()

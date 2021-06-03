@@ -34,7 +34,7 @@ class CommunityAPIAppointmentEventServiceTest {
     val urlCaptor = argumentCaptor<String>()
     val payloadCaptor = argumentCaptor<Any>()
     val referralId = appointmentEvent.appointment.actionPlan.referral.id
-    verify(communityAPIClient).makeAsyncPostRequest(urlCaptor.capture(), payloadCaptor.capture())
+    verify(communityAPIClient).makeFireAndForgetPostRequest(urlCaptor.capture(), payloadCaptor.capture())
     assertThat(urlCaptor.firstValue).isEqualTo("/secure/offenders/crn/CRN123/appointments/123456/outcome/context/commissioned-rehabilitation-services")
     assertThat(payloadCaptor.firstValue.toString()).isEqualTo(
       AppointmentOutcomeRequest(

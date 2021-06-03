@@ -20,7 +20,7 @@ class CommunityAPIClient(
     )
   }
 
-  fun makeAsyncPostRequest(uri: String, requestBody: Any) {
+  fun makeFireAndForgetPostRequest(uri: String, requestBody: Any) {
     communityApiWebClient.post().uri(uri)
       .body(Mono.just(requestBody), requestBody::class.java)
       .retrieve()

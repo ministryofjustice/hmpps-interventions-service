@@ -37,7 +37,7 @@ class CommunityAPIActionPlanEventServiceTest {
     val event = getEvent(SUBMITTED)
     communityAPIService.onApplicationEvent(event)
 
-    verify(communityAPIClient).makeAsyncPostRequest(
+    verify(communityAPIClient).makeFireAndForgetPostRequest(
       "/secure/offenders/crn/X123456/sentence/1234/notifications/context/commissioned-rehabilitation-services",
       NotificationCreateRequestDTO(
         "ACC",
