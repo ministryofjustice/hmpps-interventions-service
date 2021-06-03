@@ -1,22 +1,31 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller
 
+import org.springframework.http.HttpStatus
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.server.ResponseStatusException
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.LocationMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ActionPlanSessionDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAssignmentDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SentReferralDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentAttendanceDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentBehaviourDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AppointmentsService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
 import java.util.UUID
 
 @RestController
 class AppointmentsController(
   val appointmentsService: AppointmentsService,
+  val referralService: ReferralService,
+  private val userMapper: UserMapper,
   val locationMapper: LocationMapper
 ) {
   @PatchMapping("/action-plan/{id}/appointment/{sessionNumber}")
@@ -75,5 +84,27 @@ class AppointmentsController(
   @PostMapping("/action-plan/{actionPlanId}/appointment/{sessionNumber}/submit")
   fun submitSessionFeedback(@PathVariable actionPlanId: UUID, @PathVariable sessionNumber: Int): ActionPlanSessionDTO {
     return ActionPlanSessionDTO.from(appointmentsService.submitActionPlanSessionFeedback(actionPlanId, sessionNumber))
+  }
+
+  @PostMapping("/sent-referral/{id}/initial-assessment")
+  fun createInitialAssessment(
+    @PathVariable id: UUID,
+    @RequestBody updateAppointmentDTO: UpdateAppointmentDTO,
+    authentication: JwtAuthenticationToken,
+  ): SentReferralDTO {
+    val assignedBy = userMapper.fromToken(authentication)
+
+    val sentReferral = referralService.getSentReferralForUser(id, assignedBy, authentication)
+      ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "sent referral not found [id=$id]")
+
+//    val assignedTo = AuthUser(
+//      id = referralAssignment.assignedTo.userId,
+//      authSource = referralAssignment.assignedTo.authSource,
+//      userName = referralAssignment.assignedTo.username,
+//    )
+    return SentReferralDTO.from(
+      appointmentsService.createInitialAssessment(sentReferral, assignedBy,  updateAppointmentDTO.durationInMinutes,
+        updateAppointmentDTO.appointmentTime)
+    )
   }
 }

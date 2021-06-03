@@ -9,10 +9,14 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionP
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanSessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SupplierAssessmentRepository
 import java.time.OffsetDateTime
 import java.util.UUID
 import javax.persistence.EntityExistsException
@@ -28,6 +32,8 @@ class AppointmentsService(
   val appointmentRepository: AppointmentRepository,
   val appointmentEventPublisher: AppointmentEventPublisher,
   val communityAPIBookingService: CommunityAPIBookingService,
+  val supplierAssessmentRepository: SupplierAssessmentRepository,
+  val referralRepository: ReferralRepository,
 ) {
   fun createAppointment(
     actionPlan: ActionPlan,
@@ -183,4 +189,29 @@ class AppointmentsService(
     appointmentTime?.let { actionPlanSession.appointment.appointmentTime = it }
     durationInMinutes?.let { actionPlanSession.appointment.durationInMinutes = it }
   }
+
+  fun createInitialAssessment(referral: Referral,
+                              createdByUser: AuthUser,
+                              durationInMinutes: Int?,
+                              appointmentTime: OffsetDateTime?): Referral {
+
+    val supplierAssessment = SupplierAssessment(
+      id = UUID.randomUUID(),
+      referral = referral,
+      appointments = setOf(
+        appointmentRepository.save(
+          Appointment(
+            id = UUID.randomUUID(), appointmentTime = appointmentTime,
+            durationInMinutes = durationInMinutes,
+            createdBy = authUserRepository.save(createdByUser),
+            createdAt = OffsetDateTime.now()
+          )
+        )
+      ),
+    )
+
+    referral.supplierAssessment = supplierAssessmentRepository.save(supplierAssessment)
+    return referralRepository.save(referral)
+  }
+
 }
