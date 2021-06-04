@@ -21,6 +21,14 @@ _snyk_options: &snyk_options
   snyk-args: --policy-path=.snyk --configuration-matching='^((?!test).)*$'
 
 jobs:
+  docker_branch_push:
+    executor: hmpps/default
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: docker build --pull . --tag="quay.io/hmpps/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH}"
+      - run: docker login -u="${QUAYIO_USERNAME}" -p="${QUAYIO_PASSWORD}" quay.io
+      - run: docker push "quay.io/hmpps/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH}"
   validate:
     executor: hmpps/java
     docker:
@@ -190,97 +198,8 @@ workflows:
   build_test_and_deploy:
     unless: << pipeline.parameters.only_pacts >>
     jobs:
+      - docker_branch_push
       - validate
-      - publish_data:
-          requires:
-            - build_docker
-            - build_and_publish_docker
-      - hmpps/helm_lint:
-          name: helm_lint
-      - hmpps/build_docker:
-          name: build_and_publish_docker
-          <<: *snyk_options
-          filters:
-            branches:
-              only:
-                - main
-      - vulnerability_scan:
-          name: vulnerability_scan_and_monitor
-          monitor: true
-          <<: *snyk_options
-          filters:
-            branches:
-              only:
-                - main
-      - vulnerability_scan:
-          <<: *snyk_options
-          filters:
-            branches:
-              ignore:
-                - main
-      - hmpps/build_docker:
-          name: build_docker
-          publish: false
-          <<: *snyk_options
-          filters:
-            branches:
-              ignore:
-                - main
-      - hmpps/deploy_env:
-          name: deploy_dev
-          env: "dev"
-          slack_notification: true
-          slack_channel_name: "interventions-dev-notifications"
-          filters:
-            branches:
-              only:
-                - main
-          requires:
-            - validate
-            - publish_data
-            - build_and_publish_docker
-            - helm_lint
-            - vulnerability_scan_and_monitor
-          context:
-            - hmpps-common-vars
-      - approve_research:
-          type: approval
-          requires:
-            - deploy_dev
-      - hmpps/deploy_env:
-          name: deploy_research
-          env: "research"
-          slack_notification: true
-          slack_channel_name: "interventions-dev-notifications"
-          requires:
-            - approve_research
-          context:
-            - hmpps-common-vars
-            - hmpps-interventions-service-research
-      - approve_preprod:
-          type: approval
-          requires:
-            - deploy_dev
-      - hmpps/deploy_env:
-          name: deploy_preprod
-          env: "preprod"
-          slack_notification: true
-          slack_channel_name: "interventions-dev-notifications"
-          requires:
-            - approve_preprod
-          context:
-            - hmpps-common-vars
-            - hmpps-interventions-service-preprod
-      - hmpps/deploy_env:
-          name: deploy_prod
-          env: "prod"
-          slack_notification: true
-          slack_channel_name: "interventions-alerts"
-          requires:
-            - deploy_preprod
-          context:
-            - hmpps-common-vars
-            - hmpps-interventions-service-prod
 
   nightly:
     triggers:
