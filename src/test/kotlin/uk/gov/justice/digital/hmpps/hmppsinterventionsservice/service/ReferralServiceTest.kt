@@ -122,7 +122,7 @@ class ReferralServiceTest @Autowired constructor(
           contractType = SampleData.sampleContractType(
             name = "Personal Wellbeing",
             code = "PWB",
-            serviceCategories = mutableSetOf(
+            serviceCategories = linkedSetOf(
               SampleData.sampleServiceCategory(),
               SampleData.sampleServiceCategory(name = "Social inclusion")
             )
@@ -491,14 +491,14 @@ class ReferralServiceTest @Autowired constructor(
     val serviceCategory1 = serviceCategoryFactory.create(id = serviceCategoryId1, desiredOutcomes = mutableListOf(desiredOutcome1))
     val serviceCategory2 = serviceCategoryFactory.create(id = serviceCategoryId2, desiredOutcomes = mutableListOf(desiredOutcome2))
 
-    val contractType = contractTypeFactory.create(serviceCategories = setOf(serviceCategory1, serviceCategory2))
+    val contractType = contractTypeFactory.create(serviceCategories = linkedSetOf(serviceCategory1, serviceCategory2))
     val referral = referralFactory.createDraft(
       intervention = interventionFactory.create(
         contract = dynamicFrameworkContractFactory.create(
           contractType = contractType
         )
       ),
-      selectedServiceCategories = setOf(serviceCategory1).toMutableSet(),
+      selectedServiceCategories = linkedSetOf(serviceCategory1),
       desiredOutcomes = listOf(desiredOutcome1).toMutableList()
     )
     referralService.updateDraftReferral(referral, DraftReferralDTO(serviceCategoryIds = listOf(serviceCategoryId2)))

@@ -27,7 +27,7 @@ class EndOfServiceReportRepositoryTest @Autowired constructor(
     val intervention = interventionFactory.create()
     val outcomes = desiredOutcomesFactory.create(intervention.dynamicFrameworkContract.contractType.serviceCategories.elementAt(0), 1)
 
-    val referral = referralFactory.createSent(selectedServiceCategories = intervention.dynamicFrameworkContract.contractType.serviceCategories.toMutableSet(), desiredOutcomes = outcomes)
+    val referral = referralFactory.createSent(selectedServiceCategories = intervention.dynamicFrameworkContract.contractType.serviceCategories, desiredOutcomes = outcomes)
     val endOfServiceReport = endOfServiceReportFactory.create(
       referral = referral,
       outcomes = outcomes.map {

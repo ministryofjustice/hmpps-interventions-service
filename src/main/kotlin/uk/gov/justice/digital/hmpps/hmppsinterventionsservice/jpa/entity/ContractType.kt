@@ -19,5 +19,5 @@ data class ContractType(
     joinColumns = [JoinColumn(name = "contract_type_id")],
     inverseJoinColumns = [JoinColumn(name = "service_category_id")]
   )
-  val serviceCategories: Set<ServiceCategory> = setOf(),
+  val serviceCategories: LinkedHashSet<ServiceCategory> = linkedSetOf(),
 )

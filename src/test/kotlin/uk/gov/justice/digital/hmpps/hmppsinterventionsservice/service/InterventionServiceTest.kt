@@ -169,19 +169,19 @@ class InterventionServiceTest @Autowired constructor(
     // build map of contracts
     val contracts = mapOf(
       "harmonyLiving1" to sampleContract(
-        contractType = contractTypeFactory.create(serviceCategories = setOf(accommodationSC)),
+        contractType = contractTypeFactory.create(serviceCategories = linkedSetOf(accommodationSC)),
         primeProvider = serviceProviders["harmonyLiving"]!!,
         npsRegion = npsRegion,
       ),
       "harmonyLiving2" to sampleContract(
-        contractType = contractTypeFactory.create(serviceCategories = setOf(accommodationSC)),
+        contractType = contractTypeFactory.create(serviceCategories = linkedSetOf(accommodationSC)),
         primeProvider = serviceProviders["harmonyLiving"]!!,
         startDate = LocalDate.of(2020, 11, 5),
         endDate = LocalDate.of(2022, 10, 7),
         npsRegion = npsRegion,
       ),
       "homeTrust" to sampleContract(
-        contractType = contractTypeFactory.create(serviceCategories = setOf(accommodationSC)),
+        contractType = contractTypeFactory.create(serviceCategories = linkedSetOf(accommodationSC)),
         primeProvider = serviceProviders["homeTrust"]!!,
         startDate = LocalDate.of(2019, 5, 12),
         endDate = LocalDate.of(2022, 5, 12),

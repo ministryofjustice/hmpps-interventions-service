@@ -270,8 +270,8 @@ class SetupAssistant(
 
   fun fillReferralFields(
     referral: Referral,
-    selectedServiceCategories: List<ServiceCategory> = referral.intervention.dynamicFrameworkContract.contractType.serviceCategories.toList(),
-    complexityLevelIds: MutableMap<UUID, UUID>? = mutableMapOf(selectedServiceCategories[0].id to randomComplexityLevel(selectedServiceCategories[0]).id),
+    selectedServiceCategories: LinkedHashSet<ServiceCategory> = referral.intervention.dynamicFrameworkContract.contractType.serviceCategories,
+    complexityLevelIds: MutableMap<UUID, UUID>? = mutableMapOf(selectedServiceCategories.elementAt(0).id to randomComplexityLevel(selectedServiceCategories.elementAt(0)).id),
     desiredOutcomes: List<DesiredOutcome> = referral.intervention.dynamicFrameworkContract.contractType.serviceCategories.first().desiredOutcomes,
     serviceUserData: ServiceUserData = ServiceUserData(
       referral = referral,
@@ -298,7 +298,7 @@ class SetupAssistant(
     usingRarDays: Boolean = true,
     whenUnavailable: String = "She works Mondays 9am - midday",
   ): Referral {
-    referral.selectedServiceCategories = selectedServiceCategories.toSet()
+    referral.selectedServiceCategories = selectedServiceCategories
     // required to satisfy foreign key constrains on desired outcomes and complexity levels
     referralRepository.saveAndFlush(referral)
 

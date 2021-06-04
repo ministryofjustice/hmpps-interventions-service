@@ -12,7 +12,7 @@ class ContractTypeFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     id: UUID = UUID.randomUUID(),
     name: String = "Accommodation",
     code: String = "ACC",
-    serviceCategories: Set<ServiceCategory> = setOf(serviceCategoryFactory.create(name = "accommodation"))
+    serviceCategories: LinkedHashSet<ServiceCategory> = linkedSetOf(serviceCategoryFactory.create(name = "accommodation"))
   ): ContractType {
     return save(
       ContractType(

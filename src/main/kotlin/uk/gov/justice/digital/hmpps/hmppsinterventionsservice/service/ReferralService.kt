@@ -169,7 +169,7 @@ class ReferralService(
 
     val intervention = interventionRepository.getOne(interventionId)
     val serviceCategories = intervention.dynamicFrameworkContract.contractType.serviceCategories
-    val selectedServiceCategories = if (serviceCategories.size == 1) serviceCategories.toMutableSet() else null
+    val selectedServiceCategories = if (serviceCategories.size == 1) serviceCategories else null
 
     return referralRepository.save(
       Referral(
@@ -301,7 +301,7 @@ class ReferralService(
     referralRepository.saveAndFlush(referral)
 
     update.serviceCategoryIds?.let { serviceCategoryIds ->
-      referral.selectedServiceCategories = serviceCategoryRepository.findByIdIn(serviceCategoryIds)
+      referral.selectedServiceCategories = LinkedHashSet(serviceCategoryRepository.findByIdIn(serviceCategoryIds))
     }
     return referralRepository.save(referral)
   }

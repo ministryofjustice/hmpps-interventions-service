@@ -137,7 +137,7 @@ class ReferralServiceUnitTest {
     fun `cant set complexity level for an invalid service category`() {
       val serviceCategory1 = serviceCategoryFactory.create()
       val serviceCategory2 = serviceCategoryFactory.create()
-      val referral = referralFactory.createDraft(selectedServiceCategories = setOf(serviceCategory1))
+      val referral = referralFactory.createDraft(selectedServiceCategories = linkedSetOf(serviceCategory1))
       val e = assertThrows<ServerWebInputException> {
         referralService.updateDraftReferralComplexityLevel(
           referral,
@@ -153,7 +153,7 @@ class ReferralServiceUnitTest {
     fun `cant set complexity level when service category is not found`() {
       whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.empty())
       val serviceCategory = serviceCategoryFactory.create()
-      val referral = referralFactory.createDraft(selectedServiceCategories = setOf(serviceCategory))
+      val referral = referralFactory.createDraft(selectedServiceCategories = linkedSetOf(serviceCategory))
       val e = assertThrows<ServerWebInputException> {
         referralService.updateDraftReferralComplexityLevel(
           referral,
@@ -169,7 +169,7 @@ class ReferralServiceUnitTest {
     fun `cant set complexity level when its invalid for the service category`() {
       val complexityLevel = ComplexityLevel(UUID.randomUUID(), "title", "description")
       val serviceCategory = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel))
-      val referral = referralFactory.createDraft(selectedServiceCategories = setOf(serviceCategory))
+      val referral = referralFactory.createDraft(selectedServiceCategories = linkedSetOf(serviceCategory))
 
       whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.of(serviceCategory))
 
@@ -188,7 +188,7 @@ class ReferralServiceUnitTest {
     fun `can set complexity level for the first time`() {
       val complexityLevel = ComplexityLevel(UUID.randomUUID(), "title", "description")
       val serviceCategory = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel))
-      val referral = referralFactory.createDraft(selectedServiceCategories = setOf(serviceCategory))
+      val referral = referralFactory.createDraft(selectedServiceCategories = linkedSetOf(serviceCategory))
 
       assertThat(referral.complexityLevelIds).isNull()
 
@@ -210,7 +210,7 @@ class ReferralServiceUnitTest {
       val complexityLevel2 = ComplexityLevel(UUID.randomUUID(), "2", "description")
       val serviceCategory = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel1, complexityLevel2))
       val referral = referralFactory.createDraft(
-        selectedServiceCategories = setOf(serviceCategory),
+        selectedServiceCategories = linkedSetOf(serviceCategory),
         complexityLevelIds = mutableMapOf(serviceCategory.id to complexityLevel1.id)
       )
 
@@ -239,14 +239,14 @@ class ReferralServiceUnitTest {
 
     @Test
     fun `successfully update service categories`() {
-      val serviceCategories = setOf(
+      val serviceCategories = linkedSetOf(
         serviceCategoryFactory.create(id = UUID.fromString("8221a81c-08b2-4262-9c1a-0ab3c82cec8c"), name = "aaa"),
         serviceCategoryFactory.create(id = UUID.fromString("9556a399-3529-4993-8030-41db2090555e"), name = "bbb"),
         serviceCategoryFactory.create(id = UUID.fromString("b84f4eb7-4db0-477e-8c59-21027b3262c5"), name = "ccc"),
         serviceCategoryFactory.create(id = UUID.fromString("c036826e-f077-49a5-8b33-601dca7ad479"), name = "ddd")
       )
 
-      val contractType = contractTypeFactory.create(serviceCategories = serviceCategories.toSet())
+      val contractType = contractTypeFactory.create(serviceCategories = serviceCategories)
       val referral = referralFactory.createDraft(
         intervention = interventionFactory.create(
           contract = dynamicFrameworkContractFactory.create(
@@ -277,14 +277,14 @@ class ReferralServiceUnitTest {
       val serviceCategory1 = serviceCategoryFactory.create(id = serviceCategoryId1, desiredOutcomes = listOf(desiredOutcome1))
       val serviceCategory2 = serviceCategoryFactory.create(id = serviceCategoryId2, desiredOutcomes = listOf(desiredOutcome2))
 
-      val contractType = contractTypeFactory.create(serviceCategories = setOf(serviceCategory1, serviceCategory2))
+      val contractType = contractTypeFactory.create(serviceCategories = linkedSetOf(serviceCategory1, serviceCategory2))
       val referral = referralFactory.createDraft(
         intervention = interventionFactory.create(
           contract = dynamicFrameworkContractFactory.create(
             contractType = contractType
           )
         ),
-        selectedServiceCategories = setOf(serviceCategory1),
+        selectedServiceCategories = linkedSetOf(serviceCategory1),
         desiredOutcomes = listOf(desiredOutcome1)
       )
 
@@ -305,14 +305,14 @@ class ReferralServiceUnitTest {
       val desiredOutcome1 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId1)
       val serviceCategory1 = serviceCategoryFactory.create(id = serviceCategoryId1, desiredOutcomes = listOf(desiredOutcome1))
 
-      val contractType = contractTypeFactory.create(serviceCategories = setOf(serviceCategory1))
+      val contractType = contractTypeFactory.create(serviceCategories = linkedSetOf(serviceCategory1))
       val referral = referralFactory.createDraft(
         intervention = interventionFactory.create(
           contract = dynamicFrameworkContractFactory.create(
             contractType = contractType
           )
         ),
-        selectedServiceCategories = setOf(serviceCategory1),
+        selectedServiceCategories = linkedSetOf(serviceCategory1),
         desiredOutcomes = listOf(desiredOutcome1)
       )
 
@@ -338,14 +338,14 @@ class ReferralServiceUnitTest {
       val serviceCategory1 = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel1))
       val serviceCategory2 = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel2))
 
-      val contractType = contractTypeFactory.create(serviceCategories = setOf(serviceCategory1, serviceCategory2))
+      val contractType = contractTypeFactory.create(serviceCategories = linkedSetOf(serviceCategory1, serviceCategory2))
       val referral = referralFactory.createDraft(
         intervention = interventionFactory.create(
           contract = dynamicFrameworkContractFactory.create(
             contractType = contractType
           )
         ),
-        selectedServiceCategories = setOf(serviceCategory1),
+        selectedServiceCategories = linkedSetOf(serviceCategory1),
         complexityLevelIds = mapOf(serviceCategory1.id to complexityLevel1.id).toMutableMap()
       )
 
@@ -365,14 +365,14 @@ class ReferralServiceUnitTest {
       val complexityLevel1 = ComplexityLevel(UUID.randomUUID(), "title", "description")
       val serviceCategory1 = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel1))
 
-      val contractType = contractTypeFactory.create(serviceCategories = setOf(serviceCategory1))
+      val contractType = contractTypeFactory.create(serviceCategories = linkedSetOf(serviceCategory1))
       val referral = referralFactory.createDraft(
         intervention = interventionFactory.create(
           contract = dynamicFrameworkContractFactory.create(
             contractType = contractType
           )
         ),
-        selectedServiceCategories = setOf(serviceCategory1),
+        selectedServiceCategories = linkedSetOf(serviceCategory1),
         complexityLevelIds = mapOf(serviceCategory1.id to complexityLevel1.id).toMutableMap()
       )
 
@@ -389,7 +389,7 @@ class ReferralServiceUnitTest {
 
     @Test
     fun `fail to update referral with service category not part of contract type`() {
-      val serviceCategories = setOf(
+      val serviceCategories = linkedSetOf(
         serviceCategoryFactory.create(id = UUID.fromString("8221a81c-08b2-4262-9c1a-0ab3c82cec8c"), name = "aaa"),
         serviceCategoryFactory.create(id = UUID.fromString("9556a399-3529-4993-8030-41db2090555e"), name = "bbb"),
         serviceCategoryFactory.create(id = UUID.fromString("b84f4eb7-4db0-477e-8c59-21027b3262c5"), name = "ccc")
@@ -451,7 +451,7 @@ class ReferralServiceUnitTest {
     fun `cant set desired outcomes for an invalid service category`() {
       val serviceCategory1 = serviceCategoryFactory.create()
       val serviceCategory2 = serviceCategoryFactory.create()
-      val referral = referralFactory.createDraft(selectedServiceCategories = setOf(serviceCategory1))
+      val referral = referralFactory.createDraft(selectedServiceCategories = linkedSetOf(serviceCategory1))
       val e = assertThrows<ServerWebInputException> {
         referralService.updateDraftReferralDesiredOutcomes(
           referral,
@@ -467,7 +467,7 @@ class ReferralServiceUnitTest {
     fun `cant set desired outcome when service category is not found`() {
       whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.empty())
       val serviceCategory = serviceCategoryFactory.create()
-      val referral = referralFactory.createDraft(selectedServiceCategories = setOf(serviceCategory))
+      val referral = referralFactory.createDraft(selectedServiceCategories = linkedSetOf(serviceCategory))
       val e = assertThrows<ServerWebInputException> {
         referralService.updateDraftReferralDesiredOutcomes(
           referral,
@@ -484,7 +484,7 @@ class ReferralServiceUnitTest {
       val serviceCategoryId = UUID.randomUUID()
       val desiredOutcome = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId)
       val serviceCategory = serviceCategoryFactory.create(id = serviceCategoryId, desiredOutcomes = listOf(desiredOutcome))
-      val referral = referralFactory.createDraft(selectedServiceCategories = setOf(serviceCategory))
+      val referral = referralFactory.createDraft(selectedServiceCategories = linkedSetOf(serviceCategory))
 
       whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.of(serviceCategory))
 
@@ -504,7 +504,7 @@ class ReferralServiceUnitTest {
       val serviceCategoryId = UUID.randomUUID()
       val desiredOutcome = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId)
       val serviceCategory = serviceCategoryFactory.create(id = serviceCategoryId, desiredOutcomes = listOf(desiredOutcome))
-      val referral = referralFactory.createDraft(selectedServiceCategories = setOf(serviceCategory))
+      val referral = referralFactory.createDraft(selectedServiceCategories = linkedSetOf(serviceCategory))
 
       assertThat(referral.selectedDesiredOutcomes).isEmpty()
 
@@ -529,7 +529,7 @@ class ReferralServiceUnitTest {
       val desiredOutcome2 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId)
       val serviceCategory = serviceCategoryFactory.create(id = serviceCategoryId, desiredOutcomes = listOf(desiredOutcome1, desiredOutcome2))
       val referral = referralFactory.createDraft(
-        selectedServiceCategories = setOf(serviceCategory),
+        selectedServiceCategories = linkedSetOf(serviceCategory),
         desiredOutcomes = mutableListOf(desiredOutcome1)
       )
 
@@ -556,7 +556,7 @@ class ReferralServiceUnitTest {
       val serviceCategory1 = serviceCategoryFactory.create(id = serviceCategoryId1, desiredOutcomes = listOf(desiredOutcome2))
       val serviceCategory2 = serviceCategoryFactory.create(id = serviceCategoryId2, desiredOutcomes = listOf(desiredOutcome1, desiredOutcome2))
       val referral = referralFactory.createDraft(
-        selectedServiceCategories = setOf(serviceCategory1, serviceCategory2),
+        selectedServiceCategories = linkedSetOf(serviceCategory1, serviceCategory2),
         desiredOutcomes = mutableListOf(desiredOutcome1)
       )
 

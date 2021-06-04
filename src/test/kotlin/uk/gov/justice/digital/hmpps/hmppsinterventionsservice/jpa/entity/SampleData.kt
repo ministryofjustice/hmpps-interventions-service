@@ -92,7 +92,7 @@ class SampleData {
         assignedTo = assignedTo,
         assignedAt = assignedAt,
         intervention = intervention,
-        selectedServiceCategories = intervention.dynamicFrameworkContract.contractType.serviceCategories.toMutableSet(),
+        selectedServiceCategories = intervention.dynamicFrameworkContract.contractType.serviceCategories,
         actionPlan = actionPlan,
         endOfServiceReport = endOfServiceReport,
         concludedAt = concludedAt,
@@ -149,13 +149,13 @@ class SampleData {
       id: UUID? = null,
       name: String? = null,
       code: String? = null,
-      serviceCategories: Set<ServiceCategory>? = null
+      serviceCategories: LinkedHashSet<ServiceCategory>? = null
     ): ContractType {
       return ContractType(
         id = id ?: UUID.randomUUID(),
         name = name ?: "Accommodation",
         code = code ?: "ACC",
-        serviceCategories = serviceCategories ?: setOf(sampleServiceCategory())
+        serviceCategories = serviceCategories ?: linkedSetOf(sampleServiceCategory())
       )
     }
 
