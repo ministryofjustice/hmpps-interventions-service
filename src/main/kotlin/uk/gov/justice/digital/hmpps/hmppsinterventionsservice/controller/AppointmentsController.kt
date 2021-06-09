@@ -12,8 +12,7 @@ import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.LocationMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ActionPlanSessionDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAssignmentDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SentReferralDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SupplierAssessmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentAttendanceDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentBehaviourDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentDTO
@@ -86,25 +85,22 @@ class AppointmentsController(
     return ActionPlanSessionDTO.from(appointmentsService.submitActionPlanSessionFeedback(actionPlanId, sessionNumber))
   }
 
-  @PostMapping("/sent-referral/{id}/initial-assessment")
+  @PatchMapping("/sent-referral/{id}/initial-assessment")
   fun createInitialAssessment(
     @PathVariable id: UUID,
     @RequestBody updateAppointmentDTO: UpdateAppointmentDTO,
     authentication: JwtAuthenticationToken,
-  ): SentReferralDTO {
+  ): SupplierAssessmentDTO {
     val assignedBy = userMapper.fromToken(authentication)
 
-    val sentReferral = referralService.getSentReferralForUser(id, assignedBy, authentication)
+    val sentReferral = referralService.getSentReferralForUser(id, assignedBy)
       ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "sent referral not found [id=$id]")
 
-//    val assignedTo = AuthUser(
-//      id = referralAssignment.assignedTo.userId,
-//      authSource = referralAssignment.assignedTo.authSource,
-//      userName = referralAssignment.assignedTo.username,
-//    )
-    return SentReferralDTO.from(
-      appointmentsService.createInitialAssessment(sentReferral, assignedBy,  updateAppointmentDTO.durationInMinutes,
-        updateAppointmentDTO.appointmentTime)
+    return SupplierAssessmentDTO.from(
+      appointmentsService.updateInitialAssessment(
+        sentReferral, updateAppointmentDTO.durationInMinutes,
+        updateAppointmentDTO.appointmentTime
+      )
     )
   }
 }

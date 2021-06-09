@@ -190,28 +190,37 @@ class AppointmentsService(
     durationInMinutes?.let { actionPlanSession.appointment.durationInMinutes = it }
   }
 
-  fun createInitialAssessment(referral: Referral,
-                              createdByUser: AuthUser,
-                              durationInMinutes: Int?,
-                              appointmentTime: OffsetDateTime?): Referral {
+  fun createInitialAssessment(
+    referral: Referral,
+    createdByUser: AuthUser
+  ): Referral {
 
-    val supplierAssessment = SupplierAssessment(
-      id = UUID.randomUUID(),
-      referral = referral,
-      appointments = setOf(
-        appointmentRepository.save(
-          Appointment(
-            id = UUID.randomUUID(), appointmentTime = appointmentTime,
-            durationInMinutes = durationInMinutes,
-            createdBy = authUserRepository.save(createdByUser),
-            createdAt = OffsetDateTime.now()
+    referral.supplierAssessment = supplierAssessmentRepository.save(
+      SupplierAssessment(
+        id = UUID.randomUUID(),
+        referral = referral,
+        appointments = setOf(
+          appointmentRepository.save(
+            Appointment(
+              id = UUID.randomUUID(),
+              createdBy = authUserRepository.save(createdByUser),
+              createdAt = OffsetDateTime.now()
+            )
           )
-        )
-      ),
+        ),
+      )
     )
-
-    referral.supplierAssessment = supplierAssessmentRepository.save(supplierAssessment)
     return referralRepository.save(referral)
   }
 
+  fun updateInitialAssessment(
+    referral: Referral,
+    durationInMinutes: Int?,
+    appointmentTime: OffsetDateTime?
+  ): SupplierAssessment {
+    durationInMinutes?.let { referral.supplierAssessment!!.appointment.durationInMinutes = durationInMinutes }
+    appointmentTime?. let { referral.supplierAssessment!!.appointment.appointmentTime = appointmentTime }
+
+    return supplierAssessmentRepository.save(referral.supplierAssessment!!)
+  }
 }

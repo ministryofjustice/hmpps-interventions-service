@@ -7,9 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
-
-//import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanAppointmentRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.SetupAssistant
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanSessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
@@ -24,6 +21,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.NPS
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceProviderRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SupplierAssessmentRepository
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("test", "local")
@@ -48,6 +46,7 @@ abstract class IntegrationTestBase {
   @Autowired protected lateinit var cancellationReasonRepository: CancellationReasonRepository
   @Autowired protected lateinit var contractTypeRepository: ContractTypeRepository
   @Autowired protected lateinit var appointmentRepository: AppointmentRepository
+  @Autowired protected lateinit var supplierAssessmentRepository: SupplierAssessmentRepository
   protected lateinit var setupAssistant: SetupAssistant
 
   @BeforeEach
@@ -67,6 +66,7 @@ abstract class IntegrationTestBase {
       cancellationReasonRepository,
       contractTypeRepository,
       appointmentRepository,
+      supplierAssessmentRepository
     )
     setupAssistant.cleanAll()
   }

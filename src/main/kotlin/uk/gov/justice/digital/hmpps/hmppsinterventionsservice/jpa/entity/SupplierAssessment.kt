@@ -12,13 +12,12 @@ import javax.validation.constraints.NotNull
 
 @Entity
 @Table(name = "supplier_assessment")
-data class SupplierAssessment (
+data class SupplierAssessment(
   @Id val id: UUID,
   @NotNull @OneToOne val referral: Referral,
 
   @NotNull @OneToMany @Fetch(FetchMode.JOIN) val appointments: Set<Appointment>,
-)
-{
+) {
   val appointment: Appointment
-  get() = appointments.maxByOrNull { it.createdAt }!!
+    get() = appointments.maxByOrNull { it.createdAt }!!
 }

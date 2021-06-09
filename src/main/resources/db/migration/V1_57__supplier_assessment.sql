@@ -13,9 +13,3 @@ create table supplier_assessment_appointments (
       constraint uk_supplier_assessment_appointments_appointments_id unique (appointments_id),
       primary key (supplier_assessment_id, appointments_id)
 );
-
-alter table referral
-    add column supplier_assessment_id UUID;
-
-alter table referral
-    add constraint fk_supplier_assessment_id foreign key (supplier_assessment_id) references supplier_assessment;

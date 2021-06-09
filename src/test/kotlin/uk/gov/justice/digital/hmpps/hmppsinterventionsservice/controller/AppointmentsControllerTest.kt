@@ -4,6 +4,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.LocationMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ActionPlanSessionDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentAttendanceDTO
@@ -11,14 +12,17 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointm
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AppointmentsService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
 import java.time.OffsetDateTime
 import java.util.UUID
 
 internal class AppointmentsControllerTest {
   private val appointmentsService = mock<AppointmentsService>()
   private val locationMapper = mock<LocationMapper>()
+  private val referralService = mock<ReferralService>()
+  private val userMapper = mock<UserMapper>()
 
-  private val appointmentsController = AppointmentsController(appointmentsService, locationMapper)
+  private val appointmentsController = AppointmentsController(appointmentsService, referralService, userMapper, locationMapper)
 
   @Test
   fun `updates an appointment`() {

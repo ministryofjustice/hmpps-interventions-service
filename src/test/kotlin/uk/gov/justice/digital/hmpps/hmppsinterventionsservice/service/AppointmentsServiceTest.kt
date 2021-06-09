@@ -19,11 +19,18 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlanSession
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanSessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SupplierAssessmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAssessmentFactory
 import java.time.OffsetDateTime
 import java.util.Optional.of
 import java.util.UUID
@@ -39,11 +46,17 @@ internal class AppointmentsServiceTest {
   private val appointmentEventPublisher: AppointmentEventPublisher = mock()
   private val communityAPIBookingService: CommunityAPIBookingService = mock()
   private val actionPlanFactory = ActionPlanFactory()
+  private val supplierAssessmentRepository: SupplierAssessmentRepository = mock()
+  val referralRepository: ReferralRepository = mock()
+  private val referralFactory = ReferralFactory()
+  private val authUserFactory = AuthUserFactory()
+  private val appointmentFactory = AppointmentFactory()
+  private val supplierAssessmentFactory = SupplierAssessmentFactory()
 
   private val appointmentsService = AppointmentsService(
     actionPlanSessionRepository, actionPlanRepository,
     authUserRepository, appointmentRepository, appointmentEventPublisher,
-    communityAPIBookingService
+    communityAPIBookingService, supplierAssessmentRepository, referralRepository
   )
 
   @Test
@@ -422,5 +435,46 @@ internal class AppointmentsServiceTest {
     assertThrows(ResponseStatusException::class.java) {
       appointmentsService.recordActionPlanSessionBehaviour(actionPlan.id, 1, "bad", false)
     }
+  }
+
+  @Test
+  fun `initial assessment can be created`() {
+    val referral = referralFactory.createDraft()
+    val createdByUser = authUserFactory.create()
+
+    whenever(authUserRepository.save(any())).thenReturn(createdByUser)
+    whenever(appointmentRepository.save(any())).thenReturn(appointmentFactory.create())
+    whenever(supplierAssessmentRepository.save(any())).thenReturn(supplierAssessmentFactory.create())
+    whenever(referralRepository.save(any())).thenReturn(referral)
+
+    appointmentsService.createInitialAssessment(referral, createdByUser)
+
+    val argumentCaptor = argumentCaptor<SupplierAssessment>()
+    verify(supplierAssessmentRepository, atLeastOnce()).save(argumentCaptor.capture())
+    val arguments = argumentCaptor.firstValue
+
+    assertThat(arguments.referral).isEqualTo(referral)
+    assertThat(arguments.appointments.size).isEqualTo(1)
+    assertThat(arguments.appointment.createdBy).isEqualTo(createdByUser)
+  }
+
+  @Test
+  fun `initial assessment appointment can be updated`() {
+    val referral = referralFactory.createSent()
+    referral.supplierAssessment = supplierAssessmentFactory.create()
+    val durationInMinutes = 60
+    val appointmentTime = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
+
+    whenever(supplierAssessmentRepository.save(any())).thenReturn(supplierAssessmentFactory.create())
+
+    appointmentsService.updateInitialAssessment(referral, durationInMinutes, appointmentTime)
+
+    val argumentCaptor = argumentCaptor<SupplierAssessment>()
+    verify(supplierAssessmentRepository, atLeastOnce()).save(argumentCaptor.capture())
+    val arguments = argumentCaptor.firstValue
+
+    assertThat(arguments.appointments.size).isEqualTo(1)
+    assertThat(arguments.appointment.durationInMinutes).isEqualTo(durationInMinutes)
+    assertThat(arguments.appointment.appointmentTime).isEqualTo(appointmentTime)
   }
 }

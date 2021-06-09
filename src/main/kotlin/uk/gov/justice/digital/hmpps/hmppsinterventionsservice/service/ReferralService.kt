@@ -52,6 +52,7 @@ class ReferralService(
   val communityAPIReferralService: CommunityAPIReferralService,
   val serviceUserAccessChecker: ServiceUserAccessChecker,
   val assessRisksAndNeedsService: RisksAndNeedsService,
+  val appointmentsService: AppointmentsService,
 ) {
   companion object {
     private val logger = KotlinLogging.logger {}
@@ -149,6 +150,8 @@ class ReferralService(
 
     val sentReferral = referralRepository.save(referral)
     eventPublisher.referralSentEvent(sentReferral)
+    appointmentsService.createInitialAssessment(referral, user)
+
     return sentReferral
   }
 

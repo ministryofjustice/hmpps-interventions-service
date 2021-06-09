@@ -4,6 +4,7 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
@@ -61,6 +62,7 @@ class ReferralServiceUnitTest {
   private val userTypeChecker: UserTypeChecker = mock()
   private val serviceUserAccessChecker: ServiceUserAccessChecker = mock()
   private val assessRisksAndNeedsService: RisksAndNeedsService = mock()
+  private val appointmentsService: AppointmentsService = mock()
 
   private val referralFactory = ReferralFactory()
   private val authUserFactory = AuthUserFactory()
@@ -73,18 +75,9 @@ class ReferralServiceUnitTest {
   private val referralService = ReferralService(
     referralRepository, authUserRepository, interventionRepository, referralConcluder,
     referralEventPublisher, referralReferenceGenerator, cancellationReasonRepository,
-<<<<<<< HEAD
-<<<<<<< HEAD
-    supplierAssessmentAppointmentRepository, serviceCategoryRepository, referralAccessChecker, userTypeChecker,
-    serviceProviderAccessScopeMapper, referralAccessFilter, communityAPIReferralService, serviceUserAccessChecker,
-    assessRisksAndNeedsService,
-=======
-    sessionDeliveryAppointmentRepository, serviceCategoryRepository, referralAccessChecker, userTypeChecker,
-=======
     actionPlanSessionRepository, serviceCategoryRepository, referralAccessChecker, userTypeChecker,
->>>>>>> rename sessionDeliveryAppointment to ActionPlanSession
-    serviceProviderAccessScopeMapper, referralAccessFilter, communityAPIReferralService, serviceUserAccessChecker
->>>>>>> rename supplier_assessment_appointment to session_delivery_appointment
+    serviceProviderAccessScopeMapper, referralAccessFilter, communityAPIReferralService, serviceUserAccessChecker,
+    assessRisksAndNeedsService, appointmentsService
   )
 
   @Test
