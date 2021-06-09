@@ -91,9 +91,9 @@ class AppointmentsController(
     @RequestBody updateAppointmentDTO: UpdateAppointmentDTO,
     authentication: JwtAuthenticationToken,
   ): SupplierAssessmentDTO {
-    val assignedBy = userMapper.fromToken(authentication)
+    val user = userMapper.fromToken(authentication)
 
-    val sentReferral = referralService.getSentReferralForUser(id, assignedBy)
+    val sentReferral = referralService.getSentReferralForUser(id, user)
       ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "sent referral not found [id=$id]")
 
     return SupplierAssessmentDTO.from(

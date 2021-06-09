@@ -137,7 +137,8 @@ class ActionPlanContracts(private val setupAssistant: SetupAssistant) {
         appointmentTime = OffsetDateTime.parse("2021-05-13T13:30:00+01:00"),
         attended = Attended.LATE,
         behaviour = "Alex was well behaved",
-        notifyPPOfBehaviour = false
+        notifyPPOfBehaviour = false,
+        attendanceInfo = "Missed to bus"
       )
     )
   }
