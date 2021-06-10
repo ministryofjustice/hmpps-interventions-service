@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.LocationMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ActionPlanSessionDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SupplierAssessmentAppointmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SupplierAssessmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentAttendanceDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentBehaviourDTO
@@ -102,5 +103,18 @@ class AppointmentsController(
         updateAppointmentDTO.appointmentTime
       )
     )
+  }
+
+  @GetMapping("sent-referral/{id}/supplier-assessment-appointment")
+  fun getSupplierAssessmentAppointment(
+    @PathVariable id: UUID,
+    authentication: JwtAuthenticationToken,
+  ): SupplierAssessmentAppointmentDTO {
+    val user = userMapper.fromToken(authentication)
+
+    val sentReferral = referralService.getSentReferralForUser(id, user)
+      ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "sent referral not found [id=$id]")
+
+    return SupplierAssessmentAppointmentDTO.from(sentReferral.supplierAssessment!!.appointment)
   }
 }
