@@ -376,6 +376,42 @@ internal class AppointmentsServiceTest {
   }
 
   @Test
+  fun `attendance is submitted (without feedback)`() {
+    val actionPlan = SampleData.sampleActionPlan()
+    val appointment = SampleData.sampleActionPlanAppointment(actionPlan = actionPlan, createdBy = actionPlan.createdBy)
+    whenever(actionPlanAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlan.id, 1)).thenReturn(
+      appointment
+    )
+    whenever(actionPlanAppointmentRepository.save(any())).thenReturn(appointment)
+
+    appointmentsService.recordAttendance(actionPlan.id, 1, Attended.YES, "")
+    appointmentsService.submitSessionFeedback(actionPlan.id, 1)
+
+    verify(actionPlanAppointmentRepository, atLeastOnce()).save(appointment)
+
+    verify(appointmentEventPublisher).attendanceRecordedEvent(appointment, false)
+    verify(appointmentEventPublisher).sessionFeedbackRecordedEvent(appointment, false)
+  }
+
+  @Test
+  fun `non attendance is submitted (without feedback) and notify PP is not set on session feedback`() {
+    val actionPlan = SampleData.sampleActionPlan()
+    val appointment = SampleData.sampleActionPlanAppointment(actionPlan = actionPlan, createdBy = actionPlan.createdBy)
+    whenever(actionPlanAppointmentRepository.findByActionPlanIdAndSessionNumber(actionPlan.id, 1)).thenReturn(
+      appointment
+    )
+    whenever(actionPlanAppointmentRepository.save(any())).thenReturn(appointment)
+
+    appointmentsService.recordAttendance(actionPlan.id, 1, Attended.NO, "")
+    appointmentsService.submitSessionFeedback(actionPlan.id, 1)
+
+    verify(actionPlanAppointmentRepository, atLeastOnce()).save(appointment)
+
+    verify(appointmentEventPublisher).attendanceRecordedEvent(appointment, true)
+    verify(appointmentEventPublisher).sessionFeedbackRecordedEvent(appointment, false)
+  }
+
+  @Test
   fun `attendance can't be updated once session feedback has been submitted`() {
     val actionPlan = SampleData.sampleActionPlan()
     val appointment = SampleData.sampleActionPlanAppointment(actionPlan = actionPlan, createdBy = actionPlan.createdBy)

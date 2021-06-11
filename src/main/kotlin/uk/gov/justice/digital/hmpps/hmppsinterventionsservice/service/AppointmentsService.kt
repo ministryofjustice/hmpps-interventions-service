@@ -119,8 +119,12 @@ class AppointmentsService(
     actionPlanAppointmentRepository.save(appointment)
 
     appointmentEventPublisher.attendanceRecordedEvent(appointment, appointment.attended == Attended.NO)
-    appointmentEventPublisher.behaviourRecordedEvent(appointment, appointment.notifyPPOfAttendanceBehaviour!!)
-    appointmentEventPublisher.sessionFeedbackRecordedEvent(appointment, appointment.notifyPPOfAttendanceBehaviour!!)
+
+    if (appointment.notifyPPOfAttendanceBehaviour != null) {
+      appointmentEventPublisher.behaviourRecordedEvent(appointment, appointment.notifyPPOfAttendanceBehaviour!!)
+    }
+
+    appointmentEventPublisher.sessionFeedbackRecordedEvent(appointment, appointment.notifyPPOfAttendanceBehaviour ?: false)
     return appointment
   }
 
