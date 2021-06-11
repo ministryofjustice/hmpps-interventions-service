@@ -86,7 +86,7 @@ class AppointmentsController(
     return ActionPlanSessionDTO.from(appointmentsService.submitActionPlanSessionFeedback(actionPlanId, sessionNumber))
   }
 
-  @PatchMapping("/sent-referral/{id}/initial-assessment")
+  @PatchMapping("/sent-referral/{id}/supplier-assessment-appointment")
   fun createInitialAssessment(
     @PathVariable id: UUID,
     @RequestBody updateAppointmentDTO: UpdateAppointmentDTO,
@@ -98,7 +98,7 @@ class AppointmentsController(
       ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "sent referral not found [id=$id]")
 
     return SupplierAssessmentDTO.from(
-      appointmentsService.updateInitialAssessment(
+      appointmentsService.updateSupplierAssessmentAppointment(
         sentReferral, updateAppointmentDTO.durationInMinutes,
         updateAppointmentDTO.appointmentTime
       )

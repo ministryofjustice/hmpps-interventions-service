@@ -190,7 +190,7 @@ class AppointmentsService(
     durationInMinutes?.let { actionPlanSession.appointment.durationInMinutes = it }
   }
 
-  fun createInitialAssessment(
+  fun createSupplierAssessment(
     referral: Referral,
     createdByUser: AuthUser
   ): Referral {
@@ -213,7 +213,7 @@ class AppointmentsService(
     return referralRepository.save(referral)
   }
 
-  fun updateInitialAssessment(
+  fun updateSupplierAssessmentAppointment(
     referral: Referral,
     durationInMinutes: Int?,
     appointmentTime: OffsetDateTime?

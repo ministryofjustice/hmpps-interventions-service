@@ -150,7 +150,7 @@ class ReferralService(
 
     val sentReferral = referralRepository.save(referral)
     eventPublisher.referralSentEvent(sentReferral)
-    appointmentsService.createInitialAssessment(referral, user)
+    appointmentsService.createSupplierAssessment(referral, user)
 
     return sentReferral
   }

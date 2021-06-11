@@ -447,7 +447,7 @@ internal class AppointmentsServiceTest {
     whenever(supplierAssessmentRepository.save(any())).thenReturn(supplierAssessmentFactory.create())
     whenever(referralRepository.save(any())).thenReturn(referral)
 
-    appointmentsService.createInitialAssessment(referral, createdByUser)
+    appointmentsService.createSupplierAssessment(referral, createdByUser)
 
     val argumentCaptor = argumentCaptor<SupplierAssessment>()
     verify(supplierAssessmentRepository, atLeastOnce()).save(argumentCaptor.capture())
@@ -467,7 +467,7 @@ internal class AppointmentsServiceTest {
 
     whenever(supplierAssessmentRepository.save(any())).thenReturn(supplierAssessmentFactory.create())
 
-    appointmentsService.updateInitialAssessment(referral, durationInMinutes, appointmentTime)
+    appointmentsService.updateSupplierAssessmentAppointment(referral, durationInMinutes, appointmentTime)
 
     val argumentCaptor = argumentCaptor<SupplierAssessment>()
     verify(supplierAssessmentRepository, atLeastOnce()).save(argumentCaptor.capture())
