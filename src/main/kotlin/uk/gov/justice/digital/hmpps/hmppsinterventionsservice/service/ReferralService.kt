@@ -222,7 +222,7 @@ class ReferralService(
 
     update.completionDeadline?.let {
       if (it.isBefore(LocalDate.now())) {
-        errors.add(FieldError(field = "completionDeadline", error = Code.DATE_MUST_BE_IN_THE_FUTURE))
+        errors.add(FieldError(field = "completionDeadline", error = Code.DATE_MUST_BE_IN_THE_FUTURE, errorMessage = "Completion deadline must be in the future"))
       }
 
       // fixme: error if completion deadline is after sentence end date
@@ -230,19 +230,19 @@ class ReferralService(
 
     update.needsInterpreter?.let {
       if (it && update.interpreterLanguage == null) {
-        errors.add(FieldError(field = "needsInterpreter", error = Code.CONDITIONAL_FIELD_MUST_BE_SET))
+        errors.add(FieldError(field = "needsInterpreter", error = Code.CONDITIONAL_FIELD_MUST_BE_SET, "Needs interpreter must be set."))
       }
     }
 
     update.hasAdditionalResponsibilities?.let {
       if (it && update.whenUnavailable == null) {
-        errors.add(FieldError(field = "hasAdditionalResponsibilities", error = Code.CONDITIONAL_FIELD_MUST_BE_SET))
+        errors.add(FieldError(field = "hasAdditionalResponsibilities", error = Code.CONDITIONAL_FIELD_MUST_BE_SET, errorMessage = "Has additional responsibilities must be set."))
       }
     }
 
     update.serviceUser?.let {
       if (it.crn != null && it.crn != referral.serviceUserCRN) {
-        errors.add(FieldError(field = "serviceUser.crn", error = Code.FIELD_CANNOT_BE_CHANGED))
+        errors.add(FieldError(field = "serviceUser.crn", error = Code.FIELD_CANNOT_BE_CHANGED, "CRN cannot be changed"))
       }
     }
 
@@ -252,7 +252,7 @@ class ReferralService(
         serviceCategory.id
       }.containsAll(it)
       ) {
-        errors.add(FieldError(field = "serviceCategoryIds", error = Code.INVALID_SERVICE_CATEGORY_FOR_CONTRACT))
+        errors.add(FieldError(field = "serviceCategoryIds", error = Code.INVALID_SERVICE_CATEGORY_FOR_CONTRACT, "Invalid service category id for contract"))
       }
     }
 

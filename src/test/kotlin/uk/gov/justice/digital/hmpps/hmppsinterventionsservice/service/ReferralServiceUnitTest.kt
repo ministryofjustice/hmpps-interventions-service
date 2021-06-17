@@ -418,7 +418,7 @@ class ReferralServiceUnitTest {
         referralService.updateDraftReferral(referral, update)
       }
       assertThat(exception.message).isEqualTo("draft referral update invalid")
-      assertThat(exception.errors[0]).isEqualTo(FieldError(field = "serviceCategoryIds", error = Code.INVALID_SERVICE_CATEGORY_FOR_CONTRACT))
+      assertThat(exception.errors[0]).isEqualTo(FieldError(field = "serviceCategoryIds", error = Code.INVALID_SERVICE_CATEGORY_FOR_CONTRACT, "Invalid service category id for contract"))
     }
   }
 

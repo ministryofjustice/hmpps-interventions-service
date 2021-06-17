@@ -32,13 +32,13 @@ class ActionPlanValidator {
   private fun validateNumberOfSessionsIsGreaterThanZero(update: ActionPlan, errors: MutableList<FieldError>) {
     update.numberOfSessions?.let {
       if (it <= 0) {
-        errors.add(FieldError(field = "numberOfSessions", error = CANNOT_BE_NEGATIVE_OR_ZERO))
+        errors.add(FieldError(field = "numberOfSessions", error = CANNOT_BE_NEGATIVE_OR_ZERO, errorMessage = "Number of sessions cannot be negative or zero"))
       }
     }
   }
 
   private fun validateNumberOfSessionsIsSpecified(update: ActionPlan, errors: MutableList<FieldError>) {
     update.numberOfSessions?.let {
-    } ?: errors.add(FieldError(field = "numberOfSessions", error = CANNOT_BE_EMPTY))
+    } ?: errors.add(FieldError(field = "numberOfSessions", error = CANNOT_BE_EMPTY, errorMessage = "Number of sessions cannot be empty"))
   }
 }

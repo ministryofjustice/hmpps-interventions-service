@@ -29,6 +29,7 @@ enum class Code {
 data class FieldError(
   val field: String,
   val error: Code,
+  val errorMessage: String,
 )
 
 class ValidationError(override val message: String, val errors: List<FieldError>) : RuntimeException(message)
