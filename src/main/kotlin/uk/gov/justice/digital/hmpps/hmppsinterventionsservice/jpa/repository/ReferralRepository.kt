@@ -25,8 +25,9 @@ interface ReferralRepository : JpaRepository<Referral, UUID> {
   fun findByIdAndSentAtIsNull(id: UUID): Referral?
   fun findByCreatedByIdAndSentAtIsNull(userId: String): List<Referral>
 
-  @Query(value =
-  """WITH attended_sessions AS (
+  @Query(
+    value =
+    """WITH attended_sessions AS (
         select count(app.id) AS attended, min(app.appointment_time) as first_appointment, aps.action_plan_id, act.referral_id
             from appointment app 
                 join action_plan_session_appointment apsa on app.id = apsa.appointment_id
@@ -98,8 +99,8 @@ interface ReferralRepository : JpaRepository<Referral, UUID> {
 					          left join action_plans_dates apds ON (apds.referral_id = ref.id and apds.submitted_at_desc_seq = 1)
                 where (ref.sent_at >= :from or ref.sent_at is null)
                 and (ref.end_requested_at <= :to or ref.end_requested_at is null)
-                and con.id in :contracts"""
-    , nativeQuery = true)
+                and con.id in :contracts""",
+    nativeQuery = true
+  )
   fun reportingData(from: OffsetDateTime, to: OffsetDateTime, contracts: Set<DynamicFrameworkContract>): List<ReferralReportData>
 }
-

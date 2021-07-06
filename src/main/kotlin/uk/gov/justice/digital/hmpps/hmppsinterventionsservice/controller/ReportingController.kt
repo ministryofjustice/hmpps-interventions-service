@@ -18,11 +18,11 @@ class ReportingController(
   private val userMapper: UserMapper,
 ) {
   @GetMapping("/performance-report")
-    fun getReportData(
+  fun getReportData(
     @RequestParam(name = "fromIncludingDate", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") fromIncludingDate: LocalDate,
-    @RequestParam(name = "toIncludingDate", required = true)  @DateTimeFormat(pattern = "yyyy-MM-dd") toIncludingDate: LocalDate,
+    @RequestParam(name = "toIncludingDate", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") toIncludingDate: LocalDate,
     authentication: JwtAuthenticationToken,
-    ) : List<ReferralReportDataDTO> {
+  ): List<ReferralReportDataDTO> {
     val fromDateOffset = OffsetDateTime.of(fromIncludingDate.atStartOfDay(), ZoneOffset.UTC)
     val toDateOffset = OffsetDateTime.of(toIncludingDate.atStartOfDay(), ZoneOffset.UTC).plusDays(1)
     val user = userMapper.fromToken(authentication)

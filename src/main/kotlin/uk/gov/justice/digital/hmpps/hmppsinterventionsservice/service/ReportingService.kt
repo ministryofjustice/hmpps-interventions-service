@@ -22,7 +22,7 @@ class ReportingService(
   fun getReportData(from: OffsetDateTime, to: OffsetDateTime, user: AuthUser): List<ReferralReportDataDTO> {
     val contracts = serviceProviderUserAccessScopeMapper.fromUser(user).contracts
     val referrals = referralRepository.reportingData(from, to, contracts)
-    return referrals.map {ReferralReportDataDTO.from(it, buildUrl(it.referralId))}
+    return referrals.map { ReferralReportDataDTO.from(it, buildUrl(it.referralId)) }
   }
 
   private fun buildUrl(referralId: UUID): String {

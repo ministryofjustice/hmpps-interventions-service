@@ -29,7 +29,7 @@ data class ReferralReportDataDTO(
   val endRequestedByPPReason: CancellationReason?,
   val dateEOSRSubmitted: OffsetDateTime?,
   val concludedAt: OffsetDateTime?,
-){
+) {
   companion object {
     fun from(referralReportData: ReferralReportData, referralLink: String): ReferralReportDataDTO {
       return ReferralReportDataDTO(
@@ -42,19 +42,19 @@ data class ReferralReportDataDTO(
         caseworkerId = referralReportData.caseworkerId,
         serviceUserCRN = referralReportData.serviceUserCRN,
         dateReferralReceived = OffsetDateTime.ofInstant(referralReportData.dateReferralReceived, ZoneOffset.UTC),
-        dateSAABooked = referralReportData.dateSAABooked ?.let {OffsetDateTime.ofInstant(referralReportData.dateSAABooked, ZoneOffset.UTC)},
-        dateSAAAttended = referralReportData.dateSAAAttended ?.let{ OffsetDateTime.ofInstant(referralReportData.dateSAAAttended, ZoneOffset.UTC)},
-        dateFirstActionPlanSubmitted = referralReportData.dateFirstActionPlanSubmitted ?.let{ OffsetDateTime.ofInstant(referralReportData.dateFirstActionPlanSubmitted, ZoneOffset.UTC)},
-        dateOfFirstActionPlanApproval = referralReportData.dateOfFirstActionPlanApproval ?. let{ OffsetDateTime.ofInstant(referralReportData.dateOfFirstActionPlanApproval, ZoneOffset.UTC)},
-        dateOfFirstAttendedSession = referralReportData.dateOfFirstAttendedSession ?. let{ OffsetDateTime.ofInstant(referralReportData.dateOfFirstAttendedSession, ZoneOffset.UTC)},
+        dateSAABooked = referralReportData.dateSAABooked ?.let { OffsetDateTime.ofInstant(referralReportData.dateSAABooked, ZoneOffset.UTC) },
+        dateSAAAttended = referralReportData.dateSAAAttended ?.let { OffsetDateTime.ofInstant(referralReportData.dateSAAAttended, ZoneOffset.UTC) },
+        dateFirstActionPlanSubmitted = referralReportData.dateFirstActionPlanSubmitted ?.let { OffsetDateTime.ofInstant(referralReportData.dateFirstActionPlanSubmitted, ZoneOffset.UTC) },
+        dateOfFirstActionPlanApproval = referralReportData.dateOfFirstActionPlanApproval ?. let { OffsetDateTime.ofInstant(referralReportData.dateOfFirstActionPlanApproval, ZoneOffset.UTC) },
+        dateOfFirstAttendedSession = referralReportData.dateOfFirstAttendedSession ?. let { OffsetDateTime.ofInstant(referralReportData.dateOfFirstAttendedSession, ZoneOffset.UTC) },
         outcomesToBeAchievedCount = referralReportData.outcomesToBeAchievedCount,
-        outcomesAchieved =  referralReportData.outcomesAchieved,
+        outcomesAchieved = referralReportData.outcomesAchieved,
         countOfSessionsExpected = referralReportData.countOfSessionsExpected,
         countOfSessionsAttended = referralReportData.countOfSessionsAttended,
-        endRequestedByPPAt = referralReportData.endRequestedByPPAt ?. let{ OffsetDateTime.ofInstant(referralReportData.endRequestedByPPAt, ZoneOffset.UTC)},
+        endRequestedByPPAt = referralReportData.endRequestedByPPAt ?. let { OffsetDateTime.ofInstant(referralReportData.endRequestedByPPAt, ZoneOffset.UTC) },
         endRequestedByPPReason = referralReportData.endRequestedByPPReason,
-        dateEOSRSubmitted = referralReportData.dateEOSRSubmitted ?. let{ OffsetDateTime.ofInstant(referralReportData.dateEOSRSubmitted, ZoneOffset.UTC)},
-        concludedAt = referralReportData.concludedAt ?. let{ OffsetDateTime.ofInstant(referralReportData.concludedAt, ZoneOffset.UTC)}
+        dateEOSRSubmitted = referralReportData.dateEOSRSubmitted ?. let { OffsetDateTime.ofInstant(referralReportData.dateEOSRSubmitted, ZoneOffset.UTC) },
+        concludedAt = referralReportData.concludedAt ?. let { OffsetDateTime.ofInstant(referralReportData.concludedAt, ZoneOffset.UTC) }
       )
     }
   }
