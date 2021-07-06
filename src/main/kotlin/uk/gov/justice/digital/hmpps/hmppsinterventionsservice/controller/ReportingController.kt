@@ -26,10 +26,10 @@ class ReportingController(
     @RequestParam(name = "toIncludingDate", required = true)  @DateTimeFormat(pattern = "yyyy-MM-dd") toIncludingDate: Date,
     authentication: JwtAuthenticationToken,
     ) : List<ReferralReportDataDTO> {
-    val toDateOffset = OffsetDateTime.from(toIncludingDate.toInstant().atOffset(ZoneOffset.UTC))
+    val toDateOffset = OffsetDateTime.from(toIncludingDate.toInstant().atOffset(ZoneOffset.UTC)).plusDays(1)
     val fromDateOffset = OffsetDateTime.from(fromIncludingDate.toInstant().atOffset(ZoneOffset.UTC))
     val user = userMapper.fromToken(authentication)
 
-    return reportingService.getReportData(toDateOffset, fromDateOffset, user)
+    return reportingService.getReportData(fromDateOffset, toDateOffset, user)
   }
 }

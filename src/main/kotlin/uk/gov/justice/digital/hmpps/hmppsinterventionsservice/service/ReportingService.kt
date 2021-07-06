@@ -17,11 +17,11 @@ class ReportingService(
   val referralRepository: ReferralRepository,
   val serviceProviderUserAccessScopeMapper: ServiceProviderAccessScopeMapper,
   @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
-  @Value("\${interventions-ui.locations.referral-details}") private val interventionsUIReferralDetailsLocation: String,
+  @Value("\${interventions-ui.locations.service-provider.referral-details}") private val interventionsUIReferralDetailsLocation: String,
 ) {
-  fun getReportData(to: OffsetDateTime, from: OffsetDateTime, user: AuthUser): List<ReferralReportDataDTO> {
+  fun getReportData(from: OffsetDateTime, to: OffsetDateTime, user: AuthUser): List<ReferralReportDataDTO> {
     val contracts = serviceProviderUserAccessScopeMapper.fromUser(user).contracts
-    val referrals = referralRepository.reportingData(to, from, contracts)
+    val referrals = referralRepository.reportingData(from, to, contracts)
     return referrals.map {ReferralReportDataDTO.from(it, buildUrl(it.referralId))}
   }
 
