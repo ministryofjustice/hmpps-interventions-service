@@ -12,7 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUse
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReportingService
 import java.time.OffsetDateTime
 
-class ReportingServiceIntegrationTest() : IntegrationTestBase() {
+class ReportingServiceIntegrationTest : IntegrationTestBase() {
   @MockBean lateinit var serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper
 
   private lateinit var reportingService: ReportingService
@@ -38,12 +38,15 @@ class ReportingServiceIntegrationTest() : IntegrationTestBase() {
     val contract = setupAssistant.createDynamicFrameworkContract(contractReference = "PRJ_123", primeProviderId = "HARMONY_LIVING")
     whenever(serviceProviderAccessScopeMapper.fromUser(spUser)).thenReturn(ServiceProviderAccessScope(setOf(contract.primeProvider), setOf(contract)))
 
+    val intervention = setupAssistant.createIntervention(dynamicFrameworkContract = contract)
+
     (1..10).forEach {
-      setupAssistant.createDraftReferral(intervention = setupAssistant.createIntervention(dynamicFrameworkContract = contract))
+      setupAssistant.createDraftReferral(intervention = intervention)
+      setupAssistant.createSentReferral(intervention = intervention)
     }
 
-    val report = reportingService.getReportData(OffsetDateTime.now().plusDays(1), OffsetDateTime.now().minusDays(1), spUser)
-    assertThat(report.size).isEqualTo(10)
+    val report = reportingService.getReportData(OffsetDateTime.now().minusDays(1), OffsetDateTime.now().plusDays(1), spUser)
+    assertThat(report.size).isEqualTo(20)
   }
 
   @Test
