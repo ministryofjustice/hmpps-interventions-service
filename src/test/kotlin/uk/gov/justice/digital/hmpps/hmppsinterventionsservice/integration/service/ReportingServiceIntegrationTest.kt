@@ -58,7 +58,7 @@ class ReportingServiceIntegrationTest() : IntegrationTestBase() {
     val firstSubmittedActionPlan = setupAssistant.createActionPlan(referral = referral, submittedAt = now.minusHours(2))
     val firstApprovedActionPlan = setupAssistant.createActionPlan(referral = referral, submittedAt = now.minusHours(1), approvedAt = now)
 
-    val report = reportingService.getReportData(OffsetDateTime.now().plusDays(1), OffsetDateTime.now().minusDays(1), spUser)
+    val report = reportingService.getReportData(OffsetDateTime.now().minusDays(1), OffsetDateTime.now().plusDays(1), spUser)
     assertThat(report.size).isEqualTo(1)
     assertThat(report[0].dateFirstActionPlanSubmitted).isEqualTo(firstSubmittedActionPlan.submittedAt)
     assertThat(report[0].dateOfFirstActionPlanApproval).isEqualTo(firstApprovedActionPlan.approvedAt)

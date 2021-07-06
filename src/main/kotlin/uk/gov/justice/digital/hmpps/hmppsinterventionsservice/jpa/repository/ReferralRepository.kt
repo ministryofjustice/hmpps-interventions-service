@@ -60,8 +60,8 @@ interface ReferralRepository : JpaRepository<Referral, UUID> {
         action_plans_dates AS (
 			      select 
                 ref.id as referral_id, ap.number_of_sessions as number_of_sessions, ap.submitted_at, ap.approved_at,
-                ROW_NUMBER() OVER(PARTITION BY ref.id ORDER BY ap.approved_at DESC) as approved_at_desc_seq,
-                ROW_NUMBER() OVER(PARTITION BY ref.id ORDER BY ap.submitted_at DESC) as submitted_at_desc_seq
+                ROW_NUMBER() OVER(PARTITION BY ref.id ORDER BY ap.approved_at ASC) as approved_at_desc_seq,
+                ROW_NUMBER() OVER(PARTITION BY ref.id ORDER BY ap.submitted_at ASC) as submitted_at_desc_seq
 			      from referral ref
 			          inner join action_plan ap on ap.referral_id = ref.id)
         select
