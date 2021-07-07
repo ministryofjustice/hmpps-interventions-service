@@ -52,7 +52,7 @@ class ReportingServiceIntegrationTest : IntegrationTestBase() {
     }
 
     val report = reportingService.getReportData(OffsetDateTime.now().minusDays(1), OffsetDateTime.now().plusDays(1), spUser)
-    assertThat(report.size).isEqualTo(20)
+    assertThat(report.size).isEqualTo(10)
   }
 
   @Test
