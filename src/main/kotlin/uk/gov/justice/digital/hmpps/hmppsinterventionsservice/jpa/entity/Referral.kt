@@ -36,6 +36,15 @@ class SelectedDesiredOutcomesMapping(
 @Entity
 @Table(indexes = arrayOf(Index(columnList = "created_by_id")))
 class Referral(
+  // nominated access
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+    name = "referral_nominated_access",
+    joinColumns = [JoinColumn(name = "referral_id")],
+    inverseJoinColumns = [JoinColumn(name = "subcontractor_provider_id")]
+  )
+  var nominatedServiceProviders: MutableList<ServiceProvider>? = null,
+
   // assigned referral fields
   var assignedAt: OffsetDateTime? = null,
   @ManyToOne @Fetch(FetchMode.JOIN) var assignedBy: AuthUser? = null,
