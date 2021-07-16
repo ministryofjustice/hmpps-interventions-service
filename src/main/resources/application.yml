@@ -87,6 +87,7 @@ notify:
     appointment-not-attended: "21b14c86-30d2-4bf2-b355-8f3deb62ef69"
     concerning-behaviour: "a8ef6769-4c8e-4459-938c-19dd4b661b04"
     end-of-service-report-submitted: "f79cb53f-dc5c-42aa-947e-f599f9ad7942"
+    service-provider-performance-report-ready: "9839e772-cd88-435d-9d18-61ea14d3531b"
 
 interventions-ui:
   locations:
@@ -94,6 +95,7 @@ interventions-ui:
       referral-details: "/service-provider/referrals/{id}/details"
       intervention-progress: "/service-provider/referrals/{id}/progress"
       action-plan: "/service-provider/referrals/{id}/action-plan"
+      download-report: "/reports/service-provider/performance/download?filename={filename}"
     probation-practitioner:
       referral-details: "/probation-practitioner/referrals/{id}/details"
       intervention-progress: "/probation-practitioner/referrals/{id}/progress"
