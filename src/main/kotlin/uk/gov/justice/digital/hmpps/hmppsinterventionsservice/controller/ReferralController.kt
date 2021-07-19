@@ -22,7 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EndReferralReq
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAssignmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SelectedDesiredOutcomesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SentReferralDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SentReferralSummaryDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SentReferralDashboardSummaryDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ServiceCategoryFullDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SetComplexityLevelRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SupplierAssessmentDTO
@@ -99,9 +99,9 @@ class ReferralController(
   @GetMapping("/sent-referrals")
   fun getSentReferrals(
     authentication: JwtAuthenticationToken,
-  ): List<SentReferralSummaryDTO> {
+  ): List<SentReferralDashboardSummaryDTO> {
     val user = userMapper.fromToken(authentication)
-    return referralService.getSentReferralsForUser(user).map { SentReferralSummaryDTO.from(it) }
+    return referralService.getSentReferralsForUser(user).map { SentReferralDashboardSummaryDTO.from(it) }
   }
 
   @JsonView(Views.SentReferral::class)

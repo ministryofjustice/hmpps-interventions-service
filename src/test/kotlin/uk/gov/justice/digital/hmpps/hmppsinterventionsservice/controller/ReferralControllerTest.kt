@@ -263,4 +263,15 @@ internal class ReferralControllerTest {
       assertThat(response.endOfServiceReportCreationRequired).isTrue
     }
   }
+
+  @Test
+  fun `get all sent referrals`() {
+    val user = authUserFactory.create()
+    val token = tokenFactory.create(userID = user.id, userName = user.userName, authSource = user.authSource)
+
+    val referral = referralFactory.createSent()
+    whenever(referralService.getSentReferralsForUser(any())).thenReturn(listOf(referral))
+    val result = referralController.getSentReferrals(token)
+    assertThat(result.size).isEqualTo(1)
+  }
 }
