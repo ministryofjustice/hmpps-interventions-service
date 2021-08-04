@@ -21,6 +21,9 @@ data class AppointmentDelivery(
   @Type(type = "appointment_delivery_type")
   @Enumerated(EnumType.STRING)
   @NotNull var appointmentDeliveryType: AppointmentDeliveryType,
+  @Type(type = "appointment_session_type")
+  @Enumerated(EnumType.STRING)
+  @NotNull var appointmentSessionType: AppointmentSessionType,
   var npsOfficeCode: String? = null,
   @OneToOne(cascade = [CascadeType.ALL])
   @PrimaryKeyJoinColumn
@@ -32,4 +35,8 @@ enum class AppointmentDeliveryType {
   VIDEO_CALL,
   IN_PERSON_MEETING_PROBATION_OFFICE,
   IN_PERSON_MEETING_OTHER;
+}
+
+enum class AppointmentSessionType {
+  ONE_TO_ONE, GROUP
 }
