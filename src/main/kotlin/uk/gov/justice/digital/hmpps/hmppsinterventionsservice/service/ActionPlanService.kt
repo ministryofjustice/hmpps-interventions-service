@@ -37,7 +37,6 @@ class ActionPlanService(
     activities: List<ActionPlanActivity>,
     createdByUser: AuthUser
   ): ActionPlan {
-
     val draftActionPlan = ActionPlan(
       id = randomUUID(),
       numberOfSessions = numberOfSessions,
@@ -90,13 +89,28 @@ class ActionPlanService(
 
   fun approveActionPlan(id: UUID, user: AuthUser): ActionPlan {
     val actionPlan = getActionPlan(id)
+
+    actionPlan.referral.approvedActionPlan?. let {
+      reassignSessions(it.id, actionPlan)
+    } ?: run {
+      actionPlanSessionsService.createUnscheduledSessionsForActionPlan(actionPlan)
+    }
+
     actionPlan.approvedAt = OffsetDateTime.now()
     actionPlan.approvedBy = authUserRepository.save(user)
 
-    actionPlanSessionsService.createUnscheduledSessionsForActionPlan(actionPlan)
     val approvedActionPlan = actionPlanRepository.save(actionPlan)
     actionPlanEventPublisher.actionPlanApprovedEvent(approvedActionPlan)
     return approvedActionPlan
+  }
+
+  private fun reassignSessions(fromActionPlanId: UUID, toActionPlan: ActionPlan) {
+    val sessions = actionPlanSessionRepository.findAllByActionPlanId(fromActionPlanId)
+    sessions.forEach {
+      it.actionPlan = toActionPlan
+      actionPlanSessionRepository.save(it)
+    }
+    actionPlanSessionsService.createUnscheduledSessionsForActionPlan(toActionPlan, sessions.count())
   }
 
   fun getActionPlan(id: UUID): ActionPlan {
