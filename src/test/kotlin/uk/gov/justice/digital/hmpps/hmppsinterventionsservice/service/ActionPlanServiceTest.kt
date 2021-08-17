@@ -232,7 +232,7 @@ internal class ActionPlanServiceTest {
     assertThat(approvedActionPlan.approvedAt).isNotNull
     assertThat(approvedActionPlan.approvedBy).isEqualTo(authUser)
     verify(actionPlanEventPublisher).actionPlanApprovedEvent(same(actionPlan))
-    verify(actionPlanSessionsService).createUnscheduledSessionsForActionPlan(same(actionPlan), same(1))
+    verify(actionPlanSessionsService).createUnscheduledSessionsForActionPlan(same(actionPlan), same(0))
   }
 
   @Test
@@ -254,7 +254,7 @@ internal class ActionPlanServiceTest {
     assertThat(approvedActionPlan.approvedAt).isNotNull
     assertThat(approvedActionPlan.approvedBy).isEqualTo(authUser)
     verify(actionPlanEventPublisher).actionPlanApprovedEvent(same(newActionPlan))
-    verify(actionPlanSessionsService).createUnscheduledSessionsForActionPlan(same(newActionPlan), same(3))
+    verify(actionPlanSessionsService).createUnscheduledSessionsForActionPlan(same(newActionPlan), same(2))
     verify(actionPlanSessionRepository, times(2)).save(any())
   }
 
