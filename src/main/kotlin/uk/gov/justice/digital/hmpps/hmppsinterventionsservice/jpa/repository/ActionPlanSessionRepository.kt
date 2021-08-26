@@ -5,6 +5,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionP
 import java.util.UUID
 
 interface ActionPlanSessionRepository : JpaRepository<ActionPlanSession, UUID> {
-  fun findAllByActionPlanId(actionPlanId: UUID): List<ActionPlanSession>
-  fun findByActionPlanIdAndSessionNumber(actionPlanId: UUID, sessionNumber: Int): ActionPlanSession?
+  fun findAllByReferralId(referralId: UUID): List<ActionPlanSession>
+  fun findByReferralIdAndSessionNumber(referralId: UUID, sessionNumber: Int): ActionPlanSession?
 }
