@@ -109,7 +109,7 @@ class ActionPlanService(
   }
 
   fun getAllAttendedAppointments(actionPlan: ActionPlan): List<Appointment> {
-    return actionPlanSessionRepository.findAllByActionPlanId(actionPlan.id)
+    return actionPlanSessionRepository.findAllByReferralId(actionPlan.referral.id)
       .flatMap { it.appointments }
       .filter {
         it.appointmentFeedbackSubmittedAt != null &&
