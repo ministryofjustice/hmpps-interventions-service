@@ -12,7 +12,9 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attende
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.NO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.YES
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanSessionFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -21,6 +23,8 @@ class CommunityAPIActionPlanAppointmentEventServiceTest {
   private val communityAPIClient = mock<CommunityAPIClient>()
 
   private val actionPlanSessionFactory = ActionPlanSessionFactory()
+  private val referralFactory = ReferralFactory()
+  private val actionPlanFactory = ActionPlanFactory()
 
   private val communityAPIService = CommunityAPIActionPlanAppointmentEventService(
     "http://baseUrl",
@@ -33,7 +37,7 @@ class CommunityAPIActionPlanAppointmentEventServiceTest {
   @Test
   fun `notifies community-api of late attended appointment outcome`() {
 
-    appointmentEvent.actionPlanSession.actionPlan.referral.referenceNumber = "X123456"
+    appointmentEvent.actionPlanSession.referral.referenceNumber = "X123456"
     appointmentEvent.actionPlanSession.currentAppointment!!.attended = LATE
     appointmentEvent.actionPlanSession.currentAppointment!!.notifyPPOfAttendanceBehaviour = false
 
@@ -44,8 +48,7 @@ class CommunityAPIActionPlanAppointmentEventServiceTest {
 
   @Test
   fun `notifies community-api of attended appointment outcome`() {
-
-    appointmentEvent.actionPlanSession.actionPlan.referral.referenceNumber = "X123456"
+    appointmentEvent.actionPlanSession.referral.referenceNumber = "X123456"
     appointmentEvent.actionPlanSession.currentAppointment!!.attended = YES
     appointmentEvent.actionPlanSession.currentAppointment!!.notifyPPOfAttendanceBehaviour = false
 
@@ -56,8 +59,7 @@ class CommunityAPIActionPlanAppointmentEventServiceTest {
 
   @Test
   fun `notifies community-api of non attended appointment outcome and notify PP set is always set`() {
-
-    appointmentEvent.actionPlanSession.actionPlan.referral.referenceNumber = "X123456"
+    appointmentEvent.actionPlanSession.referral.referenceNumber = "X123456"
     appointmentEvent.actionPlanSession.currentAppointment!!.attended = NO
     appointmentEvent.actionPlanSession.currentAppointment!!.notifyPPOfAttendanceBehaviour = false
 
@@ -69,7 +71,7 @@ class CommunityAPIActionPlanAppointmentEventServiceTest {
   @Test
   fun `notifies community-api of appointment outcome with notify PP set`() {
 
-    appointmentEvent.actionPlanSession.actionPlan.referral.referenceNumber = "X123456"
+    appointmentEvent.actionPlanSession.referral.referenceNumber = "X123456"
     appointmentEvent.actionPlanSession.currentAppointment!!.attended = YES
     appointmentEvent.actionPlanSession.currentAppointment!!.notifyPPOfAttendanceBehaviour = true
 
@@ -81,13 +83,13 @@ class CommunityAPIActionPlanAppointmentEventServiceTest {
   private fun verifyNotification(attended: String, notifyPP: Boolean) {
     val urlCaptor = argumentCaptor<String>()
     val payloadCaptor = argumentCaptor<Any>()
-    val actionPlanId = appointmentEvent.actionPlanSession.actionPlan.id
+    val referralId = appointmentEvent.actionPlanSession.referral.id
     verify(communityAPIClient).makeAsyncPostRequest(urlCaptor.capture(), payloadCaptor.capture())
     assertThat(urlCaptor.firstValue).isEqualTo("/secure/offenders/crn/CRN123/appointments/123456/outcome/context/commissioned-rehabilitation-services")
     assertThat(payloadCaptor.firstValue.toString()).isEqualTo(
       AppointmentOutcomeRequest(
         "Session Feedback Recorded for Accommodation Referral X123456 with Prime Provider Service Provider\n" +
-          "http://baseUrl/probation-practitioner/action-plan/$actionPlanId/appointment/1/post-session-feedback",
+          "http://baseUrl/probation-practitioner/referrals/$referralId/appointment/1/post-session-feedback",
         attended,
         notifyPP
       ).toString()
@@ -99,7 +101,7 @@ class CommunityAPIActionPlanAppointmentEventServiceTest {
     SESSION_FEEDBACK_RECORDED,
     actionPlanSessionFactory.createAttended(
       id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
-      actionPlan = SampleData.sampleActionPlan(),
+      referral = referralFactory.createSent(serviceUserCRN = "CRN123", actionPlans = mutableListOf(actionPlanFactory.create())),
       sessionNumber = 1,
       appointmentTime = OffsetDateTime.now(),
       durationInMinutes = 60,

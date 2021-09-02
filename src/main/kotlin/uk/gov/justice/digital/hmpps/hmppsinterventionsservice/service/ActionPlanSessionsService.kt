@@ -69,7 +69,7 @@ class ActionPlanSessionsService(
     npsOfficeCode: String? = null,
   ): ActionPlanSession {
 
-    val session = getActionPlanSessionOrThrowException(actionPlanId, sessionNumber)
+    val session = getActionPlanSessionByActionPlanIdOrThrowException(actionPlanId, sessionNumber)
     val existingAppointment = session.currentAppointment
 
     // TODO: Some code duplication here with AppointmentService.kt
@@ -111,7 +111,7 @@ class ActionPlanSessionsService(
     attended: Attended,
     additionalInformation: String?
   ): ActionPlanSession {
-    val session = getActionPlanSessionOrThrowException(actionPlanId, sessionNumber)
+    val session = getActionPlanSessionByActionPlanIdOrThrowException(actionPlanId, sessionNumber)
     val appointment = session.currentAppointment
       ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "can't record appointment attendance; no appointments have been booked for this session")
 
@@ -130,7 +130,7 @@ class ActionPlanSessionsService(
     behaviourDescription: String,
     notifyProbationPractitioner: Boolean,
   ): ActionPlanSession {
-    val session = getActionPlanSessionOrThrowException(actionPlanId, sessionNumber)
+    val session = getActionPlanSessionByActionPlanIdOrThrowException(actionPlanId, sessionNumber)
     val appointment = session.currentAppointment
       ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "can't record appointment behaviour; no appointments have been booked for this session")
 
@@ -144,7 +144,7 @@ class ActionPlanSessionsService(
   }
 
   fun submitSessionFeedback(actionPlanId: UUID, sessionNumber: Int, submitter: AuthUser): ActionPlanSession {
-    val session = getActionPlanSessionOrThrowException(actionPlanId, sessionNumber)
+    val session = getActionPlanSessionByActionPlanIdOrThrowException(actionPlanId, sessionNumber)
     val appointment = session.currentAppointment
 
     if (appointment?.appointmentFeedbackSubmittedAt != null) {
@@ -202,7 +202,7 @@ class ActionPlanSessionsService(
   }
 
   private fun checkSessionIsNotDuplicate(actionPlanId: UUID, sessionNumber: Int) {
-    getActionPlanSession(actionPlanId, sessionNumber)?.let {
+    getActionPlanSessionByActionPlanId(actionPlanId, sessionNumber)?.let {
       throw EntityExistsException("Action plan session already exists for [id=$actionPlanId, sessionNumber=$sessionNumber]")
     }
   }
@@ -213,4 +213,11 @@ class ActionPlanSessionsService(
 
   private fun getActionPlanSession(referralId: UUID, sessionNumber: Int) =
     actionPlanSessionRepository.findByReferralIdAndSessionNumber(referralId, sessionNumber)
+
+  private fun getActionPlanSessionByActionPlanIdOrThrowException(actionPlanId: UUID, sessionNumber: Int): ActionPlanSession =
+    getActionPlanSessionByActionPlanId(actionPlanId, sessionNumber)
+      ?: throw EntityNotFoundException("Action plan session not found [actionPlanId=$actionPlanId, sessionNumber=$sessionNumber]")
+
+  private fun getActionPlanSessionByActionPlanId(actionPlanId: UUID, sessionNumber: Int) =
+    actionPlanSessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)
 }

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanSessionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
@@ -23,7 +22,6 @@ class ActionPlanSessionRepositoryTest @Autowired constructor(
 ) {
   private val authUserFactory = AuthUserFactory(entityManager)
   private val referralFactory = ReferralFactory(entityManager)
-  private val actionPlanFactory = ActionPlanFactory(entityManager)
   private val actionPlanSessionFactory = ActionPlanSessionFactory(entityManager)
 
   @BeforeEach
@@ -43,8 +41,7 @@ class ActionPlanSessionRepositoryTest @Autowired constructor(
   fun `can retrieve an action plan session`() {
     val user = authUserFactory.create(id = "referral_repository_test_user_id")
     val referral = referralFactory.createDraft(createdBy = user)
-    val actionPlan = actionPlanFactory.create(referral = referral)
-    val actionPlanSession = actionPlanSessionFactory.createScheduled(actionPlan = actionPlan)
+    val actionPlanSession = actionPlanSessionFactory.createScheduled(referral = referral)
 
     entityManager.flush()
     entityManager.clear()
