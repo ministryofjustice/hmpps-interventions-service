@@ -412,7 +412,6 @@ class SetupAssistant(
   }
 
   fun createActionPlanSession(
-    actionPlan: ActionPlan,
     sessionNumber: Int,
     duration: Int,
     appointmentTime: OffsetDateTime,
@@ -464,7 +463,7 @@ class SetupAssistant(
       id = UUID.randomUUID(),
       sessionNumber = sessionNumber,
       appointments = mutableSetOf(appointment),
-      actionPlan = actionPlan,
+      referral = referral,
     )
     return actionPlanSessionRepository.save(session)
   }

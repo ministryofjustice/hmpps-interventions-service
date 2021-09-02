@@ -117,7 +117,7 @@ class NotifyActionPlanAppointmentService(
       val location = generateResourceUrl(
         interventionsUIBaseURL,
         ppSessionFeedbackLocation,
-        event.actionPlanSession.actionPlan.id,
+        event.actionPlanSession.referral.id,
         event.actionPlanSession.sessionNumber,
       )
 
