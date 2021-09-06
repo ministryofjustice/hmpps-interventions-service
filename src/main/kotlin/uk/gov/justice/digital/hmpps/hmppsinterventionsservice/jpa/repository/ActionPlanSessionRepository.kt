@@ -11,4 +11,7 @@ interface ActionPlanSessionRepository : JpaRepository<ActionPlanSession, UUID> {
 
   @Query("select aps from ActionPlanSession aps left join ActionPlan ap on ap.referral = aps.referral where ap.id = :actionPlanId and aps.sessionNumber = :sessionNumber")
   fun findAllByActionPlanIdAndSessionNumber(actionPlanId: UUID, sessionNumber: Int): ActionPlanSession?
+
+  @Query("select aps from ActionPlanSession aps left join ActionPlan ap on ap.referral = aps.referral where ap.id = :actionPlanId")
+  fun findAllByActionPlanId(actionPlanId: UUID): List<ActionPlanSession>
 }
