@@ -1,19 +1,19 @@
 COPY (
   WITH attended_sessions AS (
-      select count(app.id) AS attended, min(app.appointment_time) as first_appointment, aps.action_plan_id
+      select count(app.id) AS attended, min(app.appointment_time) as first_appointment, aps.deprecated_action_plan_id
       from appointment app
         join action_plan_session_appointment apsa on app.id = apsa.appointment_id
         join action_plan_session aps on apsa.action_plan_session_id = aps.id
       where attended in ('YES', 'LATE')
-      group by aps.action_plan_id
+      group by aps.deprecated_action_plan_id
   ),
   attempted_sessions AS (
-      select count(app.id) AS attempted, aps.action_plan_id
+      select count(app.id) AS attempted, aps.deprecated_action_plan_id
       from appointment app
         join action_plan_session_appointment apsa on app.id = apsa.appointment_id
         join action_plan_session aps on apsa.action_plan_session_id = aps.id
       where attended IS NOT NULL
-      group by aps.action_plan_id
+      group by aps.deprecated_action_plan_id
   ),
   first_submitted_and_approved_action_plans AS (
     select referral_id, min(submitted_at) as first_submitted_at, min(approved_at) as first_approved_at
@@ -71,8 +71,8 @@ COPY (
     JOIN service_provider prime ON (c.prime_provider_id = prime.id)
     LEFT JOIN first_submitted_and_approved_action_plans fsaap ON (fsaap.referral_id = r.id)
     LEFT JOIN current_action_plans cap ON (cap.referral_id = r.id)
-    LEFT JOIN attended_sessions shows ON (shows.action_plan_id = cap.id) --❗️should be linked to referrals instead, sessions are static
-    LEFT JOIN attempted_sessions atts ON (atts.action_plan_id = cap.id) --❗️should be linked to referrals instead, sessions are static
+    LEFT JOIN attended_sessions shows ON (shows.deprecated_action_plan_id = cap.id) --❗️should be linked to referrals instead, sessions are static
+    LEFT JOIN attempted_sessions atts ON (atts.deprecated_action_plan_id = cap.id) --❗️should be linked to referrals instead, sessions are static
     LEFT JOIN end_of_service_report eosr ON (eosr.referral_id = r.id)
   WHERE
     r.sent_at IS NOT NULL
