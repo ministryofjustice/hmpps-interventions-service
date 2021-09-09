@@ -28,7 +28,7 @@ class CommunityAPIActionPlanAppointmentEventServiceTest {
 
   private val communityAPIService = CommunityAPIActionPlanAppointmentEventService(
     "http://baseUrl",
-    "/probation-practitioner/action-plan/{id}/appointment/{sessionNumber}/post-session-feedback",
+    "/probation-practitioner/referrals/{id}/appointment/{sessionNumber}/post-session-feedback",
     "/secure/offenders/crn/{crn}/appointments/{appointmentId}/outcome/context/{contextName}",
     "commissioned-rehabilitation-services",
     communityAPIClient
@@ -88,7 +88,7 @@ class CommunityAPIActionPlanAppointmentEventServiceTest {
     assertThat(urlCaptor.firstValue).isEqualTo("/secure/offenders/crn/CRN123/appointments/123456/outcome/context/commissioned-rehabilitation-services")
     assertThat(payloadCaptor.firstValue.toString()).isEqualTo(
       AppointmentOutcomeRequest(
-        "Session Feedback Recorded for Accommodation Referral X123456 with Prime Provider Service Provider\n" +
+        "Session Feedback Recorded for Accommodation Referral X123456 with Prime Provider Harmony Living\n" +
           "http://baseUrl/probation-practitioner/referrals/$referralId/appointment/1/post-session-feedback",
         attended,
         notifyPP
