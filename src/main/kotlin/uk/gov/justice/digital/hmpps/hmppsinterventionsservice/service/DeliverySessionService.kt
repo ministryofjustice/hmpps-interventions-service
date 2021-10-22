@@ -64,7 +64,7 @@ class DeliverySessionService(
     durationInMinutes: Int,
     updatedBy: AuthUser,
     appointmentDeliveryType: AppointmentDeliveryType,
-    appointmentSessionType: AppointmentSessionType? = null,
+    appointmentSessionType: AppointmentSessionType,
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
   ): DeliverySession {

@@ -31,7 +31,7 @@ data class UpdateAppointmentDTO(
   val appointmentTime: OffsetDateTime,
   @JsonProperty(required = true) val durationInMinutes: Int,
   val appointmentDeliveryType: AppointmentDeliveryType,
-  val sessionType: AppointmentSessionType? = null,
+  val sessionType: AppointmentSessionType,
   val appointmentDeliveryAddress: AddressDTO? = null,
   val npsOfficeCode: String? = null,
 )

@@ -40,7 +40,7 @@ class AppointmentService(
     appointmentType: AppointmentType,
     createdByUser: AuthUser,
     appointmentDeliveryType: AppointmentDeliveryType,
-    appointmentSessionType: AppointmentSessionType?,
+    appointmentSessionType: AppointmentSessionType,
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
   ): Appointment {
@@ -104,7 +104,7 @@ class AppointmentService(
   fun createOrUpdateAppointmentDeliveryDetails(
     appointment: Appointment,
     appointmentDeliveryType: AppointmentDeliveryType,
-    appointmentSessionType: AppointmentSessionType?,
+    appointmentSessionType: AppointmentSessionType,
     appointmentDeliveryAddressDTO: AddressDTO?,
     npsOfficeCode: String? = null
   ) {
@@ -230,7 +230,7 @@ class AppointmentService(
     deliusAppointmentId: Long?,
     createdByUser: AuthUser,
     appointmentDeliveryType: AppointmentDeliveryType,
-    appointmentSessionType: AppointmentSessionType?,
+    appointmentSessionType: AppointmentSessionType,
     appointmentDeliveryAddress: AddressDTO? = null,
     referral: Referral,
     npsOfficeCode: String?,
@@ -255,7 +255,7 @@ class AppointmentService(
     appointmentTime: OffsetDateTime,
     deliusAppointmentId: Long?,
     appointmentDeliveryType: AppointmentDeliveryType,
-    appointmentSessionType: AppointmentSessionType?,
+    appointmentSessionType: AppointmentSessionType,
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String?,
   ): Appointment {

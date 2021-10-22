@@ -29,8 +29,7 @@ data class AppointmentDelivery(
   @NotNull var appointmentDeliveryType: AppointmentDeliveryType,
   @Type(type = "appointment_session_type")
   @Enumerated(EnumType.STRING)
-  // TODO: Transform to @NotNull this change is live
-  var appointmentSessionType: AppointmentSessionType? = null,
+  @NotNull var appointmentSessionType: AppointmentSessionType,
   var npsOfficeCode: String? = null,
   @OneToOne(cascade = [CascadeType.ALL])
   @PrimaryKeyJoinColumn

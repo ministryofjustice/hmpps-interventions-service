@@ -42,7 +42,7 @@ class SupplierAssessmentService(
     appointmentTime: OffsetDateTime,
     createdByUser: AuthUser,
     appointmentDeliveryType: AppointmentDeliveryType,
-    appointmentSessionType: AppointmentSessionType? = null,
+    appointmentSessionType: AppointmentSessionType,
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
   ): Appointment {
