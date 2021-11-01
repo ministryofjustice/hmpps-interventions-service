@@ -12,6 +12,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfSe
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceProviderSentReferralSummary
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFrameworkContractFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportFactory
@@ -20,6 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFacto
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceProviderFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceUserFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAssessmentFactory
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -41,6 +44,9 @@ class ReferralRepositoryTest @Autowired constructor(
   private val serviceProviderFactory = ServiceProviderFactory(entityManager)
   private val serviceUserFactory = ServiceUserFactory(entityManager)
   private val endOfServiceReport = EndOfServiceReportFactory(entityManager)
+  private val actionPlanFactory = ActionPlanFactory(entityManager)
+  private val appointmentFactory = AppointmentFactory(entityManager)
+  private val supplierAssessmentFactory = SupplierAssessmentFactory(entityManager)
 
   @Nested
   inner class ServiceProviderSelection {
@@ -157,20 +163,96 @@ class ReferralRepositoryTest @Autowired constructor(
 
   @Nested
   inner class StatusExclusion {
+    @Nested
+    inner class CancelledReferrals {
+      @Test
+      fun `will exclude cancelled referrals which are assigned and have no SAA booked`() {
+        val cancelledReferral = createEndedReferral(
+          true,
+          endRequestedAt = OffsetDateTime.now(),
+          concludedAt = OffsetDateTime.now(),
+          eosR = null,
+        )
 
-    @Test
-    fun `will exclude cancelled referrals`() {
-      val referral = createEndedReferral(
-        true,
-        endRequestedAt = OffsetDateTime.now(),
-        concludedAt = OffsetDateTime.now(),
-        eosR = null,
-      )
+        val serviceProviderSearchId = cancelledReferral.intervention.dynamicFrameworkContract.primeProvider.id
+        val summaries = referralRepository.referralSummaryForServiceProviders(listOf(serviceProviderSearchId))
 
-      val serviceProviderSearchId = referral.intervention.dynamicFrameworkContract.primeProvider.id
-      val summaries = referralRepository.referralSummaryForServiceProviders(listOf(serviceProviderSearchId))
+        assertThat(summaries.size).isEqualTo(0)
+      }
 
-      assertThat(summaries.size).isEqualTo(0)
+      @Test
+      fun `will exclude cancelled referrals which have their SAA booked but with no feedback`() {
+        val cancelledReferral = createEndedReferral(
+          true,
+          endRequestedAt = OffsetDateTime.now(),
+          concludedAt = OffsetDateTime.now(),
+          eosR = null,
+        )
+
+        val appointment = appointmentFactory.create(referral = cancelledReferral)
+        val supplierAssessment = supplierAssessmentFactory.create(referral = cancelledReferral, appointment = appointment)
+        cancelledReferral.supplierAssessment = supplierAssessment
+        entityManager.refresh(cancelledReferral)
+
+        val serviceProviderSearchId = cancelledReferral.intervention.dynamicFrameworkContract.primeProvider.id
+        val summaries = referralRepository.referralSummaryForServiceProviders(listOf(serviceProviderSearchId))
+
+        assertThat(summaries.size).isEqualTo(0)
+      }
+
+      @Test
+      fun `will exclude cancelled referrals which have their Action Plan created but not submitted`() {
+        val cancelledReferral = createEndedReferral(
+          true,
+          endRequestedAt = OffsetDateTime.now(),
+          concludedAt = OffsetDateTime.now(),
+          eosR = null,
+        )
+
+        actionPlanFactory.create(referral = cancelledReferral)
+
+        val serviceProviderSearchId = cancelledReferral.intervention.dynamicFrameworkContract.primeProvider.id
+        val summaries = referralRepository.referralSummaryForServiceProviders(listOf(serviceProviderSearchId))
+
+        assertThat(summaries.size).isEqualTo(0)
+      }
+
+      @Test
+      fun `will include cancelled referrals which are which have their SAA with feedback`() {
+        val cancelledReferral = createEndedReferral(
+          true,
+          endRequestedAt = OffsetDateTime.now(),
+          concludedAt = OffsetDateTime.now(),
+          eosR = null,
+        )
+
+        val appointment = appointmentFactory.create(referral = cancelledReferral, attendanceSubmittedAt = OffsetDateTime.now())
+        val supplierAssessment = supplierAssessmentFactory.create(referral = cancelledReferral, appointment = appointment)
+        cancelledReferral.supplierAssessment = supplierAssessment
+        entityManager.refresh(cancelledReferral)
+
+        val serviceProviderSearchId = cancelledReferral.intervention.dynamicFrameworkContract.primeProvider.id
+        val summaries = referralRepository.referralSummaryForServiceProviders(listOf(serviceProviderSearchId))
+
+        assertThat(summaries.size).isEqualTo(1)
+      }
+
+      @Test
+      fun `will include cancelled referrals which are which have their Action Plan submitted`() {
+        val cancelledReferral = createEndedReferral(
+          true,
+          endRequestedAt = OffsetDateTime.now(),
+          concludedAt = OffsetDateTime.now(),
+          eosR = null,
+        )
+
+        actionPlanFactory.createSubmitted(referral = cancelledReferral)
+
+        val serviceProviderSearchId = cancelledReferral.intervention.dynamicFrameworkContract.primeProvider.id
+        val summaries = referralRepository.referralSummaryForServiceProviders(listOf(serviceProviderSearchId))
+
+        assertThat(summaries.size).isEqualTo(1)
+      }
     }
 
     @Test
@@ -235,7 +317,7 @@ class ReferralRepositoryTest @Autowired constructor(
       intervention = intervention,
       assignments = assignedUsers.map { ReferralAssignment(OffsetDateTime.now(), assignedBy = it, assignedTo = it) }
     )
-    val serviceUser = serviceUserFactory.create(random(15), random(16), referral)
+    serviceUserFactory.create(random(15), random(16), referral)
 
     return entityManager.refresh(referral)
   }
@@ -259,9 +341,9 @@ class ReferralRepositoryTest @Autowired constructor(
       assignments = listOf(ReferralAssignment(OffsetDateTime.now(), assignedBy = user, assignedTo = user)),
       endRequestedAt = endRequestedAt,
       concludedAt = concludedAt,
-      endOfServiceReport = eosR
+      endOfServiceReport = eosR,
     )
-    val serviceUser = serviceUserFactory.create(random(15), random(16), referral)
+    serviceUserFactory.create(random(15), random(16), referral)
 
     return entityManager.refresh(referral)
   }
@@ -312,7 +394,8 @@ class ReferralRepositoryTest @Autowired constructor(
       referral.serviceUserData!!.firstName,
       referral.serviceUserData!!.lastName,
       referral.endOfServiceReport?.id,
-      referral.endOfServiceReport?.submittedAt?.toInstant()
+      referral.endOfServiceReport?.submittedAt?.toInstant(),
+      referral.concludedAt?.toInstant(),
     )
 
   @Test
@@ -342,4 +425,5 @@ data class Summary(
   override val serviceUserLastName: String?,
   override val endOfServiceReportId: UUID?,
   override val endOfServiceReportSubmittedAt: Instant?,
+  override val concludedAt: Instant?
 ) : ServiceProviderSentReferralSummary

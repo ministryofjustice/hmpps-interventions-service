@@ -14,4 +14,5 @@ interface ServiceProviderSentReferralSummary {
   val serviceUserLastName: String?
   val endOfServiceReportId: UUID?
   val endOfServiceReportSubmittedAt: Instant?
+  val concludedAt: Instant?
 }
