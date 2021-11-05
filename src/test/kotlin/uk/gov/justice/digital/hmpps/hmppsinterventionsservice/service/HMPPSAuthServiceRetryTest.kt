@@ -91,6 +91,7 @@ class HMPPSAuthServiceRetryTest {
     hmppsAuthService = HMPPSAuthService(
       "/authuser/groups",
       "/authuser/detail",
+      "/authuser/detail/id",
       "/user/email",
       "/user/detail",
       2L,

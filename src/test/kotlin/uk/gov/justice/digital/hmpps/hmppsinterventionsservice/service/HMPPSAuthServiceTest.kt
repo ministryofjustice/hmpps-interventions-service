@@ -11,12 +11,14 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.RestClient
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
+import java.util.UUID
 
 class HMPPSAuthServiceTest {
   private val mockWebServer = MockWebServer()
   private val hmppsAuthService = HMPPSAuthService(
     "/authuser/groups",
     "/authuser/detail",
+    "/authuser/detail/id",
     "/user/email",
     "/user/detail",
     0L,
@@ -27,6 +29,26 @@ class HMPPSAuthServiceTest {
       "client-registration-id"
     )
   )
+
+  @Test
+  fun `checkAuthUserExists returns false on 404 responses from hmpps auth`() {
+    mockWebServer.enqueue(MockResponse().setResponseCode(404))
+    assertThat(hmppsAuthService.checkAuthUserExists(UUID.randomUUID().toString())).isFalse
+  }
+
+  @Test
+  fun `checkAuthUserExists throws on error responses from hmpps auth`() {
+    mockWebServer.enqueue(MockResponse().setResponseCode(403))
+    assertThrows<WebClientResponseException> {
+      hmppsAuthService.checkAuthUserExists(UUID.randomUUID().toString())
+    }
+  }
+
+  @Test
+  fun `checkAuthUserExists returns true on 200 responses from hmpps auth`() {
+    mockWebServer.enqueue(MockResponse().setResponseCode(200))
+    assertThat(hmppsAuthService.checkAuthUserExists(UUID.randomUUID().toString())).isTrue
+  }
 
   @Test
   fun `getUserDetail gets details for verified auth user`() {

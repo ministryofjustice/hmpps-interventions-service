@@ -50,6 +50,7 @@ private data class UserDetailResponse(
 class HMPPSAuthService(
   @Value("\${hmppsauth.api.locations.auth-user-groups}") private val authUserGroupsLocation: String,
   @Value("\${hmppsauth.api.locations.auth-user-detail}") private val authUserDetailLocation: String,
+  @Value("\${hmppsauth.api.locations.auth-user-detail-by-id}") private val authUserDetailByIdLocation: String,
   @Value("\${hmppsauth.api.locations.user-email}") private val userEmailLocation: String,
   @Value("\${hmppsauth.api.locations.user-detail}") private val userDetailLocation: String,
   @Value("\${webclient.hmpps-auth.max-retry-attempts}") private val maxRetryAttempts: Long,
@@ -69,6 +70,16 @@ class HMPPSAuthService(
       .withRetryPolicy()
       .map { it.groupCode }
       .collectList().block()
+  }
+
+  fun checkAuthUserExists(userId: String): Boolean {
+    val url = UriComponentsBuilder.fromPath(authUserDetailByIdLocation).buildAndExpand(userId).toString()
+    val response = hmppsAuthApiClient.get(url)
+      .retrieve()
+      .onStatus({ it.equals(HttpStatus.NOT_FOUND) }, { Mono.empty() })
+      .toBodilessEntity()
+      .block()
+    return !response.statusCode.equals(HttpStatus.NOT_FOUND)
   }
 
   fun getUserDetail(user: AuthUser): UserDetail {

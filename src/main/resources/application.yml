@@ -165,6 +165,7 @@ hmppsauth:
     locations:
       auth-user-groups: "/api/authuser/{username}/groups"
       auth-user-detail: "/api/authuser/{username}"
+      auth-user-detail-by-id: "/api/authuser/id/{userId}"
       user-email: "/api/user/{username}/email"
       user-detail: "/api/user/{username}"
 
