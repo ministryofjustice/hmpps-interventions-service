@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events
 
-import org.springframework.context.ApplicationEvent
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.LocationMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller.ActionPlanController
@@ -12,7 +10,7 @@ enum class ActionPlanEventType {
   APPROVED,
 }
 
-class ActionPlanEvent(source: Any, val type: ActionPlanEventType, val actionPlan: ActionPlan, val detailUrl: String) : ApplicationEvent(source) {
+class ActionPlanEvent(source: Any, val type: ActionPlanEventType, val actionPlan: ActionPlan, val detailUrl: String) : TraceableEvent(source) {
   override fun toString(): String {
     return "ActionPlanEvent(type=$type, actionPlanId=${actionPlan.id}, detailUrl='$detailUrl', source=$source)"
   }
@@ -20,16 +18,16 @@ class ActionPlanEvent(source: Any, val type: ActionPlanEventType, val actionPlan
 
 @Component
 class ActionPlanEventPublisher(
-  private val applicationEventPublisher: ApplicationEventPublisher,
+  private val eventPublisher: TracePropagatingEventPublisher,
   private val locationMapper: LocationMapper
 ) {
 
   fun actionPlanSubmitEvent(actionPlan: ActionPlan) {
-    applicationEventPublisher.publishEvent(ActionPlanEvent(this, ActionPlanEventType.SUBMITTED, actionPlan, createDetailUrl(actionPlan)))
+    eventPublisher.publishEvent(ActionPlanEvent(this, ActionPlanEventType.SUBMITTED, actionPlan, createDetailUrl(actionPlan)))
   }
 
   fun actionPlanApprovedEvent(actionPlan: ActionPlan) {
-    applicationEventPublisher.publishEvent(ActionPlanEvent(this, ActionPlanEventType.APPROVED, actionPlan, createDetailUrl(actionPlan)))
+    eventPublisher.publishEvent(ActionPlanEvent(this, ActionPlanEventType.APPROVED, actionPlan, createDetailUrl(actionPlan)))
   }
 
   private fun createDetailUrl(actionPlan: ActionPlan): String {

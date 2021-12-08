@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
-import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.SNSPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
@@ -14,19 +13,41 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.EndOfServic
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.EndOfServiceReportEventType.SUBMITTED
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.TracePropagatingEventListener
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.TraceableEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.AsyncEventExceptionHandling
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 
-interface SNSService
-
 @Service
-class SNSActionPlanService(
-  private val snsPublisher: SNSPublisher,
-) : ApplicationListener<ActionPlanEvent>, SNSService {
-
+class SNSService(private val snsPublisher: SNSPublisher): TracePropagatingEventListener {
   @AsyncEventExceptionHandling
-  override fun onApplicationEvent(event: ActionPlanEvent) {
+  override fun processTraceableEvent(event: TraceableEvent) {
+    when (event) {
+      is ReferralEvent -> processReferralEvent(event)
+      is ActionPlanEvent -> processActionPlanEvent(event)
+      is ActionPlanAppointmentEvent -> processActionPlanAppointmentEvent(event)
+      is AppointmentEvent -> processAppointmentEvent(event)
+      is EndOfServiceReportEvent -> processEndOfServiceReportEvent(event)
+    }
+  }
+
+  private fun processEndOfServiceReportEvent(event: EndOfServiceReportEvent) {
+    when (event.type) {
+      SUBMITTED -> {
+        val snsEvent = EventDTO(
+          "intervention.end-of-service-report.submitted",
+          "An end of service report has been submitted",
+          event.detailUrl,
+          event.endOfServiceReport.submittedAt!!,
+          mapOf("endOfServiceReportId" to event.endOfServiceReport.id, "submittedBy" to (event.endOfServiceReport.submittedBy?.userName!!))
+        )
+        snsPublisher.publish(event.endOfServiceReport.referral.id, event.endOfServiceReport.submittedBy!!, snsEvent)
+      }
+    }
+  }
+
+  private fun processActionPlanEvent(event: ActionPlanEvent) {
     when (event.type) {
       ActionPlanEventType.SUBMITTED -> {
         val snsEvent = EventDTO(
@@ -50,15 +71,55 @@ class SNSActionPlanService(
       }
     }
   }
-}
 
-@Service
-class SNSReferralService(
-  private val snsPublisher: SNSPublisher,
-) : ApplicationListener<ReferralEvent>, SNSService {
+  private fun processAppointmentEvent(event: AppointmentEvent) {
+    when (event.type) {
+      AppointmentEventType.ATTENDANCE_RECORDED -> {
+        val referral = event.appointment.referral
+        val appointment = event.appointment
 
-  @AsyncEventExceptionHandling
-  override fun onApplicationEvent(event: ReferralEvent) {
+        val eventType = "intervention.initial-assessment-appointment.${
+          when (appointment.attended) {
+            Attended.YES, Attended.LATE -> "attended"
+            Attended.NO -> "missed"
+            null -> throw RuntimeException("event triggered for appointment with no recorded attendance")
+          }
+        }"
+
+        val snsEvent = EventDTO(
+          eventType,
+          "Attendance was recorded for an initial assessment appointment",
+          event.detailUrl,
+          appointment.attendanceSubmittedAt!!,
+          mapOf("serviceUserCRN" to referral.serviceUserCRN, "referralId" to referral.id)
+        )
+
+        snsPublisher.publish(referral.id, appointment.appointmentFeedbackSubmittedBy!!, snsEvent)
+      }
+      AppointmentEventType.SESSION_FEEDBACK_RECORDED -> {
+        val referral = event.appointment.referral
+        val appointment = event.appointment
+
+        val eventType = "intervention.initial-assessment-appointment.session-feedback-submitted"
+
+        val snsEvent = EventDTO(
+          eventType,
+          "Session feedback submitted for an initial assessment appointment",
+          event.detailUrl,
+          appointment.appointmentFeedbackSubmittedAt!!,
+          mapOf(
+            "serviceUserCRN" to referral.serviceUserCRN,
+            "referralId" to referral.id,
+            "deliusAppointmentId" to appointment.deliusAppointmentId.toString()
+          )
+        )
+
+        snsPublisher.publish(referral.id, appointment.appointmentFeedbackSubmittedBy!!, snsEvent)
+      }
+    }
+  }
+
+  private fun processReferralEvent(event: ReferralEvent) {
     when (event.type) {
       ReferralEventType.SENT -> {
         val snsEvent = EventDTO(
@@ -114,26 +175,20 @@ class SNSReferralService(
       }
     }
   }
-}
-
-@Service
-class SNSActionPlanAppointmentService(
-  private val snsPublisher: SNSPublisher,
-) : ApplicationListener<ActionPlanAppointmentEvent>, SNSService {
-
-  @AsyncEventExceptionHandling
-  override fun onApplicationEvent(event: ActionPlanAppointmentEvent) {
+  private fun processActionPlanAppointmentEvent(event: ActionPlanAppointmentEvent) {
     when (event.type) {
       ActionPlanAppointmentEventType.ATTENDANCE_RECORDED -> {
         val referral = event.deliverySession.referral
         val appointment = event.deliverySession.currentAppointment
           ?: throw RuntimeException("event triggered for session with no appointments")
 
-        val eventType = "intervention.session-appointment.${when (appointment.attended) {
-          Attended.YES, Attended.LATE -> "attended"
-          Attended.NO -> "missed"
-          null -> throw RuntimeException("event triggered for appointment with no recorded attendance")
-        }}"
+        val eventType = "intervention.session-appointment.${
+          when (appointment.attended) {
+            Attended.YES, Attended.LATE -> "attended"
+            Attended.NO -> "missed"
+            null -> throw RuntimeException("event triggered for appointment with no recorded attendance")
+          }
+        }"
 
         val snsEvent = EventDTO(
           eventType,
@@ -165,80 +220,6 @@ class SNSActionPlanAppointmentService(
         )
 
         snsPublisher.publish(referral.id, appointment.appointmentFeedbackSubmittedBy!!, snsEvent)
-      }
-    }
-  }
-}
-
-@Service
-class SNSAppointmentService(
-  private val snsPublisher: SNSPublisher,
-) : ApplicationListener<AppointmentEvent>, SNSService {
-
-  @AsyncEventExceptionHandling
-  override fun onApplicationEvent(event: AppointmentEvent) {
-    when (event.type) {
-      AppointmentEventType.ATTENDANCE_RECORDED -> {
-        val referral = event.appointment.referral
-        val appointment = event.appointment
-
-        val eventType = "intervention.initial-assessment-appointment.${when (appointment.attended) {
-          Attended.YES, Attended.LATE -> "attended"
-          Attended.NO -> "missed"
-          null -> throw RuntimeException("event triggered for appointment with no recorded attendance")
-        }}"
-
-        val snsEvent = EventDTO(
-          eventType,
-          "Attendance was recorded for an initial assessment appointment",
-          event.detailUrl,
-          appointment.attendanceSubmittedAt!!,
-          mapOf("serviceUserCRN" to referral.serviceUserCRN, "referralId" to referral.id)
-        )
-
-        snsPublisher.publish(referral.id, appointment.appointmentFeedbackSubmittedBy!!, snsEvent)
-      }
-      AppointmentEventType.SESSION_FEEDBACK_RECORDED -> {
-        val referral = event.appointment.referral
-        val appointment = event.appointment
-
-        val eventType = "intervention.initial-assessment-appointment.session-feedback-submitted"
-
-        val snsEvent = EventDTO(
-          eventType,
-          "Session feedback submitted for an initial assessment appointment",
-          event.detailUrl,
-          appointment.appointmentFeedbackSubmittedAt!!,
-          mapOf(
-            "serviceUserCRN" to referral.serviceUserCRN,
-            "referralId" to referral.id,
-            "deliusAppointmentId" to appointment.deliusAppointmentId.toString()
-          )
-        )
-
-        snsPublisher.publish(referral.id, appointment.appointmentFeedbackSubmittedBy!!, snsEvent)
-      }
-    }
-  }
-}
-
-@Service
-class SNSEndOfServiceReportService(
-  private val snsPublisher: SNSPublisher,
-) : ApplicationListener<EndOfServiceReportEvent>, SNSService {
-
-  @AsyncEventExceptionHandling
-  override fun onApplicationEvent(event: EndOfServiceReportEvent) {
-    when (event.type) {
-      SUBMITTED -> {
-        val snsEvent = EventDTO(
-          "intervention.end-of-service-report.submitted",
-          "An end of service report has been submitted",
-          event.detailUrl,
-          event.endOfServiceReport.submittedAt!!,
-          mapOf("endOfServiceReportId" to event.endOfServiceReport.id, "submittedBy" to (event.endOfServiceReport.submittedBy?.userName!!))
-        )
-        snsPublisher.publish(event.endOfServiceReport.referral.id, event.endOfServiceReport.submittedBy!!, snsEvent)
       }
     }
   }

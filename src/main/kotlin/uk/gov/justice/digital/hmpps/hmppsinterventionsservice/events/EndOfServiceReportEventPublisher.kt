@@ -17,7 +17,7 @@ class EndOfServiceReportEvent(
   val endOfServiceReport: EndOfServiceReport,
   val detailUrl: String
 ) :
-  ApplicationEvent(source) {
+  TraceableEvent(source) {
   override fun toString(): String {
     return "EndOfServiceReportEvent(type=$type, referralId=${endOfServiceReport.referral.id}, detailUrl='$detailUrl', source=$source)"
   }
@@ -25,11 +25,11 @@ class EndOfServiceReportEvent(
 
 @Component
 class EndOfServiceReportEventPublisher(
-  private val applicationEventPublisher: ApplicationEventPublisher,
+  private val eventPublisher: TracePropagatingEventPublisher,
   private val locationMapper: LocationMapper
 ) {
   fun endOfServiceReportSubmittedEvent(endOfServiceReport: EndOfServiceReport) {
-    applicationEventPublisher.publishEvent(
+    eventPublisher.publishEvent(
       EndOfServiceReportEvent(
         this, EndOfServiceReportEventType.SUBMITTED,
         endOfServiceReport, getEndOfServiceReportUrl(endOfServiceReport)

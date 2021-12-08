@@ -196,3 +196,8 @@ webclient:
     max-retry-attempts: 2
     connect-timeout-seconds: 3
     read-timeout-seconds: 3
+
+azure:
+  application-insights:
+    web:
+      enabled: false # let the v3 application insights agent handle all the telemetry

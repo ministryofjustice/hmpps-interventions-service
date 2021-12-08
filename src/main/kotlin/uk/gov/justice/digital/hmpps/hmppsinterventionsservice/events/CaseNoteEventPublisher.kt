@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events
 
-import org.springframework.context.ApplicationEvent
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.LocationMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller.CaseNoteController
@@ -15,17 +13,17 @@ class CreateCaseNoteEvent(
   val sentBy: AuthUser,
   val detailUrl: String,
   val referralId: UUID,
-) : ApplicationEvent(source) {
+) : TraceableEvent(source) {
   override fun toString(): String = "CreateCaseNoteEvent(caseNoteId=$caseNoteId, referralId=$referralId)"
 }
 
 @Component
 class CaseNoteEventPublisher(
-  private val applicationEventPublisher: ApplicationEventPublisher,
+  private val eventPublisher: TracePropagatingEventPublisher,
   private val locationMapper: LocationMapper,
 ) {
   fun caseNoteSentEvent(caseNote: CaseNote) {
-    applicationEventPublisher.publishEvent(
+    eventPublisher.publishEvent(
       CreateCaseNoteEvent(
         this,
         caseNote.id,

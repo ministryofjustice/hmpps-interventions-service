@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events
 
-import org.springframework.context.ApplicationEvent
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.LocationMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller.ReferralController
@@ -23,7 +21,7 @@ class AppointmentEvent(
   val detailUrl: String,
   val notifyPP: Boolean,
   val appointmentType: AppointmentType
-) : ApplicationEvent(source) {
+) : TraceableEvent(source) {
   override fun toString(): String {
     return "AppointmentEvent(type=$type, appointmentId=${appointment.id}, detailUrl='$detailUrl', source=$source)"
   }
@@ -31,11 +29,11 @@ class AppointmentEvent(
 
 @Component
 class AppointmentEventPublisher(
-  private val applicationEventPublisher: ApplicationEventPublisher,
+  private val eventPublisher: TracePropagatingEventPublisher,
   private val locationMapper: LocationMapper
 ) {
   fun appointmentScheduledEvent(appointment: Appointment, appointmentType: AppointmentType) {
-    applicationEventPublisher.publishEvent(
+    eventPublisher.publishEvent(
       AppointmentEvent(
         this,
         AppointmentEventType.SCHEDULED,
@@ -48,7 +46,7 @@ class AppointmentEventPublisher(
   }
 
   fun attendanceRecordedEvent(appointment: Appointment, notifyPP: Boolean, appointmentType: AppointmentType) {
-    applicationEventPublisher.publishEvent(
+    eventPublisher.publishEvent(
       AppointmentEvent(
         this,
         AppointmentEventType.ATTENDANCE_RECORDED,
@@ -61,7 +59,7 @@ class AppointmentEventPublisher(
   }
 
   fun behaviourRecordedEvent(appointment: Appointment, notifyPP: Boolean, appointmentType: AppointmentType) {
-    applicationEventPublisher.publishEvent(
+    eventPublisher.publishEvent(
       AppointmentEvent(
         this,
         AppointmentEventType.BEHAVIOUR_RECORDED,
@@ -74,7 +72,7 @@ class AppointmentEventPublisher(
   }
 
   fun sessionFeedbackRecordedEvent(appointment: Appointment, notifyPP: Boolean, appointmentType: AppointmentType) {
-    applicationEventPublisher.publishEvent(
+    eventPublisher.publishEvent(
       AppointmentEvent(
         this,
         AppointmentEventType.SESSION_FEEDBACK_RECORDED,

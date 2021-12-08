@@ -12,7 +12,7 @@ enum class ReferralEventType {
   SENT, ASSIGNED, CANCELLED, PREMATURELY_ENDED, COMPLETED
 }
 
-class ReferralEvent(source: Any, val type: ReferralEventType, val referral: Referral, val detailUrl: String) : ApplicationEvent(source) {
+class ReferralEvent(source: Any, val type: ReferralEventType, val referral: Referral, val detailUrl: String) : TraceableEvent(source) {
   override fun toString(): String {
     return "ReferralEvent(type=$type, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
   }
@@ -20,22 +20,22 @@ class ReferralEvent(source: Any, val type: ReferralEventType, val referral: Refe
 
 @Component
 class ReferralEventPublisher(
-  private val applicationEventPublisher: ApplicationEventPublisher,
+  private val eventPublisher: TracePropagatingEventPublisher,
   private val locationMapper: LocationMapper
 ) {
   companion object : KLogging()
 
   fun referralSentEvent(referral: Referral) {
-    applicationEventPublisher.publishEvent(ReferralEvent(this, ReferralEventType.SENT, referral, getSentReferralURL(referral)))
+    eventPublisher.publishEvent(ReferralEvent(this, ReferralEventType.SENT, referral, getSentReferralURL(referral)))
   }
 
   fun referralAssignedEvent(referral: Referral) {
-    applicationEventPublisher.publishEvent(ReferralEvent(this, ReferralEventType.ASSIGNED, referral, getSentReferralURL(referral)))
+    eventPublisher.publishEvent(ReferralEvent(this, ReferralEventType.ASSIGNED, referral, getSentReferralURL(referral)))
   }
 
   fun referralConcludedEvent(referral: Referral, eventType: ReferralEventType) {
     referral.currentAssignee ?: logger.warn("Concluding referral has no current assignment ${referral.id} for event type $eventType")
-    applicationEventPublisher.publishEvent(ReferralEvent(this, eventType, referral, getSentReferralURL(referral)))
+    eventPublisher.publishEvent(ReferralEvent(this, eventType, referral, getSentReferralURL(referral)))
   }
 
   private fun getSentReferralURL(referral: Referral): String {
