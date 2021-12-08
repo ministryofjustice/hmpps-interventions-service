@@ -2,6 +2,9 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.microsoft.applicationinsights.TelemetryClient
+import io.opentelemetry.api.trace.Span
+import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator
+import io.opentelemetry.context.Context
 import mu.KLogging
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -46,12 +49,17 @@ class SNSPublisher(
 
   private fun buildRequestAndPublish(event: EventDTO) {
     val message = objectMapper.writeValueAsString(event)
-    val messageAttributes = mapOf(
+    val messageAttributes = mutableMapOf(
       "eventType" to MessageAttributeValue.builder()
         .dataType("String")
         .stringValue(event.eventType)
         .build()
     )
+
+    W3CTraceContextPropagator.getInstance().inject(Context.current(), messageAttributes) { attributes, key, value ->
+      attributes?.put(key, MessageAttributeValue.builder().dataType("String").stringValue(value).build())
+    }
+    
     val request = PublishRequest.builder()
       .messageAttributes(messageAttributes)
       .message(message)
