@@ -6,16 +6,20 @@
 			"description": "R&M human-readable unique reference",
 			"constraints": {
 				"required": true,
-				"type": "http://www.w3.org/2001/XMLSchema#string"
+				"type": "http://www.w3.org/2001/XMLSchema#string",
+				"minLength": 8,
+				"maxLength": 8
 			}
 		},
 		{
 			"name": "referral_id",
 			"title": "Referral ID",
 			"description": "R&M system unique ID for the referral",
+			"format": "uuid",
 			"constraints": {
 				"required": true,
-				"type": "http://www.w3.org/2001/XMLSchema#string"
+				"type": "http://www.w3.org/2001/XMLSchema#string",
+				"unique": true
 			}
 		},
 		{
@@ -33,7 +37,8 @@
 			"description": "Type of contract",
 			"constraints": {
 				"required": true,
-				"type": "http://www.w3.org/2001/XMLSchema#string"
+				"type": "http://www.w3.org/2001/XMLSchema#string",
+				"maxLength": 255
 			}
 		},
 		{
@@ -51,7 +56,8 @@
 			"description": "Referring officer ID",
 			"constraints": {
 				"required": true,
-				"type": "http://www.w3.org/2001/XMLSchema#string"
+				"type": "http://www.w3.org/2001/XMLSchema#string",
+				"maxLength": 255
 			}
 		},
 		{
@@ -103,6 +109,7 @@
 			"name": "outcomes_to_be_achieved_count",
 			"title": "Count of outcomes to be achieved",
 			"description": "Number of outcomes to be achieved",
+			"type": "number",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#int"
@@ -112,15 +119,17 @@
 			"name": "outcomes_progress",
 			"title": "Outcomes progress",
 			"description": "Number of outcomes achieved or partially achieved, based on a score of 0 for not achieved, 0.5 for partially achieved, 1 for achieved.",
+			"type": "number",
 			"constraints": {
 				"required": false,
-				"type": "http://www.w3.org/2001/XMLSchema#string"
+				"type": "http://www.w3.org/2001/XMLSchema#float"
 			}
 		},
 		{
 			"name": "count_of_sessions_expected",
 			"title": "Expected number of sessions",
 			"description": "Number of sessions that the SP expects to use (based on latest version of action plan)",
+			"type": "number",
 			"constraints": {
 				"required": false,
 				"type": "http://www.w3.org/2001/XMLSchema#int"
@@ -130,6 +139,7 @@
 			"name": "count_of_sessions_attended",
 			"title": "Number of sessions attended",
 			"description": "Number of sessions with SU which have been attended (including late attendance)",
+			"type": "number",
 			"constraints": {
 				"required": false,
 				"type": "http://www.w3.org/2001/XMLSchema#int"
@@ -149,7 +159,12 @@
 			"title": "Reason for end of intervention",
 			"constraints": {
 				"required": false,
-				"type": "http://www.w3.org/2001/XMLSchema#string"
+				"type": "http://www.w3.org/2001/XMLSchema#string",
+				"enum": [
+					"completed",
+					"cancelled",
+					"ended"
+				]
 			}
 		},
 		{
@@ -167,7 +182,8 @@
 			"description": "Three-letter reason code for ending",
 			"constraints": {
 				"required": false,
-				"type": "http://www.w3.org/2001/XMLSchema#string"
+				"type": "http://www.w3.org/2001/XMLSchema#string",
+				"maxLength": 3
 			}
 		},
 		{
@@ -176,7 +192,8 @@
 			"description": "Description of the end reason",
 			"constraints": {
 				"required": false,
-				"type": "http://www.w3.org/2001/XMLSchema#string"
+				"type": "http://www.w3.org/2001/XMLSchema#string",
+				"maxLength": 255
 			}
 		},
 		{
@@ -188,5 +205,6 @@
 				"type": "http://www.w3.org/2001/XMLSchema#string"
 			}
 		}
-	]
+	],
+	"primaryKey": "referral_id"
 }

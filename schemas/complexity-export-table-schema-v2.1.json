@@ -6,13 +6,16 @@
 			"description": "R&M human-readable unique reference",
 			"constraints": {
 				"required": true,
-				"type": "http://www.w3.org/2001/XMLSchema#string"
+				"type": "http://www.w3.org/2001/XMLSchema#string",
+				"minLength": 8,
+				"maxLength": 8
 			}
 		},
 		{
 			"name": "referral_id",
 			"title": "Referral ID",
 			"description": "R&M system unique ID for the referral",
+			"format": "uuid",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
@@ -31,6 +34,7 @@
 			"name": "service_category_id",
 			"title": "Service category ID",
 			"description": "R&M system unique ID for the service category",
+			"format": "uuid",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
@@ -54,5 +58,9 @@
 				"type": "http://www.w3.org/2001/XMLSchema#string"
 			}
 		}
+	],
+	"primaryKey": [
+		"referral_id",
+		"service_category_id"
 	]
 }
