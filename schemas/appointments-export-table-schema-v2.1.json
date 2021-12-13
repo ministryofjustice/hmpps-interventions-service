@@ -1,0 +1,118 @@
+{
+  "fields": [
+    {
+      "name": "referral_ref",
+      "title": "Referral reference",
+      "description": "R&M human-readable unique reference",
+      "constraints": {
+        "required": true,
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "minLength": 8,
+        "maxLength": 8
+      }
+    },
+    {
+      "name": "referral_id",
+      "title": "Referral ID",
+      "description": "R&M system unique ID for the referral",
+      "format": "uuid",
+      "constraints": {
+        "required": true,
+        "type": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    },
+    {
+      "name": "appointmentId",
+      "title": "Appointment ID",
+      "description": "R&M system unique ID for the appointment",
+      "format": "uuid",
+      "constraints": {
+        "required": true,
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "unique": true
+      }
+    },
+    {
+      "name": "appointment_time",
+      "title": "Appointment time",
+      "description": "Date and time of the appointment",
+      "constraints": {
+        "required": true,
+        "type": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    },
+    {
+      "name": "duration_in_minutes",
+      "title": "Appointment duration (in minutes)",
+      "description": "Duration of the appointment",
+      "constraints": {
+        "required": true,
+        "type": "http://www.w3.org/2001/XMLSchema#int"
+      }
+    },
+    {
+      "name": "booked_at",
+      "title": "Appointment booked at",
+      "description": "Date and time the appointment was booked in R&M",
+      "constraints": {
+        "required": true,
+        "type": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    },
+    {
+      "name": "attended",
+      "title": "Appointment attended?",
+      "description": "If the appointment was attended",
+      "constraints": {
+        "required": false,
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "enum": [
+          "YES",
+          "LATE",
+          "NO"
+        ]
+      }
+    },
+    {
+      "name": "attendance_submitted_at",
+      "title": "Attendance report submitted at",
+      "description": "Date and time the attendance details were added",
+      "constraints": {
+        "required": false,
+        "type": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    },
+    {
+      "name": "notifyppof_attendance_behaviour",
+      "title": "Notify PP of attendande behaviour?",
+      "description": "If the SP explicitly asked R&M to notify the PP of attendance behaviour",
+      "constraints": {
+        "required": false,
+        "type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "name": "delius_appointment_id",
+      "title": "Delius appointment ID",
+      "description": "Related appointment ID in Delius",
+      "constraints": {
+        "required": true,
+        "type": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    },
+    {
+      "name": "reason_for_appointment",
+      "title": "Reason for appointment",
+      "description": "Type of session",
+      "constraints": {
+        "required": true,
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "enum": [
+          "saa",
+          "delivery"
+        ]
+      }
+    }
+  ],
+  "primaryKey": "appointment_id"
+}

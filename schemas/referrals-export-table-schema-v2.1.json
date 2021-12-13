@@ -1,0 +1,210 @@
+{
+  "fields": [
+    {
+      "name": "referral_ref",
+      "title": "Referral reference",
+      "description": "R&M human-readable unique reference",
+      "constraints": {
+        "required": true,
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "minLength": 8,
+        "maxLength": 8
+      }
+    },
+    {
+      "name": "referral_id",
+      "title": "Referral ID",
+      "description": "R&M system unique ID for the referral",
+      "format": "uuid",
+      "constraints": {
+        "required": true,
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "unique": true
+      }
+    },
+    {
+      "name": "crs_contract_reference",
+      "title": "CRS contract reference",
+      "description": "The Procurement ID of the main contract for delivering this intervention",
+      "constraints": {
+        "required": true,
+        "type": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    },
+    {
+      "name": "crs_contract_type",
+      "title": "CRS contract type",
+      "description": "Type of contract",
+      "constraints": {
+        "required": true,
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "maxLength": 255
+      }
+    },
+    {
+      "name": "crs_provider_id",
+      "title": "CRS provider ID",
+      "description": "The provider ID of the primary company for delivery this intervention",
+      "constraints": {
+        "required": true,
+        "type": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    },
+    {
+      "name": "referring_officer_id",
+      "title": "Referring officer ID",
+      "description": "Referring officer ID",
+      "constraints": {
+        "required": true,
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "maxLength": 255
+      }
+    },
+    {
+      "name": "relevant_sentence_id",
+      "title": "Relevant sentence ID",
+      "description": "The specific probation order this intervention is to be associated with (Delius event ID)",
+      "constraints": {
+        "required": true,
+        "type": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    },
+    {
+      "name": "service_user_crn",
+      "title": "Service user CRN",
+      "description": "CRN of the offender",
+      "constraints": {
+        "required": true,
+        "type": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    },
+    {
+      "name": "date_referral_received",
+      "title": "Date referral received",
+      "description": "Date referral is received by service provider",
+      "constraints": {
+        "required": true,
+        "type": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    },
+    {
+      "name": "date_first_action_plan_submitted",
+      "title": "Date first action plan submitted",
+      "description": "Date of initial action plan being submitted by SP",
+      "constraints": {
+        "required": false,
+        "type": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    },
+    {
+      "name": "date_of_first_action_plan_approval",
+      "title": "Date of first action plan approval",
+      "description": "Date of initial action plan being approved by PP",
+      "constraints": {
+        "required": false,
+        "type": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    },
+    {
+      "name": "outcomes_to_be_achieved_count",
+      "title": "Count of outcomes to be achieved",
+      "description": "Number of outcomes to be achieved",
+      "type": "number",
+      "constraints": {
+        "required": true,
+        "type": "http://www.w3.org/2001/XMLSchema#int"
+      }
+    },
+    {
+      "name": "outcomes_progress",
+      "title": "Outcomes progress",
+      "description": "Number of outcomes achieved or partially achieved, based on a score of 0 for not achieved, 0.5 for partially achieved, 1 for achieved.",
+      "type": "number",
+      "constraints": {
+        "required": false,
+        "type": "http://www.w3.org/2001/XMLSchema#float"
+      }
+    },
+    {
+      "name": "count_of_sessions_expected",
+      "title": "Expected number of sessions",
+      "description": "Number of sessions that the SP expects to use (based on latest version of action plan)",
+      "type": "number",
+      "constraints": {
+        "required": false,
+        "type": "http://www.w3.org/2001/XMLSchema#int"
+      }
+    },
+    {
+      "name": "count_of_sessions_attended",
+      "title": "Number of sessions attended",
+      "description": "Number of sessions with SU which have been attended (including late attendance)",
+      "type": "number",
+      "constraints": {
+        "required": false,
+        "type": "http://www.w3.org/2001/XMLSchema#int"
+      }
+    },
+    {
+      "name": "date_intervention_ended",
+      "title": "Date intervention ended",
+      "description": "Date that the EOSR is submitted OR when PP submits the premature end request",
+      "constraints": {
+        "required": false,
+        "type": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    },
+    {
+      "name": "intervention_end_reason",
+      "title": "Reason for end of intervention",
+      "constraints": {
+        "required": false,
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "enum": [
+          "completed",
+          "cancelled",
+          "ended"
+        ]
+      }
+    },
+    {
+      "name": "date_end_of_service_report_submitted",
+      "title": "Date end of service report submitted",
+      "description": "Date EOSR is submitted by SP",
+      "constraints": {
+        "required": false,
+        "type": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    },
+    {
+      "name": "intervention_end_reason_code",
+      "title": "Code for reason for end of intervention",
+      "description": "Three-letter reason code for ending",
+      "constraints": {
+        "required": false,
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "maxLength": 3
+      }
+    },
+    {
+      "name": "intervention_end_reason_description",
+      "title": "Description of reason for end of intervention",
+      "description": "Description of the end reason",
+      "constraints": {
+        "required": false,
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "maxLength": 255
+      }
+    },
+    {
+      "name": "intervention_concluded_at",
+      "title": "Intervention concluded at",
+      "description": "Date the intervention ended or was cancelled",
+      "constraints": {
+        "required": false,
+        "type": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    }
+  ],
+  "primaryKey": "referral_id"
+}
