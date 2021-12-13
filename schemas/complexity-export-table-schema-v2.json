@@ -2,7 +2,7 @@
 	"fields": [
 		{
 			"name": "referral_ref",
-			"title": "referral_ref",
+			"title": "Referral reference",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
@@ -10,7 +10,7 @@
 		},
 		{
 			"name": "referral_id",
-			"title": "referral_id",
+			"title": "Referral ID",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
@@ -18,7 +18,7 @@
 		},
 		{
 			"name": "intervention_title",
-			"title": "intervention_title",
+			"title": "Intervention title",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
@@ -26,7 +26,7 @@
 		},
 		{
 			"name": "service_category_id",
-			"title": "service_category_id",
+			"title": "Service category ID",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
@@ -34,7 +34,7 @@
 		},
 		{
 			"name": "service_category_name",
-			"title": "service_category_name",
+			"title": "Service category name",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
@@ -42,7 +42,7 @@
 		},
 		{
 			"name": "complexity_level_title",
-			"title": "complexity_level_title",
+			"title": "Complexity level title",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#string"

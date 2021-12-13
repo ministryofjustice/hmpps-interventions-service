@@ -2,7 +2,7 @@
 	"fields": [
 		{
 			"name": "referral_ref",
-			"title": "referral_ref",
+			"title": "Referral reference",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
@@ -10,7 +10,7 @@
 		},
 		{
 			"name": "referral_id",
-			"title": "referral_id",
+			"title": "Referral ID",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
@@ -18,7 +18,7 @@
 		},
 		{
 			"name": "appointmentId",
-			"title": "appointmentId",
+			"title": "Appointment ID",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
@@ -26,7 +26,7 @@
 		},
 		{
 			"name": "appointment_time",
-			"title": "appointment_time",
+			"title": "Appointment time",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
@@ -34,7 +34,7 @@
 		},
 		{
 			"name": "duration_in_minutes",
-			"title": "duration_in_minutes",
+			"title": "Appointment duration (in minutes)",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#int"
@@ -42,7 +42,7 @@
 		},
 		{
 			"name": "booked_at",
-			"title": "booked_at",
+			"title": "Appointment booked at",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
@@ -50,7 +50,7 @@
 		},
 		{
 			"name": "attended",
-			"title": "attended",
+			"title": "Appointment attended?",
 			"constraints": {
 				"required": false,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
@@ -58,7 +58,7 @@
 		},
 		{
 			"name": "attendance_submitted_at",
-			"title": "attendance_submitted_at",
+			"title": "Attendance report submitted at",
 			"constraints": {
 				"required": false,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
@@ -66,7 +66,7 @@
 		},
 		{
 			"name": "notifyppof_attendance_behaviour",
-			"title": "notifyppof_attendance_behaviour",
+			"title": "Notify PP of attendande behaviour?",
 			"constraints": {
 				"required": false,
 				"type": "http://www.w3.org/2001/XMLSchema#boolean"
@@ -74,7 +74,7 @@
 		},
 		{
 			"name": "delius_appointment_id",
-			"title": "delius_appointment_id",
+			"title": "Delius appointment ID",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
@@ -82,7 +82,7 @@
 		},
 		{
 			"name": "reason_for_appointment",
-			"title": "reason_for_appointment",
+			"title": "Reason for appointment",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
