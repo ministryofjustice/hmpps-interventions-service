@@ -1,0 +1,172 @@
+{
+	"fields": [
+		{
+			"name": "referral_ref",
+			"title": "referral_ref",
+			"constraints": {
+				"required": true,
+				"type": "http://www.w3.org/2001/XMLSchema#string"
+			}
+		},
+		{
+			"name": "referral_id",
+			"title": "referral_id",
+			"constraints": {
+				"required": true,
+				"type": "http://www.w3.org/2001/XMLSchema#string"
+			}
+		},
+		{
+			"name": "crs_contract_reference",
+			"title": "crs_contract_reference",
+			"constraints": {
+				"required": true,
+				"type": "http://www.w3.org/2001/XMLSchema#string"
+			}
+		},
+		{
+			"name": "crs_contract_type",
+			"title": "crs_contract_type",
+			"constraints": {
+				"required": true,
+				"type": "http://www.w3.org/2001/XMLSchema#string"
+			}
+		},
+		{
+			"name": "crs_provider_id",
+			"title": "crs_provider_id",
+			"constraints": {
+				"required": true,
+				"type": "http://www.w3.org/2001/XMLSchema#string"
+			}
+		},
+		{
+			"name": "referring_officer_id",
+			"title": "referring_officer_id",
+			"constraints": {
+				"required": true,
+				"type": "http://www.w3.org/2001/XMLSchema#string"
+			}
+		},
+		{
+			"name": "relevant_sentence_id",
+			"title": "relevant_sentence_id",
+			"constraints": {
+				"required": true,
+				"type": "http://www.w3.org/2001/XMLSchema#string"
+			}
+		},
+		{
+			"name": "service_user_crn",
+			"title": "service_user_crn",
+			"constraints": {
+				"required": true,
+				"type": "http://www.w3.org/2001/XMLSchema#string"
+			}
+		},
+		{
+			"name": "date_referral_received",
+			"title": "date_referral_received",
+			"constraints": {
+				"required": true,
+				"type": "http://www.w3.org/2001/XMLSchema#string"
+			}
+		},
+		{
+			"name": "date_first_action_plan_submitted",
+			"title": "date_first_action_plan_submitted",
+			"constraints": {
+				"required": false,
+				"type": "http://www.w3.org/2001/XMLSchema#string"
+			}
+		},
+		{
+			"name": "date_of_first_action_plan_approval",
+			"title": "date_of_first_action_plan_approval",
+			"constraints": {
+				"required": false,
+				"type": "http://www.w3.org/2001/XMLSchema#string"
+			}
+		},
+		{
+			"name": "outcomes_to_be_achieved_count",
+			"title": "outcomes_to_be_achieved_count",
+			"constraints": {
+				"required": true,
+				"type": "http://www.w3.org/2001/XMLSchema#int"
+			}
+		},
+		{
+			"name": "outcomes_progress",
+			"title": "outcomes_progress",
+			"constraints": {
+				"required": false,
+				"type": "http://www.w3.org/2001/XMLSchema#string"
+			}
+		},
+		{
+			"name": "count_of_sessions_expected",
+			"title": "count_of_sessions_expected",
+			"constraints": {
+				"required": false,
+				"type": "http://www.w3.org/2001/XMLSchema#int"
+			}
+		},
+		{
+			"name": "count_of_sessions_attended",
+			"title": "count_of_sessions_attended",
+			"constraints": {
+				"required": false,
+				"type": "http://www.w3.org/2001/XMLSchema#int"
+			}
+		},
+		{
+			"name": "date_intervention_ended",
+			"title": "date_intervention_ended",
+			"constraints": {
+				"required": false,
+				"type": "http://www.w3.org/2001/XMLSchema#string"
+			}
+		},
+		{
+			"name": "intervention_end_reason",
+			"title": "intervention_end_reason",
+			"constraints": {
+				"required": false,
+				"type": "http://www.w3.org/2001/XMLSchema#string"
+			}
+		},
+		{
+			"name": "date_end_of_service_report_submitted",
+			"title": "date_end_of_service_report_submitted",
+			"constraints": {
+				"required": false,
+				"type": "http://www.w3.org/2001/XMLSchema#string"
+			}
+		},
+		{
+			"name": "intervention_end_reason_code",
+			"title": "intervention_end_reason_code",
+			"constraints": {
+				"required": false,
+				"type": "http://www.w3.org/2001/XMLSchema#string"
+			}
+		},
+		{
+			"name": "intervention_end_reason_description",
+			"title": "intervention_end_reason_description",
+			"constraints": {
+				"required": false,
+				"type": "http://www.w3.org/2001/XMLSchema#string"
+			}
+		},
+		{
+			"name": "intervention_concluded_at",
+			"title": "intervention_concluded_at",
+			"constraints": {
+				"required": false,
+				"type": "http://www.w3.org/2001/XMLSchema#string"
+			}
+		}
+	]
+}
