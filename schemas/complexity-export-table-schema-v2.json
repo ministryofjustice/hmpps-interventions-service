@@ -3,6 +3,7 @@
 		{
 			"name": "referral_ref",
 			"title": "Referral reference",
+			"description": "R&M human-readable unique reference",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
@@ -11,6 +12,7 @@
 		{
 			"name": "referral_id",
 			"title": "Referral ID",
+			"description": "R&M system unique ID for the referral",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
@@ -19,6 +21,7 @@
 		{
 			"name": "intervention_title",
 			"title": "Intervention title",
+			"description": "Title from the contract",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
@@ -27,6 +30,7 @@
 		{
 			"name": "service_category_id",
 			"title": "Service category ID",
+			"description": "R&M system unique ID for the service category",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
@@ -35,6 +39,7 @@
 		{
 			"name": "service_category_name",
 			"title": "Service category name",
+			"description": "R&M human-readable category name",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
@@ -43,6 +48,7 @@
 		{
 			"name": "complexity_level_title",
 			"title": "Complexity level title",
+			"description": "R&M complexity data",
 			"constraints": {
 				"required": true,
 				"type": "http://www.w3.org/2001/XMLSchema#string"
