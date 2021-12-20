@@ -65,6 +65,7 @@ dependencies {
   implementation("org.apache.logging.log4j:log4j-api:2.17.0") // CVE-2021-45105
   implementation("org.apache.logging.log4j:log4j-to-slf4j:2.17.0") // CVE-2021-45105
 
+
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
