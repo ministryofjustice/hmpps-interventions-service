@@ -6,7 +6,7 @@ parameters:
     default: false
   pact_consumer_tags:
     type: string
-    default: main
+    default: release/code-freeze
 
 orbs:
   hmpps: ministryofjustice/hmpps@3.11
@@ -56,7 +56,7 @@ jobs:
           name: Run main migrations then branch migrations to detect clashes
           command: |
             flyway clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
-            git reset --hard origin/main
+            git reset --hard origin/release/code-freeze
             flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
             git reset --hard "$CIRCLE_SHA1"
             flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
@@ -99,7 +99,7 @@ jobs:
             docker tag data-dictionary "quay.io/hmpps/${CIRCLE_PROJECT_REPONAME}:data-dictionary-${APP_VERSION}"
       - when:
           condition:
-            equal: [ main, << pipeline.git.branch >> ]
+            equal: [ release/code-freeze, << pipeline.git.branch >> ]
           steps:
             - run:
                 name: Publish docker image
@@ -192,14 +192,14 @@ workflows:
           persist_container_image: true
           filters:
             branches:
-              only: [main]
+              only: [release/code-freeze]
       - hmpps/build_docker:
           name: build_docker
           publish: false
           persist_container_image: true
           filters:
             branches:
-              ignore: [main]
+              ignore: [release/code-freeze]
       - hmpps/trivy_pipeline_scan:
           name: vulnerability_scan
           requires: [build_docker, build_and_publish_docker]
@@ -211,7 +211,7 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - release/code-freeze
           requires:
             - validate
             - validate_db
@@ -270,7 +270,7 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - release/code-freeze
     jobs:
       - hmpps/veracode_policy_scan:
           teams: hmpps-interventions
