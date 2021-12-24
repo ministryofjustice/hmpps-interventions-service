@@ -56,7 +56,7 @@ jobs:
           name: Run main migrations then branch migrations to detect clashes
           command: |
             flyway clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
-            git reset --hard origin/release/code-freeze
+            git reset --hard origin/main
             flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
             git reset --hard "$CIRCLE_SHA1"
             flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
