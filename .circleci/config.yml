@@ -6,7 +6,7 @@ parameters:
     default: false
   pact_consumer_tags:
     type: string
-    default: release/code-freeze
+    default: main
 
 orbs:
   hmpps: ministryofjustice/hmpps@3.11
