@@ -59,7 +59,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-  implementation("com.nimbusds:oauth2-oidc-sdk:9.20")
+  implementation("com.nimbusds:oauth2-oidc-sdk:9.20.1")
   // until bumped in upstream
   implementation("io.netty:netty-codec:4.1.72.Final") // CVE-2021-43797
   implementation("org.apache.logging.log4j:log4j-api:2.17.1") // CVE-2021-44228
