@@ -40,7 +40,8 @@ class SentReferralDTO(
         relevantSentenceId = referral.relevantSentenceId!!,
         actionPlanId = referral.currentActionPlan?.id,
         currentActionPlanId = referral.currentActionPlan?.id,
-        approvedActionPlanIds = referral.actionPlans?.filter { it.approvedAt != null }?.map { it.id },
+        approvedActionPlanIds = referral.actionPlans?.filter { it.approvedAt != null }
+          ?.sortedByDescending { it.approvedAt }?.map { it.id },
         endRequestedAt = referral.endRequestedAt,
         endRequestedReason = referral.endRequestedReason?.let { it.description },
         endRequestedComments = referral.endRequestedComments,

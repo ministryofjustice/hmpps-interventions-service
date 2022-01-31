@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleD
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.UUID
 
 @JsonTest
@@ -237,6 +238,32 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
         "endRequestedComments": null,
         "endOfServiceReportCreationRequired": false,
         "concludedAt": "2021-01-13T21:57:13Z"
+      }
+    }
+    """
+    )
+  }
+
+  @Test
+  fun `approved action plan ids are ordered so the most recently approved comes first`() {
+    val latestApprovedActionPlan = actionPlanFactory.createApproved(approvedAt = OffsetDateTime.of(2021, 12, 12, 12, 12, 0, 0, ZoneOffset.UTC))
+    val olderApprovedActionPlan = actionPlanFactory.createApproved(approvedAt = OffsetDateTime.of(2021, 11, 12, 12, 12, 0, 0, ZoneOffset.UTC))
+    val evenOlderApprovedActionPlan = actionPlanFactory.createApproved(approvedAt = OffsetDateTime.of(2021, 10, 12, 12, 12, 0, 0, ZoneOffset.UTC))
+    val referral = referralFactory.createAssigned(
+      actionPlans = mutableListOf(
+        olderApprovedActionPlan, evenOlderApprovedActionPlan, latestApprovedActionPlan
+      )
+    )
+
+    val out = json.write(SentReferralDTO.from(referral, false))
+    Assertions.assertThat(out).isEqualToJson(
+      """
+      {
+        "approvedActionPlanIds": [
+          ${latestApprovedActionPlan.id}, 
+          ${olderApprovedActionPlan.id},
+          ${evenOlderApprovedActionPlan.id}
+        ]
       }
     }
     """
