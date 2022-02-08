@@ -63,7 +63,7 @@ dependencies {
 
   // bumps for security, until bumped in upstream
   implementation("org.apache.tomcat.embed:tomcat-embed-core:9.0.58") // CVE-2022-23181
-  implementation("org.apache.tomcat.embed:tomcat-embed-websocket:9.0.58") // CVE-2022-23181
+  implementation("org.apache.tomcat.embed:tomcat-embed-websocket:10.0.16") // CVE-2022-23181
   implementation("org.postgresql:postgresql:42.3.2") // CVE-2022-21724
 
   // database
