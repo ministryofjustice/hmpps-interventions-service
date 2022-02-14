@@ -1,0 +1,13 @@
+{{- if .Values.env_details.production_env -}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard
+  labels:
+    grafana_dashboard: ""
+# to refresh, change the dashboard in grafana (grafana.live.cloud-platform.service.justice.gov.uk)
+# press "Save" on the top right and replace the content of the grafana/hmpps-interventions-dashboard.json file
+data:
+{{ (.Files.Glob "grafana/hmpps-interventions-dashboard.json").AsConfig | indent 2 }}
+{{- end }}
