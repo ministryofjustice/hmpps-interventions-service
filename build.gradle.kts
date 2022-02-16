@@ -62,7 +62,7 @@ dependencies {
   implementation("com.nimbusds:oauth2-oidc-sdk:9.25")
 
   // bumps for security, until bumped in upstream
-  implementation("org.postgresql:postgresql:42.3.2") // CVE-2022-21724
+  implementation("org.postgresql:postgresql:42.3.3") // CVE-2022-21724
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
