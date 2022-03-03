@@ -17,7 +17,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 1,
-  "iteration": 1644574513137,
+  "iteration": 1646319560247,
   "links": [],
   "panels": [
     {
@@ -435,7 +435,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
+      "datasource": "Cloudwatch",
       "decimals": null,
       "description": "",
       "fieldConfig": {
@@ -482,14 +482,21 @@
       "steppedLine": false,
       "targets": [
         {
-          "exemplar": true,
-          "expr": "aws_rds_cpuutilization_average{dbinstance_identifier='cloud-platform-e4573fa1c83bbbb9'}",
-          "format": "time_series",
-          "instant": false,
-          "interval": "",
-          "intervalFactor": 5,
-          "legendFormat": "",
-          "refId": "A"
+          "alias": "",
+          "dimensions": {
+            "DBInstanceIdentifier": "cloud-platform-e4573fa1c83bbbb9"
+          },
+          "expression": "",
+          "id": "",
+          "matchExact": true,
+          "metricName": "CPUUtilization",
+          "namespace": "AWS/RDS",
+          "period": "",
+          "refId": "A",
+          "region": "default",
+          "statistics": [
+            "Average"
+          ]
         }
       ],
       "thresholds": [],
@@ -1378,5 +1385,5 @@
   "timezone": "browser",
   "title": "HMPPS Refer and monitor an intervention",
   "uid": "PyQ91ARnk",
-  "version": 25
+  "version": 1
 }
