@@ -34,17 +34,24 @@ spec:
                 psql -v ON_ERROR_STOP=1 --tuples-only --expanded --file=/reports/team_kpi_report.sql > 'export/team_kpi_report' \
                   && /scripts/send_to_slack.sh 'export/team_kpi_report'
               - |
-                psql -v ON_ERROR_STOP=1 --pset="footer=off" --file=/reports/team_kpi_details_report.sql > 'export/team_kpi_details_report' \
-                  && /scripts/send_to_slack.sh 'export/team_kpi_details_report'
+                psql -v ON_ERROR_STOP=1 --pset="footer=off" --file=/reports/team_kpi_details_ages.sql > 'export/team_kpi_details_ages' \
+                  && /scripts/send_to_slack.sh 'export/team_kpi_details_ages'
+              - |
+                psql -v ON_ERROR_STOP=1 --pset="footer=off" --file=/reports/team_kpi_details_counts.sql > 'export/team_kpi_details_counts' \
+                  && /scripts/send_to_slack.sh 'export/team_kpi_details_counts'
             volumeMounts:
             - name: kpi-scripts
               mountPath: /reports/team_kpi_report.sql
               readOnly: true
               subPath: team_kpi_report.sql
             - name: kpi-scripts
-              mountPath: /reports/team_kpi_details_report.sql
+              mountPath: /reports/team_kpi_details_ages.sql
               readOnly: true
-              subPath: team_kpi_details_report.sql
+              subPath: team_kpi_details_ages.sql
+            - name: kpi-scripts
+              mountPath: /reports/team_kpi_details_counts.sql
+              readOnly: true
+              subPath: team_kpi_details_counts.sql
             - name: kpi-scripts
               mountPath: /scripts/send_to_slack.sh
               readOnly: true
