@@ -57,14 +57,17 @@ Selector labels
 */}}
 {{- define "app.selectorLabels" -}}
 app: {{ include "app.name" . }}
+section: api
 release: {{ .Release.Name }}
 {{- end }}
 {{- define "suspectApp.selectorLabels" -}}
-app: api-suspect
+app: {{ include "app.name" . }}
+section: dashboard-api
 release: {{ .Release.Name }}
 {{- end }}
 {{- define "performanceReportApp.selectorLabels" -}}
-app: performance-report
+app: {{ include "app.name" . }}
+section: performance-report-api
 release: {{ .Release.Name }}
 {{- end }}
 {{- define "dataDictionary.selectorLabels" -}}
