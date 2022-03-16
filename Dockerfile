@@ -1,12 +1,26 @@
 FROM openjdk:11-slim AS builder
 
-ARG BUILD_NUMBER
-ENV BUILD_NUMBER ${BUILD_NUMBER:-1_0_0}
-
 WORKDIR /app
-ADD . .
-RUN ./gradlew clean assemble -Dorg.gradle.daemon=false
 
+ENV GRADLE_OPTS="-Dorg.gradle.daemon=false"
+
+# download most dependencies
+# exclude generateGitProperties -- .git folder is not copied to allow caching
+COPY build.gradle.kts settings.gradle.kts gradlew ./
+COPY gradle/ gradle/
+RUN ./gradlew classes --exclude-task=generateGitProperties
+
+# compile main app
+# exclude generateGitProperties -- .git folder is not copied to allow caching
+COPY src/main/ src/main/
+RUN ./gradlew classes --exclude-task=generateGitProperties
+
+# assemble extracts information from .git, this layer changes for all commits
+COPY . .
+RUN ./gradlew assemble
+
+
+# ---
 FROM adoptopenjdk/openjdk11:alpine-jre
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
@@ -28,7 +42,7 @@ RUN addgroup --gid 2000 --system appgroup && \
 WORKDIR /app
 COPY --from=builder --chown=appuser:appgroup /app/build/libs/hmpps-interventions-service*.jar /app/app.jar
 COPY --from=builder --chown=appuser:appgroup /app/build/libs/applicationinsights-agent*.jar /app/agent.jar
-COPY --from=builder --chown=appuser:appgroup /app/applicationinsights.json /app
+COPY --chown=appuser:appgroup applicationinsights.json /app
 
 USER 2000
 
