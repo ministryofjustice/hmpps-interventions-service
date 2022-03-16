@@ -24,6 +24,7 @@ RUN ./gradlew assemble
 FROM adoptopenjdk/openjdk11:alpine-jre
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
+# force a rebuild of `apk upgrade` below by invalidating the BUILD_NUMBER env variable on every commit
 ARG BUILD_NUMBER
 ENV BUILD_NUMBER ${BUILD_NUMBER:-1_0_0}
 
