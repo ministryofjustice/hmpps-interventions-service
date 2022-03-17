@@ -655,8 +655,7 @@ class ReferralService(
   }
 
   fun getResponsibleProbationPractitioner(referral: Referral): ResponsibleProbationPractitioner {
-    val sentBy = referral.sentBy?.let { it } ?: null
-    return getResponsibleProbationPractitioner(referral.serviceUserCRN, sentBy, referral.createdBy)
+    return getResponsibleProbationPractitioner(referral.serviceUserCRN, referral.sentBy, referral.createdBy)
   }
 
   fun getResponsibleProbationPractitioner(crn: String, sentBy: AuthUser?, createdBy: AuthUser): ResponsibleProbationPractitioner {
