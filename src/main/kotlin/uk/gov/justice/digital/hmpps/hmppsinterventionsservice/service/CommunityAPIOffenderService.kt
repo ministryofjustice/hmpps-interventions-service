@@ -109,7 +109,7 @@ class CommunityAPIOffenderService(
       ?.staffIdentifier
   }
 
-  fun getResponsibleOfficer(crn: String): ResponsibleOfficer {
+  fun getResponsibleOfficer(crn: String): ResponsibleOfficer? {
     val offenderManagersPath = UriComponentsBuilder.fromPath(offenderManagersLocation)
       .buildAndExpand(crn)
       .toString()
@@ -125,12 +125,11 @@ class CommunityAPIOffenderService(
     // as with many community API endpoints, we have a few assumptions about the data.
     // if there are no ROs, we can't recover. if there are more than one, we just take
     // the first.
-    responsibleOfficers.size.let {
+    responsibleOfficers?.size?.let {
       when {
         it == 0 -> telemetryService.reportInvalidAssumption(
           "service users always have a responsible officer",
           mapOf("crn" to crn),
-          recoverable = false
         )
         it > 1 -> telemetryService.reportInvalidAssumption(
           "service users only have one responsible officer",
@@ -139,6 +138,6 @@ class CommunityAPIOffenderService(
       }
     }
 
-    return responsibleOfficers.first()
+    return responsibleOfficers?.firstOrNull()
   }
 }

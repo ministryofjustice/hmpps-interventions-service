@@ -758,40 +758,71 @@ class ReferralServiceUnitTest {
   }
 
   @Test
-  fun `getResponsibleProbationPractitioner uses responsible officer`() {
-    whenever(communityAPIOffenderService.getResponsibleOfficer(any())).thenReturn(ResponsibleOfficer("tom", "tom@tom.tom", 123, "jones"))
+  fun `getResponsibleProbationPractitioner uses responsible officer if they have an email`() {
+    whenever(communityAPIOffenderService.getResponsibleOfficer(any()))
+      .thenReturn(ResponsibleOfficer("tom", "tom@tom.tom", 123, "jones"))
+
     val pp = referralService.getResponsibleProbationPractitioner(referralFactory.createSent())
+
     assertThat(pp.firstName).isEqualTo("tom")
+    assertThat(pp.lastName).isEqualTo("jones")
     assertThat(pp.email).isEqualTo("tom@tom.tom")
   }
 
   @Test
-  fun `getResponsibleProbationPractitioner uses sender if there is an unexpected error`() {
+  fun `getResponsibleProbationPractitioner uses the referring officer details if the community-api call fails`() {
+    whenever(communityAPIOffenderService.getResponsibleOfficer(any()))
+      .thenThrow(ReadTimeoutException.INSTANCE)
+
     val sender = authUserFactory.create("sender")
-    whenever(communityAPIOffenderService.getResponsibleOfficer(any())).thenThrow(ReadTimeoutException.INSTANCE)
-    whenever(hmppsAuthService.getUserDetail(sender)).thenReturn(UserDetail("andrew", "andrew@tom.tom", "marr"))
+    whenever(hmppsAuthService.getUserDetail(sender))
+      .thenReturn(UserDetail("andrew", "andrew@tom.tom", "marr"))
     val pp = referralService.getResponsibleProbationPractitioner(referralFactory.createSent(sentBy = sender))
+
     assertThat(pp.firstName).isEqualTo("andrew")
+    assertThat(pp.lastName).isEqualTo("marr")
     assertThat(pp.email).isEqualTo("andrew@tom.tom")
   }
 
   @Test
-  fun `getResponsibleProbationPractitioner uses sender if there is no responsible officer email address`() {
+  fun `getResponsibleProbationPractitioner aborts if it cannot retrieve responsible and referring officer details`() {
+    whenever(communityAPIOffenderService.getResponsibleOfficer(any()))
+      .thenThrow(ReadTimeoutException.INSTANCE)
+
     val sender = authUserFactory.create("sender")
-    whenever(communityAPIOffenderService.getResponsibleOfficer(any())).thenReturn(ResponsibleOfficer("tom", null, 123, "jones"))
+    whenever(hmppsAuthService.getUserDetail(sender))
+      .thenThrow(ReadTimeoutException.INSTANCE)
+
+    assertThrows<ReadTimeoutException> {
+      referralService.getResponsibleProbationPractitioner(referralFactory.createSent(sentBy = sender))
+    }
+  }
+
+  @Test
+  fun `getResponsibleProbationPractitioner uses the referring officer details if the responsible officer has no email`() {
+    whenever(communityAPIOffenderService.getResponsibleOfficer(any()))
+      .thenReturn(ResponsibleOfficer("tom", null, 123, "jones"))
+
+    val sender = authUserFactory.create("sender")
     whenever(hmppsAuthService.getUserDetail(sender)).thenReturn(UserDetail("andrew", "andrew@tom.tom", "marr"))
     val pp = referralService.getResponsibleProbationPractitioner(referralFactory.createSent(sentBy = sender))
+
     assertThat(pp.firstName).isEqualTo("andrew")
+    assertThat(pp.lastName).isEqualTo("marr")
     assertThat(pp.email).isEqualTo("andrew@tom.tom")
   }
 
   @Test
-  fun `getResponsibleProbationPractitioner uses creator if there is no responsible officer email address`() {
+  fun `getResponsibleProbationPractitioner uses the creator officer details if the responsible officer has no email and the referral is a draft`() {
+    whenever(communityAPIOffenderService.getResponsibleOfficer(any()))
+      .thenReturn(ResponsibleOfficer("tom", null, 123, "jones"))
+
     val creator = authUserFactory.create("creator")
-    whenever(communityAPIOffenderService.getResponsibleOfficer(any())).thenReturn(ResponsibleOfficer("tom", null, 123, "jones"))
     whenever(hmppsAuthService.getUserDetail(creator)).thenReturn(UserDetail("dan", "dan@tom.tom", "walker"))
     val pp = referralService.getResponsibleProbationPractitioner(referralFactory.createDraft(createdBy = creator))
+
     assertThat(pp.firstName).isEqualTo("dan")
+    assertThat(pp.lastName).isEqualTo("walker")
     assertThat(pp.email).isEqualTo("dan@tom.tom")
   }
 

@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
+import io.netty.channel.ChannelException
 import mu.KotlinLogging
 import net.logstash.logback.argument.StructuredArguments.kv
 import org.springframework.data.domain.Pageable
@@ -659,33 +660,45 @@ class ReferralService(
   }
 
   fun getResponsibleProbationPractitioner(crn: String, sentBy: AuthUser?, createdBy: AuthUser): ResponsibleProbationPractitioner {
-    try {
-      val responsibleOfficer = communityAPIOffenderService.getResponsibleOfficer(crn)
-      if (responsibleOfficer.email != null) {
-        return ResponsibleProbationPractitioner(
-          responsibleOfficer.firstName ?: "",
-          responsibleOfficer.email,
-          responsibleOfficer.staffId,
-          null,
-          responsibleOfficer.lastName ?: "",
-        )
+    val fallbackReason = try {
+      val officer = getContactableResponsibleOfficer(crn)
+      if (officer != null) {
+        return officer
       }
+      "no email address for responsible officer"
+    } catch (e: ChannelException) {
+      "call to get responsible officer failed: $e"
+    }
 
+    logger.warn("falling back to referring probation practitioner for crn {}", crn, kv("reason", fallbackReason))
+    return getContactableReferringOfficer(sentBy, createdBy)
+  }
+
+  private fun getContactableResponsibleOfficer(crn: String): ResponsibleProbationPractitioner? {
+    val responsibleOfficer = communityAPIOffenderService.getResponsibleOfficer(crn)
+      ?: return null
+
+    return if (responsibleOfficer.email == null) {
       telemetryService.reportInvalidAssumption(
         "all responsible officers have email addresses",
         mapOf("staffId" to responsibleOfficer.staffId.toString())
       )
-
-      logger.warn("no email address for responsible officer; falling back to referring probation practitioner")
-    } catch (e: Exception) {
-      logger.error(
-        "could not get responsible officer due to unexpected error; falling back to referring probation practitioner",
-        e
+      null
+    } else {
+      ResponsibleProbationPractitioner(
+        responsibleOfficer.firstName ?: "",
+        responsibleOfficer.email,
+        responsibleOfficer.staffId,
+        null,
+        responsibleOfficer.lastName ?: "",
       )
     }
+  }
 
+  private fun getContactableReferringOfficer(sentBy: AuthUser?, createdBy: AuthUser): ResponsibleProbationPractitioner {
     val referringProbationPractitioner = sentBy ?: createdBy
     val userDetail = hmppsAuthService.getUserDetail(referringProbationPractitioner)
+
     return ResponsibleProbationPractitioner(
       userDetail.firstName,
       userDetail.email,
