@@ -44,7 +44,7 @@ class PerformanceReportProcessor(
       eosrSubmittedAt = referral.endOfServiceReport?.submittedAt,
       concludedAt = referral.concludedAt,
       referralEndState = referral.endState,
-      dateSupplierAssessmentBooked = saa?.firstAppointment?.createdAt,
+      dateSupplierAssessmentFirstArranged = saa?.firstAppointment?.createdAt,
       dateSupplierAssessmentFirstScheduledFor = saa?.firstAppointment?.appointmentTime,
       dateSupplierAssessmentFirstNotAttended = saa?.firstAppointmentWithNonAttendance?.appointmentTime,
       dateSupplierAssessmentFirstAttended = saa?.firstAttendedAppointment?.appointmentTime,
