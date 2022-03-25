@@ -32,6 +32,11 @@ class PerformanceReportProcessor(
       currentAssigneeEmail = referral.currentAssignee?.userName,
       serviceUserCRN = referral.serviceUserCRN,
       dateReferralReceived = referral.sentAt!!,
+      dateSupplierAssessmentFirstArranged = saa?.firstAppointment?.createdAt,
+      dateSupplierAssessmentFirstScheduledFor = saa?.firstAppointment?.appointmentTime,
+      dateSupplierAssessmentFirstNotAttended = saa?.firstAppointmentWithNonAttendance?.appointmentTime,
+      dateSupplierAssessmentFirstAttended = saa?.firstAttendedAppointment?.appointmentTime,
+      supplierAssessmentAttendedOnTime = saa?.firstAttendedAppointment?.attended?.let { it == Attended.YES },
       firstActionPlanSubmittedAt = referral.actionPlans?.mapNotNull { it.submittedAt }?.minOrNull(),
       firstActionPlanApprovedAt = referral.actionPlans?.mapNotNull { it.approvedAt }?.minOrNull(),
       firstSessionAttendedAt = approvedActionPlan?.let { actionPlanService.getFirstAttendedAppointment(it)?.appointmentTime },
@@ -44,11 +49,6 @@ class PerformanceReportProcessor(
       eosrSubmittedAt = referral.endOfServiceReport?.submittedAt,
       concludedAt = referral.concludedAt,
       referralEndState = referral.endState,
-      dateSupplierAssessmentFirstArranged = saa?.firstAppointment?.createdAt,
-      dateSupplierAssessmentFirstScheduledFor = saa?.firstAppointment?.appointmentTime,
-      dateSupplierAssessmentFirstNotAttended = saa?.firstAppointmentWithNonAttendance?.appointmentTime,
-      dateSupplierAssessmentFirstAttended = saa?.firstAttendedAppointment?.appointmentTime,
-      supplierAssessmentAttendedOnTime = saa?.firstAttendedAppointment?.attended?.let { it == Attended.YES },
     )
   }
 }

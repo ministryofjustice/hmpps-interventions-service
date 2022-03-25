@@ -11,6 +11,11 @@ data class PerformanceReportData(
   val currentAssigneeEmail: String?,
   val serviceUserCRN: String,
   val dateReferralReceived: OffsetDateTime,
+  val dateSupplierAssessmentFirstArranged: OffsetDateTime?,
+  val dateSupplierAssessmentFirstScheduledFor: OffsetDateTime?,
+  val dateSupplierAssessmentFirstNotAttended: OffsetDateTime?,
+  val dateSupplierAssessmentFirstAttended: OffsetDateTime?,
+  val supplierAssessmentAttendedOnTime: Boolean?,
   val firstActionPlanSubmittedAt: OffsetDateTime?,
   val firstActionPlanApprovedAt: OffsetDateTime?,
   val firstSessionAttendedAt: OffsetDateTime?,
@@ -23,11 +28,6 @@ data class PerformanceReportData(
   val eosrSubmittedAt: OffsetDateTime?,
   val concludedAt: OffsetDateTime?,
   val referralEndState: String?,
-  val dateSupplierAssessmentFirstArranged: OffsetDateTime?,
-  val dateSupplierAssessmentFirstScheduledFor: OffsetDateTime?,
-  val dateSupplierAssessmentFirstNotAttended: OffsetDateTime?,
-  val dateSupplierAssessmentFirstAttended: OffsetDateTime?,
-  val supplierAssessmentAttendedOnTime: Boolean?,
 ) {
   companion object {
     // it would be neater to use reflection to get the fields, but we cannot guarantee the order
@@ -39,6 +39,11 @@ data class PerformanceReportData(
       "currentAssigneeEmail",
       "serviceUserCRN",
       "dateReferralReceived",
+      "dateSupplierAssessmentFirstArranged",
+      "dateSupplierAssessmentFirstScheduledFor",
+      "dateSupplierAssessmentFirstNotAttended",
+      "dateSupplierAssessmentFirstAttended",
+      "supplierAssessmentAttendedOnTime",
       "firstActionPlanSubmittedAt",
       "firstActionPlanApprovedAt",
       "firstSessionAttendedAt",
@@ -51,11 +56,6 @@ data class PerformanceReportData(
       "eosrSubmittedAt",
       "concludedAt",
       "referralEndState",
-      "dateSupplierAssessmentFirstArranged",
-      "dateSupplierAssessmentFirstScheduledFor",
-      "dateSupplierAssessmentFirstNotAttended",
-      "dateSupplierAssessmentFirstAttended",
-      "supplierAssessmentAttendedOnTime",
     )
     val headers = listOf(
       "referral_ref",
@@ -65,6 +65,11 @@ data class PerformanceReportData(
       "caseworker_id",
       "service_user_crn",
       "date_referral_received",
+      "date_saa_first_arranged",
+      "date_saa_first_scheduled_for",
+      "date_saa_first_not_attended",
+      "date_saa_first_attended",
+      "saa_attended_on_time",
       "date_first_action_plan_submitted",
       "date_of_first_action_plan_approval",
       "date_of_first_attended_session",
@@ -77,11 +82,6 @@ data class PerformanceReportData(
       "date_eosr_submitted",
       "concluded_at",
       "referral_end_state",
-      "date_saa_first_arranged",
-      "date_saa_first_scheduled_for",
-      "date_saa_first_not_attended",
-      "date_saa_first_attended",
-      "saa_attended_on_time",
     )
   }
 }
