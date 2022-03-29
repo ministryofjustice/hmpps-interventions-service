@@ -11,8 +11,10 @@ import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.firstValue
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.secondValue
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -26,6 +28,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.Code
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.FieldError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.ValidationError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DraftReferralDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
@@ -904,6 +907,56 @@ class ReferralServiceUnitTest {
       assertThat(referralDetails.completionDeadline).isEqualTo(LocalDate.of(3022, 3, 28))
       assertThat(referralDetails.furtherInformation).isEqualTo("nothing to see here")
       assertThat(referralDetails.maximumEnforceableDays).isEqualTo(25)
+    }
+  }
+
+  @Nested inner class UpdateSentReferralDetails {
+    @Test
+    fun `a new version is not created if the update contains no data`() {
+      val referral = referralFactory.createSent()
+      val update = UpdateReferralDetailsDTO(null, null, null, reasonForChange = "blah blah")
+      val returnedValue = referralService.updateReferralDetails(referral, update, referral.createdBy)
+
+      verify(referralDetailsRepository, times(0)).saveAndFlush(any())
+      assertThat(returnedValue).isNull()
+    }
+
+    @Test
+    fun `a new version is created with the current timestamp and updated fields`() {
+      val referral = referralFactory.createSent()
+      val existingDetails = ReferralDetails(
+        UUID.randomUUID(),
+        null,
+        referral.id,
+        referral.createdAt,
+        referral.createdBy.id,
+        "initial version",
+        LocalDate.of(2022, 3, 28),
+        "old information",
+        10,
+      )
+
+      whenever(referralDetailsRepository.findLatestByReferralId(referral.id)).thenReturn(existingDetails)
+
+      val returnedValue = referralService.updateReferralDetails(
+        referral,
+        UpdateReferralDetailsDTO(20, null, "new information", "we decided 10 days wasn't enough"),
+        referral.createdBy,
+      )
+
+      val captor = ArgumentCaptor.forClass(ReferralDetails::class.java)
+      verify(referralDetailsRepository, times(2)).saveAndFlush(captor.capture())
+
+      assertThat(captor.firstValue).isEqualTo(returnedValue)
+      assertThat(returnedValue!!.createdAt).isNotEqualTo(existingDetails.createdAt)
+      assertThat(returnedValue.createdAt).isNotEqualTo(referral.createdAt)
+      assertThat(returnedValue.reasonForChange).isEqualTo("we decided 10 days wasn't enough")
+      assertThat(returnedValue.completionDeadline).isEqualTo(LocalDate.of(2022, 3, 28))
+      assertThat(returnedValue.furtherInformation).isEqualTo("new information")
+      assertThat(returnedValue.maximumEnforceableDays).isEqualTo(20)
+
+      assertThat(captor.secondValue).isEqualTo(existingDetails)
+      assertThat(existingDetails.supersededById).isEqualTo(returnedValue.id)
     }
   }
 }
