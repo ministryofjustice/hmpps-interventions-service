@@ -188,6 +188,7 @@ class ReferralService(
 
     // todo: filter out referrals for limited access offenders (LAOs)
     val referralSpecification = where(referralsForPPUser).and(sentReferralFilterSpecification)
+    val filteredSpec = referralAccessFilter.probationPractitionerReferrals(referralSpecification, user)
     return if (page == null) referralForDashboardRepository.findAll(referralSpecification).sortedBy { it.sentAt } else referralForDashboardRepository.findAll(referralSpecification, page)
   }
 
