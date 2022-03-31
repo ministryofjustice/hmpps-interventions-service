@@ -21,6 +21,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.FieldError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.ValidationError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DashboardType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DraftReferralDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
@@ -348,10 +349,6 @@ class ReferralService(
     }
   }
 
-  private fun updateContainsReferralDetails(update: DraftReferralDTO): Boolean {
-    return update.completionDeadline != null || update.furtherInformation != null || update.maximumEnforceableDays != null
-  }
-
   @Deprecated(
     """
     currently we are duplicating these fields in both the referral 
@@ -373,9 +370,9 @@ class ReferralService(
     }
   }
 
-  private fun updateReferralDetails(referral: Referral, update: DraftReferralDTO, actor: AuthUser, reason: String) {
-    if (!updateContainsReferralDetails(update)) {
-      return
+  fun updateReferralDetails(referral: Referral, update: UpdateReferralDetailsDTO, actor: AuthUser): ReferralDetails? {
+    if (!update.isValidUpdate) {
+      return null
     }
 
     val isDraftUpdate = referral.sentAt == null
@@ -395,7 +392,7 @@ class ReferralService(
         referral.id,
         updateTime,
         actor.id,
-        reason,
+        update.reasonForChange,
         existingDetails?.completionDeadline,
         existingDetails?.furtherInformation,
         existingDetails?.maximumEnforceableDays,
@@ -419,6 +416,8 @@ class ReferralService(
       existingDetails.supersededById = newDetails.id
       referralDetailsRepository.saveAndFlush(existingDetails)
     }
+
+    return newDetails
   }
 
   private fun updateServiceUserNeeds(referral: Referral, update: DraftReferralDTO) {
@@ -500,7 +499,16 @@ class ReferralService(
     validateDraftReferralUpdate(referral, update)
 
     legacyUpdateReferralDetails(referral, update)
-    updateReferralDetails(referral, update, referral.createdBy, "initial referral details")
+    updateReferralDetails(
+      referral,
+      UpdateReferralDetailsDTO(
+        update.maximumEnforceableDays,
+        update.completionDeadline,
+        update.furtherInformation,
+        "initial referral details",
+      ),
+      referral.createdBy,
+    )
     updateServiceUserDetails(referral, update)
     updateServiceUserNeeds(referral, update)
     updateDraftRiskInformation(referral, update)

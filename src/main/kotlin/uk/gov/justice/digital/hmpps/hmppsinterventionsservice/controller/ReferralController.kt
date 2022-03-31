@@ -31,12 +31,14 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DraftOasysRisk
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DraftReferralDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EndReferralRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAssignmentDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SelectedDesiredOutcomesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SentReferralDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SentReferralSummaryDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ServiceCategoryFullDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SetComplexityLevelRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SupplierAssessmentDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.Views
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
@@ -301,6 +303,19 @@ class ReferralController(
   ): List<ActionPlanSummaryDTO> {
     val actionPlans = actionPlanService.getApprovedActionPlansByReferral(id)
     return ActionPlanSummaryDTO.from(actionPlans)
+  }
+
+  @PostMapping("/sent-referral/{referralId}/referral-details")
+  fun updateReferralDetails(
+    @PathVariable referralId: UUID,
+    @RequestBody referralDetails: UpdateReferralDetailsDTO,
+    authentication: JwtAuthenticationToken,
+  ): ReferralDetailsDTO? {
+    val user = userMapper.fromToken(authentication)
+    val referral = getSentReferralForAuthenticatedUser(authentication, referralId)
+    return referralService.updateReferralDetails(referral, referralDetails, user)?.let {
+      ReferralDetailsDTO(it.referralId, it.maximumEnforceableDays, it.completionDeadline, it.furtherInformation)
+    } ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "no updatable values present in request")
   }
 
   private fun getSupplierAssessment(sentReferral: Referral): SupplierAssessment {
