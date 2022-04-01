@@ -62,6 +62,12 @@ tasks {
 }
 
 dependencies {
+  // temporary manual library bumps
+  implementation("org.springframework:spring-beans:5.3.18")
+  implementation("org.springframework:spring-core:5.3.18")
+  implementation("org.springframework:spring-webmvc:5.3.18")
+  implementation("org.springframework:spring-webflux:5.3.18")
+
   // batch processing
   implementation("org.springframework.boot:spring-boot-starter-batch")
 
