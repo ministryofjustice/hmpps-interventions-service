@@ -33,6 +33,10 @@ spec:
     - host: {{ .host }}
       http:
         paths:
+          - path: /prometheus
+            backend:
+              serviceName: default-http-backend
+              servicePort: 80
           - path: /sent-referrals/summary/service-provider
             backend:
               serviceName: api-suspect
