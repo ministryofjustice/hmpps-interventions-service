@@ -38,7 +38,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Can
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralForDashboardRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralSummariesRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.specification.ReferralSpecifications
@@ -59,7 +59,7 @@ data class ResponsibleProbationPractitioner(
 @Transactional
 class ReferralService(
   val referralRepository: ReferralRepository,
-  val referralForDashboardRepository: ReferralForDashboardRepository,
+  val referralSummariesRepository: ReferralSummariesRepository,
   val authUserRepository: AuthUserRepository,
   val interventionRepository: InterventionRepository,
   val referralConcluder: ReferralConcluder,
@@ -184,7 +184,7 @@ class ReferralService(
   private fun getSentReferralSummaryForServiceProviderUser(user: AuthUser, sentReferralFilterSpecification: Specification<ReferralSummary>, page: Pageable?): Iterable<ReferralSummary> {
     // todo: query for referrals where the service provider has been granted nominated access only
     val filteredSpec = referralAccessFilter.serviceProviderReferrals(sentReferralFilterSpecification, user)
-    return if (page == null) referralForDashboardRepository.findAll(filteredSpec).sortedBy { it.sentAt } else referralForDashboardRepository.findAll(filteredSpec, page)
+    return if (page == null) referralSummariesRepository.findAll(filteredSpec).sortedBy { it.sentAt } else referralSummariesRepository.findAll(filteredSpec, page)
   }
 
   @Deprecated("deprecated as this method will be replaced by getSentReferralSummaryForServiceProviderUser")
@@ -217,7 +217,7 @@ class ReferralService(
     // todo: filter out referrals for limited access offenders (LAOs)
     val referralSpecification = where(referralsForPPUser).and(sentReferralFilterSpecification)
     val filteredSpec = referralAccessFilter.probationPractitionerReferrals(referralSpecification, user)
-    return if (page == null) referralForDashboardRepository.findAll(referralSpecification).sortedBy { it.sentAt } else referralForDashboardRepository.findAll(referralSpecification, page)
+    return if (page == null) referralSummariesRepository.findAll(referralSpecification).sortedBy { it.sentAt } else referralSummariesRepository.findAll(referralSpecification, page)
   }
 
   @Deprecated("deprecated as this method will be replaced by getSentReferralSummaryForServiceProviderUser")

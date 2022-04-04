@@ -42,7 +42,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Del
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralForDashboardRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralSummariesRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
@@ -54,7 +54,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFramew
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralForDashboardFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralSummariesFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceProviderFactory
@@ -70,7 +70,7 @@ import kotlin.random.Random
 class ReferralServiceTest @Autowired constructor(
   val entityManager: TestEntityManager,
   val referralRepository: ReferralRepository,
-  val referralForDashboardRepository: ReferralForDashboardRepository,
+  val referralSummariesRepository: ReferralSummariesRepository,
   val authUserRepository: AuthUserRepository,
   val interventionRepository: InterventionRepository,
   val cancellationReasonRepository: CancellationReasonRepository,
@@ -85,7 +85,7 @@ class ReferralServiceTest @Autowired constructor(
   private val contractFactory = DynamicFrameworkContractFactory(entityManager)
   private val serviceProviderFactory = ServiceProviderFactory(entityManager)
   private val referralFactory = ReferralFactory(entityManager)
-  private val referralForDashboardFactory = ReferralForDashboardFactory(entityManager)
+  private val referralSummariesFactory = ReferralSummariesFactory(entityManager)
   private val serviceCategoryFactory = ServiceCategoryFactory(entityManager)
   private val contractTypeFactory = ContractTypeFactory(entityManager)
   private val dynamicFrameworkContractFactory = DynamicFrameworkContractFactory(entityManager)
@@ -114,7 +114,7 @@ class ReferralServiceTest @Autowired constructor(
 
   private val referralService = ReferralService(
     referralRepository,
-    referralForDashboardRepository,
+    referralSummariesRepository,
     authUserRepository,
     interventionRepository,
     referralConcluder,
@@ -497,7 +497,7 @@ class ReferralServiceTest @Autowired constructor(
     @Test
     fun `returns referrals started by the user`() {
       val user = userFactory.create("pp_user_1", "delius")
-      val startedReferrals = (1..3).map { referralForDashboardFactory.createSent(createdBy = user) }
+      val startedReferrals = (1..3).map { referralSummariesFactory.createSent(createdBy = user) }
 
       val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, null)
       assertThat(result)
@@ -508,7 +508,7 @@ class ReferralServiceTest @Autowired constructor(
     @Test
     fun `must not return referrals sent by the user`() {
       val user = userFactory.create("pp_user_1", "delius")
-      val sentReferral = referralForDashboardFactory.createSent(sentBy = user)
+      val sentReferral = referralSummariesFactory.createSent(sentBy = user)
 
       val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, null)
       assertThat(result).doesNotContain(sentReferral)
@@ -518,7 +518,7 @@ class ReferralServiceTest @Autowired constructor(
     @Test
     fun `must not propagate errors from community-api`() {
       val user = userFactory.create("pp_user_1", "delius")
-      val createdReferral = referralForDashboardFactory.createSent(createdBy = user)
+      val createdReferral = referralSummariesFactory.createSent(createdBy = user)
 
       whenever(communityAPIOffenderService.getManagedOffendersForDeliusUser(user))
         .thenThrow(WebClientResponseException::class.java)
@@ -534,8 +534,8 @@ class ReferralServiceTest @Autowired constructor(
       val someoneElse = userFactory.create("helper_pp_user", "delius")
       val user = userFactory.create("pp_user_1", "delius")
 
-      val managedReferral1 = referralForDashboardFactory.createSent(serviceUserCRN = "CRN129876234", createdBy = someoneElse)
-      val managedReferral2 = referralForDashboardFactory.createSent(serviceUserCRN = "CRN129876235", createdBy = someoneElse)
+      val managedReferral1 = referralSummariesFactory.createSent(serviceUserCRN = "CRN129876234", createdBy = someoneElse)
+      val managedReferral2 = referralSummariesFactory.createSent(serviceUserCRN = "CRN129876235", createdBy = someoneElse)
       referralFactory.createSent(serviceUserCRN = "CRN129876236", createdBy = someoneElse)
       whenever(communityAPIOffenderService.getManagedOffendersForDeliusUser(user))
         .thenReturn(listOf(Offender("CRN129876234"), Offender("CRN129876235")))
@@ -549,7 +549,7 @@ class ReferralServiceTest @Autowired constructor(
     @Test
     fun `returns referrals both managed and started by the user only once`() {
       val user = userFactory.create("pp_user_1", "delius")
-      val managedAndStartedReferral = referralForDashboardFactory.createSent(serviceUserCRN = "CRN129876234", createdBy = user)
+      val managedAndStartedReferral = referralSummariesFactory.createSent(serviceUserCRN = "CRN129876234", createdBy = user)
 
       whenever(communityAPIOffenderService.getManagedOffendersForDeliusUser(user))
         .thenReturn(listOf(Offender("CRN129876234")))

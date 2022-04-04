@@ -158,7 +158,7 @@ class ReferralController(
   }
 
   @GetMapping("/sent-referrals/summaries")
-  fun getSentReferralsForDashboard(
+  fun getSentReferralsSummaries(
     authentication: JwtAuthenticationToken,
     @Nullable @RequestParam(name = "concluded", required = false) concluded: Boolean?,
     @Nullable @RequestParam(name = "cancelled", required = false) cancelled: Boolean?,
