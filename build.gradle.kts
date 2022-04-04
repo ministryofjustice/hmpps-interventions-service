@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.1.2"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.1.3-beta"
   kotlin("plugin.spring") version "1.6.10"
   id("org.jetbrains.kotlin.plugin.jpa") version "1.6.10"
   id("jacoco")
@@ -62,12 +62,6 @@ tasks {
 }
 
 dependencies {
-  // temporary manual library bumps
-  implementation("org.springframework:spring-beans:5.3.18")
-  implementation("org.springframework:spring-core:5.3.18")
-  implementation("org.springframework:spring-webmvc:5.3.18")
-  implementation("org.springframework:spring-webflux:5.3.18")
-
   // batch processing
   implementation("org.springframework.boot:spring-boot-starter-batch")
 
