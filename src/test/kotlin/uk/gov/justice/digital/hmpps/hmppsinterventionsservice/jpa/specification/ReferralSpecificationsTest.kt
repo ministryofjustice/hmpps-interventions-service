@@ -69,7 +69,7 @@ class ReferralSpecificationsTest @Autowired constructor(
     @Test
     fun `only sent referrals are returned`() {
       val sent = referralFactory.createSent()
-      val sentReferralForDashboard = referralFactory.getReferralForDashboard(sent)
+      val sentReferralForDashboard = referralFactory.getReferralSummary(sent)
       val result = referralForDashboardRepository.findAll(ReferralSpecifications.sent())
       assertThat(result)
         .usingRecursiveFieldByFieldElementComparator()
@@ -85,9 +85,9 @@ class ReferralSpecificationsTest @Autowired constructor(
       val cancelled = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now(), concludedAt = OffsetDateTime.now(), endOfServiceReport = null)
       val completed = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now(), concludedAt = OffsetDateTime.now())
       val endOfServiceReport = endOfServiceReportFactory.create(referral = completed)
-      val sentReferralForDashboard = referralFactory.getReferralForDashboard(sent)
-      val cancelledReferralForDashboard = referralFactory.getReferralForDashboard(cancelled)
-      val completedReferralForDashboard = referralFactory.getReferralForDashboard(completed, endOfServiceReport)
+      val sentReferralForDashboard = referralFactory.getReferralSummary(sent)
+      val cancelledReferralForDashboard = referralFactory.getReferralSummary(cancelled)
+      val completedReferralForDashboard = referralFactory.getReferralSummary(completed, endOfServiceReport)
       val result = referralForDashboardRepository.findAll(ReferralSpecifications.concluded())
       assertThat(result)
         .usingRecursiveFieldByFieldElementComparator()
@@ -103,8 +103,8 @@ class ReferralSpecificationsTest @Autowired constructor(
       val cancelled = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now(), concludedAt = OffsetDateTime.now(), endOfServiceReport = null)
       val completed = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now(), concludedAt = OffsetDateTime.now())
       val endOfServiceReport = endOfServiceReportFactory.create(referral = completed)
-      val cancelledReferralForDashboard = referralFactory.getReferralForDashboard(cancelled)
-      val completedReferralForDashboard = referralFactory.getReferralForDashboard(completed, endOfServiceReport)
+      val cancelledReferralForDashboard = referralFactory.getReferralSummary(cancelled)
+      val completedReferralForDashboard = referralFactory.getReferralSummary(completed, endOfServiceReport)
       val result = referralForDashboardRepository.findAll(ReferralSpecifications.cancelled())
       assertThat(result)
         .usingRecursiveFieldByFieldElementComparator()
@@ -129,14 +129,14 @@ class ReferralSpecificationsTest @Autowired constructor(
       val spContract = dynamicFrameworkContractFactory.create(contractReference = "spContractRef")
       val spIntervention = interventionFactory.create(contract = spContract)
       val referralWithSpContract = referralFactory.createSent(intervention = spIntervention)
-      val referralForDashboardWithSpContract = referralFactory.getReferralForDashboard(referralWithSpContract)
+      val referralForDashboardWithSpContract = referralFactory.getReferralSummary(referralWithSpContract)
 
       val unrelatedSpContract = dynamicFrameworkContractFactory.create(contractReference = "unrelatedSpContractRef")
 
       val someOtherContract = dynamicFrameworkContractFactory.create(contractReference = "someOtherContractRef")
       val someOtherIntervention = interventionFactory.create(contract = someOtherContract)
       val someOtherReferral = referralFactory.createSent(intervention = someOtherIntervention)
-      val someOtherReferralForDashboardWithSpContract = referralFactory.getReferralForDashboard(referralWithSpContract)
+      val someOtherReferralForDashboardWithSpContract = referralFactory.getReferralSummary(referralWithSpContract)
 
       val result = referralForDashboardRepository.findAll(ReferralSpecifications.withSPAccess(setOf(spContract, unrelatedSpContract)))
       assertThat(result)
@@ -159,7 +159,7 @@ class ReferralSpecificationsTest @Autowired constructor(
       )
 
       val assignedReferral = referralFactory.createAssigned(assignments = assignments)
-      val assignedReferralForDashboard = referralFactory.getReferralForDashboard(assignedReferral)
+      val assignedReferralForDashboard = referralFactory.getReferralSummary(assignedReferral)
 
       val result = referralForDashboardRepository.findAll(ReferralSpecifications.currentlyAssignedTo(user.id))
       assertThat(result)

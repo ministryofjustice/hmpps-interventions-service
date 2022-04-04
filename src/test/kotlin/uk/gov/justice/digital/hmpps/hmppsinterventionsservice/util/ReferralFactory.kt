@@ -11,7 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Interve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralForDashboard
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SelectedDesiredOutcomesMapping
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
@@ -193,21 +193,24 @@ class ReferralFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     )
   }
 
-  fun getReferralForDashboard(referral: Referral, endOfServiceReport: EndOfServiceReport? = null): ReferralForDashboard {
+  fun getReferralSummary(
+    referral: Referral,
+    endOfServiceReport: EndOfServiceReport? = null
+  ): ReferralSummary {
 
-    return ReferralForDashboard(
+    return ReferralSummary(
       id = referral.id,
       serviceUserCRN = referral.serviceUserCRN,
       createdBy = referral.createdBy,
       intervention = referral.intervention,
-      sentAt = referral.sentAt,
-      sentBy = referral.sentBy,
-      referenceNumber = referral.referenceNumber,
-      supplementaryRiskId = referral.supplementaryRiskId,
+      sentAt = referral.sentAt!!,
+      sentBy = referral.sentBy!!,
+      referenceNumber = referral.referenceNumber!!,
       concludedAt = referral.concludedAt,
       assignments = referral.assignments,
       endRequestedAt = referral.endRequestedAt,
-      endOfServiceReport = referral.endOfServiceReport ?: endOfServiceReport
+      endOfServiceReport = referral.endOfServiceReport ?: endOfServiceReport,
+      serviceUserData = referral.serviceUserData
     )
   }
 

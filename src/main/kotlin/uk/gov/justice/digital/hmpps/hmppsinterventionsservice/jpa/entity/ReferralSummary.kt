@@ -55,17 +55,16 @@ import javax.validation.constraints.NotNull
 )
 @Entity(name = "referral")
 @Table(name = "referral", indexes = arrayOf(Index(columnList = "created_by_id")))
-class ReferralForDashboard(
+class ReferralSummary(
   @Id val id: UUID,
   @ElementCollection
   @CollectionTable(name = "referral_assignments")
   val assignments: MutableList<ReferralAssignment> = mutableListOf(),
-  @ManyToOne @Fetch(FetchMode.JOIN) var sentBy: AuthUser? = null,
-  var sentAt: OffsetDateTime? = null,
+  @ManyToOne @Fetch(FetchMode.JOIN) var sentBy: AuthUser,
+  var sentAt: OffsetDateTime,
   var concludedAt: OffsetDateTime? = null,
-  var referenceNumber: String? = null,
-  var supplementaryRiskId: UUID? = null,
-  @OneToOne(mappedBy = "referral", cascade = arrayOf(CascadeType.ALL)) @PrimaryKeyJoinColumn var serviceUserData: ServiceUserData? = null,
+  var referenceNumber: String,
+  @OneToOne(mappedBy = "referral", cascade = arrayOf(CascadeType.ALL)) @PrimaryKeyJoinColumn var serviceUserData: ServiceUserData?,
   @NotNull @ManyToOne @Fetch(FetchMode.JOIN) val createdBy: AuthUser,
   var endRequestedAt: OffsetDateTime? = null,
   @NotNull @ManyToOne(fetch = FetchType.LAZY) val intervention: Intervention,

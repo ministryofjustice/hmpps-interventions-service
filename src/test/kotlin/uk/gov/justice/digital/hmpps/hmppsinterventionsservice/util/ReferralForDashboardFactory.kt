@@ -9,7 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfSe
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralForDashboard
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SelectedDesiredOutcomesMapping
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
@@ -67,13 +67,14 @@ class ReferralForDashboardFactory(em: TestEntityManager? = null) : EntityFactory
 
     sentAt: OffsetDateTime = OffsetDateTime.now(),
     sentBy: AuthUser = authUserFactory.create(),
-    referenceNumber: String? = "JS18726AC",
+    referenceNumber: String = "JS18726AC",
     supplementaryRiskId: UUID = UUID.randomUUID(),
 
     assignments: List<ReferralAssignment> = emptyList(),
 
     supplierAssessment: SupplierAssessment? = null,
-  ): ReferralForDashboard {
+    serviceUserData: ServiceUserData? = null
+  ): ReferralSummary {
     create(
       id = id,
       createdAt = createdAt,
@@ -92,10 +93,11 @@ class ReferralForDashboardFactory(em: TestEntityManager? = null) : EntityFactory
 
       assignments = assignments,
       concludedAt = concludedAt,
-      supplierAssessment = supplierAssessment
+      supplierAssessment = supplierAssessment,
+      serviceUserData = serviceUserData
     )
 
-    return ReferralForDashboard(
+    return ReferralSummary(
       id = id,
       serviceUserCRN = serviceUserCRN,
       intervention = intervention,
@@ -103,69 +105,9 @@ class ReferralForDashboardFactory(em: TestEntityManager? = null) : EntityFactory
       sentAt = sentAt,
       sentBy = sentBy,
       referenceNumber = referenceNumber,
-      supplementaryRiskId = supplementaryRiskId,
       concludedAt = concludedAt,
       assignments = assignments.toMutableList(),
-
-    )
-  }
-
-  fun createAssigned(
-    id: UUID = UUID.randomUUID(),
-    createdAt: OffsetDateTime = OffsetDateTime.now(),
-    concludedAt: OffsetDateTime? = createdAt.plusHours(3),
-    createdBy: AuthUser = authUserFactory.create(),
-    serviceUserCRN: String = "X123456",
-    relevantSentenceId: Long = 1234567L,
-    intervention: Intervention = interventionFactory.create(),
-    selectedServiceCategories: MutableSet<ServiceCategory>? = null,
-    desiredOutcomes: List<DesiredOutcome> = emptyList(),
-    actionPlans: MutableList<ActionPlan>? = null,
-
-    sentAt: OffsetDateTime = OffsetDateTime.now(),
-    sentBy: AuthUser = authUserFactory.create(),
-    referenceNumber: String? = "JS18726AC",
-    supplementaryRiskId: UUID = UUID.randomUUID(),
-
-    assignments: List<ReferralAssignment> = listOf(
-      ReferralAssignment(OffsetDateTime.now(), authUserFactory.createSP(), authUserFactory.createSP())
-    ),
-
-    supplierAssessment: SupplierAssessment? = null,
-  ): ReferralForDashboard {
-    val referral = create(
-      id = id,
-      createdAt = createdAt,
-      createdBy = createdBy,
-      serviceUserCRN = serviceUserCRN,
-      relevantSentenceId = relevantSentenceId,
-      intervention = intervention,
-      selectedServiceCategories = selectedServiceCategories,
-      desiredOutcomes = desiredOutcomes,
-      actionPlans = actionPlans,
-
-      sentAt = sentAt,
-      sentBy = sentBy,
-      referenceNumber = referenceNumber,
-      supplementaryRiskId = supplementaryRiskId,
-
-      assignments = assignments,
-      concludedAt = concludedAt,
-      supplierAssessment = supplierAssessment
-    )
-
-    return ReferralForDashboard(
-      id = id,
-      serviceUserCRN = serviceUserCRN,
-      intervention = intervention,
-      createdBy = createdBy,
-      sentAt = sentAt,
-      sentBy = sentBy,
-      referenceNumber = referenceNumber,
-      supplementaryRiskId = supplementaryRiskId,
-      concludedAt = concludedAt,
-      assignments = assignments.toMutableList()
-
+      serviceUserData = serviceUserData
     )
   }
 
@@ -178,7 +120,7 @@ class ReferralForDashboardFactory(em: TestEntityManager? = null) : EntityFactory
     selectedServiceCategories: MutableSet<ServiceCategory>? = null,
     sentAt: OffsetDateTime = OffsetDateTime.now(),
     sentBy: AuthUser = authUserFactory.create(),
-    referenceNumber: String? = "JS18726AC",
+    referenceNumber: String = "JS18726AC",
     relevantSentenceId: Long? = 123456L,
     supplementaryRiskId: UUID = UUID.randomUUID(),
     actionPlans: MutableList<ActionPlan>? = null,
@@ -193,7 +135,8 @@ class ReferralForDashboardFactory(em: TestEntityManager? = null) : EntityFactory
     concludedAt: OffsetDateTime? = null,
 
     endOfServiceReport: EndOfServiceReport? = null,
-  ): ReferralForDashboard {
+    serviceUserData: ServiceUserData? = null
+  ): ReferralSummary {
     create(
       id = id,
       createdAt = createdAt,
@@ -221,7 +164,7 @@ class ReferralForDashboardFactory(em: TestEntityManager? = null) : EntityFactory
       endOfServiceReport = endOfServiceReport,
     )
 
-    return ReferralForDashboard(
+    return ReferralSummary(
       id = id,
       serviceUserCRN = serviceUserCRN,
       intervention = intervention,
@@ -229,9 +172,9 @@ class ReferralForDashboardFactory(em: TestEntityManager? = null) : EntityFactory
       sentAt = sentAt,
       sentBy = sentBy,
       referenceNumber = referenceNumber,
-      supplementaryRiskId = supplementaryRiskId,
       concludedAt = concludedAt,
-      assignments = assignments.toMutableList()
+      assignments = assignments.toMutableList(),
+      serviceUserData = serviceUserData!!
     )
   }
 

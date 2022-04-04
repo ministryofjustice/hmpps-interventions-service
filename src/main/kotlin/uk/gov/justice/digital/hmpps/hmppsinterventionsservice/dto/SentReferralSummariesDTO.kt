@@ -1,10 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto
 
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralForDashboard
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralSummary
 import java.time.OffsetDateTime
 import java.util.UUID
 
-data class SentReferralSummaryForDashboardDTO(
+data class SentReferralSummariesDTO(
   val id: UUID,
   val sentAt: OffsetDateTime,
   val sentBy: AuthUserDTO,
@@ -12,21 +12,19 @@ data class SentReferralSummaryForDashboardDTO(
   val assignedTo: AuthUserDTO?,
   val serviceUser: ServiceUserDTO?,
   val serviceProvider: ServiceProviderDTO?,
-  val supplementaryRiskId: UUID,
   val interventionTitle: String,
   val concludedAt: OffsetDateTime?
 ) {
   companion object {
-    fun from(referral: ReferralForDashboard): SentReferralSummaryForDashboardDTO {
-      return SentReferralSummaryForDashboardDTO(
+    fun from(referral: ReferralSummary): SentReferralSummariesDTO {
+      return SentReferralSummariesDTO(
         id = referral.id,
-        sentAt = referral.sentAt!!,
-        sentBy = AuthUserDTO.from(referral.sentBy!!),
-        referenceNumber = referral.referenceNumber!!,
+        sentAt = referral.sentAt,
+        sentBy = AuthUserDTO.from(referral.sentBy),
+        referenceNumber = referral.referenceNumber,
         assignedTo = referral.currentAssignee?.let { AuthUserDTO.from(it) },
         serviceUser = ServiceUserDTO.from(referral.serviceUserCRN, referral.serviceUserData),
         serviceProvider = ServiceProviderDTO.from(referral.intervention.dynamicFrameworkContract.primeProvider),
-        supplementaryRiskId = referral.supplementaryRiskId!!,
         interventionTitle = referral.intervention.title,
         concludedAt = referral.concludedAt
       )
