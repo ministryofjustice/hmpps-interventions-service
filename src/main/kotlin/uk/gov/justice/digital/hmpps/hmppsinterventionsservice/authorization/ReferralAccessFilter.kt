@@ -28,7 +28,7 @@ class ReferralAccessFilter(
     return referrals
   }
 
-  fun probationPractitionerReferrals(referralSpec: Specification<Referral>, user: AuthUser): Specification<Referral> {
+  fun <T> probationPractitionerReferrals(referralSpec: Specification<T>, user: AuthUser): Specification<T> {
     // todo: filter out referrals for limited access offenders (LAOs)
     return referralSpec
   }
