@@ -1,6 +1,6 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.1.2"
-  kotlin("plugin.spring") version "1.6.10"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.1.3-beta"
+  kotlin("plugin.spring") version "1.6.20"
   id("org.jetbrains.kotlin.plugin.jpa") version "1.6.10"
   id("jacoco")
 }
@@ -67,8 +67,8 @@ dependencies {
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
-  implementation("io.sentry:sentry-spring-boot-starter:5.7.0")
-  implementation("io.sentry:sentry-logback:5.7.0")
+  implementation("io.sentry:sentry-spring-boot-starter:5.7.1")
+  implementation("io.sentry:sentry-logback:5.7.1")
   implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
   runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.2") // needed for OffsetDateTime for AppInsights
 
