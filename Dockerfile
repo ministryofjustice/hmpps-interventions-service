@@ -1,4 +1,4 @@
-FROM openjdk:11-slim AS builder
+FROM openjdk:17-slim AS builder
 
 WORKDIR /app
 
@@ -23,17 +23,17 @@ RUN ./gradlew assemble
 
 
 # ---
-FROM adoptopenjdk/openjdk11:alpine-jre
+FROM openjdk:17-slim
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
-# force a rebuild of `apk upgrade` below by invalidating the BUILD_NUMBER env variable on every commit
+# force a rebuild of `apt-get update` below by invalidating the BUILD_NUMBER env variable on every commit
 ARG BUILD_NUMBER
 ENV BUILD_NUMBER ${BUILD_NUMBER:-1_0_0}
 
-RUN apk upgrade --no-cache && \
-    apk add --no-cache \
-      curl \
-      tzdata
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y curl && \
+    apt-get install -y tzdata
 
 ENV TZ=Europe/London
 RUN ln -snf "/usr/share/zoneinfo/$TZ" /etc/localtime && echo "$TZ" > /etc/timezone
