@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Interve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NPSRegion
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SelectedDesiredOutcomesMapping
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
@@ -116,13 +117,22 @@ class SetupAssistant(
     appointmentDeliveryRepository.deleteAll()
     appointmentRepository.deleteAll()
 
-    referralDetailsRepository.deleteAll()
+    deleteAllReferralDetails()
     referralRepository.deleteAll()
     interventionRepository.deleteAll()
     dynamicFrameworkContractRepository.deleteAll()
 
     serviceProviderRepository.deleteAll()
     authUserRepository.deleteAll()
+  }
+
+  private fun deleteAllReferralDetails() {
+    // this is kinda annoying - foreign key constraints on referral details
+    // 'superseded_by_id' mean we have to delete the rows in creation order
+    referralDetailsRepository
+      .findAll()
+      .sortedBy { it.createdAt }
+      .forEach { referralDetailsRepository.delete(it) }
   }
 
   fun serviceCategory(id: UUID): ServiceCategory {
@@ -538,6 +548,20 @@ class SetupAssistant(
     referral.needsInterpreter = needsInterpreter
     referral.relevantSentenceId = relevantSentenceId
     referral.whenUnavailable = whenUnavailable
+
+    referralDetailsRepository.save(
+      ReferralDetails(
+        UUID.randomUUID(),
+        null,
+        referral.id,
+        referral.createdAt,
+        referral.createdBy.id,
+        "initial referral details",
+        completionDeadline,
+        furtherInformation,
+        maximumEnforceableDays,
+      )
+    )
 
     return referralRepository.save(referral)
   }
