@@ -26,7 +26,7 @@ RUN ./gradlew assemble
 FROM alpine:3.15 AS final
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
-# force a rebuild of `apt-get update` below by invalidating the BUILD_NUMBER env variable on every commit
+# force a rebuild of `apk upgrade` below by invalidating the BUILD_NUMBER env variable on every commit
 ARG BUILD_NUMBER
 ENV BUILD_NUMBER ${BUILD_NUMBER:-1_0_0}
 
