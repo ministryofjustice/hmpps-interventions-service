@@ -52,7 +52,7 @@ class SentReferralSummariesDTOTest(@Autowired private val json: JacksonTester<Se
         },
         "referenceNumber": "something",
         "serviceUser": {"crn": "X123456"},
-        "serviceProvider": {"name": "Provider"}
+        "serviceProvider": {id:"Provider","name": "Provider"}
       }
     """
     )
