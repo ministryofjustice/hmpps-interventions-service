@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.json.JsonTest
 import org.springframework.boot.test.json.JacksonTester
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralDetailsFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
 import java.time.LocalDate
@@ -16,6 +18,8 @@ import java.util.UUID
 @JsonTest
 class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftReferralDTO>) {
   private val referralFactory = ReferralFactory()
+  private val referralDetailsFactory = ReferralDetailsFactory()
+  private val authUserFactory = AuthUserFactory()
   private val serviceCategoryFactory = ServiceCategoryFactory()
   @Test
   fun `test serialization of newly created referral`() {
@@ -96,16 +100,19 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
   @Test
   fun `test serialization of referral with completionDeadline`() {
     val referralID = UUID.fromString("3B9ED289-8412-41A9-8291-45E33E60276C")
+    val createdAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
+    val createdBy = authUserFactory.createPP()
     val referral = referralFactory.createDraft(
       serviceUserCRN = "X123456",
       id = referralID,
-      createdAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00"),
-      referralDetails = ReferralDetailsDTO(
-        referralId = referralID,
-        completionDeadline = LocalDate.of(2021, 2, 12),
-        maximumEnforceableDays = null, furtherInformation = null,
+      createdAt = createdAt,
+      createdBy = createdBy,
+      referralDetails = ReferralDetailsDTO.from(
+        referralDetailsFactory.create(
+          referralID, createdAt, createdBy,
+          completionDeadline = LocalDate.of(2021, 2, 12),
+        )
       )
-
     )
 
     val out = json.write(DraftReferralDTO.from(referral))

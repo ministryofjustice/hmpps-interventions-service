@@ -14,8 +14,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.EndOfServiceReportEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.EndOfServiceReportEventType
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEvent
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.AsyncEventExceptionHandling
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
