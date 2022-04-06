@@ -33,7 +33,7 @@ ENV BUILD_NUMBER ${BUILD_NUMBER:-1_0_0}
 RUN apk upgrade --no-cache && \
      apk add --no-cache \
        curl \
-       openjdk17-jre \
+       openjdk17-jre-headless \
        tzdata
 
 ENV TZ=Europe/London
