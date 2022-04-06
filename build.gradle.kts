@@ -16,7 +16,7 @@ configurations {
 }
 
 jacoco {
-  toolVersion = "0.8.8"
+  toolVersion = "0.8.7"
 }
 
 tasks {
