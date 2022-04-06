@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Interve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NPSRegion
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SelectedDesiredOutcomesMapping
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
@@ -116,13 +117,22 @@ class SetupAssistant(
     appointmentDeliveryRepository.deleteAll()
     appointmentRepository.deleteAll()
 
-    referralDetailsRepository.deleteAll()
+    deleteAllReferralDetails()
     referralRepository.deleteAll()
     interventionRepository.deleteAll()
     dynamicFrameworkContractRepository.deleteAll()
 
     serviceProviderRepository.deleteAll()
     authUserRepository.deleteAll()
+  }
+
+  private fun deleteAllReferralDetails() {
+    // this is kinda annoying - foreign key constraints on referral details
+    // 'superseded_by_id' mean we have to delete the rows in creation order
+    referralDetailsRepository
+      .findAll()
+      .sortedBy { it.createdAt }
+      .forEach { referralDetailsRepository.delete(it) }
   }
 
   fun serviceCategory(id: UUID): ServiceCategory {
@@ -529,17 +539,32 @@ class SetupAssistant(
     referral.accessibilityNeeds = accessibilityNeeds
     referral.additionalNeedsInformation = additionalNeedsInformation
     referral.additionalRiskInformation = additionalRiskInformation
-    referral.completionDeadline = completionDeadline
     referral.complexityLevelIds = complexityLevelIds
-    referral.furtherInformation = furtherInformation
     referral.hasAdditionalResponsibilities = hasAdditionalResponsibilities
     referral.interpreterLanguage = interpreterLanguage
-    referral.maximumEnforceableDays = maximumEnforceableDays
     referral.needsInterpreter = needsInterpreter
     referral.relevantSentenceId = relevantSentenceId
     referral.whenUnavailable = whenUnavailable
 
-    return referralRepository.save(referral)
+    return referralRepository.save(referral).also {
+      val details = referralDetailsRepository.save(
+        ReferralDetails(
+          UUID.randomUUID(),
+          null,
+          it.id,
+          it.createdAt,
+          it.createdBy.id,
+          "initial referral details",
+          completionDeadline,
+          furtherInformation,
+          maximumEnforceableDays,
+        )
+      )
+      it.referralDetails?.let { existingDetails ->
+        existingDetails.supersededById = details.id
+        referralDetailsRepository.save(existingDetails)
+      }
+    }
   }
 
   fun createEndOfServiceReport(id: UUID = UUID.randomUUID(), referral: Referral = createAssignedReferral()): EndOfServiceReport {

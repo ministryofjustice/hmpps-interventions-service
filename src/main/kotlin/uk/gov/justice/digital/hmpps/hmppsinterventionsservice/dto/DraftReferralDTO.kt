@@ -52,11 +52,11 @@ data class DraftReferralDTO(
       return DraftReferralDTO(
         id = referral.id,
         createdAt = referral.createdAt,
-        completionDeadline = referral.completionDeadline,
+        completionDeadline = referral.referralDetails?.completionDeadline,
         complexityLevels = referral.complexityLevelIds?.ifEmpty { null }
           ?.map { ReferralComplexityLevel(it.key, it.value) }
           ?.sortedBy { it.serviceCategoryId },
-        furtherInformation = referral.furtherInformation,
+        furtherInformation = referral.referralDetails?.furtherInformation,
         additionalNeedsInformation = referral.additionalNeedsInformation,
         accessibilityNeeds = referral.accessibilityNeeds,
         needsInterpreter = referral.needsInterpreter,
@@ -64,7 +64,7 @@ data class DraftReferralDTO(
         hasAdditionalResponsibilities = referral.hasAdditionalResponsibilities,
         whenUnavailable = referral.whenUnavailable,
         additionalRiskInformation = referral.additionalRiskInformation,
-        maximumEnforceableDays = referral.maximumEnforceableDays,
+        maximumEnforceableDays = referral.referralDetails?.maximumEnforceableDays,
         desiredOutcomes = referral.selectedDesiredOutcomes?.ifEmpty { null }
           ?.groupBy { it.serviceCategoryId }
           ?.toSortedMap()

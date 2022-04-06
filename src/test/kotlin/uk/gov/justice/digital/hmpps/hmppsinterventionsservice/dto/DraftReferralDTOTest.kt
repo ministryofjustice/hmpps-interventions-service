@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.json.JsonTest
 import org.springframework.boot.test.json.JacksonTester
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
 import java.time.LocalDate
@@ -96,12 +95,17 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
 
   @Test
   fun `test serialization of referral with completionDeadline`() {
-    val referral = SampleData.sampleReferral(
-      "X123456",
-      "Provider",
-      id = UUID.fromString("3B9ED289-8412-41A9-8291-45E33E60276C"),
+    val referralID = UUID.fromString("3B9ED289-8412-41A9-8291-45E33E60276C")
+    val referral = referralFactory.createDraft(
+      serviceUserCRN = "X123456",
+      id = referralID,
       createdAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00"),
-      completionDeadline = LocalDate.of(2021, 2, 12),
+      referralDetails = ReferralDetailsDTO(
+        referralId = referralID,
+        completionDeadline = LocalDate.of(2021, 2, 12),
+        maximumEnforceableDays = null, furtherInformation = null,
+      )
+
     )
 
     val out = json.write(DraftReferralDTO.from(referral))
@@ -114,9 +118,6 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
         "serviceUser": {
           "crn": "X123456"
         },
-        "serviceProvider": {
-          "name": "Provider"
-        }
       }
     """
     )

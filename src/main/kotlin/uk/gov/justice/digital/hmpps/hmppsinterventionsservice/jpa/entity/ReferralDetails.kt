@@ -11,10 +11,10 @@ import javax.persistence.Id
 data class ReferralDetails(
   @Id val id: UUID,
   var supersededById: UUID?,
-  val referralId: UUID,
+  @Column(name = "referral_id") val referralId: UUID,
   val createdAt: OffsetDateTime,
   @Column(name = "created_by") val createdByUserId: String,
-  val reasonForChange: String?,
+  val reasonForChange: String,
 
   // actual referral details fields:
   var completionDeadline: LocalDate?,

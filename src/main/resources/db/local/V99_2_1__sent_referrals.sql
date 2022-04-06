@@ -2,6 +2,10 @@ insert into referral (id, intervention_id, created_at, sent_at, sent_by_id, serv
 values ('81d754aa-d868-4347-9c0f-50690773014e', '98a42c61-c30f-4beb-8062-04033c376e2d', '2021-01-11 10:32:12.382884+00', '2021-01-14 15:56:45.382884+00', '2500099998', 'CRN23', '2021-04-01', '2500099998', 'Some information about the service user', 'Alex is currently sleeping on her aunt''s sofa', 'She uses a wheelchair', true, 'Spanish', true, 'She works Mondays 9am - midday', null, 10, 'HD2123AC', '7cfc77d5-ea79-4201-bc8b-ac35b4f4d4a3'),
        ('f89bd739-b9a2-482e-9947-12a793abcfb1', '3ccb511b-89b2-42f7-803b-304f54d85a24', '2021-01-11 10:32:12.382884+00', '2021-01-14 15:56:45.382884+00', '2500099998', 'CRN23', '2021-04-01', '2500099998', 'Some information about the service user', 'Alex is currently sleeping on her aunt''s sofa', 'She uses a wheelchair', true, 'Spanish', true, 'She works Mondays 9am - midday', null, 10, 'AJ1827DR', 'a6586f6a-1be9-44ef-9a7c-685dbcff9769');
 
+insert into referral_details (id, superseded_by_id, referral_id, created_at, created_by, reason_for_change, completion_deadline, further_information, maximum_enforceable_days)
+values ('e8ec245d-156a-4fc9-a4c9-7bd918095398', null, '81d754aa-d868-4347-9c0f-50690773014e', '2021-01-11 10:32:12.382884+00', '2500099998', 'initial referral details', '2021-04-01', 'Some information about the service user', 10),
+       ('f050bde8-69c7-4e6a-bbe2-7092292667aa', null, 'f89bd739-b9a2-482e-9947-12a793abcfb1', '2021-01-11 10:32:12.382884+00', '2500099998', 'initial referral details', '2021-04-01', 'Some information about the service user', 10);
+
 insert into referral_selected_service_category(referral_id, service_category_id)
 values ('81d754aa-d868-4347-9c0f-50690773014e', '428ee70f-3001-4399-95a6-ad25eaaede16'),
        ('f89bd739-b9a2-482e-9947-12a793abcfb1', 'b84f4eb7-4db0-477e-8c59-21027b3262c5'),

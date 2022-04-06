@@ -3,6 +3,11 @@ values ('BBC2FEEE-2E86-4A33-8069-DD79A606B741', '08524319-7d5b-4b56-862a-bfe2c9a
        ('B59D3599-0681-466A-82B2-F6F957E46190', '90e35306-5d65-4901-bb36-c4c44c7d19f9', '2021-03-10 16:49:34.235464+00', '2021-03-10 16:50:34.235464+00', '11', 'CRN25', '2022-01-01', '11', '', '', '', false, null, false, null, null, 5, 'GH3927AC', '43d7a768-bfa8-4fbe-a466-5f2cdf89afd6'),
        ('a2a551aa-3d11-44b1-907b-42a028852bc1', 'f803445f-326c-4ef8-aee2-f7716d417832', '2021-04-22 09:00:00.000000+00', '2021-04-22 09:00:00.000000+00', '2500099998', 'CRN21', '2021-06-21', '2500099998', '', '', '', false, null, false, null, null, null, 'FH12376SO', '122744b2-8e08-4a62-85ab-0b52cb4727ad');
 
+insert into referral_details (id, superseded_by_id, referral_id, created_at, created_by, reason_for_change, completion_deadline, further_information, maximum_enforceable_days)
+values ('2918bb10-235b-48c8-958e-d483d25f475a', null, 'BBC2FEEE-2E86-4A33-8069-DD79A606B741', '2021-01-11 10:32:12.382884+00', '2500099998', 'initial referral details', '2021-04-01', 'Some information about the service user', 10),
+       ('39cfd626-0ef9-40b7-a04c-0982863b63d9', null, 'B59D3599-0681-466A-82B2-F6F957E46190', '2021-03-10 16:49:34.235464+00', '11', 'initial referral details', '2022-01-01', '', 5),
+       ('43d9c226-cb8f-45e2-bc19-293464ce19e1', null, 'a2a551aa-3d11-44b1-907b-42a028852bc1', '2021-04-22 09:00:00.000000+00', '2500099998', 'initial referral details', '2021-06-21', '', 5);
+
 insert into referral_assignments(referral_id, assigned_at, assigned_by_id, assigned_to_id)
 values ('BBC2FEEE-2E86-4A33-8069-DD79A606B741', '2021-02-18 10:32:12.382884+00', '6c4036b7-e87d-44fb-864f-5a06c1c492f3', '6c4036b7-e87d-44fb-864f-5a06c1c492f3'),
        ('B59D3599-0681-466A-82B2-F6F957E46190', '2021-03-10 17:50:34.235464+00', '6c4036b7-e87d-44fb-864f-5a06c1c492f3', '608955ae-52ed-44cc-884c-011597a77949'),

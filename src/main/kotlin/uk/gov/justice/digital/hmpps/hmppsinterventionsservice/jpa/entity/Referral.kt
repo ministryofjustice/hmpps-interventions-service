@@ -90,6 +90,9 @@ class Referral(
 
   @OneToOne(mappedBy = "referral") @Fetch(JOIN) var endOfServiceReport: EndOfServiceReport? = null,
   @OneToOne(mappedBy = "referral") @Fetch(JOIN) var supplierAssessment: SupplierAssessment? = null,
+
+  @OneToMany(fetch = FetchType.LAZY) @JoinColumn(name = "referral_id")
+  private val referralDetailsHistory: Set<ReferralDetails>? = null,
 ) {
   val approvedActionPlan: ActionPlan?
     get() = actionPlans?.filter { it.approvedAt != null }?.maxByOrNull { it.approvedAt!! }
@@ -113,5 +116,9 @@ class Referral(
     }
 
     return if (endOfServiceReport == null) "cancelled" else "ended"
+  }
+
+  val referralDetails: ReferralDetails? get() {
+    return referralDetailsHistory?.firstOrNull { it.supersededById == null }
   }
 }
