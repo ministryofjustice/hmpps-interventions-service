@@ -539,31 +539,32 @@ class SetupAssistant(
     referral.accessibilityNeeds = accessibilityNeeds
     referral.additionalNeedsInformation = additionalNeedsInformation
     referral.additionalRiskInformation = additionalRiskInformation
-    referral.completionDeadline = completionDeadline
     referral.complexityLevelIds = complexityLevelIds
-    referral.furtherInformation = furtherInformation
     referral.hasAdditionalResponsibilities = hasAdditionalResponsibilities
     referral.interpreterLanguage = interpreterLanguage
-    referral.maximumEnforceableDays = maximumEnforceableDays
     referral.needsInterpreter = needsInterpreter
     referral.relevantSentenceId = relevantSentenceId
     referral.whenUnavailable = whenUnavailable
 
-    referralDetailsRepository.save(
-      ReferralDetails(
-        UUID.randomUUID(),
-        null,
-        referral.id,
-        referral.createdAt,
-        referral.createdBy.id,
-        "initial referral details",
-        completionDeadline,
-        furtherInformation,
-        maximumEnforceableDays,
+    return referralRepository.save(referral).also {
+      val details = referralDetailsRepository.save(
+        ReferralDetails(
+          UUID.randomUUID(),
+          null,
+          it.id,
+          it.createdAt,
+          it.createdBy.id,
+          "initial referral details",
+          completionDeadline,
+          furtherInformation,
+          maximumEnforceableDays,
+        )
       )
-    )
-
-    return referralRepository.save(referral)
+      it.referralDetails?.let { existingDetails ->
+        existingDetails.supersededById = details.id
+        referralDetailsRepository.save(existingDetails)
+      }
+    }
   }
 
   fun createEndOfServiceReport(id: UUID = UUID.randomUUID(), referral: Referral = createAssignedReferral()): EndOfServiceReport {

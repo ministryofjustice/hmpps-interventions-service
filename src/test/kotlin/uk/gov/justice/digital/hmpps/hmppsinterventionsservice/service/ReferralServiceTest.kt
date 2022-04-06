@@ -61,6 +61,7 @@ import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID
+import kotlin.random.Random
 
 @RepositoryTest
 class ReferralServiceTest @Autowired constructor(
@@ -221,51 +222,57 @@ class ReferralServiceTest @Autowired constructor(
 
     @Test
     fun `null fields in the update do not overwrite original fields`() {
-      sampleReferral.completionDeadline = LocalDate.of(2021, 6, 26)
+      val sentenceId = Random.nextLong()
+      sampleReferral.relevantSentenceId = sentenceId
       entityManager.persistAndFlush(sampleReferral)
 
-      val draftReferral = DraftReferralDTO(completionDeadline = null)
+      val draftReferral = DraftReferralDTO(relevantSentenceId = null)
 
       val updated = referralService.updateDraftReferral(sampleReferral, draftReferral)
-      assertThat(updated.completionDeadline).isEqualTo(LocalDate.of(2021, 6, 26))
+      assertThat(updated.relevantSentenceId).isEqualTo(sentenceId)
     }
 
     @Test
     fun `non-null fields in the update overwrite original fields`() {
-      sampleReferral.completionDeadline = LocalDate.of(2021, 6, 26)
+      val existingSentenceId = Random.nextLong()
+      val newSentenceId = Random.nextLong()
+      sampleReferral.relevantSentenceId = existingSentenceId
       entityManager.persistAndFlush(sampleReferral)
 
       val today = LocalDate.now()
-      val draftReferral = DraftReferralDTO(completionDeadline = today)
+      val draftReferral = DraftReferralDTO(relevantSentenceId = newSentenceId)
 
       val updated = referralService.updateDraftReferral(sampleReferral, draftReferral)
-      assertThat(updated.completionDeadline).isEqualTo(today)
+      assertThat(updated.relevantSentenceId).isEqualTo(newSentenceId)
     }
 
     @Test
     fun `update mutates the original object`() {
-      sampleReferral.completionDeadline = LocalDate.of(2021, 6, 26)
+      val existingSentenceId = Random.nextLong()
+      val newSentenceId = Random.nextLong()
+      sampleReferral.relevantSentenceId = existingSentenceId
       entityManager.persistAndFlush(sampleReferral)
 
       val today = LocalDate.now()
-      val draftReferral = DraftReferralDTO(completionDeadline = today)
+      val draftReferral = DraftReferralDTO(relevantSentenceId = newSentenceId)
 
       val updated = referralService.updateDraftReferral(sampleReferral, draftReferral)
-      assertThat(updated.completionDeadline).isEqualTo(today)
+      assertThat(updated.relevantSentenceId).isEqualTo(newSentenceId)
     }
 
     @Test
     fun `update successfully persists the updated draft referral`() {
-      sampleReferral.completionDeadline = LocalDate.of(2021, 6, 26)
+      val existingSentenceId = Random.nextLong()
+      val newSentenceId = Random.nextLong()
+      sampleReferral.relevantSentenceId = existingSentenceId
       entityManager.persistAndFlush(sampleReferral)
 
-      val today = LocalDate.now()
-      val draftReferral = DraftReferralDTO(completionDeadline = today)
+      val draftReferral = DraftReferralDTO(relevantSentenceId = newSentenceId)
       referralService.updateDraftReferral(sampleReferral, draftReferral)
       val savedDraftReferral = referralService.getDraftReferralForUser(sampleReferral.id, userFactory.create())
       assertThat(savedDraftReferral!!.id).isEqualTo(sampleReferral.id)
       assertThat(savedDraftReferral.createdAt).isEqualTo(sampleReferral.createdAt)
-      assertThat(savedDraftReferral.completionDeadline).isEqualTo(draftReferral.completionDeadline)
+      assertThat(savedDraftReferral.relevantSentenceId).isEqualTo(draftReferral.relevantSentenceId)
     }
 
     @Test
@@ -303,13 +310,14 @@ class ReferralServiceTest @Autowired constructor(
 
     @Test
     fun `get a draft referral`() {
-      sampleReferral.completionDeadline = LocalDate.of(2021, 6, 26)
+      val sentenceId = Random.nextLong()
+      sampleReferral.relevantSentenceId = sentenceId
       entityManager.persistAndFlush(sampleReferral)
 
       val savedDraftReferral = referralService.getDraftReferralForUser(sampleReferral.id, userFactory.create())
       assertThat(savedDraftReferral!!.id).isEqualTo(sampleReferral.id)
       assertThat(savedDraftReferral.createdAt).isEqualTo(sampleReferral.createdAt)
-      assertThat(savedDraftReferral.completionDeadline).isEqualTo(sampleReferral.completionDeadline)
+      assertThat(savedDraftReferral.relevantSentenceId).isEqualTo(sampleReferral.relevantSentenceId)
     }
 
     @Test

@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
@@ -9,11 +10,11 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfSe
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SelectedDesiredOutcomesMapping
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
-import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -29,12 +30,12 @@ class ReferralFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     serviceUserCRN: String = "X123456",
     intervention: Intervention = interventionFactory.create(),
     selectedServiceCategories: MutableSet<ServiceCategory>? = null,
-    completionDeadline: LocalDate? = null,
     desiredOutcomes: List<DesiredOutcome> = emptyList(),
     serviceUserData: ServiceUserData? = null,
     complexityLevelIds: MutableMap<UUID, UUID>? = null,
     additionalRiskInformation: String? = null,
     additionalRiskInformationUpdatedAt: OffsetDateTime? = null,
+    referralDetails: ReferralDetailsDTO? = null,
   ): Referral {
     return create(
       id = id,
@@ -43,12 +44,12 @@ class ReferralFactory(em: TestEntityManager? = null) : EntityFactory(em) {
       serviceUserCRN = serviceUserCRN,
       intervention = intervention,
       selectedServiceCategories = selectedServiceCategories,
-      completionDeadline = completionDeadline,
       desiredOutcomes = desiredOutcomes,
       serviceUserData = serviceUserData,
       complexityLevelIds = complexityLevelIds,
       additionalRiskInformation = additionalRiskInformation,
       additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt,
+      referralDetailsDTO = referralDetails,
     )
   }
 
@@ -198,8 +199,7 @@ class ReferralFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     serviceUserCRN: String,
     intervention: Intervention,
     relevantSentenceId: Long? = null,
-
-    completionDeadline: LocalDate? = null,
+    referralDetailsDTO: ReferralDetailsDTO? = null,
     desiredOutcomes: List<DesiredOutcome> = emptyList(),
     serviceUserData: ServiceUserData? = null,
     actionPlans: MutableList<ActionPlan>? = null,
@@ -224,6 +224,23 @@ class ReferralFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     supplierAssessment: SupplierAssessment? = null,
     endOfServiceReport: EndOfServiceReport? = null,
   ): Referral {
+
+    val referralDetails = referralDetailsDTO?.let {
+      save(
+        ReferralDetails(
+          UUID.randomUUID(),
+          null,
+          it.referralId,
+          createdAt,
+          createdBy.id,
+          "initial referral details",
+          it.completionDeadline,
+          it.furtherInformation,
+          it.maximumEnforceableDays,
+        )
+      )
+    }
+
     val referral = save(
       Referral(
         id = id,
@@ -232,7 +249,6 @@ class ReferralFactory(em: TestEntityManager? = null) : EntityFactory(em) {
         serviceUserCRN = serviceUserCRN,
         intervention = intervention,
         relevantSentenceId = relevantSentenceId,
-        completionDeadline = completionDeadline,
         serviceUserData = serviceUserData,
         actionPlans = actionPlans,
         selectedServiceCategories = selectedServiceCategories,
@@ -251,6 +267,7 @@ class ReferralFactory(em: TestEntityManager? = null) : EntityFactory(em) {
         concludedAt = concludedAt,
         endOfServiceReport = endOfServiceReport,
         supplierAssessment = supplierAssessment,
+        referralDetailsHistory = referralDetails?.let { setOf(it) },
       )
     )
     referral.selectedDesiredOutcomes = desiredOutcomes.map { SelectedDesiredOutcomesMapping(it.serviceCategoryId, it.id) }.toMutableList()
