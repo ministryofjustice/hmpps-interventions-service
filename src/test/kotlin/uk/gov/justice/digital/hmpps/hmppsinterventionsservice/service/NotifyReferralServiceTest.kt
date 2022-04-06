@@ -91,7 +91,7 @@ class NotifyReferralServiceTest {
 
   @Test
   fun `referral assigned event generates valid url and sends an email`() {
-    whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("tom", "tom@tom.tom"))
+    whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("tom", "tom@tom.tom", "jones"))
 
     notifyService().onApplicationEvent(referralAssignedEvent)
     val personalisationCaptor = argumentCaptor<Map<String, String>>()

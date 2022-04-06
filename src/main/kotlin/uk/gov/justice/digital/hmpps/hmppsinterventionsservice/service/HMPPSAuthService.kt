@@ -23,6 +23,7 @@ class UnverifiedEmailException : RuntimeException()
 data class UserDetail(
   override val firstName: String,
   override val email: String,
+  override val lastName: String,
 ) : ContactablePerson
 
 private const val AuthServiceProviderGroupPrefix = "INT_SP_"
@@ -36,6 +37,7 @@ private data class AuthUserDetailResponse(
   val firstName: String,
   val email: String,
   val verified: Boolean,
+  val lastName: String,
 )
 
 private data class UserEmailResponse(
@@ -87,7 +89,7 @@ class HMPPSAuthService(
           if (!it.verified) {
             throw UnverifiedEmailException()
           }
-          UserDetail(it.firstName, it.email)
+          UserDetail(it.firstName, it.email, it.lastName)
         }
         .block()
     } else {
@@ -98,7 +100,7 @@ class HMPPSAuthService(
           .retrieve()
           .bodyToMono(UserDetailResponse::class.java)
           .withRetryPolicy()
-          .map { it.name.substringBefore(' ') },
+          .map { Pair(it.name.substringBefore(' '), it.name.substringAfterLast(' ')) },
         hmppsAuthApiClient.get(emailUrl)
           .retrieve()
           .onStatus({ it.equals(HttpStatus.NO_CONTENT) }, { Mono.error(UnverifiedEmailException()) })
@@ -106,7 +108,7 @@ class HMPPSAuthService(
           .withRetryPolicy()
           .map { it.email }
       )
-        .map { UserDetail(it.t1, it.t2) }
+        .map { UserDetail(it.t1.first, it.t2, it.t1.second) }
         .block()
     }
   }

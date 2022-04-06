@@ -44,9 +44,9 @@ internal class CaseNotesNotificationsServiceTest {
   @Test
   fun `both PPs (responsible officer) and SPs (assignee) get notifications for a sent case note as long as they didn't send it`() {
 
-    whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("sp", "sp@provider.co.uk"))
+    whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("sp", "sp@provider.co.uk", "last"))
     whenever(referralService.getResponsibleProbationPractitioner(any())).thenReturn(
-      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", null, null)
+      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", null, null, "last")
     )
 
     val sender = authUserFactory.createSP(id = "sp_sender", userName = "sp_user_name")
@@ -86,9 +86,9 @@ internal class CaseNotesNotificationsServiceTest {
 
   @Test
   fun `PP (responsible officer) does not get notified if they sent the case note`() {
-    whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("sp", "sp@provider.co.uk"))
+    whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("sp", "sp@provider.co.uk", "last"))
     whenever(referralService.getResponsibleProbationPractitioner(any())).thenReturn(
-      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", 123L, null)
+      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", 123L, null, "last")
     )
     whenever(communityAPIOffenderService.getStaffIdentifier(any())).thenReturn(123L)
 
@@ -124,9 +124,9 @@ internal class CaseNotesNotificationsServiceTest {
   fun `PP (referring officer) does not get notified if they sent the case note`() {
     val sender = authUserFactory.createPP(id = "pp_sender")
 
-    whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("sp", "sp@provider.co.uk"))
+    whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("sp", "sp@provider.co.uk", "last"))
     whenever(referralService.getResponsibleProbationPractitioner(any())).thenReturn(
-      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", null, sender)
+      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", null, sender, "last")
     )
 
     val referral = referralFactory.createAssigned()
@@ -158,9 +158,9 @@ internal class CaseNotesNotificationsServiceTest {
 
   @Test
   fun `SP (assignee) does not get notified if they sent the case note`() {
-    whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("sp", "sp@provider.co.uk"))
+    whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("sp", "sp@provider.co.uk", "last"))
     whenever(referralService.getResponsibleProbationPractitioner(any())).thenReturn(
-      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", null, null)
+      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", null, null, "last")
     )
 
     val sender = authUserFactory.createSP(id = "sp_sender")
@@ -196,10 +196,10 @@ internal class CaseNotesNotificationsServiceTest {
   // user
   @Test
   fun `SP (assignee) does not get notified as the assignee has the same user name as the sender`() {
-    whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("sp", "sp@provider.co.uk"))
+    whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("sp", "sp@provider.co.uk", "last"))
     val responsiblePp = authUserFactory.createSP(id = "responsiblePp", userName = "sameUserName")
     whenever(referralService.getResponsibleProbationPractitioner(any())).thenReturn(
-      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", null, responsiblePp)
+      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", null, responsiblePp, "last")
     )
 
     val assignedToId = authUserFactory.createSP(id = "sp_assignedToId", userName = "sameUserName")
@@ -234,9 +234,9 @@ internal class CaseNotesNotificationsServiceTest {
 
   @Test
   fun `SP (assignee) does not get notified if the referral is unassigned`() {
-    whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("sp", "sp@provider.co.uk"))
+    whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("sp", "sp@provider.co.uk", "last"))
     whenever(referralService.getResponsibleProbationPractitioner(any())).thenReturn(
-      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", null, null)
+      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", null, null, "last")
     )
 
     val sender = authUserFactory.createPP(id = "sender")

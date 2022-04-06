@@ -91,7 +91,7 @@ class NotifyActionPlanServiceTest {
     val event = actionPlanApprovedEvent
     val actionPlan = event.actionPlan
     whenever(hmppsAuthService.getUserDetail(actionPlan.submittedBy!!))
-      .thenReturn(UserDetail("tom", "tom@tom.tom"))
+      .thenReturn(UserDetail("tom", "tom@tom.tom", "jones"))
 
     notifyService().onApplicationEvent(actionPlanApprovedEvent)
     val personalisationCaptor = argumentCaptor<Map<String, String>>()
@@ -104,7 +104,7 @@ class NotifyActionPlanServiceTest {
   @Test
   fun `action plan submitted event generates valid url and sends an email`() {
     whenever(referralService.getResponsibleProbationPractitioner(any()))
-      .thenReturn(ResponsibleProbationPractitioner("tom", "tom@tom.tom", null, null))
+      .thenReturn(ResponsibleProbationPractitioner("tom", "tom@tom.tom", null, null, "jones"))
 
     notifyService().onApplicationEvent(actionPlanSubmittedEvent)
     val personalisationCaptor = argumentCaptor<Map<String, String>>()

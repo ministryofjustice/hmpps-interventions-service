@@ -22,6 +22,7 @@ data class ResponsibleOfficer(
   val firstName: String?,
   val email: String?,
   val staffId: Long?,
+  val lastName: String?,
 )
 
 private data class UserAccessResponse(
@@ -117,7 +118,7 @@ class CommunityAPIOffenderService(
       .retrieve()
       .bodyToFlux(OffenderManagerResponse::class.java)
       .filter { it.isResponsibleOfficer == true }
-      .map { ResponsibleOfficer(it.staff?.forenames?.substringBefore(' '), it.staff?.email, it.staffId) }
+      .map { ResponsibleOfficer(it.staff?.forenames?.substringBefore(' '), it.staff?.email, it.staffId, it.staff?.surname) }
       .collectList()
       .block()
 
