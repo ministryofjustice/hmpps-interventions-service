@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.notifications.ReferralNotificationService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import java.time.OffsetDateTime
@@ -49,8 +50,8 @@ class NotifyReferralServiceTest {
     "http://localhost:8080/sent-referral/42c7d267-0776-4272-a8e8-a673bfe30d0d",
   )
 
-  private fun notifyService(): NotifyReferralService {
-    return NotifyReferralService(
+  private fun notifyService(): ReferralNotificationService {
+    return ReferralNotificationService(
       "referralSentTemplateID",
       "referralAssignedTemplateID",
       "http://example.com",
