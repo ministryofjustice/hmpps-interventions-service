@@ -1,0 +1,42 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: hmpps-interventions
+  title: HMPPS Refer and monitor an intervention
+  description: Refer and monitor an intervention for people on probation or in custody
+spec:
+  owner: group:hmpps-interventions-dev
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: hmpps-interventions-service
+  title: Intervention service (REST API)
+  description: Domain API for tracking the lifecycle of CRS (Commissioned Rehabilitative Services) interventions and services
+  tags:
+    - kotlin
+    - spring-boot
+spec:
+  type: service
+  owner: group:hmpps-interventions-dev
+  system: system:hmpps-interventions
+  lifecycle: production
+  providesApis:
+    - api:hmpps-interventions-service
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: hmpps-interventions-service
+  title: Intervention service (REST API)
+  description: Domain API for tracking the lifecycle of CRS (Commissioned Rehabilitative Services) interventions and services
+spec:
+  type: openapi
+  lifecycle: production
+  owner: group:hmpps-interventions-dev
+  system: system:hmpps-interventions
+  definition:
+    $json: https://hmpps-interventions-service-dev.apps.live-1.cloud-platform.service.justice.gov.uk/v3/api-docs
