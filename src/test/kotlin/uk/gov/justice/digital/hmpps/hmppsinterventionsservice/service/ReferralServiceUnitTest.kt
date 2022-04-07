@@ -757,7 +757,7 @@ class ReferralServiceUnitTest {
 
   @Test
   fun `getResponsibleProbationPractitioner uses responsible officer`() {
-    whenever(communityAPIOffenderService.getResponsibleOfficer(any())).thenReturn(ResponsibleOfficer("tom", "tom@tom.tom", 123))
+    whenever(communityAPIOffenderService.getResponsibleOfficer(any())).thenReturn(ResponsibleOfficer("tom", "tom@tom.tom", 123, "jones"))
     val pp = referralService.getResponsibleProbationPractitioner(referralFactory.createSent())
     assertThat(pp.firstName).isEqualTo("tom")
     assertThat(pp.email).isEqualTo("tom@tom.tom")
@@ -767,7 +767,7 @@ class ReferralServiceUnitTest {
   fun `getResponsibleProbationPractitioner uses sender if there is an unexpected error`() {
     val sender = authUserFactory.create("sender")
     whenever(communityAPIOffenderService.getResponsibleOfficer(any())).thenThrow(ReadTimeoutException.INSTANCE)
-    whenever(hmppsAuthService.getUserDetail(sender)).thenReturn(UserDetail("andrew", "andrew@tom.tom"))
+    whenever(hmppsAuthService.getUserDetail(sender)).thenReturn(UserDetail("andrew", "andrew@tom.tom", "marr"))
     val pp = referralService.getResponsibleProbationPractitioner(referralFactory.createSent(sentBy = sender))
     assertThat(pp.firstName).isEqualTo("andrew")
     assertThat(pp.email).isEqualTo("andrew@tom.tom")
@@ -776,8 +776,8 @@ class ReferralServiceUnitTest {
   @Test
   fun `getResponsibleProbationPractitioner uses sender if there is no responsible officer email address`() {
     val sender = authUserFactory.create("sender")
-    whenever(communityAPIOffenderService.getResponsibleOfficer(any())).thenReturn(ResponsibleOfficer("tom", null, 123))
-    whenever(hmppsAuthService.getUserDetail(sender)).thenReturn(UserDetail("andrew", "andrew@tom.tom"))
+    whenever(communityAPIOffenderService.getResponsibleOfficer(any())).thenReturn(ResponsibleOfficer("tom", null, 123, "jones"))
+    whenever(hmppsAuthService.getUserDetail(sender)).thenReturn(UserDetail("andrew", "andrew@tom.tom", "marr"))
     val pp = referralService.getResponsibleProbationPractitioner(referralFactory.createSent(sentBy = sender))
     assertThat(pp.firstName).isEqualTo("andrew")
     assertThat(pp.email).isEqualTo("andrew@tom.tom")
@@ -786,8 +786,8 @@ class ReferralServiceUnitTest {
   @Test
   fun `getResponsibleProbationPractitioner uses creator if there is no responsible officer email address`() {
     val creator = authUserFactory.create("creator")
-    whenever(communityAPIOffenderService.getResponsibleOfficer(any())).thenReturn(ResponsibleOfficer("tom", null, 123))
-    whenever(hmppsAuthService.getUserDetail(creator)).thenReturn(UserDetail("dan", "dan@tom.tom"))
+    whenever(communityAPIOffenderService.getResponsibleOfficer(any())).thenReturn(ResponsibleOfficer("tom", null, 123, "jones"))
+    whenever(hmppsAuthService.getUserDetail(creator)).thenReturn(UserDetail("dan", "dan@tom.tom", "walker"))
     val pp = referralService.getResponsibleProbationPractitioner(referralFactory.createDraft(createdBy = creator))
     assertThat(pp.firstName).isEqualTo("dan")
     assertThat(pp.email).isEqualTo("dan@tom.tom")

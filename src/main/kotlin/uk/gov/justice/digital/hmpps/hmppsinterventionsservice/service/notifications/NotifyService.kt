@@ -31,6 +31,7 @@ interface NotifyService {
 interface ContactablePerson {
   val firstName: String
   val email: String
+  val lastName: String
 }
 
 @Service

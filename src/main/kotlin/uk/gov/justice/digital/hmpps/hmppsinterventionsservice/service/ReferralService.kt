@@ -50,6 +50,7 @@ data class ResponsibleProbationPractitioner(
   override val email: String,
   val deliusStaffId: Long?,
   val authUser: AuthUser?,
+  override val lastName: String,
 ) : ContactablePerson
 
 @Service
@@ -617,6 +618,7 @@ class ReferralService(
           responsibleOfficer.email,
           responsibleOfficer.staffId,
           null,
+          responsibleOfficer.lastName ?: "",
         )
       }
 
@@ -640,6 +642,7 @@ class ReferralService(
       userDetail.email,
       null,
       referringProbationPractitioner,
+      userDetail.lastName
     )
   }
 }

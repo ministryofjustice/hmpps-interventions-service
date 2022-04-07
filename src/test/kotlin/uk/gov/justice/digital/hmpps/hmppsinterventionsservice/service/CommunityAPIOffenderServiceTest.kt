@@ -107,8 +107,15 @@ internal class CommunityAPIOffenderServiceTest {
 
   @Test
   fun `getResponsibleOfficer returns first when there are multiple responsible officers`() {
-    val offenderService = offenderServiceFactory(createMockedRestClient(MockedResponse(offenderManagersLocation, HttpStatus.OK, "[{\"isResponsibleOfficer\": true, \"staff\": {\"forenames\": \"tom\", \"email\": \"tom@tom.tom\"}, \"staffId\": 123}, {\"isResponsibleOfficer\": true}]")))
+    val offenderService = offenderServiceFactory(createMockedRestClient(MockedResponse(offenderManagersLocation, HttpStatus.OK, "[{\"isResponsibleOfficer\": true, \"staff\": {\"forenames\": \"tom\", \"email\": \"tom@tom.tom\", \"surname\": \"jones\"}, \"staffId\": 123}, {\"isResponsibleOfficer\": true}]")))
     val result = offenderService.getResponsibleOfficer("X123456")
-    assertThat(result).isEqualTo(ResponsibleOfficer("tom", "tom@tom.tom", 123))
+    assertThat(result).isEqualTo(ResponsibleOfficer("tom", "tom@tom.tom", 123, "jones"))
+  }
+
+  @Test
+  fun `getResponsibleOfficer can handle null values in staff fields - we don't make any assumptions about the quality of data in delius`() {
+    val offenderService = offenderServiceFactory(createMockedRestClient(MockedResponse(offenderManagersLocation, HttpStatus.OK, "[{\"isResponsibleOfficer\": true, \"staffId\": 123}, {\"isResponsibleOfficer\": true}]")))
+    val result = offenderService.getResponsibleOfficer("X123456")
+    assertThat(result).isEqualTo(ResponsibleOfficer(null, null, 123, null))
   }
 }
