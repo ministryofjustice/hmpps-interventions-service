@@ -2,29 +2,38 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.EmailSender
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AuthUserDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.notifications.ReferralNotificationService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralDetailsFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
+import java.time.LocalDate
 import java.time.OffsetDateTime
+import java.util.Optional
 import java.util.UUID
 
 class NotifyReferralServiceTest {
   private val emailSender = mock<EmailSender>()
   private val hmppsAuthService = mock<HMPPSAuthService>()
+  private val authUserRepository = mock<AuthUserRepository>()
   private val referralFactory = ReferralFactory()
   private val authUserFactory = AuthUserFactory()
 
@@ -49,14 +58,16 @@ class NotifyReferralServiceTest {
     "http://localhost:8080/sent-referral/42c7d267-0776-4272-a8e8-a673bfe30d0d",
   )
 
-  private fun notifyService(): NotifyReferralService {
-    return NotifyReferralService(
+  private fun notifyService(): ReferralNotificationService {
+    return ReferralNotificationService(
       "referralSentTemplateID",
       "referralAssignedTemplateID",
+      "completionDeadlineUpdatedTemplateID",
       "http://example.com",
       "/referral/{id}",
       emailSender,
       hmppsAuthService,
+      authUserRepository,
     )
   }
 
@@ -99,5 +110,64 @@ class NotifyReferralServiceTest {
     assertThat(personalisationCaptor.firstValue["spFirstName"]).isEqualTo("tom")
     assertThat(personalisationCaptor.firstValue["referenceNumber"]).isEqualTo("AJ9871AC")
     assertThat(personalisationCaptor.firstValue["referralUrl"]).isEqualTo("http://example.com/referral/42c7d267-0776-4272-a8e8-a673bfe30d0d")
+  }
+
+  @Nested
+  inner class ReferralDetailsChangedEvent {
+    private val referralDetailsFactory = ReferralDetailsFactory()
+    private val referral = referralFactory.createAssigned()
+
+    private val makeReferralDetailsChangedEvent = { assigned: Boolean ->
+      ReferralEvent(
+        "source",
+        ReferralEventType.DETAILS_AMENDED,
+        referral,
+        "http://localhost:8080/sent-referral/${referral.id}",
+        data = mapOf(
+          "newDetails" to ReferralDetailsDTO.from(
+            referralDetailsFactory.create(
+              referral.id,
+              referral.createdAt,
+              referral.createdBy,
+              completionDeadline = LocalDate.of(2022, 6, 6)
+            )
+          ),
+          "previousDetails" to ReferralDetailsDTO.from(
+            referralDetailsFactory.create(
+              referral.id,
+              referral.createdAt,
+              referral.createdBy,
+              completionDeadline = LocalDate.of(2022, 4, 13)
+            )
+          ),
+          "currentAssignee" to if (assigned) AuthUserDTO.from(referral.currentAssignee!!) else null
+        )
+      )
+    }
+
+    @Test
+    fun `referral details changed event sends email when completion deadline has changed`() {
+      whenever(authUserRepository.findById(referral.createdBy.id)).thenReturn(Optional.of(referral.createdBy))
+      whenever(hmppsAuthService.getUserDetail(referral.createdBy)).thenReturn(UserDetail("sally", "sally@tom.com", "smith"))
+      whenever(hmppsAuthService.getUserDetail(AuthUserDTO.from(referral.currentAssignee!!))).thenReturn(UserDetail("tom", "tom@tom.tom", "jones"))
+
+      notifyService().onApplicationEvent(makeReferralDetailsChangedEvent(true))
+      val personalisationCaptor = argumentCaptor<Map<String, String>>()
+      verify(emailSender).sendEmail(eq("completionDeadlineUpdatedTemplateID"), eq("tom@tom.tom"), personalisationCaptor.capture())
+      assertThat(personalisationCaptor.firstValue["caseworkerFirstName"]).isEqualTo("tom")
+      assertThat(personalisationCaptor.firstValue["newCompletionDeadline"]).isEqualTo("6 June 2022")
+      assertThat(personalisationCaptor.firstValue["previousCompletionDeadline"]).isEqualTo("13 April 2022")
+      assertThat(personalisationCaptor.firstValue["changedByName"]).isEqualTo("sally smith")
+      assertThat(personalisationCaptor.firstValue["referralDetailsUrl"]).isEqualTo("http://example.com/referral/${referral.id}")
+
+      // reason for change contains sensitive information
+      assertThat(personalisationCaptor.firstValue["reasonForChange"]).isNull()
+    }
+
+    @Test
+    fun `referral details changed event does not send email when no caseworker is assigned`() {
+      notifyService().onApplicationEvent(makeReferralDetailsChangedEvent(false))
+      verify(emailSender, times(0)).sendEmail(any(), any(), any())
+    }
   }
 }

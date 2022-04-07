@@ -314,7 +314,7 @@ class ReferralController(
     val user = userMapper.fromToken(authentication)
     val referral = getSentReferralForAuthenticatedUser(authentication, referralId)
     return referralService.updateReferralDetails(referral, referralDetails, user)?.let {
-      ReferralDetailsDTO(it.referralId, it.maximumEnforceableDays, it.completionDeadline, it.furtherInformation)
+      ReferralDetailsDTO.from(it)
     } ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "no updatable values present in request")
   }
 

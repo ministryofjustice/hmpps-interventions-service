@@ -112,6 +112,7 @@ notify:
     service-provider-performance-report-ready: "9839e772-cd88-435d-9d18-61ea14d3531b"
     service-provider-performance-report-failed: "b4a09047-bf01-4ca1-ba55-f08bcce524f2"
     case-note-sent: "83868039-3d42-4af6-86da-df14e9d4a8b7"
+    completion-deadline-updated: "fb5c9bc1-3131-49aa-8aeb-6138208406d1"
 
 interventions-ui:
   locations:

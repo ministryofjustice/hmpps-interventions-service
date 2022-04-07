@@ -416,6 +416,8 @@ class ReferralService(
     if (existingDetails !== null && existingDetails !== newDetails) {
       existingDetails.supersededById = newDetails.id
       referralDetailsRepository.saveAndFlush(existingDetails)
+
+      eventPublisher.referralDetailsChangedEvent(referral, newDetails, existingDetails)
     }
 
     return newDetails
