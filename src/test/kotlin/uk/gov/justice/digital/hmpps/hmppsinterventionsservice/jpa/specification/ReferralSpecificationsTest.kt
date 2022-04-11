@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.specification
 
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -27,7 +26,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTes
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SentReferralSummariesFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceProviderFactory
 import java.time.OffsetDateTime
-
 
 @RepositoryTest
 class ReferralSpecificationsTest @Autowired constructor(
@@ -75,8 +73,6 @@ class ReferralSpecificationsTest @Autowired constructor(
       val sent = referralFactory.createSent()
       val sentReferralSummary = referralSumariesFactory.getReferralSummary(sent)
       val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.sent())
-      println("sentReferralSummary==> $sentReferralSummary")
-      println("result==> $result")
       assertThat(result)
         .usingRecursiveFieldByFieldElementComparator()
         .containsExactly(sentReferralSummary)
