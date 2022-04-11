@@ -18,6 +18,9 @@ metadata:
   name: hmpps-interventions-service
   title: Intervention service
   description: Domain API for tracking the lifecycle of CRS (Commissioned Rehabilitative Services) interventions and services
+  links:
+    - url: https://hmpps-interventions-service-dev.apps.live-1.cloud-platform.service.justice.gov.uk/meta/schema/
+      title: Data dictionary
   tags:
     - kotlin
     - spring-boot
