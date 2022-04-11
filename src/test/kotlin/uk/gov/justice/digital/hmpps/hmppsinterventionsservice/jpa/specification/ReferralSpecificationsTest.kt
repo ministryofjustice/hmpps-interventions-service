@@ -26,6 +26,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTes
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SentReferralSummariesFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceProviderFactory
 import java.time.OffsetDateTime
+import java.time.temporal.ChronoUnit
 
 @RepositoryTest
 class ReferralSpecificationsTest @Autowired constructor(
@@ -84,8 +85,8 @@ class ReferralSpecificationsTest @Autowired constructor(
     @Test
     fun `only concluded referrals are returned`() {
       val sent = referralFactory.createSent()
-      val cancelled = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now(), concludedAt = OffsetDateTime.now(), endOfServiceReport = null)
-      val completed = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now(), concludedAt = OffsetDateTime.now())
+      val cancelled = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS), concludedAt = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS), endOfServiceReport = null)
+      val completed = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS), concludedAt = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS))
       val endOfServiceReport = endOfServiceReportFactory.create(referral = completed)
       val sentReferralSummary = referralSumariesFactory.getReferralSummary(sent)
       val cancelledReferralSummary = referralSumariesFactory.getReferralSummary(cancelled)
@@ -103,8 +104,8 @@ class ReferralSpecificationsTest @Autowired constructor(
   inner class cancelled {
     @Test
     fun `only cancelled referrals are returned`() {
-      val cancelled = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now(), concludedAt = OffsetDateTime.now(), endOfServiceReport = null)
-      val completed = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now(), concludedAt = OffsetDateTime.now())
+      val cancelled = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS), concludedAt = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS), endOfServiceReport = null)
+      val completed = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS), concludedAt = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS))
       val endOfServiceReport = endOfServiceReportFactory.create(referral = completed)
       val cancelledReferralSummary = referralSumariesFactory.getReferralSummary(cancelled)
       val completedReferralSummary = referralSumariesFactory.getReferralSummary(completed, endOfServiceReport)
@@ -157,18 +158,15 @@ class ReferralSpecificationsTest @Autowired constructor(
       val someOtherUser = authUserFactory.create(id = "someOtherUser")
 
       val assignments: List<ReferralAssignment> = listOf(
-        ReferralAssignment(OffsetDateTime.now(), assignedBy = someOtherUser, assignedTo = user),
-        ReferralAssignment(OffsetDateTime.now().minusDays(1), assignedBy = someOtherUser, assignedTo = someOtherUser),
+        ReferralAssignment(OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS), assignedBy = someOtherUser, assignedTo = user),
+        ReferralAssignment(OffsetDateTime.now().minusDays(1).truncatedTo(ChronoUnit.SECONDS), assignedBy = someOtherUser, assignedTo = someOtherUser),
       )
 
       val assignedReferral = referralFactory.createAssigned(assignments = assignments)
       val assignedReferralSummary = referralSumariesFactory.getReferralSummary(assignedReferral)
 
-      println("assignmentSummary===> $assignedReferralSummary")
-
       val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.currentlyAssignedTo(user.id))
 
-      println("result===> $result")
       assertThat(result)
         .usingRecursiveFieldByFieldElementComparator()
         .containsExactly(assignedReferralSummary)
