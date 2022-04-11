@@ -22,7 +22,7 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
 
   fun createSent(
     id: UUID = UUID.randomUUID(),
-    createdAt: OffsetDateTime = OffsetDateTime.now(),
+    createdAt: OffsetDateTime = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS),
     concludedAt: OffsetDateTime? = createdAt.plusHours(3),
     createdBy: AuthUser = authUserFactory.create(),
     serviceUserCRN: String = "X123456",

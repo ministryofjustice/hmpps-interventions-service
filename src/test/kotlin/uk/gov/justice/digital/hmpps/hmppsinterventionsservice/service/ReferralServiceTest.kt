@@ -64,6 +64,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 import kotlin.random.Random
 
@@ -854,7 +855,7 @@ class ReferralServiceTest @Autowired constructor(
       completedReferral = referralFactory.createEnded(
         intervention = intervention,
         endRequestedReason = cancellationReasonFactory.create("ANY"),
-        concludedAt = OffsetDateTime.now(),
+        concludedAt = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS),
       ).also { referral ->
         referral.endOfServiceReport = endOfServiceReportFactory.create(referral = referral)
       }
@@ -870,7 +871,7 @@ class ReferralServiceTest @Autowired constructor(
       cancelledReferral = referralFactory.createEnded(
         intervention = intervention,
         endRequestedReason = cancellationReasonFactory.create("ANY"),
-        concludedAt = OffsetDateTime.now(),
+        concludedAt = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS),
         endOfServiceReport = null,
       )
 
@@ -881,7 +882,7 @@ class ReferralServiceTest @Autowired constructor(
       selfAssignedReferral = referralFactory.createAssigned(
         intervention = intervention,
         assignments = listOf(
-          ReferralAssignment(OffsetDateTime.now(), user, user)
+          ReferralAssignment(OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS), user, user)
         )
       )
 
@@ -890,7 +891,7 @@ class ReferralServiceTest @Autowired constructor(
       otherAssignedReferral = referralFactory.createAssigned(
         intervention = intervention,
         assignments = listOf(
-          ReferralAssignment(OffsetDateTime.now(), otherUser, otherUser)
+          ReferralAssignment(OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS), otherUser, otherUser)
         )
       )
 
