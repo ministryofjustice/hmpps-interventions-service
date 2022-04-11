@@ -12,6 +12,9 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
+  annotations:
+    circleci.com/project-slug: github/ministryofjustice/hmpps-interventions-service
+    sentry.io/project-slug: interventions-service-prod
   name: hmpps-interventions-service
   title: Intervention service
   description: Domain API for tracking the lifecycle of CRS (Commissioned Rehabilitative Services) interventions and services
