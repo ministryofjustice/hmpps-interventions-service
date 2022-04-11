@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.json.JsonTest
 import org.springframework.boot.test.json.JacksonTester
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SentReferralSummariesFactory
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -16,6 +16,7 @@ import java.util.UUID
 @JsonTest
 class SentReferralSummariesDTOTest(@Autowired private val json: JacksonTester<SentReferralSummariesDTO>) {
   private val interventionFactory = InterventionFactory()
+  private val sentReferralSummariesFactory = SentReferralSummariesFactory()
 
   @Test
   fun `sent referral includes all fields related to referral Summary`() {
@@ -31,9 +32,7 @@ class SentReferralSummariesDTOTest(@Autowired private val json: JacksonTester<Se
       ethnicity = "Indian"
     )
 
-    val referral = SampleData.sampleReferralSummary(
-      "X123456",
-      "Provider",
+    val sentReferralSummary = sentReferralSummariesFactory.createSent(
       id = id,
       serviceUserData = serviceUserData,
       referenceNumber = "something",
@@ -41,7 +40,7 @@ class SentReferralSummariesDTOTest(@Autowired private val json: JacksonTester<Se
       sentBy = sentBy
     )
 
-    val out = json.write(SentReferralSummariesDTO.from(referral))
+    val out = json.write(SentReferralSummariesDTO.from(sentReferralSummary))
     Assertions.assertThat(out).isEqualToJson(
       """
       {
@@ -52,7 +51,7 @@ class SentReferralSummariesDTOTest(@Autowired private val json: JacksonTester<Se
         },
         "referenceNumber": "something",
         "serviceUser": {"crn": "X123456"},
-        "serviceProvider": {id:"Provider","name": "Provider"}
+        "serviceProvider": {id:"HARMONY_LIVING","name": "Harmony Living"}
       }
     """
     )
@@ -71,17 +70,16 @@ class SentReferralSummariesDTOTest(@Autowired private val json: JacksonTester<Se
       gender = "male",
       ethnicity = "Indian"
     )
-    val referral = SampleData.sampleReferralSummary(
-      "X123456",
-      "Provider",
+
+    val sentReferralSummary = sentReferralSummariesFactory.createSent(
       id = id,
       serviceUserData = serviceUserData,
-      intervention = interventionFactory.create(title = "Accommodation Services for Yorkshire"),
       referenceNumber = "something",
+      intervention = interventionFactory.create(title = "Accommodation Services for Yorkshire"),
       sentAt = sentAt,
       sentBy = sentBy
     )
-    val out = json.write(SentReferralSummariesDTO.from(referral))
+    val out = json.write(SentReferralSummariesDTO.from(sentReferralSummary))
     Assertions.assertThat(out).isEqualToJson(
       """
       {

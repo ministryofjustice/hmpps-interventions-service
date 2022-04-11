@@ -6,7 +6,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Dynamic
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralSummary
 import java.time.OffsetDateTime
 import java.util.UUID
 import javax.persistence.criteria.JoinType
@@ -44,7 +43,7 @@ class ReferralSpecifications {
         cb.and(
           cb.isNotNull(root.get<OffsetDateTime>("endRequestedAt")),
           cb.isNotNull(root.get<OffsetDateTime>("concludedAt")),
-          root.join<ReferralSummary, EndOfServiceReport>("endOfServiceReport", JoinType.LEFT).isNull
+          root.join<T, EndOfServiceReport>("endOfServiceReport", JoinType.LEFT).isNull
         )
       }
     }
@@ -83,7 +82,7 @@ class ReferralSpecifications {
         // WHERE assigned_at = max(assigned_at)
         val subquery = query.subquery(OffsetDateTime::class.java)
         val subQueryReferral = subquery.from(T::class.java)
-        val subQueryReferralAssignmentJoin = subQueryReferral.join<ReferralSummary, ReferralAssignment>("assignments", JoinType.INNER)
+        val subQueryReferralAssignmentJoin = subQueryReferral.join<T, ReferralAssignment>("assignments", JoinType.INNER)
         val maxAssignedAt = cb.greatest(subQueryReferralAssignmentJoin.get<OffsetDateTime>("assignedAt"))
         subquery.select(maxAssignedAt)
         subquery.where(cb.equal(root.get<UUID>("id"), subQueryReferral.get<UUID>("id")))

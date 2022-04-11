@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto
 
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralSummary
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SentReferralSummary
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -10,13 +10,13 @@ data class SentReferralSummariesDTO(
   val sentBy: AuthUserDTO,
   val referenceNumber: String,
   val assignedTo: AuthUserDTO?,
-  val serviceUser: ServiceUserDTO?,
-  val serviceProvider: ServiceProviderDTO?,
+  val serviceUser: ServiceUserDTO,
+  val serviceProvider: ServiceProviderDTO,
   val interventionTitle: String,
   val concludedAt: OffsetDateTime?
 ) {
   companion object {
-    fun from(referral: ReferralSummary): SentReferralSummariesDTO {
+    fun from(referral: SentReferralSummary): SentReferralSummariesDTO {
       return SentReferralSummariesDTO(
         id = referral.id,
         sentAt = referral.sentAt,

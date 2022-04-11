@@ -44,7 +44,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.Views
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralSummary
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SentReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DraftOasysRiskInformationService
@@ -167,7 +167,7 @@ class ReferralController(
     @PageableDefault(page = 0, size = 50, sort = ["sentAt"]) page: Pageable,
   ): Page<SentReferralSummariesDTO> {
     val user = userMapper.fromToken(authentication)
-    return (referralService.getSentReferralSummaryForUser(user, concluded, cancelled, unassigned, assignedToUserId, page) as Page<ReferralSummary>).map { SentReferralSummariesDTO.from(it) }.also {
+    return (referralService.getSentReferralSummaryForUser(user, concluded, cancelled, unassigned, assignedToUserId, page) as Page<SentReferralSummary>).map { SentReferralSummariesDTO.from(it) }.also {
       telemetryClient.trackEvent(
         "PagedDashboardRequest",
         null,

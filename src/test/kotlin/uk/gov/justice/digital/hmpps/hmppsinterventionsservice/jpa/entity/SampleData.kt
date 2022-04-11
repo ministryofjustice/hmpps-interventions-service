@@ -94,37 +94,6 @@ class SampleData {
       )
     }
 
-    fun sampleReferralSummary(
-      crn: String,
-      serviceProviderName: String,
-      id: UUID = UUID.randomUUID(),
-      referenceNumber: String? = null,
-      createdBy: AuthUser = AuthUser("123456", "delius", "bernard.beaks"),
-      sentAt: OffsetDateTime? = null,
-      sentBy: AuthUser = AuthUser(UUID.randomUUID().toString(), "PR", "test", false),
-      endOfServiceReport: EndOfServiceReport? = null,
-      serviceUserData: ServiceUserData,
-      concludedAt: OffsetDateTime? = null,
-      intervention: Intervention = sampleIntervention(
-        dynamicFrameworkContract = sampleContract(
-          primeProvider = sampleServiceProvider(id = serviceProviderName, name = serviceProviderName),
-        )
-      ),
-    ): ReferralSummary {
-      return ReferralSummary(
-        serviceUserCRN = crn,
-        id = id,
-        createdBy = createdBy,
-        referenceNumber = referenceNumber!!,
-        sentAt = sentAt!!,
-        intervention = intervention,
-        sentBy = sentBy!!,
-        serviceUserData = serviceUserData,
-        endOfServiceReport = endOfServiceReport,
-        concludedAt = concludedAt
-      )
-    }
-
     fun sampleIntervention(
       title: String = "Accommodation Service",
       description: String = """Help find sheltered housing
