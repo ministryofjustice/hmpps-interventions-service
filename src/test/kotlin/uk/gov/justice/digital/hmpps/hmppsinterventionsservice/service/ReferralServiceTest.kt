@@ -871,6 +871,7 @@ class ReferralServiceTest @Autowired constructor(
       cancelledReferral = referralFactory.createEnded(
         intervention = intervention,
         endRequestedReason = cancellationReasonFactory.create("ANY"),
+        endRequestedAt = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS),
         concludedAt = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS),
         endOfServiceReport = null,
       )
