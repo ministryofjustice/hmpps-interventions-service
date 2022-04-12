@@ -85,8 +85,8 @@ class ReferralSpecificationsTest @Autowired constructor(
     @Test
     fun `only concluded referrals are returned`() {
       val sent = referralFactory.createSent()
-      val cancelled = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS), concludedAt = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS), endOfServiceReport = null)
-      val completed = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS), concludedAt = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+      val cancelled = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now(), concludedAt = OffsetDateTime.now(), endOfServiceReport = null)
+      val completed = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now(), concludedAt = OffsetDateTime.now())
       val endOfServiceReport = endOfServiceReportFactory.create(referral = completed)
       val sentReferralSummary = referralSumariesFactory.getReferralSummary(sent)
       val cancelledReferralSummary = referralSumariesFactory.getReferralSummary(cancelled)
