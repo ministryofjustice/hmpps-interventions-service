@@ -13,7 +13,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Service
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
 import java.time.OffsetDateTime
-import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
@@ -22,7 +21,7 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
 
   fun createSent(
     id: UUID = UUID.randomUUID(),
-    createdAt: OffsetDateTime = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS),
+    createdAt: OffsetDateTime = OffsetDateTime.now(),
     concludedAt: OffsetDateTime? = createdAt.plusHours(3),
     createdBy: AuthUser = authUserFactory.create(),
     serviceUserCRN: String = "X123456",
@@ -32,7 +31,7 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
     desiredOutcomes: List<DesiredOutcome> = emptyList(),
     actionPlans: MutableList<ActionPlan>? = null,
 
-    sentAt: OffsetDateTime = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS),
+    sentAt: OffsetDateTime = OffsetDateTime.now(),
     sentBy: AuthUser = authUserFactory.create(),
     referenceNumber: String = "JS18726AC",
     supplementaryRiskId: UUID = UUID.randomUUID(),

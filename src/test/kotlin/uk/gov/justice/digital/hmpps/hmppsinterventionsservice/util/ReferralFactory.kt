@@ -14,7 +14,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Service
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
 import java.time.OffsetDateTime
-import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
@@ -62,7 +61,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     selectedServiceCategories: MutableSet<ServiceCategory>? = null,
     desiredOutcomes: List<DesiredOutcome> = emptyList(),
     actionPlans: MutableList<ActionPlan>? = null,
-    sentAt: OffsetDateTime = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS),
+    sentAt: OffsetDateTime = OffsetDateTime.now(),
     sentBy: AuthUser = authUserFactory.create(),
     referenceNumber: String? = "JS18726AC",
     supplementaryRiskId: UUID = UUID.randomUUID(),
@@ -103,7 +102,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     desiredOutcomes: List<DesiredOutcome> = emptyList(),
     actionPlans: MutableList<ActionPlan>? = null,
 
-    sentAt: OffsetDateTime = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS),
+    sentAt: OffsetDateTime = OffsetDateTime.now(),
     sentBy: AuthUser = authUserFactory.create(),
     referenceNumber: String? = "JS18726AC",
     supplementaryRiskId: UUID = UUID.randomUUID(),
@@ -142,7 +141,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     serviceUserCRN: String = "X123456",
     intervention: Intervention = interventionFactory.create(),
     selectedServiceCategories: MutableSet<ServiceCategory>? = null,
-    sentAt: OffsetDateTime = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS),
+    sentAt: OffsetDateTime = OffsetDateTime.now(),
     sentBy: AuthUser = authUserFactory.create(),
     referenceNumber: String? = "JS18726AC",
     relevantSentenceId: Long? = 123456L,
