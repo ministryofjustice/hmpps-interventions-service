@@ -25,7 +25,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionF
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SentReferralSummariesFactory
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceProviderFactory
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
 
