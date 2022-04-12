@@ -86,7 +86,7 @@ class ReferralSpecificationsTest @Autowired constructor(
       val sentReferralSummary = referralSumariesFactory.getReferralSummary(sent)
       val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.sent())
       assertThat(result)
-        .usingRecursiveFieldByFieldElementComparator()
+        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
         .containsExactly(sentReferralSummary)
     }
   }
@@ -155,7 +155,7 @@ class ReferralSpecificationsTest @Autowired constructor(
 
       val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.withSPAccess(setOf(spContract, unrelatedSpContract)))
       assertThat(result)
-        .usingRecursiveFieldByFieldElementComparator()
+        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
         .containsExactly(referralSummaryWithSpContract)
       assertThat(result).doesNotContain(someOtherReferralSummaryWithSpContract)
     }
