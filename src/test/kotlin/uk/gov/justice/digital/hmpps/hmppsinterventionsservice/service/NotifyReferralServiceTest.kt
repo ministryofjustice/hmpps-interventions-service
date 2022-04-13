@@ -63,6 +63,7 @@ class NotifyReferralServiceTest {
       "referralSentTemplateID",
       "referralAssignedTemplateID",
       "completionDeadlineUpdatedTemplateID",
+      "enforceableDaysUpdatedTemplateID",
       "http://example.com",
       "/referral/{id}",
       emailSender,
@@ -117,7 +118,7 @@ class NotifyReferralServiceTest {
     private val referralDetailsFactory = ReferralDetailsFactory()
     private val referral = referralFactory.createAssigned()
 
-    private val makeReferralDetailsChangedEvent = { assigned: Boolean ->
+    private val makeReferralDetailsCompletionDeadlineChangedEvent = { assigned: Boolean ->
       ReferralEvent(
         "source",
         ReferralEventType.DETAILS_AMENDED,
@@ -144,6 +145,33 @@ class NotifyReferralServiceTest {
         )
       )
     }
+    private val makeReferralDetailsEnforceableDaysChangedEvent = { assigned: Boolean ->
+      ReferralEvent(
+        "source",
+        ReferralEventType.DETAILS_AMENDED,
+        referral,
+        "http://localhost:8080/sent-referral/${referral.id}",
+        data = mapOf(
+          "newDetails" to ReferralDetailsDTO.from(
+            referralDetailsFactory.create(
+              referral.id,
+              referral.createdAt,
+              referral.createdBy,
+              maximumNumberOfEnforceableDays = 2
+            )
+          ),
+          "previousDetails" to ReferralDetailsDTO.from(
+            referralDetailsFactory.create(
+              referral.id,
+              referral.createdAt,
+              referral.createdBy,
+              maximumNumberOfEnforceableDays = 3
+            )
+          ),
+          "currentAssignee" to if (assigned) AuthUserDTO.from(referral.currentAssignee!!) else null
+        )
+      )
+    }
 
     @Test
     fun `referral details changed event sends email when completion deadline has changed`() {
@@ -151,7 +179,7 @@ class NotifyReferralServiceTest {
       whenever(hmppsAuthService.getUserDetail(referral.createdBy)).thenReturn(UserDetail("sally", "sally@tom.com", "smith"))
       whenever(hmppsAuthService.getUserDetail(AuthUserDTO.from(referral.currentAssignee!!))).thenReturn(UserDetail("tom", "tom@tom.tom", "jones"))
 
-      notifyService().onApplicationEvent(makeReferralDetailsChangedEvent(true))
+      notifyService().onApplicationEvent(makeReferralDetailsCompletionDeadlineChangedEvent(true))
       val personalisationCaptor = argumentCaptor<Map<String, String>>()
       verify(emailSender).sendEmail(eq("completionDeadlineUpdatedTemplateID"), eq("tom@tom.tom"), personalisationCaptor.capture())
       assertThat(personalisationCaptor.firstValue["caseworkerFirstName"]).isEqualTo("tom")
@@ -165,8 +193,27 @@ class NotifyReferralServiceTest {
     }
 
     @Test
+    fun `referral details changed event sends email when enforceable days has changed`() {
+      whenever(authUserRepository.findById(referral.createdBy.id)).thenReturn(Optional.of(referral.createdBy))
+      whenever(hmppsAuthService.getUserDetail(referral.createdBy)).thenReturn(UserDetail("sally", "sally@tom.com", "smith"))
+      whenever(hmppsAuthService.getUserDetail(AuthUserDTO.from(referral.currentAssignee!!))).thenReturn(UserDetail("tom", "tom@tom.tom", "jones"))
+
+      notifyService().onApplicationEvent(makeReferralDetailsEnforceableDaysChangedEvent(true))
+      val personalisationCaptor = argumentCaptor<Map<String, String>>()
+      verify(emailSender).sendEmail(eq("enforceableDaysUpdatedTemplateID"), eq("tom@tom.tom"), personalisationCaptor.capture())
+      assertThat(personalisationCaptor.firstValue["recipientFirstName"]).isEqualTo("tom")
+      assertThat(personalisationCaptor.firstValue["newMaximumEnforceableDays"]).isEqualTo("2")
+      assertThat(personalisationCaptor.firstValue["previousMaximumEnforceableDays"]).isEqualTo("3")
+      assertThat(personalisationCaptor.firstValue["changedByName"]).isEqualTo("sally smith")
+      assertThat(personalisationCaptor.firstValue["referralDetailsUrl"]).isEqualTo("http://example.com/referral/${referral.id}")
+
+      // reason for change contains sensitive information
+      assertThat(personalisationCaptor.firstValue["reasonForChange"]).isNull()
+    }
+
+    @Test
     fun `referral details changed event does not send email when no caseworker is assigned`() {
-      notifyService().onApplicationEvent(makeReferralDetailsChangedEvent(false))
+      notifyService().onApplicationEvent(makeReferralDetailsCompletionDeadlineChangedEvent(false))
       verify(emailSender, times(0)).sendEmail(any(), any(), any())
     }
   }

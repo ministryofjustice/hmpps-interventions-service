@@ -25,6 +25,7 @@ class ReferralNotificationService(
   @Value("\${notify.templates.referral-sent}") private val referralSentTemplateID: String,
   @Value("\${notify.templates.referral-assigned}") private val referralAssignedTemplateID: String,
   @Value("\${notify.templates.completion-deadline-updated}") private val completionDeadlineUpdatedTemplateID: String,
+  @Value("\${notify.templates.enforceable-days-updated}") private val enforceableDaysUpdatedTemplateID: String,
   @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
   @Value("\${interventions-ui.locations.service-provider.referral-details}") private val spReferralDetailsLocation: String,
   private val emailSender: EmailSender,
@@ -88,6 +89,19 @@ class ReferralNotificationService(
           "caseworkerFirstName" to recipient.firstName,
           "newCompletionDeadline" to formatDate(newDetails.completionDeadline!!),
           "previousCompletionDeadline" to formatDate(previousDetails.completionDeadline!!),
+          "changedByName" to "${updater.firstName} ${updater.lastName}",
+          "referralDetailsUrl" to frontendUrl.toString(),
+        )
+      )
+    }
+
+    if (newDetails.maximumEnforceableDays != previousDetails.maximumEnforceableDays) {
+      emailSender.sendEmail(
+        enforceableDaysUpdatedTemplateID, recipient.email,
+        mapOf(
+          "recipientFirstName" to recipient.firstName,
+          "newMaximumEnforceableDays" to newDetails.maximumEnforceableDays!!.toString(),
+          "previousMaximumEnforceableDays" to previousDetails.maximumEnforceableDays!!.toString(),
           "changedByName" to "${updater.firstName} ${updater.lastName}",
           "referralDetailsUrl" to frontendUrl.toString(),
         )
