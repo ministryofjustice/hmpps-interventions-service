@@ -67,8 +67,8 @@ dependencies {
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
-  implementation("io.sentry:sentry-spring-boot-starter:5.7.2")
-  implementation("io.sentry:sentry-logback:5.7.2")
+  implementation("io.sentry:sentry-spring-boot-starter:5.7.3")
+  implementation("io.sentry:sentry-logback:5.7.3")
   implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
   runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.2") // needed for OffsetDateTime for AppInsights
 
@@ -79,20 +79,20 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:3.17.3-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.17.16")
-  implementation("software.amazon.awssdk:s3:2.17.16")
+  implementation("software.amazon.awssdk:sns:2.17.170")
+  implementation("software.amazon.awssdk:s3:2.17.170")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-  implementation("com.nimbusds:oauth2-oidc-sdk:9.32")
+  implementation("com.nimbusds:oauth2-oidc-sdk:9.33")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("org.hibernate:hibernate-core:5.6.7.Final")
-  implementation("com.vladmihalcea:hibernate-types-52:2.15.2")
+  implementation("com.vladmihalcea:hibernate-types-52:2.16.0")
   runtimeOnly("org.flywaydb:flyway-core")
   runtimeOnly("org.postgresql:postgresql:42.2.25")
 

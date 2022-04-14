@@ -12,9 +12,15 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
+  annotations:
+    circleci.com/project-slug: github/ministryofjustice/hmpps-interventions-service
+    sentry.io/project-slug: interventions-service-prod
   name: hmpps-interventions-service
-  title: Intervention service (REST API)
+  title: Intervention service
   description: Domain API for tracking the lifecycle of CRS (Commissioned Rehabilitative Services) interventions and services
+  links:
+    - url: https://hmpps-interventions-service-dev.apps.live-1.cloud-platform.service.justice.gov.uk/meta/schema/
+      title: Data dictionary
   tags:
     - kotlin
     - spring-boot
@@ -23,3 +29,20 @@ spec:
   owner: group:hmpps-interventions-dev
   system: system:hmpps-interventions
   lifecycle: production
+  providesApis:
+    - api:hmpps-interventions
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: hmpps-interventions
+  title: Intervention API
+  description: Domain API for tracking the lifecycle of CRS (Commissioned Rehabilitative Services) interventions and services
+spec:
+  type: openapi
+  lifecycle: production
+  owner: group:hmpps-interventions-dev
+  system: system:hmpps-interventions
+  definition:
+    $text: https://hmpps-interventions-service-dev.apps.live-1.cloud-platform.service.justice.gov.uk/v3/api-docs
