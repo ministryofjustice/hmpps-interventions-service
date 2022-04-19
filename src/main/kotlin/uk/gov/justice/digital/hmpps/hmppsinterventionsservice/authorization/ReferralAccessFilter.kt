@@ -13,7 +13,7 @@ class ReferralAccessFilter(
   private val serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper,
 ) {
 
-  fun serviceProviderReferrals(referralSpec: Specification<Referral>, user: AuthUser): Specification<Referral> {
+  fun <T> serviceProviderReferrals(referralSpec: Specification<T>, user: AuthUser): Specification<T> {
     val userScope = serviceProviderAccessScopeMapper.fromUser(user)
     return referralSpec.and(ReferralSpecifications.withSPAccess(userScope.contracts))
   }
@@ -28,7 +28,7 @@ class ReferralAccessFilter(
     return referrals
   }
 
-  fun probationPractitionerReferrals(referralSpec: Specification<Referral>, user: AuthUser): Specification<Referral> {
+  fun <T> probationPractitionerReferrals(referralSpec: Specification<T>, user: AuthUser): Specification<T> {
     // todo: filter out referrals for limited access offenders (LAOs)
     return referralSpec
   }

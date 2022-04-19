@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -15,6 +16,7 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessChecker
@@ -33,6 +35,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Interve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SentReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceProvider
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
@@ -42,6 +45,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.End
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSummariesRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
@@ -53,6 +57,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceR
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SentReferralSummariesFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceProviderFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAssessmentFactory
@@ -60,6 +65,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 import kotlin.random.Random
 
@@ -67,6 +73,7 @@ import kotlin.random.Random
 class ReferralServiceTest @Autowired constructor(
   val entityManager: TestEntityManager,
   val referralRepository: ReferralRepository,
+  val sentReferralSummariesRepository: SentReferralSummariesRepository,
   val authUserRepository: AuthUserRepository,
   val interventionRepository: InterventionRepository,
   val cancellationReasonRepository: CancellationReasonRepository,
@@ -81,6 +88,7 @@ class ReferralServiceTest @Autowired constructor(
   private val contractFactory = DynamicFrameworkContractFactory(entityManager)
   private val serviceProviderFactory = ServiceProviderFactory(entityManager)
   private val referralFactory = ReferralFactory(entityManager)
+  private val sentReferralSummariesFactory = SentReferralSummariesFactory(entityManager)
   private val serviceCategoryFactory = ServiceCategoryFactory(entityManager)
   private val contractTypeFactory = ContractTypeFactory(entityManager)
   private val dynamicFrameworkContractFactory = DynamicFrameworkContractFactory(entityManager)
@@ -106,9 +114,11 @@ class ReferralServiceTest @Autowired constructor(
   private val telemetryService: TelemetryService = mock()
   private val draftOasysRiskInformationService: DraftOasysRiskInformationService = mock()
   private val referralDetailsRepository: ReferralDetailsRepository = mock()
+  private val recursiveComparisonConfigurationBuilder = RecursiveComparisonConfiguration.builder()
 
   private val referralService = ReferralService(
     referralRepository,
+    sentReferralSummariesRepository,
     authUserRepository,
     interventionRepository,
     referralConcluder,
@@ -488,21 +498,35 @@ class ReferralServiceTest @Autowired constructor(
   @Nested
   @DisplayName("get sent referrals with a probation practitioner user")
   inner class GetSentReferralsPPUser {
+    private val truncateSeconds: Comparator<OffsetDateTime> = Comparator { a, exp ->
+      if (a
+        .truncatedTo(ChronoUnit.SECONDS)
+        .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
+      ) 0 else 1
+    }
+
+    private val recursiveComparisonConfiguration: RecursiveComparisonConfiguration = recursiveComparisonConfigurationBuilder
+      .withComparatorForType(truncateSeconds, OffsetDateTime::class.java)
+      .build()
+
+    var pageRequest: PageRequest = PageRequest.of(0, 20)
     @Test
     fun `returns referrals started by the user`() {
       val user = userFactory.create("pp_user_1", "delius")
-      val startedReferrals = (1..3).map { referralFactory.createSent(createdBy = user) }
+      val startedReferrals = (1..3).map { sentReferralSummariesFactory.createSent(createdBy = user) }
 
-      val result = referralService.getSentReferralsForUser(user, null, null, null, null, null)
-      assertThat(result).containsExactlyElementsOf(startedReferrals)
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest)
+      assertThat(result)
+        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
+        .containsExactlyInAnyOrderElementsOf(startedReferrals)
     }
 
     @Test
     fun `must not return referrals sent by the user`() {
       val user = userFactory.create("pp_user_1", "delius")
-      val sentReferral = referralFactory.createSent(sentBy = user)
+      val sentReferral = sentReferralSummariesFactory.createSent(sentBy = user)
 
-      val result = referralService.getSentReferralsForUser(user, null, null, null, null, null)
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest)
       assertThat(result).doesNotContain(sentReferral)
       assertThat(result).isEmpty()
     }
@@ -510,13 +534,15 @@ class ReferralServiceTest @Autowired constructor(
     @Test
     fun `must not propagate errors from community-api`() {
       val user = userFactory.create("pp_user_1", "delius")
-      val createdReferral = referralFactory.createSent(createdBy = user)
+      val createdReferral = sentReferralSummariesFactory.createSent(createdBy = user)
 
       whenever(communityAPIOffenderService.getManagedOffendersForDeliusUser(user))
         .thenThrow(WebClientResponseException::class.java)
 
-      val result = assertDoesNotThrow { referralService.getSentReferralsForUser(user, null, null, null, null, null) }
-      assertThat(result).containsExactly(createdReferral)
+      val result = assertDoesNotThrow { referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest) }
+      assertThat(result)
+        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
+        .containsExactly(createdReferral)
     }
 
     @Test
@@ -524,26 +550,30 @@ class ReferralServiceTest @Autowired constructor(
       val someoneElse = userFactory.create("helper_pp_user", "delius")
       val user = userFactory.create("pp_user_1", "delius")
 
-      val managedReferral1 = referralFactory.createSent(serviceUserCRN = "CRN129876234", createdBy = someoneElse)
-      val managedReferral2 = referralFactory.createSent(serviceUserCRN = "CRN129876235", createdBy = someoneElse)
+      val managedReferral1 = sentReferralSummariesFactory.createSent(serviceUserCRN = "CRN129876234", createdBy = someoneElse)
+      val managedReferral2 = sentReferralSummariesFactory.createSent(serviceUserCRN = "CRN129876235", createdBy = someoneElse)
       referralFactory.createSent(serviceUserCRN = "CRN129876236", createdBy = someoneElse)
       whenever(communityAPIOffenderService.getManagedOffendersForDeliusUser(user))
         .thenReturn(listOf(Offender("CRN129876234"), Offender("CRN129876235")))
 
-      val result = referralService.getSentReferralsForUser(user, null, null, null, null, null)
-      assertThat(result).containsExactlyInAnyOrder(managedReferral1, managedReferral2)
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest)
+      assertThat(result)
+        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
+        .containsExactlyInAnyOrder(managedReferral1, managedReferral2)
     }
 
     @Test
     fun `returns referrals both managed and started by the user only once`() {
       val user = userFactory.create("pp_user_1", "delius")
-      val managedAndStartedReferral = referralFactory.createSent(serviceUserCRN = "CRN129876234", createdBy = user)
+      val managedAndStartedReferral = sentReferralSummariesFactory.createSent(serviceUserCRN = "CRN129876234", createdBy = user)
 
       whenever(communityAPIOffenderService.getManagedOffendersForDeliusUser(user))
         .thenReturn(listOf(Offender("CRN129876234")))
 
-      val result = referralService.getSentReferralsForUser(user, null, null, null, null, null)
-      assertThat(result).containsExactly(managedAndStartedReferral)
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest)
+      assertThat(result)
+        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
+        .containsExactly(managedAndStartedReferral)
     }
 
     @Test
@@ -552,14 +582,14 @@ class ReferralServiceTest @Autowired constructor(
       (1..8).map { referralFactory.createSent(createdBy = user) }
 
       val pageSize = 5
-      val page = referralService.getSentReferralsForUser(
+      val page = referralService.getSentReferralSummaryForUser(
         user,
         null,
         null,
         null,
         null,
         Pageable.ofSize(pageSize)
-      ) as Page<Referral>
+      ) as Page<SentReferralSummary>
       assertThat(page.content.size).isEqualTo(pageSize)
       assertThat(page.totalElements).isEqualTo(8)
     }
@@ -568,6 +598,7 @@ class ReferralServiceTest @Autowired constructor(
   @Nested
   @DisplayName("get sent referrals with a provider user")
   inner class GetSentReferralsSPUser {
+
     @Test
     fun `returns a Page of results if the page parameter is not null`() {
       val referrals = (1..8).map { referralFactory.createSent() }
@@ -578,14 +609,14 @@ class ReferralServiceTest @Autowired constructor(
         .thenReturn(ServiceProviderAccessScope(setOf(serviceProviderFactory.create()), contracts.toSet()))
 
       val pageSize = 5
-      val page = referralService.getSentReferralsForUser(
+      val page = referralService.getSentReferralSummaryForUser(
         user,
         null,
         null,
         null,
         null,
         Pageable.ofSize(pageSize)
-      ) as Page<Referral>
+      ) as Page<SentReferralSummary>
       assertThat(page.content.size).isEqualTo(pageSize)
       assertThat(page.totalElements).isEqualTo(8)
     }
@@ -820,6 +851,22 @@ class ReferralServiceTest @Autowired constructor(
     lateinit var draftReferral: Referral
     lateinit var selfAssignedReferral: Referral
     lateinit var otherAssignedReferral: Referral
+    lateinit var completedSentReferralSummary: SentReferralSummary
+    lateinit var liveSentReferralSummary: SentReferralSummary
+    lateinit var cancelledSentReferralSummary: SentReferralSummary
+    lateinit var selfAssignedSentReferralSummary: SentReferralSummary
+    lateinit var otherAssignedSentReferralSummary: SentReferralSummary
+    lateinit var pageRequest: PageRequest
+    private val truncateSeconds: Comparator<OffsetDateTime> = Comparator { a, exp ->
+      if (a
+        .truncatedTo(ChronoUnit.SECONDS)
+        .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
+      ) 0 else 1
+    }
+
+    private val recursiveComparisonConfiguration: RecursiveComparisonConfiguration = recursiveComparisonConfigurationBuilder
+      .withComparatorForType(truncateSeconds, OffsetDateTime::class.java)
+      .build()
 
     @BeforeEach
     fun `setup referrals`() {
@@ -831,21 +878,29 @@ class ReferralServiceTest @Autowired constructor(
       completedReferral = referralFactory.createEnded(
         intervention = intervention,
         endRequestedReason = cancellationReasonFactory.create("ANY"),
+        endRequestedAt = OffsetDateTime.now(),
         concludedAt = OffsetDateTime.now(),
       ).also { referral ->
         referral.endOfServiceReport = endOfServiceReportFactory.create(referral = referral)
       }
 
+      completedSentReferralSummary = sentReferralSummariesFactory.getReferralSummary(completedReferral)
+
       liveReferral = referralFactory.createSent(
         intervention = intervention
       )
 
+      liveSentReferralSummary = sentReferralSummariesFactory.getReferralSummary(liveReferral)
+
       cancelledReferral = referralFactory.createEnded(
         intervention = intervention,
         endRequestedReason = cancellationReasonFactory.create("ANY"),
+        endRequestedAt = OffsetDateTime.now(),
         concludedAt = OffsetDateTime.now(),
         endOfServiceReport = null,
       )
+
+      cancelledSentReferralSummary = sentReferralSummariesFactory.getReferralSummary(cancelledReferral)
 
       draftReferral = referralFactory.createDraft(intervention = intervention)
 
@@ -856,6 +911,8 @@ class ReferralServiceTest @Autowired constructor(
         )
       )
 
+      selfAssignedSentReferralSummary = sentReferralSummariesFactory.getReferralSummary(selfAssignedReferral)
+
       otherAssignedReferral = referralFactory.createAssigned(
         intervention = intervention,
         assignments = listOf(
@@ -863,129 +920,146 @@ class ReferralServiceTest @Autowired constructor(
         )
       )
 
+      otherAssignedSentReferralSummary = sentReferralSummariesFactory.getReferralSummary(otherAssignedReferral)
+
       whenever(serviceProviderAccessScopeMapper.fromUser(user))
         .thenReturn(ServiceProviderAccessScope(setOf(provider), setOf(intervention.dynamicFrameworkContract)))
+
+      pageRequest = PageRequest.of(0, 20)
     }
 
     @Test
     fun `by default only non sent referrals are filtered`() {
-      val result = referralService.getSentReferralsForUser(user, null, null, null, null, null)
-      assertThat(result).containsExactlyInAnyOrder(
-        completedReferral,
-        liveReferral,
-        cancelledReferral,
-        selfAssignedReferral,
-        otherAssignedReferral
-      )
-      assertThat(result).doesNotContain(draftReferral)
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest)
+      assertThat(result)
+        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
+        .containsExactlyInAnyOrder(
+          completedSentReferralSummary,
+          liveSentReferralSummary,
+          cancelledSentReferralSummary,
+          selfAssignedSentReferralSummary,
+          otherAssignedSentReferralSummary
+        )
     }
 
     @Test
     fun `setting concluded returns only concluded referrals`() {
-      val result = referralService.getSentReferralsForUser(user, true, null, null, null, null)
-      assertThat(result).containsExactlyInAnyOrder(completedReferral, cancelledReferral)
-      assertThat(result).doesNotContain(draftReferral, liveReferral, selfAssignedReferral, otherAssignedReferral)
+      val result = referralService.getSentReferralSummaryForUser(user, true, null, null, null, pageRequest)
+      assertThat(result)
+        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
+        .containsExactlyInAnyOrder(completedSentReferralSummary, cancelledSentReferralSummary)
+      assertThat(result).doesNotContain(liveSentReferralSummary, selfAssignedSentReferralSummary, otherAssignedSentReferralSummary)
     }
 
     @Test
     fun `setting not concluded returns only non concluded referrals`() {
-      val result = referralService.getSentReferralsForUser(user, false, null, null, null, null)
-      assertThat(result).containsExactlyInAnyOrder(liveReferral, selfAssignedReferral, otherAssignedReferral)
-      assertThat(result).doesNotContain(draftReferral, completedReferral, cancelledReferral)
+      val result = referralService.getSentReferralSummaryForUser(user, false, null, null, null, pageRequest)
+      assertThat(result)
+        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
+        .containsExactlyInAnyOrder(liveSentReferralSummary, selfAssignedSentReferralSummary, otherAssignedSentReferralSummary)
+      assertThat(result).doesNotContain(completedSentReferralSummary, cancelledSentReferralSummary)
     }
 
     @Test
     fun `setting cancelled returns only cancelled referrals`() {
-      val result = referralService.getSentReferralsForUser(user, null, true, null, null, null)
-      assertThat(result).containsExactlyInAnyOrder(cancelledReferral)
+      val result = referralService.getSentReferralSummaryForUser(user, null, true, null, null, pageRequest)
+      assertThat(result)
+        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
+        .containsExactlyInAnyOrder(cancelledSentReferralSummary)
       assertThat(result).doesNotContain(
-        draftReferral,
-        completedReferral,
-        liveReferral,
-        selfAssignedReferral,
-        otherAssignedReferral
+        completedSentReferralSummary,
+        liveSentReferralSummary,
+        selfAssignedSentReferralSummary,
+        otherAssignedSentReferralSummary
       )
     }
 
     @Test
     fun `setting not cancelled returns only non cancelled referrals`() {
-      val result = referralService.getSentReferralsForUser(user, null, false, null, null, null)
+      val result = referralService.getSentReferralSummaryForUser(user, null, false, null, null, pageRequest)
 
-      assertThat(result).containsExactlyInAnyOrder(
-        completedReferral,
-        liveReferral,
-        selfAssignedReferral,
-        otherAssignedReferral
-      )
+      assertThat(result)
+        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
+        .containsExactlyInAnyOrder(
+          completedSentReferralSummary,
+          liveSentReferralSummary,
+          selfAssignedSentReferralSummary,
+          otherAssignedSentReferralSummary
+        )
 
-      assertThat(result).doesNotContain(cancelledReferral)
-      assertThat(result).doesNotContain(draftReferral)
+      assertThat(result).doesNotContain(cancelledSentReferralSummary)
     }
 
     @Test
     fun `setting unassigned returns only unassigned referrals`() {
-      val result = referralService.getSentReferralsForUser(user, null, null, true, null, null)
-      assertThat(result).containsExactlyInAnyOrder(completedReferral, liveReferral, cancelledReferral)
-      assertThat(result).doesNotContain(draftReferral, selfAssignedReferral, otherAssignedReferral)
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, true, null, pageRequest)
+      assertThat(result)
+        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
+        .containsExactlyInAnyOrder(completedSentReferralSummary, liveSentReferralSummary, cancelledSentReferralSummary)
+      assertThat(result).doesNotContain(selfAssignedSentReferralSummary, otherAssignedSentReferralSummary)
     }
 
     @Test
     fun `setting not unassigned returns only referrals with assignments`() {
-      val result = referralService.getSentReferralsForUser(user, null, null, false, null, null)
-      assertThat(result).containsExactlyInAnyOrder(selfAssignedReferral, otherAssignedReferral)
-      assertThat(result).doesNotContain(draftReferral, completedReferral, liveReferral, cancelledReferral)
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, false, null, pageRequest)
+      assertThat(result)
+        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
+        .containsExactlyInAnyOrder(selfAssignedSentReferralSummary, otherAssignedSentReferralSummary)
+      assertThat(result).doesNotContain(completedSentReferralSummary, liveSentReferralSummary, cancelledSentReferralSummary)
     }
 
     @Test
     fun `setting assigned to returns referrals with correct assignments`() {
-      val result = referralService.getSentReferralsForUser(user, null, null, false, otherUser.id, null)
-      assertThat(result).containsExactlyInAnyOrder(otherAssignedReferral)
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, false, otherUser.id, pageRequest)
+      assertThat(result)
+        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
+        .containsExactlyInAnyOrder(otherAssignedSentReferralSummary)
       assertThat(result).doesNotContain(
-        draftReferral,
-        completedReferral,
-        liveReferral,
-        cancelledReferral,
-        selfAssignedReferral
+        completedSentReferralSummary,
+        liveSentReferralSummary,
+        cancelledSentReferralSummary,
+        selfAssignedSentReferralSummary
       )
     }
 
     @Test
     fun `setting assigned to with unknown user returns no referrals`() {
-      val result = referralService.getSentReferralsForUser(user, null, null, false, "unknown", null)
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, false, "unknown", pageRequest)
       assertThat(result).isEmpty()
       assertThat(result).doesNotContain(
-        draftReferral,
-        completedReferral,
-        liveReferral,
-        cancelledReferral,
-        otherAssignedReferral,
-        selfAssignedReferral
+        completedSentReferralSummary,
+        liveSentReferralSummary,
+        cancelledSentReferralSummary,
+        otherAssignedSentReferralSummary,
+        selfAssignedSentReferralSummary
       )
     }
 
     @Test
     fun `setting all filter options to true will return cancelled and unassigned referral`() {
-      val result = referralService.getSentReferralsForUser(user, true, true, true, null, null)
-      assertThat(result).containsExactlyInAnyOrder(cancelledReferral)
+      val result = referralService.getSentReferralSummaryForUser(user, true, true, true, null, pageRequest)
+      assertThat(result)
+        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
+        .containsExactlyInAnyOrder(cancelledSentReferralSummary)
       assertThat(result).doesNotContain(
-        draftReferral,
-        completedReferral,
-        liveReferral,
-        selfAssignedReferral,
-        otherAssignedReferral
+        completedSentReferralSummary,
+        liveSentReferralSummary,
+        selfAssignedSentReferralSummary,
+        otherAssignedSentReferralSummary
       )
     }
 
     @Test
     fun `setting all filter options to false will return an assigned referral`() {
-      val result = referralService.getSentReferralsForUser(user, false, false, false, user.id, null)
-      assertThat(result).containsExactlyInAnyOrder(selfAssignedReferral)
+      val result = referralService.getSentReferralSummaryForUser(user, false, false, false, user.id, pageRequest)
+      assertThat(result)
+        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
+        .containsExactlyInAnyOrder(selfAssignedSentReferralSummary)
       assertThat(result).doesNotContain(
-        draftReferral,
-        completedReferral,
-        liveReferral,
-        cancelledReferral,
-        otherAssignedReferral
+        completedSentReferralSummary,
+        liveSentReferralSummary,
+        cancelledSentReferralSummary,
+        otherAssignedSentReferralSummary
       )
     }
   }

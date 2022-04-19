@@ -4,6 +4,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import java.time.OffsetDateTime
 import java.util.UUID
 
+@Deprecated("This is the DTO for the /sent-referrals and /sent-referrals/paged which will be deprecated")
 data class SentReferralSummaryDTO(
   val id: UUID,
   val sentAt: OffsetDateTime,
