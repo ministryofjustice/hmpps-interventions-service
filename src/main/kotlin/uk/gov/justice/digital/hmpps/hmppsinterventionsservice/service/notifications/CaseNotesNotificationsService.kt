@@ -40,15 +40,7 @@ class CaseNotesNotificationsService(
 
   private fun emailResponsibleProbationPractitioner(referral: Referral, sender: AuthUser, caseNoteId: UUID) {
     val responsibleOfficer = referralService.getResponsibleProbationPractitioner(referral)
-    val senderIsResponsibleOfficer =
-      userTypeChecker.isProbationPractitionerUser(sender) &&
-        (
-          (responsibleOfficer.authUser?.let { it == sender } ?: false) ||
-            (
-              responsibleOfficer.deliusStaffId?.let { it == communityAPIOffenderService.getStaffIdentifier(sender) }
-                ?: false // if the RO doesn't have a staff ID we cannot determine if they are the sender, so assume not
-              )
-          )
+    val senderIsResponsibleOfficer = referralService.isUserTheResponsibleOfficer(responsibleOfficer, sender)
 
     // if the case note was sent by someone other than the RO, email the RO
     if (!senderIsResponsibleOfficer) {

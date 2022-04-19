@@ -695,4 +695,15 @@ class ReferralService(
       userDetail.lastName
     )
   }
+
+  fun isUserTheResponsibleOfficer(responsibleOfficer: ResponsibleProbationPractitioner, user: AuthUser): Boolean {
+    return userTypeChecker.isProbationPractitionerUser(user) &&
+      (
+        (responsibleOfficer.authUser?.let { it == user } ?: false) ||
+          (
+            responsibleOfficer.deliusStaffId?.let { it == communityAPIOffenderService.getStaffIdentifier(user) }
+              ?: false // if the RO doesn't have a staff ID we cannot determine if they are the sender, so assume not
+            )
+        )
+  }
 }

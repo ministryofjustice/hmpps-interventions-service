@@ -3,12 +3,15 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
@@ -1119,5 +1122,47 @@ class ReferralServiceTest @Autowired constructor(
     assertThat(updatedReferral.selectedServiceCategories).hasSize(1)
     assertThat(updatedReferral.selectedServiceCategories!!.elementAt(0).id).isEqualTo(serviceCategoryId)
     assertThat(updatedReferral.selectedDesiredOutcomes).hasSize(1)
+  }
+
+  @Test
+  fun `check when user is not the same as the responsible officer`() {
+    val responsibleProbationPractitioner = ResponsibleProbationPractitioner("abc", "abc@abc.com", null, AuthUser("123456", "delius", "TEST_INTERVENTIONS_SP_1"), "def")
+    val authUser = AuthUser("123457", "delius", "bernard.beaks")
+
+    val isUserTheResponsibleOfficer = referralService.isUserTheResponsibleOfficer(responsibleProbationPractitioner, authUser)
+
+    assertFalse(isUserTheResponsibleOfficer)
+  }
+
+  @Test
+  fun `check when user is the same as the responsible officer`() {
+    val authUser = AuthUser("123457", "delius", "bernard.beaks")
+    val responsibleProbationPractitioner = ResponsibleProbationPractitioner("abc", "abc@abc.com", null, authUser, "def")
+
+    val isUserTheResponsibleOfficer = referralService.isUserTheResponsibleOfficer(responsibleProbationPractitioner, authUser)
+
+    assertTrue(isUserTheResponsibleOfficer)
+  }
+
+  @Test
+  fun `check when user is not the same as the responsible officer and has a valid deliusStaffId `() {
+    val responsibleProbationPractitioner = ResponsibleProbationPractitioner("abc", "abc@abc.com", 768912, AuthUser("123456", "delius", "TEST_INTERVENTIONS_SP_1"), "def")
+    val authUser = AuthUser("123457", "delius", "bernard.beaks")
+    whenever(communityAPIOffenderService.getStaffIdentifier(any())).thenReturn(768912)
+
+    val isUserTheResponsibleOfficer = referralService.isUserTheResponsibleOfficer(responsibleProbationPractitioner, authUser)
+
+    assertTrue(isUserTheResponsibleOfficer)
+  }
+
+  @Test
+  fun `check when user is not the same as the responsible officer and does not have a valid deliusStaffId `() {
+    val responsibleProbationPractitioner = ResponsibleProbationPractitioner("abc", "abc@abc.com", 768912, AuthUser("123456", "delius", "TEST_INTERVENTIONS_SP_1"), "def")
+    val authUser = AuthUser("123457", "delius", "bernard.beaks")
+    whenever(communityAPIOffenderService.getStaffIdentifier(any())).thenReturn(768913)
+
+    val isUserTheResponsibleOfficer = referralService.isUserTheResponsibleOfficer(responsibleProbationPractitioner, authUser)
+
+    assertFalse(isUserTheResponsibleOfficer)
   }
 }
