@@ -173,7 +173,10 @@ class NotifyReferralServiceTest {
               maximumNumberOfEnforceableDays = 3
             )
           ),
-          "currentAssignee" to if (assigned) AuthUserDTO.from(referral.currentAssignee!!) else null
+          "currentAssignee" to if (assigned) AuthUserDTO.from(referral.currentAssignee!!) else null,
+          "crn" to referral.serviceUserCRN,
+          "sentBy" to referral.sentBy,
+          "createdBy" to referral.createdBy
         )
       )
     }
@@ -207,7 +210,7 @@ class NotifyReferralServiceTest {
       whenever(referralService.getResponsibleProbationPractitioner(any(), any(), any())).thenReturn(ResponsibleProbationPractitioner("abc", "abc@abc.com", null, null, "def"))
       whenever(referralService.isUserTheResponsibleOfficer(any(), any())).thenReturn(false)
 
-      notifyService().onApplicationEvent(makeReferralDetailsChangedEvent(true))
+      notifyService().onApplicationEvent(makeReferralDetailsCompletionDeadlineChangedEvent(true))
       val personalisationCaptor = argumentCaptor<Map<String, String>>()
       verify(emailSender).sendEmail(eq("completionDeadlineUpdatedTemplateID"), eq("tom@tom.tom"), personalisationCaptor.capture())
       verify(emailSender).sendEmail(eq("completionDeadlineUpdatedTemplateID"), eq("abc@abc.com"), personalisationCaptor.capture())
