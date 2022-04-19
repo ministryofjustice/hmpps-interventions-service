@@ -284,5 +284,6 @@ workflows:
           slack_channel: "interventions-dev-notifications"
           context: [hmpps-common-vars]
       - hmpps/gradle_owasp_dependency_check:
+          cache_key: "v2-bump"
           slack_channel: "interventions-dev-notifications"
           context: [hmpps-common-vars]
