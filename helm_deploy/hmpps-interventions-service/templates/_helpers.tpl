@@ -59,10 +59,6 @@ Selector labels
 app: {{ include "app.name" . }}
 release: {{ .Release.Name }}
 {{- end }}
-{{- define "suspectApp.selectorLabels" -}}
-app: api-suspect
-release: {{ .Release.Name }}
-{{- end }}
 {{- define "performanceReportApp.selectorLabels" -}}
 app: performance-report
 release: {{ .Release.Name }}
