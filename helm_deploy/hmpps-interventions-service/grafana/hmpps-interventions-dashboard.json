@@ -17,7 +17,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 1,
-  "iteration": 1647470012854,
+  "iteration": 1648808383727,
   "links": [],
   "panels": [
     {
@@ -701,7 +701,7 @@
         {
           "$$hashKey": "object:691",
           "decimals": null,
-          "format": "none",
+          "format": "s",
           "label": null,
           "logBase": 1,
           "max": null,
@@ -1493,5 +1493,5 @@
   "timezone": "browser",
   "title": "HMPPS Refer and monitor an intervention",
   "uid": "PyQ91ARnk",
-  "version": 2
+  "version": 1
 }
