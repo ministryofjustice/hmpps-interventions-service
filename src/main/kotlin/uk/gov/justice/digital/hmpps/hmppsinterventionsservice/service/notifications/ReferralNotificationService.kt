@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUse
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.NotifyService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ProbationPractitionerRole.RESPONSIBLE_OFFICER
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.UserDetail
 import java.net.URI
@@ -89,12 +90,11 @@ class ReferralNotificationService(
     val recipient = hmppsAuthService.getUserDetail(currentAssignee)
     val newDetailsCreatedAuthUser = authUserRepository.findByIdOrNull(newDetails.createdById)
     val updater = hmppsAuthService.getUserDetail(newDetailsCreatedAuthUser!!)
-    val responsibleProbationPractitioner = referralService.getResponsibleProbationPractitioner(crn, sentBy, createdBy)
-    val isUserTheResponsibleOfficer = referralService.isUserTheResponsibleOfficer(responsibleProbationPractitioner, newDetailsCreatedAuthUser)
+    val responsibleProbationPractitioner = referralService.getResponsibleProbationPractitioner(crn, sentBy, createdBy, newDetailsCreatedAuthUser)
     val frontendUrl = generateResourceUrl(interventionsUIBaseURL, spReferralDetailsLocation, event.referral.id)
 
     if (newDetails.completionDeadline != previousDetails.completionDeadline) {
-      sendEmail(
+      sendEmailForNotifyingCompletionDeadline(
         recipient.email,
         recipient.firstName,
         newDetails,
@@ -102,8 +102,8 @@ class ReferralNotificationService(
         updater,
         frontendUrl
       )
-      if (!isUserTheResponsibleOfficer) {
-        sendEmail(
+      if (responsibleProbationPractitioner.role != RESPONSIBLE_OFFICER) {
+        sendEmailForNotifyingCompletionDeadline(
           responsibleProbationPractitioner.email,
           recipient.firstName,
           newDetails,
@@ -128,7 +128,7 @@ class ReferralNotificationService(
     }
   }
 
-  private fun sendEmail(
+  private fun sendEmailForNotifyingCompletionDeadline(
     email: String,
     firstName: String,
     newDetails: ReferralDetailsDTO,

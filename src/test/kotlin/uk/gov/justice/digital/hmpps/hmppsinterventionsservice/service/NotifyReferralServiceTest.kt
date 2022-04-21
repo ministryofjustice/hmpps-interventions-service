@@ -21,6 +21,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ProbationPractitionerRole.RESPONSIBLE_OFFICER
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ProbationPractitionerRole.SENDER
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.notifications.ReferralNotificationService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralDetailsFactory
@@ -186,8 +188,7 @@ class NotifyReferralServiceTest {
       whenever(authUserRepository.findById(referral.createdBy.id)).thenReturn(Optional.of(referral.createdBy))
       whenever(hmppsAuthService.getUserDetail(referral.createdBy)).thenReturn(UserDetail("sally", "sally@tom.com", "smith"))
       whenever(hmppsAuthService.getUserDetail(AuthUserDTO.from(referral.currentAssignee!!))).thenReturn(UserDetail("tom", "tom@tom.tom", "jones"))
-      whenever(referralService.getResponsibleProbationPractitioner(any(), any(), any())).thenReturn(ResponsibleProbationPractitioner("abc", "abc@abc.com", null, null, "def"))
-      whenever(referralService.isUserTheResponsibleOfficer(any(), any())).thenReturn(true)
+      whenever(referralService.getResponsibleProbationPractitioner(any(), any(), any(), any())).thenReturn(ResponsibleProbationPractitioner("abc", "abc@abc.com", null, null, "def", RESPONSIBLE_OFFICER))
 
       notifyService().onApplicationEvent(makeReferralDetailsCompletionDeadlineChangedEvent(true))
       val personalisationCaptor = argumentCaptor<Map<String, String>>()
@@ -207,8 +208,7 @@ class NotifyReferralServiceTest {
       whenever(authUserRepository.findById(referral.createdBy.id)).thenReturn(Optional.of(referral.createdBy))
       whenever(hmppsAuthService.getUserDetail(referral.createdBy)).thenReturn(UserDetail("sally", "sally@tom.com", "smith"))
       whenever(hmppsAuthService.getUserDetail(AuthUserDTO.from(referral.currentAssignee!!))).thenReturn(UserDetail("tom", "tom@tom.tom", "jones"))
-      whenever(referralService.getResponsibleProbationPractitioner(any(), any(), any())).thenReturn(ResponsibleProbationPractitioner("abc", "abc@abc.com", null, null, "def"))
-      whenever(referralService.isUserTheResponsibleOfficer(any(), any())).thenReturn(false)
+      whenever(referralService.getResponsibleProbationPractitioner(any(), any(), any(), any())).thenReturn(ResponsibleProbationPractitioner("abc", "abc@abc.com", null, null, "def", SENDER))
 
       notifyService().onApplicationEvent(makeReferralDetailsCompletionDeadlineChangedEvent(true))
       val personalisationCaptor = argumentCaptor<Map<String, String>>()
