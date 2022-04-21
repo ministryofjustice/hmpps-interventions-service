@@ -49,7 +49,7 @@ internal class ReferralMetricsListenerTest @Autowired constructor(
   }
 
   @Test
-  fun `re-referring a person to the same intervention measures the elapsed time between the referrals`() {
+  fun `re-referring a person to the same intervention measures elapsed time as repeated referral`() {
     val crn = "T123456"
     val intervention = interventionFactory.create()
 
@@ -58,23 +58,41 @@ internal class ReferralMetricsListenerTest @Autowired constructor(
       metricsListener.onApplicationEvent(createEvent(referral))
     }
 
-    val reReferralTimer = registry.find("intervention.referral.repeat_time").timer()
-    assertThat(reReferralTimer?.count()).isEqualTo(2)
-    assertThat(reReferralTimer?.totalTime(TimeUnit.HOURS)).isEqualTo(2.0)
+    registry.find("intervention.referral.repeat_time").timer().let {
+      assertThat(it?.count()).isEqualTo(2)
+      assertThat(it?.totalTime(TimeUnit.HOURS)).isEqualTo(2.0)
+    }
+    assertThat(registry.find("intervention.referral.redirect_time").timer()).isNull()
   }
 
   @Test
-  fun `re-referring a person to a different intervention measures nothing`() {
+  fun `re-referring a person to a different intervention measures elapsed time as redirected referral`() {
     val crn = "T123456"
-    val intervention1 = interventionFactory.create()
-    val intervention2 = interventionFactory.create()
 
-    createReferral(crn, intervention1, sentAtHour = 13)
-    val newReferral = createReferral(crn, intervention2, sentAtHour = 14)
+    listOf(13, 14, 15).forEach { hour ->
+      val referral = createReferral(crn, interventionFactory.create(), sentAtHour = hour)
+      metricsListener.onApplicationEvent(createEvent(referral))
+    }
+
+    registry.find("intervention.referral.redirect_time").timer().let {
+      assertThat(it?.count()).isEqualTo(2)
+      assertThat(it?.totalTime(TimeUnit.HOURS)).isEqualTo(2.0)
+    }
+    assertThat(registry.find("intervention.referral.repeat_time").timer()).isNull()
+  }
+
+  @Test
+  fun `referring a new person does not measure anything`() {
+    val crn1 = "T123456"
+    val crn2 = "W123456"
+    val intervention = interventionFactory.create()
+
+    createReferral(crn1, intervention, sentAtHour = 13)
+    val newReferral = createReferral(crn2, intervention, sentAtHour = 14)
 
     metricsListener.onApplicationEvent(createEvent(newReferral))
 
-    val reReferralTimer = registry.find("intervention.referral.repeat_time").timer()
-    assertThat(reReferralTimer).isNull()
+    assertThat(registry.find("intervention.referral.repeat_time").timer()).isNull()
+    assertThat(registry.find("intervention.referral.redirect_time").timer()).isNull()
   }
 }

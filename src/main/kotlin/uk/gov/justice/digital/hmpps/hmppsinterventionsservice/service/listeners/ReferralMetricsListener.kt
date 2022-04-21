@@ -9,7 +9,6 @@ import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import java.time.Duration
@@ -30,30 +29,38 @@ class ReferralMetricsListener(
     val previous = findPreviousReferral(current)
       ?: return
 
-    val timer = Timer.builder("intervention.referral.repeat_time")
-      .tag("crn", current.serviceUserCRN)
-      .tag("interventionId", current.intervention.id.toString())
-      .register(registry)
-
     val elapsedTime = Duration.between(previous.sentAt, current.sentAt)
-    timer.record(elapsedTime)
+    timer(previous, current).record(elapsedTime)
+  }
+
+  private fun timer(previous: Referral, current: Referral): Timer {
+    return if (current.intervention.id == previous.intervention.id) {
+      Timer.builder("intervention.referral.repeat_time")
+        .tag("crn", current.serviceUserCRN)
+        .tag("interventionId", current.intervention.id.toString())
+        .register(registry)
+    } else {
+      Timer.builder("intervention.referral.redirect_time")
+        .tag("crn", current.serviceUserCRN)
+        .register(registry)
+    }
   }
 
   private fun findPreviousReferral(current: Referral): Referral? {
     return repository.findAll(
-      otherReferrals(current.id, current.serviceUserCRN, current.intervention),
-      PageRequest.ofSize(1)
-        .withSort(Sort.Direction.DESC, "sentAt")
+      otherReferralsForSamePerson(current.id, current.serviceUserCRN),
+      limitToLatestSent()
     ).firstOrNull()
   }
 
-  private fun otherReferrals(id: UUID, crn: String, intervention: Intervention) =
+  private fun otherReferralsForSamePerson(id: UUID, crn: String) =
     Specification<Referral> { r, _, cb ->
       cb.and(
         cb.notEqual(r.get<String>("id"), id),
-        cb.equal(r.get<Intervention>("intervention"), intervention),
         cb.equal(r.get<String>("serviceUserCRN"), crn),
         cb.isNotNull(r.get<OffsetDateTime?>("sentAt"))
       )
     }
+
+  private fun limitToLatestSent() = PageRequest.ofSize(1).withSort(Sort.Direction.DESC, "sentAt")
 }
