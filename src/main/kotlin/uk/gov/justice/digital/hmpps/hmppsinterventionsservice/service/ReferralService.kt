@@ -42,8 +42,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Ref
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSummariesRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.specification.ReferralSpecifications
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ProbationPractitionerRole.RESPONSIBLE_OFFICER
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ProbationPractitionerRole.SENDER
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -55,12 +53,7 @@ data class ResponsibleProbationPractitioner(
   val deliusStaffId: Long?,
   val authUser: AuthUser?,
   override val lastName: String,
-  var role: ProbationPractitionerRole = SENDER
 ) : ContactablePerson
-
-enum class ProbationPractitionerRole {
-  RESPONSIBLE_OFFICER, SENDER
-}
 
 @Service
 @Transactional
@@ -664,20 +657,6 @@ class ReferralService(
   fun getResponsibleProbationPractitioner(referral: Referral): ResponsibleProbationPractitioner {
     val sentBy = referral.sentBy?.let { it } ?: null
     return getResponsibleProbationPractitioner(referral.serviceUserCRN, sentBy, referral.createdBy)
-  }
-
-  fun getResponsibleProbationPractitioner(referral: Referral, user: AuthUser): ResponsibleProbationPractitioner {
-    val sentBy = referral.sentBy?.let { it } ?: null
-    return getResponsibleProbationPractitioner(referral.serviceUserCRN, sentBy, referral.createdBy, user)
-  }
-
-  fun getResponsibleProbationPractitioner(crn: String, sentBy: AuthUser?, createdBy: AuthUser, user: AuthUser): ResponsibleProbationPractitioner {
-    val responsibleProbationPractitioner = getResponsibleProbationPractitioner(crn, sentBy, createdBy)
-    val isUserResponsibleOfficer = isUserTheResponsibleOfficer(responsibleProbationPractitioner, user)
-    if (isUserResponsibleOfficer) {
-      responsibleProbationPractitioner.role = RESPONSIBLE_OFFICER
-    }
-    return responsibleProbationPractitioner
   }
 
   fun getResponsibleProbationPractitioner(crn: String, sentBy: AuthUser?, createdBy: AuthUser): ResponsibleProbationPractitioner {

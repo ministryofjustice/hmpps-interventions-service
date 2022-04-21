@@ -50,8 +50,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Ref
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSummariesRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ProbationPractitionerRole.RESPONSIBLE_OFFICER
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ProbationPractitionerRole.SENDER
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
@@ -1124,46 +1122,6 @@ class ReferralServiceTest @Autowired constructor(
     assertThat(updatedReferral.selectedServiceCategories).hasSize(1)
     assertThat(updatedReferral.selectedServiceCategories!!.elementAt(0).id).isEqualTo(serviceCategoryId)
     assertThat(updatedReferral.selectedDesiredOutcomes).hasSize(1)
-  }
-
-  @Test
-  fun `check if responsible probation practitioner for the referral is returned with responsibe officer as its role`() {
-
-    whenever(communityAPIOffenderService.getResponsibleOfficer(any())).thenReturn(ResponsibleOfficer("abc", "abc@abc.com", 123456L, "def"))
-    val authUser = AuthUser("123457", "delius", "bernard.beaks")
-    val createByAuthUser = AuthUser("123458", "delius", "bernard.beaks")
-    whenever(communityAPIOffenderService.getStaffIdentifier(authUser)).thenReturn(123456L)
-    whenever(hmppsAuthService.getUserDetail(createByAuthUser)).thenReturn(UserDetail("bernard", "beaks", "bernard.beaks@gmail.com"))
-
-    val expectedResponsibleProbationPractitioner = ResponsibleProbationPractitioner("abc", "abc@abc.com", 123456L, null, "def", RESPONSIBLE_OFFICER)
-
-    val responsibleProbationPractitioner = referralService.getResponsibleProbationPractitioner(
-      crn = "D007516",
-      sentBy = null,
-      createdBy = createByAuthUser,
-      user = authUser
-    )
-    assertThat(responsibleProbationPractitioner).isEqualTo(expectedResponsibleProbationPractitioner)
-  }
-
-  @Test
-  fun `check if responsible probation practitioner for the referral is returned with sender as its role`() {
-
-    whenever(communityAPIOffenderService.getResponsibleOfficer(any())).thenReturn(ResponsibleOfficer("abc", "abc@abc.com", 123456L, "def"))
-    val authUser = AuthUser("123457", "delius", "bernard.beaks")
-    val createByAuthUser = AuthUser("123458", "delius", "bernard.beaks")
-    whenever(communityAPIOffenderService.getStaffIdentifier(authUser)).thenReturn(123458L)
-    whenever(hmppsAuthService.getUserDetail(createByAuthUser)).thenReturn(UserDetail("bernard", "beaks", "bernard.beaks@gmail.com"))
-
-    val expectedResponsibleProbationPractitioner = ResponsibleProbationPractitioner("abc", "abc@abc.com", 123456L, null, "def", SENDER)
-
-    val responsibleProbationPractitioner = referralService.getResponsibleProbationPractitioner(
-      crn = "D007516",
-      sentBy = null,
-      createdBy = createByAuthUser,
-      user = authUser
-    )
-    assertThat(responsibleProbationPractitioner).isEqualTo(expectedResponsibleProbationPractitioner)
   }
 
   @Test

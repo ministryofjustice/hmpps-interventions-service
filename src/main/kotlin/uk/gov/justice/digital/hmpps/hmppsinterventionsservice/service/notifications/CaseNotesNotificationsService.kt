@@ -10,7 +10,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.CreateCaseN
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.AsyncEventExceptionHandling
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ProbationPractitionerRole.RESPONSIBLE_OFFICER
 import java.util.UUID
 import javax.transaction.Transactional
 
@@ -40,10 +39,11 @@ class CaseNotesNotificationsService(
   }
 
   private fun emailResponsibleProbationPractitioner(referral: Referral, sender: AuthUser, caseNoteId: UUID) {
-    val responsibleOfficer = referralService.getResponsibleProbationPractitioner(referral, sender)
+    val responsibleOfficer = referralService.getResponsibleProbationPractitioner(referral)
+    val senderIsResponsibleOfficer = referralService.isUserTheResponsibleOfficer(responsibleOfficer, sender)
 
     // if the case note was sent by someone other than the RO, email the RO
-    if (responsibleOfficer.role != RESPONSIBLE_OFFICER) {
+    if (!senderIsResponsibleOfficer) {
       emailSender.sendEmail(
         sentTemplate,
         responsibleOfficer.email,
