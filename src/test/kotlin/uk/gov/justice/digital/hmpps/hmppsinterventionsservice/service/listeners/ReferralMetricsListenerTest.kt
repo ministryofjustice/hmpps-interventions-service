@@ -58,11 +58,13 @@ internal class ReferralMetricsListenerTest @Autowired constructor(
       metricsListener.onApplicationEvent(createEvent(referral))
     }
 
-    registry.find("intervention.referral.repeat_time").timer().let {
+    registry.find("intervention.referral.repeated_time").tag("intervention", "same").timer().let {
       assertThat(it?.count()).isEqualTo(2)
       assertThat(it?.totalTime(TimeUnit.HOURS)).isEqualTo(2.0)
     }
-    assertThat(registry.find("intervention.referral.redirect_time").timer()).isNull()
+    assertThat(
+      registry.find("intervention.referral.repeated_time").tag("intervention", "different").timers()
+    ).isEmpty()
   }
 
   @Test
@@ -74,11 +76,13 @@ internal class ReferralMetricsListenerTest @Autowired constructor(
       metricsListener.onApplicationEvent(createEvent(referral))
     }
 
-    registry.find("intervention.referral.redirect_time").timer().let {
+    registry.find("intervention.referral.repeated_time").tag("intervention", "different").timer().let {
       assertThat(it?.count()).isEqualTo(2)
       assertThat(it?.totalTime(TimeUnit.HOURS)).isEqualTo(2.0)
     }
-    assertThat(registry.find("intervention.referral.repeat_time").timer()).isNull()
+    assertThat(
+      registry.find("intervention.referral.repeated_time").tag("intervention", "same").timers()
+    ).isEmpty()
   }
 
   @Test
@@ -92,7 +96,6 @@ internal class ReferralMetricsListenerTest @Autowired constructor(
 
     metricsListener.onApplicationEvent(createEvent(newReferral))
 
-    assertThat(registry.find("intervention.referral.repeat_time").timer()).isNull()
-    assertThat(registry.find("intervention.referral.redirect_time").timer()).isNull()
+    assertThat(registry.find("intervention.referral.repeated_time").timers()).isEmpty()
   }
 }
