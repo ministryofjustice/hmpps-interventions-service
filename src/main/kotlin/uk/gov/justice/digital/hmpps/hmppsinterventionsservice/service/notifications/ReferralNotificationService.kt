@@ -11,9 +11,13 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralDetail
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.AsyncEventExceptionHandling
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.NotifyService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.UserDetail
+import java.net.URI
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
@@ -31,6 +35,7 @@ class ReferralNotificationService(
   private val emailSender: EmailSender,
   private val hmppsAuthService: HMPPSAuthService,
   private val authUserRepository: AuthUserRepository,
+  private val referralService: ReferralService
 ) : ApplicationListener<ReferralEvent>, NotifyService {
 
   companion object : KLogging()
@@ -77,22 +82,36 @@ class ReferralNotificationService(
     val newDetails = event.data["newDetails"] as ReferralDetailsDTO
     val previousDetails = event.data["previousDetails"] as ReferralDetailsDTO
     val currentAssignee = event.data["currentAssignee"] as AuthUserDTO? ?: return
+    val crn = event.data["crn"] as String
+    val sentBy = event.data["sentBy"] as AuthUser?
+    val createdBy = event.data["createdBy"] as AuthUser
 
     val recipient = hmppsAuthService.getUserDetail(currentAssignee)
-    val updater = hmppsAuthService.getUserDetail(authUserRepository.findByIdOrNull(newDetails.createdById)!!)
+    val newDetailsCreatedAuthUser = authUserRepository.findByIdOrNull(newDetails.createdById)
+    val updater = hmppsAuthService.getUserDetail(newDetailsCreatedAuthUser!!)
+    val responsibleProbationPractitioner = referralService.getResponsibleProbationPractitioner(crn, sentBy, createdBy)
+    val isUserTheResponsibleOfficer = referralService.isUserTheResponsibleOfficer(responsibleProbationPractitioner, newDetailsCreatedAuthUser)
     val frontendUrl = generateResourceUrl(interventionsUIBaseURL, spReferralDetailsLocation, event.referral.id)
 
     if (newDetails.completionDeadline != previousDetails.completionDeadline) {
-      emailSender.sendEmail(
-        completionDeadlineUpdatedTemplateID, recipient.email,
-        mapOf(
-          "caseworkerFirstName" to recipient.firstName,
-          "newCompletionDeadline" to formatDate(newDetails.completionDeadline!!),
-          "previousCompletionDeadline" to formatDate(previousDetails.completionDeadline!!),
-          "changedByName" to "${updater.firstName} ${updater.lastName}",
-          "referralDetailsUrl" to frontendUrl.toString(),
-        )
+      sendEmail(
+        recipient.email,
+        recipient.firstName,
+        newDetails,
+        previousDetails,
+        updater,
+        frontendUrl
       )
+      if (!isUserTheResponsibleOfficer) {
+        sendEmail(
+          responsibleProbationPractitioner.email,
+          recipient.firstName,
+          newDetails,
+          previousDetails,
+          updater,
+          frontendUrl
+        )
+      }
     }
 
     if (newDetails.maximumEnforceableDays != previousDetails.maximumEnforceableDays) {
@@ -107,6 +126,26 @@ class ReferralNotificationService(
         )
       )
     }
+  }
+
+  private fun sendEmail(
+    email: String,
+    firstName: String,
+    newDetails: ReferralDetailsDTO,
+    previousDetails: ReferralDetailsDTO,
+    updater: UserDetail,
+    frontendUrl: URI
+  ) {
+    emailSender.sendEmail(
+      completionDeadlineUpdatedTemplateID, email,
+      mapOf(
+        "caseworkerFirstName" to firstName,
+        "newCompletionDeadline" to formatDate(newDetails.completionDeadline!!),
+        "previousCompletionDeadline" to formatDate(previousDetails.completionDeadline!!),
+        "changedByName" to "${updater.firstName} ${updater.lastName}",
+        "referralDetailsUrl" to frontendUrl.toString(),
+      )
+    )
   }
 
   private fun formatDate(date: LocalDate): String {

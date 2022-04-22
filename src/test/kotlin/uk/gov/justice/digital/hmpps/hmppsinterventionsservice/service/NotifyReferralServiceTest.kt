@@ -34,6 +34,7 @@ class NotifyReferralServiceTest {
   private val emailSender = mock<EmailSender>()
   private val hmppsAuthService = mock<HMPPSAuthService>()
   private val authUserRepository = mock<AuthUserRepository>()
+  private val referralService = mock<ReferralService>()
   private val referralFactory = ReferralFactory()
   private val authUserFactory = AuthUserFactory()
 
@@ -69,6 +70,7 @@ class NotifyReferralServiceTest {
       emailSender,
       hmppsAuthService,
       authUserRepository,
+      referralService
     )
   }
 
@@ -141,7 +143,10 @@ class NotifyReferralServiceTest {
               completionDeadline = LocalDate.of(2022, 4, 13)
             )
           ),
-          "currentAssignee" to if (assigned) AuthUserDTO.from(referral.currentAssignee!!) else null
+          "currentAssignee" to if (assigned) AuthUserDTO.from(referral.currentAssignee!!) else null,
+          "crn" to referral.serviceUserCRN,
+          "sentBy" to referral.sentBy,
+          "createdBy" to referral.createdBy
         )
       )
     }
@@ -168,7 +173,10 @@ class NotifyReferralServiceTest {
               maximumNumberOfEnforceableDays = 3
             )
           ),
-          "currentAssignee" to if (assigned) AuthUserDTO.from(referral.currentAssignee!!) else null
+          "currentAssignee" to if (assigned) AuthUserDTO.from(referral.currentAssignee!!) else null,
+          "crn" to referral.serviceUserCRN,
+          "sentBy" to referral.sentBy,
+          "createdBy" to referral.createdBy
         )
       )
     }
@@ -178,10 +186,34 @@ class NotifyReferralServiceTest {
       whenever(authUserRepository.findById(referral.createdBy.id)).thenReturn(Optional.of(referral.createdBy))
       whenever(hmppsAuthService.getUserDetail(referral.createdBy)).thenReturn(UserDetail("sally", "sally@tom.com", "smith"))
       whenever(hmppsAuthService.getUserDetail(AuthUserDTO.from(referral.currentAssignee!!))).thenReturn(UserDetail("tom", "tom@tom.tom", "jones"))
+      whenever(referralService.getResponsibleProbationPractitioner(any(), any(), any())).thenReturn(ResponsibleProbationPractitioner("abc", "abc@abc.com", null, null, "def"))
+      whenever(referralService.isUserTheResponsibleOfficer(any(), any())).thenReturn(true)
 
       notifyService().onApplicationEvent(makeReferralDetailsCompletionDeadlineChangedEvent(true))
       val personalisationCaptor = argumentCaptor<Map<String, String>>()
       verify(emailSender).sendEmail(eq("completionDeadlineUpdatedTemplateID"), eq("tom@tom.tom"), personalisationCaptor.capture())
+      assertThat(personalisationCaptor.firstValue["caseworkerFirstName"]).isEqualTo("tom")
+      assertThat(personalisationCaptor.firstValue["newCompletionDeadline"]).isEqualTo("6 June 2022")
+      assertThat(personalisationCaptor.firstValue["previousCompletionDeadline"]).isEqualTo("13 April 2022")
+      assertThat(personalisationCaptor.firstValue["changedByName"]).isEqualTo("sally smith")
+      assertThat(personalisationCaptor.firstValue["referralDetailsUrl"]).isEqualTo("http://example.com/referral/${referral.id}")
+
+      // reason for change contains sensitive information
+      assertThat(personalisationCaptor.firstValue["reasonForChange"]).isNull()
+    }
+
+    @Test
+    fun `referral details changed event sends email to responsible officer when completion deadline has changed`() {
+      whenever(authUserRepository.findById(referral.createdBy.id)).thenReturn(Optional.of(referral.createdBy))
+      whenever(hmppsAuthService.getUserDetail(referral.createdBy)).thenReturn(UserDetail("sally", "sally@tom.com", "smith"))
+      whenever(hmppsAuthService.getUserDetail(AuthUserDTO.from(referral.currentAssignee!!))).thenReturn(UserDetail("tom", "tom@tom.tom", "jones"))
+      whenever(referralService.getResponsibleProbationPractitioner(any(), any(), any())).thenReturn(ResponsibleProbationPractitioner("abc", "abc@abc.com", null, null, "def"))
+      whenever(referralService.isUserTheResponsibleOfficer(any(), any())).thenReturn(false)
+
+      notifyService().onApplicationEvent(makeReferralDetailsCompletionDeadlineChangedEvent(true))
+      val personalisationCaptor = argumentCaptor<Map<String, String>>()
+      verify(emailSender).sendEmail(eq("completionDeadlineUpdatedTemplateID"), eq("tom@tom.tom"), personalisationCaptor.capture())
+      verify(emailSender).sendEmail(eq("completionDeadlineUpdatedTemplateID"), eq("abc@abc.com"), personalisationCaptor.capture())
       assertThat(personalisationCaptor.firstValue["caseworkerFirstName"]).isEqualTo("tom")
       assertThat(personalisationCaptor.firstValue["newCompletionDeadline"]).isEqualTo("6 June 2022")
       assertThat(personalisationCaptor.firstValue["previousCompletionDeadline"]).isEqualTo("13 April 2022")

@@ -54,7 +54,10 @@ class ReferralEventPublisher(
         mapOf(
           "newDetails" to ReferralDetailsDTO.from(newDetails),
           "previousDetails" to ReferralDetailsDTO.from(previousDetails),
-          "currentAssignee" to referral.currentAssignee?.let { AuthUserDTO.from(it) }
+          "currentAssignee" to referral.currentAssignee?.let { AuthUserDTO.from(it) },
+          "crn" to referral.serviceUserCRN,
+          "sentBy" to referral.sentBy,
+          "createdBy" to referral.createdBy
         )
       )
     )
