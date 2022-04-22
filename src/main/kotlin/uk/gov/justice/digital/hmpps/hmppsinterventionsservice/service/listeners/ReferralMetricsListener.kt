@@ -34,16 +34,14 @@ class ReferralMetricsListener(
   }
 
   private fun timer(previous: Referral, current: Referral): Timer {
-    return if (current.intervention.id == previous.intervention.id) {
-      Timer.builder("intervention.referral.repeat_time")
-        .tag("crn", current.serviceUserCRN)
-        .tag("interventionId", current.intervention.id.toString())
-        .register(registry)
-    } else {
-      Timer.builder("intervention.referral.redirect_time")
-        .tag("crn", current.serviceUserCRN)
-        .register(registry)
-    }
+    val interventionKind =
+      if (current.intervention.id == previous.intervention.id) "same"
+      else "different"
+
+    return Timer.builder("intervention.referral.repeated_time")
+      .tag("crn", current.serviceUserCRN)
+      .tag("intervention", interventionKind)
+      .register(registry)
   }
 
   private fun findPreviousReferral(current: Referral): Referral? {
