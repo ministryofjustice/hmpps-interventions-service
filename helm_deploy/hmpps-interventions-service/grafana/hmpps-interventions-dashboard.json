@@ -17,7 +17,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 1,
-  "iteration": 1650452889338,
+  "iteration": 1648808383727,
   "links": [],
   "panels": [
     {
@@ -167,7 +167,7 @@
         "cardRound": null
       },
       "color": {
-        "cardColor": "#B877D9",
+        "cardColor": "#FADE2A",
         "colorScale": "sqrt",
         "colorScheme": "interpolateMagma",
         "exponent": 0.2,
@@ -190,7 +190,7 @@
       "heatmap": {},
       "hideZeroBuckets": false,
       "highlightCards": true,
-      "id": 20,
+      "id": 18,
       "legend": {
         "show": true
       },
@@ -199,7 +199,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "sum by (le)(\n  increase(\n    nginx_ingress_controller_request_duration_seconds_bucket{\n      exported_namespace =~ \"$namespace\",\n      exported_service = \"hmpps-interventions-ui\",\n    }[1m]\n  )\n)",
+          "expr": "sum by (le)(\n  increase(\n    nginx_ingress_controller_request_duration_seconds_bucket{\n      exported_namespace =~ \"$namespace\",\n      exported_service = \"api-suspect\",\n    }[1m]\n  )\n)",
           "format": "heatmap",
           "interval": "1m",
           "intervalFactor": 1,
@@ -207,7 +207,7 @@
           "refId": "A"
         }
       ],
-      "title": "UI request durations",
+      "title": "Dashboard request durations",
       "tooltip": {
         "show": true,
         "showHistogram": false
@@ -363,7 +363,7 @@
         "cardRound": null
       },
       "color": {
-        "cardColor": "#FF9830",
+        "cardColor": "#B877D9",
         "colorScale": "sqrt",
         "colorScheme": "interpolateMagma",
         "exponent": 0.2,
@@ -386,7 +386,7 @@
       "heatmap": {},
       "hideZeroBuckets": false,
       "highlightCards": true,
-      "id": 19,
+      "id": 20,
       "legend": {
         "show": true
       },
@@ -395,16 +395,15 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "sum by (le)(\n  increase(\n    nginx_ingress_controller_request_duration_seconds_bucket{\n      exported_namespace =~ \"$namespace\",\n      exported_service = \"hmpps-interventions-service\",\n    }[1m]\n  )\n)",
+          "expr": "sum by (le)(\n  increase(\n    nginx_ingress_controller_request_duration_seconds_bucket{\n      exported_namespace =~ \"$namespace\",\n      exported_service = \"hmpps-interventions-ui\",\n    }[1m]\n  )\n)",
           "format": "heatmap",
-          "instant": false,
           "interval": "1m",
           "intervalFactor": 1,
           "legendFormat": "{{le}}",
           "refId": "A"
         }
       ],
-      "title": "Service request durations",
+      "title": "UI request durations",
       "tooltip": {
         "show": true,
         "showHistogram": false
@@ -551,10 +550,10 @@
         "cardRound": null
       },
       "color": {
-        "cardColor": "#5794F2",
+        "cardColor": "#FF9830",
         "colorScale": "sqrt",
         "colorScheme": "interpolateMagma",
-        "exponent": 0.4,
+        "exponent": 0.2,
         "min": null,
         "mode": "opacity"
       },
@@ -574,7 +573,7 @@
       "heatmap": {},
       "hideZeroBuckets": false,
       "highlightCards": true,
-      "id": 22,
+      "id": 19,
       "legend": {
         "show": true
       },
@@ -583,16 +582,16 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "sum by (le)(\n  increase(\n    nginx_ingress_controller_request_duration_seconds_bucket{\n      exported_namespace =~ \"$namespace\",\n      exported_service = \"performance-report\",\n    }[5m]\n  )\n)",
+          "expr": "sum by (le)(\n  increase(\n    nginx_ingress_controller_request_duration_seconds_bucket{\n      exported_namespace =~ \"$namespace\",\n      exported_service = \"hmpps-interventions-service\",\n    }[1m]\n  )\n)",
           "format": "heatmap",
           "instant": false,
           "interval": "1m",
-          "intervalFactor": 5,
+          "intervalFactor": 1,
           "legendFormat": "{{le}}",
           "refId": "A"
         }
       ],
-      "title": "Performance report request durations",
+      "title": "Service request durations",
       "tooltip": {
         "show": true,
         "showHistogram": false
@@ -725,114 +724,75 @@
       }
     },
     {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Prometheus",
+      "cards": {
+        "cardPadding": null,
+        "cardRound": null
+      },
+      "color": {
+        "cardColor": "#5794F2",
+        "colorScale": "sqrt",
+        "colorScheme": "interpolateMagma",
+        "exponent": 0.4,
+        "min": null,
+        "mode": "opacity"
+      },
+      "dataFormat": "tsbuckets",
+      "datasource": null,
       "description": "",
       "fieldConfig": {
-        "defaults": {
-          "unit": "short"
-        },
+        "defaults": {},
         "overrides": []
       },
-      "fill": 1,
-      "fillGradient": 0,
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
         "y": 25
       },
-      "hiddenSeries": false,
-      "id": 23,
+      "heatmap": {},
+      "hideZeroBuckets": false,
+      "highlightCards": true,
+      "id": 22,
       "legend": {
-        "avg": false,
-        "current": false,
-        "hideZero": true,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
+        "show": true
       },
-      "lines": false,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
       "pluginVersion": "7.5.9",
-      "pointradius": 2,
-      "points": true,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
+      "reverseYBuckets": false,
       "targets": [
         {
           "exemplar": true,
-          "expr": "avg(rate(nginx_ingress_controller_requests{status=~\"5..\",exported_namespace=\"$namespace\"}[1m])*60) by(exported_service,status)",
-          "format": "time_series",
-          "interval": "60s",
-          "intervalFactor": 1,
-          "legendFormat": "{{exported_service}}@{{ status }}",
+          "expr": "sum by (le)(\n  increase(\n    nginx_ingress_controller_request_duration_seconds_bucket{\n      exported_namespace =~ \"$namespace\",\n      exported_service = \"performance-report\",\n    }[5m]\n  )\n)",
+          "format": "heatmap",
+          "instant": false,
+          "interval": "1m",
+          "intervalFactor": 5,
+          "legendFormat": "{{le}}",
           "refId": "A"
         }
       ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "5xx responses",
+      "title": "Performance report request durations",
       "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "transformations": [
-        {
-          "id": "filterByRefId",
-          "options": {}
-        }
-      ],
-      "transparent": true,
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
         "show": true,
-        "values": []
+        "showHistogram": false
       },
-      "yaxes": [
-        {
-          "$$hashKey": "object:102",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": "0.00001",
-          "show": true
-        },
-        {
-          "$$hashKey": "object:103",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
+      "type": "heatmap",
+      "xAxis": {
+        "show": true
+      },
+      "xBucketNumber": null,
+      "xBucketSize": "",
+      "yAxis": {
+        "decimals": null,
+        "format": "s",
+        "logBase": 1,
+        "max": null,
+        "min": null,
+        "show": true,
+        "splitFactor": null
+      },
+      "yBucketBound": "auto",
+      "yBucketNumber": null,
+      "yBucketSize": null
     },
     {
       "aliasColors": {
@@ -1082,7 +1042,7 @@
         "y": 41
       },
       "hiddenSeries": false,
-      "id": 24,
+      "id": 23,
       "legend": {
         "avg": false,
         "current": false,
@@ -1112,7 +1072,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "avg(rate(nginx_ingress_controller_requests{status=~\"2..|3..\",exported_namespace=\"$namespace\"}[1m])*60) by(exported_service,status)",
+          "expr": "avg(rate(nginx_ingress_controller_requests{status=~\"5..\",exported_namespace=\"$namespace\"}[1m])*60) by(exported_service,status)",
           "format": "time_series",
           "interval": "60s",
           "intervalFactor": 1,
@@ -1124,7 +1084,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "2xx, 3xx responses",
+      "title": "5xx responses",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1283,6 +1243,116 @@
       }
     },
     {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 49
+      },
+      "hiddenSeries": false,
+      "id": 24,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "hideZero": true,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.5.9",
+      "pointradius": 2,
+      "points": true,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "avg(rate(nginx_ingress_controller_requests{status=~\"2..|3..\",exported_namespace=\"$namespace\"}[1m])*60) by(exported_service,status)",
+          "format": "time_series",
+          "interval": "60s",
+          "intervalFactor": 1,
+          "legendFormat": "{{exported_service}}@{{ status }}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "2xx, 3xx responses",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transformations": [
+        {
+          "id": "filterByRefId",
+          "options": {}
+        }
+      ],
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:102",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": "0.00001",
+          "show": true
+        },
+        {
+          "$$hashKey": "object:103",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
       "cards": {
         "cardPadding": null,
         "cardRound": null
@@ -1362,7 +1432,7 @@
       {
         "allValue": null,
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "hmpps-interventions-prod",
           "value": "hmpps-interventions-prod"
         },
@@ -1393,7 +1463,7 @@
     ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-3h",
     "to": "now"
   },
   "timepicker": {
@@ -1423,5 +1493,5 @@
   "timezone": "browser",
   "title": "HMPPS Refer and monitor an intervention",
   "uid": "PyQ91ARnk",
-  "version": 2
+  "version": 1
 }
