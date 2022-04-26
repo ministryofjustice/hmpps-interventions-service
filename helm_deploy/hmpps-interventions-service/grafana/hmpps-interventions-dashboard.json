@@ -17,7 +17,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 1,
-  "iteration": 1650972113474,
+  "iteration": 1650972521835,
   "links": [],
   "panels": [
     {
@@ -850,7 +850,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "topk(10,avg by (uri)(300*rate(http_server_requests_seconds_sum{namespace='$namespace'}[5m])))",
+          "expr": "topk(10, quantile(0.99, 300*rate(http_server_requests_seconds_sum{namespace='$namespace'}[5m])) by (uri))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -862,7 +862,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Longest API requests",
+      "title": "Longest API requests (99th percentile)",
       "tooltip": {
         "shared": true,
         "sort": 0,
