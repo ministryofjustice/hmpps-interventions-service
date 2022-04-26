@@ -17,7 +17,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 1,
-  "iteration": 1650876944575,
+  "iteration": 1650960564709,
   "links": [],
   "panels": [
     {
@@ -625,6 +625,7 @@
       "dashes": false,
       "datasource": "Prometheus",
       "decimals": null,
+      "description": "",
       "fieldConfig": {
         "defaults": {},
         "overrides": []
@@ -670,11 +671,11 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "avg by (repository)(300*rate(spring_data_repository_invocations_seconds_sum{namespace='$namespace'}[5m]))",
+          "expr": "topk(10,avg by (uri)(300*rate(http_server_requests_seconds_sum{namespace='$namespace'}[5m])))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
-          "legendFormat": "{{ repository }}",
+          "legendFormat": "{{ uri }}",
           "refId": "A"
         }
       ],
@@ -682,7 +683,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Spring Repository invocations",
+      "title": "Longest API requests",
       "tooltip": {
         "shared": true,
         "sort": 0,
