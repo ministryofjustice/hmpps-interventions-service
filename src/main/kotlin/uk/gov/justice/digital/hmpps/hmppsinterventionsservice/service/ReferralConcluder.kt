@@ -43,7 +43,7 @@ class ReferralConcluder(
     if (totalNumberOfSessions == 0)
       return false
 
-    val numberOfSessionsAttempted = countSessionsAttempted(referral)
+    val numberOfSessionsAttempted = countSessionsAttended(referral)
     val allSessionsAttempted = totalNumberOfSessions == numberOfSessionsAttempted
     if (allSessionsAttempted)
       return true
@@ -86,6 +86,12 @@ class ReferralConcluder(
   private fun countSessionsAttempted(referral: Referral): Int {
     return referral.currentActionPlan?.let {
       actionPlanRepository.countNumberOfAttemptedSessions(referral.id)
+    } ?: 0
+  }
+
+  private fun countSessionsAttended(referral: Referral): Int {
+    return referral.currentActionPlan?.let {
+      actionPlanRepository.countNumberOfAttendedSessions(referral.id)
     } ?: 0
   }
 }
