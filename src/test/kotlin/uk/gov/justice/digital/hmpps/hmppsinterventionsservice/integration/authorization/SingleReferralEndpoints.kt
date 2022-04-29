@@ -219,11 +219,10 @@ class SingleReferralEndpoints : IntegrationTestBase() {
     response.expectStatus().isForbidden
     response.expectBody().json(
       """
-      {"accessErrors": [
-      "unidentified provider 'BETTER_LTD': group does not exist in the reference data",
-      "unidentified contract '0002': group does not exist in the reference data",
-      "no valid service provider groups associated with user",
-      "no valid contract groups associated with user"
+      {
+      "message": "You do not have permission to view this service",
+      "accessErrors": [
+      "Your provider group is not recognised. Ask an admin in your organisation to check it has been set up correctly in HMPPS Digital Services. <a target=\"_blank\" href=\"https://hmpps-interventions-ui-dev.apps.live-1.cloud-platform.service.justice.gov.uk/report-a-problem\">They may need to report it as a problem.</a>"
       ]}
       """.trimIndent()
     )
@@ -333,10 +332,8 @@ class SingleReferralEndpoints : IntegrationTestBase() {
     response.expectStatus().isForbidden
     response.expectBody().json(
       """
-      {"accessErrors": [
-      "unidentified contract '0002': group does not exist in the reference data",
-      "no valid contract groups associated with user"
-      ]}
+      {"message":"You do not have permission to view this service",
+      "accessErrors": ["Your contract group is not recognised. Ask an admin in your organisation to check it has been set up correctly in HMPPS Digital Services. <a target=\"_blank\" href=\"https://hmpps-interventions-ui-dev.apps.live-1.cloud-platform.service.justice.gov.uk/report-a-problem\">They may need to report it as a problem.</a>"]}
       """.trimIndent()
     )
   }
@@ -360,8 +357,7 @@ class SingleReferralEndpoints : IntegrationTestBase() {
     response.expectBody().json(
       """
       {"accessErrors": [
-      "no valid service provider groups associated with user",
-      "no valid contract groups associated with user"
+      "You do not have any supplier groups on your account. Ask an admin in your organisation to set this up in HMPPS Digital Services."
       ]}
       """.trimIndent()
     )
@@ -459,7 +455,7 @@ class SingleReferralEndpoints : IntegrationTestBase() {
     response.expectBody().json(
       """
       {"accessErrors": [
-      "cannot find user in hmpps auth"
+      "Your email address is not recognised. If it has changed recently, try signing out and signing in with the correct one. Ask an admin user in your organisation to check what the right email is in HMPPS Digital Services. If that does not work, <a target=\"_blank\" href=\"https://hmpps-interventions-ui-dev.apps.live-1.cloud-platform.service.justice.gov.uk/report-a-problem\">report it as a problem.</a>"
       ]}
       """.trimIndent()
     )

@@ -47,8 +47,8 @@ class ServiceProviderAccessScopeMapperTest {
   fun `throws AccessError if the user is not a service provider`() {
     val error = assertThrows<AccessError> { mapper.fromUser(ppUser) }
     assertThat(error.user).isEqualTo(ppUser)
-    assertThat(error.message).isEqualTo("could not map service provider user to access scope")
-    assertThat(error.errors).containsExactly("user is not a service provider")
+    assertThat(error.message).isEqualTo("You do not have permission to view this page")
+    assertThat(error.errors).containsExactly("Your account is not set up correctly. Ask an admin user in your organisation to add the ‘CRS provider’ role in HMPPS Digital Services.")
   }
 
   @Test
@@ -57,8 +57,8 @@ class ServiceProviderAccessScopeMapperTest {
 
     val error = assertThrows<AccessError> { mapper.fromUser(spUser) }
     assertThat(error.user).isEqualTo(spUser)
-    assertThat(error.message).isEqualTo("could not map service provider user to access scope")
-    assertThat(error.errors).containsExactly("cannot find user in hmpps auth")
+    assertThat(error.message).isEqualTo("You do not have permission to view this page")
+    assertThat(error.errors).containsExactly("Your email address is not recognised. If it has changed recently, try signing out and signing in with the correct one. Ask an admin user in your organisation to check what the right email is in HMPPS Digital Services. If that does not work, <a target=\"_blank\" href=\"https://hmpps-interventions-ui-dev.apps.live-1.cloud-platform.service.justice.gov.uk/report-a-problem\">report it as a problem.</a>")
   }
 
   // the business behaviour is tested through integration tests at

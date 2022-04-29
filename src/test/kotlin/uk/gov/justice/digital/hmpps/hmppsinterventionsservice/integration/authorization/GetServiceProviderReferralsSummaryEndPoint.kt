@@ -162,16 +162,6 @@ class GetServiceProviderReferralsSummaryEndPoint : IntegrationTestBase() {
     val token = createEncodedTokenForUser(user)
     val response = requestFactory.create(Request.GetServiceProviderReferralsSummary, token).exchange()
     response.expectStatus().isForbidden
-    response.expectBody().json(
-      """
-      {"accessErrors": [
-      "unidentified provider 'HOME_TRUST': group does not exist in the reference data",
-      "unidentified contract '0999': group does not exist in the reference data",
-      "no valid service provider groups associated with user",
-      "no valid contract groups associated with user"
-      ]}
-      """.trimIndent()
-    )
   }
 
   @Test
@@ -201,7 +191,7 @@ class GetServiceProviderReferralsSummaryEndPoint : IntegrationTestBase() {
     response.expectBody().json(
       """
       {"accessErrors": [
-      "cannot find user in hmpps auth"
+      "Your email address is not recognised. If it has changed recently, try signing out and signing in with the correct one. Ask an admin user in your organisation to check what the right email is in HMPPS Digital Services. If that does not work, <a target=\"_blank\" href=\"https://hmpps-interventions-ui-dev.apps.live-1.cloud-platform.service.justice.gov.uk/report-a-problem\">report it as a problem.</a>"
       ]}
       """.trimIndent()
     )

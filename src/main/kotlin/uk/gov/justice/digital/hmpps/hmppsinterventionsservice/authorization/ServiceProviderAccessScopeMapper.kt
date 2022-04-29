@@ -34,28 +34,70 @@ class ServiceProviderAccessScopeMapper(
 ) {
   private val serviceProviderGroupPrefix = "INT_SP_"
   private val contractGroupPrefix = "INT_CR_"
-  private val errorMessage = "could not map service provider user to access scope"
+  private val noAccessToPageHeader = "You do not have permission to view this page"
+  private val noAccessToServiceHeader = "You do not have permission to view this service"
 
   fun fromUser(user: AuthUser): ServiceProviderAccessScope {
     if (!userTypeChecker.isServiceProviderUser(user)) {
-      throw AccessError(user, errorMessage, listOf("user is not a service provider"))
+      throw AccessError(
+        user,
+        noAccessToPageHeader,
+        listOf("Your account is not set up correctly. Ask an admin user in your organisation to add the ‘CRS provider’ role in HMPPS Digital Services.")
+      )
     }
 
-    val groups = hmppsAuthService.getUserGroups(user)
-      ?: throw AccessError(user, errorMessage, listOf("cannot find user in hmpps auth"))
+    val groups = hmppsAuthService.getUserGroups(user) ?: throw AccessError(
+      user,
+      noAccessToPageHeader,
+      listOf("Your email address is not recognised. If it has changed recently, try signing out and signing in with the correct one. Ask an admin user in your organisation to check what the right email is in HMPPS Digital Services. If that does not work, <a target=\"_blank\" href=\"https://hmpps-interventions-ui-dev.apps.live-1.cloud-platform.service.justice.gov.uk/report-a-problem\">report it as a problem.</a>")
+    )
 
     // order is important as each step can mutate WorkingScope
     val workingScope = WorkingScope(authGroups = groups)
 
     resolveProviders(workingScope)
+    if (workingScope.errors.isNotEmpty()) {
+      throw AccessError(
+        user,
+        noAccessToServiceHeader,
+        listOf("Your provider group is not recognised. Ask an admin in your organisation to check it has been set up correctly in HMPPS Digital Services. <a target=\"_blank\" href=\"https://hmpps-interventions-ui-dev.apps.live-1.cloud-platform.service.justice.gov.uk/report-a-problem\">They may need to report it as a problem.</a>")
+      )
+    }
+
     resolveContracts(workingScope)
+    if (workingScope.errors.isNotEmpty()) {
+      throw AccessError(
+        user,
+        noAccessToServiceHeader,
+        listOf("Your contract group is not recognised. Ask an admin in your organisation to check it has been set up correctly in HMPPS Digital Services. <a target=\"_blank\" href=\"https://hmpps-interventions-ui-dev.apps.live-1.cloud-platform.service.justice.gov.uk/report-a-problem\">They may need to report it as a problem.</a>")
+      )
+    }
+
     removeInaccessibleContracts(workingScope)
+    if (workingScope.errors.isNotEmpty()) {
+      throw AccessError(
+        user,
+        noAccessToServiceHeader,
+        listOf("The contract and supplier groups on your account do not match. Ask an admin user in your organisation to fix this in HMPPS Digital Services.")
+      )
+    }
 
     blockUsersWithoutProviders(workingScope)
-    blockUsersWithoutContracts(workingScope)
-
     if (workingScope.errors.isNotEmpty()) {
-      throw AccessError(user, errorMessage, workingScope.errors)
+      throw AccessError(
+        user,
+        noAccessToServiceHeader,
+        listOf("You do not have any supplier groups on your account. Ask an admin in your organisation to set this up in HMPPS Digital Services.")
+      )
+    }
+
+    blockUsersWithoutContracts(workingScope)
+    if (workingScope.errors.isNotEmpty()) {
+      throw AccessError(
+        user,
+        noAccessToServiceHeader,
+        listOf("You do not have any contract groups on your account. Ask an admin in your organisation to set this up in HMPPS Digital Services.")
+      )
     }
 
     return ServiceProviderAccessScope(
@@ -77,8 +119,7 @@ class ServiceProviderAccessScopeMapper(
   }
 
   private fun resolveProviders(scope: WorkingScope) {
-    val serviceProviderGroups = scope.authGroups
-      .filter { it.startsWith(serviceProviderGroupPrefix) }
+    val serviceProviderGroups = scope.authGroups.filter { it.startsWith(serviceProviderGroupPrefix) }
       .map { it.removePrefix(serviceProviderGroupPrefix) }
 
     val providers = getProviders(serviceProviderGroups, scope.errors)
@@ -86,9 +127,8 @@ class ServiceProviderAccessScopeMapper(
   }
 
   private fun resolveContracts(scope: WorkingScope) {
-    val contractGroups = scope.authGroups
-      .filter { it.startsWith(contractGroupPrefix) }
-      .map { it.removePrefix(contractGroupPrefix) }
+    val contractGroups =
+      scope.authGroups.filter { it.startsWith(contractGroupPrefix) }.map { it.removePrefix(contractGroupPrefix) }
 
     val contracts = getContracts(contractGroups, scope.errors)
     scope.contracts.addAll(contracts)
@@ -126,7 +166,10 @@ class ServiceProviderAccessScopeMapper(
     return providers.sortedBy { it.id }
   }
 
-  private fun getContracts(contractGroups: List<String>, configErrors: MutableList<String>): List<DynamicFrameworkContract> {
+  private fun getContracts(
+    contractGroups: List<String>,
+    configErrors: MutableList<String>
+  ): List<DynamicFrameworkContract> {
     val contracts = dynamicFrameworkContractRepository.findAllByContractReferenceIn(contractGroups)
     val unidentifiedContracts = contractGroups.subtract(contracts.map { it.contractReference })
     unidentifiedContracts.forEach { undefinedContract ->
