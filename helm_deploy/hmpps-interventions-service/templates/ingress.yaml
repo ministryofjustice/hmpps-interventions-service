@@ -37,7 +37,7 @@ spec:
             backend:
               serviceName: default-http-backend
               servicePort: 80
-          - path: /sent-referrals/summary/service-provider
+          - path: /sent-referrals
             backend:
               serviceName: api-suspect
               servicePort: http
