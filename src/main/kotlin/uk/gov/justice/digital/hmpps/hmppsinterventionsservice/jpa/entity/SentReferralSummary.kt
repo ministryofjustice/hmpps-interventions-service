@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
+import org.hibernate.annotations.Where
 import java.time.OffsetDateTime
 import java.util.UUID
 import javax.persistence.CascadeType
@@ -59,12 +60,13 @@ class SentReferralSummary(
   @Id val id: UUID,
   @ElementCollection
   @CollectionTable(name = "referral_assignments")
+  @Where(clause = "superseded = false")
   val assignments: MutableList<ReferralAssignment> = mutableListOf(),
   @ManyToOne @Fetch(FetchMode.JOIN) var sentBy: AuthUser,
   var sentAt: OffsetDateTime,
   var concludedAt: OffsetDateTime? = null,
   var referenceNumber: String,
-  @OneToOne(mappedBy = "referral", cascade = arrayOf(CascadeType.ALL)) @PrimaryKeyJoinColumn var serviceUserData: ServiceUserData?,
+  @OneToOne(mappedBy = "referral", cascade = [CascadeType.ALL]) @PrimaryKeyJoinColumn var serviceUserData: ServiceUserData?,
   @NotNull @ManyToOne @Fetch(FetchMode.JOIN) val createdBy: AuthUser,
   var endRequestedAt: OffsetDateTime? = null,
   @NotNull @ManyToOne(fetch = FetchType.LAZY) val intervention: Intervention,
