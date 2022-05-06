@@ -313,7 +313,7 @@ class ReferralRepositoryTest @Autowired constructor(
     fun `does not show referrals where the user has been historically assigned but no longer the active assignee`() {
 
       val assignedReferral = createReferral(true, 2)
-      val oldAssignee = assignedReferral.assignments.get(0).assignedTo
+      val oldAssignee = assignedReferral.assignments[0].assignedTo
       val serviceProviderSearchId = assignedReferral.intervention.dynamicFrameworkContract.primeProvider.id
       val summaries = referralRepository.getSentReferralSummaries(oldAssignee, listOf(serviceProviderSearchId), DashboardType.myCases)
 
@@ -412,23 +412,19 @@ class ReferralRepositoryTest @Autowired constructor(
     numberOfAssignedUsers: Int = 1,
     intervention: Intervention? = null
   ): Referral {
-
-    val assignedUsers = mutableListOf<AuthUser>().apply {
-      repeat(numberOfAssignedUsers) { this.add(element = authUserFactory.create(random(6), random(5), random(12))) }
+    val assignedUsers = mutableListOf<ReferralAssignment>().apply {
+      repeat(numberOfAssignedUsers) {
+        val user = authUserFactory.create(random(6), random(5), random(12))
+        this.add(ReferralAssignment(OffsetDateTime.now(), assignedBy = user, assignedTo = user, superseded = true))
+      }
+      this.lastOrNull()?.superseded = false
     }
-    val referral: Referral = intervention?.let { intervention ->
-      referralFactory.createSent(
-        intervention = intervention,
-        assignments = assignedUsers.map { ReferralAssignment(OffsetDateTime.now(), assignedBy = it, assignedTo = it) }
-      )
-    } ?: run {
-      referralFactory.createSent(
-        intervention = createIntervention(asPrime),
-        assignments = assignedUsers.map { ReferralAssignment(OffsetDateTime.now(), assignedBy = it, assignedTo = it) }
-      )
-    }
+    val referral: Referral = referralFactory.createSent(
+      intervention = intervention ?: createIntervention(asPrime),
+      assignments = assignedUsers
+    )
 
-    val serviceUser = serviceUserFactory.create(random(15), random(16), referral)
+    serviceUserFactory.create(random(15), random(16), referral)
     return entityManager.refresh(referral)
   }
 
@@ -439,28 +435,19 @@ class ReferralRepositoryTest @Autowired constructor(
     hasEosr: Boolean = false,
     intervention: Intervention? = null
   ): Referral {
-
     val user = authUserFactory.create(random(6), random(5), random(12))
-    val referral: Referral = intervention?.let { intervention ->
-      referralFactory.createEnded(
-        intervention = intervention,
-        assignments = listOf(ReferralAssignment(OffsetDateTime.now(), assignedBy = user, assignedTo = user)),
-        endRequestedAt = endRequestedAt,
-        concludedAt = concludedAt,
-      )
-    } ?: run {
-      referralFactory.createEnded(
-        intervention = createIntervention(asPrime),
-        assignments = listOf(ReferralAssignment(OffsetDateTime.now(), assignedBy = user, assignedTo = user)),
-        endRequestedAt = endRequestedAt,
-        concludedAt = concludedAt,
-      )
-    }
+    val referral: Referral = referralFactory.createEnded(
+      intervention = intervention ?: createIntervention(asPrime),
+      assignments = listOf(ReferralAssignment(OffsetDateTime.now(), assignedBy = user, assignedTo = user)),
+      endRequestedAt = endRequestedAt,
+      concludedAt = concludedAt,
+    )
+
     if (hasEosr) {
       referral.endOfServiceReport = endOfServiceReport.create(referral = referral, submittedAt = OffsetDateTime.now())
     }
-    val serviceUser = serviceUserFactory.create(random(15), random(16), referral)
 
+    serviceUserFactory.create(random(15), random(16), referral)
     return entityManager.refresh(referral)
   }
 
