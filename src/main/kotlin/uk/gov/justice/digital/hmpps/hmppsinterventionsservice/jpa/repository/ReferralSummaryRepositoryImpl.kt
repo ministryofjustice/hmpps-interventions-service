@@ -15,19 +15,7 @@ class ReferralSummaryRepositoryImpl : ReferralSummaryRepository {
 
   private fun summariesQuery(customCriteria: String?): String {
     val dashboardRestrictionCriteria = customCriteria?.let { " $customCriteria " } ?: ""
-    return """select 
-      referralId, 
-      sentAt,
-			referenceNumber,
-			interventionTitle,
-      dynamicFrameworkContractId,
-			assignedToUserName,
-			serviceUserFirstName,
-			serviceUserLastName,
-      endOfServiceReportId,
-      endOfServiceReportSubmittedAt,
-      concludedAt from (	
-	select
+    return """select
 			cast(r.id as varchar) AS referralId,
 			cast(r.sent_at as TIMESTAMP WITH TIME ZONE) as sentAt,
 			r.reference_number as referenceNumber,
@@ -38,14 +26,13 @@ class ReferralSummaryRepositoryImpl : ReferralSummaryRepository {
 			rsud.last_name as serviceUserLastName,
       cast(eosr.id as varchar) as endOfServiceReportId,
       cast(eosr.submitted_at as TIMESTAMP WITH TIME ZONE) as endOfServiceReportSubmittedAt,
-			row_number() over(partition by r.id order by ra.assigned_at desc) as assigned_at_desc_seq,
       cast(r.concluded_at as TIMESTAMP WITH TIME ZONE) as concludedAt
 	from referral r
 			 inner join intervention i on i.id = r.intervention_id
 			 left join referral_service_user_data rsud on rsud.referral_id = r.id
 			 inner join dynamic_framework_contract dfc on dfc.id = i.dynamic_framework_contract_id
 			 left join dynamic_framework_contract_sub_contractor dfcsc on dfcsc.dynamic_framework_contract_id = dfc.id
-			 left join referral_assignments ra on ra.referral_id = r.id
+			 left join referral_assignments ra on ra.referral_id = r.id and ra.superseded = false
 			 left join auth_user au on au.id = ra.assigned_to_id
 			 left join end_of_service_report eosr on eosr.referral_id = r.id
 			 left outer join action_plan ap on ap.referral_id = r.id
@@ -60,7 +47,7 @@ class ReferralSummaryRepositoryImpl : ReferralSummaryRepository {
 	 	        and app.attendance_submitted_at is null -- supplier assessment feedback not submitted
             and ap.submitted_at is null -- action plan has not been submitted
         ) -- filter out referrals that are cancelled with SAA feedback not completed yet or cancelled with no action plan submitted
-) a where assigned_at_desc_seq = 1 $dashboardRestrictionCriteria"""
+      $dashboardRestrictionCriteria"""
   }
 
   override fun getSentReferralSummaries(authUser: AuthUser, serviceProviders: List<String>, dashboardType: DashboardType?): List<ServiceProviderSentReferralSummary> {
