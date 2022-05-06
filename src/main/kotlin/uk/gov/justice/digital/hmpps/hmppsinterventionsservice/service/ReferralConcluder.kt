@@ -59,12 +59,12 @@ class ReferralConcluder(
 
     val hasActionPlan = nonNull(referral.currentActionPlan)
 
-    val numberOfAttemptedSessions = countSessionsAttempted(referral)
-    val hasAttemptedNoSessions = numberOfAttemptedSessions == 0
+    val numberOfAttendedSessions = countSessionsAttended(referral)
+    val hasAttemptedNoSessions = numberOfAttendedSessions == 0
 
     val totalNumberOfSessions = referral.currentActionPlan?.numberOfSessions ?: 0
-    val hasAttemptedSomeSessions = totalNumberOfSessions > numberOfAttemptedSessions
-    val hasAttemptedAllSessions = totalNumberOfSessions == numberOfAttemptedSessions
+    val hasAttemptedSomeSessions = totalNumberOfSessions > numberOfAttendedSessions
+    val hasAttemptedAllSessions = totalNumberOfSessions == numberOfAttendedSessions
 
     val hasSubmittedEndOfServiceReport = referral.endOfServiceReport?.submittedAt?.let { true } ?: false
 
