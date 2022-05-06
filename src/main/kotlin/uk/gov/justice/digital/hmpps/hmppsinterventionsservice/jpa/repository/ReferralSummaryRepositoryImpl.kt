@@ -76,10 +76,10 @@ class ReferralSummaryRepositoryImpl : ReferralSummaryRepository {
 
   private fun constructCustomCriteria(dashboardType: DashboardType?): String? {
     return when (dashboardType) {
-      DashboardType.myCases -> "and assignedToUserName = :username and concludedAt is null "
-      DashboardType.openCases -> "and concludedAt is null "
-      DashboardType.unassignedCases -> "and assignedToUserName is null and concludedAt is null "
-      DashboardType.completedCases -> "and concludedAt is not null "
+      DashboardType.myCases -> "and au.user_name = :username and r.concluded_at is null "
+      DashboardType.openCases -> "and r.concluded_at is null "
+      DashboardType.unassignedCases -> "and au.user_name is null and r.concluded_at is null "
+      DashboardType.completedCases -> "and r.concluded_at is not null "
       null -> null
     }
   }
