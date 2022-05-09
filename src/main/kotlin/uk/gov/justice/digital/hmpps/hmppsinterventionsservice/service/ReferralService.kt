@@ -142,21 +142,6 @@ class ReferralService(
     throw AccessError(user, "unsupported user type", listOf("logins from ${user.authSource} are not supported"))
   }
 
-  @Deprecated("deprecated as this method will be replaced by getSentReferralSummaryForUser")
-  fun getSentReferralsForUser(user: AuthUser, concluded: Boolean?, cancelled: Boolean?, unassigned: Boolean?, assignedToUserId: String?, page: Pageable?): Iterable<Referral> {
-    val findSentReferralsSpec: Specification<Referral> = createSpecification(concluded, cancelled, unassigned, assignedToUserId)
-
-    if (userTypeChecker.isServiceProviderUser(user)) {
-      return getSentReferralsForServiceProviderUser(user, findSentReferralsSpec, page)
-    }
-
-    if (userTypeChecker.isProbationPractitionerUser(user)) {
-      return getSentReferralsForProbationPractitionerUser(user, findSentReferralsSpec, page)
-    }
-
-    throw AccessError(user, "unsupported user type", listOf("logins from ${user.authSource} are not supported"))
-  }
-
   fun getServiceProviderSummaries(user: AuthUser, dashboardType: DashboardType? = null): List<ServiceProviderSentReferralSummary> {
     if (userTypeChecker.isServiceProviderUser(user)) {
       return getSentReferralSummariesForServiceProviderUser(user, dashboardType)
@@ -173,19 +158,6 @@ class ReferralService(
     // todo: query for referrals where the service provider has been granted nominated access only
     val filteredSpec = referralAccessFilter.serviceProviderReferrals(sentReferralFilterSpecification, user)
     return sentReferralSummariesRepository.findAll(filteredSpec, page)
-  }
-
-  @Deprecated("deprecated as this method will be replaced by getSentReferralSummaryForServiceProviderUser")
-  private fun getSentReferralsForServiceProviderUser(user: AuthUser, sentReferralFilterSpecification: Specification<Referral>, page: Pageable?): Iterable<Referral> {
-    // todo: query for referrals where the service provider has been granted nominated access only
-    val filteredSpec = referralAccessFilter.serviceProviderReferrals(sentReferralFilterSpecification, user)
-    return if (page == null) referralRepository.findAll(filteredSpec).sortedBy { it.sentAt } else referralRepository.findAll(filteredSpec, page)
-  }
-
-  @Deprecated("deprecated as this method will be replaced by getSentReferralSummaryForServiceProviderUser")
-  private fun getSentReferralsForProbationPractitionerUser(user: AuthUser, sentReferralFilterSpecification: Specification<Referral>, page: Pageable?): Iterable<Referral> {
-    val filteredSpec = createSpecificationForProbationPractitionerUser(user, sentReferralFilterSpecification)
-    return if (page == null) referralRepository.findAll(filteredSpec).sortedBy { it.sentAt } else referralRepository.findAll(filteredSpec, page)
   }
 
   private fun getSentReferralSummariesForServiceProviderUser(user: AuthUser, dashboardType: DashboardType?): List<ServiceProviderSentReferralSummary> {
