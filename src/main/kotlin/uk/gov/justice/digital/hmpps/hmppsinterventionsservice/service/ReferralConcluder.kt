@@ -60,7 +60,7 @@ class ReferralConcluder(
     val hasActionPlan = nonNull(referral.currentActionPlan)
 
     val numberOfAttendedSessions = countSessionsAttended(referral)
-    val hasAttemptedNoSessions = numberOfAttendedSessions == 0
+    val hasAttendedNoSessions = numberOfAttendedSessions == 0
 
     val totalNumberOfSessions = referral.currentActionPlan?.numberOfSessions ?: 0
     val hasAttemptedSomeSessions = totalNumberOfSessions > numberOfAttendedSessions
@@ -71,7 +71,7 @@ class ReferralConcluder(
     if (!hasActionPlan)
       return CANCELLED
 
-    if (hasAttemptedNoSessions)
+    if (hasAttendedNoSessions)
       return CANCELLED
 
     if (hasAttemptedSomeSessions && hasSubmittedEndOfServiceReport)
