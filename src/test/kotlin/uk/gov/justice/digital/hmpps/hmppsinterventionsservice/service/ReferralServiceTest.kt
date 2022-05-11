@@ -635,7 +635,7 @@ class ReferralServiceTest @Autowired constructor(
         .thenReturn(ServiceProviderAccessScope(setOf(serviceProviderFactory.create()), validContracts.toSet()))
 
       val filteredReferrals = referralService.getSentReferralSummaryForUser(user, null, null, null, null, PageRequest.of(0, 10))
-      assertThat((filteredReferrals as Page<SentReferralSummary>).size).isEqualTo(10)
+      assertThat((filteredReferrals as Page<SentReferralSummary>).content.size).isEqualTo(3)
       assertThat(filteredReferrals.map { it.intervention.dynamicFrameworkContract }).doesNotContain(*invalidContracts.toTypedArray())
     }
   }
