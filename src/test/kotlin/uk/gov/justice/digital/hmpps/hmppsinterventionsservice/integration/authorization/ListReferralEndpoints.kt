@@ -69,9 +69,9 @@ class ListReferralEndpoints : IntegrationTestBase() {
     }
 
     val token = createEncodedTokenForUser(user)
-    val response = requestFactory.create(Request.GetSentReferrals, token).exchange()
+    val response = requestFactory.create(Request.GetSentReferralSummaries, token).exchange()
     response.expectStatus().is2xxSuccessful
-    response.expectBody().jsonPath("$.length()").isEqualTo(2)
+    response.expectBody().jsonPath("$.content.length()").isEqualTo(2)
   }
 
   @Test
@@ -103,9 +103,9 @@ class ListReferralEndpoints : IntegrationTestBase() {
     }
 
     val token = createEncodedTokenForUser(user)
-    val response = requestFactory.create(Request.GetSentReferrals, token).exchange()
+    val response = requestFactory.create(Request.GetSentReferralSummaries, token).exchange()
     response.expectStatus().is2xxSuccessful
-    response.expectBody().jsonPath("$.length()").isEqualTo(2)
+    response.expectBody().jsonPath("$.content.length()").isEqualTo(2)
   }
 
   @Test
@@ -143,9 +143,9 @@ class ListReferralEndpoints : IntegrationTestBase() {
     )
 
     val token = createEncodedTokenForUser(user)
-    val response = requestFactory.create(Request.GetSentReferrals, token).exchange()
+    val response = requestFactory.create(Request.GetSentReferralSummaries, token).exchange()
     response.expectStatus().is2xxSuccessful
-    response.expectBody().jsonPath("$.length()").isEqualTo(0)
+    response.expectBody().jsonPath("$.content.length()").isEqualTo(0)
   }
 
   @Test
@@ -161,7 +161,7 @@ class ListReferralEndpoints : IntegrationTestBase() {
     )
 
     val token = createEncodedTokenForUser(user)
-    val response = requestFactory.create(Request.GetSentReferrals, token).exchange()
+    val response = requestFactory.create(Request.GetSentReferralSummaries, token).exchange()
     response.expectStatus().isForbidden
     response.expectBody().json(
       """
@@ -184,9 +184,9 @@ class ListReferralEndpoints : IntegrationTestBase() {
 
     whenever(mockCommunityAPIOffenderService.getManagedOffendersForDeliusUser(any())).thenReturn(emptyList())
     val token = createEncodedTokenForUser(user1)
-    val response = requestFactory.create(Request.GetSentReferrals, token).exchange()
+    val response = requestFactory.create(Request.GetSentReferralSummaries, token).exchange()
     response.expectStatus().is2xxSuccessful
-    response.expectBody().jsonPath("$.length()").isEqualTo(1)
+    response.expectBody().jsonPath("$.content.length()").isEqualTo(1)
   }
 
   @Test
@@ -225,7 +225,7 @@ class ListReferralEndpoints : IntegrationTestBase() {
     setupAssistant.createSentReferral()
     val token = tokenFactory.createEncodedToken("123456", "nomis", "tom")
 
-    val response = requestFactory.create(Request.GetSentReferrals, token).exchange()
+    val response = requestFactory.create(Request.GetSentReferralSummaries, token).exchange()
     response.expectStatus().isForbidden
     response.expectBody().json(
       """
@@ -242,7 +242,7 @@ class ListReferralEndpoints : IntegrationTestBase() {
     val referral = setupAssistant.createSentReferral()
     val token = createEncodedTokenForUser(user)
 
-    val response = requestFactory.create(Request.GetSentReferrals, token, referral.id.toString()).exchange()
+    val response = requestFactory.create(Request.GetSentReferralSummaries, token, referral.id.toString()).exchange()
     response.expectStatus().isForbidden
     response.expectBody().json(
       """

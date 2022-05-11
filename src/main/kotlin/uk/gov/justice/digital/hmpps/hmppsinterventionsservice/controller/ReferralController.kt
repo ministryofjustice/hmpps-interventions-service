@@ -4,7 +4,6 @@ import ServiceProviderSentReferralSummaryDTO
 import com.fasterxml.jackson.annotation.JsonView
 import com.microsoft.applicationinsights.TelemetryClient
 import mu.KLogging
-import net.logstash.logback.argument.StructuredArguments.kv
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
@@ -35,7 +34,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralDetail
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SelectedDesiredOutcomesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SentReferralDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SentReferralSummariesDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SentReferralSummaryDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ServiceCategoryFullDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SetComplexityLevelRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SupplierAssessmentDTO
@@ -115,46 +113,6 @@ class ReferralController(
   fun getSentReferral(@PathVariable id: UUID, authentication: JwtAuthenticationToken): SentReferralDTO {
     val referral = getSentReferralAuthenticatedRequest(authentication, id)
     return SentReferralDTO.from(referral, referralConcluder.requiresEndOfServiceReportCreation(referral))
-  }
-
-  @JsonView(Views.SentReferral::class)
-  @GetMapping("/sent-referrals")
-  fun getSentReferrals(
-    authentication: JwtAuthenticationToken,
-    @Nullable @RequestParam(name = "concluded", required = false) concluded: Boolean?,
-    @Nullable @RequestParam(name = "cancelled", required = false) cancelled: Boolean?,
-    @Nullable @RequestParam(name = "unassigned", required = false) unassigned: Boolean?,
-    @Nullable @RequestParam(name = "assignedTo", required = false) assignedToUserId: String?,
-  ): List<SentReferralSummaryDTO> {
-    val user = userMapper.fromToken(authentication)
-    val referrals = referralService.getSentReferralsForUser(user, concluded, cancelled, unassigned, assignedToUserId, null) as List<Referral>
-    logger.info(
-      "returning list of referrals from /sent-referrals",
-      kv("userType", user.authSource),
-      kv("numberOfReferrals", referrals.size),
-      kv("params", mapOf("concluded" to concluded, "cancelled" to cancelled, "unassigned" to unassigned, "assignedTo" to (assignedToUserId != null)))
-    )
-    return referrals.map { SentReferralSummaryDTO.from(it) }
-  }
-
-  @JsonView(Views.SentReferral::class)
-  @GetMapping("/sent-referrals/paged")
-  fun getSentReferrals(
-    authentication: JwtAuthenticationToken,
-    @Nullable @RequestParam(name = "concluded", required = false) concluded: Boolean?,
-    @Nullable @RequestParam(name = "cancelled", required = false) cancelled: Boolean?,
-    @Nullable @RequestParam(name = "unassigned", required = false) unassigned: Boolean?,
-    @Nullable @RequestParam(name = "assignedTo", required = false) assignedToUserId: String?,
-    @PageableDefault(page = 0, size = 50, sort = ["sentAt"]) page: Pageable,
-  ): Page<SentReferralSummaryDTO> {
-    val user = userMapper.fromToken(authentication)
-    return (referralService.getSentReferralsForUser(user, concluded, cancelled, unassigned, assignedToUserId, page) as Page<Referral>).map { SentReferralSummaryDTO.from(it) }.also {
-      telemetryClient.trackEvent(
-        "PagedDashboardRequest",
-        null,
-        mutableMapOf("totalNumberOfReferrals" to it.totalElements.toDouble(), "pageSize" to page.pageSize.toDouble())
-      )
-    }
   }
 
   @GetMapping("/sent-referrals/summaries")

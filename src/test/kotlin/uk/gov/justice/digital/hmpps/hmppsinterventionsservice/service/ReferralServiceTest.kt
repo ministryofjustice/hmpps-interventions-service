@@ -30,7 +30,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.Serv
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserTypeChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.ValidationError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DraftReferralDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.Views
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
@@ -635,8 +634,8 @@ class ReferralServiceTest @Autowired constructor(
       whenever(serviceProviderAccessScopeMapper.fromUser(user))
         .thenReturn(ServiceProviderAccessScope(setOf(serviceProviderFactory.create()), validContracts.toSet()))
 
-      val filteredReferrals = referralService.getSentReferralsForUser(user, null, null, null, null, null)
-      assertThat((filteredReferrals as List<Views.SentReferral>).size).isEqualTo(3)
+      val filteredReferrals = referralService.getSentReferralSummaryForUser(user, null, null, null, null, PageRequest.of(0, 10))
+      assertThat((filteredReferrals as Page<SentReferralSummary>).content.size).isEqualTo(3)
       assertThat(filteredReferrals.map { it.intervention.dynamicFrameworkContract }).doesNotContain(*invalidContracts.toTypedArray())
     }
   }
