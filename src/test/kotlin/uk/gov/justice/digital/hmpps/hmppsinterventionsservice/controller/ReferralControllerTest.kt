@@ -459,4 +459,38 @@ internal class ReferralControllerTest {
 
     assertThat(response.size).isEqualTo(2)
   }
+
+  @Nested
+  inner class GetDraftReferralByID {
+    private val referral = referralFactory.createDraft()
+    private val user = authUserFactory.create()
+    private val token = tokenFactory.create(userID = user.id, userName = user.userName, authSource = user.authSource)
+    private val clientApiToken = tokenFactory.create("interventions-event-client", "ROLE_INTERVENTIONS_API_READ_ALL")
+
+    @Test
+    fun `getDraftReferralByID returns a sent referral if it exists`() {
+      whenever(referralService.getDraftReferralForUser(eq(referral.id), any())).thenReturn(referral)
+      val draftReferral = referralController.getDraftReferralByID(
+        referral.id,
+        token,
+      )
+      assertThat(draftReferral.id).isEqualTo(referral.id)
+    }
+  }
+
+  @Nested
+  inner class GetDraftReferrals {
+    private val referral = referralFactory.createDraft()
+    private val user = authUserFactory.create()
+    private val token = tokenFactory.create(userID = user.id, userName = user.userName, authSource = user.authSource)
+    private val clientApiToken = tokenFactory.create("interventions-event-client", "ROLE_INTERVENTIONS_API_READ_ALL")
+
+    @Test
+    fun `getDraftReferrals returns a list of draft referrals if they exist`() {
+      whenever(referralService.getDraftReferralsForUser(any())).thenReturn(listOf(referral))
+      val draftReferrals = referralController.getDraftReferrals(token)
+      assertThat(draftReferrals).isNotNull
+      assertThat(draftReferrals.count()).isEqualTo(1)
+    }
+  }
 }

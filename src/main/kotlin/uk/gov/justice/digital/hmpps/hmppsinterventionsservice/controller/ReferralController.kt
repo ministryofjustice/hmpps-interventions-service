@@ -250,6 +250,7 @@ class ReferralController(
   @GetMapping("/draft-referrals")
   fun getDraftReferrals(authentication: JwtAuthenticationToken): List<DraftReferralDTO> {
     val user = userMapper.fromToken(authentication)
+
     return referralService.getDraftReferralsForUser(user).map { DraftReferralDTO.from(it) }
   }
 

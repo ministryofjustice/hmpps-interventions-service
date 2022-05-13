@@ -42,7 +42,8 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
         },
         "serviceCategoryIds": null,
         "desiredOutcomes": null,
-        "complexityLevels": null
+        "complexityLevels": null,
+        "contractTypeName": "Accommodation"
       }
     """
     )
