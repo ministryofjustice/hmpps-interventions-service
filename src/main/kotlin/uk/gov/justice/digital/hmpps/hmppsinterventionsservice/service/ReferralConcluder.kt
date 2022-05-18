@@ -43,13 +43,13 @@ class ReferralConcluder(
     if (totalNumberOfSessions == 0)
       return false
 
-    val numberOfSessionsAttempted = countSessionsAttempted(referral)
+    val numberOfSessionsAttempted = countSessionsAttended(referral)
     val allSessionsAttempted = totalNumberOfSessions == numberOfSessionsAttempted
     if (allSessionsAttempted)
       return true
 
-    val atLeastOneSessionAttempted = numberOfSessionsAttempted > 0
-    if (atLeastOneSessionAttempted && referral.endRequestedAt != null)
+    val deliveredFirstSubstantiveAppointment = numberOfSessionsAttempted > 0
+    if (deliveredFirstSubstantiveAppointment && referral.endRequestedAt != null)
       return true
 
     return false
@@ -59,19 +59,19 @@ class ReferralConcluder(
 
     val hasActionPlan = nonNull(referral.currentActionPlan)
 
-    val numberOfAttemptedSessions = countSessionsAttempted(referral)
-    val hasAttemptedNoSessions = numberOfAttemptedSessions == 0
+    val numberOfAttendedSessions = countSessionsAttended(referral)
+    val hasAttendedNoSessions = numberOfAttendedSessions == 0
 
     val totalNumberOfSessions = referral.currentActionPlan?.numberOfSessions ?: 0
-    val hasAttemptedSomeSessions = totalNumberOfSessions > numberOfAttemptedSessions
-    val hasAttemptedAllSessions = totalNumberOfSessions == numberOfAttemptedSessions
+    val hasAttemptedSomeSessions = totalNumberOfSessions > numberOfAttendedSessions
+    val hasAttemptedAllSessions = totalNumberOfSessions == numberOfAttendedSessions
 
     val hasSubmittedEndOfServiceReport = referral.endOfServiceReport?.submittedAt?.let { true } ?: false
 
     if (!hasActionPlan)
       return CANCELLED
 
-    if (hasAttemptedNoSessions)
+    if (hasAttendedNoSessions)
       return CANCELLED
 
     if (hasAttemptedSomeSessions && hasSubmittedEndOfServiceReport)
@@ -85,7 +85,11 @@ class ReferralConcluder(
 
   private fun countSessionsAttempted(referral: Referral): Int {
     return referral.currentActionPlan?.let {
-      actionPlanRepository.countNumberOfAttemptedSessions(referral.id)
+      return actionPlanRepository.countNumberOfAttemptedSessions(referral.id)
     } ?: 0
+  }
+
+  private fun countSessionsAttended(referral: Referral): Int {
+    return actionPlanRepository.countNumberOfAttendedSessions(referral.id)
   }
 }
