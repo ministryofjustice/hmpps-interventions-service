@@ -45,6 +45,7 @@ data class DraftReferralDTO(
   val serviceProvider: ServiceProviderDTO? = null,
   val relevantSentenceId: Long? = null,
   val interventionId: UUID? = null,
+  val contractTypeName: String? = null,
 ) {
   companion object {
     fun from(referral: Referral): DraftReferralDTO {
@@ -81,6 +82,7 @@ data class DraftReferralDTO(
           ?.map { it.id }
           ?.sorted(),
         interventionId = referral.intervention.id,
+        contractTypeName = referral.intervention.dynamicFrameworkContract.contractType.name,
       )
     }
   }
