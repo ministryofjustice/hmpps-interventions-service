@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: performance-report
+  name: {{ template "app.name" . }}-performance-report
   labels:
     {{- include "app.labels" . | nindent 4 }}
 spec:

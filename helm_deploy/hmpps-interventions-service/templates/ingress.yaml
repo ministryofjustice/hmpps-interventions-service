@@ -1,4 +1,4 @@
-{{- $fullName := include "app.fullname" . -}}
+{{- $fullName := include "app.name" . -}}
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
@@ -39,18 +39,18 @@ spec:
               servicePort: 80
           - path: /sent-referrals
             backend:
-              serviceName: api-suspect
+              serviceName: {{ $fullName }}-dashboard
               servicePort: http
           - path: /reports/service-provider/performance
             backend:
-              serviceName: performance-report
+              serviceName: {{ $fullName }}-performance-report
               servicePort: http
           - path: /
             backend:
-              serviceName: {{ $fullName }}
+              serviceName: {{ $fullName }}-api
               servicePort: http
           - path: /meta/schema
             backend:
-              serviceName: data-dictionary
+              serviceName: {{ $fullName }}-data-dictionary
               servicePort: http
   {{- end }}

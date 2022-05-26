@@ -199,7 +199,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "sum by (le)(\n  increase(\n    nginx_ingress_controller_request_duration_seconds_bucket{\n      exported_namespace =~ \"$namespace\",\n      exported_service = \"api-suspect\",\n    }[1m]\n  )\n)",
+          "expr": "sum by (le)(\n  increase(\n    nginx_ingress_controller_request_duration_seconds_bucket{\n      exported_namespace =~ \"$namespace\",\n      exported_service = \"hmpps-interventions-service-dashboard\",\n    }[1m]\n  )\n)",
           "format": "heatmap",
           "interval": "1m",
           "intervalFactor": 1,
@@ -582,7 +582,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "sum by (le)(\n  increase(\n    nginx_ingress_controller_request_duration_seconds_bucket{\n      exported_namespace =~ \"$namespace\",\n      exported_service = \"hmpps-interventions-service\",\n    }[1m]\n  )\n)",
+          "expr": "sum by (le)(\n  increase(\n    nginx_ingress_controller_request_duration_seconds_bucket{\n      exported_namespace =~ \"$namespace\",\n      exported_service = \"hmpps-interventions-service-api\",\n    }[1m]\n  )\n)",
           "format": "heatmap",
           "instant": false,
           "interval": "1m",

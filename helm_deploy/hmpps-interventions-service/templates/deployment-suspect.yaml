@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api-suspect
+  name: {{ template "app.name" . }}-dashboard
   labels:
     {{- include "app.labels" . | nindent 4 }}
 spec:
@@ -15,11 +15,11 @@ spec:
       maxUnavailable: 50%
   selector:
     matchLabels:
-      {{- include "suspectApp.selectorLabels" . | nindent 6 }}
+      {{- include "dashboardApp.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "suspectApp.selectorLabels" . | nindent 8 }}
+        {{- include "dashboardApp.selectorLabels" . | nindent 8 }}
     spec:
       affinity:
         podAntiAffinity:
