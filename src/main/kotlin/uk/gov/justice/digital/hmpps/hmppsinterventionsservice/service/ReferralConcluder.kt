@@ -43,12 +43,12 @@ class ReferralConcluder(
     if (totalNumberOfSessions == 0)
       return false
 
-    val numberOfSessionsAttempted = countSessionsAttended(referral)
-    val allSessionsAttempted = totalNumberOfSessions == numberOfSessionsAttempted
-    if (allSessionsAttempted)
+    val numberOfSessionsAttended = countSessionsAttended(referral)
+    val allSessionsAttended = totalNumberOfSessions == numberOfSessionsAttended
+    if (allSessionsAttended)
       return true
 
-    val deliveredFirstSubstantiveAppointment = numberOfSessionsAttempted > 0
+    val deliveredFirstSubstantiveAppointment = numberOfSessionsAttended > 0
     if (deliveredFirstSubstantiveAppointment && referral.endRequestedAt != null)
       return true
 
@@ -63,8 +63,8 @@ class ReferralConcluder(
     val hasAttendedNoSessions = numberOfAttendedSessions == 0
 
     val totalNumberOfSessions = referral.currentActionPlan?.numberOfSessions ?: 0
-    val hasAttemptedSomeSessions = totalNumberOfSessions > numberOfAttendedSessions
-    val hasAttemptedAllSessions = totalNumberOfSessions == numberOfAttendedSessions
+    val hasAttendedSomeSessions = totalNumberOfSessions > numberOfAttendedSessions
+    val hasAttendedAllSessions = totalNumberOfSessions == numberOfAttendedSessions
 
     val hasSubmittedEndOfServiceReport = referral.endOfServiceReport?.submittedAt?.let { true } ?: false
 
@@ -74,19 +74,13 @@ class ReferralConcluder(
     if (hasAttendedNoSessions)
       return CANCELLED
 
-    if (hasAttemptedSomeSessions && hasSubmittedEndOfServiceReport)
+    if (hasAttendedSomeSessions && hasSubmittedEndOfServiceReport)
       return PREMATURELY_ENDED
 
-    if (hasAttemptedAllSessions && hasSubmittedEndOfServiceReport)
+    if (hasAttendedAllSessions && hasSubmittedEndOfServiceReport)
       return COMPLETED
 
     return null
-  }
-
-  private fun countSessionsAttempted(referral: Referral): Int {
-    return referral.currentActionPlan?.let {
-      return actionPlanRepository.countNumberOfAttemptedSessions(referral.id)
-    } ?: 0
   }
 
   private fun countSessionsAttended(referral: Referral): Int {
