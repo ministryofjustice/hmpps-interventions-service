@@ -17,7 +17,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 1,
-  "iteration": 1651827910531,
+  "iteration": 1653946635075,
   "links": [],
   "panels": [
     {
@@ -779,11 +779,12 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "quantile(0.99, 300*rate(http_client_requests_seconds_sum{namespace='$namespace'}[5m])) by (clientName)",
+          "expr": "quantile(0.99, 300*rate(http_client_requests_seconds_sum{namespace='$namespace'}[5m])) by (client_name)",
           "format": "time_series",
+          "instant": false,
           "interval": "",
           "intervalFactor": 2,
-          "legendFormat": "{{ clientName }}",
+          "legendFormat": "{{ client_name }}",
           "refId": "A"
         }
       ],
