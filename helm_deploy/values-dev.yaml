@@ -3,6 +3,8 @@
 
 replicaCount: 2
 
+nameOverride: hmpps-interventions-service
+
 image:
   repository: quay.io/hmpps/hmpps-interventions-service
   tag: latest
