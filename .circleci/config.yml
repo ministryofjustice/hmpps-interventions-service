@@ -298,7 +298,6 @@ workflows:
       - hmpps/deploy_env:
           name: deploy_preprod
           env: "preprod"
-          show_changelog: true
           slack_notification: true
           slack_channel_name: "interventions-dev-notifications"
           requires: [deploy_dev]
@@ -317,7 +316,6 @@ workflows:
       - hmpps/deploy_env:
           name: deploy_prod
           env: "prod"
-          show_changelog: true
           slack_notification: true
           slack_channel_name: "interventions"
           requires:
