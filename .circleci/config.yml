@@ -274,6 +274,7 @@ workflows:
           env: "dev"
           slack_notification: true
           slack_channel_name: "interventions-dev-notifications"
+          k8s_deployment_name: hmpps-interventions-service-api
           filters:
             branches:
               only:
@@ -300,6 +301,7 @@ workflows:
           env: "preprod"
           slack_notification: true
           slack_channel_name: "interventions-dev-notifications"
+          k8s_deployment_name: hmpps-interventions-service-api
           requires: [deploy_dev]
           context:
             - hmpps-common-vars
@@ -318,6 +320,7 @@ workflows:
           env: "prod"
           slack_notification: true
           slack_channel_name: "interventions"
+          k8s_deployment_name: hmpps-interventions-service-api
           requires:
             - approve_prod
           context:
