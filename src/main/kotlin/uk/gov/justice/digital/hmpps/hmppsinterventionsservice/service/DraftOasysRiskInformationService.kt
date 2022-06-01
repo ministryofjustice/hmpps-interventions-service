@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DraftOasysRiskInformationDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftOasysRiskInformation
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftOasysRiskInformationRepository
 import java.time.OffsetDateTime
@@ -18,7 +18,7 @@ class DraftOasysRiskInformationService(
   val draftOasysRiskInformationRepository: DraftOasysRiskInformationRepository,
   val authUserRepository: AuthUserRepository,
 ) {
-  fun updateDraftOasysRiskInformation(referral: Referral, draftOasysRiskInformationDTO: DraftOasysRiskInformationDTO, user: AuthUser): DraftOasysRiskInformation {
+  fun updateDraftOasysRiskInformation(referral: DraftReferral, draftOasysRiskInformationDTO: DraftOasysRiskInformationDTO, user: AuthUser): DraftOasysRiskInformation {
     val draftOasysRiskInformation = DraftOasysRiskInformation(
       referralId = referral.id,
       updatedAt = OffsetDateTime.now(),

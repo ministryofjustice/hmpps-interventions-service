@@ -48,7 +48,7 @@ class SupplierAssessmentServiceTest {
 
   @Test
   fun `supplier assessment can be created`() {
-    val referral = referralFactory.createDraft()
+    val referral = referralFactory.createSent()
 
     whenever(appointmentRepository.save(any())).thenReturn(appointmentFactory.create())
     whenever(supplierAssessmentRepository.save(any())).thenReturn(supplierAssessmentFactory.create())
