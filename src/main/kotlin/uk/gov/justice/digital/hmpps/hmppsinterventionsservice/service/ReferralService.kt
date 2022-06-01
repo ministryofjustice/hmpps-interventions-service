@@ -128,8 +128,8 @@ class ReferralService(
     return assignedReferral
   }
 
-  fun getSentReferralSummaryForUser(user: AuthUser, concluded: Boolean?, cancelled: Boolean?, unassigned: Boolean?, assignedToUserId: String?, page: Pageable): Iterable<SentReferralSummary> {
-    val findSentReferralsSpec: Specification<SentReferralSummary> = createSpecification(concluded, cancelled, unassigned, assignedToUserId)
+  fun getSentReferralSummaryForUser(user: AuthUser, concluded: Boolean?, cancelled: Boolean?, unassigned: Boolean?, assignedToUserId: String?, page: Pageable, searchText: String? = null): Iterable<SentReferralSummary> {
+    val findSentReferralsSpec: Specification<SentReferralSummary> = createSpecification(concluded, cancelled, unassigned, assignedToUserId, searchText)
 
     if (userTypeChecker.isServiceProviderUser(user)) {
       return getSentReferralSummaryForServiceProviderUser(user, findSentReferralsSpec, page)
@@ -175,7 +175,8 @@ class ReferralService(
     concluded: Boolean?,
     cancelled: Boolean?,
     unassigned: Boolean?,
-    assignedToUserId: String?
+    assignedToUserId: String?,
+    searchText: String?,
   ): Specification<T> {
     var findSentReferralsSpec = ReferralSpecifications.sent<T>()
     findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, concluded, ReferralSpecifications.concluded())
@@ -183,6 +184,9 @@ class ReferralService(
     findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, unassigned, ReferralSpecifications.unassigned())
     assignedToUserId?.let {
       findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, true, ReferralSpecifications.currentlyAssignedTo(it))
+    }
+    searchText?.let {
+      findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, true, ReferralSpecifications.search(searchText))
     }
     return findSentReferralsSpec
   }

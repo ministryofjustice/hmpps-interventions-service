@@ -69,6 +69,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     assignments: List<ReferralAssignment> = emptyList(),
 
     supplierAssessment: SupplierAssessment? = null,
+    serviceUserData: ServiceUserData? = null,
   ): Referral {
     return create(
       id = id,
@@ -87,7 +88,8 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       supplementaryRiskId = supplementaryRiskId,
 
       assignments = assignments,
-      supplierAssessment = supplierAssessment
+      supplierAssessment = supplierAssessment,
+      serviceUserData = serviceUserData
     )
   }
 
@@ -112,6 +114,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     ),
 
     supplierAssessment: SupplierAssessment? = null,
+    serviceUserData: ServiceUserData? = null,
   ): Referral {
     return create(
       id = id,
@@ -130,7 +133,8 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       supplementaryRiskId = supplementaryRiskId,
 
       assignments = assignments,
-      supplierAssessment = supplierAssessment
+      supplierAssessment = supplierAssessment,
+      serviceUserData = serviceUserData
     )
   }
 
