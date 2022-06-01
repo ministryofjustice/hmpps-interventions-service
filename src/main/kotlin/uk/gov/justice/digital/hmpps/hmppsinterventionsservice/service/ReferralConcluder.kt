@@ -43,47 +43,50 @@ class ReferralConcluder(
     if (totalNumberOfSessions == 0)
       return false
 
-    val numberOfSessionsAttended = countSessionsAttended(referral)
-    val allSessionsAttended = totalNumberOfSessions == numberOfSessionsAttended
-    if (allSessionsAttended)
+    val endRequested = referral.endRequestedAt != null
+    if (deliveredFirstSubstantiveAppointment(referral) && endRequested)
       return true
 
-    val deliveredFirstSubstantiveAppointment = numberOfSessionsAttended > 0
-    if (deliveredFirstSubstantiveAppointment && referral.endRequestedAt != null)
+    val numberOfAttemptedSessions = countSessionsAttempted(referral)
+    val allSessionsHaveAttendance = totalNumberOfSessions == numberOfAttemptedSessions
+    if (allSessionsHaveAttendance)
       return true
 
     return false
   }
 
   private fun getConcludedEventType(referral: Referral): ReferralEventType? {
-
     val hasActionPlan = nonNull(referral.currentActionPlan)
-
-    val numberOfAttendedSessions = countSessionsAttended(referral)
-    val hasAttendedNoSessions = numberOfAttendedSessions == 0
-
-    val totalNumberOfSessions = referral.currentActionPlan?.numberOfSessions ?: 0
-    val hasAttendedSomeSessions = totalNumberOfSessions > numberOfAttendedSessions
-    val hasAttendedAllSessions = totalNumberOfSessions == numberOfAttendedSessions
-
-    val hasSubmittedEndOfServiceReport = referral.endOfServiceReport?.submittedAt?.let { true } ?: false
-
     if (!hasActionPlan)
       return CANCELLED
 
-    if (hasAttendedNoSessions)
+    if (!deliveredFirstSubstantiveAppointment(referral))
       return CANCELLED
 
-    if (hasAttendedSomeSessions && hasSubmittedEndOfServiceReport)
+    val numberOfAttemptedSessions = countSessionsAttempted(referral)
+    val totalNumberOfSessions = referral.currentActionPlan?.numberOfSessions ?: 0
+    val someSessionsHaveNoAttendance = totalNumberOfSessions > numberOfAttemptedSessions
+    val allSessionsHaveAttendance = totalNumberOfSessions == numberOfAttemptedSessions
+    val hasSubmittedEndOfServiceReport = referral.endOfServiceReport?.submittedAt?.let { true } ?: false
+
+    if (someSessionsHaveNoAttendance && hasSubmittedEndOfServiceReport)
       return PREMATURELY_ENDED
 
-    if (hasAttendedAllSessions && hasSubmittedEndOfServiceReport)
+    if (allSessionsHaveAttendance && hasSubmittedEndOfServiceReport)
       return COMPLETED
 
     return null
   }
 
+  private fun countSessionsAttempted(referral: Referral): Int {
+    return actionPlanRepository.countNumberOfAttemptedSessions(referral.id)
+  }
+
   private fun countSessionsAttended(referral: Referral): Int {
     return actionPlanRepository.countNumberOfAttendedSessions(referral.id)
+  }
+
+  private fun deliveredFirstSubstantiveAppointment(referral: Referral): Boolean {
+    return countSessionsAttended(referral) > 0
   }
 }
