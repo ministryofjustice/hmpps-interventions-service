@@ -12,9 +12,6 @@ env:
     value: "{{ $value }}"
   {{ end }}
 
-  - name: JAVA_OPTS
-    value: "-Xmx750m"
-
   - name: APPLICATIONINSIGHTS_CONNECTION_STRING
     valueFrom:
       secretKeyRef:
