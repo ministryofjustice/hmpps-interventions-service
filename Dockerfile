@@ -50,4 +50,4 @@ COPY --chown=appuser:appgroup applicationinsights.json /app
 
 USER 2000
 
-ENTRYPOINT ["java", "-XX:+AlwaysActAsServerClassMachine", "-XX:+HeapDumpOnOutOfMemoryError", "-XX:HeapDumpPath=/dumps", "-javaagent:/app/agent.jar", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-XX:MaxHeapSize=786432000", "-XX:+AlwaysActAsServerClassMachine", "-XX:+HeapDumpOnOutOfMemoryError", "-XX:HeapDumpPath=/dumps", "-javaagent:/app/agent.jar", "-jar", "/app/app.jar"]
