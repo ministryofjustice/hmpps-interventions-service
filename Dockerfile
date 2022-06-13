@@ -23,7 +23,7 @@ RUN ./gradlew assemble
 
 
 # ---
-FROM alpine:3.15 AS final
+FROM alpine:3.16 AS final
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
 # force a rebuild of `apk upgrade` below by invalidating the BUILD_NUMBER env variable on every commit
@@ -33,7 +33,7 @@ ENV BUILD_NUMBER ${BUILD_NUMBER:-1_0_0}
 RUN apk upgrade --no-cache && \
      apk add --no-cache \
        curl \
-       openjdk17-jre-headless \
+       openjdk17-jdk \
        tzdata
 
 ENV TZ=Europe/London
