@@ -14,4 +14,10 @@ spec:
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
               imagePullPolicy: Always
               args: ["--jobName=ndmisPerformanceReportJob"]
+              volumeMounts:
+                - name: heap-dumps
+                  mountPath: /dumps
   {{- include "deployment.envs" . | nindent 14 }}
+          volumes:
+            - name: heap-dumps
+              emptyDir: {}
