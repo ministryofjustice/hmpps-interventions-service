@@ -102,7 +102,7 @@ dependencies {
   implementation("org.apache.commons:commons-csv:1.9.0")
 
   testImplementation("au.com.dius.pact.provider:junit5spring:4.3.9")
-  testImplementation("com.squareup.okhttp3:okhttp:4.9.3")
+  testImplementation("com.squareup.okhttp3:okhttp:4.10.0")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
   testImplementation("org.mockito:mockito-inline:4.6.1")
 }
