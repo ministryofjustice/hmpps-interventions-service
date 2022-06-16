@@ -369,27 +369,6 @@ class ReferralService(
     }
   }
 
-  @Deprecated(
-    """
-    currently we are duplicating these fields in both the referral 
-    and referral_details tables. once we solely rely on the latter, 
-    we can remove this method entirely.
-  """
-  )
-  private fun legacyUpdateReferralDetails(referral: Referral, update: DraftReferralDTO) {
-    update.completionDeadline?.let {
-      referral.completionDeadline = it
-    }
-
-    update.furtherInformation?.let {
-      referral.furtherInformation = it
-    }
-
-    update.maximumEnforceableDays?.let {
-      referral.maximumEnforceableDays = it
-    }
-  }
-
   fun updateReferralDetails(referral: Referral, update: UpdateReferralDetailsDTO, actor: AuthUser): ReferralDetails? {
     if (!update.isValidUpdate) {
       return null
@@ -520,7 +499,6 @@ class ReferralService(
   fun updateDraftReferral(referral: Referral, update: DraftReferralDTO): Referral {
     validateDraftReferralUpdate(referral, update)
 
-    legacyUpdateReferralDetails(referral, update)
     updateReferralDetails(
       referral,
       UpdateReferralDetailsDTO(
