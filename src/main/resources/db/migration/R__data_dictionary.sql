@@ -143,12 +143,6 @@ COMMENT ON COLUMN draft_oasys_risk_information.risk_to_self_hostel_setting IS 'O
 COMMENT ON COLUMN draft_oasys_risk_information.risk_to_self_vulnerability IS 'OASYS Risk to Self - vulnerability';
 COMMENT ON COLUMN draft_oasys_risk_information.additional_information IS 'OASYS Additional risk information';
 
-COMMENT ON TABLE deprecated_action_plan_appointment IS '**deprecated**; use `appointment`';
-COMMENT ON TABLE deprecated_action_plan_session IS '**deprecated**; use `delivery_session`';
-COMMENT ON TABLE deprecated_action_plan_session_appointment IS '**deprecated**; use `delivery_session_appointment`';
-COMMENT ON VIEW delivery_session_deprecated IS '**deprecated** view in favour of new table `delivery_session`';
-COMMENT ON VIEW delivery_session_appointment_deprecated IS '**deprecated** view in favour of new table `delivery_session_appointment`';
-
 COMMENT ON TABLE action_plan_session_appointment_pre_v1_78 IS '**backup** no longer in use; for up-to-date session appointment links, see `delivery_session_appointment`';
 COMMENT ON TABLE delivery_session IS 'session details for a referral';
 COMMENT ON TABLE delivery_session_appointment IS 'links between sessions and appointments for a referral';
