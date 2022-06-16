@@ -356,8 +356,7 @@ class ReferralService(
     }
 
     update.serviceCategoryIds?.let {
-      if (!referral.intervention.dynamicFrameworkContract.contractType.serviceCategories.map {
-        serviceCategory ->
+      if (!referral.intervention.dynamicFrameworkContract.contractType.serviceCategories.map { serviceCategory ->
         serviceCategory.id
       }.containsAll(it)
       ) {
