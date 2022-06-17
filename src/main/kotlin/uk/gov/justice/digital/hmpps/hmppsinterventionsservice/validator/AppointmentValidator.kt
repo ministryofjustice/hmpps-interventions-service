@@ -13,13 +13,15 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attende
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.NO
 import java.time.LocalTime
 import java.time.OffsetDateTime
+import java.time.temporal.ChronoUnit
 
 @Component
 class AppointmentValidator {
   companion object : KLogging() {
     val postCodeRegex = Regex("""^[A-Z]{1,2}\d[A-Z\d]?\d[A-Z]{2}${'$'}""")
   }
-  fun validateUpdateAppointment(updateAppointmentDTO: UpdateAppointmentDTO) {
+
+  fun validateUpdateAppointment(updateAppointmentDTO: UpdateAppointmentDTO, referralStartDate: OffsetDateTime?) {
     val errors = mutableListOf<FieldError>()
     val appointmentDeliveryAddress = updateAppointmentDTO.appointmentDeliveryAddress
     when (updateAppointmentDTO.appointmentDeliveryType) {
@@ -36,6 +38,18 @@ class AppointmentValidator {
         }
       }
     }
+
+    if (referralStartDate != null && updateAppointmentDTO.appointmentTime.isBefore(referralStartDate)) {
+      errors.add(FieldError(field = "appointmentTime", error = Code.APPOINTMENT_TIME_BEFORE_REFERRAL_START_DATE))
+    }
+
+    val maximumDate =
+      OffsetDateTime.now().plus(6, ChronoUnit.MONTHS).withHour(23).withMinute(59).withSecond(59)
+
+    if (referralStartDate != null && updateAppointmentDTO.appointmentTime.isAfter(maximumDate)) {
+      errors.add(FieldError(field = "appointmentTime", error = Code.APPOINTMENT_TIME_TOO_FAR_IN_FUTURE))
+    }
+
     validateAttendanceAndBehaviourFieldsIfHistoricAppointment(
       updateAppointmentDTO.appointmentTime,
       updateAppointmentDTO.appointmentAttendance?.attended,

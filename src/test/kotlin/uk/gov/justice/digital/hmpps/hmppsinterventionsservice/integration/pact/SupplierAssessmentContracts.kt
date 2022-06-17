@@ -9,7 +9,7 @@ import java.util.UUID
 
 class SupplierAssessmentContracts(private val setupAssistant: SetupAssistant) {
   @State("a sent referral with ID cbf2f82b-4581-4fe1-9de1-1b52465f1afa exists, and a supplier assessment appointment has not yet been booked for it")
-  fun `create a sent referral with no supplier assessmen appointmnet`() {
+  fun `create a sent referral with no supplier assessment appointment`() {
     setupAssistant.createSentReferral(id = UUID.fromString("cbf2f82b-4581-4fe1-9de1-1b52465f1afa"))
   }
 

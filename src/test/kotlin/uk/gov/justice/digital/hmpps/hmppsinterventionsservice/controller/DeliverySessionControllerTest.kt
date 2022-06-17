@@ -64,6 +64,13 @@ internal class DeliverySessionControllerTest {
       val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null)
 
       whenever(
+        sessionsService.getDeliverySessionByActionPlanIdOrThrowException(
+          actionPlanId,
+          sessionNumber
+        )
+      ).thenReturn(deliverySession)
+
+      whenever(
         sessionsService.updateSessionAppointment(
           actionPlanId,
           sessionNumber,
@@ -97,6 +104,13 @@ internal class DeliverySessionControllerTest {
       val attendanceDTO = UpdateAppointmentAttendanceDTO(YES, "attended")
       val behaviourDTO = RecordAppointmentBehaviourDTO("behaviour", false)
       val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, attendanceDTO, behaviourDTO)
+
+      whenever(
+        sessionsService.getDeliverySessionByActionPlanIdOrThrowException(
+          actionPlanId,
+          sessionNumber
+        )
+      ).thenReturn(deliverySession)
 
       whenever(
         sessionsService.updateSessionAppointment(

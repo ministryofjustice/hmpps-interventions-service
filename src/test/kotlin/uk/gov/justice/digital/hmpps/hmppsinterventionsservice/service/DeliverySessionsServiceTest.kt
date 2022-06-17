@@ -28,6 +28,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Act
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DeliverySessionFactory
@@ -46,6 +47,7 @@ internal class DeliverySessionsServiceTest {
   private val communityAPIBookingService: CommunityAPIBookingService = mock()
   private val appointmentRepository: AppointmentRepository = mock()
   private val appointmentService: AppointmentService = mock()
+  private val referralRepository: ReferralRepository = mock()
   private val actionPlanFactory = ActionPlanFactory()
   private val deliverySessionFactory = DeliverySessionFactory()
   private val authUserFactory = AuthUserFactory()
@@ -54,7 +56,7 @@ internal class DeliverySessionsServiceTest {
   private val deliverySessionsService = DeliverySessionService(
     deliverySessionRepository, actionPlanRepository,
     authUserRepository, actionPlanAppointmentEventPublisher,
-    communityAPIBookingService, appointmentService, appointmentRepository,
+    communityAPIBookingService, appointmentService, appointmentRepository, referralRepository
   )
 
   private fun createActor(userName: String = "action_plan_session_test"): AuthUser =

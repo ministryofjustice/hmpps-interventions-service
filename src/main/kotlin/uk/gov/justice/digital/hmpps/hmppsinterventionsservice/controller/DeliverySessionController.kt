@@ -48,7 +48,8 @@ class DeliverySessionController(
     authentication: JwtAuthenticationToken,
   ): DeliverySessionDTO {
     val user = userMapper.fromToken(authentication)
-    appointmentValidator.validateUpdateAppointment(updateAppointmentDTO)
+    val session = deliverySessionService.getDeliverySessionByActionPlanIdOrThrowException(actionPlanId, sessionNumber)
+    appointmentValidator.validateUpdateAppointment(updateAppointmentDTO, session.referral.sentAt)
     val deliverySession = deliverySessionService.updateSessionAppointment(
       actionPlanId,
       sessionNumber,
