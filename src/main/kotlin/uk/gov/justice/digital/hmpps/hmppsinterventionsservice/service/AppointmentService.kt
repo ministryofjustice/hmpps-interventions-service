@@ -280,7 +280,7 @@ class AppointmentService(
   }
 
   private fun updateAppointment(
-    oldAppointment: Appointment,
+    appointment: Appointment,
     durationInMinutes: Int,
     appointmentTime: OffsetDateTime,
     deliusAppointmentId: Long?,
@@ -295,26 +295,13 @@ class AppointmentService(
     behaviourDescription: String?,
     appointmentType: AppointmentType,
   ): Appointment {
-    oldAppointment.durationInMinutes = durationInMinutes
-    oldAppointment.appointmentTime = appointmentTime
-    oldAppointment.deliusAppointmentId = deliusAppointmentId
-    val appointment = Appointment(
-      id = UUID.randomUUID(),
-      appointmentTime = appointmentTime,
-      durationInMinutes = durationInMinutes,
-      deliusAppointmentId = deliusAppointmentId,
-      createdBy = authUserRepository.save(createdByUser),
-      createdAt = OffsetDateTime.now(),
-      referral = oldAppointment.referral,
-      appointmentDelivery = oldAppointment.appointmentDelivery,
-      appointmentFeedbackSubmittedAt = oldAppointment.appointmentFeedbackSubmittedAt,
-      attendanceSubmittedAt = oldAppointment.attendanceSubmittedAt,
-      attendanceBehaviourSubmittedAt = oldAppointment.attendanceBehaviourSubmittedAt
-    )
+    appointment.durationInMinutes = durationInMinutes
+    appointment.appointmentTime = appointmentTime
+    appointment.deliusAppointmentId = deliusAppointmentId
     setAttendanceAndBehaviourIfHistoricAppointment(appointment, appointmentTime, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, createdByUser, appointmentType)
-    val newAppointment = appointmentRepository.save(appointment)
-    createOrUpdateAppointmentDeliveryDetails(newAppointment, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
-    return newAppointment
+    val appointment = appointmentRepository.save(appointment)
+    createOrUpdateAppointmentDeliveryDetails(appointment, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
+    return appointment
   }
 
   private fun createOrUpdateAppointmentDeliveryAddress(
