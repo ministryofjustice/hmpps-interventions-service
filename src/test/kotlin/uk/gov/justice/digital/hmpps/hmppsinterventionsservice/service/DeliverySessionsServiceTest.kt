@@ -272,6 +272,7 @@ internal class DeliverySessionsServiceTest {
   @Test
   fun `makes a booking when a session is updated`() {
     val session = deliverySessionFactory.createScheduled()
+    val appointment = session.currentAppointment
     val actionPlanId = UUID.randomUUID()
     val sessionNumber = session.sessionNumber
     val referral = session.referral
@@ -282,7 +283,7 @@ internal class DeliverySessionsServiceTest {
     whenever(
       communityAPIBookingService.book(
         referral,
-        session.currentAppointment,
+        appointment,
         appointmentTime,
         durationInMinutes,
         SERVICE_DELIVERY,
@@ -308,7 +309,7 @@ internal class DeliverySessionsServiceTest {
     verify(appointmentService, times(1)).createOrUpdateAppointmentDeliveryDetails(any(), eq(AppointmentDeliveryType.PHONE_CALL), eq(AppointmentSessionType.ONE_TO_ONE), isNull(), isNull())
     verify(communityAPIBookingService).book(
       referral,
-      session.currentAppointment,
+      appointment,
       appointmentTime,
       durationInMinutes,
       SERVICE_DELIVERY,
@@ -648,6 +649,7 @@ internal class DeliverySessionsServiceTest {
   @Test
   fun `makes a booking with delius office location`() {
     val session = deliverySessionFactory.createScheduled()
+    val appointment = session.currentAppointment
     val actionPlanId = UUID.randomUUID()
     val sessionNumber = session.sessionNumber
     val referral = session.referral
@@ -659,7 +661,7 @@ internal class DeliverySessionsServiceTest {
     whenever(
       communityAPIBookingService.book(
         referral,
-        session.currentAppointment,
+        appointment,
         appointmentTime,
         durationInMinutes,
         SERVICE_DELIVERY,
@@ -688,7 +690,7 @@ internal class DeliverySessionsServiceTest {
     verify(appointmentService, times(1)).createOrUpdateAppointmentDeliveryDetails(any(), eq(AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE), eq(AppointmentSessionType.ONE_TO_ONE), isNull(), eq(npsOfficeCode))
     verify(communityAPIBookingService).book(
       referral,
-      session.currentAppointment,
+      appointment,
       appointmentTime,
       durationInMinutes,
       SERVICE_DELIVERY,
