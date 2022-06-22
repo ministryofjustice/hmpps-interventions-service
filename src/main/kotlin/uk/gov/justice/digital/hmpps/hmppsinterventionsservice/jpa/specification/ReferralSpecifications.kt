@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Dynamic
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import java.time.OffsetDateTime
 import java.util.UUID
 import javax.persistence.criteria.JoinType
@@ -28,6 +29,15 @@ class ReferralSpecifications {
     fun <T> unassigned(): Specification<T> {
       return Specification<T> { root, query, cb ->
         cb.isEmpty(root.get<List<ReferralAssignment>>("assignments"))
+      }
+    }
+
+    fun <T> search(searchText: String): Specification<T> {
+      return Specification<T> { root, query, cb ->
+        val serviceUserDataJoin = root.join<T, ServiceUserData>("serviceUserData", JoinType.INNER)
+        val exp1 = cb.concat(cb.upper(serviceUserDataJoin.get("firstName")), " ")
+        val exp2 = cb.concat(exp1, cb.upper(serviceUserDataJoin.get("lastName")))
+        cb.equal(exp2, searchText.uppercase())
       }
     }
 

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.provider.Arguments
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.spy
@@ -62,6 +63,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTes
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SentReferralSummariesFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceProviderFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAssessmentFactory
 import java.time.LocalDate
 import java.time.LocalTime
@@ -99,6 +101,7 @@ class ReferralServiceTest @Autowired constructor(
   private val actionPlanFactory = ActionPlanFactory(entityManager)
   private val appointmentFactory = AppointmentFactory(entityManager)
   private val supplierAssessmentFactory = SupplierAssessmentFactory(entityManager)
+  private val serviceUserDataFactory = ServiceUserFactory(entityManager)
 
   private val referralEventPublisher: ReferralEventPublisher = mock()
   private val referenceGenerator: ReferralReferenceGenerator = spy(ReferralReferenceGenerator())
@@ -143,6 +146,16 @@ class ReferralServiceTest @Autowired constructor(
     draftOasysRiskInformationService,
     referralDetailsRepository,
   )
+
+  companion object {
+    @JvmStatic
+    fun names1234(): List<Arguments> {
+      return listOf(
+        Arguments.of("bob-smith", "smith", "bob-smith smith"),
+        Arguments.of("john", "blue-red", "john blue-red")
+      )
+    }
+  }
 
   @AfterEach
   fun `clear referrals`() {
@@ -842,6 +855,79 @@ class ReferralServiceTest @Autowired constructor(
   }
 
   @Nested
+  @DisplayName("get sent referrals with person on probation search")
+  inner class GetSentReferralsWithPopSearchTest {
+    lateinit var user: AuthUser
+    lateinit var pageRequest: PageRequest
+    lateinit var referral: Referral
+    lateinit var referral2: Referral
+    lateinit var referral3: Referral
+    lateinit var provider: ServiceProvider
+    lateinit var intervention: Intervention
+
+    @BeforeEach
+    fun `setup referrals`() {
+      user = userFactory.create("test_user", "auth")
+      pageRequest = PageRequest.of(0, 20)
+      provider = serviceProviderFactory.create("test")
+      intervention = interventionFactory.create(contract = contractFactory.create(primeProvider = provider))
+
+      referral = referralFactory.createSent(intervention = intervention)
+      val serviceUserData = serviceUserDataFactory.create(firstName = "john", lastName = "smith", referral = referral)
+      referral.serviceUserData = serviceUserData
+
+      referral2 = referralFactory.createSent(intervention = intervention)
+      val serviceUserData2 = serviceUserDataFactory.create(firstName = "john", lastName = "smith", referral = referral2)
+      referral2.serviceUserData = serviceUserData2
+
+      referral3 = referralFactory.createSent(intervention = intervention)
+      val serviceUserData3 = serviceUserDataFactory.create(firstName = "tim", lastName = "brown", referral = referral3)
+      referral3.serviceUserData = serviceUserData3
+
+      whenever(serviceProviderAccessScopeMapper.fromUser(user))
+        .thenReturn(ServiceProviderAccessScope(setOf(provider), setOf(intervention.dynamicFrameworkContract)))
+    }
+
+    @Test
+    fun `only referrals that have a person on probation matching the search text should be returned`() {
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest, "john smith")
+
+      assertThat(result).size().isEqualTo(2)
+      assertThat(result.first().id).isEqualTo(referral.id)
+      assertThat(result.last().id).isEqualTo(referral2.id)
+    }
+
+    @Test
+    fun `no referrals should be returned if no people on probation matches the search term`() {
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest, "hello there")
+      assertThat(result).size().isEqualTo(0)
+    }
+
+    @Test
+    fun `hyphenated names are returned in the search results `() {
+      val referralWithHyphenatedName = referralFactory.createSent(intervention = intervention)
+      val serviceUserData2 = serviceUserDataFactory.create(firstName = "bob-blue", lastName = "green", referral = referralWithHyphenatedName)
+      referralWithHyphenatedName.serviceUserData = serviceUserData2
+
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest, "bob-blue green")
+      assertThat(result).size().isEqualTo(1)
+      assertThat(result.first().id).isEqualTo(referralWithHyphenatedName.id)
+    }
+
+    @Test
+    fun `a search for an empty string should return no results`() {
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest, "")
+      assertThat(result).size().isEqualTo(0)
+    }
+
+    @Test
+    fun `a search for a space should return no results`() {
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest, " ")
+      assertThat(result).size().isEqualTo(0)
+    }
+  }
+
+  @Nested
   @DisplayName("get sent referrals with filter options")
   inner class GetSentReferralsFilterOptionsTest {
     lateinit var user: AuthUser
@@ -931,7 +1017,7 @@ class ReferralServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `by default only non sent referrals are filtered`() {
+    fun `by default only sent referrals are returned`() {
       val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest)
       assertThat(result)
         .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
