@@ -55,7 +55,7 @@ class ActionPlanContracts(private val setupAssistant: SetupAssistant) {
     setupAssistant.createDeliverySession(
       1,
       120,
-      OffsetDateTime.parse("2021-05-13T12:30:00+00:00"),
+      OffsetDateTime.now(),
       appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_OTHER,
       appointmentDeliveryAddress = appointmentDeliveryAddress,
       appointmentSessionType = AppointmentSessionType.GROUP,
@@ -64,7 +64,7 @@ class ActionPlanContracts(private val setupAssistant: SetupAssistant) {
     setupAssistant.createDeliverySession(
       2,
       120,
-      OffsetDateTime.parse("2021-05-13T12:30:00+00:00"),
+      OffsetDateTime.now(),
       appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_OTHER,
       appointmentDeliveryAddress = appointmentDeliveryAddress,
       appointmentSessionType = AppointmentSessionType.GROUP,

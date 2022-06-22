@@ -30,7 +30,6 @@ class SupplierAssessmentController(
   private val appointmentValidator: AppointmentValidator,
   private val appointmentService: AppointmentService,
 ) {
-
   @Deprecated("superseded by POST /referral/{referralId}/supplier-assessment and PUT /referral/{referralId}/supplier-assessment/{appointmentId}")
   @PutMapping("/supplier-assessment/{id}/schedule-appointment")
   fun updateSupplierAssessmentAppointment(
@@ -40,7 +39,7 @@ class SupplierAssessmentController(
   ): AppointmentDTO {
     val user = userMapper.fromToken(authentication)
     val supplierAssessment = supplierAssessmentService.getSupplierAssessmentById(id)
-    appointmentValidator.validateUpdateAppointment(updateAppointmentDTO)
+    appointmentValidator.validateUpdateAppointment(updateAppointmentDTO, supplierAssessment.referral.sentAt)
     return AppointmentDTO.from(
       supplierAssessmentService.createOrUpdateSupplierAssessmentAppointment(
         supplierAssessment,
@@ -66,7 +65,7 @@ class SupplierAssessmentController(
     authentication: JwtAuthenticationToken,
   ): AppointmentDTO {
     val user = userMapper.fromToken(authentication)
-    appointmentValidator.validateUpdateAppointment(updateAppointmentDTO)
+    appointmentValidator.validateUpdateAppointment(updateAppointmentDTO, supplierAssessmentService.getReferral(referralId).sentAt)
     val appointment = supplierAssessmentService.scheduleNewSupplierAssessmentAppointment(
       referralId,
       updateAppointmentDTO.durationInMinutes,
@@ -87,7 +86,7 @@ class SupplierAssessmentController(
     authentication: JwtAuthenticationToken,
   ): AppointmentDTO {
     val user = userMapper.fromToken(authentication)
-    appointmentValidator.validateUpdateAppointment(updateAppointmentDTO)
+    appointmentValidator.validateUpdateAppointment(updateAppointmentDTO, supplierAssessmentService.getReferral(referralId).sentAt)
     val appointment = supplierAssessmentService.rescheduleSupplierAssessmentAppointment(
       referralId,
       appointmentId,

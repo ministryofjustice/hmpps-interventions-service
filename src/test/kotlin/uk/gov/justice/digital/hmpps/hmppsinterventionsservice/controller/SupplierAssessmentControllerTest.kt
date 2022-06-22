@@ -53,9 +53,9 @@ class SupplierAssessmentControllerTest {
   inner class UpdateSupplierAssessmentAppointment {
     @Test
     fun `update supplier assessment appointment details`() {
-      val referral = referralFactory.createSent()
+      val referral = referralFactory.createSent(sentAt = OffsetDateTime.now().minusDays(10))
       val durationInMinutes = 60
-      val appointmentTime = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
+      val appointmentTime = OffsetDateTime.now().minusDays(5)
       val appointmentDeliveryType = AppointmentDeliveryType.PHONE_CALL
       val npsOfficeCode = "CRSEXT"
       val appointmentSessionType = AppointmentSessionType.ONE_TO_ONE
@@ -77,15 +77,15 @@ class SupplierAssessmentControllerTest {
       whenever(supplierAssessmentService.createOrUpdateSupplierAssessmentAppointment(supplierAssessment, durationInMinutes, appointmentTime, user, appointmentDeliveryType, appointmentSessionType, addressDTO, npsOfficeCode, null, null, null, null)).thenReturn(supplierAssessment.currentAppointment)
 
       val response = supplierAssessmentController.updateSupplierAssessmentAppointment(referral.id, update, token)
-      verify(appointmentValidator).validateUpdateAppointment(eq(update))
+      verify(appointmentValidator).validateUpdateAppointment(eq(update), any())
       assertThat(response).isNotNull
     }
 
     @Test
     fun `update supplier assessment with new historic appointment`() {
-      val referral = referralFactory.createSent()
+      val referral = referralFactory.createSent(sentAt = OffsetDateTime.now().minusDays(10))
       val durationInMinutes = 60
-      val appointmentTime = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
+      val appointmentTime = OffsetDateTime.now().minusDays(2)
       val appointmentDeliveryType = AppointmentDeliveryType.PHONE_CALL
       val npsOfficeCode = "CRSEXT"
       val appointmentSessionType = AppointmentSessionType.ONE_TO_ONE
@@ -103,7 +103,7 @@ class SupplierAssessmentControllerTest {
       whenever(supplierAssessmentService.createOrUpdateSupplierAssessmentAppointment(supplierAssessment, durationInMinutes, appointmentTime, user, appointmentDeliveryType, appointmentSessionType, addressDTO, npsOfficeCode, LATE, "attended", true, "behaviour")).thenReturn(supplierAssessment.currentAppointment)
 
       val response = supplierAssessmentController.updateSupplierAssessmentAppointment(referral.id, update, token)
-      verify(appointmentValidator).validateUpdateAppointment(eq(update))
+      verify(appointmentValidator).validateUpdateAppointment(eq(update), any())
       assertThat(response).isNotNull
     }
   }

@@ -62,7 +62,7 @@ class DeliverySessionServiceTest @Autowired constructor(
     deliverySessionRepository, actionPlanRepository, authUserRepository,
     actionPlanAppointmentEventPublisher,
     communityAPIBookingService,
-    appointmentService, appointmentRepository,
+    appointmentService, appointmentRepository, referralRepository
   )
 
   private val referralFactory = ReferralFactory(entityManager)
