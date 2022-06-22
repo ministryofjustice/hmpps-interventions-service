@@ -205,11 +205,7 @@ class DeliverySessionService(
         deliusAppointmentId = deliusAppointmentId,
         createdBy = it.createdBy,
         createdAt = OffsetDateTime.now(),
-        referral = it.referral,
-        appointmentDelivery = it.appointmentDelivery,
-        appointmentFeedbackSubmittedAt = it.appointmentFeedbackSubmittedAt,
-        attendanceSubmittedAt = it.attendanceSubmittedAt,
-        attendanceBehaviourSubmittedAt = it.attendanceBehaviourSubmittedAt
+        referral = it.referral
       )
     } ?: Appointment(
       id = UUID.randomUUID(),
