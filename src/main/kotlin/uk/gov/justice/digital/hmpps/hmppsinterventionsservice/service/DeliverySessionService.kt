@@ -196,25 +196,15 @@ class DeliverySessionService(
       notifyProbationPractitioner,
     )
 
-    // creating a new appointment from the existing appointment
-    val appointment = existingAppointment?.let {
-      Appointment(
-        id = UUID.randomUUID(),
-        appointmentTime = appointmentTime,
-        durationInMinutes = durationInMinutes,
-        deliusAppointmentId = deliusAppointmentId,
-        createdBy = it.createdBy,
-        createdAt = OffsetDateTime.now(),
-        referral = it.referral
-      )
-    } ?: Appointment(
+    // creating a new appointment from the existing appointment or else create a new appointment
+    val appointment = Appointment(
       id = UUID.randomUUID(),
-      createdBy = authUserRepository.save(updatedBy),
-      createdAt = OffsetDateTime.now(),
-      appointmentTime = appointmentTime,
       durationInMinutes = durationInMinutes,
+      appointmentTime = appointmentTime,
       deliusAppointmentId = deliusAppointmentId,
-      referral = session.referral
+      createdAt = OffsetDateTime.now(),
+      createdBy = existingAppointment?.createdBy ?: authUserRepository.save(updatedBy),
+      referral = existingAppointment?.referral ?: session.referral
     )
 
     appointmentRepository.saveAndFlush(appointment)
