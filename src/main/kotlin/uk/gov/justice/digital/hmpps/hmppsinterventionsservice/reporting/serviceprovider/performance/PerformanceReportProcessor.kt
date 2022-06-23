@@ -25,7 +25,7 @@ class PerformanceReportProcessor(
     // note: all referrals here are 'sent', we can safely access fields like 'referenceNumber'
     val contract = referral.intervention.dynamicFrameworkContract
     val approvedActionPlan = referral.approvedActionPlan
-    //Supplier assessment will only have the latest appointments. Hence, retrieving from the appointments
+    // Supplier assessment will only have the latest appointments. Hence, retrieving from the appointments
     val appointments = appointmentRepository.findAllByReferralId(referral.id)
     val firstAppointment: Appointment? = appointments.minByOrNull { it.createdAt }
     val firstAppointmentWithNonAttendance: Appointment? = appointments.filter { it.attended == Attended.NO }.minByOrNull { it.appointmentTime }
