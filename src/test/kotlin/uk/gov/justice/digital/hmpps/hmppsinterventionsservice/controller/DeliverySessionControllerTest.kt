@@ -158,6 +158,7 @@ internal class DeliverySessionControllerTest {
         referral = deliverySession.referral,
       )
       deliverySession.appointments.add(newAppointment)
+      whenever(sessionsService.getDeliverySessionByActionPlanIdOrThrowException(actionPlanId, sessionNumber)).thenReturn(deliverySession)
       whenever(
         sessionsService.updateSessionAppointment(
           actionPlanId,
