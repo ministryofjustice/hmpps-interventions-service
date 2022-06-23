@@ -53,9 +53,10 @@ class SupplierAssessmentService(
     notifyProbationPractitioner: Boolean? = null,
     behaviourDescription: String? = null,
   ): Appointment {
+    val existingAppointment = supplierAssessment.currentAppointment
     val appointment = appointmentService.createOrUpdateAppointment(
       supplierAssessment.referral,
-      supplierAssessment.currentAppointment,
+      existingAppointment,
       durationInMinutes,
       appointmentTime,
       SUPPLIER_ASSESSMENT,
@@ -69,9 +70,26 @@ class SupplierAssessmentService(
       notifyProbationPractitioner,
       behaviourDescription
     )
-    supplierAssessment.appointments.add(appointment)
-    supplierAssessmentRepository.save(supplierAssessment)
+    handleSupplierAppointments(existingAppointment, supplierAssessment, appointment)
     return appointment
+  }
+
+  private fun handleSupplierAppointments(
+    existingAppointment: Appointment?,
+    supplierAssessment: SupplierAssessment,
+    appointment: Appointment
+  ) {
+    when {
+      existingAppointment == null || existingAppointment.attended == Attended.NO -> {
+        supplierAssessment.appointments.add(appointment)
+      }
+      existingAppointment.attended == null -> {
+        // Replacing the existing appointment with the new appointment so that we can maintain both in the appointment repository
+        supplierAssessment.appointments.remove(existingAppointment)
+        supplierAssessment.appointments.add(appointment)
+      }
+    }
+    supplierAssessmentRepository.save(supplierAssessment)
   }
 
   fun scheduleNewSupplierAssessmentAppointment(

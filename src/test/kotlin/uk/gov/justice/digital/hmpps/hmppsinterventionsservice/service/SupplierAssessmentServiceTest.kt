@@ -15,6 +15,7 @@ import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentDeliveryType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentSessionType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentType.SUPPLIER_ASSESSMENT
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
@@ -137,6 +138,81 @@ class SupplierAssessmentServiceTest {
 
       assertThat(arguments.appointments.size).isEqualTo(1)
       assertThat(arguments.currentAppointment).isEqualTo(appointment)
+    }
+
+    @Test
+    fun `can replace the existing appointment with the new appointment`() {
+
+      val appointment = appointmentFactory.create()
+      val supplierAssessment = supplierAssessmentFactory.create(appointment = appointment)
+      val newAppointment = appointmentFactory.create()
+
+      whenever(
+        appointmentService.createOrUpdateAppointment(
+          eq(supplierAssessment.referral),
+          isNull(),
+          eq(durationInMinutes),
+          eq(appointmentTime),
+          eq(SUPPLIER_ASSESSMENT),
+          eq(createdByUser),
+          eq(appointmentDeliveryType),
+          eq(appointmentSessionType),
+          isNull(),
+          isNull(),
+          isNull(),
+          isNull(),
+          isNull(),
+          isNull(),
+        )
+      ).thenReturn(newAppointment)
+      whenever(supplierAssessmentRepository.save(any())).thenReturn(supplierAssessment)
+
+      val supplierAssessmentAppointment = supplierAssessmentService.createOrUpdateSupplierAssessmentAppointment(supplierAssessment, durationInMinutes, appointmentTime, createdByUser, appointmentDeliveryType, appointmentSessionType)
+
+      val argumentCaptor = argumentCaptor<SupplierAssessment>()
+      verify(supplierAssessmentRepository, atLeastOnce()).save(argumentCaptor.capture())
+      val arguments = argumentCaptor.firstValue
+
+      assertThat(arguments.appointments.size).isEqualTo(1)
+      assertThat(arguments.currentAppointment).isEqualTo(supplierAssessmentAppointment)
+    }
+
+    @Test
+    fun `can create a new appointment when the previous appointment was not attended`() {
+
+      val appointment = appointmentFactory.create(attended = Attended.NO)
+      val supplierAssessment = supplierAssessmentFactory.create(appointment = appointment)
+      val newAppointment = appointmentFactory.create()
+      val attended = Attended.NO
+
+      whenever(
+        appointmentService.createOrUpdateAppointment(
+          eq(supplierAssessment.referral),
+          eq(supplierAssessment.currentAppointment),
+          eq(durationInMinutes),
+          eq(appointmentTime),
+          eq(SUPPLIER_ASSESSMENT),
+          eq(createdByUser),
+          eq(appointmentDeliveryType),
+          eq(appointmentSessionType),
+          isNull(),
+          isNull(),
+          eq(attended),
+          isNull(),
+          isNull(),
+          isNull(),
+        )
+      ).thenReturn(newAppointment)
+      whenever(supplierAssessmentRepository.save(any())).thenReturn(supplierAssessment)
+
+      val supplierAssessmentAppointment = supplierAssessmentService.createOrUpdateSupplierAssessmentAppointment(supplierAssessment, durationInMinutes, appointmentTime, createdByUser, appointmentDeliveryType, appointmentSessionType, attended = attended)
+
+      val argumentCaptor = argumentCaptor<SupplierAssessment>()
+      verify(supplierAssessmentRepository, atLeastOnce()).save(argumentCaptor.capture())
+      val arguments = argumentCaptor.firstValue
+
+      assertThat(arguments.appointments.size).isEqualTo(2)
+      assertThat(arguments.currentAppointment).isEqualTo(supplierAssessmentAppointment)
     }
   }
 

@@ -75,11 +75,10 @@ class AppointmentService(
         )
       }
       // the current appointment needs to be updated
-      appointment!!.attended == null -> {
+      appointment.attended == null -> {
         val deliusAppointmentId =
           communityAPIBookingService.book(referral, appointment, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode)
         updateAppointment(
-          appointment,
           durationInMinutes,
           appointmentTime,
           deliusAppointmentId,
@@ -89,6 +88,7 @@ class AppointmentService(
           appointmentDeliveryAddress,
           npsOfficeCode,
           attended,
+          referral,
           additionalAttendanceInformation,
           notifyProbationPractitioner,
           behaviourDescription,
@@ -273,14 +273,13 @@ class AppointmentService(
       createdAt = OffsetDateTime.now(),
       referral = referral,
     )
-    setAttendanceAndBehaviourIfHistoricAppointment(appointment, appointmentTime, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, createdByUser, appointmentType)
+    setAttendanceAndBehaviourIfHistoricAppointment(appointment, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, createdByUser, appointmentType)
     appointmentRepository.saveAndFlush(appointment)
     createOrUpdateAppointmentDeliveryDetails(appointment, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
     return appointment
   }
 
   private fun updateAppointment(
-    appointment: Appointment,
     durationInMinutes: Int,
     appointmentTime: OffsetDateTime,
     deliusAppointmentId: Long?,
@@ -290,16 +289,23 @@ class AppointmentService(
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String?,
     attended: Attended?,
+    referral: Referral,
     additionalAttendanceInformation: String?,
     notifyProbationPractitioner: Boolean?,
     behaviourDescription: String?,
     appointmentType: AppointmentType,
   ): Appointment {
-    appointment.durationInMinutes = durationInMinutes
-    appointment.appointmentTime = appointmentTime
-    appointment.deliusAppointmentId = deliusAppointmentId
-    setAttendanceAndBehaviourIfHistoricAppointment(appointment, appointmentTime, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, createdByUser, appointmentType)
-    val appointment = appointmentRepository.save(appointment)
+    val appointment = Appointment(
+      id = UUID.randomUUID(),
+      appointmentTime = appointmentTime,
+      durationInMinutes = durationInMinutes,
+      deliusAppointmentId = deliusAppointmentId,
+      createdBy = authUserRepository.save(createdByUser),
+      createdAt = OffsetDateTime.now(),
+      referral = referral,
+    )
+    setAttendanceAndBehaviourIfHistoricAppointment(appointment, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, createdByUser, appointmentType)
+    appointmentRepository.saveAndFlush(appointment)
     createOrUpdateAppointmentDeliveryDetails(appointment, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
     return appointment
   }
@@ -385,7 +391,6 @@ class AppointmentService(
 
   private fun setAttendanceAndBehaviourIfHistoricAppointment(
     appointment: Appointment,
-    appointmentTime: OffsetDateTime,
     attended: Attended?,
     additionalAttendanceInformation: String?,
     behaviourDescription: String?,
