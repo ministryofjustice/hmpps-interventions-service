@@ -1,10 +1,10 @@
--- to enable querying the single "live" entry via `AND superseded = false`
+-- to enable querying the single "live" appointments
 ALTER TABLE appointment
     ADD COLUMN superseded bool NOT NULL DEFAULT false;
 
--- migrating the values to "true" will be done in a subsequent deploy, to avoid race conditions where
--- • we migrate the data
--- • assignments happen with the old code not using `superseded`
--- • then new code takes over
+-- migrating the values to "true" will be done in when a new reschedule start to happen
+-- • all the appointments can be false to start with
+-- • reschedule appointments happens, new appointments will be created instead of overwriting and the old appointments will be set to true
 
--- instead, we'll deploy in one go, _then_ migrate all the old data once the new code is live and ensures consistency
+-- inserting the metadata for the new column
+INSERT INTO metadata (table_name, column_name, sensitive) VALUES ('appointment','superseded',FALSE);
