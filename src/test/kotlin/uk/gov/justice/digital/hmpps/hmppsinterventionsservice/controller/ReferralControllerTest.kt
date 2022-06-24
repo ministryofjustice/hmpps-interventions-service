@@ -36,6 +36,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralCo
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ServiceCategoryService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
@@ -69,6 +70,7 @@ internal class ReferralControllerTest {
   private val referralFactory = ReferralFactory()
   private val authUserFactory = AuthUserFactory()
   private val supplierAssessmentFactory = SupplierAssessmentFactory()
+  private val appointmentsFactory = AppointmentFactory()
   private val actionPlanFactory = ActionPlanFactory()
 
   @Test
@@ -184,6 +186,30 @@ internal class ReferralControllerTest {
         ),
       )
       assertThat(supplierAssessmentDto.id).isEqualTo(supplierAssessment.id)
+    }
+
+    @Test
+    fun `getSupplierAssessmentAppointment returns a supplier assessment with only superseded appointments`() {
+      val oldAppointment = appointmentsFactory.create(superseded = true)
+      val newAppointment = appointmentsFactory.create()
+      val supplierAssessment = supplierAssessmentFactory.createWithMultipleAppointments(appointments = mutableSetOf(oldAppointment, newAppointment))
+      val referral = supplierAssessment.referral
+      referral.supplierAssessment = supplierAssessment
+
+      whenever(referralService.getSentReferral(eq(referral.id))).thenReturn(referral)
+      val supplierAssessmentDto = referralController.getSupplierAssessmentAppointment(
+        referral.id,
+        tokenFactory.create(
+          clientId = "interventions-event-client",
+          subject = "interventions-event-client",
+          authorities = arrayOf("ROLE_INTERVENTIONS_API_READ_ALL")
+        ),
+      )
+      assertThat(supplierAssessmentDto.id).isEqualTo(supplierAssessment.id)
+      assertThat(supplierAssessmentDto.appointments)
+        .hasSize(1)
+        .extracting("id")
+        .contains(newAppointment.id)
     }
 
     @Test

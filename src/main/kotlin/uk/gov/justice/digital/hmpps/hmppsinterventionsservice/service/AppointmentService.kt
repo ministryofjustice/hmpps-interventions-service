@@ -80,6 +80,7 @@ class AppointmentService(
           communityAPIBookingService.book(referral, appointment, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode)
         updateAppointment(
           durationInMinutes,
+          appointment,
           appointmentTime,
           deliusAppointmentId,
           createdByUser,
@@ -281,6 +282,7 @@ class AppointmentService(
 
   private fun updateAppointment(
     durationInMinutes: Int,
+    oldAppointment: Appointment,
     appointmentTime: OffsetDateTime,
     deliusAppointmentId: Long?,
     createdByUser: AuthUser,
@@ -305,7 +307,9 @@ class AppointmentService(
       referral = referral,
     )
     setAttendanceAndBehaviourIfHistoricAppointment(appointment, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, createdByUser, appointmentType)
-    appointmentRepository.saveAndFlush(appointment)
+    oldAppointment.superseded = true
+    appointmentRepository.saveAndFlush(oldAppointment)
+    appointmentRepository.save(appointment)
     createOrUpdateAppointmentDeliveryDetails(appointment, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
     return appointment
   }

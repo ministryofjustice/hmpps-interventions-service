@@ -150,7 +150,7 @@ class SupplierAssessmentServiceTest {
       whenever(
         appointmentService.createOrUpdateAppointment(
           eq(supplierAssessment.referral),
-          isNull(),
+          eq(supplierAssessment.currentAppointment),
           eq(durationInMinutes),
           eq(appointmentTime),
           eq(SUPPLIER_ASSESSMENT),
@@ -173,7 +173,7 @@ class SupplierAssessmentServiceTest {
       verify(supplierAssessmentRepository, atLeastOnce()).save(argumentCaptor.capture())
       val arguments = argumentCaptor.firstValue
 
-      assertThat(arguments.appointments.size).isEqualTo(1)
+      assertThat(arguments.appointments.size).isEqualTo(2)
       assertThat(arguments.currentAppointment).isEqualTo(supplierAssessmentAppointment)
     }
 

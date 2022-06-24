@@ -23,7 +23,7 @@ internal class PerformanceReportDataProcessorTest {
   private val appointmentRepository: AppointmentRepository = mock()
   private val actionPlanFactory = ActionPlanFactory()
 
-  private val processor = PerformanceReportProcessor(actionPlanService, appointmentRepository)
+  private val processor = PerformanceReportProcessor(actionPlanService)
 
   private val referralFactory = ReferralFactory()
 
