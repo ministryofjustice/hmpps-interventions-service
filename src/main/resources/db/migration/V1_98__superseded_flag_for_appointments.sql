@@ -7,4 +7,4 @@ ALTER TABLE appointment
 -- • reschedule appointments happens, new appointments will be created instead of overwriting and the old appointments will be set to true
 
 -- inserting the metadata for the new column
-INSERT INTO metadata (table_name, column_name, sensitive) VALUES ('appointment','superseded',FALSE);
+INSERT INTO metadata (table_name, column_name, sensitive, domain_data) VALUES ('appointment','superseded',FALSE, TRUE);
