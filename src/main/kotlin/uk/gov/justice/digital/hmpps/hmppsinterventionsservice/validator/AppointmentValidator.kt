@@ -37,6 +37,7 @@ class AppointmentValidator {
           validateAddress(appointmentDeliveryAddress, errors)
         }
       }
+      else -> {}
     }
 
     if (referralStartDate != null && updateAppointmentDTO.appointmentTime.isBefore(referralStartDate)) {

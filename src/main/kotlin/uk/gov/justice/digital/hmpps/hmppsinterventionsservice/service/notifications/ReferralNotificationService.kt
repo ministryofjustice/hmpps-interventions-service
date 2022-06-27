@@ -75,6 +75,7 @@ class ReferralNotificationService(
       ReferralEventType.DETAILS_AMENDED -> {
         handleDetailsChangedEvent(event)
       }
+      else -> {}
     }
   }
 
