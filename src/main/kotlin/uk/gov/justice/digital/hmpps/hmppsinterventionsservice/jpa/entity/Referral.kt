@@ -21,6 +21,7 @@ import javax.persistence.ManyToMany
 import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
 import javax.persistence.OneToOne
+import javax.persistence.PrePersist
 import javax.persistence.PrimaryKeyJoinColumn
 import javax.persistence.Table
 import javax.validation.constraints.NotNull
@@ -120,5 +121,24 @@ class Referral(
 
   val referralDetails: ReferralDetails? get() {
     return referralDetailsHistory?.firstOrNull { it.supersededById == null }
+  }
+
+  // A better way to ensure invariants, perhaps, would be to remove the `assignment` collection
+  // and use a @Service to add/remove assignments and validate invariants during those operations
+  @PrePersist
+  fun validateInvariants() {
+    // despite the type guarantee, the persistence layer can create this class with a `null` assignments field
+    if (assignments.isNullOrEmpty()) {
+      return
+    }
+
+    val expectedSuperseded = assignments.size - 1
+    val totalSuperseded = assignments.count { it.superseded }
+    val latestIsNotSuperseded = currentAssignment!!.superseded.not()
+    val valid = (totalSuperseded == expectedSuperseded) && latestIsNotSuperseded
+
+    if (!valid) {
+      throw IllegalStateException("Invariant violation: referral assignments must have all assignments superseded, except the latest one")
+    }
   }
 }
