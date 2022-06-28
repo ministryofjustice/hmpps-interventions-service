@@ -15,7 +15,12 @@ class AssignmentsFactory(em: TestEntityManager? = null) : EntityFactory(em) {
         this.add(authUserFactory.create(randomAlphanumeric(6), randomAlphanumeric(5), randomAlphanumeric(12)))
       }
     }
-    return assignedUsers.mapIndexed { i, u ->
+    return createInOrder(*assignedUsers.toTypedArray())
+  }
+
+  fun createInOrder(vararg users: AuthUser): List<ReferralAssignment> {
+    val numberOfAssignments = users.size
+    return users.mapIndexed { i, u ->
       val latest = numberOfAssignments - 1
       ReferralAssignment(
         OffsetDateTime.now().minusHours(latest.toLong()).plusHours(i.toLong()),
