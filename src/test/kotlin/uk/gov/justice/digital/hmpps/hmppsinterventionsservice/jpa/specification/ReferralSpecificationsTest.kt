@@ -168,18 +168,14 @@ class ReferralSpecificationsTest @Autowired constructor(
       val someOtherUser = authUserFactory.create(id = "someOtherUser")
 
       val assignments: List<ReferralAssignment> = listOf(
-        ReferralAssignment(OffsetDateTime.now(), assignedBy = someOtherUser, assignedTo = user),
-        ReferralAssignment(OffsetDateTime.now().minusDays(1), assignedBy = someOtherUser, assignedTo = someOtherUser),
+        ReferralAssignment(OffsetDateTime.now().minusDays(1), assignedBy = someOtherUser, assignedTo = someOtherUser, superseded = true),
+        ReferralAssignment(OffsetDateTime.now(), assignedBy = someOtherUser, assignedTo = user, superseded = false),
       )
 
       val assignedReferral = referralFactory.createAssigned(assignments = assignments)
-      val assignedReferralSummary = referralSumariesFactory.getReferralSummary(assignedReferral)
-
       val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.currentlyAssignedTo(user.id))
 
-      assertThat(result)
-        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
-        .containsExactly(assignedReferralSummary)
+      assertThat(result.map { it.id }).containsExactly(assignedReferral.id)
     }
 
     @Test
@@ -188,8 +184,8 @@ class ReferralSpecificationsTest @Autowired constructor(
       val someOtherUser = authUserFactory.create(id = "someOtherUser")
 
       val assignments: List<ReferralAssignment> = listOf(
-        ReferralAssignment(OffsetDateTime.now(), assignedBy = someOtherUser, assignedTo = someOtherUser),
-        ReferralAssignment(OffsetDateTime.now().minusDays(1), assignedBy = someOtherUser, assignedTo = user),
+        ReferralAssignment(OffsetDateTime.now().minusDays(1), assignedBy = someOtherUser, assignedTo = user, superseded = true),
+        ReferralAssignment(OffsetDateTime.now(), assignedBy = someOtherUser, assignedTo = someOtherUser, superseded = false),
       )
 
       referralFactory.createAssigned(assignments = assignments)
@@ -203,7 +199,7 @@ class ReferralSpecificationsTest @Autowired constructor(
       val someOtherUser = authUserFactory.create(id = "someOtherUser")
 
       val assignments: List<ReferralAssignment> = listOf(
-        ReferralAssignment(OffsetDateTime.now(), assignedBy = someOtherUser, assignedTo = someOtherUser)
+        ReferralAssignment(OffsetDateTime.now(), assignedBy = someOtherUser, assignedTo = someOtherUser, superseded = false)
       )
 
       referralFactory.createAssigned(assignments = assignments)
