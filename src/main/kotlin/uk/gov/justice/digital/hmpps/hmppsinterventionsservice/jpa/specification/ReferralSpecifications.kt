@@ -8,7 +8,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Interve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import java.time.OffsetDateTime
-import java.util.UUID
 import javax.persistence.criteria.JoinType
 
 class ReferralSpecifications {
@@ -74,33 +73,14 @@ class ReferralSpecifications {
       return Specification<T> { root, _, _ -> root.get<String>("serviceUserCRN").`in`(serviceUserCRNs) }
     }
 
-    /**
-     * This is performing the equivalent of:
-     *
-     * SELECT r FROM referral r
-     * inner join referral_assignments ra
-     *    inner join auth_user au on ra.assigned_to_id = au.id
-     *  on ra.referral_id = r.id
-     * where ra.assigned_at = (SELECT MAX(assigned_at) FROM referral_assignments WHERE referral_id = ra.referral_id)
-     * and au.id = $USER_ID
-     */
     inline fun <reified T> currentlyAssignedTo(authUserId: String): Specification<T> {
-      return Specification<T> { root, query, cb ->
-        // INNER JOIN
+      return Specification<T> { root, _, cb ->
         val referralAssignmentJoin = root.join<T, ReferralAssignment>("assignments", JoinType.INNER)
-
-        // WHERE assigned_at = max(assigned_at)
-        val subquery = query.subquery(OffsetDateTime::class.java)
-        val subQueryReferral = subquery.from(T::class.java)
-        val subQueryReferralAssignmentJoin = subQueryReferral.join<T, ReferralAssignment>("assignments", JoinType.INNER)
-        val maxAssignedAt = cb.greatest(subQueryReferralAssignmentJoin.get<OffsetDateTime>("assignedAt"))
-        subquery.select(maxAssignedAt)
-        subquery.where(cb.equal(root.get<UUID>("id"), subQueryReferral.get<UUID>("id")))
-        val maxAssignedAtMatch = cb.equal(referralAssignmentJoin.get<OffsetDateTime>("assignedAt"), subquery)
-
-        // AND assigned_to = authUser
         val authUserJoin = referralAssignmentJoin.join<ReferralAssignment, AuthUser>("assignedTo", JoinType.LEFT)
-        cb.and(maxAssignedAtMatch, cb.equal(authUserJoin.get<String>("id"), authUserId))
+
+        val latestAssignment = cb.equal(referralAssignmentJoin.get<Boolean>("superseded"), false)
+        val sameUser = cb.equal(authUserJoin.get<String>("id"), authUserId)
+        cb.and(latestAssignment, sameUser)
       }
     }
   }
