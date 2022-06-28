@@ -15,25 +15,25 @@ class ReferralSpecifications {
   companion object {
 
     fun <T> sent(): Specification<T> {
-      return Specification<T> { root, query, cb ->
+      return Specification<T> { root, _, cb ->
         cb.isNotNull(root.get<OffsetDateTime>("sentAt"))
       }
     }
 
     fun <T> concluded(): Specification<T> {
-      return Specification<T> { root, query, cb ->
+      return Specification<T> { root, _, cb ->
         cb.isNotNull(root.get<OffsetDateTime>("concludedAt"))
       }
     }
 
     fun <T> unassigned(): Specification<T> {
-      return Specification<T> { root, query, cb ->
+      return Specification<T> { root, _, cb ->
         cb.isEmpty(root.get<List<ReferralAssignment>>("assignments"))
       }
     }
 
     fun <T> search(searchText: String): Specification<T> {
-      return Specification<T> { root, query, cb ->
+      return Specification<T> { root, _, cb ->
         val serviceUserDataJoin = root.join<T, ServiceUserData>("serviceUserData", JoinType.INNER)
         val exp1 = cb.concat(cb.upper(serviceUserDataJoin.get("firstName")), " ")
         val exp2 = cb.concat(exp1, cb.upper(serviceUserDataJoin.get("lastName")))
@@ -49,7 +49,7 @@ class ReferralSpecifications {
      * ReferralConcluder.kt class.
      */
     fun <T> cancelled(): Specification<T> {
-      return Specification<T> { root, query, cb ->
+      return Specification<T> { root, _, cb ->
         cb.and(
           cb.isNotNull(root.get<OffsetDateTime>("endRequestedAt")),
           cb.isNotNull(root.get<OffsetDateTime>("concludedAt")),
@@ -59,7 +59,7 @@ class ReferralSpecifications {
     }
 
     fun <T> withSPAccess(contracts: Set<DynamicFrameworkContract>): Specification<T> {
-      return Specification<T> { root, query, cb ->
+      return Specification<T> { root, _, _ ->
         val interventionJoin = root.join<T, Intervention>("intervention", JoinType.INNER)
         val dynamicContractJoin = interventionJoin.join<Intervention, DynamicFrameworkContract>("dynamicFrameworkContract", JoinType.LEFT)
         dynamicContractJoin.`in`(contracts)
@@ -67,11 +67,11 @@ class ReferralSpecifications {
     }
 
     fun <T> createdBy(authUser: AuthUser): Specification<T> {
-      return Specification<T> { root, query, cb -> cb.equal(root.get<String>("createdBy"), authUser) }
+      return Specification<T> { root, _, cb -> cb.equal(root.get<String>("createdBy"), authUser) }
     }
 
     fun <T> matchingServiceUserReferrals(serviceUserCRNs: List<String>): Specification<T> {
-      return Specification<T> { root, query, cb -> root.get<String>("serviceUserCRN").`in`(serviceUserCRNs) }
+      return Specification<T> { root, _, _ -> root.get<String>("serviceUserCRN").`in`(serviceUserCRNs) }
     }
 
     /**
