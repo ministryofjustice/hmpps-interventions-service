@@ -54,18 +54,22 @@ internal class ReferralTest {
       referral.assignments.clear()
       assertThatNoException().isThrownBy { referral.validateInvariants() }
 
-      val firstAssignment =
+      val initialAssignment =
         ReferralAssignment(OffsetDateTime.now().plusMinutes(1L), assignee, assignee, superseded = false)
-      referral.assignments.add(firstAssignment)
+      referral.assignments.add(initialAssignment)
       assertThatNoException().isThrownBy { referral.validateInvariants() }
 
-      val secondAssignment =
+      val latestAssignment =
         ReferralAssignment(OffsetDateTime.now().plusMinutes(5L), assignee, assignee, superseded = false)
-      referral.assignments.add(secondAssignment)
+      referral.assignments.add(latestAssignment)
       assertThatExceptionOfType(IllegalStateException::class.java).isThrownBy { referral.validateInvariants() }
 
-      firstAssignment.superseded = true
-      secondAssignment.superseded = false
+      initialAssignment.superseded = false
+      latestAssignment.superseded = true
+      assertThatExceptionOfType(IllegalStateException::class.java).isThrownBy { referral.validateInvariants() }
+
+      initialAssignment.superseded = true
+      latestAssignment.superseded = false
       assertThatNoException().isThrownBy { referral.validateInvariants() }
     }
   }
