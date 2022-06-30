@@ -1,6 +1,8 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatExceptionOfType
+import org.assertj.core.api.Assertions.assertThatNoException
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
@@ -42,6 +44,33 @@ internal class ReferralTest {
       )
 
       assertThat(referral.currentAssignee).isEqualTo(currentAssignee)
+    }
+
+    @Test
+    fun `all but the latest assignment needs to be superseded`() {
+      val referral = referralFactory.createSent()
+      val assignee = authUserFactory.createSP()
+
+      referral.assignments.clear()
+      assertThatNoException().isThrownBy { referral.validateInvariants() }
+
+      val initialAssignment =
+        ReferralAssignment(OffsetDateTime.now().plusMinutes(1L), assignee, assignee, superseded = false)
+      referral.assignments.add(initialAssignment)
+      assertThatNoException().isThrownBy { referral.validateInvariants() }
+
+      val latestAssignment =
+        ReferralAssignment(OffsetDateTime.now().plusMinutes(5L), assignee, assignee, superseded = false)
+      referral.assignments.add(latestAssignment)
+      assertThatExceptionOfType(IllegalStateException::class.java).isThrownBy { referral.validateInvariants() }
+
+      initialAssignment.superseded = false
+      latestAssignment.superseded = true
+      assertThatExceptionOfType(IllegalStateException::class.java).isThrownBy { referral.validateInvariants() }
+
+      initialAssignment.superseded = true
+      latestAssignment.superseded = false
+      assertThatNoException().isThrownBy { referral.validateInvariants() }
     }
   }
 
