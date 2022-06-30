@@ -39,7 +39,9 @@ class AppointmentValidator {
       }
     }
 
-    if (referralStartDate != null && updateAppointmentDTO.appointmentTime.isBefore(referralStartDate)) {
+    val referralStartDateStartOfDay = referralStartDate?.withHour(0)?.withMinute(0)?.withSecond(1)
+
+    if (referralStartDate != null && updateAppointmentDTO.appointmentTime.isBefore(referralStartDateStartOfDay)) {
       errors.add(FieldError(field = "appointmentTime", error = Code.APPOINTMENT_TIME_BEFORE_REFERRAL_START_DATE))
     }
 
