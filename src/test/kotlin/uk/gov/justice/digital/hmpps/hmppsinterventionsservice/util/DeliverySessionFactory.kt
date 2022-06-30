@@ -38,6 +38,7 @@ class DeliverySessionFactory(em: TestEntityManager? = null) : EntityFactory(em) 
     appointmentTime: OffsetDateTime = OffsetDateTime.now().plusMonths(1),
     durationInMinutes: Int = 120,
     deliusAppointmentId: Long? = null,
+    attended: Attended? = null
   ): DeliverySession {
     val appointment = appointmentFactory.create(
       createdBy = createdBy,
@@ -46,6 +47,7 @@ class DeliverySessionFactory(em: TestEntityManager? = null) : EntityFactory(em) 
       durationInMinutes = durationInMinutes,
       appointmentFeedbackSubmittedBy = createdBy,
       deliusAppointmentId = deliusAppointmentId,
+      attended = attended
     )
 
     return save(

@@ -201,7 +201,7 @@ class DeliverySessionService(
     // TODO: Some code duplication here with AppointmentService.kt
     val deliusAppointmentId = communityAPIBookingService.book(
       session.referral,
-      if (attended != Attended.NO) existingAppointment else null,
+      if (existingAppointment != null && existingAppointment.attended != Attended.NO) existingAppointment else null,
       appointmentTime,
       durationInMinutes,
       SERVICE_DELIVERY,

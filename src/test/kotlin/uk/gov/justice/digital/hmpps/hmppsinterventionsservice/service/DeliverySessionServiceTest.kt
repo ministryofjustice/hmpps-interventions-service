@@ -547,7 +547,7 @@ class DeliverySessionServiceTest @Autowired constructor(
     @Test
     fun `can create new delivery session appointment for an appointment did not attend`() {
       val actionPlan = actionPlanFactory.createApproved(numberOfSessions = 1)
-      val session = deliverySessionFactory.createScheduled(referral = actionPlan.referral)
+      val session = deliverySessionFactory.createScheduled(referral = actionPlan.referral, attended = Attended.NO)
 
       whenever(actionPlanAppointmentEventPublisher.sessionFeedbackRecordedEvent(any())).doAnswer {
         val session = it.getArgument<DeliverySession>(0)
