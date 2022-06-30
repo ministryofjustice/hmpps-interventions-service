@@ -37,6 +37,7 @@ class AppointmentValidator {
           validateAddress(appointmentDeliveryAddress, errors)
         }
       }
+      else -> {}
     }
 
     val referralStartDateStartOfDay = referralStartDate?.withHour(0)?.withMinute(0)?.withSecond(1)

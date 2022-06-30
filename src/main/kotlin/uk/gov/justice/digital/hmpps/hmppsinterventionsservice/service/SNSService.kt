@@ -112,6 +112,7 @@ class SNSReferralService(
         // This is a system generated event at present and as such the actor will represent this
         snsPublisher.publish(event.referral.id, AuthUser.interventionsServiceUser, snsEvent)
       }
+      else -> {}
     }
   }
 }
@@ -164,6 +165,7 @@ class SNSActionPlanAppointmentService(
 
         snsPublisher.publish(referral.id, event.deliverySession.sessionFeedback.submittedBy!!, snsEvent)
       }
+      else -> {}
     }
   }
 }
@@ -216,6 +218,7 @@ class SNSAppointmentService(
 
         snsPublisher.publish(referral.id, appointment.appointmentFeedbackSubmittedBy!!, snsEvent)
       }
+      else -> {}
     }
   }
 }
