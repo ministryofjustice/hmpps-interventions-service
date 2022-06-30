@@ -570,7 +570,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         null
       )
 
-      verify(communityAPIBookingService).book(eq(session.referral), any(), eq(defaultAppointmentTime), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull())
+      verify(communityAPIBookingService).book(eq(session.referral), isNull(), eq(defaultAppointmentTime), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull())
 
       assertThat(updatedSession.appointments.size).isEqualTo(2)
       val appointment = updatedSession.currentAppointment!!
