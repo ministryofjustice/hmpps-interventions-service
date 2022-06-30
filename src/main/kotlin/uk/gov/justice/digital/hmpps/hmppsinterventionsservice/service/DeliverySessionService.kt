@@ -87,7 +87,10 @@ class DeliverySessionService(
       if (it.appointmentTime.isAfter(appointmentTime)) {
         throw EntityExistsException("can't schedule new appointment for session; new appointment occurs before previously scheduled appointment for session [referralId=$referralId, sessionNumber=$sessionNumber]")
       }
-      if (it.appointmentTime.isBefore(getReferral(referralId).sentAt)) {
+
+      val sentAtAtStartOfDay = getReferral(referralId).sentAt?.withHour(0)?.withMinute(0)?.withSecond(1)
+
+      if (it.appointmentTime.isBefore(sentAtAtStartOfDay)) {
         throw ValidationError("can't schedule new appointment for session; new appointment occurs before referral creation date for session [referralId=$referralId, sessionNumber=$sessionNumber]", listOf())
       }
 

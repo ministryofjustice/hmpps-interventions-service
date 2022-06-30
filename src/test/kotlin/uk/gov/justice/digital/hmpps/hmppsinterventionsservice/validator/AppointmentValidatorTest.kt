@@ -135,20 +135,21 @@ internal class AppointmentValidatorTest {
       @Test
       fun `appointment date before referral date throws validation error`() {
         val updateAppointmentDTO = UpdateAppointmentDTO(
-          appointmentTime = OffsetDateTime.now().minusMinutes(1), // will fail if the test runs just after midnight
+          appointmentTime = OffsetDateTime.now().minusDays(1),
           durationInMinutes = 1,
           appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE,
           sessionType = AppointmentSessionType.ONE_TO_ONE,
           npsOfficeCode = "CRSEXT",
           appointmentAttendance = null,
-          appointmentBehaviour = null
+          appointmentBehaviour = null,
+
         )
 
         var exception = assertThrows<ValidationError> {
           deliverySessionValidator.validateUpdateAppointment(updateAppointmentDTO, OffsetDateTime.now())
         }
 
-        assertThat(exception.errors).containsExactly(
+        assertThat(exception.errors).contains(
           FieldError("appointmentTime", Code.APPOINTMENT_TIME_BEFORE_REFERRAL_START_DATE),
         )
       }
