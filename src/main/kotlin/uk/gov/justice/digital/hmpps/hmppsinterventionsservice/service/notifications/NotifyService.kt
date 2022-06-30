@@ -160,6 +160,7 @@ class NotifyActionPlanAppointmentService(
             )
           )
         }
+        else -> {}
       }
     }
   }
@@ -228,6 +229,7 @@ class NotifyAppointmentService(
             )
           )
         }
+        else -> {}
       }
     }
   }

@@ -15,9 +15,11 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DeliverySessio
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.RecordAppointmentBehaviourDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentAttendanceDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentDeliveryType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentSessionType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.NO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.YES
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
@@ -64,6 +66,13 @@ internal class DeliverySessionControllerTest {
       val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null)
 
       whenever(
+        sessionsService.getDeliverySessionByActionPlanIdOrThrowException(
+          actionPlanId,
+          sessionNumber
+        )
+      ).thenReturn(deliverySession)
+
+      whenever(
         sessionsService.updateSessionAppointment(
           actionPlanId,
           sessionNumber,
@@ -99,6 +108,13 @@ internal class DeliverySessionControllerTest {
       val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, attendanceDTO, behaviourDTO)
 
       whenever(
+        sessionsService.getDeliverySessionByActionPlanIdOrThrowException(
+          actionPlanId,
+          sessionNumber
+        )
+      ).thenReturn(deliverySession)
+
+      whenever(
         sessionsService.updateSessionAppointment(
           actionPlanId,
           sessionNumber,
@@ -110,6 +126,51 @@ internal class DeliverySessionControllerTest {
           null,
           null,
           YES,
+          "attended",
+          false,
+          "behaviour"
+        )
+      ).thenReturn(deliverySession)
+
+      val sessionResponse = sessionsController.updateSessionAppointment(actionPlanId, sessionNumber, updateAppointmentDTO, userToken)
+
+      assertThat(sessionResponse).isEqualTo(DeliverySessionDTO.from(deliverySession))
+    }
+
+    @Test
+    fun `updates a session with new appointment when a PoP did not attend`() {
+      val user = authUserFactory.create()
+      val userToken = jwtTokenFactory.create(user)
+      val deliverySession = deliverySessionFactory.createScheduled(createdBy = user)
+      val actionPlanId = UUID.randomUUID()
+      val sessionNumber = deliverySession.sessionNumber
+
+      val attendanceDTO = UpdateAppointmentAttendanceDTO(NO, "attended")
+      val behaviourDTO = RecordAppointmentBehaviourDTO("behaviour", false)
+      val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, attendanceDTO, behaviourDTO)
+      val newAppointment = Appointment(
+        id = UUID.randomUUID(),
+        createdBy = user,
+        createdAt = OffsetDateTime.now(),
+        appointmentTime = updateAppointmentDTO.appointmentTime,
+        durationInMinutes = updateAppointmentDTO.durationInMinutes,
+        deliusAppointmentId = 123L,
+        referral = deliverySession.referral,
+      )
+      deliverySession.appointments.add(newAppointment)
+      whenever(sessionsService.getDeliverySessionByActionPlanIdOrThrowException(actionPlanId, sessionNumber)).thenReturn(deliverySession)
+      whenever(
+        sessionsService.updateSessionAppointment(
+          actionPlanId,
+          sessionNumber,
+          updateAppointmentDTO.appointmentTime,
+          updateAppointmentDTO.durationInMinutes,
+          user,
+          AppointmentDeliveryType.PHONE_CALL,
+          AppointmentSessionType.ONE_TO_ONE,
+          null,
+          null,
+          NO,
           "attended",
           false,
           "behaviour"

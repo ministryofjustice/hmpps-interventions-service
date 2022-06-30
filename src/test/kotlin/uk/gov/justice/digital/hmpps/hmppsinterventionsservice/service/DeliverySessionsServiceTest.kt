@@ -28,6 +28,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Act
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DeliverySessionFactory
@@ -46,6 +47,7 @@ internal class DeliverySessionsServiceTest {
   private val communityAPIBookingService: CommunityAPIBookingService = mock()
   private val appointmentRepository: AppointmentRepository = mock()
   private val appointmentService: AppointmentService = mock()
+  private val referralRepository: ReferralRepository = mock()
   private val actionPlanFactory = ActionPlanFactory()
   private val deliverySessionFactory = DeliverySessionFactory()
   private val authUserFactory = AuthUserFactory()
@@ -54,7 +56,7 @@ internal class DeliverySessionsServiceTest {
   private val deliverySessionsService = DeliverySessionService(
     deliverySessionRepository, actionPlanRepository,
     authUserRepository, actionPlanAppointmentEventPublisher,
-    communityAPIBookingService, appointmentService, appointmentRepository,
+    communityAPIBookingService, appointmentService, appointmentRepository, referralRepository
   )
 
   private fun createActor(userName: String = "action_plan_session_test"): AuthUser =
@@ -272,6 +274,7 @@ internal class DeliverySessionsServiceTest {
   @Test
   fun `makes a booking when a session is updated`() {
     val session = deliverySessionFactory.createScheduled()
+    val appointment = session.currentAppointment
     val actionPlanId = UUID.randomUUID()
     val sessionNumber = session.sessionNumber
     val referral = session.referral
@@ -282,7 +285,7 @@ internal class DeliverySessionsServiceTest {
     whenever(
       communityAPIBookingService.book(
         referral,
-        session.currentAppointment,
+        appointment,
         appointmentTime,
         durationInMinutes,
         SERVICE_DELIVERY,
@@ -308,7 +311,7 @@ internal class DeliverySessionsServiceTest {
     verify(appointmentService, times(1)).createOrUpdateAppointmentDeliveryDetails(any(), eq(AppointmentDeliveryType.PHONE_CALL), eq(AppointmentSessionType.ONE_TO_ONE), isNull(), isNull())
     verify(communityAPIBookingService).book(
       referral,
-      session.currentAppointment,
+      appointment,
       appointmentTime,
       durationInMinutes,
       SERVICE_DELIVERY,
@@ -648,6 +651,7 @@ internal class DeliverySessionsServiceTest {
   @Test
   fun `makes a booking with delius office location`() {
     val session = deliverySessionFactory.createScheduled()
+    val appointment = session.currentAppointment
     val actionPlanId = UUID.randomUUID()
     val sessionNumber = session.sessionNumber
     val referral = session.referral
@@ -659,7 +663,7 @@ internal class DeliverySessionsServiceTest {
     whenever(
       communityAPIBookingService.book(
         referral,
-        session.currentAppointment,
+        appointment,
         appointmentTime,
         durationInMinutes,
         SERVICE_DELIVERY,
@@ -688,7 +692,7 @@ internal class DeliverySessionsServiceTest {
     verify(appointmentService, times(1)).createOrUpdateAppointmentDeliveryDetails(any(), eq(AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE), eq(AppointmentSessionType.ONE_TO_ONE), isNull(), eq(npsOfficeCode))
     verify(communityAPIBookingService).book(
       referral,
-      session.currentAppointment,
+      appointment,
       appointmentTime,
       durationInMinutes,
       SERVICE_DELIVERY,

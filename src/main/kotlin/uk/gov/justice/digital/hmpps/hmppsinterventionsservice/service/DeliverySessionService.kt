@@ -15,11 +15,14 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appoint
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DeliverySession
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import java.time.OffsetDateTime
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 import javax.persistence.EntityExistsException
 import javax.persistence.EntityNotFoundException
@@ -35,6 +38,7 @@ class DeliverySessionService(
   val communityAPIBookingService: CommunityAPIBookingService,
   val appointmentService: AppointmentService,
   val appointmentRepository: AppointmentRepository,
+  val referralRepository: ReferralRepository
 ) {
   fun createUnscheduledSessionsForActionPlan(approvedActionPlan: ActionPlan) {
     val previouslyApprovedSessions = approvedActionPlan.referral.approvedActionPlan?. let {
@@ -82,6 +86,19 @@ class DeliverySessionService(
     val existingAppointment = session.currentAppointment?.let {
       if (it.appointmentTime.isAfter(appointmentTime)) {
         throw EntityExistsException("can't schedule new appointment for session; new appointment occurs before previously scheduled appointment for session [referralId=$referralId, sessionNumber=$sessionNumber]")
+      }
+
+      val sentAtAtStartOfDay = getReferral(referralId).sentAt?.withHour(0)?.withMinute(0)?.withSecond(1)
+
+      if (it.appointmentTime.isBefore(sentAtAtStartOfDay)) {
+        throw ValidationError("can't schedule new appointment for session; new appointment occurs before referral creation date for session [referralId=$referralId, sessionNumber=$sessionNumber]", listOf())
+      }
+
+      val maximumDate =
+        OffsetDateTime.now().plus(6, ChronoUnit.MONTHS).withHour(23).withMinute(59).withSecond(59)
+
+      if (it.appointmentTime.isAfter(maximumDate)) {
+        throw ValidationError("can't schedule new appointment for session; new appointment occurs later than 6 months from now [referralId=$referralId, sessionNumber=$sessionNumber]", listOf())
       }
       it.appointmentFeedbackSubmittedAt ?: throw ValidationError("can't schedule new appointment for session; latest appointment has no feedback delivered [referralId=$referralId, sessionNumber=$sessionNumber]", listOf())
       it
@@ -196,19 +213,17 @@ class DeliverySessionService(
       notifyProbationPractitioner,
     )
 
-    val appointment = existingAppointment?.apply {
-      this.appointmentTime = appointmentTime
-      this.durationInMinutes = durationInMinutes
-      this.deliusAppointmentId = deliusAppointmentId
-    } ?: Appointment(
+    // creating a new appointment from the existing appointment or else create a new appointment
+    val appointment = Appointment(
       id = UUID.randomUUID(),
-      createdBy = authUserRepository.save(updatedBy),
-      createdAt = OffsetDateTime.now(),
-      appointmentTime = appointmentTime,
       durationInMinutes = durationInMinutes,
+      appointmentTime = appointmentTime,
       deliusAppointmentId = deliusAppointmentId,
-      referral = session.referral,
+      createdAt = OffsetDateTime.now(),
+      createdBy = existingAppointment?.createdBy ?: authUserRepository.save(updatedBy),
+      referral = existingAppointment?.referral ?: session.referral
     )
+
     appointmentRepository.saveAndFlush(appointment)
     appointmentService.createOrUpdateAppointmentDeliveryDetails(appointment, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
     session.appointments.add(appointment)
@@ -384,16 +399,22 @@ class DeliverySessionService(
     }
   }
 
+  private fun getReferral(referralId: UUID): Referral {
+    return referralRepository.findById(referralId).orElseThrow {
+      throw EntityNotFoundException("Referral not found [id=$referralId]")
+    }
+  }
+
+  fun getDeliverySessionByActionPlanIdOrThrowException(actionPlanId: UUID, sessionNumber: Int): DeliverySession =
+    getDeliverySessionByActionPlanId(actionPlanId, sessionNumber)
+      ?: throw EntityNotFoundException("Action plan session not found [actionPlanId=$actionPlanId, sessionNumber=$sessionNumber]")
+
   private fun getDeliverySessionOrThrowException(referralId: UUID, sessionNumber: Int): DeliverySession =
     getDeliverySession(referralId, sessionNumber)
       ?: throw EntityNotFoundException("Action plan session not found [referralId=$referralId, sessionNumber=$sessionNumber]")
 
   private fun getDeliverySession(referralId: UUID, sessionNumber: Int) =
     deliverySessionRepository.findByReferralIdAndSessionNumber(referralId, sessionNumber)
-
-  private fun getDeliverySessionByActionPlanIdOrThrowException(actionPlanId: UUID, sessionNumber: Int): DeliverySession =
-    getDeliverySessionByActionPlanId(actionPlanId, sessionNumber)
-      ?: throw EntityNotFoundException("Action plan session not found [actionPlanId=$actionPlanId, sessionNumber=$sessionNumber]")
 
   private fun getDeliverySessionByActionPlanId(actionPlanId: UUID, sessionNumber: Int) =
     deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)

@@ -66,6 +66,7 @@ data class DeliverySessionDTO(
   val appointmentTime: OffsetDateTime?,
   val durationInMinutes: Int?,
   val appointmentDeliveryType: AppointmentDeliveryType?,
+  val oldAppointments: MutableSet<AppointmentDTO> = mutableSetOf(),
   val sessionType: AppointmentSessionType?,
   val npsOfficeCode: String?,
   val appointmentDeliveryAddress: AddressDTO?,
@@ -95,6 +96,9 @@ data class DeliverySessionDTO(
         appointmentDeliveryType = session.currentAppointment?.appointmentDelivery?.appointmentDeliveryType,
         sessionType = session.currentAppointment?.appointmentDelivery?.appointmentSessionType,
         appointmentDeliveryAddress = address,
+        oldAppointments = session.appointments
+          .filterNot { it == session.currentAppointment }
+          .mapTo(HashSet()) { AppointmentDTO.from(it) },
         npsOfficeCode = session.currentAppointment?.appointmentDelivery?.npsOfficeCode,
         sessionFeedback = SessionFeedbackDTO.from(session.currentAppointment),
         deliusAppointmentId = session.currentAppointment?.deliusAppointmentId

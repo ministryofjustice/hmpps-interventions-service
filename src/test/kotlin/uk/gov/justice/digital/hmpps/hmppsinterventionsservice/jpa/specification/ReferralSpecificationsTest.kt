@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
@@ -18,6 +17,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Int
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSummariesRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SupplierAssessmentRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AssignmentsFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFrameworkContractFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportFactory
@@ -49,6 +49,7 @@ class ReferralSpecificationsTest @Autowired constructor(
   private val endOfServiceReportFactory = EndOfServiceReportFactory(entityManager)
   private val interventionFactory = InterventionFactory(entityManager)
   private val dynamicFrameworkContractFactory = DynamicFrameworkContractFactory(entityManager)
+  private val assignmentsFactory = AssignmentsFactory(entityManager)
   private val recursiveComparisonConfigurationBuilder = RecursiveComparisonConfiguration.builder()
   private lateinit var recursiveComparisonConfiguration: RecursiveComparisonConfiguration
 
@@ -166,31 +167,19 @@ class ReferralSpecificationsTest @Autowired constructor(
     fun `returns referral if user is currently assigned`() {
       val user = authUserFactory.create(id = "loggedInUser")
       val someOtherUser = authUserFactory.create(id = "someOtherUser")
-
-      val assignments: List<ReferralAssignment> = listOf(
-        ReferralAssignment(OffsetDateTime.now(), assignedBy = someOtherUser, assignedTo = user),
-        ReferralAssignment(OffsetDateTime.now().minusDays(1), assignedBy = someOtherUser, assignedTo = someOtherUser),
-      )
+      val assignments = assignmentsFactory.createInOrder(someOtherUser, user)
 
       val assignedReferral = referralFactory.createAssigned(assignments = assignments)
-      val assignedReferralSummary = referralSumariesFactory.getReferralSummary(assignedReferral)
-
       val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.currentlyAssignedTo(user.id))
 
-      assertThat(result)
-        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
-        .containsExactly(assignedReferralSummary)
+      assertThat(result.map { it.id }).containsExactly(assignedReferral.id)
     }
 
     @Test
     fun `does not return referral if user is previously assigned`() {
       val user = authUserFactory.create(id = "loggedInUser")
       val someOtherUser = authUserFactory.create(id = "someOtherUser")
-
-      val assignments: List<ReferralAssignment> = listOf(
-        ReferralAssignment(OffsetDateTime.now(), assignedBy = someOtherUser, assignedTo = someOtherUser),
-        ReferralAssignment(OffsetDateTime.now().minusDays(1), assignedBy = someOtherUser, assignedTo = user),
-      )
+      val assignments = assignmentsFactory.createInOrder(user, someOtherUser)
 
       referralFactory.createAssigned(assignments = assignments)
       val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.currentlyAssignedTo(user.id))
@@ -201,10 +190,7 @@ class ReferralSpecificationsTest @Autowired constructor(
     fun `does not return referral if user has never been assigned`() {
       val user = authUserFactory.create(id = "loggedInUser")
       val someOtherUser = authUserFactory.create(id = "someOtherUser")
-
-      val assignments: List<ReferralAssignment> = listOf(
-        ReferralAssignment(OffsetDateTime.now(), assignedBy = someOtherUser, assignedTo = someOtherUser)
-      )
+      val assignments = assignmentsFactory.createInOrder(someOtherUser)
 
       referralFactory.createAssigned(assignments = assignments)
       referralFactory.createAssigned(assignments = emptyList())

@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.2.3"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.3.0"
   kotlin("plugin.spring") version "1.7.0"
   id("org.jetbrains.kotlin.plugin.jpa") version "1.7.0"
   id("jacoco")
@@ -67,8 +67,8 @@ dependencies {
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
-  implementation("io.sentry:sentry-spring-boot-starter:5.7.4")
-  implementation("io.sentry:sentry-logback:5.7.4")
+  implementation("io.sentry:sentry-spring-boot-starter:6.1.3")
+  implementation("io.sentry:sentry-logback:6.1.3")
   implementation("io.github.microutils:kotlin-logging-jvm:2.1.23")
   implementation("net.logstash.logback:logstash-logback-encoder:7.2")
   runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.3") // needed for OffsetDateTime for AppInsights
@@ -80,8 +80,8 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:3.17.3-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.17.209")
-  implementation("software.amazon.awssdk:s3:2.17.209")
+  implementation("software.amazon.awssdk:sns:2.17.219")
+  implementation("software.amazon.awssdk:s3:2.17.219")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -102,7 +102,7 @@ dependencies {
   implementation("org.apache.commons:commons-csv:1.9.0")
 
   testImplementation("au.com.dius.pact.provider:junit5spring:4.3.9")
-  testImplementation("com.squareup.okhttp3:okhttp:4.9.3")
+  testImplementation("com.squareup.okhttp3:okhttp:4.10.0")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
   testImplementation("org.mockito:mockito-inline:4.6.1")
 }
