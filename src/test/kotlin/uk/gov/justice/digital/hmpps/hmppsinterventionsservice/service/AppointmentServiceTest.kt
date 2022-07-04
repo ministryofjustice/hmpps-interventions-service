@@ -190,7 +190,7 @@ class AppointmentServiceTest {
       durationInMinutes = durationInMinutes,
       deliusAppointmentId = rescheduledDeliusAppointmentId,
     )
-    whenever(appointmentRepository.save(any())).thenReturn(savedAppointment)
+    whenever(appointmentRepository.saveAndFlush(any())).thenReturn(savedAppointment)
 
     // When
     val updatedAppointment = appointmentService.createOrUpdateAppointment(referral, existingAppointment, durationInMinutes, appointmentTime, SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
@@ -198,6 +198,10 @@ class AppointmentServiceTest {
     // Then
     verifyResponse(updatedAppointment, existingAppointment.id, false, rescheduledDeliusAppointmentId, appointmentTime, durationInMinutes, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
     verifySavedAppointment(appointmentTime, durationInMinutes, rescheduledDeliusAppointmentId, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
+    val argumentCaptor = argumentCaptor<Appointment>()
+    verify(appointmentRepository, atLeast(1)).save(argumentCaptor.capture())
+    val oldAppointmentArguments = argumentCaptor.lastValue
+    assertThat(oldAppointmentArguments.superseded).isTrue
     assertThat(updatedAppointment.attended).isNull()
     assertThat(updatedAppointment.additionalAttendanceInformation).isNull()
     assertThat(updatedAppointment.attendanceBehaviour).isNull()

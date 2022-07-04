@@ -297,20 +297,24 @@ class AppointmentService(
     behaviourDescription: String?,
     appointmentType: AppointmentType,
   ): Appointment {
-    val appointment = Appointment(
-      id = UUID.randomUUID(),
-      appointmentTime = appointmentTime,
-      durationInMinutes = durationInMinutes,
-      deliusAppointmentId = deliusAppointmentId,
-      createdBy = authUserRepository.save(createdByUser),
-      createdAt = OffsetDateTime.now(),
-      referral = referral,
+    val appointment = createAppointment(
+      durationInMinutes,
+      appointmentTime,
+      deliusAppointmentId,
+      createdByUser,
+      appointmentDeliveryType,
+      appointmentSessionType,
+      appointmentDeliveryAddress,
+      referral,
+      npsOfficeCode,
+      attended,
+      additionalAttendanceInformation,
+      notifyProbationPractitioner,
+      behaviourDescription,
+      appointmentType
     )
-    setAttendanceAndBehaviourIfHistoricAppointment(appointment, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, createdByUser, appointmentType)
     oldAppointment.superseded = true
-    appointmentRepository.saveAndFlush(oldAppointment)
-    appointmentRepository.save(appointment)
-    createOrUpdateAppointmentDeliveryDetails(appointment, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
+    appointmentRepository.save(oldAppointment)
     return appointment
   }
 

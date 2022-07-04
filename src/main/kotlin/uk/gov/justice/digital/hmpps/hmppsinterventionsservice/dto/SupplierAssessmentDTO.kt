@@ -13,7 +13,7 @@ data class SupplierAssessmentDTO(
     fun from(supplierAssessment: SupplierAssessment): SupplierAssessmentDTO {
       return SupplierAssessmentDTO(
         id = supplierAssessment.id,
-        appointments = AppointmentDTO.from(supplierAssessment.appointments.filter { !it.superseded }.toMutableSet()),
+        appointments = AppointmentDTO.from(supplierAssessment.appointments.filterNot { it.superseded }.toMutableSet()),
         currentAppointmentId = supplierAssessment.currentAppointment?.id,
         referralId = supplierAssessment.referral.id
       )
