@@ -10,15 +10,11 @@ WITH counts AS (SELECT COUNT(r.id)                                              
                        COUNT(r.id) FILTER ( WHERE r.concluded_at IS NOT NULL AND
                                                   r.end_requested_at IS NOT NULL AND
                                                   eosr.submitted_at IS NOT NULL )       AS count_of_early_end_referrals,
-                       COUNT(r.id) FILTER ( WHERE r.end_requested_reason_code = 'MIS' ) AS count_of_mistaken_referrals,
-                       COUNT(DISTINCT r.created_by_id)                                  AS count_of_pp_users_starting_referrals,
-                       COUNT(DISTINCT r.sent_by_id)                                     AS count_of_pp_users_sending_referrals
+                       COUNT(r.id) FILTER ( WHERE r.end_requested_reason_code = 'MIS' ) AS count_of_mistaken_referrals
                 FROM referral r
                          LEFT JOIN end_of_service_report eosr ON r.id = eosr.referral_id),
 
-     times AS (SELECT AVG(sent_at - created_at)                                            AS avg_completion_time,
-                      PERCENTILE_CONT(0.50) WITHIN GROUP ( ORDER BY sent_at - created_at ) AS p50_completion_time,
-                      PERCENTILE_CONT(0.90) WITHIN GROUP ( ORDER BY sent_at - created_at ) AS p90_completion_time,
+     times AS (SELECT PERCENTILE_CONT(0.50) WITHIN GROUP ( ORDER BY sent_at - created_at ) AS p50_completion_time,
                       PERCENTILE_CONT(0.95) WITHIN GROUP ( ORDER BY sent_at - created_at ) AS p95_completion_time,
                       PERCENTILE_CONT(0.99) WITHIN GROUP ( ORDER BY sent_at - created_at ) AS p99_completion_time
                FROM referral
@@ -32,15 +28,7 @@ SELECT counts.count_of_started_referrals,
        counts.count_of_cancelled_referrals,
        counts.count_of_mistaken_referrals,
        counts.count_of_early_end_referrals,
-       counts.count_of_pp_users_starting_referrals,
-       counts.count_of_pp_users_sending_referrals,
-       CASE
-           WHEN counts.count_of_started_referrals = 0 THEN 0.0
-           ELSE 100.0 * counts.count_of_sent_referrals / counts.count_of_started_referrals
-           END AS completion_rate_percent,
-       times.avg_completion_time,
        times.p50_completion_time,
-       times.p90_completion_time,
        times.p95_completion_time,
        times.p99_completion_time
 
