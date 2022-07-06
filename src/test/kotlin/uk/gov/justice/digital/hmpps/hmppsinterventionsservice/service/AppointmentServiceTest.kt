@@ -190,7 +190,7 @@ class AppointmentServiceTest {
       durationInMinutes = durationInMinutes,
       deliusAppointmentId = rescheduledDeliusAppointmentId,
     )
-    whenever(appointmentRepository.save(any())).thenReturn(savedAppointment)
+    whenever(appointmentRepository.saveAndFlush(any())).thenReturn(savedAppointment)
 
     // When
     val updatedAppointment = appointmentService.createOrUpdateAppointment(referral, existingAppointment, durationInMinutes, appointmentTime, SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
@@ -198,6 +198,10 @@ class AppointmentServiceTest {
     // Then
     verifyResponse(updatedAppointment, existingAppointment.id, false, rescheduledDeliusAppointmentId, appointmentTime, durationInMinutes, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
     verifySavedAppointment(appointmentTime, durationInMinutes, rescheduledDeliusAppointmentId, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
+    val argumentCaptor = argumentCaptor<Appointment>()
+    verify(appointmentRepository, atLeast(1)).save(argumentCaptor.capture())
+    val oldAppointmentArguments = argumentCaptor.lastValue
+    assertThat(oldAppointmentArguments.superseded).isTrue
     assertThat(updatedAppointment.attended).isNull()
     assertThat(updatedAppointment.additionalAttendanceInformation).isNull()
     assertThat(updatedAppointment.attendanceBehaviour).isNull()
@@ -249,12 +253,12 @@ class AppointmentServiceTest {
   fun `future appointment can be updated with a past appointment containing feedback`() {
     // Given
     val durationInMinutes = 60
-    val appointmentTime = OffsetDateTime.parse("3000-12-04T10:42:43+00:00")
+    val pastAppointmentTime = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
     val existingAppointment = appointmentFactory.create(deliusAppointmentId = 98L, attended = null)
     val referral = referralFactory.createSent()
     val rescheduledDeliusAppointmentId = 99L
 
-    whenever(communityAPIBookingService.book(referral, existingAppointment, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null))
+    whenever(communityAPIBookingService.book(referral, existingAppointment, pastAppointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null))
       .thenReturn(rescheduledDeliusAppointmentId)
     val savedAppointment = appointmentFactory.create(
       appointmentTime = OffsetDateTime.parse("2020-12-04T10:42:43+00:00"),
@@ -268,7 +272,7 @@ class AppointmentServiceTest {
     whenever(appointmentRepository.save(any())).thenReturn(savedAppointment)
 
     // When
-    val updatedAppointment = appointmentService.createOrUpdateAppointment(referral, existingAppointment, durationInMinutes, OffsetDateTime.parse("2020-12-04T10:42:43+00:00"), SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, NO, "non attended", null, null)
+    val updatedAppointment = appointmentService.createOrUpdateAppointment(referral, existingAppointment, durationInMinutes, pastAppointmentTime, SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, NO, "non attended", null, null)
 
     // Then
     verifyResponse(updatedAppointment, existingAppointment.id, false, rescheduledDeliusAppointmentId, OffsetDateTime.parse("2020-12-04T10:42:43+00:00"), durationInMinutes, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
@@ -335,10 +339,7 @@ class AppointmentServiceTest {
   private fun verifyResponse(appointment: Appointment, originalId: UUID?, expectNewId: Boolean, deliusAppointmentId: Long, appointmentTime: OffsetDateTime?, durationInMinutes: Int, appointmentDeliveryType: AppointmentDeliveryType, appointmentSessionType: AppointmentSessionType, npsOfficeCode: String? = null) {
 
     // Verifying create or update route
-    if (expectNewId)
-      assertThat(appointment).isNotEqualTo(originalId)
-    else
-      assertThat(appointment).isNotEqualTo(originalId)
+    assertThat(appointment).isNotEqualTo(originalId)
 
     assertThat(appointment.deliusAppointmentId).isEqualTo(deliusAppointmentId)
     assertThat(appointment.appointmentTime).isEqualTo(appointmentTime)
@@ -375,7 +376,7 @@ class AppointmentServiceTest {
       val oldNpsCode = "CRS0001"
       val newNpsCode = "CRS0002"
 
-      whenever(communityAPIBookingService.book(referral, existingAppointment, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null))
+      whenever(communityAPIBookingService.book(referral, existingAppointment, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, newNpsCode))
         .thenReturn(rescheduledDeliusAppointmentId)
       val savedAppointment = appointmentFactory.create(
         appointmentTime = appointmentTime,
@@ -390,6 +391,7 @@ class AppointmentServiceTest {
       val updatedAppointment = appointmentService.createOrUpdateAppointment(referral, existingAppointment, durationInMinutes, appointmentTime, SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE, AppointmentSessionType.ONE_TO_ONE, npsOfficeCode = newNpsCode)
 
       // Then
+      assertThat(existingAppointment.superseded).isTrue
       verifyResponse(updatedAppointment, existingAppointment.id, false, rescheduledDeliusAppointmentId, appointmentTime, durationInMinutes, AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE, AppointmentSessionType.ONE_TO_ONE, newNpsCode)
       verifySavedAppointment(appointmentTime, durationInMinutes, rescheduledDeliusAppointmentId, AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE, AppointmentSessionType.ONE_TO_ONE, newNpsCode)
     }

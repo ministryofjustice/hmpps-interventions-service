@@ -53,9 +53,10 @@ class SupplierAssessmentService(
     notifyProbationPractitioner: Boolean? = null,
     behaviourDescription: String? = null,
   ): Appointment {
+    val existingAppointment = supplierAssessment.currentAppointment
     val appointment = appointmentService.createOrUpdateAppointment(
       supplierAssessment.referral,
-      supplierAssessment.currentAppointment,
+      existingAppointment,
       durationInMinutes,
       appointmentTime,
       SUPPLIER_ASSESSMENT,
