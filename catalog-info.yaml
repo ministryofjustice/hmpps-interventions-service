@@ -31,6 +31,10 @@ spec:
   lifecycle: production
   providesApis:
     - api:hmpps-interventions
+  consumesApis:
+    - api:hmpps-risks-and-needs
+    - api:hmpps-community
+    - api:hmpps-auth
 
 ---
 apiVersion: backstage.io/v1alpha1
