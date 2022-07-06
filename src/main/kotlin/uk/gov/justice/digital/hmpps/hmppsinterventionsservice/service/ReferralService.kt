@@ -178,7 +178,8 @@ class ReferralService(
     assignedToUserId: String?,
     searchText: String?,
   ): Specification<T> {
-    var findSentReferralsSpec = ReferralSpecifications.sent<T>()
+    var findSentReferralsSpec = ReferralSpecifications.sent<T>().and(ReferralSpecifications.attendanceNotSubmitted<T>())
+
     findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, concluded, ReferralSpecifications.concluded())
     findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, cancelled, ReferralSpecifications.cancelled())
     findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, unassigned, ReferralSpecifications.unassigned())

@@ -12,15 +12,16 @@ import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.Id
 import javax.persistence.Index
+import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 import javax.persistence.NamedAttributeNode
 import javax.persistence.NamedEntityGraph
 import javax.persistence.NamedSubgraph
+import javax.persistence.OneToMany
 import javax.persistence.OneToOne
 import javax.persistence.PrimaryKeyJoinColumn
 import javax.persistence.Table
 import javax.validation.constraints.NotNull
-
 @NamedEntityGraph(
   name = "entity-referral-graph",
   attributeNodes =
@@ -28,7 +29,8 @@ import javax.validation.constraints.NotNull
     NamedAttributeNode("sentBy"),
     NamedAttributeNode(value = "serviceUserData", subgraph = "serviceUserData"),
     NamedAttributeNode(value = "intervention", subgraph = "interventions"),
-    NamedAttributeNode(value = "endOfServiceReport", subgraph = "endOfServiceReport")
+    NamedAttributeNode(value = "endOfServiceReport", subgraph = "endOfServiceReport"),
+    NamedAttributeNode(value = "supplierAssessment", subgraph = "supplierAssessmentData")
   ],
   subgraphs = [
     NamedSubgraph(
@@ -49,7 +51,14 @@ import javax.validation.constraints.NotNull
       name = "serviceUserData",
       attributeNodes = [
         NamedAttributeNode("disabilities"),
+        NamedAttributeNode("referral")
+      ]
+    ),
+    NamedSubgraph(
+      name = "supplierAssessmentData",
+      attributeNodes = [
         NamedAttributeNode("referral"),
+        NamedAttributeNode("appointments")
       ]
     )
   ]
@@ -71,7 +80,9 @@ class SentReferralSummary(
   var endRequestedAt: OffsetDateTime? = null,
   @NotNull @ManyToOne(fetch = FetchType.LAZY) val intervention: Intervention,
   @NotNull val serviceUserCRN: String,
-  @OneToOne(mappedBy = "referral") @Fetch(FetchMode.JOIN) var endOfServiceReport: EndOfServiceReport? = null
+  @OneToOne(mappedBy = "referral") @Fetch(FetchMode.JOIN) var endOfServiceReport: EndOfServiceReport? = null,
+  @OneToOne(mappedBy = "referral") @Fetch(FetchMode.JOIN) var supplierAssessment: SupplierAssessment? = null,
+  @OneToMany(fetch = FetchType.LAZY) @JoinColumn(name = "referral_id") var actionPlans: MutableList<ActionPlan>? = null,
 ) {
   private val currentAssignment: ReferralAssignment?
     get() = assignments.maxByOrNull { it.assignedAt }

@@ -892,9 +892,9 @@ class ReferralServiceTest @Autowired constructor(
     fun `only referrals that have a person on probation matching the search text should be returned`() {
       val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest, "john smith")
 
-      assertThat(result).size().isEqualTo(2)
-      assertThat(result.first().id).isEqualTo(referral.id)
-      assertThat(result.last().id).isEqualTo(referral2.id)
+      assertThat(result).hasSize(2)
+        .extracting("id")
+        .contains(referral.id, referral2.id)
     }
 
     @Test
@@ -945,11 +945,14 @@ class ReferralServiceTest @Autowired constructor(
     lateinit var selfAssignedSentReferralSummary: SentReferralSummary
     lateinit var otherAssignedSentReferralSummary: SentReferralSummary
     lateinit var pageRequest: PageRequest
+
     private val truncateSeconds: Comparator<OffsetDateTime> = Comparator { a, exp ->
-      if (a
-        .truncatedTo(ChronoUnit.SECONDS)
-        .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
-      ) 0 else 1
+      if (exp != null && a != null) {
+        if (a
+          .truncatedTo(ChronoUnit.SECONDS)
+          .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
+        ) 0 else 1
+      } else { 0 }
     }
 
     private val recursiveComparisonConfiguration: RecursiveComparisonConfiguration = recursiveComparisonConfigurationBuilder
@@ -986,6 +989,7 @@ class ReferralServiceTest @Autowired constructor(
         endRequestedAt = OffsetDateTime.now(),
         concludedAt = OffsetDateTime.now(),
         endOfServiceReport = null,
+        actionPlans = mutableListOf(actionPlanFactory.createSubmitted())
       )
 
       cancelledSentReferralSummary = sentReferralSummariesFactory.getReferralSummary(cancelledReferral)
@@ -1030,6 +1034,34 @@ class ReferralServiceTest @Autowired constructor(
         )
     }
 
+    @Test
+    fun `to check for cancelled referral were pop did not attend appointment should not return`() {
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest)
+      val intervention = interventionFactory.create(contract = contractFactory.create(primeProvider = provider))
+      val cancelledReferral = referralFactory.createEnded(
+        intervention = intervention,
+        endRequestedReason = cancellationReasonFactory.create("ANY"),
+        endRequestedAt = OffsetDateTime.now(),
+        concludedAt = OffsetDateTime.now(),
+        endOfServiceReport = null,
+        actionPlans = mutableListOf(actionPlanFactory.create(submittedAt = null))
+      )
+      val appointment =
+        appointmentFactory.create(referral = cancelledReferral, attendanceSubmittedAt = null)
+      val supplierAssessmentAppointment =
+        supplierAssessmentFactory.create(appointment = appointment, referral = cancelledReferral)
+      cancelledReferral.supplierAssessment = supplierAssessmentAppointment
+      entityManager.refresh(cancelledReferral)
+      assertThat(result)
+        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
+        .containsExactlyInAnyOrder(
+          completedSentReferralSummary,
+          liveSentReferralSummary,
+          cancelledSentReferralSummary,
+          selfAssignedSentReferralSummary,
+          otherAssignedSentReferralSummary
+        )
+    }
     @Test
     fun `setting concluded returns only concluded referrals`() {
       val result = referralService.getSentReferralSummaryForUser(user, true, null, null, null, pageRequest)
