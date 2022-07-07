@@ -29,7 +29,7 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
     intervention: Intervention = interventionFactory.create(),
     selectedServiceCategories: MutableSet<ServiceCategory>? = null,
     desiredOutcomes: List<DesiredOutcome> = emptyList(),
-    actionPlans: MutableList<ActionPlan>? = null,
+    actionPlans: MutableList<ActionPlan>? = mutableListOf(),
 
     sentAt: OffsetDateTime = OffsetDateTime.now(),
     sentBy: AuthUser = authUserFactory.create(),
@@ -51,12 +51,10 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
       selectedServiceCategories = selectedServiceCategories,
       desiredOutcomes = desiredOutcomes,
       actionPlans = actionPlans,
-
       sentAt = sentAt,
       sentBy = sentBy,
       referenceNumber = referenceNumber,
       supplementaryRiskId = supplementaryRiskId,
-
       assignments = assignments,
       concludedAt = concludedAt,
       supplierAssessment = supplierAssessment,
@@ -73,7 +71,9 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
       referenceNumber = referenceNumber,
       concludedAt = concludedAt,
       assignments = assignments.toMutableList(),
-      serviceUserData = serviceUserData
+      serviceUserData = serviceUserData,
+      actionPlans = actionPlans,
+      supplierAssessment = supplierAssessment
     )
   }
 
@@ -93,7 +93,9 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
       assignments = referral.assignments,
       endRequestedAt = referral.endRequestedAt,
       endOfServiceReport = referral.endOfServiceReport ?: endOfServiceReport,
-      serviceUserData = referral.serviceUserData
+      serviceUserData = referral.serviceUserData,
+      actionPlans = referral.actionPlans,
+      supplierAssessment = referral.supplierAssessment
     )
   }
 }

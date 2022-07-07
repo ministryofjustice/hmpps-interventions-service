@@ -60,7 +60,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     intervention: Intervention = interventionFactory.create(),
     selectedServiceCategories: MutableSet<ServiceCategory>? = null,
     desiredOutcomes: List<DesiredOutcome> = emptyList(),
-    actionPlans: MutableList<ActionPlan>? = null,
+    actionPlans: MutableList<ActionPlan>? = mutableListOf(),
     sentAt: OffsetDateTime = OffsetDateTime.now(),
     sentBy: AuthUser = authUserFactory.create(),
     referenceNumber: String? = "JS18726AC",
@@ -102,7 +102,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     intervention: Intervention = interventionFactory.create(),
     selectedServiceCategories: MutableSet<ServiceCategory>? = null,
     desiredOutcomes: List<DesiredOutcome> = emptyList(),
-    actionPlans: MutableList<ActionPlan>? = null,
+    actionPlans: MutableList<ActionPlan>? = mutableListOf(),
 
     sentAt: OffsetDateTime = OffsetDateTime.now(),
     sentBy: AuthUser = authUserFactory.create(),
@@ -150,7 +150,8 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     referenceNumber: String? = "JS18726AC",
     relevantSentenceId: Long? = 123456L,
     supplementaryRiskId: UUID = UUID.randomUUID(),
-    actionPlans: MutableList<ActionPlan>? = null,
+    actionPlans: MutableList<ActionPlan>? = mutableListOf(),
+    supplierAssessment: SupplierAssessment? = null,
 
     assignments: List<ReferralAssignment> = emptyList(),
 
@@ -171,6 +172,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       intervention = intervention,
       selectedServiceCategories = selectedServiceCategories,
       actionPlans = actionPlans,
+      supplierAssessment = supplierAssessment,
 
       sentAt = sentAt,
       sentBy = sentBy,
