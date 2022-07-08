@@ -17,7 +17,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 1,
-  "iteration": 1653946635075,
+  "iteration": 1657286549734,
   "links": [],
   "panels": [
     {
@@ -943,20 +943,22 @@
       }
     },
     {
-      "aliasColors": {},
+      "aliasColors": {
+        "Limit": "#bf1b00",
+        "Requested (soft limit)": "#f2c96d"
+      },
       "bars": false,
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
+      "decimals": null,
       "description": "",
       "fieldConfig": {
-        "defaults": {
-          "unit": "short"
-        },
+        "defaults": {},
         "overrides": []
       },
       "fill": 1,
-      "fillGradient": 0,
+      "fillGradient": 2,
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -964,19 +966,20 @@
         "y": 33
       },
       "hiddenSeries": false,
-      "id": 25,
+      "id": 30,
       "legend": {
+        "alignAsTable": false,
         "avg": false,
         "current": false,
-        "hideEmpty": false,
-        "hideZero": true,
         "max": false,
         "min": false,
+        "rightSide": false,
         "show": true,
+        "sideWidth": 450,
         "total": false,
         "values": false
       },
-      "lines": false,
+      "lines": true,
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
@@ -985,8 +988,8 @@
       },
       "percentage": false,
       "pluginVersion": "7.5.9",
-      "pointradius": 2,
-      "points": true,
+      "pointradius": 5,
+      "points": false,
       "renderer": "flot",
       "seriesOverrides": [],
       "spaceLength": 10,
@@ -995,11 +998,12 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "avg(rate(nginx_ingress_controller_requests{status=~\"4..\",exported_namespace=\"$namespace\"}[1m])*60) by(exported_service,status)",
+          "expr": "quantile(0.999, 300*rate(http_client_requests_seconds_sum{namespace='$namespace'}[5m])) by (client_name)",
           "format": "time_series",
-          "interval": "60s",
-          "intervalFactor": 1,
-          "legendFormat": "{{exported_service}}@{{ status }}",
+          "instant": false,
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "{{ client_name }}",
           "refId": "A"
         }
       ],
@@ -1007,18 +1011,12 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "4xx responses",
+      "title": "Dependency call times (from API, 99.9th percentile)",
       "tooltip": {
         "shared": true,
         "sort": 0,
         "value_type": "individual"
       },
-      "transformations": [
-        {
-          "id": "filterByRefId",
-          "options": {}
-        }
-      ],
       "transparent": true,
       "type": "graph",
       "xaxis": {
@@ -1030,23 +1028,23 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:102",
+          "$$hashKey": "object:691",
           "decimals": null,
-          "format": "short",
-          "label": "",
+          "format": "s",
+          "label": null,
           "logBase": 1,
           "max": null,
-          "min": "0.00001",
+          "min": "0",
           "show": true
         },
         {
-          "$$hashKey": "object:103",
+          "$$hashKey": "object:692",
           "format": "short",
           "label": null,
           "logBase": 1,
           "max": null,
           "min": null,
-          "show": false
+          "show": true
         }
       ],
       "yaxis": {
@@ -1190,7 +1188,7 @@
         "y": 41
       },
       "hiddenSeries": false,
-      "id": 15,
+      "id": 25,
       "legend": {
         "avg": false,
         "current": false,
@@ -1221,7 +1219,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "avg(rate(nginx_ingress_controller_requests{status=~\"423\",exported_namespace=\"$namespace\"}[1m])*60) by(exported_service,status)",
+          "expr": "avg(rate(nginx_ingress_controller_requests{status=~\"4..\",exported_namespace=\"$namespace\"}[1m])*60) by(exported_service,status)",
           "format": "time_series",
           "interval": "60s",
           "intervalFactor": 1,
@@ -1233,7 +1231,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "WAF (423)  responses",
+      "title": "4xx responses",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1391,74 +1389,116 @@
       }
     },
     {
-      "cards": {
-        "cardPadding": null,
-        "cardRound": null
-      },
-      "color": {
-        "cardColor": "#F2495C",
-        "colorScale": "sqrt",
-        "colorScheme": "interpolateMagma",
-        "exponent": 0.5,
-        "min": null,
-        "mode": "opacity"
-      },
-      "dataFormat": "tsbuckets",
-      "datasource": null,
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
       "description": "",
       "fieldConfig": {
-        "defaults": {},
+        "defaults": {
+          "unit": "short"
+        },
         "overrides": []
       },
+      "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
         "y": 49
       },
-      "heatmap": {},
-      "hideZeroBuckets": false,
-      "highlightCards": true,
-      "id": 26,
+      "hiddenSeries": false,
+      "id": 15,
       "legend": {
-        "show": true
+        "avg": false,
+        "current": false,
+        "hideEmpty": false,
+        "hideZero": true,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
       },
+      "lines": false,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
       "pluginVersion": "7.5.9",
-      "reverseYBuckets": false,
+      "pointradius": 2,
+      "points": true,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
       "targets": [
         {
           "exemplar": true,
-          "expr": "sum by (le)(\n  increase(\n    nginx_ingress_controller_request_duration_seconds_bucket{\n      status = \"499\",\n      exported_namespace =~ \"$namespace\"\n    }[1m]\n  )\n)",
-          "format": "heatmap",
-          "interval": "1m",
+          "expr": "avg(rate(nginx_ingress_controller_requests{status=~\"423\",exported_namespace=\"$namespace\"}[1m])*60) by(exported_service,status)",
+          "format": "time_series",
+          "interval": "60s",
           "intervalFactor": 1,
-          "legendFormat": "{{le}}",
+          "legendFormat": "{{exported_service}}@{{ status }}",
           "refId": "A"
         }
       ],
-      "title": "Aborted (499) request durations",
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "WAF (423)  responses",
       "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transformations": [
+        {
+          "id": "filterByRefId",
+          "options": {}
+        }
+      ],
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
         "show": true,
-        "showHistogram": false
+        "values": []
       },
-      "type": "heatmap",
-      "xAxis": {
-        "show": true
-      },
-      "xBucketNumber": null,
-      "xBucketSize": "",
-      "yAxis": {
-        "decimals": null,
-        "format": "s",
-        "logBase": 1,
-        "max": null,
-        "min": null,
-        "show": true,
-        "splitFactor": null
-      },
-      "yBucketBound": "auto",
-      "yBucketNumber": null,
-      "yBucketSize": null
+      "yaxes": [
+        {
+          "$$hashKey": "object:102",
+          "decimals": null,
+          "format": "short",
+          "label": "",
+          "logBase": 1,
+          "max": null,
+          "min": "0.00001",
+          "show": true
+        },
+        {
+          "$$hashKey": "object:103",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     },
     {
       "aliasColors": {},
@@ -1569,6 +1609,76 @@
         "align": false,
         "alignLevel": null
       }
+    },
+    {
+      "cards": {
+        "cardPadding": null,
+        "cardRound": null
+      },
+      "color": {
+        "cardColor": "#F2495C",
+        "colorScale": "sqrt",
+        "colorScheme": "interpolateMagma",
+        "exponent": 0.5,
+        "min": null,
+        "mode": "opacity"
+      },
+      "dataFormat": "tsbuckets",
+      "datasource": null,
+      "description": "",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 57
+      },
+      "heatmap": {},
+      "hideZeroBuckets": false,
+      "highlightCards": true,
+      "id": 26,
+      "legend": {
+        "show": true
+      },
+      "pluginVersion": "7.5.9",
+      "reverseYBuckets": false,
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "sum by (le)(\n  increase(\n    nginx_ingress_controller_request_duration_seconds_bucket{\n      status = \"499\",\n      exported_namespace =~ \"$namespace\"\n    }[1m]\n  )\n)",
+          "format": "heatmap",
+          "interval": "1m",
+          "intervalFactor": 1,
+          "legendFormat": "{{le}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Aborted (499) request durations",
+      "tooltip": {
+        "show": true,
+        "showHistogram": false
+      },
+      "type": "heatmap",
+      "xAxis": {
+        "show": true
+      },
+      "xBucketNumber": null,
+      "xBucketSize": "",
+      "yAxis": {
+        "decimals": null,
+        "format": "s",
+        "logBase": 1,
+        "max": null,
+        "min": null,
+        "show": true,
+        "splitFactor": null
+      },
+      "yBucketBound": "auto",
+      "yBucketNumber": null,
+      "yBucketSize": null
     }
   ],
   "refresh": false,
