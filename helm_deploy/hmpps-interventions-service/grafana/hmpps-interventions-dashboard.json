@@ -998,7 +998,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "quantile(0.999, 300*rate(http_client_requests_seconds_sum{namespace='$namespace'}[5m])) by (client_name)",
+          "expr": "quantile(1, 300*rate(http_client_requests_seconds_sum{namespace='$namespace'}[5m])) by (client_name)",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -1011,7 +1011,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Dependency call times (from API, 99.9th percentile)",
+      "title": "Dependency call times (from API, 100th percentile, worst calls)",
       "tooltip": {
         "shared": true,
         "sort": 0,
