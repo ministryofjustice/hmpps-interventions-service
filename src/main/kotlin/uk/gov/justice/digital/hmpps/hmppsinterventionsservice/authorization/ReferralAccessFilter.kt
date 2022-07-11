@@ -15,7 +15,7 @@ class ReferralAccessFilter(
 
   fun <T> serviceProviderReferrals(referralSpec: Specification<T>, user: AuthUser): Specification<T> {
     val userScope = serviceProviderAccessScopeMapper.fromUser(user)
-    return referralSpec.and(ReferralSpecifications.withSPAccess(userScope.contracts))
+    return referralSpec.and(ReferralSpecifications.withSPAccess(userScope.contracts)).and(ReferralSpecifications.attendanceNotSubmitted<T>())
   }
 
   fun serviceProviderReferralSummaries(referrals: List<ServiceProviderSentReferralSummary>, user: AuthUser): List<ServiceProviderSentReferralSummary> {
