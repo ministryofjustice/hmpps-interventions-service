@@ -17,7 +17,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 1,
-  "iteration": 1657286549734,
+  "iteration": 1657529551498,
   "links": [],
   "panels": [
     {
@@ -1167,20 +1167,22 @@
       }
     },
     {
-      "aliasColors": {},
+      "aliasColors": {
+        "Limit": "#bf1b00",
+        "Requested (soft limit)": "#f2c96d"
+      },
       "bars": false,
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
+      "decimals": null,
       "description": "",
       "fieldConfig": {
-        "defaults": {
-          "unit": "short"
-        },
+        "defaults": {},
         "overrides": []
       },
       "fill": 1,
-      "fillGradient": 0,
+      "fillGradient": 2,
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -1188,29 +1190,30 @@
         "y": 41
       },
       "hiddenSeries": false,
-      "id": 25,
+      "id": 31,
       "legend": {
+        "alignAsTable": false,
         "avg": false,
         "current": false,
-        "hideEmpty": false,
-        "hideZero": true,
         "max": false,
         "min": false,
+        "rightSide": false,
         "show": true,
+        "sideWidth": 450,
         "total": false,
         "values": false
       },
-      "lines": false,
+      "lines": true,
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
       "options": {
-        "alertThreshold": true
+        "alertThreshold": false
       },
       "percentage": false,
       "pluginVersion": "7.5.9",
-      "pointradius": 2,
-      "points": true,
+      "pointradius": 1,
+      "points": false,
       "renderer": "flot",
       "seriesOverrides": [],
       "spaceLength": 10,
@@ -1219,11 +1222,12 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "avg(rate(nginx_ingress_controller_requests{status=~\"4..\",exported_namespace=\"$namespace\"}[1m])*60) by(exported_service,status)",
+          "expr": "max(rate(nginx_ingress_controller_requests{status=~\"5..\",exported_namespace=~\"(token-verification-api-prod|hmpps-auth-prod|hmpps-assess-risks-and-needs-prod)\"}[2m])*120) by(exported_service)",
           "format": "time_series",
-          "interval": "60s",
-          "intervalFactor": 1,
-          "legendFormat": "{{exported_service}}@{{ status }}",
+          "instant": false,
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "{{ exported_service }}",
           "refId": "A"
         }
       ],
@@ -1231,18 +1235,12 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "4xx responses",
+      "title": "Dependency server errors",
       "tooltip": {
         "shared": true,
         "sort": 0,
         "value_type": "individual"
       },
-      "transformations": [
-        {
-          "id": "filterByRefId",
-          "options": {}
-        }
-      ],
       "transparent": true,
       "type": "graph",
       "xaxis": {
@@ -1254,23 +1252,23 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:102",
+          "$$hashKey": "object:691",
           "decimals": null,
-          "format": "short",
-          "label": "",
+          "format": "none",
+          "label": null,
           "logBase": 1,
           "max": null,
-          "min": "0.00001",
+          "min": "0.001",
           "show": true
         },
         {
-          "$$hashKey": "object:103",
+          "$$hashKey": "object:692",
           "format": "short",
           "label": null,
           "logBase": 1,
           "max": null,
           "min": null,
-          "show": false
+          "show": true
         }
       ],
       "yaxis": {
@@ -1410,7 +1408,7 @@
         "y": 49
       },
       "hiddenSeries": false,
-      "id": 15,
+      "id": 25,
       "legend": {
         "avg": false,
         "current": false,
@@ -1441,7 +1439,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "avg(rate(nginx_ingress_controller_requests{status=~\"423\",exported_namespace=\"$namespace\"}[1m])*60) by(exported_service,status)",
+          "expr": "avg(rate(nginx_ingress_controller_requests{status=~\"4..\",exported_namespace=\"$namespace\"}[1m])*60) by(exported_service,status)",
           "format": "time_series",
           "interval": "60s",
           "intervalFactor": 1,
@@ -1453,7 +1451,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "WAF (423)  responses",
+      "title": "4xx responses",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1611,6 +1609,118 @@
       }
     },
     {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 57
+      },
+      "hiddenSeries": false,
+      "id": 15,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "hideEmpty": false,
+        "hideZero": true,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.5.9",
+      "pointradius": 2,
+      "points": true,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "avg(rate(nginx_ingress_controller_requests{status=~\"423\",exported_namespace=\"$namespace\"}[1m])*60) by(exported_service,status)",
+          "format": "time_series",
+          "interval": "60s",
+          "intervalFactor": 1,
+          "legendFormat": "{{exported_service}}@{{ status }}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "WAF (423)  responses",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transformations": [
+        {
+          "id": "filterByRefId",
+          "options": {}
+        }
+      ],
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:102",
+          "decimals": null,
+          "format": "short",
+          "label": "",
+          "logBase": 1,
+          "max": null,
+          "min": "0.00001",
+          "show": true
+        },
+        {
+          "$$hashKey": "object:103",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
       "cards": {
         "cardPadding": null,
         "cardRound": null
@@ -1634,7 +1744,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 57
+        "y": 65
       },
       "heatmap": {},
       "hideZeroBuckets": false,
@@ -1690,7 +1800,7 @@
       {
         "allValue": null,
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "hmpps-interventions-prod",
           "value": "hmpps-interventions-prod"
         },
