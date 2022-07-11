@@ -514,10 +514,12 @@ class ReferralServiceTest @Autowired constructor(
   @DisplayName("get sent referrals with a probation practitioner user")
   inner class GetSentReferralsPPUser {
     private val truncateSeconds: Comparator<OffsetDateTime> = Comparator { a, exp ->
-      if (a
-        .truncatedTo(ChronoUnit.SECONDS)
-        .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
-      ) 0 else 1
+      if (exp != null && a != null) {
+        if (a
+          .truncatedTo(ChronoUnit.SECONDS)
+          .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
+        ) 0 else 1
+      } else { 0 }
     }
 
     private val recursiveComparisonConfiguration: RecursiveComparisonConfiguration = recursiveComparisonConfigurationBuilder
