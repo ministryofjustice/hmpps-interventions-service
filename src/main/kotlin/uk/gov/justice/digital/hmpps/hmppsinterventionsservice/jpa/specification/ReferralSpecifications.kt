@@ -1,15 +1,12 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.specification
 
 import org.springframework.data.jpa.domain.Specification
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DynamicFrameworkContract
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
 import java.time.OffsetDateTime
 import javax.persistence.criteria.JoinType
 
@@ -56,25 +53,6 @@ class ReferralSpecifications {
           cb.isNotNull(root.get<OffsetDateTime>("endRequestedAt")),
           cb.isNotNull(root.get<OffsetDateTime>("concludedAt")),
           root.join<T, EndOfServiceReport>("endOfServiceReport", JoinType.LEFT).isNull
-        )
-      }
-    }
-
-    fun <T> attendanceNotSubmitted(): Specification<T> {
-      return Specification<T> { root, _, cb ->
-        val supplierAssessmentJoin = root.join<T, SupplierAssessment>("supplierAssessment", JoinType.LEFT)
-        val appointmentJoin = supplierAssessmentJoin.join<SupplierAssessment, Appointment>("appointments", JoinType.LEFT)
-        val actionPlanJoin = root.join<T, ActionPlan>("actionPlans", JoinType.LEFT)
-        cb.not(
-          cb.and(
-            cb.and(
-              cb.isNotNull(root.get<OffsetDateTime>("endRequestedAt")),
-              cb.isNotNull(root.get<OffsetDateTime>("concludedAt")),
-              root.join<T, EndOfServiceReport>("endOfServiceReport", JoinType.LEFT).isNull
-            ),
-            cb.isNull(appointmentJoin.get<OffsetDateTime>("attendanceSubmittedAt")),
-            cb.isNull(actionPlanJoin.get<OffsetDateTime>("submittedAt")),
-          )
         )
       }
     }
