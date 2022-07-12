@@ -539,7 +539,7 @@ class ReferralServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `to check for cancelled referral were pop did not attend appointment should return for SP user`() {
+    fun `to check for cancelled referral were pop did not attend appointment should return for PP user`() {
       val user = userFactory.create("pp_user_1", "delius")
       val startedReferrals = (1..3).map { sentReferralSummariesFactory.createSent(createdBy = user) }
 
@@ -1068,7 +1068,6 @@ class ReferralServiceTest @Autowired constructor(
 
     @Test
     fun `to check for cancelled referral were pop did not attend appointment should not return for SP User`() {
-      val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest)
       val intervention = interventionFactory.create(contract = contractFactory.create(primeProvider = provider))
       val cancelledReferral = referralFactory.createEnded(
         intervention = intervention,
@@ -1084,6 +1083,7 @@ class ReferralServiceTest @Autowired constructor(
         supplierAssessmentFactory.create(appointment = appointment, referral = cancelledReferral)
       cancelledReferral.supplierAssessment = supplierAssessmentAppointment
       entityManager.refresh(cancelledReferral)
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest)
       assertThat(result)
         .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
         .containsExactlyInAnyOrder(
