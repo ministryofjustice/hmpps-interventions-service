@@ -12,7 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 
 enum class ReferralEventType {
-  SENT, ASSIGNED, CANCELLED, PREMATURELY_ENDED, COMPLETED, DETAILS_AMENDED
+  SENT, ASSIGNED, CANCELLED, PREMATURELY_ENDED, COMPLETED, DETAILS_AMENDED, COMPLEXITY_LEVEL_AMENDED
 }
 
 class ReferralEvent(
@@ -40,6 +40,10 @@ class ReferralEventPublisher(
 
   fun referralAssignedEvent(referral: Referral) {
     applicationEventPublisher.publishEvent(ReferralEvent(this, ReferralEventType.ASSIGNED, referral, getSentReferralURL(referral)))
+  }
+
+  fun referralComplexityChangedEvent(referral: Referral) {
+    applicationEventPublisher.publishEvent(ReferralEvent(this, ReferralEventType.COMPLEXITY_LEVEL_AMENDED, referral, getSentReferralURL(referral)))
   }
 
   fun referralConcludedEvent(referral: Referral, eventType: ReferralEventType) {
