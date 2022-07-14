@@ -1,0 +1,367 @@
+package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
+
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import org.mockito.ArgumentCaptor
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.atLeast
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
+import org.springframework.http.HttpStatus
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
+import org.springframework.web.server.ResponseStatusException
+import org.springframework.web.server.ServerWebInputException
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOutcomesDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ChangeLogFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
+import java.time.OffsetDateTime
+import java.util.Optional
+import java.util.UUID
+
+class AmendReferralServiceUnitTest {
+  private val referralRepository: ReferralRepository = mock()
+  private val referralService = mock<ReferralService>()
+  private val serviceCategoryRepository: ServiceCategoryRepository = mock()
+  private val changelogRepository: ChangelogRepository = mock()
+  private val referralEventPublisher: ReferralEventPublisher = mock()
+  private val jwtAuthenticationToken = JwtAuthenticationToken(mock())
+
+  private val userMapper: UserMapper = mock()
+
+  private val referralFactory = ReferralFactory()
+  private val serviceCategoryFactory = ServiceCategoryFactory()
+  private val tokenFactory = JwtTokenFactory()
+  private val changeLogFactory = ChangeLogFactory()
+  private val actionPlanFactory = ActionPlanFactory()
+
+  private val amendReferralService = AmendReferralService(
+    referralEventPublisher,
+    changelogRepository,
+    referralRepository,
+    serviceCategoryRepository,
+    userMapper,
+    referralService
+  )
+
+  @Nested
+  inner class UpdateDraftReferralDesiredOutcomes() {
+    val authUser = AuthUser("CRN123", "auth", "user")
+
+    @Test
+    fun `cant set desired outcomes to an empty list`() {
+      val referral = referralFactory.createSent()
+      whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
+      val e = assertThrows<ServerWebInputException> {
+        amendReferralService.updateReferralDesiredOutcomes(
+          referral,
+          AmendDesiredOutcomesDTO(listOf(), "wrong input"),
+          jwtAuthenticationToken,
+          referral.intervention.dynamicFrameworkContract.contractType.serviceCategories.first().id,
+        )
+      }
+      assertThat(e.message.equals("desired outcomes cannot be empty"))
+    }
+
+    @Test
+    fun `cant set desired outcomes when no service categories have been selected`() {
+      val referral = referralFactory.createSent()
+      whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
+      val e = assertThrows<ServerWebInputException> {
+        amendReferralService.updateReferralDesiredOutcomes(
+          referral,
+          AmendDesiredOutcomesDTO(listOf(UUID.randomUUID()), "wrong input"),
+          jwtAuthenticationToken,
+          referral.intervention.dynamicFrameworkContract.contractType.serviceCategories.first().id,
+        )
+      }
+
+      assertThat(e.message.equals("desired outcomes cannot be updated: no service categories selected for this referral"))
+    }
+
+    @Test
+    fun `cant set desired outcomes for an invalid service category`() {
+      val serviceCategory1 = serviceCategoryFactory.create()
+      val serviceCategory2 = serviceCategoryFactory.create()
+      val referral = referralFactory.createSent(selectedServiceCategories = mutableSetOf(serviceCategory1))
+      whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
+      val e = assertThrows<ServerWebInputException> {
+        amendReferralService.updateReferralDesiredOutcomes(
+          referral,
+          AmendDesiredOutcomesDTO(listOf(UUID.randomUUID()), "wrong input"),
+          jwtAuthenticationToken,
+          serviceCategory2.id
+        )
+      }
+      assertThat(e.message.equals("desired outcomes cannot be updated: specified service category not selected for this referral"))
+    }
+
+    @Test
+    fun `cant set desired outcome when service category is not found`() {
+      whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.empty())
+      val serviceCategory = serviceCategoryFactory.create()
+      val referral = referralFactory.createSent(selectedServiceCategories = mutableSetOf(serviceCategory))
+      whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
+      val e = assertThrows<ServerWebInputException> {
+        amendReferralService.updateReferralDesiredOutcomes(
+          referral,
+          AmendDesiredOutcomesDTO(listOf(UUID.randomUUID()), "wrong input"),
+          jwtAuthenticationToken,
+          serviceCategory.id
+        )
+      }
+
+      assertThat(e.message.equals("desired outcomes cannot be updated: specified service category not found"))
+    }
+
+    @Test
+    fun `cant set desired outcome when the action plan is approved`() {
+      val serviceCategoryId = UUID.randomUUID()
+      val desiredOutcome = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId)
+      val serviceCategory = serviceCategoryFactory.create(
+        id = serviceCategoryId,
+        desiredOutcomes = listOf(desiredOutcome)
+      )
+      val referral = referralFactory.createSent(
+        selectedServiceCategories = mutableSetOf(serviceCategory),
+        desiredOutcomes = mutableListOf(desiredOutcome),
+        actionPlans = mutableListOf(actionPlanFactory.create(approvedAt = OffsetDateTime.now()))
+      )
+
+      val e = assertThrows<ServerWebInputException> {
+        amendReferralService.updateReferralDesiredOutcomes(
+          referral,
+          AmendDesiredOutcomesDTO(listOf(desiredOutcome.id), "there is a reason"),
+          jwtAuthenticationToken,
+          serviceCategory.id
+        )
+      }
+      assertThat(e.reason).isEqualTo("desired outcomes cannot be updated: the action plan is already approved")
+    }
+
+    @Test
+    fun `cant set desired outcomes when its invalid for the service category`() {
+      val serviceCategoryId = UUID.randomUUID()
+      val desiredOutcome = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId)
+      val serviceCategory =
+        serviceCategoryFactory.create(id = serviceCategoryId, desiredOutcomes = listOf(desiredOutcome))
+      val referral = referralFactory.createSent(selectedServiceCategories = mutableSetOf(serviceCategory))
+
+      whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
+      whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.of(serviceCategory))
+
+      val e = assertThrows<ServerWebInputException> {
+        amendReferralService.updateReferralDesiredOutcomes(
+          referral,
+          AmendDesiredOutcomesDTO(listOf(UUID.randomUUID()), "wrong input"),
+          jwtAuthenticationToken,
+          serviceCategory.id
+        )
+      }
+      assertThat(e.message.equals("desired outcomes cannot be updated: at least one desired outcome is not valid for this service category"))
+    }
+
+    @Test
+    fun `can update an already selected desired outcome for service category`() {
+      val serviceCategoryId = UUID.randomUUID()
+      val desiredOutcome1 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId)
+      val desiredOutcome2 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId)
+      val serviceCategory = serviceCategoryFactory.create(
+        id = serviceCategoryId,
+        desiredOutcomes = listOf(desiredOutcome1, desiredOutcome2)
+      )
+      val oldReferral = referralFactory.createSent(
+        selectedServiceCategories = mutableSetOf(serviceCategory),
+        desiredOutcomes = mutableListOf(desiredOutcome1)
+      )
+      val referral = referralFactory.createSent(
+        selectedServiceCategories = mutableSetOf(serviceCategory),
+        desiredOutcomes = mutableListOf(desiredOutcome2)
+      )
+      val expectedChangeLog = changeLogFactory.create(
+        oldVal = ReferralAmendmentDetails(listOf(desiredOutcome1.id.toString())),
+        newVal = ReferralAmendmentDetails(listOf(desiredOutcome2.id.toString()))
+      )
+
+      whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
+      whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.of(serviceCategory))
+      whenever(referralRepository.save(any())).thenReturn(referral)
+      whenever(changelogRepository.save(any())).thenReturn(expectedChangeLog)
+
+      val updateReferralDesiredOutcomes = amendReferralService.updateReferralDesiredOutcomes(
+        oldReferral,
+        AmendDesiredOutcomesDTO(listOf(desiredOutcome2.id), "needs changing"),
+        jwtAuthenticationToken,
+        serviceCategory.id
+      )
+
+      assertThat(updateReferralDesiredOutcomes?.newVal!!.values.size).isEqualTo(1)
+      assertThat(updateReferralDesiredOutcomes.newVal.values).containsExactlyInAnyOrder(desiredOutcome2.id.toString())
+      assertThat(updateReferralDesiredOutcomes.reasonForChange).isEqualTo("needs changing")
+
+      val argument: ArgumentCaptor<Referral> = ArgumentCaptor.forClass(Referral::class.java)
+      verify(referralRepository).save(argument.capture())
+      val expectedReferral = argument.value
+
+      assertThat(expectedReferral?.selectedDesiredOutcomes!!.size).isEqualTo(1)
+      assertThat(expectedReferral.selectedDesiredOutcomes!![0].serviceCategoryId).isEqualTo(serviceCategory.id)
+      assertThat(expectedReferral.selectedDesiredOutcomes!![0].desiredOutcomeId).isEqualTo(desiredOutcome2.id)
+    }
+
+    @Test
+    fun `can update multiple selected desired outcome for a service category`() {
+      val serviceCategoryId1 = UUID.randomUUID()
+      val desiredOutcome1 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId1)
+      val desiredOutcome2 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId1)
+      val desiredOutcome3 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId1)
+      val desiredOutcome4 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId1)
+      val serviceCategory =
+        serviceCategoryFactory.create(id = serviceCategoryId1, desiredOutcomes = listOf(desiredOutcome1, desiredOutcome2, desiredOutcome3, desiredOutcome4))
+
+      val oldReferral = referralFactory.createSent(
+        selectedServiceCategories = mutableSetOf(serviceCategory),
+        desiredOutcomes = mutableListOf(desiredOutcome1)
+      )
+      val referral = referralFactory.createSent(
+        selectedServiceCategories = mutableSetOf(serviceCategory),
+        desiredOutcomes = mutableListOf(desiredOutcome1, desiredOutcome2)
+      )
+
+      val expectedChangeLog = changeLogFactory.create(
+        oldVal = ReferralAmendmentDetails(listOf(desiredOutcome1.id.toString(), desiredOutcome2.id.toString())),
+        newVal = ReferralAmendmentDetails(listOf(desiredOutcome3.id.toString(), desiredOutcome4.id.toString()))
+      )
+
+      whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
+      whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.of(serviceCategory))
+      whenever(referralRepository.save(any())).thenReturn(referral)
+      whenever(changelogRepository.save(any())).thenReturn(expectedChangeLog)
+
+      whenever(changelogRepository.save(any())).thenReturn(expectedChangeLog)
+
+      val updateReferralDesiredOutcomes = amendReferralService.updateReferralDesiredOutcomes(
+        oldReferral,
+        AmendDesiredOutcomesDTO(listOf(desiredOutcome3.id, desiredOutcome4.id), "needs changing"),
+        jwtAuthenticationToken,
+        serviceCategory.id
+      )
+
+      assertThat(updateReferralDesiredOutcomes?.newVal!!.values.size).isEqualTo(2)
+      assertThat(updateReferralDesiredOutcomes.newVal.values).containsExactlyInAnyOrder(desiredOutcome3.id.toString(), desiredOutcome4.id.toString())
+      assertThat(updateReferralDesiredOutcomes.reasonForChange).isEqualTo("needs changing")
+
+      val argument: ArgumentCaptor<Referral> = ArgumentCaptor.forClass(Referral::class.java)
+      verify(referralRepository).save(argument.capture())
+      val expectedReferral = argument.value
+
+      assertThat(expectedReferral?.selectedDesiredOutcomes!!.size).isEqualTo(2)
+      assertThat(expectedReferral.selectedDesiredOutcomes!![0].serviceCategoryId).isEqualTo(serviceCategory.id)
+      assertThat(expectedReferral.selectedDesiredOutcomes!![0].desiredOutcomeId).isEqualTo(desiredOutcome3.id)
+      assertThat(expectedReferral.selectedDesiredOutcomes!![1].serviceCategoryId).isEqualTo(serviceCategory.id)
+      assertThat(expectedReferral.selectedDesiredOutcomes!![1].desiredOutcomeId).isEqualTo(desiredOutcome4.id)
+    }
+  }
+
+  @Nested
+  inner class UpdateComplexityLevelId() {
+
+    val authUser = AuthUser("CRN123", "auth", "user")
+
+    @Test
+    fun `updateComplexityLevel results in changes being saved`() {
+
+      val complexityLevelId1 = UUID.randomUUID()
+      val complexityLevelId2 = UUID.randomUUID()
+
+      val complexityLevel1 = ComplexityLevel(complexityLevelId1, "1", "description")
+      val complexityLevel2 = ComplexityLevel(complexityLevelId2, "2", "description")
+
+      val serviceCategory = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel1, complexityLevel2))
+
+      whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
+      whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.of(serviceCategory))
+
+      val referral = referralFactory.createSent(
+        selectedServiceCategories = mutableSetOf(serviceCategory),
+        complexityLevelIds = mutableMapOf(serviceCategory.id to complexityLevel1.id)
+      )
+
+      val updateToReferral = AmendComplexityLevelDTO(complexityLevelId1, "testing change")
+
+      amendReferralService.updateComplexityLevel(referral, updateToReferral, serviceCategory.id, jwtAuthenticationToken)
+
+      val argumentCaptorReferral = argumentCaptor<Referral>()
+      verify(referralRepository, atLeast(1)).save(argumentCaptorReferral.capture())
+
+      val referralValues = argumentCaptorReferral.firstValue
+      Assertions.assertEquals(complexityLevelId1, referralValues.complexityLevelIds?.get(serviceCategory.id))
+
+      val argumentCaptorChangelog = argumentCaptor<Changelog>()
+      verify(changelogRepository, atLeast(1)).save(argumentCaptorChangelog.capture())
+
+      val changeLogValues = argumentCaptorChangelog.firstValue
+      assertThat(changeLogValues.id).isNotNull
+      Assertions.assertEquals(authUser.id, changeLogValues.changedBy.id)
+    }
+
+    @Test
+    fun `no sent referral found error returned when appropriate `() {
+      val referralId = UUID.randomUUID()
+      val token = tokenFactory.create()
+
+      whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
+      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(null)
+
+      val e = assertThrows<ResponseStatusException> {
+        amendReferralService.getSentReferralForAuthenticatedUser(token, referralId)
+      }
+      assertThat(e.status).isEqualTo(HttpStatus.NOT_FOUND)
+      assertThat(e.message).contains("sent referral not found [id=$referralId]")
+    }
+
+    @Test
+    fun `cant set desired outcome when the action plan is approved`() {
+
+      val complexityLevelId1 = UUID.randomUUID()
+
+      val complexityLevel1 = ComplexityLevel(complexityLevelId1, "1", "description")
+
+      val serviceCategory = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel1))
+
+      val referral = referralFactory.createSent(
+        selectedServiceCategories = mutableSetOf(serviceCategory),
+        complexityLevelIds = mutableMapOf(serviceCategory.id to complexityLevel1.id),
+        actionPlans = mutableListOf(actionPlanFactory.create(approvedAt = OffsetDateTime.now()))
+      )
+
+      val e = assertThrows<ServerWebInputException> {
+        amendReferralService.updateComplexityLevel(
+          referral,
+          AmendComplexityLevelDTO(complexityLevelId1, "testing change"),
+          serviceCategory.id,
+          jwtAuthenticationToken
+        )
+      }
+      assertThat(e.reason).isEqualTo("desired outcomes cannot be updated: the action plan is already approved")
+    }
+  }
+}

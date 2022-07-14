@@ -27,6 +27,7 @@ import javax.transaction.Transactional
 @Transactional
 class ReferralNotificationService(
   @Value("\${notify.templates.complexity-level-changed}") private val complexityLevelTemplateID: String,
+  @Value("\${notify.templates.desired-outcome-changed}") private val desiredOutcomesAmendTemplateID: String,
   @Value("\${notify.templates.referral-sent}") private val referralSentTemplateID: String,
   @Value("\${notify.templates.referral-assigned}") private val referralAssignedTemplateID: String,
   @Value("\${notify.templates.completion-deadline-updated}") private val completionDeadlineUpdatedTemplateID: String,
@@ -78,6 +79,20 @@ class ReferralNotificationService(
         val location = generateResourceUrl(interventionsUIBaseURL, spReferralDetailsLocation, event.referral.id)
         emailSender.sendEmail(
           complexityLevelTemplateID,
+          userDetails.email,
+          mapOf(
+            "sp_first_name" to userDetails.firstName,
+            "referral_number" to event.referral.referenceNumber!!,
+            "referral" to location.toString()
+          )
+        )
+      }
+
+      ReferralEventType.DESIRED_OUTCOMES_AMENDED -> {
+        val userDetails = hmppsAuthService.getUserDetail(event.referral.currentAssignee!!)
+        val location = generateResourceUrl(interventionsUIBaseURL, spReferralDetailsLocation, event.referral.id)
+        emailSender.sendEmail(
+          desiredOutcomesAmendTemplateID,
           userDetails.email,
           mapOf(
             "sp_first_name" to userDetails.firstName,

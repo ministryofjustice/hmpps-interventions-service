@@ -1,27 +1,31 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto
 
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendTopic
 import java.util.UUID
 
 data class AmendReferralsDTO(
-  val complexityLevelId: UUID,
-  val serviceCategoryId: UUID,
-  val reasonForChange: String
-) {
-  // nothing to do
-}
-
-data class AmendComplexityLevelDTO(
-  val complexityLevelId: UUID,
-  val serviceCategoryId: UUID,
-  val reasonForChange: String
+  val values: List<String>,
+  val reasonForChange: String? = null,
+  val amendTopic: AmendTopic
 ) {
   companion object {
-    fun from(amendComplexityLevelDTO: AmendComplexityLevelDTO): AmendComplexityLevelDTO {
-      return AmendComplexityLevelDTO(
-        complexityLevelId = amendComplexityLevelDTO.complexityLevelId,
-        serviceCategoryId = amendComplexityLevelDTO.serviceCategoryId,
-        reasonForChange = amendComplexityLevelDTO.reasonForChange
+    fun from(changelog: Changelog): AmendReferralsDTO {
+      return AmendReferralsDTO(
+        values = changelog.newVal.values,
+        reasonForChange = changelog.reasonForChange,
+        amendTopic = changelog.topic
       )
     }
   }
 }
+
+data class AmendComplexityLevelDTO(
+  val complexityLevelId: UUID,
+  val reasonForChange: String
+)
+
+data class AmendDesiredOutcomesDTO(
+  val desiredOutcomesIds: List<UUID>,
+  val reasonForChange: String
+)

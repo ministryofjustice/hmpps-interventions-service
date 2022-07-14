@@ -1,5 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto
 
-data class ReferralAmendmentDetails(
+data class AmendReferralChangesDTO(
   var values: List<String>
 )

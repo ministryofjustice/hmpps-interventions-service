@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
+import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
@@ -7,10 +8,13 @@ import org.hibernate.annotations.Type
 import org.hibernate.annotations.TypeDef
 import org.hibernate.annotations.TypeDefs
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendTopic
 import java.time.OffsetDateTime
 import java.util.UUID
 import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
 import javax.persistence.Id
 import javax.persistence.ManyToOne
 import javax.validation.constraints.NotNull
@@ -18,7 +22,8 @@ import javax.validation.constraints.NotNull
 @Entity
 @TypeDefs(
   value = [
-    TypeDef(name = "jsonb", typeClass = JsonBinaryType::class)
+    TypeDef(name = "jsonb", typeClass = JsonBinaryType::class),
+    TypeDef(name = "topic", typeClass = PostgreSQLEnumType::class)
   ]
 )
 data class Changelog(
@@ -28,7 +33,8 @@ data class Changelog(
   @Column(name = "changelog_id")
   val id: UUID,
 
-  var topic: String,
+  @Type(type = "topic") @Enumerated(EnumType.STRING)
+  var topic: AmendTopic,
 
   @Type(type = "jsonb")
   @Column(name = "old_value")
