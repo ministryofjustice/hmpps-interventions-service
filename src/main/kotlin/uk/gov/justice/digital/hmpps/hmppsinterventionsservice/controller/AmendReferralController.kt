@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedAndRequirementDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
@@ -40,5 +41,18 @@ class AmendReferralController(
     val user = userMapper.fromToken(authentication)
     return referralService.getSentReferralForUser(id, user)
       ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "sent referral not found [id=$id]")
+  }
+
+  @PatchMapping("/sent-referral/{referralId}/amend-needs-and-requirement")
+  fun updateNeedsAndRequirements(
+    @PathVariable referralId: UUID,
+    @RequestBody needsAndRequirement: AmendNeedAndRequirementDTO,
+    authentication: JwtAuthenticationToken
+  ): AmendNeedAndRequirementDTO? {
+    val user = userMapper.fromToken(authentication)
+    val referral = getSentReferralForAuthenticatedUser(authentication, referralId)
+    return amendReferralService.updateNeedAndRequirement(referral, needsAndRequirement, user)?.let {
+      AmendNeedAndRequirementDTO.from(it)
+    } ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "complexity level could not be updated")
   }
 }
