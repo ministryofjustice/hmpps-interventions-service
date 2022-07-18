@@ -25,6 +25,7 @@ data class AmendComplexityLevelDTO(
     }
   }
 }
+
 data class AmendNeedAndRequirementDTO(
   var furtherInformation: String? = null,
   var additionalNeedsInformation: String? = null,
