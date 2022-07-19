@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
-import org.junit.Ignore
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -23,6 +22,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessFilter
@@ -1068,8 +1068,6 @@ class ReferralServiceTest @Autowired constructor(
     }
 
     @Test
-    @Ignore
-    // TODO- come back once we solve the production issue
     fun `to check for cancelled referral were pop did not attend appointment should not return for SP User`() {
       val intervention = interventionFactory.create(contract = contractFactory.create(primeProvider = provider))
       val cancelledReferral = referralFactory.createEnded(
@@ -1097,6 +1095,34 @@ class ReferralServiceTest @Autowired constructor(
           otherAssignedSentReferralSummary
         )
     }
+
+    @Test
+    fun `to check if unattended cancelled referral should not return with referrals sorted for SP User`() {
+      val intervention = interventionFactory.create(contract = contractFactory.create(primeProvider = provider))
+      val cancelledReferral = referralFactory.createEnded(
+        intervention = intervention,
+        endRequestedReason = cancellationReasonFactory.create("ANY"),
+        endRequestedAt = OffsetDateTime.now(),
+        concludedAt = OffsetDateTime.now(),
+        endOfServiceReport = null,
+        actionPlans = mutableListOf(actionPlanFactory.create(submittedAt = null))
+      )
+      val appointment =
+        appointmentFactory.create(referral = cancelledReferral, attendanceSubmittedAt = null)
+      val supplierAssessmentAppointment =
+        supplierAssessmentFactory.create(appointment = appointment, referral = cancelledReferral)
+      cancelledReferral.supplierAssessment = supplierAssessmentAppointment
+      entityManager.refresh(cancelledReferral)
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, true, null, PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "assignments.assignedTo.userName")))
+      assertThat(result)
+        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
+        .containsExactlyInAnyOrder(
+          completedSentReferralSummary,
+          liveSentReferralSummary,
+          cancelledSentReferralSummary
+        )
+    }
+
     @Test
     fun `setting concluded returns only concluded referrals`() {
       val result = referralService.getSentReferralSummaryForUser(user, true, null, null, null, pageRequest)
