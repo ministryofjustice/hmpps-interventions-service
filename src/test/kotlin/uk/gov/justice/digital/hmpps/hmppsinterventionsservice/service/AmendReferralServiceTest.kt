@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
-import java.util.Optional
-import java.util.UUID
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -25,6 +23,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Ser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
+import java.util.Optional
+import java.util.UUID
 
 @RepositoryTest
 class AmendReferralServiceTest {
