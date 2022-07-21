@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -86,7 +86,7 @@ class AmendReferralServiceTest {
     verify(changelogRepository, atLeast(1)).save(argumentCaptorChangelog.capture())
 
     val changeLogValues = argumentCaptorChangelog.firstValue
-    Assertions.assertThat(changeLogValues.id).isNotNull()
+    assertThat(changeLogValues.id).isNotNull()
     assertEquals(authUser.id, changeLogValues.changedBy.id)
   }
 
@@ -100,7 +100,7 @@ class AmendReferralServiceTest {
     val e = assertThrows<ResponseStatusException> {
       amendReferralService.getSentReferralForAuthenticatedUser(token, referralId)
     }
-    Assertions.assertThat(e.status).isEqualTo(HttpStatus.NOT_FOUND)
-    Assertions.assertThat(e.message).contains("sent referral not found [id=$referralId]")
+    assertThat(e.status).isEqualTo(HttpStatus.NOT_FOUND)
+    assertThat(e.message).contains("sent referral not found [id=$referralId]")
   }
 }

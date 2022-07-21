@@ -26,7 +26,7 @@ internal class AmendReferralControllerTest {
   private val authUserFactory = AuthUserFactory()
 
   @Nested
-  inner class GetSentReferralForUser {
+  inner class UpdateComplexityLevel {
     private val referral = referralFactory.createSent()
     private val user = authUserFactory.create()
     private val token = tokenFactory.create(userID = user.id, userName = user.userName, authSource = user.authSource)
