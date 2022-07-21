@@ -114,6 +114,7 @@ notify:
     case-note-sent: "83868039-3d42-4af6-86da-df14e9d4a8b7"
     completion-deadline-updated: "fb5c9bc1-3131-49aa-8aeb-6138208406d1"
     enforceable-days-updated: "eef5834f-3a33-46e1-a937-a8bf0e3320c0"
+    complexity-level-changed: "824900b1-7c06-4594-984d-310b1b46098a"
 
 interventions-ui:
   locations:
