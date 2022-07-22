@@ -119,6 +119,8 @@ class SetupAssistant(
     appointmentDeliveryRepository.deleteAll()
     appointmentRepository.deleteAll()
 
+    changelogRepository.deleteAll()
+
     deleteAllReferralDetails()
     changelogRepository.deleteAll()
     referralRepository.deleteAll()

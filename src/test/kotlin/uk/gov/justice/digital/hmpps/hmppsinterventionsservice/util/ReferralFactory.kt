@@ -70,6 +70,13 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
 
     supplierAssessment: SupplierAssessment? = null,
     serviceUserData: ServiceUserData? = null,
+    furtherInformation: String? = null,
+    additionalNeedsInformation: String? = null,
+    accessibilityNeeds: String? = null,
+    needsInterpreter: Boolean? = null,
+    interpreterLanguage: String? = null,
+    hasAdditionalResponsibilities: Boolean? = null,
+    whenUnavailable: String? = null,
   ): Referral {
     return create(
       id = id,
@@ -89,7 +96,14 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
 
       assignments = assignments,
       supplierAssessment = supplierAssessment,
-      serviceUserData = serviceUserData
+      serviceUserData = serviceUserData,
+      furtherInformation = furtherInformation,
+      additionalNeedsInformation = additionalNeedsInformation,
+      accessibilityNeeds = accessibilityNeeds,
+      needsInterpreter = needsInterpreter,
+      interpreterLanguage = interpreterLanguage,
+      hasAdditionalResponsibilities = hasAdditionalResponsibilities,
+      whenUnavailable = whenUnavailable,
     )
   }
 

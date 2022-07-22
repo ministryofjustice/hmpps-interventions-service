@@ -25,3 +25,29 @@ data class AmendComplexityLevelDTO(
     }
   }
 }
+data class AmendNeedAndRequirementDTO(
+  var furtherInformation: String? = null,
+  var additionalNeedsInformation: String? = null,
+  var accessibilityNeeds: String? = null,
+  var needsInterpreter: Boolean? = null,
+  var interpreterLanguage: String? = null,
+  var hasAdditionalResponsibilities: Boolean? = null,
+  var whenUnavailable: String? = null,
+  val reasonForChange: String
+) {
+  companion object {
+    fun from(amendNeedAndRequirementDTO: AmendNeedAndRequirementDTO): AmendNeedAndRequirementDTO {
+      return AmendNeedAndRequirementDTO(
+        furtherInformation = amendNeedAndRequirementDTO.furtherInformation,
+        additionalNeedsInformation = amendNeedAndRequirementDTO.additionalNeedsInformation,
+        accessibilityNeeds = amendNeedAndRequirementDTO.accessibilityNeeds,
+        needsInterpreter = amendNeedAndRequirementDTO.needsInterpreter,
+        interpreterLanguage = amendNeedAndRequirementDTO.interpreterLanguage,
+        hasAdditionalResponsibilities = amendNeedAndRequirementDTO.hasAdditionalResponsibilities,
+        whenUnavailable = amendNeedAndRequirementDTO.whenUnavailable,
+        reasonForChange = amendNeedAndRequirementDTO.reasonForChange
+
+      )
+    }
+  }
+}

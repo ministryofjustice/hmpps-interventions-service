@@ -10,7 +10,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.same
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.ActionPlanValidator
@@ -49,7 +48,6 @@ internal class ActionPlanServiceTest {
   private val referralFactory = ReferralFactory()
   private val actionPlanFactory = ActionPlanFactory()
   private val appointmentFactory = AppointmentFactory()
-
   private val actionPlanService = ActionPlanService(
     authUserRepository,
     referralRepository,
@@ -58,6 +56,7 @@ internal class ActionPlanServiceTest {
     actionPlanEventPublisher,
     deliverySessionService,
     deliverySessionRepository,
+
   )
 
   @Test
