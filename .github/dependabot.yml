@@ -8,3 +8,7 @@ updates:
     time: "03:00"
     timezone: Europe/London
   open-pull-requests-limit: 10
+- package-ecosystem: docker
+  directory: "/script"
+  schedule:
+    interval: weekly
