@@ -9,7 +9,7 @@ parameters:
     default: main
 
 orbs:
-  hmpps: ministryofjustice/hmpps@3.14
+  hmpps: ministryofjustice/hmpps@5.1
   gradle: circleci/gradle@2.2.0
   mem: circleci/rememborb@0.0.1
 
@@ -252,10 +252,8 @@ workflows:
       - validate_helm:
           context:
             - hmpps-interventions-dev-deploy
-      - hmpps/build_docker:
+      - hmpps/build_multiplatform_docker:
           name: build_and_publish_docker
-          publish: true
-          persist_container_image: true
           filters:
             branches:
               only: [main]

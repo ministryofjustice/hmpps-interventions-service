@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jre-alpine AS builder
+FROM --platform=$BUILDPLATFORM eclipse-temurin:17-jre-alpine AS builder
 
 WORKDIR /app
 
