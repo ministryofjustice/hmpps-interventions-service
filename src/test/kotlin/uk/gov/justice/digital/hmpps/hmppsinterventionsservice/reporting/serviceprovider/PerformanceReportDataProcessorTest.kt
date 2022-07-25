@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.service
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
@@ -13,7 +12,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFac
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAssessmentFactory
-import java.lang.RuntimeException
 import java.time.OffsetDateTime
 
 internal class PerformanceReportDataProcessorTest {
@@ -26,13 +24,6 @@ internal class PerformanceReportDataProcessorTest {
   private val processor = PerformanceReportProcessor(actionPlanService)
 
   private val referralFactory = ReferralFactory()
-
-  @Test
-  fun `will not process draft referrals`() {
-    val referral = referralFactory.createDraft()
-
-    assertThrows<RuntimeException> { processor.process(referral) }
-  }
 
   @Test
   fun `will process sent referrals`() {

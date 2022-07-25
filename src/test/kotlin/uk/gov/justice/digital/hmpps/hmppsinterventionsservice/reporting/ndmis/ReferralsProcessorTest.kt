@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -23,13 +22,6 @@ internal class ReferralsProcessorTest {
   private val eosrFactory = EndOfServiceReportFactory()
   private val appointmentFactory = AppointmentFactory()
   private val actionPlanFactory = ActionPlanFactory()
-
-  @Test
-  fun `will not process draft referrals`() {
-    val referral = referralFactory.createDraft()
-
-    assertThrows<RuntimeException> { processor.process(referral) }
-  }
 
   @Test
   fun `referral correctly returns a referralData object`() {

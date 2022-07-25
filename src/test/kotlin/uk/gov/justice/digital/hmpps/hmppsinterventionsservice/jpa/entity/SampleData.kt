@@ -37,7 +37,7 @@ class SampleData {
       return em.persistAndFlush(intervention)
     }
 
-    fun persistReferral(em: TestEntityManager, referral: Referral): Referral {
+    fun persistReferral(em: TestEntityManager, referral: DraftReferral): DraftReferral {
       persistIntervention(em, referral.intervention)
 
       // we need to ensure any users associated with the referral have been created.
@@ -49,9 +49,6 @@ class SampleData {
         referral.createdBy.authSource,
         referral.createdBy.userName
       )
-      referral.sentBy?.let {
-        AuthUserFactory(em).create(it.id, it.authSource, it.userName)
-      }
       return em.persistAndFlush(referral)
     }
 
@@ -93,6 +90,31 @@ class SampleData {
         endOfServiceReport = endOfServiceReport,
         concludedAt = concludedAt,
         supplementaryRiskId = supplementaryRiskId,
+      )
+    }
+
+    fun sampleDraftReferral(
+      crn: String,
+      serviceProviderName: String,
+      id: UUID = UUID.randomUUID(),
+      relevantSentenceId: Long? = null,
+      createdAt: OffsetDateTime = OffsetDateTime.now(),
+      createdBy: AuthUser = AuthUser("123456", "delius", "bernard.beaks"),
+      intervention: Intervention = sampleIntervention(
+        dynamicFrameworkContract = sampleContract(
+          primeProvider = sampleServiceProvider(id = serviceProviderName, name = serviceProviderName),
+        )
+      ),
+    ): DraftReferral {
+
+      return DraftReferral(
+        serviceUserCRN = crn,
+        id = id,
+        createdAt = createdAt,
+        createdBy = createdBy,
+        intervention = intervention,
+        selectedServiceCategories = intervention.dynamicFrameworkContract.contractType.serviceCategories.toMutableSet(),
+        relevantSentenceId = relevantSentenceId,
       )
     }
 

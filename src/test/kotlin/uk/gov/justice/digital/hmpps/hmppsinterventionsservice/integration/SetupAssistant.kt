@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Complex
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ContractType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DeliverySession
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DynamicFrameworkContract
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
@@ -38,6 +39,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Cha
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ContractTypeRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DesiredOutcomeRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DynamicFrameworkContractRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
@@ -71,6 +73,7 @@ fun <T> Collection<T>.random(): T = elementAt(random.nextInt(size))
 class SetupAssistant(
   private val authUserRepository: AuthUserRepository,
   private val referralRepository: ReferralRepository,
+  private val draftReferralRepository: DraftReferralRepository,
   private val interventionRepository: InterventionRepository,
   private val actionPlanRepository: ActionPlanRepository,
   private val deliverySessionRepository: DeliverySessionRepository,
@@ -122,6 +125,7 @@ class SetupAssistant(
     deleteAllReferralDetails()
     changelogRepository.deleteAll()
     referralRepository.deleteAll()
+    draftReferralRepository.deleteAll()
     interventionRepository.deleteAll()
     dynamicFrameworkContractRepository.deleteAll()
 
@@ -231,9 +235,9 @@ class SetupAssistant(
     createdBy: AuthUser = createPPUser(),
     createdAt: OffsetDateTime = OffsetDateTime.now(),
     serviceUserCRN: String = "X123456",
-    selectedServiceCategories: MutableSet<ServiceCategory>? = null
-  ): Referral {
-    return referralRepository.save(
+    selectedServiceCategories: MutableSet<ServiceCategory>? = null,
+  ): DraftReferral {
+    return draftReferralRepository.save(
       referralFactory.createDraft(
         id = id,
         intervention = intervention,
@@ -248,18 +252,21 @@ class SetupAssistant(
   fun createEndedReferral(id: UUID = UUID.randomUUID(), intervention: Intervention = createIntervention(), endRequestedReason: CancellationReason? = randomCancellationReason(), endRequestedComments: String? = null): Referral {
     val ppUser = createPPUser()
     val spUser = createSPUser()
+    draftReferralRepository.save(referralFactory.createDraft(id = id, intervention = intervention, createdBy = ppUser))
     return referralRepository.save(referralFactory.createEnded(id = id, intervention = intervention, createdBy = ppUser, sentBy = ppUser, endRequestedBy = ppUser, assignments = listOf(ReferralAssignment(OffsetDateTime.now(), spUser, spUser)), endRequestedReason = endRequestedReason, endRequestedComments = endRequestedComments))
   }
 
   fun createCancelledReferral(id: UUID = UUID.randomUUID(), intervention: Intervention = createIntervention(), endRequestedReason: CancellationReason? = randomCancellationReason(), endRequestedComments: String? = null): Referral {
     val ppUser = createPPUser()
     val spUser = createSPUser()
+    draftReferralRepository.save(referralFactory.createDraft(id = id, intervention = intervention, createdBy = ppUser))
     return referralRepository.save(referralFactory.createEnded(id = id, intervention = intervention, createdBy = ppUser, sentBy = ppUser, endRequestedBy = ppUser, assignments = listOf(ReferralAssignment(OffsetDateTime.now(), spUser, spUser)), endRequestedReason = endRequestedReason, endRequestedComments = endRequestedComments, concludedAt = OffsetDateTime.now()))
   }
 
   fun createCompletedReferral(id: UUID = UUID.randomUUID(), intervention: Intervention = createIntervention(), endRequestedReason: CancellationReason? = randomCancellationReason(), endRequestedComments: String? = null): Referral {
     val ppUser = createPPUser()
     val spUser = createSPUser()
+    draftReferralRepository.save(referralFactory.createDraft(id = id, intervention = intervention, createdBy = ppUser))
     val referral = referralRepository.save(referralFactory.createEnded(id = id, intervention = intervention, createdBy = ppUser, sentBy = ppUser, endRequestedBy = ppUser, assignments = listOf(ReferralAssignment(OffsetDateTime.now(), spUser, spUser)), endRequestedReason = endRequestedReason, endRequestedComments = endRequestedComments, concludedAt = OffsetDateTime.now()))
     createEndOfServiceReport(referral = referral)
     return referral
@@ -271,6 +278,11 @@ class SetupAssistant(
     ppUser: AuthUser = createPPUser(),
     sentAt: OffsetDateTime = OffsetDateTime.now()
   ): Referral {
+    createDraftReferral(
+      id = id,
+      intervention = intervention,
+      createdBy = ppUser
+    )
     val referral = referralRepository.save(
       referralFactory.createSent(
         id = id,
@@ -373,6 +385,11 @@ class SetupAssistant(
     val intervention = intervention ?: createIntervention()
     val ppUser = createPPUser()
     val spUser = createSPUser()
+    createDraftReferral(
+      id = id,
+      intervention = intervention,
+      createdBy = ppUser
+    )
     return referralRepository.save(
       referralFactory.createSent(
         id = id,
@@ -407,6 +424,13 @@ class SetupAssistant(
     val intervention = createIntervention(interventionTitle = interventionTitle, serviceProviderId = serviceProviderId, dynamicFrameworkContract = dynamicFrameworkContract)
     val ppUser = createPPUser()
     val spUser = if (assignedToUsername != null) createSPUser(assignedToUsername) else null
+
+    val draftReferral = createDraftReferral(
+      id = id,
+      intervention = intervention,
+      createdBy = ppUser
+    )
+
     val referral = referralRepository.save(
       referralFactory.createSent(
         id = id,
@@ -419,8 +443,10 @@ class SetupAssistant(
         referenceNumber = referenceNumber
       )
     )
-    val serviceUser = serviceUserFactory.create(firstName = serviceUserFirstName, lastName = serviceUserLastName, referral = referral)
+    val serviceUser = serviceUserFactory.create(firstName = serviceUserFirstName, lastName = serviceUserLastName, referral = draftReferral)
+    draftReferral.serviceUserData = serviceUser
     referral.serviceUserData = serviceUser
+    draftReferralRepository.save(draftReferral)
     referralRepository.save(referral)
     return referral
   }
@@ -516,13 +542,14 @@ class SetupAssistant(
     complexityLevelIds: MutableMap<UUID, UUID>? = mutableMapOf(selectedServiceCategories[0].id to randomComplexityLevel(selectedServiceCategories[0]).id),
     desiredOutcomes: List<DesiredOutcome> = referral.intervention.dynamicFrameworkContract.contractType.serviceCategories.first().desiredOutcomes,
     serviceUserData: ServiceUserData = ServiceUserData(
-      referral = referral,
       title = "Mr",
       firstName = "Alex",
       lastName = "River",
       dateOfBirth = LocalDate.of(1980, 1, 1),
       gender = "Male",
       preferredLanguage = "English",
+      draftReferral = draftReferralRepository.findById(referral.id).get(),
+      referralID = referral.id,
       ethnicity = "British",
       religionOrBelief = "Agnostic",
       disabilities = listOf("Autism spectrum condition")
@@ -541,6 +568,9 @@ class SetupAssistant(
   ): Referral {
     referral.selectedServiceCategories = selectedServiceCategories.toMutableSet()
     // required to satisfy foreign key constrains on desired outcomes and complexity levels
+    val draftReferral = serviceUserData.draftReferral!!
+    draftReferral.serviceUserData = serviceUserData
+    draftReferralRepository.save(draftReferral)
     referralRepository.saveAndFlush(referral)
 
     referral.serviceUserData = serviceUserData
@@ -567,6 +597,73 @@ class SetupAssistant(
           completionDeadline,
           furtherInformation,
           maximumEnforceableDays
+        )
+      )
+      it.referralDetails?.let { existingDetails ->
+        existingDetails.supersededById = details.id
+        referralDetailsRepository.save(existingDetails)
+      }
+    }
+  }
+
+  fun fillDraftReferralFields(
+    referral: DraftReferral,
+    selectedServiceCategories: List<ServiceCategory> = referral.intervention.dynamicFrameworkContract.contractType.serviceCategories.toList(),
+    complexityLevelIds: MutableMap<UUID, UUID>? = mutableMapOf(selectedServiceCategories[0].id to randomComplexityLevel(selectedServiceCategories[0]).id),
+    desiredOutcomes: List<DesiredOutcome> = referral.intervention.dynamicFrameworkContract.contractType.serviceCategories.first().desiredOutcomes,
+    serviceUserData: ServiceUserData = ServiceUserData(
+      title = "Mr",
+      firstName = "Alex",
+      lastName = "River",
+      dateOfBirth = LocalDate.of(1980, 1, 1),
+      gender = "Male",
+      preferredLanguage = "English",
+      referralID = referral.id,
+      ethnicity = "British",
+      religionOrBelief = "Agnostic",
+      draftReferral = referral,
+      disabilities = listOf("Autism spectrum condition"),
+    ),
+    accessibilityNeeds: String = "She uses a wheelchair",
+    additionalNeedsInformation: String = "Alex is currently sleeping on her aunt's sofa",
+    additionalRiskInformation: String = "A danger to the elderly",
+    completionDeadline: LocalDate = LocalDate.of(2021, 4, 1),
+    furtherInformation: String = "Some information about the service user",
+    hasAdditionalResponsibilities: Boolean = true,
+    interpreterLanguage: String = "Spanish",
+    maximumEnforceableDays: Int = 10,
+    needsInterpreter: Boolean = true,
+    relevantSentenceId: Long = 2600295124,
+    whenUnavailable: String = "She works Mondays 9am - midday",
+  ): DraftReferral {
+    referral.selectedServiceCategories = selectedServiceCategories.toMutableSet()
+    // required to satisfy foreign key constrains on desired outcomes and complexity levels
+    draftReferralRepository.saveAndFlush(referral)
+
+    referral.serviceUserData = serviceUserData
+    referral.selectedDesiredOutcomes = desiredOutcomes.map { SelectedDesiredOutcomesMapping(it.serviceCategoryId, it.id) }.toMutableList()
+    referral.accessibilityNeeds = accessibilityNeeds
+    referral.additionalNeedsInformation = additionalNeedsInformation
+    referral.additionalRiskInformation = additionalRiskInformation
+    referral.complexityLevelIds = complexityLevelIds
+    referral.hasAdditionalResponsibilities = hasAdditionalResponsibilities
+    referral.interpreterLanguage = interpreterLanguage
+    referral.needsInterpreter = needsInterpreter
+    referral.relevantSentenceId = relevantSentenceId
+    referral.whenUnavailable = whenUnavailable
+
+    return draftReferralRepository.save(referral).also {
+      val details = referralDetailsRepository.save(
+        ReferralDetails(
+          UUID.randomUUID(),
+          null,
+          it.id,
+          it.createdAt,
+          it.createdBy.id,
+          "initial referral details",
+          completionDeadline,
+          furtherInformation,
+          maximumEnforceableDays,
         )
       )
       it.referralDetails?.let { existingDetails ->

@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance.ComplexityProcessor
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
@@ -14,13 +13,6 @@ internal class ComplexityProcessorTest {
 
   private val referralFactory = ReferralFactory()
   private val serviceCategoryFactory = ServiceCategoryFactory()
-
-  @Test
-  fun `will not process draft referrals`() {
-    val referral = referralFactory.createDraft()
-
-    assertThrows<RuntimeException> { processor.process(referral) }
-  }
 
   @Test
   fun `referral with single selected service category correctly returns a complexityData object`() {

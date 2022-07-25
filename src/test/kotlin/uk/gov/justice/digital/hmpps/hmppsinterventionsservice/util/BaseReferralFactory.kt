@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionP
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
@@ -20,7 +21,7 @@ import java.util.UUID
 
 open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em) {
 
-  protected fun create(
+  protected fun createReferral(
     id: UUID,
     createdAt: OffsetDateTime,
     createdBy: AuthUser,
@@ -101,5 +102,59 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     referral.selectedDesiredOutcomes = desiredOutcomes.map { SelectedDesiredOutcomesMapping(it.serviceCategoryId, it.id) }.toMutableList()
     save(referral)
     return referral
+  }
+
+  protected fun createDraftReferral(
+    id: UUID,
+    createdAt: OffsetDateTime,
+    createdBy: AuthUser,
+    serviceUserCRN: String,
+    intervention: Intervention,
+    relevantSentenceId: Long? = null,
+    referralDetailsDTO: ReferralDetailsDTO? = null,
+    desiredOutcomes: List<DesiredOutcome> = emptyList(),
+    serviceUserData: ServiceUserData? = null,
+    selectedServiceCategories: MutableSet<ServiceCategory>? = null,
+    complexityLevelIds: MutableMap<UUID, UUID>? = null,
+    additionalRiskInformation: String? = null,
+    additionalRiskInformationUpdatedAt: OffsetDateTime? = null,
+  ): DraftReferral {
+
+    val referralDetails = referralDetailsDTO?.let {
+      save(
+        ReferralDetails(
+          UUID.randomUUID(),
+          null,
+          it.referralId,
+          createdAt,
+          createdBy.id,
+          "initial referral details",
+          it.completionDeadline,
+          it.furtherInformation,
+          it.maximumEnforceableDays,
+        )
+      )
+    }
+
+    val draftReferral = DraftReferral(
+      id = id,
+      createdAt = createdAt,
+      createdBy = createdBy,
+      serviceUserCRN = serviceUserCRN,
+      intervention = intervention,
+      relevantSentenceId = relevantSentenceId,
+      serviceUserData = serviceUserData,
+      selectedServiceCategories = selectedServiceCategories,
+      complexityLevelIds = complexityLevelIds,
+      additionalRiskInformation = additionalRiskInformation,
+      additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt,
+      referralDetailsHistory = referralDetails?.let { setOf(it) },
+    )
+
+    save(draftReferral)
+    draftReferral.selectedDesiredOutcomes =
+      desiredOutcomes.map { SelectedDesiredOutcomesMapping(it.serviceCategoryId, it.id) }.toMutableList()
+    save(draftReferral)
+    return draftReferral
   }
 }

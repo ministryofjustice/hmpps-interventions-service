@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
 import org.hibernate.annotations.Fetch
-import org.hibernate.annotations.FetchMode
 import org.hibernate.annotations.FetchMode.JOIN
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -35,24 +34,24 @@ class SelectedDesiredOutcomesMapping(
 )
 
 @Entity
-@Table(name = "referral", indexes = arrayOf(Index(columnList = "created_by_id")))
+@Table(name = "referral", indexes = [Index(columnList = "created_by_id")])
 class Referral(
   @ElementCollection
   val assignments: MutableList<ReferralAssignment> = mutableListOf(),
   // sent referral fields
   var sentAt: OffsetDateTime? = null,
-  @ManyToOne @Fetch(FetchMode.JOIN) var sentBy: AuthUser? = null,
+  @ManyToOne @Fetch(JOIN) var sentBy: AuthUser? = null,
   var referenceNumber: String? = null,
   var supplementaryRiskId: UUID? = null,
 
   var endRequestedAt: OffsetDateTime? = null,
-  @ManyToOne @Fetch(FetchMode.JOIN) var endRequestedBy: AuthUser? = null,
+  @ManyToOne @Fetch(JOIN) var endRequestedBy: AuthUser? = null,
   @ManyToOne @JoinColumn(name = "end_requested_reason_code") var endRequestedReason: CancellationReason? = null,
   var endRequestedComments: String? = null,
   var concludedAt: OffsetDateTime? = null,
 
   // draft referral fields
-  @OneToOne(mappedBy = "referral", cascade = arrayOf(CascadeType.ALL)) @PrimaryKeyJoinColumn var serviceUserData: ServiceUserData? = null,
+  @OneToOne(mappedBy = "draftReferral", cascade = [CascadeType.ALL]) @PrimaryKeyJoinColumn var serviceUserData: ServiceUserData? = null,
   @Column(name = "draft_supplementary_risk") var additionalRiskInformation: String? = null,
   @Column(name = "draft_supplementary_risk_updated_at") var additionalRiskInformationUpdatedAt: OffsetDateTime? = null,
   var furtherInformation: String? = null,
@@ -78,14 +77,16 @@ class Referral(
     joinColumns = [JoinColumn(name = "referral_id")],
     inverseJoinColumns = [JoinColumn(name = "service_category_id")]
   )
-  var selectedServiceCategories: MutableSet<ServiceCategory>? = null,
+  var selectedServiceCategories: MutableSet<ServiceCategory>? = mutableSetOf(),
 
-  @ElementCollection var complexityLevelIds: MutableMap<UUID, UUID>? = null,
+  @ElementCollection
+  @CollectionTable(name = "referral_complexity_level_ids", joinColumns = [JoinColumn(name = "referral_id")])
+  var complexityLevelIds: MutableMap<UUID, UUID>? = mutableMapOf(),
 
   // required fields
   @NotNull @ManyToOne(fetch = FetchType.LAZY) val intervention: Intervention,
   @NotNull val serviceUserCRN: String,
-  @NotNull @ManyToOne @Fetch(FetchMode.JOIN) val createdBy: AuthUser,
+  @NotNull @ManyToOne @Fetch(JOIN) val createdBy: AuthUser,
   @NotNull val createdAt: OffsetDateTime,
   @Id val id: UUID,
 
