@@ -10,10 +10,12 @@ import org.mockito.kotlin.whenever
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogValuesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
+import java.time.OffsetDateTime
 import java.util.UUID
 
 internal class AmendReferralControllerTest {
@@ -63,6 +65,35 @@ internal class AmendReferralControllerTest {
       val returnedValue = amendReferralController.updateComplexityLevel(referral.id, complexityLevel, token)
       assertThat(returnedValue?.complexityLevelId).isEqualTo(complexityLevel.complexityLevelId)
       assertThat(returnedValue?.serviceCategoryId).isEqualTo(complexityLevel.serviceCategoryId)
+    }
+
+    @Test
+    fun `getChangelog returns multiple changelog entries`() {
+      whenever(amendReferralService.getSentReferralForAuthenticatedUser(eq(token), eq(referral.id))).thenReturn(referral)
+
+      val changeLogValuesList = mutableListOf<ChangelogValuesDTO>(
+        ChangelogValuesDTO(UUID.randomUUID(), referral.id, "COMPLEXITY_LEVEL", OffsetDateTime.now(), "PP's Name", "A reason"),
+        ChangelogValuesDTO(UUID.randomUUID(), referral.id, "COMPLEXITY_LEVEL", OffsetDateTime.now(), "PP's Name 2", "Another reason")
+      )
+      whenever(amendReferralService.getListOfChangeLogEntries(eq(referral))).thenReturn(changeLogValuesList)
+
+      val returnedChangeLogObject = amendReferralController.getChangelog(referral.id, token)
+
+      assertThat(returnedChangeLogObject?.size).isEqualTo(2)
+      assertThat(returnedChangeLogObject?.get(0)?.changelogId).isEqualTo(changeLogValuesList.get(0).changelogId)
+      assertThat(returnedChangeLogObject?.get(0)?.referralId).isEqualTo(changeLogValuesList.get(0).referralId)
+    }
+
+    @Test
+    fun `getChangelog returns no changelog entries`() {
+      whenever(amendReferralService.getSentReferralForAuthenticatedUser(eq(token), eq(referral.id))).thenReturn(referral)
+
+      val changeLogValuesList = mutableListOf<ChangelogValuesDTO>()
+      whenever(amendReferralService.getListOfChangeLogEntries(eq(referral))).thenReturn(changeLogValuesList)
+
+      val returnedChangeLogObject = amendReferralController.getChangelog(referral.id, token)
+
+      assertThat(returnedChangeLogObject?.size).isEqualTo(0)
     }
   }
 }

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeast
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -15,6 +16,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
@@ -27,6 +29,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFacto
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
+import java.time.OffsetDateTime
 import java.util.Optional
 import java.util.UUID
 
@@ -39,6 +42,7 @@ class AmendReferralServiceTest {
   private val userMapper: UserMapper = mock()
   private val referralService: ReferralService = mock()
   private val jwtAuthenticationToken = JwtAuthenticationToken(mock())
+  private val hmppsAuthService: HMPPSAuthService = mock()
 
   private val tokenFactory = JwtTokenFactory()
   private val referralFactory = ReferralFactory()
@@ -49,7 +53,8 @@ class AmendReferralServiceTest {
     changelogRepository,
     referralRepository,
     userMapper,
-    referralService
+    referralService,
+    hmppsAuthService
   )
 
   @Test
@@ -102,5 +107,38 @@ class AmendReferralServiceTest {
     }
     assertThat(e.status).isEqualTo(HttpStatus.NOT_FOUND)
     assertThat(e.message).contains("sent referral not found [id=$referralId]")
+  }
+
+  @Test
+  fun `getListOfChangeLogEntries returns list of changelog entries `() {
+    val authUser = AuthUser("CRN123", "auth", "user")
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
+
+    val referral = referralFactory.createSent()
+
+    val changeLogValuesList = mutableListOf(
+      Changelog(
+        referral.id,
+        UUID.randomUUID(),
+        "COMPLEXITY_LEVEL",
+        ReferralAmendmentDetails(mutableListOf()),
+        ReferralAmendmentDetails(
+          mutableListOf()
+        ),
+        "A reason",
+        OffsetDateTime.now(),
+        authUser
+      )
+    )
+
+    val userdetail = UserDetail("firstname", "email", "lastname")
+
+    whenever(changelogRepository.findByReferralIdOrderByChangedAtDesc(any())).thenReturn(changeLogValuesList)
+    whenever(hmppsAuthService.getUserDetail(eq(authUser))).thenReturn(userdetail)
+
+    val returnedValue = amendReferralService.getListOfChangeLogEntries(referral)
+
+    assertThat(returnedValue.size).isEqualTo(1)
+    assertThat(returnedValue.get(0).referralId).isEqualTo(referral.id)
   }
 }

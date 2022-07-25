@@ -64,7 +64,6 @@ class AmendReferralService(
     val changeLogEntities = changelogRepository.findByReferralIdOrderByChangedAtDesc(referral.id)
     val listOfChangelogValuesDTO: MutableList<ChangelogValuesDTO> = mutableListOf()
 
-    // TODO: get users name
     val listOfChangelogValues = changeLogEntities.map { cle ->
       run {
         val userDetails = hmppsAuthService.getUserDetail(cle.changedBy)
