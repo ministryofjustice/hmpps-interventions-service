@@ -11,16 +11,5 @@ data class ChangelogValuesDTO(
   val name: String,
   val reasonForChange: String
 ) {
-  companion object {
-    fun from(changelogValuesDTO: ChangelogValuesDTO): ChangelogValuesDTO {
-      return ChangelogValuesDTO(
-        changelogId = changelogValuesDTO.changelogId,
-        referralId = changelogValuesDTO.referralId,
-        topic = changelogValuesDTO.topic,
-        changedAt = changelogValuesDTO.changedAt,
-        name = changelogValuesDTO.name,
-        reasonForChange = changelogValuesDTO.reasonForChange,
-      )
-    }
-  }
+// nothing to do
 }
