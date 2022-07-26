@@ -9,14 +9,18 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogValuesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendReferralService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthService
 import java.util.UUID
 
 @RestController
 class AmendReferralController(
-  private val amendReferralService: AmendReferralService
+  private val amendReferralService: AmendReferralService,
+  private val userMapper: UserMapper,
+  private val hmppsAuthService: HMPPSAuthService
 ) {
   companion object : KLogging()
 
@@ -38,6 +42,10 @@ class AmendReferralController(
     authentication: JwtAuthenticationToken
   ): List<ChangelogValuesDTO>? {
     val referral = amendReferralService.getSentReferralForAuthenticatedUser(authentication, referralId)
-    return amendReferralService.getListOfChangeLogEntries(referral)
+    val user = userMapper.fromToken(authentication)
+
+    return amendReferralService.getListOfChangeLogEntries(referral).map {
+      ChangelogValuesDTO.from(it, hmppsAuthService.getUserDetail(user))
+    }
   }
 }

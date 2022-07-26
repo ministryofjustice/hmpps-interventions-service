@@ -53,8 +53,7 @@ class AmendReferralServiceTest {
     changelogRepository,
     referralRepository,
     userMapper,
-    referralService,
-    hmppsAuthService
+    referralService
   )
 
   @Test

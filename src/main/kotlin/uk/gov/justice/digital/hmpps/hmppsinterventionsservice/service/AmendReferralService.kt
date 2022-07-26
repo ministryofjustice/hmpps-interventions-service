@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogValuesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
@@ -24,8 +23,7 @@ class AmendReferralService(
   private val changelogRepository: ChangelogRepository,
   private val referralRepository: ReferralRepository,
   private val userMapper: UserMapper,
-  private val referralService: ReferralService,
-  private val hmppsAuthService: HMPPSAuthService
+  private val referralService: ReferralService
 ) {
 
   fun updateComplexityLevel(referral: Referral, update: AmendComplexityLevelDTO, authentication: JwtAuthenticationToken): AmendComplexityLevelDTO? {
@@ -60,27 +58,8 @@ class AmendReferralService(
       ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "sent referral not found [id=$id]")
   }
 
-  fun getListOfChangeLogEntries(referral: Referral): List<ChangelogValuesDTO> {
+  fun getListOfChangeLogEntries(referral: Referral): List<Changelog> {
     val changeLogEntities = changelogRepository.findByReferralIdOrderByChangedAtDesc(referral.id)
-    val listOfChangelogValuesDTO: MutableList<ChangelogValuesDTO> = mutableListOf()
-
-    val listOfChangelogValues = changeLogEntities.map { cle ->
-      run {
-        val userDetails = hmppsAuthService.getUserDetail(cle.changedBy)
-
-        listOfChangelogValuesDTO.add(
-          ChangelogValuesDTO(
-            cle.id,
-            cle.referralId,
-            cle.topic,
-            cle.changedAt,
-            userDetails.firstName + ' ' + userDetails.lastName,
-            cle.reasonForChange
-          )
-        )
-      }
-      return listOfChangelogValuesDTO
-    }
-    return listOfChangelogValues
+    return changeLogEntities
   }
 }
