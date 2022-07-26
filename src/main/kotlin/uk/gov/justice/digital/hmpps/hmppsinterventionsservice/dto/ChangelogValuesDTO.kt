@@ -10,6 +10,4 @@ data class ChangelogValuesDTO(
   val changedAt: OffsetDateTime,
   val name: String,
   val reasonForChange: String
-) {
-// nothing to do
-}
+)
