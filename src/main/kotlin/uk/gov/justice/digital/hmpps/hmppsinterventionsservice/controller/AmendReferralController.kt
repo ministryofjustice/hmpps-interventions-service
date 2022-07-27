@@ -42,10 +42,8 @@ class AmendReferralController(
     authentication: JwtAuthenticationToken
   ): List<ChangelogValuesDTO>? {
     val referral = amendReferralService.getSentReferralForAuthenticatedUser(authentication, referralId)
-    val user = userMapper.fromToken(authentication)
-
     return amendReferralService.getListOfChangeLogEntries(referral).map {
-      ChangelogValuesDTO.from(it, hmppsAuthService.getUserDetail(user))
+      ChangelogValuesDTO.from(it, hmppsAuthService.getUserDetail(it.changedBy))
     }
   }
 }
