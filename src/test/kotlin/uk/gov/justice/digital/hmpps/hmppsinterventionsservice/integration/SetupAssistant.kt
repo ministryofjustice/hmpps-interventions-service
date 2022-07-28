@@ -122,6 +122,7 @@ class SetupAssistant(
     changelogRepository.deleteAll()
 
     deleteAllReferralDetails()
+    changelogRepository.deleteAll()
     referralRepository.deleteAll()
     interventionRepository.deleteAll()
     dynamicFrameworkContractRepository.deleteAll()

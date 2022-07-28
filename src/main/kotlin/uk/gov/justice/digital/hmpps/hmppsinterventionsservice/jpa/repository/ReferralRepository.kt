@@ -13,6 +13,7 @@ import java.util.UUID
 interface ReferralRepository : JpaRepository<Referral, UUID>, JpaSpecificationExecutor<Referral>, ReferralSummaryRepository {
   // queries for sent referrals
   fun findByIdAndSentAtIsNotNull(id: UUID): Referral?
+
   fun existsByReferenceNumber(reference: String): Boolean
 
   // queries for draft referrals

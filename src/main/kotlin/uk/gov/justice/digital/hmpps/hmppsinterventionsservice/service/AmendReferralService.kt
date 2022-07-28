@@ -1,11 +1,14 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
+import org.springframework.http.HttpStatus
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedAndRequirementDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
@@ -18,11 +21,14 @@ import javax.transaction.Transactional
 @Transactional
 class AmendReferralService(
   private val referralEventPublisher: ReferralEventPublisher,
-  val changelogRepository: ChangelogRepository,
-  val referralRepository: ReferralRepository
+  private val changelogRepository: ChangelogRepository,
+  private val referralRepository: ReferralRepository,
+  private val userMapper: UserMapper,
+  private val referralService: ReferralService
 ) {
 
-  fun updateComplexityLevel(referral: Referral, update: AmendComplexityLevelDTO, actor: AuthUser): AmendComplexityLevelDTO? {
+  fun updateComplexityLevel(referral: Referral, update: AmendComplexityLevelDTO, authentication: JwtAuthenticationToken): AmendComplexityLevelDTO? {
+    val actor = userMapper.fromToken(authentication)
     val complexityLevel = referral.complexityLevelIds?.getValue(update.serviceCategoryId)
 
     referral.complexityLevelIds?.put(update.serviceCategoryId, update.complexityLevelId)
@@ -38,7 +44,7 @@ class AmendReferralService(
       newValue,
       update.reasonForChange,
       OffsetDateTime.now(),
-      actor.id
+      actor
     )
     changelogRepository.save(changelog)
     referralRepository.save(referral)
@@ -47,28 +53,40 @@ class AmendReferralService(
     return update
   }
 
-  fun updateNeedAndRequirement(referral: Referral, update: AmendNeedAndRequirementDTO, actor: AuthUser): AmendNeedAndRequirementDTO? {
+  fun getSentReferralForAuthenticatedUser(authentication: JwtAuthenticationToken, id: UUID): Referral {
+    val user = userMapper.fromToken(authentication)
+    return referralService.getSentReferralForUser(id, user)
+      ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "sent referral not found [id=$id]")
+  }
 
-    val furtherInformation = update.furtherInformation
-    val additionalNeedsInformation = update.additionalNeedsInformation
-    val accessibilityNeeds = update.accessibilityNeeds
-    val needsInterpreter = update.needsInterpreter
-    val interpreterLanguage = update.interpreterLanguage
-    val hasAdditionalResponsibilities = update.hasAdditionalResponsibilities
-    val whenUnavailable = update.whenUnavailable
-
+  fun updateNeedAndRequirement(referral: Referral, update: AmendNeedAndRequirementDTO, authentication: JwtAuthenticationToken): AmendNeedAndRequirementDTO? {
+    val actor = userMapper.fromToken(authentication)
     val oldValue = ReferralAmendmentDetails(
-      listOf(
-        furtherInformation.toString(), additionalNeedsInformation.toString(), accessibilityNeeds.toString(), needsInterpreter.toString(),
-        interpreterLanguage.toString(), hasAdditionalResponsibilities.toString(), whenUnavailable.toString()
-      )
+      furtherInformation = referral.furtherInformation,
+      additionalNeedsInformation = referral.additionalNeedsInformation,
+      accessibilityNeeds = referral.accessibilityNeeds,
+      needsInterpreter = referral.needsInterpreter,
+      interpreterLanguage = referral.interpreterLanguage,
+      hasAdditionalResponsibilities = referral.hasAdditionalResponsibilities,
+      whenUnavailable = referral.whenUnavailable
     )
     val newValue = ReferralAmendmentDetails(
-      listOf(
-        update.furtherInformation.toString(), update.additionalNeedsInformation.toString(), update.accessibilityNeeds.toString(), update.needsInterpreter.toString(),
-        update.interpreterLanguage.toString(), update.hasAdditionalResponsibilities.toString(), update.whenUnavailable.toString()
-      )
+      additionalNeedsInformation = update.additionalNeedsInformation,
+      furtherInformation = update.furtherInformation,
+      accessibilityNeeds = update.accessibilityNeeds,
+      needsInterpreter = update.needsInterpreter,
+      interpreterLanguage = update.interpreterLanguage,
+      hasAdditionalResponsibilities = update.hasAdditionalResponsibilities,
+      whenUnavailable = update.whenUnavailable
+
     )
+    referral.additionalNeedsInformation = update.additionalNeedsInformation
+    referral.accessibilityNeeds = update.accessibilityNeeds
+    referral.needsInterpreter = update.needsInterpreter
+    referral.interpreterLanguage = update.interpreterLanguage
+    referral.hasAdditionalResponsibilities = update.hasAdditionalResponsibilities
+    referral.whenUnavailable = update.whenUnavailable
+    referral.furtherInformation = update.furtherInformation
 
     val changelog = Changelog(
       referral.id,
@@ -78,7 +96,7 @@ class AmendReferralService(
       newValue,
       update.reasonForChange,
       OffsetDateTime.now(),
-      actor.id
+      actor
     )
     changelogRepository.save(changelog)
     referralRepository.save(referral)

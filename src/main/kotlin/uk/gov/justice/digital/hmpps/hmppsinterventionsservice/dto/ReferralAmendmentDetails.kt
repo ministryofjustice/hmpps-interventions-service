@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto
 
 data class ReferralAmendmentDetails(
-  var values: List<String>,
+  var values: List<String>? = null,
   var furtherInformation: String? = null,
   var additionalNeedsInformation: String? = null,
   var accessibilityNeeds: String? = null,
