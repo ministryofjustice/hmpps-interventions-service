@@ -25,7 +25,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
@@ -36,7 +36,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Service
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
@@ -60,7 +59,6 @@ data class ResponsibleProbationPractitioner(
 @Transactional
 class ReferralService(
   val referralRepository: ReferralRepository,
-  val draftReferralRepository: DraftReferralRepository,
   val sentReferralSummariesRepository: SentReferralSummariesRepository,
   val authUserRepository: AuthUserRepository,
   val interventionRepository: InterventionRepository,
@@ -104,16 +102,16 @@ class ReferralService(
     return referralRepository.findByIdAndSentAtIsNotNull(id)
   }
 
-  fun getDraftReferralForUser(id: UUID, user: AuthUser): DraftReferral? {
+  fun getDraftReferralForUser(id: UUID, user: AuthUser): Referral? {
     if (!userTypeChecker.isProbationPractitionerUser(user)) {
       throw AccessError(user, "unsupported user type", listOf("only probation practitioners can access draft referrals"))
     }
 
-    val referral = draftReferralRepository.findById(id)
-    referral.ifPresent {
+    val referral = referralRepository.findByIdAndSentAtIsNull(id)
+    referral?.let {
       referralAccessChecker.forUser(it, user)
     }
-    return referral.map { it }.orElse(null)
+    return referral
   }
 
   fun assignSentReferral(referral: Referral, assignedBy: AuthUser, assignedTo: AuthUser): Referral {
@@ -229,12 +227,10 @@ class ReferralService(
     return savedReferral
   }
 
-  fun sendDraftReferral(draftReferral: DraftReferral, user: AuthUser): Referral {
-    val referral = createReferral(draftReferral)
+  fun sendDraftReferral(referral: Referral, user: AuthUser): Referral {
     referral.sentAt = OffsetDateTime.now()
     referral.sentBy = authUserRepository.save(user)
-
-    referral.referenceNumber = generateReferenceNumber(draftReferral)
+    referral.referenceNumber = generateReferenceNumber(referral)
 
     /*
      * This is a temporary solution until a robust asynchronous link is created between Interventions
@@ -252,30 +248,6 @@ class ReferralService(
     eventPublisher.referralSentEvent(sentReferral)
     supplierAssessmentService.createSupplierAssessment(referral)
     return sentReferral
-  }
-
-  private fun createReferral(draftReferral: DraftReferral): Referral {
-    return Referral(
-      id = draftReferral.id,
-      furtherInformation = draftReferral.furtherInformation,
-      additionalNeedsInformation = draftReferral.additionalNeedsInformation,
-      additionalRiskInformation = draftReferral.additionalRiskInformation,
-      additionalRiskInformationUpdatedAt = draftReferral.additionalRiskInformationUpdatedAt,
-      accessibilityNeeds = draftReferral.accessibilityNeeds,
-      needsInterpreter = draftReferral.needsInterpreter,
-      interpreterLanguage = draftReferral.interpreterLanguage,
-      hasAdditionalResponsibilities = draftReferral.hasAdditionalResponsibilities,
-      whenUnavailable = draftReferral.whenUnavailable,
-      maximumEnforceableDays = draftReferral.maximumEnforceableDays,
-      selectedDesiredOutcomes = draftReferral.selectedDesiredOutcomes,
-      completionDeadline = draftReferral.completionDeadline,
-      relevantSentenceId = draftReferral.relevantSentenceId,
-      intervention = draftReferral.intervention,
-      serviceUserCRN = draftReferral.serviceUserCRN,
-      createdBy = draftReferral.createdBy,
-      createdAt = draftReferral.createdAt,
-      referralDetailsHistory = draftReferral.referralDetailsHistory,
-    )
   }
 
   private fun submitAdditionalRiskInformation(referral: Referral, user: AuthUser) {
@@ -333,7 +305,8 @@ class ReferralService(
     interventionId: UUID,
     overrideID: UUID? = null,
     overrideCreatedAt: OffsetDateTime? = null,
-  ): DraftReferral {
+    endOfServiceReport: EndOfServiceReport? = null,
+  ): Referral {
     if (!userTypeChecker.isProbationPractitionerUser(user)) {
       throw AccessError(user, "user cannot create referral", listOf("only probation practitioners can create draft referrals"))
     }
@@ -345,19 +318,20 @@ class ReferralService(
     val serviceCategories = intervention.dynamicFrameworkContract.contractType.serviceCategories
     val selectedServiceCategories = if (serviceCategories.size == 1) serviceCategories.toMutableSet() else null
 
-    return draftReferralRepository.save(
-      DraftReferral(
+    return referralRepository.save(
+      Referral(
         id = overrideID ?: UUID.randomUUID(),
         createdAt = overrideCreatedAt ?: OffsetDateTime.now(),
         createdBy = authUserRepository.save(user),
         serviceUserCRN = crn,
         intervention = interventionRepository.getById(interventionId),
+        endOfServiceReport = endOfServiceReport,
         selectedServiceCategories = selectedServiceCategories,
       )
     )
   }
 
-  private fun validateDraftReferralUpdate(draftReferral: DraftReferral, update: DraftReferralDTO) {
+  private fun validateDraftReferralUpdate(referral: Referral, update: DraftReferralDTO) {
     val errors = mutableListOf<FieldError>()
 
     update.completionDeadline?.let {
@@ -381,13 +355,13 @@ class ReferralService(
     }
 
     update.serviceUser?.let {
-      if (it.crn != draftReferral.serviceUserCRN) {
+      if (it.crn != referral.serviceUserCRN) {
         errors.add(FieldError(field = "serviceUser.crn", error = Code.FIELD_CANNOT_BE_CHANGED))
       }
     }
 
     update.serviceCategoryIds?.let {
-      if (!draftReferral.intervention.dynamicFrameworkContract.contractType.serviceCategories.map {
+      if (!referral.intervention.dynamicFrameworkContract.contractType.serviceCategories.map {
         serviceCategory ->
         serviceCategory.id
       }.containsAll(it)
@@ -408,17 +382,17 @@ class ReferralService(
     we can remove this method entirely.
   """
   )
-  private fun legacyUpdateReferralDetails(draftReferral: DraftReferral, update: DraftReferralDTO) {
+  private fun legacyUpdateReferralDetails(referral: Referral, update: DraftReferralDTO) {
     update.completionDeadline?.let {
-      draftReferral.completionDeadline = it
+      referral.completionDeadline = it
     }
 
     update.furtherInformation?.let {
-      draftReferral.furtherInformation = it
+      referral.furtherInformation = it
     }
 
     update.maximumEnforceableDays?.let {
-      draftReferral.maximumEnforceableDays = it
+      referral.maximumEnforceableDays = it
     }
   }
 
@@ -474,78 +448,42 @@ class ReferralService(
     return newDetails
   }
 
-  fun updateDraftReferralDetails(referral: DraftReferral, update: UpdateReferralDetailsDTO, actor: AuthUser): ReferralDetails? {
-    if (!update.isValidUpdate) {
-      return null
-    }
-
-    val existingDetails = referralDetailsRepository.findLatestByReferralId(referral.id)
-
-    // if we are updating a draft referral, and there is already a ReferralDetails record,
-    // we update it. otherwise, we create a new one to record the changes.
-    val newDetails = existingDetails
-      ?: ReferralDetails(
-        UUID.randomUUID(),
-        null,
-        referral.id,
-        referral.createdAt,
-        actor.id,
-        update.reasonForChange,
-      )
-
-    update.completionDeadline?.let {
-      newDetails.completionDeadline = it
-    }
-
-    update.furtherInformation?.let {
-      newDetails.furtherInformation = it
-    }
-
-    update.maximumEnforceableDays?.let {
-      newDetails.maximumEnforceableDays = it
-    }
-
-    referralDetailsRepository.saveAndFlush(newDetails)
-
-    return newDetails
-  }
-
-  private fun updateServiceUserNeeds(draftReferral: DraftReferral, update: DraftReferralDTO) {
+  private fun updateServiceUserNeeds(referral: Referral, update: DraftReferralDTO) {
     update.additionalNeedsInformation?.let {
-      draftReferral.additionalNeedsInformation = it
+      referral.additionalNeedsInformation = it
     }
 
     update.accessibilityNeeds?.let {
-      draftReferral.accessibilityNeeds = it
+      referral.accessibilityNeeds = it
     }
 
     update.needsInterpreter?.let {
-      draftReferral.needsInterpreter = it
-      draftReferral.interpreterLanguage = if (it) update.interpreterLanguage else null
+      referral.needsInterpreter = it
+      referral.interpreterLanguage = if (it) update.interpreterLanguage else null
     }
 
     update.hasAdditionalResponsibilities?.let {
-      draftReferral.hasAdditionalResponsibilities = it
-      draftReferral.whenUnavailable = if (it) update.whenUnavailable else null
+      referral.hasAdditionalResponsibilities = it
+      referral.whenUnavailable = if (it) update.whenUnavailable else null
     }
   }
 
-  private fun updateDraftRiskInformation(draftReferral: DraftReferral, update: DraftReferralDTO) {
+  private fun updateDraftRiskInformation(referral: Referral, update: DraftReferralDTO) {
     update.additionalRiskInformation?.let {
-      draftReferral.additionalRiskInformation = it
-      draftReferral.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
+      referral.additionalRiskInformation = it
+      referral.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
     }
   }
-  private fun updateServiceUserDetails(draftReferral: DraftReferral, update: DraftReferralDTO) {
+  private fun updateServiceUserDetails(referral: Referral, update: DraftReferralDTO) {
     update.serviceUser?.let {
-      draftReferral.serviceUserData = ServiceUserData(
+      referral.serviceUserData = ServiceUserData(
+        referral = referral,
         title = it.title,
         firstName = it.firstName,
         lastName = it.lastName,
         dateOfBirth = it.dateOfBirth,
         gender = it.gender,
         ethnicity = it.ethnicity,
-        draftReferral = draftReferral,
         preferredLanguage = it.preferredLanguage,
         religionOrBelief = it.religionOrBelief,
         disabilities = it.disabilities,
@@ -553,7 +491,7 @@ class ReferralService(
     }
   }
 
-  private fun updateServiceCategoryDetails(referral: DraftReferral, update: DraftReferralDTO) {
+  private fun updateServiceCategoryDetails(referral: Referral, update: DraftReferralDTO) {
     // The selected complexity levels and desired outcomes need to be removed if the user has unselected service categories that are linked to them
     update.serviceCategoryIds?.let { serviceCategoryIds ->
       referral.complexityLevelIds =
@@ -565,7 +503,7 @@ class ReferralService(
     }
 
     // Need to save and flush the entity before removing selected service categories due to constraint violations being thrown from selected complexity levels and desired outcomes
-    draftReferralRepository.saveAndFlush(referral)
+    referralRepository.saveAndFlush(referral)
 
     update.serviceCategoryIds?.let { serviceCategoryIds ->
       val updatedServiceCategories = serviceCategoryRepository.findByIdIn(serviceCategoryIds)
@@ -585,11 +523,11 @@ class ReferralService(
     }
   }
 
-  fun updateDraftReferral(referral: DraftReferral, update: DraftReferralDTO): DraftReferral {
+  fun updateDraftReferral(referral: Referral, update: DraftReferralDTO): Referral {
     validateDraftReferralUpdate(referral, update)
 
     legacyUpdateReferralDetails(referral, update)
-    updateDraftReferralDetails(
+    updateReferralDetails(
       referral,
       UpdateReferralDetailsDTO(
         update.maximumEnforceableDays,
@@ -609,10 +547,10 @@ class ReferralService(
       referral.relevantSentenceId = it
     }
 
-    return draftReferralRepository.save(referral)
+    return referralRepository.save(referral)
   }
 
-  fun updateDraftReferralComplexityLevel(referral: DraftReferral, serviceCategoryId: UUID, complexityLevelId: UUID): DraftReferral {
+  fun updateDraftReferralComplexityLevel(referral: Referral, serviceCategoryId: UUID, complexityLevelId: UUID): Referral {
     if (referral.selectedServiceCategories.isNullOrEmpty()) {
       throw ServerWebInputException("complexity level cannot be updated: no service categories selected for this referral")
     }
@@ -633,10 +571,10 @@ class ReferralService(
     }
 
     referral.complexityLevelIds!![serviceCategoryId] = complexityLevelId
-    return draftReferralRepository.save(referral)
+    return referralRepository.save(referral)
   }
 
-  fun updateDraftReferralDesiredOutcomes(referral: DraftReferral, serviceCategoryId: UUID, desiredOutcomeIds: List<UUID>): DraftReferral {
+  fun updateDraftReferralDesiredOutcomes(referral: Referral, serviceCategoryId: UUID, desiredOutcomeIds: List<UUID>): Referral {
     if (desiredOutcomeIds.isEmpty()) {
       throw ServerWebInputException("desired outcomes cannot be empty")
     }
@@ -662,15 +600,15 @@ class ReferralService(
 
     referral.selectedDesiredOutcomes!!.removeIf { desiredOutcome -> desiredOutcome.serviceCategoryId == serviceCategoryId }
     desiredOutcomeIds.forEach { desiredOutcomeId -> referral.selectedDesiredOutcomes!!.add(SelectedDesiredOutcomesMapping(serviceCategoryId, desiredOutcomeId)) }
-    return draftReferralRepository.save(referral)
+    return referralRepository.save(referral)
   }
 
-  fun getDraftReferralsForUser(user: AuthUser): List<DraftReferral> {
+  fun getDraftReferralsForUser(user: AuthUser): List<Referral> {
     if (!userTypeChecker.isProbationPractitionerUser(user)) {
       throw AccessError(user, "user does not have access to referrals", listOf("only probation practitioners can access draft referrals"))
     }
 
-    val referrals = draftReferralRepository.findByCreatedById(user.id)
+    val referrals = referralRepository.findByCreatedByIdAndSentAtIsNull(user.id)
     return referralAccessFilter.probationPractitionerReferrals(referrals, user)
   }
 
@@ -678,8 +616,8 @@ class ReferralService(
     return cancellationReasonRepository.findAll()
   }
 
-  private fun generateReferenceNumber(draftReferral: DraftReferral): String? {
-    val type = draftReferral.intervention.dynamicFrameworkContract.contractType.name
+  private fun generateReferenceNumber(referral: Referral): String? {
+    val type = referral.intervention.dynamicFrameworkContract.contractType.name
 
     for (i in 1..maxReferenceNumberTries) {
       val candidate = referenceGenerator.generate(type)
@@ -689,7 +627,7 @@ class ReferralService(
         logger.warn("Clash found for referral number {}", kv("candidate", candidate))
     }
 
-    logger.error("Unable to generate a referral number {} {}", kv("tries", maxReferenceNumberTries), kv("referral_id", draftReferral.id))
+    logger.error("Unable to generate a referral number {} {}", kv("tries", maxReferenceNumberTries), kv("referral_id", referral.id))
     return null
   }
 

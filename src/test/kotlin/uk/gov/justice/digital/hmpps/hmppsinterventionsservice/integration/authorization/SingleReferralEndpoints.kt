@@ -93,8 +93,8 @@ class SingleReferralEndpoints : IntegrationTestBase() {
     setLimitedAccessCRNs("X999999")
     val referral1 = setupAssistant.createDraftReferral(serviceUserCRN = "X000000")
     val referral2 = setupAssistant.createDraftReferral(serviceUserCRN = "X999999")
-    setupAssistant.fillDraftReferralFields(referral1)
-    setupAssistant.fillDraftReferralFields(referral2)
+    setupAssistant.fillReferralFields(referral1)
+    setupAssistant.fillReferralFields(referral2)
 
     requestFactory.create(request, token, referral1.id.toString())
       .exchange()

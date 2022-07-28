@@ -6,7 +6,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionP
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
@@ -35,8 +34,8 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     additionalRiskInformation: String? = null,
     additionalRiskInformationUpdatedAt: OffsetDateTime? = null,
     referralDetails: ReferralDetailsDTO? = null,
-  ): DraftReferral {
-    return createDraftReferral(
+  ): Referral {
+    return create(
       id = id,
       createdAt = createdAt,
       createdBy = createdBy,
@@ -66,23 +65,14 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     sentBy: AuthUser = authUserFactory.create(),
     referenceNumber: String? = "JS18726AC",
     supplementaryRiskId: UUID = UUID.randomUUID(),
-    additionalRiskInformationUpdatedAt: OffsetDateTime? = null,
+
     assignments: List<ReferralAssignment> = emptyList(),
+
     supplierAssessment: SupplierAssessment? = null,
     serviceUserData: ServiceUserData? = null,
-    complexityLevelIds: MutableMap<UUID, UUID>? = null,
-    createDraft: Boolean = true
+    complexityLevelIds: MutableMap<UUID, UUID>? = null
   ): Referral {
-    if (createDraft) {
-      createDraft(
-        id = id,
-        createdAt = createdAt,
-        createdBy = createdBy,
-        serviceUserCRN = serviceUserCRN,
-        intervention = intervention,
-      )
-    }
-    return createReferral(
+    return create(
       id = id,
       createdAt = createdAt,
       createdBy = createdBy,
@@ -92,13 +82,14 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       selectedServiceCategories = selectedServiceCategories,
       desiredOutcomes = desiredOutcomes,
       actionPlans = actionPlans,
+
       sentAt = sentAt,
       sentBy = sentBy,
       referenceNumber = referenceNumber,
       supplementaryRiskId = supplementaryRiskId,
+
       assignments = assignments,
       supplierAssessment = supplierAssessment,
-      additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt,
       serviceUserData = serviceUserData,
       complexityLevelIds = complexityLevelIds
     )
@@ -127,15 +118,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     supplierAssessment: SupplierAssessment? = null,
     serviceUserData: ServiceUserData? = null,
   ): Referral {
-    createDraft(
-      id = id,
-      createdAt = createdAt,
-      createdBy = createdBy,
-      serviceUserCRN = serviceUserCRN,
-      intervention = intervention,
-      selectedServiceCategories = selectedServiceCategories,
-    )
-    return createReferral(
+    return create(
       id = id,
       createdAt = createdAt,
       createdBy = createdBy,
@@ -183,15 +166,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
 
     endOfServiceReport: EndOfServiceReport? = null,
   ): Referral {
-    createDraft(
-      id = id,
-      createdAt = createdAt,
-      createdBy = createdBy,
-      serviceUserCRN = serviceUserCRN,
-      intervention = intervention,
-      selectedServiceCategories = selectedServiceCategories,
-    )
-    return createReferral(
+    return create(
       id = id,
       createdAt = createdAt,
       createdBy = createdBy,

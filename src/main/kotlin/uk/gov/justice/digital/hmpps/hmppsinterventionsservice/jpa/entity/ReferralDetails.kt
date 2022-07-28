@@ -17,7 +17,7 @@ data class ReferralDetails(
   val reasonForChange: String,
 
   // actual referral details fields:
-  var completionDeadline: LocalDate? = null,
-  var furtherInformation: String? = null,
-  var maximumEnforceableDays: Int? = null
+  var completionDeadline: LocalDate?,
+  var furtherInformation: String?,
+  var maximumEnforceableDays: Int?,
 )

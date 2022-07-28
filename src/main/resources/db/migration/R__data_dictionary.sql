@@ -161,8 +161,6 @@ COMMENT ON TABLE referral_selected_service_category IS 'selected service categor
 
 COMMENT ON TABLE referral_details IS 'details about a referral that can change that are not used to determine state';
 
-COMMENT ON TABLE draft_referral IS 'referral that are draft versions are stored here';
-
 COMMENT ON TABLE changelog IS 'details about any amendments to an existing referral';
 
 -- some definitions are in V1_34__document_contract_table.sql; needs lifting

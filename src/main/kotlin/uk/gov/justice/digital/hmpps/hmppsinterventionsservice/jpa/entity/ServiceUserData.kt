@@ -29,6 +29,6 @@ data class ServiceUserData(
   @Type(type = "list-array") @Column(name = "disabilities", columnDefinition = "text[]")
   var disabilities: List<String>? = null,
 
-  @OneToOne @MapsId @JoinColumn(name = "referral_id") var draftReferral: DraftReferral? = null,
+  @OneToOne @MapsId @JoinColumn(name = "referral_id") var referral: Referral? = null,
   @Id @Column(name = "referral_id") var referralID: UUID? = null,
 )

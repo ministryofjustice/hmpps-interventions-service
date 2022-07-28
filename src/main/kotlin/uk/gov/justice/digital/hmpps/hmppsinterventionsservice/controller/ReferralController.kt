@@ -41,7 +41,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.Views
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SentReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
@@ -106,7 +105,7 @@ class ReferralController(
 
     return ResponseEntity
       .created(location)
-      .body(SentReferralDTO.from(sentReferral, referralConcluder.requiresEndOfServiceReportCreation(sentReferral), draftReferral))
+      .body(SentReferralDTO.from(sentReferral, referralConcluder.requiresEndOfServiceReportCreation(sentReferral)))
   }
 
   @JsonView(Views.SentReferral::class)
@@ -315,7 +314,7 @@ class ReferralController(
       getSentReferralForAuthenticatedUser(authentication, id)
     }
 
-  private fun getDraftReferralForAuthenticatedUser(authentication: JwtAuthenticationToken, id: UUID): DraftReferral {
+  private fun getDraftReferralForAuthenticatedUser(authentication: JwtAuthenticationToken, id: UUID): Referral {
     val user = userMapper.fromToken(authentication)
     return referralService.getDraftReferralForUser(id, user)
       ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "draft referral not found [id=$id]")

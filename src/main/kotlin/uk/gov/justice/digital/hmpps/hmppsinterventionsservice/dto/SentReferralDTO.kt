@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto
 
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -28,14 +27,14 @@ class SentReferralDTO(
   val createdBy: AuthUserDTO,
 ) {
   companion object {
-    fun from(referral: Referral, endOfServiceReportRequired: Boolean, draftReferral: DraftReferral? = null): SentReferralDTO {
+    fun from(referral: Referral, endOfServiceReportRequired: Boolean): SentReferralDTO {
       return SentReferralDTO(
         id = referral.id,
         sentAt = referral.sentAt!!,
         sentBy = AuthUserDTO.from(referral.sentBy!!),
         referenceNumber = referral.referenceNumber!!,
         assignedTo = referral.currentAssignee?.let { AuthUserDTO.from(it) },
-        referral = draftReferral?.let { DraftReferralDTO.from(draftReferral) } ?: DraftReferralDTO.from(referral),
+        referral = DraftReferralDTO.from(referral),
         interventionId = referral.intervention.id,
         serviceUserCRN = referral.serviceUserCRN,
         relevantSentenceId = referral.relevantSentenceId!!,
