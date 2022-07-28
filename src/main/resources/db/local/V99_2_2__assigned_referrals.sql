@@ -1,8 +1,3 @@
-insert into draft_referral (id, intervention_id, created_at, sent_at, sent_by_id, service_usercrn, completion_deadline, created_by_id, further_information, additional_needs_information, accessibility_needs, needs_interpreter, interpreter_language, has_additional_responsibilities, when_unavailable, draft_supplementary_risk, maximum_enforceable_days, reference_number, supplementary_risk_id)
-values ('BBC2FEEE-2E86-4A33-8069-DD79A606B741', '08524319-7d5b-4b56-862a-bfe2c9a545f5', '2021-01-11 10:32:12.382884+00', null, null, 'CRN24', '2021-04-01', '2500099998', null, null, null, null, null, null, null, null, null, null, null),
-('B59D3599-0681-466A-82B2-F6F957E46190', '90e35306-5d65-4901-bb36-c4c44c7d19f9', '2021-03-10 16:49:34.235464+00', null, null, 'CRN25', '2022-01-01', '11', null, null, null, null, null, null, null, null, null, null, null),
-('a2a551aa-3d11-44b1-907b-42a028852bc1', 'f803445f-326c-4ef8-aee2-f7716d417832', '2021-04-22 09:00:00.000000+00', null, null, 'CRN21', '2021-06-21', '2500099998', null, null, null, null, null, null, null, null, null, null, null);
-
 insert into referral (id, intervention_id, created_at, sent_at, sent_by_id, service_usercrn, completion_deadline, created_by_id, further_information, additional_needs_information, accessibility_needs, needs_interpreter, interpreter_language, has_additional_responsibilities, when_unavailable, draft_supplementary_risk, maximum_enforceable_days, reference_number, supplementary_risk_id)
 values ('BBC2FEEE-2E86-4A33-8069-DD79A606B741', '08524319-7d5b-4b56-862a-bfe2c9a545f5', '2021-01-11 10:32:12.382884+00', '2021-01-14 15:56:45.382884+00', '2500099998', 'CRN24', '2021-04-01', '2500099998', 'Some information about the service user', 'Alex is currently sleeping on her aunt''s sofa', 'She uses a wheelchair', true, 'Spanish', true, 'She works Mondays 9am - midday', null, 10, 'EJ3892AC',  '5f2debc5-4c6a-4972-84ce-0689b8f9ec52'),
        ('B59D3599-0681-466A-82B2-F6F957E46190', '90e35306-5d65-4901-bb36-c4c44c7d19f9', '2021-03-10 16:49:34.235464+00', '2021-03-10 16:50:34.235464+00', '11', 'CRN25', '2022-01-01', '11', '', '', '', false, null, false, null, null, 5, 'GH3927AC', '43d7a768-bfa8-4fbe-a466-5f2cdf89afd6'),
@@ -73,9 +68,6 @@ values ('2cfcfa79-bb3c-484a-9428-85072e600812', 'a2a551aa-3d11-44b1-907b-42a0288
 INSERT INTO referral_complexity_level_ids (referral_id, complexity_level_ids, complexity_level_ids_key)
 VALUES ('f89bd739-b9a2-482e-9947-12a793abcfb1','64eb3c83-c562-4a63-9182-68a3a7725463', 'c036826e-f077-49a5-8b33-601dca7ad479'),
        ('a2a551aa-3d11-44b1-907b-42a028852bc1','cb6f1c1c-29d4-4d34-902e-3c89ee8428a0', '8221a81c-08b2-4262-9c1a-0ab3c82cec8c');
-
-update draft_referral
-set relevant_sentence_id = '1';
 
 update referral
 set relevant_sentence_id = '1';

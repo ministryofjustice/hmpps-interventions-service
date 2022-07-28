@@ -48,7 +48,7 @@ class DeliverySessionRepositoryTest @Autowired constructor(
   @Test
   fun `can retrieve an action plan session`() {
     val user = authUserFactory.create(id = "referral_repository_test_user_id")
-    val referral = referralFactory.createSent(createdBy = user)
+    val referral = referralFactory.createDraft(createdBy = user)
     val deliverySession = deliverySessionFactory.createScheduled(referral = referral)
 
     entityManager.flush()
