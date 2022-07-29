@@ -11,7 +11,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.Location
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller.ReferralController
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType.ASSIGNED
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType.COMPLETED
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType.COMPLEXITY_LEVEL_AMENDED
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType.SENT
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
 import java.net.URI
@@ -77,26 +76,6 @@ class ReferralEventPublisherTest {
 
     assertThat(event.source).isSameAs(publisher)
     assertThat(event.type).isSameAs(COMPLETED)
-    assertThat(event.referral).isSameAs(referral)
-    assertThat(event.detailUrl).isEqualTo(uri.toString())
-  }
-
-  @Test
-  fun `builds an referral complexity level amended event and publishes it`() {
-    val referral = SampleData.sampleReferral("CRN1234", "Service Provider Name")
-    val uri = URI.create("http://localhost/sent-referral/" + referral.id)
-    whenever(locationMapper.expandPathToCurrentContextPathUrl("/sent-referral/{id}", referral.id)).thenReturn(uri)
-    whenever(locationMapper.getPathFromControllerMethod(ReferralController::getSentReferral)).thenReturn("/sent-referral/{id}")
-    val publisher = ReferralEventPublisher(eventPublisher, locationMapper)
-
-    publisher.referralComplexityChangedEvent(referral)
-
-    val eventCaptor = argumentCaptor<ReferralEvent>()
-    verify(eventPublisher).publishEvent(eventCaptor.capture())
-    val event = eventCaptor.firstValue
-
-    assertThat(event.source).isSameAs(publisher)
-    assertThat(event.type).isSameAs(COMPLEXITY_LEVEL_AMENDED)
     assertThat(event.referral).isSameAs(referral)
     assertThat(event.detailUrl).isEqualTo(uri.toString())
   }

@@ -15,7 +15,8 @@ class ReferralAccessFilter(
 
   fun <T> serviceProviderReferrals(referralSpec: Specification<T>, user: AuthUser): Specification<T> {
     val userScope = serviceProviderAccessScopeMapper.fromUser(user)
-    return referralSpec.and(ReferralSpecifications.withSPAccess(userScope.contracts)).and(ReferralSpecifications.attendanceNotSubmitted<T>())
+    // TODO come back later and fix the bug for throwing error page
+    return referralSpec.and(ReferralSpecifications.withSPAccess(userScope.contracts))
   }
 
   fun serviceProviderReferralSummaries(referrals: List<ServiceProviderSentReferralSummary>, user: AuthUser): List<ServiceProviderSentReferralSummary> {
