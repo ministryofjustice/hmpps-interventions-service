@@ -1,47 +1,43 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Nested
+import java.util.Optional
+import java.util.UUID
+import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.provider.Arguments
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.*
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.*
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
-import java.time.OffsetDateTime
-import java.util.*
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
 
 @RepositoryTest
-class AmendReferralServiceTest @Autowired constructor(
-  val entityManager: TestEntityManager,
-  val referralRepository: ReferralRepository,
-  val authUserRepository: AuthUserRepository,
-  val interventionRepository: InterventionRepository,
-  val deliverySessionRepository: DeliverySessionRepository,
-  val actionPlanRepository: ActionPlanRepository,
-  val endOfServiceReportRepository: EndOfServiceReportRepository,
-) {
-  private val userFactory = AuthUserFactory(entityManager)
-  private val referralFactory = ReferralFactory(entityManager)
-  private val referralEventPublisher: ReferralEventPublisher = mock()
+class AmendReferralServiceTest {
+  private val referralRepository: ReferralRepository = mock()
   private val changelogRepository: ChangelogRepository = mock()
+  private val referralEventPublisher: ReferralEventPublisher = mock()
+  private val serviceCategoryRepository: ServiceCategoryRepository = mock()
   private val userMapper: UserMapper = mock()
   private val referralService: ReferralService = mock()
+  private val jwtAuthenticationToken = JwtAuthenticationToken(mock())
+
+  private val referralFactory = ReferralFactory()
+  private val serviceCategoryFactory = ServiceCategoryFactory()
 
   private val amendReferralService = AmendReferralService(
     referralEventPublisher,
@@ -51,95 +47,41 @@ class AmendReferralServiceTest @Autowired constructor(
     referralService
   )
 
-  companion object {
-    @JvmStatic
-    fun names1234(): List<Arguments> {
-      return listOf(
-        Arguments.of("bob-smith", "smith", "bob-smith smith"),
-        Arguments.of("john", "blue-red", "john blue-red")
-      )
-    }
-  }
+  @Test
+  fun `AmendComplexityLevelDTO results in changes being saved`() {
+    val complexityLevelId1 = UUID.randomUUID()
+    val complexityLevelId2 = UUID.randomUUID()
 
-  @AfterEach
-  fun `clear referrals`() {
-    referralRepository.deleteAll()
-  }
+    val complexityLevel1 = ComplexityLevel(complexityLevelId1, "1", "description")
+    val complexityLevel2 = ComplexityLevel(complexityLevelId2, "2", "description")
 
-  @Nested
-  @DisplayName("create / find / update / send draft referrals")
-  inner class CreateFindUpdateAndSendDraftReferrals {
+    val serviceCategory = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel1, complexityLevel2))
 
-//    private lateinit var sampleReferral: Referral
-//    private lateinit var serviceCategoryId: UUID
-//    private lateinit var complexityLevelId: UUID
-//    private lateinit var testComplexityLevelIds: MutableMap<UUID, UUID>
-//    private lateinit var referral: Referral
+    val authUser = AuthUser("CRN123", "auth", "user")
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
 
+    whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.of(serviceCategory))
 
+    val referral = referralFactory.createSent(
+      selectedServiceCategories = mutableSetOf(serviceCategory),
+      complexityLevelIds = mutableMapOf(serviceCategory.id to complexityLevel1.id)
+    )
 
-    @BeforeEach
-    fun beforeEach() {
+    val updateToReferral = AmendComplexityLevelDTO(complexityLevelId1, serviceCategory.id, "testing change")
 
+    amendReferralService.updateComplexityLevel(referral, updateToReferral, jwtAuthenticationToken)
 
+    val argumentCaptorReferral = argumentCaptor<Referral>()
+    verify(referralRepository, atLeast(1)).save(argumentCaptorReferral.capture())
 
-//      sampleReferral = SampleData.persistReferral(
-//        entityManager,
-//        SampleData.sampleReferral("X123456", "Harmony Living", complexityLevelIds = testComplexityLevelIds)
-//      )
-//      sampleIntervention = sampleReferral.intervention
-//
-//      sampleCohortIntervention = SampleData.persistIntervention(
-//        entityManager,
-//        SampleData.sampleIntervention(
-//          dynamicFrameworkContract = SampleData.sampleContract(
-//            primeProvider = sampleReferral.intervention.dynamicFrameworkContract.primeProvider,
-//            contractType = SampleData.sampleContractType(
-//              name = "Personal Wellbeing",
-//              code = "PWB",
-//              serviceCategories = mutableSetOf(
-//                SampleData.sampleServiceCategory(),
-//                SampleData.sampleServiceCategory(name = "Social inclusion")
-//              )
-//            )
-//          )
-//        )
-//      )
-    }
+    val referralValues = argumentCaptorReferral.firstValue
+    assertEquals(complexityLevelId1, referralValues.complexityLevelIds?.get(serviceCategory.id))
 
-    @Test
-    fun `updateComplexityLevel results in changes being saved`() {
-      val serviceCategoryId = UUID.randomUUID()
-      val complexityLevelId = UUID.randomUUID()
-      val testComplexityLevelIds = mutableMapOf(serviceCategoryId to complexityLevelId)
+    val argumentCaptorChangelog = argumentCaptor<Changelog>()
+    verify(changelogRepository, atLeast(1)).save(argumentCaptorChangelog.capture())
 
-      val referral = referralFactory.createSent(complexityLevelIds = testComplexityLevelIds)
-
-      val update = AmendComplexityLevelDTO(complexityLevelId, serviceCategoryId, "testing change")
-      val jwtAuthenticationToken = JwtAuthenticationToken(mock())
-      val authUser = AuthUser("CRN123", "auth", "user")
-      val oldReferralDetails = ReferralAmendmentDetails(emptyList())
-      val newReferralAmendmentDetails = ReferralAmendmentDetails(listOf(complexityLevelId.toString()))
-      val changelog = Changelog(
-        referral.id,
-        any(),
-        "COMPLEXITY_LEVEL",
-        oldReferralDetails,
-        newReferralAmendmentDetails,
-        update.reasonForChange,
-        OffsetDateTime.now(),
-        authUser
-      )
-//      Key (referral_id, complexity_level_ids_key)=(4d9fb4fc-f4b6-4031-aa9f-342dd505ed51, d53546ce-6ae3-4779-8814-05fde7813123)
-//      is not present in table "referral_selected_service_category".
-
-      whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
-      whenever(changelogRepository.save(any())).thenReturn(changelog)
-
-      amendReferralService.updateComplexityLevel(referral, update, jwtAuthenticationToken)
-
-      verify(changelogRepository).save(changelog)
-    }
-
+    val changeLogValues = argumentCaptorChangelog.firstValue
+    Assertions.assertThat(changeLogValues.id).isNotNull()
+    assertEquals(authUser.id, changeLogValues.changedBy.id)
   }
 }
