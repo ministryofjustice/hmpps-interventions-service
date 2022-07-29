@@ -1,17 +1,18 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
-import java.util.Optional
-import java.util.UUID
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.springframework.http.HttpStatus
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
+import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
@@ -22,9 +23,12 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
+import java.util.Optional
+import java.util.UUID
 
 @RepositoryTest
 class AmendReferralServiceTest {
@@ -36,6 +40,7 @@ class AmendReferralServiceTest {
   private val referralService: ReferralService = mock()
   private val jwtAuthenticationToken = JwtAuthenticationToken(mock())
 
+  private val tokenFactory = JwtTokenFactory()
   private val referralFactory = ReferralFactory()
   private val serviceCategoryFactory = ServiceCategoryFactory()
 
@@ -48,7 +53,7 @@ class AmendReferralServiceTest {
   )
 
   @Test
-  fun `AmendComplexityLevelDTO results in changes being saved`() {
+  fun `updateComplexityLevel results in changes being saved`() {
     val complexityLevelId1 = UUID.randomUUID()
     val complexityLevelId2 = UUID.randomUUID()
 
@@ -83,5 +88,19 @@ class AmendReferralServiceTest {
     val changeLogValues = argumentCaptorChangelog.firstValue
     Assertions.assertThat(changeLogValues.id).isNotNull()
     assertEquals(authUser.id, changeLogValues.changedBy.id)
+  }
+
+  @Test
+  fun `no sent referral found error returned when appropriate `() {
+    val referralId = UUID.randomUUID()
+    val token = tokenFactory.create()
+
+    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(null)
+
+    val e = assertThrows<ResponseStatusException> {
+      amendReferralService.getSentReferralForAuthenticatedUser(token, referralId)
+    }
+    Assertions.assertThat(e.status).isEqualTo(HttpStatus.NOT_FOUND)
+    Assertions.assertThat(e.message).contains("sent referral not found [id=$referralId]")
   }
 }
