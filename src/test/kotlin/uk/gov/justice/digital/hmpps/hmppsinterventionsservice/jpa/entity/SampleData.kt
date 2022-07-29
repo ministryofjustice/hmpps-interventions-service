@@ -73,7 +73,6 @@ class SampleData {
           primeProvider = sampleServiceProvider(id = serviceProviderName, name = serviceProviderName),
         )
       ),
-      complexityLevelIds: MutableMap<UUID, UUID>? = null,
       supplementaryRiskId: UUID? = null
     ): Referral {
 
@@ -88,7 +87,6 @@ class SampleData {
         sentBy = sentBy,
         intervention = intervention,
         selectedServiceCategories = intervention.dynamicFrameworkContract.contractType.serviceCategories.toMutableSet(),
-        complexityLevelIds = complexityLevelIds,
         actionPlans = actionPlans,
         endOfServiceReport = endOfServiceReport,
         concludedAt = concludedAt,
