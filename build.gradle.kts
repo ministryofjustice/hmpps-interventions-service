@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.3.2"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.3.3"
   kotlin("plugin.spring") version "1.7.10"
   id("org.jetbrains.kotlin.plugin.jpa") version "1.7.10"
   id("jacoco")
@@ -81,7 +81,7 @@ dependencies {
 
   // aws
   implementation("software.amazon.awssdk:sns:2.17.237")
-  implementation("software.amazon.awssdk:s3:2.17.237")
+  implementation("software.amazon.awssdk:s3:2.17.238")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
