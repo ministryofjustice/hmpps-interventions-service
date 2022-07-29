@@ -80,20 +80,20 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:3.17.3-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.17.235")
+  implementation("software.amazon.awssdk:sns:2.17.237")
   implementation("software.amazon.awssdk:s3:2.17.233")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-  implementation("com.nimbusds:oauth2-oidc-sdk:9.38.1")
+  implementation("com.nimbusds:oauth2-oidc-sdk:9.39")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("org.hibernate:hibernate-core:5.6.7.Final")
-  implementation("com.vladmihalcea:hibernate-types-52:2.16.3")
+  implementation("com.vladmihalcea:hibernate-types-52:2.17.0")
   runtimeOnly("org.flywaydb:flyway-core")
   runtimeOnly("org.postgresql:postgresql:42.4.0")
 
