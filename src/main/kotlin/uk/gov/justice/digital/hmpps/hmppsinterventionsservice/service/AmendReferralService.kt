@@ -37,10 +37,12 @@ class AmendReferralService(
   private val referralService: ReferralService
 ) {
 
-  fun updateComplexityLevel(referral: Referral, update: AmendComplexityLevelDTO, serviceCategoryId: UUID, authentication: JwtAuthenticationToken): Changelog? {
+  fun updateComplexityLevel(referralId: UUID, update: AmendComplexityLevelDTO, serviceCategoryId: UUID, authentication: JwtAuthenticationToken) {
+
+    val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
 
     if (referral.approvedActionPlan != null) {
-      throw ServerWebInputException("desired outcomes cannot be updated: the action plan is already approved")
+      throw ServerWebInputException("complexity level cannot be updated: the action plan is already approved")
     }
     val actor = userMapper.fromToken(authentication)
     val complexityLevel = referral.complexityLevelIds?.get(serviceCategoryId)
@@ -63,16 +65,16 @@ class AmendReferralService(
     changelogRepository.save(changelog)
     referralRepository.save(referral)
     referralEventPublisher.referralComplexityChangedEvent(referral)
-
-    return changelog
   }
 
   fun updateReferralDesiredOutcomes(
-    referral: Referral,
+    referralId: UUID,
     amendDesiredOutcomesDTO: AmendDesiredOutcomesDTO,
     authentication: JwtAuthenticationToken,
     serviceCategoryId: UUID
-  ): Changelog? {
+  ) {
+
+    val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
 
     val desiredOutcomeIds = amendDesiredOutcomesDTO.desiredOutcomesIds
 
@@ -127,12 +129,11 @@ class AmendReferralService(
     changelogRepository.save(changelog)
     val savedReferral = referralRepository.save(referral)
     referralEventPublisher.referralDesiredOutcomesChangedEvent(savedReferral)
-    return changelog
   }
 
-  fun getSentReferralForAuthenticatedUser(authentication: JwtAuthenticationToken, id: UUID): Referral {
+  fun getSentReferralForAuthenticatedUser(referralId: UUID, authentication: JwtAuthenticationToken): Referral {
     val user = userMapper.fromToken(authentication)
-    return referralService.getSentReferralForUser(id, user)
-      ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "sent referral not found [id=$id]")
+    return referralService.getSentReferralForUser(referralId, user)
+      ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "sent referral not found [id=$referralId]")
   }
 }

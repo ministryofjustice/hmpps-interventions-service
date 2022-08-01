@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
@@ -11,6 +12,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOutcomesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
@@ -36,10 +38,10 @@ class AmendReferralServiceTest @Autowired constructor(
   val actionPlanRepository: ActionPlanRepository,
   val endOfServiceReportRepository: EndOfServiceReportRepository,
   val serviceCategoryRepository: ServiceCategoryRepository,
+  val changelogRepository: ChangelogRepository
 ) {
 
   private val referralEventPublisher: ReferralEventPublisher = mock()
-  private val changelogRepository: ChangelogRepository = mock()
   private val userFactory = AuthUserFactory(entityManager)
   private val referralFactory = ReferralFactory(entityManager)
   private val serviceCategoryFactory = ServiceCategoryFactory(entityManager)
@@ -64,12 +66,11 @@ class AmendReferralServiceTest @Autowired constructor(
 
   @Test
   fun `amend desired outcomes of a service category for a referral`() {
-    val user = userFactory.createSP()
+    val someoneElse = userFactory.create("helper_pp_user", "delius")
+    val user = userFactory.create("pp_user_1", "delius")
     val serviceCategoryId = UUID.randomUUID()
     val desiredOutcome1 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId)
     val desiredOutcome2 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId)
-
-    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
 
     val serviceCategory = serviceCategoryFactory.create(
       id = serviceCategoryId,
@@ -77,19 +78,25 @@ class AmendReferralServiceTest @Autowired constructor(
     )
     val referral = referralFactory.createSent(
       selectedServiceCategories = mutableSetOf(serviceCategory),
-      desiredOutcomes = mutableListOf(desiredOutcome1)
+      desiredOutcomes = mutableListOf(desiredOutcome1),
+      createdBy = someoneElse
     )
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
+    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
 
-    val updateReferralDesiredOutcomes = amendReferralService.updateReferralDesiredOutcomes(
-      referral,
+    amendReferralService.updateReferralDesiredOutcomes(
+      referral.id,
       AmendDesiredOutcomesDTO(listOf(desiredOutcome2.id), "needs changing"),
       jwtAuthenticationToken,
       serviceCategory.id
     )
+    val changelog = entityManager.entityManager.createQuery("FROM Changelog u WHERE u.referralId = :referralId")
+      .setParameter("referralId", referral.id)
+      .singleResult as Changelog
 
-    assertThat(updateReferralDesiredOutcomes?.newVal!!.values.size).isEqualTo(1)
-    assertThat(updateReferralDesiredOutcomes.newVal.values).containsExactly(desiredOutcome2.id.toString())
-    assertThat(updateReferralDesiredOutcomes.reasonForChange).isEqualTo("needs changing")
+    assertThat(changelog.newVal.values.size).isEqualTo(1)
+    assertThat(changelog.newVal.values).containsExactly(desiredOutcome2.id.toString())
+    assertThat(changelog.reasonForChange).isEqualTo("needs changing")
 
     val newReferral = referralRepository.findById(referral.id).get()
 
