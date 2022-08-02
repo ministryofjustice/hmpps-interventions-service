@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Selecte
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -51,23 +52,8 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     concludedAt: OffsetDateTime? = null,
     supplierAssessment: SupplierAssessment? = null,
     endOfServiceReport: EndOfServiceReport? = null,
+    completionDeadline: LocalDate? = null
   ): Referral {
-
-    val referralDetails = referralDetailsDTO?.let {
-      save(
-        ReferralDetails(
-          UUID.randomUUID(),
-          null,
-          it.referralId,
-          createdAt,
-          createdBy.id,
-          "initial referral details",
-          it.completionDeadline,
-          it.furtherInformation,
-          it.maximumEnforceableDays,
-        )
-      )
-    }
 
     val referral = save(
       Referral(
@@ -95,10 +81,11 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
         concludedAt = concludedAt,
         endOfServiceReport = endOfServiceReport,
         supplierAssessment = supplierAssessment,
-        referralDetailsHistory = referralDetails?.let { setOf(it) },
+
       )
     )
     referral.selectedDesiredOutcomes = desiredOutcomes.map { SelectedDesiredOutcomesMapping(it.serviceCategoryId, it.id) }.toMutableList()
+
     save(referral)
     return referral
   }
