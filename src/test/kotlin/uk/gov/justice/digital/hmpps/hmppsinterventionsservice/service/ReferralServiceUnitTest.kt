@@ -36,8 +36,24 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Complex
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.*
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.*
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSummariesRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.CancellationReasonFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ChangeLogFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ContractTypeFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DraftOasysRiskInformationFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFrameworkContractFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -941,15 +957,15 @@ class ReferralServiceUnitTest {
 
       val oldReferralValue = ReferralAmendmentDetails(listOf(existingDetails.completionDeadline.toString()))
       val newValue = ReferralAmendmentDetails(listOf(returnedValue?.completionDeadline.toString()))
-      val changelogId=UUID.randomUUID()
+      val changelogId = UUID.randomUUID()
       val changlogReturned = changeLogFactory.create(
         changelogId,
         AmendTopic.COMPLETION_DATETIME,
         referral.id,
         oldReferralValue,
         newValue,
-        "completion deadline change", OffsetDateTime.of(2022,8,3,0,0,0,0, ZoneOffset.UTC))
-
+        "completion deadline change", OffsetDateTime.of(2022, 8, 3, 0, 0, 0, 0, ZoneOffset.UTC)
+      )
 
       whenever(changeLogRepository.save(changlogReturned)).thenReturn(changlogReturned)
 

@@ -108,12 +108,7 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
       id = referralID,
       createdAt = createdAt,
       createdBy = createdBy,
-      referralDetails = ReferralDetailsDTO.from(
-        referralDetailsFactory.create(
-          referralID, createdAt, createdBy,
-          completionDeadline = LocalDate.of(2021, 2, 12),
-        )
-      )
+      completionDeadline = LocalDate.of(2021, 2, 12),
     )
 
     val out = json.write(DraftReferralDTO.from(referral))
@@ -244,15 +239,15 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
       assertThat(referralDTO.desiredOutcomes).hasSize(2)
       assertThat(referralDTO.desiredOutcomes!!.elementAt(0).serviceCategoryId).isEqualTo(uuid1)
       assertThat(referralDTO.desiredOutcomes!!.elementAt(0).desiredOutcomesIds).hasSize(3)
-      assertThat(referralDTO.desiredOutcomes!!.elementAt(0).desiredOutcomesIds!!.elementAt(0)).isEqualTo(uuid1)
-      assertThat(referralDTO.desiredOutcomes!!.elementAt(0).desiredOutcomesIds!!.elementAt(1)).isEqualTo(uuid2)
-      assertThat(referralDTO.desiredOutcomes!!.elementAt(0).desiredOutcomesIds!!.elementAt(2)).isEqualTo(uuid3)
+      assertThat(referralDTO.desiredOutcomes!!.elementAt(0).desiredOutcomesIds.elementAt(0)).isEqualTo(uuid1)
+      assertThat(referralDTO.desiredOutcomes!!.elementAt(0).desiredOutcomesIds.elementAt(1)).isEqualTo(uuid2)
+      assertThat(referralDTO.desiredOutcomes!!.elementAt(0).desiredOutcomesIds.elementAt(2)).isEqualTo(uuid3)
 
       assertThat(referralDTO.desiredOutcomes!!.elementAt(1).serviceCategoryId).isEqualTo(uuid2)
       assertThat(referralDTO.desiredOutcomes!!.elementAt(1).desiredOutcomesIds).hasSize(3)
-      assertThat(referralDTO.desiredOutcomes!!.elementAt(1).desiredOutcomesIds!!.elementAt(0)).isEqualTo(uuid4)
-      assertThat(referralDTO.desiredOutcomes!!.elementAt(1).desiredOutcomesIds!!.elementAt(1)).isEqualTo(uuid5)
-      assertThat(referralDTO.desiredOutcomes!!.elementAt(1).desiredOutcomesIds!!.elementAt(2)).isEqualTo(uuid6)
+      assertThat(referralDTO.desiredOutcomes!!.elementAt(1).desiredOutcomesIds.elementAt(0)).isEqualTo(uuid4)
+      assertThat(referralDTO.desiredOutcomes!!.elementAt(1).desiredOutcomesIds.elementAt(1)).isEqualTo(uuid5)
+      assertThat(referralDTO.desiredOutcomes!!.elementAt(1).desiredOutcomesIds.elementAt(2)).isEqualTo(uuid6)
     }
   }
 }

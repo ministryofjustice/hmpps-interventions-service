@@ -41,7 +41,17 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SentReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceProvider
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.*
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSummariesRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
@@ -112,7 +122,7 @@ class ReferralServiceTest @Autowired constructor(
   private val draftOasysRiskInformationService: DraftOasysRiskInformationService = mock()
   private val referralDetailsRepository: ReferralDetailsRepository = mock()
   private val recursiveComparisonConfigurationBuilder = RecursiveComparisonConfiguration.builder()
-  private val changelogRepository: ChangelogRepository =mock()
+  private val changelogRepository: ChangelogRepository = mock()
 
   private val referralService = ReferralService(
     referralRepository,
@@ -138,7 +148,8 @@ class ReferralServiceTest @Autowired constructor(
     telemetryService,
     draftOasysRiskInformationService,
     referralDetailsRepository,
-  changelogRepository)
+    changelogRepository
+  )
 
   companion object {
     @JvmStatic

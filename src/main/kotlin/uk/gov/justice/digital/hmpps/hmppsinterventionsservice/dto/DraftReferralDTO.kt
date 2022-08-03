@@ -53,7 +53,7 @@ data class DraftReferralDTO(
       return DraftReferralDTO(
         id = referral.id,
         createdAt = referral.createdAt,
-        completionDeadline = referral.referralDetails?.completionDeadline,
+        completionDeadline = referral?.completionDeadline,
         complexityLevels = referral.complexityLevelIds?.ifEmpty { null }
           ?.map { ReferralComplexityLevel(it.key, it.value) }
           ?.sortedBy { it.serviceCategoryId },
