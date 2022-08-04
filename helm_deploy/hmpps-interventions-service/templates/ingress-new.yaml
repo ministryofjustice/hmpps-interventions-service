@@ -2,15 +2,14 @@
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: {{ $fullName }}
+  name: {{ $fullName }}-new
   labels:
     {{- include "app.labels" . | nindent 4 }}
   annotations:
-    external-dns.alpha.kubernetes.io/set-identifier: {{ $fullName }}-{{ .Release.Namespace }}-{{ .Values.ingress.migration.colour }}
-    external-dns.alpha.kubernetes.io/aws-weight: "0"
+    external-dns.alpha.kubernetes.io/set-identifier: {{ $fullName }}-new-{{ .Release.Namespace }}-{{ .Values.ingress.migration.colour }}
+    external-dns.alpha.kubernetes.io/aws-weight: "100"
     nginx.ingress.kubernetes.io/custom-http-errors: "418"
     {{- if .Values.env_details.contains_live_data }}
-    kubernetes.io/ingress.class: "modsec01"
     nginx.ingress.kubernetes.io/enable-modsecurity: "true"
     nginx.ingress.kubernetes.io/modsecurity-transaction-id: "$request_id"
     nginx.ingress.kubernetes.io/modsecurity-snippet: |
@@ -22,6 +21,7 @@ metadata:
     kubernetes.io/ingress.class: "nginx"
     {{- end }}
 spec:
+  ingressClassName: modsec
   tls:
   {{- range .Values.ingress.hosts }}
   - hosts:
