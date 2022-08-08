@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
-import org.junit.Ignore
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -24,6 +23,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessChecker
@@ -56,6 +56,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.End
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSpecificationExecutor
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSummariesRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
@@ -97,6 +98,7 @@ class ReferralServiceTest @Autowired constructor(
   val serviceCategoryRepository: ServiceCategoryRepository,
   val referralDetailsRepository: ReferralDetailsRepository,
   val changelogRepository: ChangelogRepository
+  val sentReferralSummariesRepositoryImpl: SentReferralSpecificationExecutor
 ) {
 
   private val userFactory = AuthUserFactory(entityManager)
@@ -161,6 +163,7 @@ class ReferralServiceTest @Autowired constructor(
     telemetryService,
     draftOasysRiskInformationService,
     referralDetailsRepository,
+    sentReferralSummariesRepositoryImpl,
     changelogRepository
   )
 
@@ -562,6 +565,28 @@ class ReferralServiceTest @Autowired constructor(
     }
 
     @Test
+    fun `returns referrals started by the user in the sorted order`() {
+      val user = userFactory.create("pp_user_1", "delius")
+      val startedReferral1 = referralFactory.createSent(createdBy = user)
+      val serviceUserData1 = serviceUserDataFactory.create("Zack", "Synder", startedReferral1)
+      startedReferral1.serviceUserData = serviceUserData1
+      entityManager.refresh(startedReferral1)
+      val startedReferral2 = referralFactory.createSent(createdBy = user)
+      val serviceUserData2 = serviceUserDataFactory.create("Dom", "Barnett", startedReferral2)
+      startedReferral2.serviceUserData = serviceUserData2
+      entityManager.refresh(startedReferral2)
+      val startedReferral3 = referralFactory.createSent(createdBy = user)
+      val serviceUserData3 = serviceUserDataFactory.create("Alice", "Wonderland", startedReferral3)
+      startedReferral3.serviceUserData = serviceUserData3
+      entityManager.refresh(startedReferral3)
+
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, PageRequest.of(0, 5, Sort.by("serviceUserData.lastName").descending()))
+      assertThat(result.elementAt(0).id).isEqualTo(startedReferral3.id)
+      assertThat(result.elementAt(1).id).isEqualTo(startedReferral1.id)
+      assertThat(result.elementAt(2).id).isEqualTo(startedReferral2.id)
+    }
+
+    @Test
     fun `to check for cancelled referral were pop did not attend appointment should return for PP user`() {
       val user = userFactory.create("pp_user_1", "delius")
       val startedReferrals = (1..3).map { sentReferralSummariesFactory.createSent(createdBy = user) }
@@ -590,6 +615,7 @@ class ReferralServiceTest @Autowired constructor(
         .containsExactlyInAnyOrderElementsOf(startedReferrals.plus(cancelledWithoutAttendanceReferralSummary))
     }
 
+    @Test
     fun `must not return referrals sent by the user`() {
       val user = userFactory.create("pp_user_1", "delius")
       val sentReferral = sentReferralSummariesFactory.createSent(sentBy = user)
@@ -677,16 +703,29 @@ class ReferralServiceTest @Autowired constructor(
         .thenReturn(ServiceProviderAccessScope(setOf(serviceProviderFactory.create()), contracts.toSet()))
 
       val pageSize = 5
+      val pageable = Pageable.ofSize(pageSize)
       val page = referralService.getSentReferralSummaryForUser(
         user,
         null,
         null,
         null,
         null,
-        Pageable.ofSize(pageSize)
+        pageable
       ) as Page<SentReferralSummary>
       assertThat(page.content.size).isEqualTo(pageSize)
       assertThat(page.totalElements).isEqualTo(8)
+
+      val secondPage = referralService.getSentReferralSummaryForUser(
+        user,
+        null,
+        null,
+        null,
+        null,
+        pageable.next()
+      ) as Page<SentReferralSummary>
+
+      assertThat(secondPage.content.size).isEqualTo(3)
+      assertThat(secondPage.totalElements).isEqualTo(8)
     }
 
     @Test
@@ -1154,8 +1193,6 @@ class ReferralServiceTest @Autowired constructor(
     }
 
     @Test
-    @Ignore
-    // TODO- come back once we solve the production issue
     fun `to check for cancelled referral were pop did not attend appointment should not return for SP User`() {
       val intervention = interventionFactory.create(contract = contractFactory.create(primeProvider = provider))
       val cancelledReferral = referralFactory.createEnded(
@@ -1164,6 +1201,7 @@ class ReferralServiceTest @Autowired constructor(
         endRequestedAt = OffsetDateTime.now(),
         concludedAt = OffsetDateTime.now(),
         endOfServiceReport = null,
+        createdBy = ppUser,
         actionPlans = mutableListOf(actionPlanFactory.create(submittedAt = null))
       )
       val appointment =
@@ -1171,7 +1209,9 @@ class ReferralServiceTest @Autowired constructor(
       val supplierAssessmentAppointment =
         supplierAssessmentFactory.create(appointment = appointment, referral = cancelledReferral)
       cancelledReferral.supplierAssessment = supplierAssessmentAppointment
-      entityManager.refresh(cancelledReferral)
+      val id = entityManager.persistAndGetId(cancelledReferral)
+      val ppDashboard = referralService.getSentReferralSummaryForUser(ppUser, null, null, null, null, pageRequest)
+      assertThat(ppDashboard.count()).isEqualTo(1)
       val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest)
       assertThat(result)
         .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
