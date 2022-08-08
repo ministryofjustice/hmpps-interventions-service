@@ -32,6 +32,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Dra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSpecificationExecutor
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSummariesRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
@@ -63,6 +64,7 @@ class ReferralServiceUnitTest {
   private val hmppsAuthService: HMPPSAuthService = mock()
   private val telemetryService: TelemetryService = mock()
   private val referralDetailsRepository: ReferralDetailsRepository = mock()
+  private val sentReferralSummariesRepositoryImpl: SentReferralSpecificationExecutor = mock()
   private val changeLogRepository: ChangelogRepository = mock()
 
   private val referralFactory = ReferralFactory()
@@ -90,6 +92,7 @@ class ReferralServiceUnitTest {
     hmppsAuthService,
     telemetryService,
     referralDetailsRepository,
+    sentReferralSummariesRepositoryImpl,
     changeLogRepository
   )
 
