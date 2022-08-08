@@ -61,6 +61,8 @@ class NotifyReferralServiceTest {
 
   private fun notifyService(): ReferralNotificationService {
     return ReferralNotificationService(
+      "complexityLevelTemplateID",
+      "desiredOutcomesAmendTemplateID",
       "referralSentTemplateID",
       "referralAssignedTemplateID",
       "completionDeadlineUpdatedTemplateID",
