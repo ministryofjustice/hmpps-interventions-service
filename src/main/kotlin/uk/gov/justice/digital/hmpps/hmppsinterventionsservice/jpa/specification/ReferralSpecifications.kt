@@ -61,7 +61,8 @@ class ReferralSpecifications {
     }
 
     fun <T> attendanceNotSubmitted(): Specification<T> {
-      return Specification<T> { root, _, cb ->
+      return Specification<T> { root, query, cb ->
+        query.distinct(true)
         val supplierAssessmentJoin = root.join<T, SupplierAssessment>("supplierAssessment", JoinType.LEFT)
         val appointmentJoin = supplierAssessmentJoin.join<SupplierAssessment, Appointment>("appointments", JoinType.LEFT)
         val actionPlanJoin = root.join<T, ActionPlan>("actionPlans", JoinType.LEFT)
@@ -72,10 +73,7 @@ class ReferralSpecifications {
               cb.isNotNull(root.get<OffsetDateTime>("concludedAt")),
               root.join<T, EndOfServiceReport>("endOfServiceReport", JoinType.LEFT).isNull
             ),
-            cb.and(
-              cb.isNull(appointmentJoin.get<OffsetDateTime>("attendanceSubmittedAt")),
-              cb.equal(appointmentJoin.get<Boolean>("superseded"), false)
-            ),
+            cb.isNull(appointmentJoin.get<OffsetDateTime>("attendanceSubmittedAt")),
             cb.isNull(actionPlanJoin.get<OffsetDateTime>("submittedAt")),
           )
         )

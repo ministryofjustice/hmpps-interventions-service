@@ -27,6 +27,7 @@ import javax.transaction.Transactional
 @Transactional
 class ReferralNotificationService(
   @Value("\${notify.templates.complexity-level-changed}") private val complexityLevelTemplateID: String,
+  @Value("\${notify.templates.desired-outcome-changed}") private val desiredOutcomesAmendTemplateID: String,
   @Value("\${notify.templates.referral-sent}") private val referralSentTemplateID: String,
   @Value("\${notify.templates.referral-assigned}") private val referralAssignedTemplateID: String,
   @Value("\${notify.templates.completion-deadline-updated}") private val completionDeadlineUpdatedTemplateID: String,
@@ -68,7 +69,21 @@ class ReferralNotificationService(
           mapOf(
             "spFirstName" to userDetails.firstName,
             "referenceNumber" to event.referral.referenceNumber!!,
-            "referralUrl" to location.toString()
+            "referralUrl" to location.toString(),
+          )
+        )
+      }
+
+      ReferralEventType.DESIRED_OUTCOMES_AMENDED -> {
+        val userDetails = hmppsAuthService.getUserDetail(event.referral.currentAssignee!!)
+        val location = generateResourceUrl(interventionsUIBaseURL, spReferralDetailsLocation, event.referral.id)
+        emailSender.sendEmail(
+          desiredOutcomesAmendTemplateID,
+          userDetails.email,
+          mapOf(
+            "sp_first_name" to userDetails.firstName,
+            "referral_number" to event.referral.referenceNumber!!,
+            "referral" to location.toString()
           )
         )
       }
@@ -132,8 +147,7 @@ class ReferralNotificationService(
 
     if (newDetails.maximumEnforceableDays != previousDetails.maximumEnforceableDays) {
       emailSender.sendEmail(
-        enforceableDaysUpdatedTemplateID,
-        recipient.email,
+        enforceableDaysUpdatedTemplateID, recipient.email,
         mapOf(
           "recipientFirstName" to recipient.firstName,
           "newMaximumEnforceableDays" to newDetails.maximumEnforceableDays!!.toString(),
@@ -154,8 +168,7 @@ class ReferralNotificationService(
     frontendUrl: URI
   ) {
     emailSender.sendEmail(
-      completionDeadlineUpdatedTemplateID,
-      email,
+      completionDeadlineUpdatedTemplateID, email,
       mapOf(
         "caseworkerFirstName" to firstName,
         "newCompletionDeadline" to formatDate(newDetails.completionDeadline!!),
