@@ -68,9 +68,9 @@ jobs:
           command: |
             flyway clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
             git reset --hard origin/main
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
+            flyway -outOfOrder=true migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
             git reset --hard "$CIRCLE_SHA1"
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
+            flyway -outOfOrder=true migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
       - run:
           name: Run migrations and local seeds
           command: |
@@ -121,9 +121,9 @@ jobs:
           command: |
             flyway clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
             git reset --hard origin/main
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
+            flyway -outOfOrder=true migrate migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
             git reset --hard "$CIRCLE_SHA1"
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
+            flyway -outOfOrder=true migrate migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
       - run:
           name: Run migrations and local seeds
           command: |
