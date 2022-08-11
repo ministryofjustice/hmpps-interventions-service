@@ -959,6 +959,70 @@ class ReferralServiceTest @Autowired constructor(
   }
 
   @Nested
+  @DisplayName("get sent referrals with reference number search")
+  inner class GetSentReferralsWithReferenceNumberSearchTest {
+    lateinit var user: AuthUser
+    lateinit var pageRequest: PageRequest
+    lateinit var referral: Referral
+    lateinit var referral2: Referral
+    lateinit var referral3: Referral
+    lateinit var provider: ServiceProvider
+    lateinit var intervention: Intervention
+
+    @BeforeEach
+    fun `setup referrals`() {
+      user = userFactory.create("test_user", "auth")
+      pageRequest = PageRequest.of(0, 20)
+      provider = serviceProviderFactory.create("test")
+      intervention = interventionFactory.create(contract = contractFactory.create(primeProvider = provider))
+
+      referral = referralFactory.createSent(referenceNumber = "AJ1827DR", intervention = intervention)
+      val serviceUserData = serviceUserDataFactory.create(firstName = "john", lastName = "smith", referral = referral)
+      referral.serviceUserData = serviceUserData
+
+      referral2 = referralFactory.createSent(referenceNumber = "EJ3892AC", intervention = intervention)
+      val serviceUserData2 = serviceUserDataFactory.create(firstName = "john", lastName = "smith", referral = referral2)
+      referral2.serviceUserData = serviceUserData2
+
+      whenever(serviceProviderAccessScopeMapper.fromUser(user))
+        .thenReturn(ServiceProviderAccessScope(setOf(provider), setOf(intervention.dynamicFrameworkContract)))
+    }
+
+    @Test
+    fun `only referrals that have a referenceNumber matching the search text should be returned`() {
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest, "AJ1827DR")
+
+      assertThat(result).hasSize(1)
+        .extracting("id")
+        .contains(referral.id)
+    }
+
+    @Test
+    fun `no referrals should be returned if no reference Number matches the search term`() {
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest, "GH3927AC")
+      assertThat(result).size().isEqualTo(0)
+    }
+
+    @Test
+    fun `no referrals should be returned if no reference Number matches the pattern for referenceNumber`() {
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest, "AABBCCDD")
+      assertThat(result).size().isEqualTo(0)
+    }
+
+    @Test
+    fun `a search for an empty string should return no results`() {
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest, "")
+      assertThat(result).size().isEqualTo(0)
+    }
+
+    @Test
+    fun `a search for a space should return no results`() {
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest, " ")
+      assertThat(result).size().isEqualTo(0)
+    }
+  }
+
+  @Nested
   @DisplayName("get sent referrals with filter options")
   inner class GetSentReferralsFilterOptionsTest {
     lateinit var user: AuthUser

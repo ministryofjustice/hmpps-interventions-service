@@ -34,13 +34,17 @@ class ReferralSpecifications {
       }
     }
 
-    fun <T> search(searchText: String): Specification<T> {
+    fun <T> searchByPoPName(searchText: String): Specification<T> {
       return Specification<T> { root, _, cb ->
         val serviceUserDataJoin = root.join<T, ServiceUserData>("serviceUserData", JoinType.INNER)
         val exp1 = cb.concat(cb.upper(serviceUserDataJoin.get("firstName")), " ")
         val exp2 = cb.concat(exp1, cb.upper(serviceUserDataJoin.get("lastName")))
         cb.equal(exp2, searchText.uppercase())
       }
+    }
+
+    fun <T> searchByReferenceNumber(referenceNumber: String): Specification<T> {
+      return Specification<T> { root, _, cb -> cb.equal(root.get<String>("referenceNumber"), referenceNumber.uppercase()) }
     }
 
     /**
