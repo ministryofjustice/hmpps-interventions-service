@@ -564,8 +564,10 @@ class DeliverySessionServiceTest @Autowired constructor(
     @Test
     fun `can create new delivery session appointment for an appointment did not attend`() {
       val actionPlan = actionPlanFactory.createApproved(numberOfSessions = 1)
+      val newReferral = actionPlanRepository.findById(actionPlan.id).get()
       val session = deliverySessionFactory.createScheduled(referral = actionPlan.referral, attended = Attended.NO)
-
+      val sessionValue = deliverySessionRepository.findById(session.id).get()
+      val check = deliverySessionRepository.findByReferralIdAndSessionNumber(sessionValue.id, session.sessionNumber)
       whenever(actionPlanAppointmentEventPublisher.sessionFeedbackRecordedEvent(any())).doAnswer {
         val session = it.getArgument<DeliverySession>(0)
         assertThat(session.currentAppointment?.appointmentFeedbackSubmittedAt).isNotNull
@@ -575,8 +577,10 @@ class DeliverySessionServiceTest @Autowired constructor(
         assertThat(session.currentAppointment?.notifyPPOfAttendanceBehaviour).isNull()
         assertThat(session.currentAppointment?.attendanceBehaviour).isNull()
 
+
         null
       }
+
       val updatedSession = deliverySessionService.updateSessionAppointment(
         actionPlan.id, session.sessionNumber, defaultPastAppointmentTime, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE,
         null,
@@ -602,6 +606,64 @@ class DeliverySessionServiceTest @Autowired constructor(
       assertThat(appointment.appointmentFeedbackSubmittedBy).isNotNull
       assertThat(appointment.appointmentDelivery?.appointmentDeliveryType).isNotNull
       assertThat(appointment.appointmentDelivery?.appointmentSessionType).isNotNull
+      assertThat(updatedSession.appointments.first().superseded).isFalse
+      assertThat(updatedSession.appointments.last().superseded).isTrue
     }
+
+//    @Test
+//    fun `can create delivery session appointment for an appointment did not attend`() {
+//      val actionPlan = actionPlanFactory.createApproved(numberOfSessions = 1)
+//      val session = deliverySessionFactory.createScheduled(referral = actionPlan.referral, attended = Attended.NO)
+//
+//      whenever(actionPlanAppointmentEventPublisher.sessionFeedbackRecordedEvent(any())).doAnswer {
+//        val session = it.getArgument<DeliverySession>(0)
+//        assertThat(session.currentAppointment?.appointmentFeedbackSubmittedAt).isNotNull
+//        assertThat(session.currentAppointment?.appointmentFeedbackSubmittedBy).isNotNull
+//        assertThat(session.currentAppointment?.attended).isEqualTo(Attended.NO)
+//        assertThat(session.currentAppointment?.additionalAttendanceInformation).isNull()
+//        assertThat(session.currentAppointment?.notifyPPOfAttendanceBehaviour).isNull()
+//        assertThat(session.currentAppointment?.attendanceBehaviour).isNull()
+//
+//
+//        null
+//      }
+//      val updatedSession1 = deliverySessionService.scheduleNewDeliverySessionAppointment(
+//        actionPlan.id, session.sessionNumber, defaultAppointmentTime, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE,
+//        null,
+//        null,
+//        Attended.NO,
+//        null,
+//        true,
+//        null
+//      )
+//
+//      val updatedSession = deliverySessionService.updateSessionAppointment(
+//        actionPlan.id, session.sessionNumber, defaultAppointmentTime, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE,
+//        null,
+//        null,
+//        Attended.NO,
+//        null,
+//        true,
+//        null
+//      )
+//
+//
+//      verify(communityAPIBookingService).book(eq(session.referral), isNull(), eq(defaultAppointmentTime), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull())
+//
+//      assertThat(updatedSession.appointments.size).isEqualTo(2)
+//      val appointment = updatedSession.currentAppointment!!
+//      assertThat(appointment.appointmentTime).isEqualTo(defaultAppointmentTime)
+//      assertThat(appointment.durationInMinutes).isEqualTo(defaultDuration)
+//      assertThat(appointment.createdBy).isEqualTo(defaultUser)
+//      assertThat(appointment.attended).isEqualTo(Attended.NO)
+//      assertThat(appointment.additionalAttendanceInformation).isNull()
+//      assertThat(appointment.notifyPPOfAttendanceBehaviour).isNull()
+//      assertThat(appointment.attendanceBehaviour).isNull()
+//      assertThat(appointment.appointmentFeedbackSubmittedAt).isNotNull
+//      assertThat(appointment.appointmentFeedbackSubmittedBy).isNotNull
+//      assertThat(appointment.appointmentDelivery?.appointmentDeliveryType).isNotNull
+//      assertThat(appointment.appointmentDelivery?.appointmentSessionType).isNotNull
+//      assertThat(session.appointments.first().superseded).isTrue
+//    }
   }
 }
