@@ -32,6 +32,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Aut
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DeliverySessionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
@@ -69,6 +70,7 @@ class DeliverySessionServiceTest @Autowired constructor(
   private val userFactory = AuthUserFactory(entityManager)
   private val deliverySessionFactory = DeliverySessionFactory(entityManager)
   private val actionPlanFactory = ActionPlanFactory(entityManager)
+  private val appointmentFactory = AppointmentFactory(entityManager)
 
   val defaultAppointmentTime = OffsetDateTime.now().plusDays(1)
   val defaultDuration = 1
