@@ -53,4 +53,46 @@ class AppointmentFactory(em: TestEntityManager? = null) : EntityFactory(em) {
       )
     )
   }
+
+  fun createDuplicateReferral(
+    id: UUID = UUID.randomUUID(),
+    createdAt: OffsetDateTime = OffsetDateTime.now(),
+    createdBy: AuthUser = authUserFactory.create(),
+    appointmentTime: OffsetDateTime = OffsetDateTime.now().plusMonths(2),
+    durationInMinutes: Int = 60,
+    attended: Attended? = null,
+    additionalAttendanceInformation: String? = null,
+    attendanceSubmittedAt: OffsetDateTime? = null,
+    attendanceSubmittedBy: AuthUser? = null,
+    attendanceBehaviour: String? = null,
+    attendanceBehaviourSubmittedAt: OffsetDateTime? = null,
+    notifyPPOfAttendanceBehaviour: Boolean? = null,
+    appointmentFeedbackSubmittedAt: OffsetDateTime? = null,
+    appointmentFeedbackSubmittedBy: AuthUser? = null,
+    deliusAppointmentId: Long? = null,
+    superseded: Boolean = false,
+    referral: Referral
+  ): Appointment {
+    return save(
+      Appointment(
+        id = id,
+        createdAt = createdAt,
+        createdBy = createdBy,
+        appointmentTime = appointmentTime,
+        durationInMinutes = durationInMinutes,
+        attended = attended,
+        additionalAttendanceInformation = additionalAttendanceInformation,
+        attendanceSubmittedAt = attendanceSubmittedAt,
+        attendanceSubmittedBy = attendanceSubmittedBy,
+        attendanceBehaviour = attendanceBehaviour,
+        attendanceBehaviourSubmittedAt = attendanceBehaviourSubmittedAt,
+        notifyPPOfAttendanceBehaviour = notifyPPOfAttendanceBehaviour,
+        appointmentFeedbackSubmittedAt = appointmentFeedbackSubmittedAt,
+        appointmentFeedbackSubmittedBy = appointmentFeedbackSubmittedBy,
+        deliusAppointmentId = deliusAppointmentId,
+        superseded = superseded,
+        referral = referral,
+      )
+    )
+  }
 }
