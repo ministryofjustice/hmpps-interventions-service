@@ -104,5 +104,5 @@ dependencies {
   testImplementation("au.com.dius.pact.provider:junit5spring:4.3.13")
   testImplementation("com.squareup.okhttp3:okhttp:4.10.0")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
-  testImplementation("org.mockito:mockito-inline:4.6.1")
+  testImplementation("org.mockito:mockito-inline:4.7.0")
 }
