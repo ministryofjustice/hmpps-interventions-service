@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 
 class ServiceUserFactory(em: TestEntityManager? = null) : EntityFactory(em) {
@@ -9,13 +9,13 @@ class ServiceUserFactory(em: TestEntityManager? = null) : EntityFactory(em) {
   fun create(
     firstName: String? = null,
     lastName: String? = null,
-    referral: Referral = referralFactory.createSent()
+    referral: DraftReferral = referralFactory.createDraft()
   ): ServiceUserData {
     return save(
       ServiceUserData(
         firstName = firstName,
         lastName = lastName,
-        referral = referral,
+        draftReferral = referral,
         referralID = referral.id
       )
     )

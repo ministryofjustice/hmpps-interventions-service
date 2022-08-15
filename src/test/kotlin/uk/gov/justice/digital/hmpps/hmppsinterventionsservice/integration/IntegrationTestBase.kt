@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Cha
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ContractTypeRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DesiredOutcomeRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DynamicFrameworkContractRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
@@ -38,6 +39,7 @@ abstract class IntegrationTestBase {
   lateinit var webTestClient: WebTestClient
 
   @Autowired protected lateinit var referralRepository: ReferralRepository
+  @Autowired protected lateinit var draftReferralRepository: DraftReferralRepository
   @Autowired protected lateinit var actionPlanRepository: ActionPlanRepository
   @Autowired protected lateinit var deliverySessionRepository: DeliverySessionRepository
   @Autowired protected lateinit var authUserRepository: AuthUserRepository
@@ -64,6 +66,7 @@ abstract class IntegrationTestBase {
     setupAssistant = SetupAssistant(
       authUserRepository,
       referralRepository,
+      draftReferralRepository,
       interventionRepository,
       actionPlanRepository,
       deliverySessionRepository,

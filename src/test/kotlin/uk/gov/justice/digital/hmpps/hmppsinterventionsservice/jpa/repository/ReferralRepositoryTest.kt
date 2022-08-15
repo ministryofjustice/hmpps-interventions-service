@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DashboardType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceProviderSentReferralSummary
@@ -413,12 +414,16 @@ class ReferralRepositoryTest @Autowired constructor(
     numberOfAssignedUsers: Int = 1,
     intervention: Intervention? = null
   ): Referral {
+
     val referral: Referral = referralFactory.createSent(
       intervention = intervention ?: createIntervention(asPrime),
       assignments = assignmentsFactory.create(numberOfAssignedUsers)
     )
 
-    val serviceUser = serviceUserFactory.create(random(15), random(16), referral)
+    val draftReferral = entityManager.find(DraftReferral::class.java, referral.id)
+    val serviceUser = serviceUserFactory.create(random(15), random(16), draftReferral)
+    entityManager.refresh(draftReferral)
+
     return entityManager.refresh(referral)
   }
 
@@ -447,14 +452,16 @@ class ReferralRepositoryTest @Autowired constructor(
     if (hasEosr) {
       referral.endOfServiceReport = endOfServiceReport.create(referral = referral, submittedAt = OffsetDateTime.now())
     }
-    val serviceUser = serviceUserFactory.create(random(15), random(16), referral)
 
+    val draftReferral = entityManager.find(DraftReferral::class.java, referral.id)
+    val serviceUser = serviceUserFactory.create(random(15), random(16), draftReferral)
+    entityManager.refresh(draftReferral)
     return entityManager.refresh(referral)
   }
 
   private fun createDraftReferral(
     asPrime: Boolean
-  ): Referral {
+  ): DraftReferral {
 
     val serviceProvider = serviceProviderFactory.create(random(13), random(14))
     val contract = when {

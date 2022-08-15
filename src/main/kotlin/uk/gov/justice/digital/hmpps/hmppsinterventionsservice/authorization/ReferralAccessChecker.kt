@@ -3,6 +3,8 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.AccessError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DynamicFrameworkContract
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 
 @Component
@@ -17,22 +19,30 @@ class ReferralAccessChecker(
 
   fun forUser(referral: Referral, user: AuthUser) {
     when {
-      userTypeChecker.isProbationPractitionerUser(user) -> forProbationPractitionerUser(referral, user)
-      userTypeChecker.isServiceProviderUser(user) -> forServiceProviderUser(referral, user)
+      userTypeChecker.isProbationPractitionerUser(user) -> forProbationPractitionerUser(referral.serviceUserCRN, user)
+      userTypeChecker.isServiceProviderUser(user) -> forServiceProviderUser(referral.intervention.dynamicFrameworkContract, user)
       else -> throw AccessError(user, userTypeError, listOf("logins from ${user.authSource} are not supported"))
     }
   }
 
-  private fun forServiceProviderUser(referral: Referral, user: AuthUser) {
+  fun forUser(draftReferral: DraftReferral, user: AuthUser) {
+    when {
+      userTypeChecker.isProbationPractitionerUser(user) -> forProbationPractitionerUser(draftReferral.serviceUserCRN, user)
+      userTypeChecker.isServiceProviderUser(user) -> forServiceProviderUser(draftReferral.intervention.dynamicFrameworkContract, user)
+      else -> throw AccessError(user, userTypeError, listOf("logins from ${user.authSource} are not supported"))
+    }
+  }
+
+  private fun forServiceProviderUser(dynamicFrameworkContract: DynamicFrameworkContract, user: AuthUser) {
     val userScope = serviceProviderAccessScopeMapper.fromUser(user)
-    val eligibleServiceProviders = eligibleProviderMapper.fromReferral(referral)
+    val eligibleServiceProviders = eligibleProviderMapper.fromReferral(dynamicFrameworkContract)
     val errors = mutableListOf<String>()
 
     if (eligibleServiceProviders.intersect(userScope.serviceProviders).isEmpty()) {
       errors.add("user does not have the required provider group to access this referral")
     }
 
-    if (!userScope.contracts.contains(referral.intervention.dynamicFrameworkContract)) {
+    if (!userScope.contracts.contains(dynamicFrameworkContract)) {
       errors.add("user does not have the required contract group to access this referral")
     }
 
@@ -41,8 +51,8 @@ class ReferralAccessChecker(
     }
   }
 
-  private fun forProbationPractitionerUser(referral: Referral, user: AuthUser) {
+  private fun forProbationPractitionerUser(serviceUserCRN: String, user: AuthUser) {
     // check if the PP is allowed to access this service user's records
-    serviceUserAccessChecker.forProbationPractitionerUser(referral.serviceUserCRN, user)
+    serviceUserAccessChecker.forProbationPractitionerUser(serviceUserCRN, user)
   }
 }
