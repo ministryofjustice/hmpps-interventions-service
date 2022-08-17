@@ -126,7 +126,6 @@ class SetupAssistant(
 
     serviceProviderRepository.deleteAll()
     authUserRepository.deleteAll()
-
   }
 
   private fun deleteAllReferralDetails() {
