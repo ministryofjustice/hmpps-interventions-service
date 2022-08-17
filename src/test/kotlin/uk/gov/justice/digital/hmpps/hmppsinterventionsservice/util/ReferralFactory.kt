@@ -172,6 +172,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     concludedAt: OffsetDateTime? = null,
 
     endOfServiceReport: EndOfServiceReport? = null,
+    completionDeadline: LocalDate? = null
   ): Referral {
     return create(
       id = id,
@@ -199,6 +200,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       concludedAt = concludedAt,
 
       endOfServiceReport = endOfServiceReport,
+      completionDeadline = completionDeadline
     )
   }
 }

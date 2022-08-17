@@ -34,6 +34,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.App
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CaseNoteRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ContractTypeRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DesiredOutcomeRepository
@@ -87,6 +88,7 @@ class SetupAssistant(
   private val appointmentDeliveryAddressRepository: AppointmentDeliveryAddressRepository,
   private val caseNoteRepository: CaseNoteRepository,
   private val referralDetailsRepository: ReferralDetailsRepository,
+  private val changeLogRepository: ChangelogRepository,
 ) {
   private val dynamicFrameworkContractFactory = DynamicFrameworkContractFactory()
   private val interventionFactory = InterventionFactory()
@@ -116,7 +118,7 @@ class SetupAssistant(
     appointmentDeliveryAddressRepository.deleteAll()
     appointmentDeliveryRepository.deleteAll()
     appointmentRepository.deleteAll()
-
+    changeLogRepository.deleteAll()
     deleteAllReferralDetails()
     referralRepository.deleteAll()
     interventionRepository.deleteAll()
@@ -124,6 +126,7 @@ class SetupAssistant(
 
     serviceProviderRepository.deleteAll()
     authUserRepository.deleteAll()
+
   }
 
   private fun deleteAllReferralDetails() {
@@ -237,7 +240,8 @@ class SetupAssistant(
         createdAt = createdAt,
         createdBy = createdBy,
         serviceUserCRN = serviceUserCRN,
-        selectedServiceCategories = selectedServiceCategories
+        selectedServiceCategories = selectedServiceCategories,
+        completionDeadline = LocalDate.now()
       )
     )
   }
@@ -245,7 +249,7 @@ class SetupAssistant(
   fun createEndedReferral(id: UUID = UUID.randomUUID(), intervention: Intervention = createIntervention(), endRequestedReason: CancellationReason? = randomCancellationReason(), endRequestedComments: String? = null): Referral {
     val ppUser = createPPUser()
     val spUser = createSPUser()
-    return referralRepository.save(referralFactory.createEnded(id = id, intervention = intervention, createdBy = ppUser, sentBy = ppUser, endRequestedBy = ppUser, assignments = listOf(ReferralAssignment(OffsetDateTime.now(), spUser, spUser)), endRequestedReason = endRequestedReason, endRequestedComments = endRequestedComments))
+    return referralRepository.save(referralFactory.createEnded(id = id, intervention = intervention, createdBy = ppUser, sentBy = ppUser, endRequestedBy = ppUser, assignments = listOf(ReferralAssignment(OffsetDateTime.now(), spUser, spUser)), endRequestedReason = endRequestedReason, endRequestedComments = endRequestedComments, completionDeadline = LocalDate.now()))
   }
 
   fun createCancelledReferral(id: UUID = UUID.randomUUID(), intervention: Intervention = createIntervention(), endRequestedReason: CancellationReason? = randomCancellationReason(), endRequestedComments: String? = null): Referral {
@@ -267,6 +271,7 @@ class SetupAssistant(
     intervention: Intervention = createIntervention(),
     ppUser: AuthUser = createPPUser(),
     sentAt: OffsetDateTime = OffsetDateTime.now()
+
   ): Referral {
     val referral = referralRepository.save(
       referralFactory.createSent(
@@ -275,6 +280,7 @@ class SetupAssistant(
         createdBy = ppUser,
         sentBy = ppUser,
         sentAt = sentAt,
+        completionDeadline = LocalDate.now()
       )
     )
     referral.supplierAssessment = createSupplierAssessment(referral = referral)
@@ -374,7 +380,8 @@ class SetupAssistant(
       referralFactory.createSent(
         id = id, intervention = intervention, createdBy = ppUser, sentBy = ppUser,
         assignments = listOf(ReferralAssignment(OffsetDateTime.now(), spUser, spUser)),
-        supplierAssessment = supplierAssessmentFactory.createWithNoAppointment()
+        supplierAssessment = supplierAssessmentFactory.createWithNoAppointment(),
+        completionDeadline = LocalDate.now()
       )
     )
   }
@@ -545,7 +552,7 @@ class SetupAssistant(
     referral.needsInterpreter = needsInterpreter
     referral.relevantSentenceId = relevantSentenceId
     referral.whenUnavailable = whenUnavailable
-
+    referral.completionDeadline = completionDeadline
     return referralRepository.save(referral).also {
       val details = referralDetailsRepository.save(
         ReferralDetails(
