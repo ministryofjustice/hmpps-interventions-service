@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.3.3"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.4.1"
   kotlin("plugin.spring") version "1.7.10"
   id("org.jetbrains.kotlin.plugin.jpa") version "1.7.10"
   id("jacoco")
@@ -67,8 +67,8 @@ dependencies {
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
-  implementation("io.sentry:sentry-spring-boot-starter:6.3.0")
-  implementation("io.sentry:sentry-logback:6.3.0")
+  implementation("io.sentry:sentry-spring-boot-starter:6.3.1")
+  implementation("io.sentry:sentry-logback:6.3.1")
   implementation("io.github.microutils:kotlin-logging-jvm:2.1.23")
   implementation("net.logstash.logback:logstash-logback-encoder:7.2")
   runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.3") // needed for OffsetDateTime for AppInsights
@@ -80,29 +80,29 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:3.17.3-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.17.238")
-  implementation("software.amazon.awssdk:s3:2.17.238")
+  implementation("software.amazon.awssdk:sns:2.17.252")
+  implementation("software.amazon.awssdk:s3:2.17.252")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-  implementation("com.nimbusds:oauth2-oidc-sdk:9.39")
+  implementation("com.nimbusds:oauth2-oidc-sdk:9.41")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("org.hibernate:hibernate-core:5.6.7.Final")
-  implementation("com.vladmihalcea:hibernate-types-52:2.17.0")
+  implementation("com.vladmihalcea:hibernate-types-52:2.17.3")
   runtimeOnly("org.flywaydb:flyway-core")
-  runtimeOnly("org.postgresql:postgresql:42.4.0")
+  runtimeOnly("org.postgresql:postgresql:42.4.1")
 
   // json and csv
   implementation("com.github.java-json-tools:json-patch:1.13")
   implementation("org.apache.commons:commons-csv:1.9.0")
 
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.3.11")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.3.14")
   testImplementation("com.squareup.okhttp3:okhttp:4.10.0")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
-  testImplementation("org.mockito:mockito-inline:4.6.1")
+  testImplementation("org.mockito:mockito-inline:4.7.0")
 }

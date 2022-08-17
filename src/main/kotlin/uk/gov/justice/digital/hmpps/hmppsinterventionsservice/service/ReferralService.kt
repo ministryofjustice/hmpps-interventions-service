@@ -194,9 +194,14 @@ class ReferralService(
       findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, true, ReferralSpecifications.currentlyAssignedTo(it))
     }
     searchText?.let {
-      findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, true, ReferralSpecifications.search(searchText))
+      findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, true, searchSpec(searchText))
     }
     return findSentReferralsSpec
+  }
+
+  private fun <T> searchSpec(searchText: String): Specification<T> {
+    return if (searchText.matches(Regex("[A-Z]{2}[0-9]{4}[A-Z]{2}"))) ReferralSpecifications.searchByReferenceNumber(searchText)
+    else ReferralSpecifications.searchByPoPName(searchText)
   }
 
   private fun <T> createSpecificationForProbationPractitionerUser(

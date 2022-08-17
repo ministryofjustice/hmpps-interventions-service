@@ -23,8 +23,7 @@ import javax.transaction.Transactional
 
 enum class AmendTopic {
   COMPLEXITY_LEVEL,
-  DESIRED_OUTCOMES,
-  COMPLETION_DATETIME
+  DESIRED_OUTCOMES
 }
 
 @Service
@@ -39,7 +38,6 @@ class AmendReferralService(
 ) {
 
   fun updateComplexityLevel(referralId: UUID, update: AmendComplexityLevelDTO, serviceCategoryId: UUID, authentication: JwtAuthenticationToken) {
-
     val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
 
     if (referral.approvedActionPlan != null) {
@@ -74,7 +72,6 @@ class AmendReferralService(
     authentication: JwtAuthenticationToken,
     serviceCategoryId: UUID
   ) {
-
     val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
 
     val desiredOutcomeIds = amendDesiredOutcomesDTO.desiredOutcomesIds
@@ -136,5 +133,10 @@ class AmendReferralService(
     val user = userMapper.fromToken(authentication)
     return referralService.getSentReferralForUser(referralId, user)
       ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "sent referral not found [id=$referralId]")
+  }
+
+  fun getListOfChangeLogEntries(referral: Referral): List<Changelog> {
+    val changeLogEntities = changelogRepository.findByReferralIdOrderByChangedAtDesc(referral.id)
+    return changeLogEntities
   }
 }

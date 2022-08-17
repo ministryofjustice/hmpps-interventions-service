@@ -34,7 +34,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.App
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CaseNoteRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ContractTypeRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DesiredOutcomeRepository
@@ -88,7 +87,6 @@ class SetupAssistant(
   private val appointmentDeliveryAddressRepository: AppointmentDeliveryAddressRepository,
   private val caseNoteRepository: CaseNoteRepository,
   private val referralDetailsRepository: ReferralDetailsRepository,
-  private val changelogRepository: ChangelogRepository
 ) {
   private val dynamicFrameworkContractFactory = DynamicFrameworkContractFactory()
   private val interventionFactory = InterventionFactory()
@@ -120,7 +118,6 @@ class SetupAssistant(
     appointmentRepository.deleteAll()
 
     deleteAllReferralDetails()
-    changelogRepository.deleteAll()
     referralRepository.deleteAll()
     interventionRepository.deleteAll()
     dynamicFrameworkContractRepository.deleteAll()
@@ -196,7 +193,7 @@ class SetupAssistant(
       ?: createDynamicFrameworkContract(
         contractType = contractType,
         primeProviderId = primeProvider.id,
-        npsRegion = region
+        npsRegion = region,
       )
 
     return interventionRepository.save(interventionFactory.create(id = id, contract = contract))
@@ -218,7 +215,7 @@ class SetupAssistant(
       contract = createDynamicFrameworkContract(
         contractType = contractType,
         primeProviderId = primeProvider.id,
-        npsRegion = region
+        npsRegion = region,
       )
     }
 
@@ -231,7 +228,7 @@ class SetupAssistant(
     createdBy: AuthUser = createPPUser(),
     createdAt: OffsetDateTime = OffsetDateTime.now(),
     serviceUserCRN: String = "X123456",
-    selectedServiceCategories: MutableSet<ServiceCategory>? = null
+    selectedServiceCategories: MutableSet<ServiceCategory>? = null,
   ): Referral {
     return referralRepository.save(
       referralFactory.createDraft(
@@ -277,7 +274,7 @@ class SetupAssistant(
         intervention = intervention,
         createdBy = ppUser,
         sentBy = ppUser,
-        sentAt = sentAt
+        sentAt = sentAt,
       )
     )
     referral.supplierAssessment = createSupplierAssessment(referral = referral)
@@ -292,7 +289,7 @@ class SetupAssistant(
     attended: Attended? = null,
     additionalAttendanceInformation: String? = null,
     attendanceBehaviour: String? = null,
-    notifyPPOfAttendanceBehaviour: Boolean? = null
+    notifyPPOfAttendanceBehaviour: Boolean? = null,
   ) {
     val appointment: Appointment = appointmentFactory.create(createdBy = createPPUser(), referral = referral)
     if (attended !== null) {
@@ -321,7 +318,7 @@ class SetupAssistant(
         secondAddressLine = appointmentDeliveryAddress.secondAddressLine,
         townCity = appointmentDeliveryAddress.townOrCity,
         county = appointmentDeliveryAddress.county,
-        postCode = appointmentDeliveryAddress.postCode
+        postCode = appointmentDeliveryAddress.postCode,
       )
       appointmentDelivery.appointmentDeliveryAddress = appointmentDeliveryAddressRepository.save(appointmentDeliveryAddress)
     }
@@ -340,7 +337,7 @@ class SetupAssistant(
     return supplierAssessmentRepository.save(
       SupplierAssessment(
         id = id,
-        referral = referral
+        referral = referral,
       )
     )
   }
@@ -351,7 +348,7 @@ class SetupAssistant(
     contractReference: String = RandomStringUtils.randomAlphanumeric(8),
     primeProviderId: String,
     subContractorServiceProviderIds: Set<String> = emptySet(),
-    npsRegion: NPSRegion = randomNPSRegion()
+    npsRegion: NPSRegion = randomNPSRegion(),
   ): DynamicFrameworkContract {
     val primeProvider = serviceProviderRepository.save(serviceProviderFactory.create(id = primeProviderId, name = primeProviderId))
     val serviceProviders = subContractorServiceProviderIds.map {
@@ -375,10 +372,7 @@ class SetupAssistant(
     val spUser = createSPUser()
     return referralRepository.save(
       referralFactory.createSent(
-        id = id,
-        intervention = intervention,
-        createdBy = ppUser,
-        sentBy = ppUser,
+        id = id, intervention = intervention, createdBy = ppUser, sentBy = ppUser,
         assignments = listOf(ReferralAssignment(OffsetDateTime.now(), spUser, spUser)),
         supplierAssessment = supplierAssessmentFactory.createWithNoAppointment()
       )
@@ -393,7 +387,7 @@ class SetupAssistant(
     referenceNumber: String,
     assignedToUsername: String? = null,
     serviceUserFirstName: String? = null,
-    serviceUserLastName: String
+    serviceUserLastName: String,
   ): Referral {
     val contractType = contractTypes["ACC"]!!
     val region = npsRegions['C']!!
@@ -402,21 +396,18 @@ class SetupAssistant(
       contractReference = "PACT_TEST",
       contractType = contractType,
       primeProviderId = primeProvider.id,
-      npsRegion = region
+      npsRegion = region,
     )
     val intervention = createIntervention(interventionTitle = interventionTitle, serviceProviderId = serviceProviderId, dynamicFrameworkContract = dynamicFrameworkContract)
     val ppUser = createPPUser()
     val spUser = if (assignedToUsername != null) createSPUser(assignedToUsername) else null
     val referral = referralRepository.save(
       referralFactory.createSent(
-        id = id,
-        intervention = intervention,
-        createdBy = ppUser,
-        sentBy = ppUser,
+        id = id, intervention = intervention, createdBy = ppUser, sentBy = ppUser,
         assignments = if (spUser != null) listOf(ReferralAssignment(OffsetDateTime.now(), spUser, spUser)) else listOf(),
         supplierAssessment = supplierAssessmentFactory.createWithNoAppointment(),
         sentAt = sentAt,
-        referenceNumber = referenceNumber
+        referenceNumber = referenceNumber,
       )
     )
     val serviceUser = serviceUserFactory.create(firstName = serviceUserFirstName, lastName = serviceUserLastName, referral = referral)
@@ -435,7 +426,7 @@ class SetupAssistant(
     submittedAt: OffsetDateTime? = null,
     submittedBy: AuthUser? = null,
     approvedAt: OffsetDateTime? = null,
-    approvedBy: AuthUser? = null
+    approvedBy: AuthUser? = null,
   ): ActionPlan {
     return actionPlanRepository.save(
       ActionPlan(
@@ -448,7 +439,7 @@ class SetupAssistant(
         submittedAt = submittedAt,
         submittedBy = submittedBy,
         approvedAt = approvedAt,
-        approvedBy = approvedBy
+        approvedBy = approvedBy,
       )
     )
   }
@@ -479,14 +470,14 @@ class SetupAssistant(
       attendanceBehaviour = behaviour,
       attendanceBehaviourSubmittedAt = if (behaviour != null) now else null,
       notifyPPOfAttendanceBehaviour = notifyPPOfBehaviour,
-      referral = referral
+      referral = referral,
     )
     appointmentRepository.save(appointment)
     if (appointmentDeliveryType != null) {
       val appointmentDelivery = appointmentDeliveryFactory.create(
         appointmentId = appointment.id,
         appointmentDeliveryType = appointmentDeliveryType,
-        appointmentSessionType = appointmentSessionType
+        appointmentSessionType = appointmentSessionType,
       )
       appointmentDeliveryRepository.save(appointmentDelivery)
       if (appointmentDeliveryAddress != null) {
@@ -496,7 +487,7 @@ class SetupAssistant(
           secondAddressLine = appointmentDeliveryAddress.secondAddressLine,
           townCity = appointmentDeliveryAddress.townOrCity,
           county = appointmentDeliveryAddress.county,
-          postCode = appointmentDeliveryAddress.postCode
+          postCode = appointmentDeliveryAddress.postCode,
         )
         appointmentDeliveryAddressRepository.save(appointmentDeliveryAddress)
       }
@@ -525,7 +516,7 @@ class SetupAssistant(
       preferredLanguage = "English",
       ethnicity = "British",
       religionOrBelief = "Agnostic",
-      disabilities = listOf("Autism spectrum condition")
+      disabilities = listOf("Autism spectrum condition"),
     ),
     accessibilityNeeds: String = "She uses a wheelchair",
     additionalNeedsInformation: String = "Alex is currently sleeping on her aunt's sofa",
@@ -537,7 +528,7 @@ class SetupAssistant(
     maximumEnforceableDays: Int = 10,
     needsInterpreter: Boolean = true,
     relevantSentenceId: Long = 2600295124,
-    whenUnavailable: String = "She works Mondays 9am - midday"
+    whenUnavailable: String = "She works Mondays 9am - midday",
   ): Referral {
     referral.selectedServiceCategories = selectedServiceCategories.toMutableSet()
     // required to satisfy foreign key constrains on desired outcomes and complexity levels
@@ -566,7 +557,7 @@ class SetupAssistant(
           "initial referral details",
           completionDeadline,
           furtherInformation,
-          maximumEnforceableDays
+          maximumEnforceableDays,
         )
       )
       it.referralDetails?.let { existingDetails ->
@@ -589,7 +580,7 @@ class SetupAssistant(
     subject: String,
     body: String,
     id: UUID = UUID.randomUUID(),
-    authUser: AuthUser = createSPUser()
+    authUser: AuthUser = createSPUser(),
   ): CaseNote {
     val caseNote = caseNoteFactory.create(id = id, referral = referral, subject = subject, body = body, sentBy = authUser)
     return caseNoteRepository.save(caseNote)

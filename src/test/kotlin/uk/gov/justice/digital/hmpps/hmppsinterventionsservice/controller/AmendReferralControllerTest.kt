@@ -12,19 +12,28 @@ import org.mockito.kotlin.whenever
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.server.ServerWebInputException
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOutcomesDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendReferralService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendTopic
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.UserDetail
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ChangeLogFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
+import java.time.OffsetDateTime
 import java.util.UUID
 
 internal class AmendReferralControllerTest {
   private val amendReferralService = mock<AmendReferralService>()
+  private val hmppsAuthService = mock<HMPPSAuthService>()
   private val amendReferralController = AmendReferralController(
-    amendReferralService
+    amendReferralService,
+    hmppsAuthService
   )
   private val tokenFactory = JwtTokenFactory()
   private val referralFactory = ReferralFactory()
@@ -54,8 +63,10 @@ internal class AmendReferralControllerTest {
     @Test
     fun `updateComplexityLevel updates referral complexity level with valid referral and fields `() {
       val complexityLevel = AmendComplexityLevelDTO(complexityUUID, "A reason for change")
-      doNothing().whenever(amendReferralService).updateComplexityLevel(eq(referral.id), eq(complexityLevel), eq(serviceCategoryUUID), eq(token))
-      val returnedValue = amendReferralController.updateComplexityLevel(referral.id, serviceCategoryUUID, complexityLevel, token)
+      doNothing().whenever(amendReferralService)
+        .updateComplexityLevel(eq(referral.id), eq(complexityLevel), eq(serviceCategoryUUID), eq(token))
+      val returnedValue =
+        amendReferralController.updateComplexityLevel(referral.id, serviceCategoryUUID, complexityLevel, token)
       assertThat(returnedValue.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
     }
   }
@@ -87,9 +98,82 @@ internal class AmendReferralControllerTest {
     @Test
     fun `amendDesiredOutcomes updates referral desired outcomes for the service category`() {
       val amendDesiredOutcomesDTO = AmendDesiredOutcomesDTO(listOf(newDesiredOutcomesUUID), "A reason for change")
-      doNothing().whenever(amendReferralService).updateReferralDesiredOutcomes(eq(referral.id), eq(amendDesiredOutcomesDTO), eq(token), eq(serviceCategoryUUID))
-      val returnedValue = amendReferralController.amendDesiredOutcomes(token, referral.id, serviceCategoryUUID, amendDesiredOutcomesDTO)
+      doNothing().whenever(amendReferralService)
+        .updateReferralDesiredOutcomes(eq(referral.id), eq(amendDesiredOutcomesDTO), eq(token), eq(serviceCategoryUUID))
+      val returnedValue =
+        amendReferralController.amendDesiredOutcomes(token, referral.id, serviceCategoryUUID, amendDesiredOutcomesDTO)
       assertThat(returnedValue.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
+    }
+  }
+
+  @Nested
+  inner class Changelog {
+    private val referral = referralFactory.createSent()
+    private val user = authUserFactory.create()
+    private val token = tokenFactory.create(userID = user.id, userName = user.userName, authSource = user.authSource)
+    private val userMapper = mock<UserMapper>()
+
+    @Test
+    fun `getChangelog returns multiple changelog entries`() {
+      whenever(
+        amendReferralService.getSentReferralForAuthenticatedUser(
+          eq(referral.id),
+          eq(token)
+        )
+      ).thenReturn(referral)
+
+      val changeLogValuesList = mutableListOf(
+        Changelog(
+          referral.id,
+          UUID.randomUUID(),
+          AmendTopic.COMPLEXITY_LEVEL,
+          ReferralAmendmentDetails(mutableListOf("a value")),
+          ReferralAmendmentDetails(mutableListOf("another value")),
+          "A reason",
+          OffsetDateTime.now(),
+          user
+        ),
+        Changelog(
+          referral.id,
+          UUID.randomUUID(),
+          AmendTopic.COMPLEXITY_LEVEL,
+          ReferralAmendmentDetails(mutableListOf("a value 2")),
+          ReferralAmendmentDetails(mutableListOf("another value 2")),
+          "Another reason",
+          OffsetDateTime.now(),
+          user
+        )
+      )
+
+      whenever(amendReferralService.getListOfChangeLogEntries(eq(referral))).thenReturn(changeLogValuesList)
+      whenever(userMapper.fromToken(any())).thenReturn(user)
+
+      val userdetail = UserDetail("firstname", "email", "lastname")
+
+      whenever(hmppsAuthService.getUserDetail(eq(user))).thenReturn(userdetail)
+
+      val returnedChangeLogObject = amendReferralController.getChangelog(referral.id, token)
+
+      assertThat(returnedChangeLogObject?.size).isEqualTo(2)
+      assertThat(returnedChangeLogObject?.get(0)?.changelogId).isEqualTo(changeLogValuesList.get(0).id)
+      assertThat(returnedChangeLogObject?.get(0)?.referralId).isEqualTo(changeLogValuesList.get(0).referralId)
+    }
+
+    @Test
+    fun `getChangelog returns no changelog entries`() {
+      whenever(
+        amendReferralService.getSentReferralForAuthenticatedUser(
+          eq(referral.id),
+          eq(token)
+        )
+      ).thenReturn(referral)
+
+      val changeLogValuesList = listOf<uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog>()
+      whenever(amendReferralService.getListOfChangeLogEntries(eq(referral))).thenReturn(changeLogValuesList)
+
+      val returnedChangeLogObject = amendReferralController.getChangelog(referral.id, token)
+
+      assertThat(returnedChangeLogObject?.size).isEqualTo(0)
     }
   }
 }

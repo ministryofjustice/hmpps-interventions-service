@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
@@ -12,7 +13,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
-import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -33,8 +33,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     complexityLevelIds: MutableMap<UUID, UUID>? = null,
     additionalRiskInformation: String? = null,
     additionalRiskInformationUpdatedAt: OffsetDateTime? = null,
-    completionDeadline: LocalDate? = null
-
+    referralDetails: ReferralDetailsDTO? = null,
   ): Referral {
     return create(
       id = id,
@@ -48,7 +47,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       complexityLevelIds = complexityLevelIds,
       additionalRiskInformation = additionalRiskInformation,
       additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt,
-      completionDeadline = completionDeadline
+      referralDetailsDTO = referralDetails,
     )
   }
 
@@ -62,15 +61,16 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     selectedServiceCategories: MutableSet<ServiceCategory>? = null,
     desiredOutcomes: List<DesiredOutcome> = emptyList(),
     actionPlans: MutableList<ActionPlan>? = mutableListOf(),
-    sentAt: OffsetDateTime? = OffsetDateTime.now(),
+    sentAt: OffsetDateTime = OffsetDateTime.now(),
     sentBy: AuthUser = authUserFactory.create(),
     referenceNumber: String? = "JS18726AC",
     supplementaryRiskId: UUID = UUID.randomUUID(),
+
     assignments: List<ReferralAssignment> = emptyList(),
+
     supplierAssessment: SupplierAssessment? = null,
     serviceUserData: ServiceUserData? = null,
     complexityLevelIds: MutableMap<UUID, UUID>? = null,
-    completionDeadline: LocalDate? = null
   ): Referral {
     return create(
       id = id,
@@ -92,7 +92,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       supplierAssessment = supplierAssessment,
       serviceUserData = serviceUserData,
       complexityLevelIds = complexityLevelIds,
-      completionDeadline = completionDeadline
+
     )
   }
 

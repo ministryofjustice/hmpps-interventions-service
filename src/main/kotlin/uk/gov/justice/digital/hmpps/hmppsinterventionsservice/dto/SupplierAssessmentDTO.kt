@@ -7,7 +7,7 @@ data class SupplierAssessmentDTO(
   val id: UUID,
   val appointments: List<AppointmentDTO>,
   val currentAppointmentId: UUID?,
-  val referralId: UUID,
+  val referralId: UUID
 ) {
   companion object {
     fun from(supplierAssessment: SupplierAssessment): SupplierAssessmentDTO {

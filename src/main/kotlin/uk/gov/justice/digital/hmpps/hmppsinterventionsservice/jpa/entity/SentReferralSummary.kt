@@ -64,7 +64,7 @@ import javax.validation.constraints.NotNull
   ]
 )
 @Entity(name = "referral")
-@Table(name = "referral", indexes = [Index(columnList = "created_by_id")])
+@Table(name = "referral", indexes = arrayOf(Index(columnList = "created_by_id")))
 class SentReferralSummary(
   @Id val id: UUID,
   @ElementCollection
