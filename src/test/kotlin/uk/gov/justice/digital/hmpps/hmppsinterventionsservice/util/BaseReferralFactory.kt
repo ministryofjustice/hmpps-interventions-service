@@ -48,6 +48,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     concludedAt: OffsetDateTime? = null,
     supplierAssessment: SupplierAssessment? = null,
     endOfServiceReport: EndOfServiceReport? = null,
+    maximumEnforceableDays: Int? = null
 
   ): Referral {
 
@@ -77,7 +78,9 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
         concludedAt = concludedAt,
         endOfServiceReport = endOfServiceReport,
         supplierAssessment = supplierAssessment,
-        completionDeadline = completionDeadline
+        completionDeadline = completionDeadline,
+        maximumEnforceableDays = maximumEnforceableDays,
+
       )
     )
     referral.selectedDesiredOutcomes = desiredOutcomes.map { SelectedDesiredOutcomesMapping(it.serviceCategoryId, it.id) }.toMutableList()

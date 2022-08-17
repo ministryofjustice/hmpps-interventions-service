@@ -33,7 +33,8 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     complexityLevelIds: MutableMap<UUID, UUID>? = null,
     additionalRiskInformation: String? = null,
     additionalRiskInformationUpdatedAt: OffsetDateTime? = null,
-    completionDeadline: LocalDate? = null
+    completionDeadline: LocalDate? = null,
+    maximumEnforceableDays: Int? = null
   ): Referral {
     return create(
       id = id,
@@ -47,7 +48,8 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       complexityLevelIds = complexityLevelIds,
       additionalRiskInformation = additionalRiskInformation,
       additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt,
-      completionDeadline = completionDeadline
+      completionDeadline = completionDeadline,
+      maximumEnforceableDays = maximumEnforceableDays
     )
   }
 
@@ -71,7 +73,8 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     supplierAssessment: SupplierAssessment? = null,
     serviceUserData: ServiceUserData? = null,
     complexityLevelIds: MutableMap<UUID, UUID>? = null,
-    completionDeadline: LocalDate? = null
+    completionDeadline: LocalDate? = null,
+    maximumEnforceableDays: Int? = null
   ): Referral {
     return create(
       id = id,
@@ -93,7 +96,8 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       supplierAssessment = supplierAssessment,
       serviceUserData = serviceUserData,
       complexityLevelIds = complexityLevelIds,
-      completionDeadline = completionDeadline
+      completionDeadline = completionDeadline,
+      maximumEnforceableDays = maximumEnforceableDays
 
     )
   }

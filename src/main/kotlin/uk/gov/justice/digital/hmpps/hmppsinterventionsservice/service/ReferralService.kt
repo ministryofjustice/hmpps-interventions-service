@@ -416,22 +416,10 @@ class ReferralService(
     if (referral.approvedActionPlan != null) {
       throw ServerWebInputException("complexity level cannot be updated: the action plan is already approved")
     }
-    val completionDeadline = referral?.completionDeadline
-    val oldValue = ReferralAmendmentDetails(listOf(completionDeadline.toString()))
-    val newValue = ReferralAmendmentDetails(listOf(update.completionDeadline.toString()))
 
-    val changelog = Changelog(
-      referral.id,
-      UUID.randomUUID(),
-      AmendTopic.COMPLETION_DATETIME,
-      oldValue,
-      newValue,
-      update.reasonForChange,
-      OffsetDateTime.now(),
-      actor
-    )
+    handleChangLog(AmendTopic.COMPLETION_DATETIME, referral, update, actor)
+    handleChangLog(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS, referral, update, actor)
 
-    changelogRepository.save(changelog)
     val isDraftUpdate = referral.sentAt == null
     val existingDetails = referralDetailsRepository.findLatestByReferralId(referral.id)
 
@@ -477,6 +465,39 @@ class ReferralService(
     }
 
     return newDetails
+  }
+  private fun proccessChangeLog(ammendTopic: AmendTopic, oldValue: ReferralAmendmentDetails, newValue: ReferralAmendmentDetails, referral: Referral, actor: AuthUser, update: UpdateReferralDetailsDTO) {
+    val changelog = Changelog(
+      referral.id,
+      UUID.randomUUID(),
+      ammendTopic,
+      oldValue,
+      newValue,
+      update.reasonForChange,
+      OffsetDateTime.now(),
+      actor
+    )
+
+    changelogRepository.save(changelog)
+  }
+
+  private fun handleChangLog(topic: AmendTopic, referral: Referral, update: UpdateReferralDetailsDTO, actor: AuthUser) {
+    when (topic) {
+      AmendTopic.COMPLETION_DATETIME -> {
+        val completionDeadline = referral?.completionDeadline
+        val oldValue = ReferralAmendmentDetails(listOf(completionDeadline.toString()))
+        val newValue = ReferralAmendmentDetails(listOf(update.completionDeadline.toString()))
+        proccessChangeLog(AmendTopic.COMPLETION_DATETIME, oldValue, newValue, referral, actor, update)
+      }
+      AmendTopic.MAXIMUM_ENFORCEABLE_DAYS -> {
+        val maximumEnforceableDays = referral?.maximumEnforceableDays
+        val oldValue = ReferralAmendmentDetails(listOf(maximumEnforceableDays.toString()))
+        val newValue = ReferralAmendmentDetails(listOf(update.maximumEnforceableDays.toString()))
+        proccessChangeLog(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS, oldValue, newValue, referral, actor, update)
+      }
+      AmendTopic.COMPLEXITY_LEVEL -> return
+      AmendTopic.DESIRED_OUTCOMES -> return
+    }
   }
 
   private fun updateServiceUserNeeds(referral: Referral, update: DraftReferralDTO) {

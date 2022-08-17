@@ -24,7 +24,8 @@ import javax.transaction.Transactional
 enum class AmendTopic {
   COMPLEXITY_LEVEL,
   DESIRED_OUTCOMES,
-  COMPLETION_DATETIME
+  COMPLETION_DATETIME,
+  MAXIMUM_ENFORCEABLE_DAYS
 }
 
 @Service
