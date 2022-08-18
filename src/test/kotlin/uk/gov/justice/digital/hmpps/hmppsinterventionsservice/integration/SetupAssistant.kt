@@ -176,6 +176,10 @@ class SetupAssistant(
     val user = AuthUser(id, "delius", "BERNARD.BEAKS")
     return authUserRepository.save(user)
   }
+  fun createPPUserSecond(id: String = "2500128586"): AuthUser {
+    val user = AuthUser(id, "delius", "joe.smith")
+    return authUserRepository.save(user)
+  }
 
   fun createSPUser(username: String = "AUTH_USER"): AuthUser {
     val user = AuthUser("608955ae-52ed-44cc-884c-011597a77949", "auth", username)
@@ -269,8 +273,8 @@ class SetupAssistant(
     id: UUID = UUID.randomUUID(),
     intervention: Intervention = createIntervention(),
     ppUser: AuthUser = createPPUser(),
-    sentAt: OffsetDateTime = OffsetDateTime.now()
-
+    sentAt: OffsetDateTime = OffsetDateTime.now(),
+    completionDeadline: LocalDate = LocalDate.now()
   ): Referral {
     val referral = referralRepository.save(
       referralFactory.createSent(
@@ -279,7 +283,7 @@ class SetupAssistant(
         createdBy = ppUser,
         sentBy = ppUser,
         sentAt = sentAt,
-        completionDeadline = LocalDate.now()
+        completionDeadline = completionDeadline
       )
     )
     referral.supplierAssessment = createSupplierAssessment(referral = referral)

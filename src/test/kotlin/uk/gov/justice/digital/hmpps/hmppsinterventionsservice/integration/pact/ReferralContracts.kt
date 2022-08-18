@@ -138,7 +138,7 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
 
   @State("There is an existing sent referral with ID of 81d754aa-d868-4347-9c0f-50690773014e")
   fun `create sent referral 81d754aa`() {
-    val referral = setupAssistant.createSentReferral(id = UUID.fromString("81d754aa-d868-4347-9c0f-50690773014e"))
+    val referral = setupAssistant.createSentReferral(id = UUID.fromString("81d754aa-d868-4347-9c0f-50690773014e"), ppUser = setupAssistant.createPPUserSecond())
     setupAssistant.fillReferralFields(referral)
   }
 
