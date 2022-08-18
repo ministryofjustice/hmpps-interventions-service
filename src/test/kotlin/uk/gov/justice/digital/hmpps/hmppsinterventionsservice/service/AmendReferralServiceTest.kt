@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOutcomesDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
@@ -103,5 +104,38 @@ class AmendReferralServiceTest @Autowired constructor(
     assertThat(newReferral.selectedDesiredOutcomes!!.size).isEqualTo(1)
     assertThat(newReferral.selectedDesiredOutcomes!![0].serviceCategoryId).isEqualTo(serviceCategory.id)
     assertThat(newReferral.selectedDesiredOutcomes!![0].desiredOutcomeId).isEqualTo(desiredOutcome2.id)
+  }
+
+  @Test
+  fun `amend needs and requirements for employment responsibilities `() {
+    val someoneElse = userFactory.create("helper_pp_user", "delius")
+    val user = userFactory.create("pp_user_1", "delius")
+
+    val referral = referralFactory.createSent(
+      hasAdditionalResponsibilities = false,
+      createdBy = someoneElse
+    )
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
+    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+
+    amendReferralService.updateAmendCaringOrEmploymentResponsibilitiesDTO(
+      referral.id,
+      AmendNeedsAndRequirementsDTO(true, "9-12AM", "needs changing"),
+      jwtAuthenticationToken
+    )
+    val changelog = entityManager.entityManager.createQuery("FROM Changelog u WHERE u.referralId = :referralId")
+      .setParameter("referralId", referral.id)
+      .singleResult as Changelog
+
+    assertThat(changelog.newVal.values.size).isEqualTo(2)
+    assertThat(changelog.newVal.values).contains("true", "9-12AM")
+    assertThat(changelog.oldVal.values).contains("false")
+
+    assertThat(changelog.reasonForChange).isEqualTo("needs changing")
+
+    val newReferral = referralRepository.findById(referral.id).get()
+
+    assertThat(newReferral.hasAdditionalResponsibilities).isTrue
+    assertThat(newReferral.whenUnavailable).isEqualTo("9-12AM")
   }
 }

@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller
 
 import mu.KLogging
+import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.ResponseEntity
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOutcomesDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogValuesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthService
@@ -42,6 +44,20 @@ class AmendReferralController(
     @RequestBody request: AmendDesiredOutcomesDTO
   ): ResponseEntity<Any> {
     amendReferralService.updateReferralDesiredOutcomes(referralId, request, authentication, serviceCategoryId)
+    return ResponseEntity(NO_CONTENT)
+  }
+
+  @PostMapping("/sent-referral/{referralId}/amend-needs-and-requirements/{needsAndRequirementsType}")
+  fun amendNeedsAndRequirements(
+    authentication: JwtAuthenticationToken,
+    @PathVariable referralId: UUID,
+    @PathVariable needsAndRequirementsType: String,
+    @RequestBody request: AmendNeedsAndRequirementsDTO
+  ): ResponseEntity<Any> {
+    when (needsAndRequirementsType) {
+      "additional-responsibilities" -> amendReferralService.updateAmendCaringOrEmploymentResponsibilitiesDTO(referralId, request, authentication)
+      else -> return ResponseEntity("No accepted needs and requirements type", BAD_REQUEST)
+    }
     return ResponseEntity(NO_CONTENT)
   }
 

@@ -116,6 +116,7 @@ notify:
     enforceable-days-updated: "eef5834f-3a33-46e1-a937-a8bf0e3320c0"
     complexity-level-changed: "824900b1-7c06-4594-984d-310b1b46098a"
     desired-outcome-changed: "817ce0e0-3efd-4bc9-a65d-e3e32e78c404"
+    needs-and-requirements-outcome-changed: "41d31358-1e87-41e4-a84f-10006cf64423"
 
 interventions-ui:
   locations:
