@@ -9,6 +9,7 @@ import org.springframework.web.server.ServerWebInputException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOutcomesDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
@@ -23,9 +24,10 @@ import javax.transaction.Transactional
 
 enum class AmendTopic {
   COMPLEXITY_LEVEL,
-  DESIRED_OUTCOMES,
   COMPLETION_DATETIME,
-  MAXIMUM_ENFORCEABLE_DAYS
+  MAXIMUM_ENFORCEABLE_DAYS,
+  DESIRED_OUTCOMES,
+  NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES
 }
 
 @Service
@@ -131,6 +133,39 @@ class AmendReferralService(
     referralEventPublisher.referralDesiredOutcomesChangedEvent(savedReferral)
   }
 
+  fun updateAmendCaringOrEmploymentResponsibilitiesDTO(
+    referralId: UUID,
+    amendNeedsAndRequirementsDTO: AmendNeedsAndRequirementsDTO,
+    authentication: JwtAuthenticationToken
+  ) {
+    val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
+
+    val oldValues = mutableListOf<String>()
+    if (referral.hasAdditionalResponsibilities != null) oldValues.add(referral.hasAdditionalResponsibilities.toString())
+    if (referral.whenUnavailable != null) oldValues.add(referral.whenUnavailable!!)
+
+    val newValues = mutableListOf<String>()
+    newValues.add(amendNeedsAndRequirementsDTO.hasAdditionalResponsibilities.toString())
+    if (amendNeedsAndRequirementsDTO.whenUnavailable != null) newValues.add(amendNeedsAndRequirementsDTO.whenUnavailable)
+
+    referral.hasAdditionalResponsibilities = amendNeedsAndRequirementsDTO.hasAdditionalResponsibilities
+    referral.whenUnavailable = amendNeedsAndRequirementsDTO.whenUnavailable
+
+    val changelog = Changelog(
+      referral.id,
+      UUID.randomUUID(),
+      AmendTopic.NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES,
+      ReferralAmendmentDetails(values = oldValues),
+      ReferralAmendmentDetails(values = newValues),
+      amendNeedsAndRequirementsDTO.reasonForChange,
+      OffsetDateTime.now(),
+      userMapper.fromToken(authentication)
+    )
+    changelogRepository.save(changelog)
+    val savedReferral = referralRepository.save(referral)
+    referralEventPublisher.referralNeedsAndRequirementsChangedEvent(savedReferral)
+  }
+
   fun getSentReferralForAuthenticatedUser(referralId: UUID, authentication: JwtAuthenticationToken): Referral {
     val user = userMapper.fromToken(authentication)
     return referralService.getSentReferralForUser(referralId, user)
@@ -138,7 +173,6 @@ class AmendReferralService(
   }
 
   fun getListOfChangeLogEntries(referral: Referral): List<Changelog> {
-    val changeLogEntities = changelogRepository.findByReferralIdOrderByChangedAtDesc(referral.id)
-    return changeLogEntities
+    return changelogRepository.findByReferralIdOrderByChangedAtDesc(referral.id)
   }
 }
