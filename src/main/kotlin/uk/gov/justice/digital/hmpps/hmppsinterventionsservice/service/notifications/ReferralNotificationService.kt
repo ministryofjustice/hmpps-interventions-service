@@ -102,20 +102,6 @@ class ReferralNotificationService(
         )
       }
 
-      ReferralEventType.DESIRED_OUTCOMES_AMENDED -> {
-        val userDetails = hmppsAuthService.getUserDetail(event.referral.currentAssignee!!)
-        val location = generateResourceUrl(interventionsUIBaseURL, spReferralDetailsLocation, event.referral.id)
-        emailSender.sendEmail(
-          desiredOutcomesAmendTemplateID,
-          userDetails.email,
-          mapOf(
-            "sp_first_name" to userDetails.firstName,
-            "referral_number" to event.referral.referenceNumber!!,
-            "referral" to location.toString()
-          )
-        )
-      }
-
       ReferralEventType.DETAILS_AMENDED -> {
         handleDetailsChangedEvent(event)
       }
