@@ -413,10 +413,6 @@ class ReferralService(
       return null
     }
 
-    if (referral.approvedActionPlan != null) {
-      throw ServerWebInputException("complexity level cannot be updated: the action plan is already approved")
-    }
-
     handleChangLog(AmendTopic.COMPLETION_DATETIME, referral, update, actor)
     handleChangLog(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS, referral, update, actor)
 
