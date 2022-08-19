@@ -108,7 +108,7 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
       id = referralID,
       createdAt = createdAt,
       createdBy = createdBy,
-      completionDeadline = LocalDate.of(2021, 2, 12),
+      referralDetail = referralDetailsFactory.create(completionDeadline = LocalDate.of(2021, 2, 12), createdBy = createdBy, createdAt = createdAt, referralId = referralID)
     )
 
     val out = json.write(DraftReferralDTO.from(referral))
@@ -168,7 +168,8 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
 
     @Test
     fun `test serialization of additionalRiskInformation in sent referrals`() {
-      val referral = referralFactory.createSent(id = UUID.fromString("3b9ed289-8412-41a9-8291-45e33e60276c"))
+      val id = UUID.fromString("3b9ed289-8412-41a9-8291-45e33e60276c")
+      val referral = referralFactory.createSent(id = id)
 
       val out = json.forView(Views.SentReferral::class.java)
         .write(DraftReferralDTO.from(referral))

@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfSe
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SelectedDesiredOutcomesMapping
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
@@ -39,16 +40,15 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     referenceNumber: String? = null,
     supplementaryRiskId: UUID? = null,
     assignments: List<ReferralAssignment> = emptyList(),
-
     endRequestedAt: OffsetDateTime? = null,
     endRequestedBy: AuthUser? = null,
     endRequestedReason: CancellationReason? = null,
     endRequestedComments: String? = null,
-
+    referralDetails: ReferralDetails? = null,
     concludedAt: OffsetDateTime? = null,
     supplierAssessment: SupplierAssessment? = null,
     endOfServiceReport: EndOfServiceReport? = null,
-    maximumEnforceableDays: Int? = null
+    maximumEnforceableDays: Int? = null,
 
   ): Referral {
 
@@ -80,6 +80,21 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
         supplierAssessment = supplierAssessment,
         completionDeadline = completionDeadline,
         maximumEnforceableDays = maximumEnforceableDays,
+        referralDetailsHistory = if (referralDetails != null) setOf(
+          referralDetails.let {
+            ReferralDetails(
+              UUID.randomUUID(),
+              null,
+              it!!.referralId,
+              createdAt,
+              createdBy.id,
+              "initial referral details",
+              it.completionDeadline,
+              it.furtherInformation,
+              it.maximumEnforceableDays,
+            )
+          }
+        ) else emptySet()
 
       )
     )

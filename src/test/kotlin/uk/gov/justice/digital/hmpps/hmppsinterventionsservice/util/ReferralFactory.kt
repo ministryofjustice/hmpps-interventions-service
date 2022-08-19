@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfSe
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
@@ -20,6 +21,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
   private val authUserFactory = AuthUserFactory(em)
   private val interventionFactory = InterventionFactory(em)
   private val cancellationReasonFactory = CancellationReasonFactory(em)
+  private val referalDetailsFactory = ReferralDetailsFactory(em)
 
   fun createDraft(
     id: UUID = UUID.randomUUID(),
@@ -34,7 +36,8 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     additionalRiskInformation: String? = null,
     additionalRiskInformationUpdatedAt: OffsetDateTime? = null,
     completionDeadline: LocalDate? = null,
-    maximumEnforceableDays: Int? = null
+    maximumEnforceableDays: Int? = null,
+    referralDetail: ReferralDetails? = null
   ): Referral {
     return create(
       id = id,
@@ -49,7 +52,8 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       additionalRiskInformation = additionalRiskInformation,
       additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt,
       completionDeadline = completionDeadline,
-      maximumEnforceableDays = maximumEnforceableDays
+      maximumEnforceableDays = maximumEnforceableDays,
+      referralDetails = referralDetail
     )
   }
 
@@ -74,7 +78,9 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     serviceUserData: ServiceUserData? = null,
     complexityLevelIds: MutableMap<UUID, UUID>? = null,
     completionDeadline: LocalDate? = null,
-    maximumEnforceableDays: Int? = null
+    maximumEnforceableDays: Int? = null,
+    referralDetail: ReferralDetails? = null,
+
   ): Referral {
     return create(
       id = id,
@@ -91,7 +97,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       sentBy = sentBy,
       referenceNumber = referenceNumber,
       supplementaryRiskId = supplementaryRiskId,
-
+      referralDetails = referralDetail,
       assignments = assignments,
       supplierAssessment = supplierAssessment,
       serviceUserData = serviceUserData,
