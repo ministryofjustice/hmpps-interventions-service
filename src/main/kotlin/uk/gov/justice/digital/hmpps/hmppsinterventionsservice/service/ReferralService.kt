@@ -466,9 +466,9 @@ class ReferralService(
 
     return newDetails
   }
-  private fun proccessChangeLog(ammendTopic: AmendTopic, oldValue: ReferralAmendmentDetails, newValue: ReferralAmendmentDetails, referral: Referral, actor: AuthUser, update: UpdateReferralDetailsDTO) {
+  private fun proccessChangeLog(ammendTopic: AmendTopic, oldValue: ReferralAmendmentDetails, newValue: ReferralAmendmentDetails, referralId: UUID, actor: AuthUser, update: UpdateReferralDetailsDTO) {
     val changelog = Changelog(
-      referral.id,
+      referralId,
       UUID.randomUUID(),
       ammendTopic,
       oldValue,
@@ -487,13 +487,13 @@ class ReferralService(
         val completionDeadline = referral?.completionDeadline
         val oldValue = ReferralAmendmentDetails(listOf(completionDeadline.toString()))
         val newValue = ReferralAmendmentDetails(listOf(update.completionDeadline.toString()))
-        proccessChangeLog(AmendTopic.COMPLETION_DATETIME, oldValue, newValue, referral, actor, update)
+        proccessChangeLog(AmendTopic.COMPLETION_DATETIME, oldValue, newValue, referral.id, actor, update)
       }
       AmendTopic.MAXIMUM_ENFORCEABLE_DAYS -> {
         val maximumEnforceableDays = referral?.maximumEnforceableDays
         val oldValue = ReferralAmendmentDetails(listOf(maximumEnforceableDays.toString()))
         val newValue = ReferralAmendmentDetails(listOf(update.maximumEnforceableDays.toString()))
-        proccessChangeLog(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS, oldValue, newValue, referral, actor, update)
+        proccessChangeLog(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS, oldValue, newValue, referral.id, actor, update)
       }
       AmendTopic.COMPLEXITY_LEVEL -> return
       AmendTopic.DESIRED_OUTCOMES -> return

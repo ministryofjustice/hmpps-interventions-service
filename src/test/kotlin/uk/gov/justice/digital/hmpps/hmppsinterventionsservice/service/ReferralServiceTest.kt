@@ -23,15 +23,18 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessFilter
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceProviderAccessScope
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceProviderAccessScopeMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceUserAccessChecker
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserTypeChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.ValidationError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DraftReferralDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
@@ -60,6 +63,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ContractTypeF
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFrameworkContractFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralDetailsFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SentReferralSummariesFactory
@@ -87,6 +91,8 @@ class ReferralServiceTest @Autowired constructor(
   val actionPlanRepository: ActionPlanRepository,
   val endOfServiceReportRepository: EndOfServiceReportRepository,
   val serviceCategoryRepository: ServiceCategoryRepository,
+  val referralDetailsRepository: ReferralDetailsRepository,
+  val changelogRepository: ChangelogRepository
 ) {
 
   private val userFactory = AuthUserFactory(entityManager)
@@ -104,6 +110,7 @@ class ReferralServiceTest @Autowired constructor(
   private val appointmentFactory = AppointmentFactory(entityManager)
   private val supplierAssessmentFactory = SupplierAssessmentFactory(entityManager)
   private val serviceUserDataFactory = ServiceUserFactory(entityManager)
+  private val referralDetailsFactory = ReferralDetailsFactory(entityManager)
 
   private val referralEventPublisher: ReferralEventPublisher = mock()
   private val referenceGenerator: ReferralReferenceGenerator = spy(ReferralReferenceGenerator())
@@ -120,9 +127,10 @@ class ReferralServiceTest @Autowired constructor(
   private val hmppsAuthService: HMPPSAuthService = mock()
   private val telemetryService: TelemetryService = mock()
   private val draftOasysRiskInformationService: DraftOasysRiskInformationService = mock()
-  private val referralDetailsRepository: ReferralDetailsRepository = mock()
+
   private val recursiveComparisonConfigurationBuilder = RecursiveComparisonConfiguration.builder()
-  private val changelogRepository: ChangelogRepository = mock()
+  private val userMapper: UserMapper = mock()
+  private val jwtAuthentionToken: JwtAuthenticationToken = mock()
 
   private val referralService = ReferralService(
     referralRepository,
@@ -160,9 +168,14 @@ class ReferralServiceTest @Autowired constructor(
       )
     }
   }
-
   @AfterEach
   fun `clear referrals`() {
+    entityManager.flush()
+
+    interventionRepository.deleteAll()
+    referralDetailsRepository.deleteAll()
+    authUserRepository.deleteAll()
+    changelogRepository.deleteAll()
     referralRepository.deleteAll()
   }
 
@@ -1383,5 +1396,89 @@ class ReferralServiceTest @Autowired constructor(
     val isUserTheResponsibleOfficer = referralService.isUserTheResponsibleOfficer(responsibleProbationPractitioner, authUser)
 
     assertFalse(isUserTheResponsibleOfficer)
+  }
+
+  @Test
+  fun `updateReferralDetails updates futher information and completion deadline update when referral details exists`() {
+    val authUser = AuthUser("123457", "delius", "bernard.beaks")
+    val user = userFactory.create("pp_user_1", "delius")
+    val description = ""
+    val id = UUID.randomUUID()
+    val completionDateToChange = LocalDate.of(2022, 7, 1)
+    val intervention = interventionFactory.create(description = description)
+    val referral = referralFactory.createSent(
+      createdAt = OffsetDateTime.now(),
+      createdBy = user,
+      id = id,
+      sentAt = null,
+      serviceUserCRN = "crn",
+      intervention = intervention,
+      completionDeadline = LocalDate.of(2022, 2, 2),
+      maximumEnforceableDays = 3
+
+    )
+    referralDetailsFactory.create(referralId = id, createdAt = OffsetDateTime.now(), createdBy = authUser, id = UUID.randomUUID(), completionDeadline = LocalDate.of(2022, 8, 2), saved = true)
+    whenever(userMapper.fromToken(jwtAuthentionToken)).thenReturn(authUser)
+
+    val referralToUpdate = UpdateReferralDetailsDTO(20, completionDateToChange, "new information", "we decided 10 days wasn't enough")
+    var referralDetailsReturned = referralService.updateReferralDetails(referral, referralToUpdate, user)
+    val referralDetailsValue = referralService.getReferralDetailsById(referralDetailsReturned?.id)
+    val changeLogReturned = changelogRepository.findAll().filter { x -> x.referralId == id }
+
+    assertThat(referralDetailsValue?.referralId).isEqualTo(referral.id)
+    assertThat(referralToUpdate.furtherInformation).isEqualTo(referralDetailsValue?.furtherInformation)
+    assertThat(referralToUpdate.completionDeadline).isEqualTo(referralDetailsValue?.completionDeadline)
+    assertThat(referralToUpdate.maximumEnforceableDays).isEqualTo(referralDetailsValue?.maximumEnforceableDays)
+
+    assertThat(changeLogReturned?.firstOrNull()?.referralId).isEqualTo(referral.id)
+    assertThat(changeLogReturned?.firstOrNull()?.newVal).isNotNull
+    assertThat(changeLogReturned?.firstOrNull()?.newVal?.values).isNotEmpty
+    assertThat(changeLogReturned?.firstOrNull()?.newVal?.values?.get(0)).isEqualTo(referralDetailsValue?.completionDeadline.toString())
+    assertThat(changeLogReturned?.firstOrNull()?.oldVal).isNotNull
+    assertThat(changeLogReturned?.firstOrNull()?.oldVal?.values).isNotEmpty
+    assertThat(changeLogReturned?.firstOrNull()?.oldVal?.values?.get(0)).isEqualTo(referral.completionDeadline.toString())
+    assertThat(changeLogReturned?.firstOrNull()?.reasonForChange).isNotBlank
+    assertThat(changeLogReturned?.firstOrNull()?.topic).isEqualTo(AmendTopic.COMPLETION_DATETIME)
+
+    assertThat(changeLogReturned?.lastOrNull()?.referralId).isEqualTo(referral.id)
+    assertThat(changeLogReturned?.lastOrNull()?.newVal).isNotNull
+    assertThat(changeLogReturned?.lastOrNull()?.newVal?.values).isNotEmpty
+    assertThat(changeLogReturned?.lastOrNull()?.newVal?.values?.get(0)).isEqualTo(referralDetailsValue?.maximumEnforceableDays.toString())
+    assertThat(changeLogReturned?.lastOrNull()?.oldVal).isNotNull
+    assertThat(changeLogReturned?.lastOrNull()?.oldVal?.values).isNotEmpty
+    assertThat(changeLogReturned?.lastOrNull()?.oldVal?.values?.get(0)).isEqualTo(referral.maximumEnforceableDays.toString())
+    assertThat(changeLogReturned?.lastOrNull()?.reasonForChange).isNotBlank
+    assertThat(changeLogReturned?.lastOrNull()?.topic).isEqualTo(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS)
+  }
+
+  @Test
+  fun `updateReferralDetails updates futher information and completion deadline update when referral details doesnt exists`() {
+    val authUser = AuthUser("123457", "delius", "bernard.beaks")
+    val user = userFactory.create("pp_user_1", "delius")
+    val description = ""
+    val id = UUID.randomUUID()
+    val completionDate = LocalDate.of(2022, 3, 28)
+    val completionDateToChange = LocalDate.of(2022, 7, 1)
+    val intervention = interventionFactory.create(description = description)
+
+    val referral = referralFactory.createSent(
+      createdAt = OffsetDateTime.now(),
+      createdBy = user,
+      id = id,
+      sentAt = OffsetDateTime.now(),
+      serviceUserCRN = "crn",
+      intervention = intervention,
+      completionDeadline = completionDate
+    )
+    whenever(userMapper.fromToken(jwtAuthentionToken)).thenReturn(authUser)
+
+    val referralToUpdate = UpdateReferralDetailsDTO(20, completionDateToChange, "new information", "we decided 10 days wasn't enough")
+    var referralDetailsReturned = referralService.updateReferralDetails(referral, referralToUpdate, user)
+    val referralDetailsValue = referralService.getReferralDetailsById(referralDetailsReturned?.id)
+
+    assertThat(referralDetailsValue?.referralId).isEqualTo(referral.id)
+    assertThat(referralToUpdate.completionDeadline).isEqualTo(referralDetailsValue?.completionDeadline)
+    assertThat(referralToUpdate.reasonForChange).isEqualTo(referralDetailsValue?.reasonForChange)
+    assertThat(referralToUpdate.furtherInformation).isEqualTo(referralDetailsValue?.furtherInformation)
   }
 }
