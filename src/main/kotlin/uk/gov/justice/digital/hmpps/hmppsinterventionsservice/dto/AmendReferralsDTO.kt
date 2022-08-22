@@ -29,3 +29,9 @@ data class AmendDesiredOutcomesDTO(
   val desiredOutcomesIds: List<UUID>,
   val reasonForChange: String
 )
+
+data class AmendNeedsAndRequirementsDTO(
+  val hasAdditionalResponsibilities: Boolean,
+  val whenUnavailable: String? = null,
+  val reasonForChange: String
+)

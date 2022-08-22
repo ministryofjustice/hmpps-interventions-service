@@ -62,6 +62,8 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     desiredOutcomes: List<DesiredOutcome> = emptyList(),
     actionPlans: MutableList<ActionPlan>? = mutableListOf(),
     sentAt: OffsetDateTime = OffsetDateTime.now(),
+    hasAdditionalResponsibilities: Boolean? = false,
+    whenUnavailable: String? = null,
     sentBy: AuthUser = authUserFactory.create(),
     referenceNumber: String? = "JS18726AC",
     supplementaryRiskId: UUID = UUID.randomUUID(),
@@ -87,6 +89,8 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       sentBy = sentBy,
       referenceNumber = referenceNumber,
       supplementaryRiskId = supplementaryRiskId,
+      hasAdditionalResponsibilities = hasAdditionalResponsibilities,
+      whenUnavailable = whenUnavailable,
 
       assignments = assignments,
       supplierAssessment = supplierAssessment,

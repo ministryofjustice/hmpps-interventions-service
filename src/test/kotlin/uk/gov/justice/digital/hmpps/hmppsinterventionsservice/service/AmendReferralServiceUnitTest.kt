@@ -19,6 +19,7 @@ import org.springframework.web.server.ServerWebInputException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOutcomesDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
@@ -382,6 +383,75 @@ class AmendReferralServiceUnitTest {
         )
       }
       assertThat(e.reason).isEqualTo("complexity level cannot be updated: the action plan is already approved")
+    }
+  }
+
+  @Nested
+  inner class UpdateNeedsAndRequirementsCaringOrEmploymentResponsibilities() {
+
+    val authUser = AuthUser("CRN123", "auth", "user")
+
+    @Test
+    fun `has additional responsibilities is being amended to true and unavailability time is updated`() {
+
+      whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
+
+      val referral = referralFactory.createSent(
+        hasAdditionalResponsibilities = false
+      )
+      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+      whenever(referralRepository.save(any())).thenReturn(referral)
+
+      val updateToReferral = AmendNeedsAndRequirementsDTO(hasAdditionalResponsibilities = true, whenUnavailable = "9-12AM", reasonForChange = "additional responsibilities changed")
+
+      amendReferralService.updateAmendCaringOrEmploymentResponsibilitiesDTO(referral.id, updateToReferral, jwtAuthenticationToken)
+
+      val argumentCaptorReferral = argumentCaptor<Referral>()
+      verify(referralRepository, atLeast(1)).save(argumentCaptorReferral.capture())
+
+      val referralValues = argumentCaptorReferral.firstValue
+      assertThat(referralValues.hasAdditionalResponsibilities).isTrue
+      assertThat(referralValues.whenUnavailable).isEqualTo("9-12AM")
+
+      val argumentCaptorChangelog = argumentCaptor<Changelog>()
+      verify(changelogRepository, atLeast(1)).save(argumentCaptorChangelog.capture())
+
+      val changeLogValues = argumentCaptorChangelog.firstValue
+      assertThat(changeLogValues.id).isNotNull
+      assertThat(changeLogValues.newVal.values).contains("true", "9-12AM")
+      assertThat(changeLogValues.oldVal.values).contains("false")
+    }
+
+    @Test
+    fun `has additional responsibilities is being amended to false and unavailability time is set to null`() {
+
+      whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
+
+      val referral = referralFactory.createSent(
+        hasAdditionalResponsibilities = true,
+        whenUnavailable = "9-12AM"
+      )
+      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+      whenever(referralRepository.save(any())).thenReturn(referral)
+
+      val updateToReferral = AmendNeedsAndRequirementsDTO(hasAdditionalResponsibilities = false, reasonForChange = "additional responsibilities changed")
+
+      amendReferralService.updateAmendCaringOrEmploymentResponsibilitiesDTO(referral.id, updateToReferral, jwtAuthenticationToken)
+
+      val argumentCaptorReferral = argumentCaptor<Referral>()
+      verify(referralRepository, atLeast(1)).save(argumentCaptorReferral.capture())
+
+      val referralValues = argumentCaptorReferral.firstValue
+      assertThat(referralValues.hasAdditionalResponsibilities).isFalse()
+      assertThat(referralValues.whenUnavailable).isNull()
+
+      val argumentCaptorChangelog = argumentCaptor<Changelog>()
+      verify(changelogRepository, atLeast(1)).save(argumentCaptorChangelog.capture())
+
+      val changeLogValues = argumentCaptorChangelog.firstValue
+      assertThat(changeLogValues.id).isNotNull
+      assertThat(changeLogValues.newVal.values).contains("false")
+      assertThat(changeLogValues.oldVal.values).contains("true", "9-12AM")
     }
   }
 }

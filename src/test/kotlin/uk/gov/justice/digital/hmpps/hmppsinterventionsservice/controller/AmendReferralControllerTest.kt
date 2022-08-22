@@ -15,6 +15,7 @@ import org.springframework.web.server.ServerWebInputException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOutcomesDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendReferralService
@@ -103,6 +104,33 @@ internal class AmendReferralControllerTest {
       val returnedValue =
         amendReferralController.amendDesiredOutcomes(token, referral.id, serviceCategoryUUID, amendDesiredOutcomesDTO)
       assertThat(returnedValue.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
+    }
+  }
+
+  @Nested
+  inner class AmendNeedsAndRequirements {
+    private val referral = referralFactory.createSent()
+    private val user = authUserFactory.create()
+    private val token = tokenFactory.create(userID = user.id, userName = user.userName, authSource = user.authSource)
+
+    @Test
+    fun `amendNeedsAndRequirements updates details in referral for the correct type`() {
+      val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(true, "9-12AM", "A reason for change")
+      doNothing().whenever(amendReferralService)
+        .updateAmendCaringOrEmploymentResponsibilitiesDTO(eq(referral.id), eq(amendNeedsAndRequirementsDTO), eq(token))
+      val returnedValue =
+        amendReferralController.amendNeedsAndRequirements(token, referral.id, "additional-responsibilities", amendNeedsAndRequirementsDTO)
+      assertThat(returnedValue.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
+    }
+
+    @Test
+    fun `amendNeedsAndRequirements returns bad request for incorrect correct type`() {
+      val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(true, "9-12AM", "A reason for change")
+      doNothing().whenever(amendReferralService)
+        .updateAmendCaringOrEmploymentResponsibilitiesDTO(eq(referral.id), eq(amendNeedsAndRequirementsDTO), eq(token))
+      val returnedValue =
+        amendReferralController.amendNeedsAndRequirements(token, referral.id, "non-existing-type", amendNeedsAndRequirementsDTO)
+      assertThat(returnedValue.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
     }
   }
 

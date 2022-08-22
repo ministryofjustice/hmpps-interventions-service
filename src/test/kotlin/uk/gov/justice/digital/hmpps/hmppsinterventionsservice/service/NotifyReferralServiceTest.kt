@@ -63,6 +63,7 @@ class NotifyReferralServiceTest {
     return ReferralNotificationService(
       "complexityLevelTemplateID",
       "desiredOutcomesAmendTemplateID",
+      "needsAndRequirementsAmendTemplateID",
       "referralSentTemplateID",
       "referralAssignedTemplateID",
       "completionDeadlineUpdatedTemplateID",
