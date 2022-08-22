@@ -27,7 +27,9 @@ enum class AmendTopic {
   COMPLETION_DATETIME,
   MAXIMUM_ENFORCEABLE_DAYS,
   DESIRED_OUTCOMES,
-  NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES
+  NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES,
+  NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS,
+
 }
 
 @Service
@@ -174,5 +176,37 @@ class AmendReferralService(
 
   fun getListOfChangeLogEntries(referral: Referral): List<Changelog> {
     return changelogRepository.findByReferralIdOrderByChangedAtDesc(referral.id)
+  }
+
+  fun updateAmendAccessibilityNeedsDTO( referralId: UUID,
+                                        amendNeedsAndRequirementsDTO: AmendNeedsAndRequirementsDTO,
+                                        authentication: JwtAuthenticationToken) {
+
+    val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
+
+    val oldValues = mutableListOf<String>()
+    if (referral.accessibilityNeeds != null) oldValues.add(referral.accessibilityNeeds.toString())
+    if (referral.whenUnavailable != null) oldValues.add(referral.whenUnavailable!!)
+
+    val newValues = mutableListOf<String>()
+    newValues.add(amendNeedsAndRequirementsDTO.hasAdditionalResponsibilities.toString())
+    if (amendNeedsAndRequirementsDTO.whenUnavailable != null) newValues.add(amendNeedsAndRequirementsDTO.whenUnavailable)
+
+    referral.hasAdditionalResponsibilities = amendNeedsAndRequirementsDTO.hasAdditionalResponsibilities
+    referral.whenUnavailable = amendNeedsAndRequirementsDTO.whenUnavailable
+
+    val changelog = Changelog(
+      referral.id,
+      UUID.randomUUID(),
+      AmendTopic.NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS,
+      ReferralAmendmentDetails(values = oldValues),
+      ReferralAmendmentDetails(values = newValues),
+      amendNeedsAndRequirementsDTO.reasonForChange,
+      OffsetDateTime.now(),
+      userMapper.fromToken(authentication)
+    )
+    changelogRepository.save(changelog)
+    val savedReferral = referralRepository.save(referral)
+    referralEventPublisher.referralNeedsAndRequirementsChangedEvent(savedReferral)
   }
 }
