@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
+import java.net.URI
 import mu.KLogging
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationListener
@@ -18,7 +19,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.AsyncEve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
-import java.net.URI
 
 interface NotifyService {
   fun generateResourceUrl(baseURL: String, path: String, vararg args: Any): URI {
@@ -135,6 +135,7 @@ class NotifyActionPlanAppointmentService(
         ppSessionFeedbackLocation,
         event.referral.id,
         event.deliverySession.sessionNumber,
+        event.deliverySession.deliusAppointmentId!!,
       )
 
       when (event.type) {

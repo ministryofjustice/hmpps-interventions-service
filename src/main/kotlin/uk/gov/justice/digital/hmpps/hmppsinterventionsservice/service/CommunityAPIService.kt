@@ -214,7 +214,7 @@ class CommunityAPIActionPlanAppointmentEventService(
         }
         val url = UriComponentsBuilder.fromHttpUrl(interventionsUIBaseURL)
           .path(ppSessionFeedbackLocation)
-          .buildAndExpand(event.referral.id, event.deliverySession.sessionNumber)
+          .buildAndExpand(event.referral.id, event.deliverySession.sessionNumber, event.deliverySession.deliusAppointmentId!!)
           .toString()
 
         val notifyPP = setNotifyPPIfRequired(event.deliverySession)
