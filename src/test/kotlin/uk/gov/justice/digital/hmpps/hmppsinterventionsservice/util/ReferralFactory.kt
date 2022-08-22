@@ -79,6 +79,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     supplierAssessment: SupplierAssessment? = null,
     serviceUserData: ServiceUserData? = null,
     complexityLevelIds: MutableMap<UUID, UUID>? = null,
+    accessibilityNeeds: String? = null,
     completionDeadline: LocalDate? = null,
     maximumEnforceableDays: Int? = null,
     referralDetail: ReferralDetails? = null,
@@ -102,6 +103,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       referralDetails = referralDetail,
       hasAdditionalResponsibilities = hasAdditionalResponsibilities,
       whenUnavailable = whenUnavailable,
+      accessibilityNeeds = accessibilityNeeds,
 
       assignments = assignments,
       supplierAssessment = supplierAssessment,

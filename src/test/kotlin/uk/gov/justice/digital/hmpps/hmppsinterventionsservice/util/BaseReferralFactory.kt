@@ -15,7 +15,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Selecte
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
-import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -38,22 +37,22 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     additionalRiskInformationUpdatedAt: OffsetDateTime? = null,
     hasAdditionalResponsibilities: Boolean? = false,
     whenUnavailable: String? = null,
-    completionDeadline: LocalDate? = null,
     sentAt: OffsetDateTime? = null,
     sentBy: AuthUser? = null,
     referenceNumber: String? = null,
     supplementaryRiskId: UUID? = null,
+
     assignments: List<ReferralAssignment> = emptyList(),
+
     endRequestedAt: OffsetDateTime? = null,
     endRequestedBy: AuthUser? = null,
     endRequestedReason: CancellationReason? = null,
     endRequestedComments: String? = null,
-    referralDetails: ReferralDetails? = null,
+
     concludedAt: OffsetDateTime? = null,
     supplierAssessment: SupplierAssessment? = null,
     endOfServiceReport: EndOfServiceReport? = null,
-    maximumEnforceableDays: Int? = null,
-
+    accessibilityNeeds: String? = null,
   ): Referral {
 
     val referralDetails = referralDetailsDTO?.let {
@@ -88,6 +87,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
         additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt,
         hasAdditionalResponsibilities = hasAdditionalResponsibilities,
         whenUnavailable = whenUnavailable,
+        accessibilityNeeds = accessibilityNeeds,
         sentAt = sentAt,
         sentBy = sentBy,
         referenceNumber = referenceNumber,
@@ -100,24 +100,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
         concludedAt = concludedAt,
         endOfServiceReport = endOfServiceReport,
         supplierAssessment = supplierAssessment,
-        completionDeadline = completionDeadline,
-        maximumEnforceableDays = maximumEnforceableDays,
-        referralDetailsHistory = if (referralDetails != null) setOf(
-          referralDetails.let {
-            ReferralDetails(
-              UUID.randomUUID(),
-              null,
-              it!!.referralId,
-              createdAt,
-              createdBy.id,
-              "initial referral details",
-              it.completionDeadline,
-              it.furtherInformation,
-              it.maximumEnforceableDays,
-            )
-          }
-        ) else emptySet()
-
+        referralDetailsHistory = referralDetails?.let { setOf(it) },
       )
     )
     referral.selectedDesiredOutcomes = desiredOutcomes.map { SelectedDesiredOutcomesMapping(it.serviceCategoryId, it.id) }.toMutableList()

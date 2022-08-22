@@ -115,7 +115,7 @@ internal class AmendReferralControllerTest {
 
     @Test
     fun `amendNeedsAndRequirements updates details in referral for the correct type`() {
-      val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(true, "9-12AM", "A reason for change")
+      val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(true, "9-12AM", "", "A reason for change")
       doNothing().whenever(amendReferralService)
         .updateAmendCaringOrEmploymentResponsibilitiesDTO(eq(referral.id), eq(amendNeedsAndRequirementsDTO), eq(token))
       val returnedValue =
@@ -124,8 +124,8 @@ internal class AmendReferralControllerTest {
     }
 
     @Test
-    fun `amendNeedsAndRequirements returns bad request for incorrect correct type for amendReferralService updateAmendAccessibilityNeedsDTO`() {
-      val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(true, "9-12AM", "A reason for change")
+    fun `amendNeedsAndRequirements returns bad request for incorrect correct type for amendReferralService updateAmendCaringOrEmploymentResponsibilitiesDTO`() {
+      val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(true, "9-12AM", "", "A reason for change")
       doNothing().whenever(amendReferralService)
         .updateAmendAccessibilityNeedsDTO(eq(referral.id), eq(amendNeedsAndRequirementsDTO), eq(token))
       val returnedValue =
@@ -134,7 +134,7 @@ internal class AmendReferralControllerTest {
     }
     @Test
     fun `amendNeedsAndRequirements updates details in referral for the correct type  for amendReferralService updateAmendAccessibilityNeedsDTO`() {
-      val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(true, "9-12AM", "A reason for change")
+      val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(null, "", "school", "A reason for change")
       doNothing().whenever(amendReferralService)
         .updateAmendAccessibilityNeedsDTO(eq(referral.id), eq(amendNeedsAndRequirementsDTO), eq(token))
       val returnedValue =
@@ -144,7 +144,7 @@ internal class AmendReferralControllerTest {
 
     @Test
     fun `amendNeedsAndRequirements returns bad request for incorrect correct type  for amendReferralService updateAmendAccessibilityNeedsDTO`() {
-      val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(true, "9-12AM", "A reason for change")
+      val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(null, "", "school", "A reason for change")
       doNothing().whenever(amendReferralService)
         .updateAmendAccessibilityNeedsDTO(eq(referral.id), eq(amendNeedsAndRequirementsDTO), eq(token))
       val returnedValue =
