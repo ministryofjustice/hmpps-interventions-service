@@ -53,6 +53,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     supplierAssessment: SupplierAssessment? = null,
     endOfServiceReport: EndOfServiceReport? = null,
     accessibilityNeeds: String? = null,
+    additionalNeedsInformation: String? = null,
   ): Referral {
 
     val referralDetails = referralDetailsDTO?.let {
@@ -101,6 +102,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
         supplierAssessment = supplierAssessment,
         referralDetailsHistory = referralDetails?.let { setOf(it) },
         accessibilityNeeds = accessibilityNeeds,
+        additionalNeedsInformation = additionalNeedsInformation,
       )
     )
     referral.selectedDesiredOutcomes = desiredOutcomes.map { SelectedDesiredOutcomesMapping(it.serviceCategoryId, it.id) }.toMutableList()

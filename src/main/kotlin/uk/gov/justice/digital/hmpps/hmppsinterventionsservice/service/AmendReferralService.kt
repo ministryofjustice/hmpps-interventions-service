@@ -29,6 +29,7 @@ enum class AmendTopic {
   DESIRED_OUTCOMES,
   NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES,
   NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS,
+  NEEDS_AND_REQUIREMENTS_ADDITIONAL_INFORMATION,
 }
 
 @Service
@@ -195,6 +196,30 @@ class AmendReferralService(
       referral.id,
       UUID.randomUUID(),
       AmendTopic.NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS,
+      ReferralAmendmentDetails(values = oldValues),
+      ReferralAmendmentDetails(values = newValues),
+      amendNeedsAndRequirementsDTO.reasonForChange,
+      OffsetDateTime.now(),
+      userMapper.fromToken(authentication)
+    )
+    changelogRepository.save(changelog)
+    val savedReferral = referralRepository.save(referral)
+    referralEventPublisher.referralNeedsAndRequirementsChangedEvent(savedReferral)
+  }
+
+  fun updateAmendIdentifyNeeds(referralId: UUID, amendNeedsAndRequirementsDTO: AmendNeedsAndRequirementsDTO, authentication: JwtAuthenticationToken) {
+    val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
+    val oldValues = mutableListOf<String>()
+    if (referral.additionalNeedsInformation != null) oldValues.add(referral.additionalNeedsInformation!!)
+
+    val newValues = mutableListOf<String>()
+    if (amendNeedsAndRequirementsDTO.additionalNeedsInformation != null) newValues.add(amendNeedsAndRequirementsDTO.additionalNeedsInformation!!)
+    referral.additionalNeedsInformation = amendNeedsAndRequirementsDTO.additionalNeedsInformation
+
+    val changelog = Changelog(
+      referral.id,
+      UUID.randomUUID(),
+      AmendTopic.NEEDS_AND_REQUIREMENTS_ADDITIONAL_INFORMATION,
       ReferralAmendmentDetails(values = oldValues),
       ReferralAmendmentDetails(values = newValues),
       amendNeedsAndRequirementsDTO.reasonForChange,
