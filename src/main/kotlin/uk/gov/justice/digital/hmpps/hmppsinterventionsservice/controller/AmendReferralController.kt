@@ -57,6 +57,7 @@ class AmendReferralController(
     when (needsAndRequirementsType) {
       "additional-responsibilities" -> amendReferralService.updateAmendCaringOrEmploymentResponsibilities(referralId, request, authentication)
       "accessibility_needs" -> amendReferralService.updateAmendAccessibilityNeeds(referralId, request, authentication)
+      "identify_needs" -> amendReferralService.updateAmendIdentifyNeeds(referralId, request, authentication)
       else -> return ResponseEntity("No accepted needs and requirements type", BAD_REQUEST)
     }
     return ResponseEntity(NO_CONTENT)

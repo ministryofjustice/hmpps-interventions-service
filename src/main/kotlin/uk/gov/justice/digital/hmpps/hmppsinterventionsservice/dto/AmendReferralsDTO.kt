@@ -34,5 +34,6 @@ data class AmendNeedsAndRequirementsDTO(
   val hasAdditionalResponsibilities: Boolean? = null,
   val whenUnavailable: String? = null,
   var accessibilityNeeds: String? = null,
+  var additionalNeedsInformation: String? = null,
   val reasonForChange: String
 )
