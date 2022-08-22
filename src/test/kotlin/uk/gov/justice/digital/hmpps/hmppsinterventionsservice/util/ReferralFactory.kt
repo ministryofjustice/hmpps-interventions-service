@@ -103,7 +103,6 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       referralDetails = referralDetail,
       hasAdditionalResponsibilities = hasAdditionalResponsibilities,
       whenUnavailable = whenUnavailable,
-      accessibilityNeeds = accessibilityNeeds,
 
       assignments = assignments,
       supplierAssessment = supplierAssessment,
