@@ -4,8 +4,12 @@ SELECT ct.name                                                                  
      , COUNT(r.id) FILTER ( WHERE r.sent_at NOTNULL )                            AS received
      , COUNT(r.id) FILTER ( WHERE r.sent_at NOTNULL AND r.concluded_at ISNULL )  AS in_progress
      , COUNT(r.id) FILTER ( WHERE r.sent_at NOTNULL AND r.concluded_at NOTNULL ) AS finished
-     , ROUND(100.0 * COUNT(r.id) FILTER ( WHERE r.sent_at NOTNULL AND r.concluded_at ISNULL ) /
-             COUNT(r.id) FILTER ( WHERE r.sent_at NOTNULL ), 2)                  AS in_progress_percent
+     , CASE WHEN COUNT(r.id) FILTER ( WHERE r.sent_at NOTNULL ) > 0
+     	   THEN ROUND(100.0 * COUNT(r.id) FILTER ( WHERE r.sent_at NOTNULL AND r.concluded_at ISNULL ) /
+	             COUNT(r.id) FILTER ( WHERE r.sent_at NOTNULL ), 2)       
+	   ELSE 0.00
+       END
+                                                                                 AS in_progress_percent
 FROM referral r
          JOIN intervention i ON r.intervention_id = i.id
          JOIN dynamic_framework_contract c ON i.dynamic_framework_contract_id = c.id
