@@ -87,7 +87,6 @@ class DeliverySessionService(
       if (it.appointmentTime.isAfter(appointmentTime)) {
         throw EntityExistsException("can't schedule new appointment for session; new appointment occurs before previously scheduled appointment for session [referralId=$referralId, sessionNumber=$sessionNumber]")
       }
-
       val sentAtAtStartOfDay = getReferral(referralId).sentAt?.withHour(0)?.withMinute(0)?.withSecond(1)
 
       if (it.appointmentTime.isBefore(sentAtAtStartOfDay)) {
@@ -110,6 +109,7 @@ class DeliverySessionService(
       appointmentTime = appointmentTime,
       durationInMinutes = durationInMinutes,
       referral = session.referral,
+      superseded = session.appointments.size >= 1
     )
     return scheduleDeliverySessionAppointment(
       session, appointment, existingAppointment, appointmentTime, durationInMinutes, appointmentDeliveryType, createdBy, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode, attended, additionalAttendanceInformation, notifyProbationPractitioner, behaviourDescription
@@ -221,7 +221,9 @@ class DeliverySessionService(
       deliusAppointmentId = deliusAppointmentId,
       createdAt = OffsetDateTime.now(),
       createdBy = existingAppointment?.createdBy ?: authUserRepository.save(updatedBy),
-      referral = existingAppointment?.referral ?: session.referral
+      referral = existingAppointment?.referral ?: session.referral,
+      superseded = session.appointments.size >= 1
+
     )
 
     appointmentRepository.saveAndFlush(appointment)
