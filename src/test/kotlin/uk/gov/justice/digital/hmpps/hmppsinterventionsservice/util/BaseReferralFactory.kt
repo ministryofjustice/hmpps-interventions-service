@@ -52,6 +52,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     concludedAt: OffsetDateTime? = null,
     supplierAssessment: SupplierAssessment? = null,
     endOfServiceReport: EndOfServiceReport? = null,
+    accessibilityNeeds: String? = null,
   ): Referral {
 
     val referralDetails = referralDetailsDTO?.let {
@@ -86,6 +87,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
         additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt,
         hasAdditionalResponsibilities = hasAdditionalResponsibilities,
         whenUnavailable = whenUnavailable,
+        accessibilityNeeds = accessibilityNeeds,
         sentAt = sentAt,
         sentBy = sentBy,
         referenceNumber = referenceNumber,

@@ -27,7 +27,6 @@ enum class AmendTopic {
   DESIRED_OUTCOMES,
   NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES,
   NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS,
-
 }
 
 @Service
@@ -176,22 +175,20 @@ class AmendReferralService(
     return changelogRepository.findByReferralIdOrderByChangedAtDesc(referral.id)
   }
 
-  fun updateAmendAccessibilityNeedsDTO( referralId: UUID,
-                                        amendNeedsAndRequirementsDTO: AmendNeedsAndRequirementsDTO,
-                                        authentication: JwtAuthenticationToken) {
+  fun updateAmendAccessibilityNeedsDTO(
+    referralId: UUID,
+    amendNeedsAndRequirementsDTO: AmendNeedsAndRequirementsDTO,
+    authentication: JwtAuthenticationToken
+  ) {
 
     val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
 
     val oldValues = mutableListOf<String>()
     if (referral.accessibilityNeeds != null) oldValues.add(referral.accessibilityNeeds.toString())
-    if (referral.whenUnavailable != null) oldValues.add(referral.whenUnavailable!!)
 
     val newValues = mutableListOf<String>()
-    newValues.add(amendNeedsAndRequirementsDTO.hasAdditionalResponsibilities.toString())
-    if (amendNeedsAndRequirementsDTO.whenUnavailable != null) newValues.add(amendNeedsAndRequirementsDTO.whenUnavailable)
-
-    referral.hasAdditionalResponsibilities = amendNeedsAndRequirementsDTO.hasAdditionalResponsibilities
-    referral.whenUnavailable = amendNeedsAndRequirementsDTO.whenUnavailable
+    newValues.add(amendNeedsAndRequirementsDTO.accessibilityNeeds.toString())
+    referral.accessibilityNeeds = amendNeedsAndRequirementsDTO.accessibilityNeeds
 
     val changelog = Changelog(
       referral.id,
