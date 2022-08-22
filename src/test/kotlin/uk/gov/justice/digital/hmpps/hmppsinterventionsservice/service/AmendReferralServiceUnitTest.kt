@@ -404,7 +404,7 @@ class AmendReferralServiceUnitTest {
 
       val updateToReferral = AmendNeedsAndRequirementsDTO(hasAdditionalResponsibilities = true, whenUnavailable = "9-12AM", reasonForChange = "additional responsibilities changed")
 
-      amendReferralService.updateAmendCaringOrEmploymentResponsibilitiesDTO(referral.id, updateToReferral, jwtAuthenticationToken)
+      amendReferralService.updateAmendCaringOrEmploymentResponsibilities(referral.id, updateToReferral, jwtAuthenticationToken)
 
       val argumentCaptorReferral = argumentCaptor<Referral>()
       verify(referralRepository, atLeast(1)).save(argumentCaptorReferral.capture())
@@ -436,7 +436,7 @@ class AmendReferralServiceUnitTest {
 
       val updateToReferral = AmendNeedsAndRequirementsDTO(hasAdditionalResponsibilities = false, reasonForChange = "additional responsibilities changed")
 
-      amendReferralService.updateAmendCaringOrEmploymentResponsibilitiesDTO(referral.id, updateToReferral, jwtAuthenticationToken)
+      amendReferralService.updateAmendCaringOrEmploymentResponsibilities(referral.id, updateToReferral, jwtAuthenticationToken)
 
       val argumentCaptorReferral = argumentCaptor<Referral>()
       verify(referralRepository, atLeast(1)).save(argumentCaptorReferral.capture())
@@ -453,5 +453,34 @@ class AmendReferralServiceUnitTest {
       assertThat(changeLogValues.newVal.values).contains("false")
       assertThat(changeLogValues.oldVal.values).contains("true", "9-12AM")
     }
+  }
+
+  @Test
+  fun `has accessibility needs is being amended and updated`() {
+    val authUser = AuthUser("CRN123", "auth", "user")
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
+
+    val referral = referralFactory.createSent(
+      accessibilityNeeds = "schools"
+    )
+    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+    whenever(referralRepository.save(any())).thenReturn(referral)
+
+    val updateToReferral = AmendNeedsAndRequirementsDTO(accessibilityNeeds = "school", reasonForChange = "accessibility need changed")
+
+    amendReferralService.updateAmendAccessibilityNeeds(referral.id, updateToReferral, jwtAuthenticationToken)
+
+    val argumentCaptorReferral = argumentCaptor<Referral>()
+    verify(referralRepository, atLeast(1)).save(argumentCaptorReferral.capture())
+
+    val referralValues = argumentCaptorReferral.firstValue
+    assertThat(referralValues.accessibilityNeeds).isEqualTo("school")
+
+    val argumentCaptorChangelog = argumentCaptor<Changelog>()
+    verify(changelogRepository, atLeast(1)).save(argumentCaptorChangelog.capture())
+
+    val changeLogValues = argumentCaptorChangelog.firstValue
+    assertThat(changeLogValues.id).isNotNull
+    assertThat(changeLogValues.newVal.values).contains("school")
   }
 }

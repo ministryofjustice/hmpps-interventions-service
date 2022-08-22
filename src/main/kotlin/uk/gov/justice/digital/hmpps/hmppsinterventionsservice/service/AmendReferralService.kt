@@ -25,7 +25,8 @@ import javax.transaction.Transactional
 enum class AmendTopic {
   COMPLEXITY_LEVEL,
   DESIRED_OUTCOMES,
-  NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES
+  NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES,
+  NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS,
 }
 
 @Service
@@ -131,7 +132,7 @@ class AmendReferralService(
     referralEventPublisher.referralDesiredOutcomesChangedEvent(savedReferral)
   }
 
-  fun updateAmendCaringOrEmploymentResponsibilitiesDTO(
+  fun updateAmendCaringOrEmploymentResponsibilities(
     referralId: UUID,
     amendNeedsAndRequirementsDTO: AmendNeedsAndRequirementsDTO,
     authentication: JwtAuthenticationToken
@@ -172,5 +173,34 @@ class AmendReferralService(
 
   fun getListOfChangeLogEntries(referral: Referral): List<Changelog> {
     return changelogRepository.findByReferralIdOrderByChangedAtDesc(referral.id)
+  }
+
+  fun updateAmendAccessibilityNeeds(
+    referralId: UUID,
+    amendNeedsAndRequirementsDTO: AmendNeedsAndRequirementsDTO,
+    authentication: JwtAuthenticationToken
+  ) {
+
+    val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
+    val oldValues = mutableListOf<String>()
+    if (referral.accessibilityNeeds != null) oldValues.add(referral.accessibilityNeeds!!)
+
+    val newValues = mutableListOf<String>()
+    if (amendNeedsAndRequirementsDTO.accessibilityNeeds != null) newValues.add(amendNeedsAndRequirementsDTO.accessibilityNeeds!!)
+    referral.accessibilityNeeds = amendNeedsAndRequirementsDTO.accessibilityNeeds
+
+    val changelog = Changelog(
+      referral.id,
+      UUID.randomUUID(),
+      AmendTopic.NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS,
+      ReferralAmendmentDetails(values = oldValues),
+      ReferralAmendmentDetails(values = newValues),
+      amendNeedsAndRequirementsDTO.reasonForChange,
+      OffsetDateTime.now(),
+      userMapper.fromToken(authentication)
+    )
+    changelogRepository.save(changelog)
+    val savedReferral = referralRepository.save(referral)
+    referralEventPublisher.referralNeedsAndRequirementsChangedEvent(savedReferral)
   }
 }

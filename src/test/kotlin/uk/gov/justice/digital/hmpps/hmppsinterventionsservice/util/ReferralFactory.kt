@@ -73,6 +73,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     supplierAssessment: SupplierAssessment? = null,
     serviceUserData: ServiceUserData? = null,
     complexityLevelIds: MutableMap<UUID, UUID>? = null,
+    accessibilityNeeds: String? = null,
   ): Referral {
     return create(
       id = id,
@@ -96,6 +97,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       supplierAssessment = supplierAssessment,
       serviceUserData = serviceUserData,
       complexityLevelIds = complexityLevelIds,
+      accessibilityNeeds = accessibilityNeeds,
 
     )
   }
