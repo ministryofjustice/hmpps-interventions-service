@@ -31,7 +31,8 @@ data class AmendDesiredOutcomesDTO(
 )
 
 data class AmendNeedsAndRequirementsDTO(
-  val hasAdditionalResponsibilities: Boolean,
+  val hasAdditionalResponsibilities: Boolean? = null,
   val whenUnavailable: String? = null,
+  var accessibilityNeeds: String? = null,
   val reasonForChange: String
 )

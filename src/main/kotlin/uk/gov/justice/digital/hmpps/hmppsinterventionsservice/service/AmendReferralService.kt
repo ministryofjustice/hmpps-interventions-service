@@ -27,7 +27,6 @@ enum class AmendTopic {
   DESIRED_OUTCOMES,
   NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES,
   NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS,
-
 }
 
 @Service
@@ -133,7 +132,7 @@ class AmendReferralService(
     referralEventPublisher.referralDesiredOutcomesChangedEvent(savedReferral)
   }
 
-  fun updateAmendCaringOrEmploymentResponsibilitiesDTO(
+  fun updateAmendCaringOrEmploymentResponsibilities(
     referralId: UUID,
     amendNeedsAndRequirementsDTO: AmendNeedsAndRequirementsDTO,
     authentication: JwtAuthenticationToken
@@ -176,22 +175,19 @@ class AmendReferralService(
     return changelogRepository.findByReferralIdOrderByChangedAtDesc(referral.id)
   }
 
-  fun updateAmendAccessibilityNeedsDTO( referralId: UUID,
-                                        amendNeedsAndRequirementsDTO: AmendNeedsAndRequirementsDTO,
-                                        authentication: JwtAuthenticationToken) {
+  fun updateAmendAccessibilityNeeds(
+    referralId: UUID,
+    amendNeedsAndRequirementsDTO: AmendNeedsAndRequirementsDTO,
+    authentication: JwtAuthenticationToken
+  ) {
 
     val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
-
     val oldValues = mutableListOf<String>()
-    if (referral.accessibilityNeeds != null) oldValues.add(referral.accessibilityNeeds.toString())
-    if (referral.whenUnavailable != null) oldValues.add(referral.whenUnavailable!!)
+    if (referral.accessibilityNeeds != null) oldValues.add(referral.accessibilityNeeds!!)
 
     val newValues = mutableListOf<String>()
-    newValues.add(amendNeedsAndRequirementsDTO.hasAdditionalResponsibilities.toString())
-    if (amendNeedsAndRequirementsDTO.whenUnavailable != null) newValues.add(amendNeedsAndRequirementsDTO.whenUnavailable)
-
-    referral.hasAdditionalResponsibilities = amendNeedsAndRequirementsDTO.hasAdditionalResponsibilities
-    referral.whenUnavailable = amendNeedsAndRequirementsDTO.whenUnavailable
+    if (amendNeedsAndRequirementsDTO.accessibilityNeeds != null) newValues.add(amendNeedsAndRequirementsDTO.accessibilityNeeds!!)
+    referral.accessibilityNeeds = amendNeedsAndRequirementsDTO.accessibilityNeeds
 
     val changelog = Changelog(
       referral.id,
