@@ -120,7 +120,7 @@ class AmendReferralServiceTest @Autowired constructor(
 
     amendReferralService.updateAmendCaringOrEmploymentResponsibilitiesDTO(
       referral.id,
-      AmendNeedsAndRequirementsDTO(true, "9-12AM", "", "needs changing"),
+      AmendNeedsAndRequirementsDTO(true, "9-12AM", "needs changing"),
       jwtAuthenticationToken
     )
     val changelog = entityManager.entityManager.createQuery("FROM Changelog u WHERE u.referralId = :referralId")
@@ -137,32 +137,5 @@ class AmendReferralServiceTest @Autowired constructor(
 
     assertThat(newReferral.hasAdditionalResponsibilities).isTrue
     assertThat(newReferral.whenUnavailable).isEqualTo("9-12AM")
-  }
-  @Test
-  fun `amend needs and requirements for accessibility needs `() {
-    val someoneElse = userFactory.create("helper_pp_user", "delius")
-    val user = userFactory.create("pp_user_1", "delius")
-
-    val referral = referralFactory.createSent(
-      accessibilityNeeds = "schools",
-      createdBy = someoneElse
-    )
-    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
-
-    amendReferralService.updateAmendAccessibilityNeedsDTO(
-      referral.id,
-      AmendNeedsAndRequirementsDTO(accessibilityNeeds = "Home", reasonForChange = "needs changing"),
-      jwtAuthenticationToken
-    )
-    val changelog = entityManager.entityManager.createQuery("FROM Changelog u WHERE u.referralId = :referralId")
-      .setParameter("referralId", referral.id)
-      .singleResult as Changelog
-
-    assertThat(changelog.newVal.values.size).isEqualTo(1)
-    assertThat(changelog.newVal.values).contains("Home")
-    assertThat(changelog.reasonForChange).isEqualTo("needs changing")
-    val newReferral = referralRepository.findById(referral.id).get()
-    assertThat(newReferral.accessibilityNeeds).isEqualTo("Home")
   }
 }
