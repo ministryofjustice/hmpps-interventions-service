@@ -135,6 +135,7 @@ class NotifyActionPlanAppointmentService(
         ppSessionFeedbackLocation,
         event.referral.id,
         event.deliverySession.sessionNumber,
+        event.deliverySession.deliusAppointmentId!!,
       )
 
       when (event.type) {

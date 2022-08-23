@@ -34,6 +34,7 @@ class NotifyActionPlanAppointmentServiceTest {
       type,
       deliverySessionFactory.createAttended(
         id = UUID.fromString("42c7d267-0776-4272-a8e8-a673bfe30d0d"),
+        deliusAppointmentId = 12345L,
         referral = SampleData.sampleReferral(
           "X123456",
           "Harmony Living",
@@ -52,13 +53,12 @@ class NotifyActionPlanAppointmentServiceTest {
       "http://localhost:8080/appointment/42c7d267-0776-4272-a8e8-a673bfe30d0d"
     )
   }
-
   private fun notifyService(): NotifyActionPlanAppointmentService {
     return NotifyActionPlanAppointmentService(
       "template",
       "template",
       "http://example.com",
-      "/pp/referrals/{id}/appointment/sessionNumber/{sessionNumber}/feedback",
+      "/pp/referrals/{id}/session/{sessionNumber}/appointment/{appointmentId}/feedback",
       emailSender,
       referralService,
     )
@@ -88,7 +88,7 @@ class NotifyActionPlanAppointmentServiceTest {
     verify(emailSender).sendEmail(eq("template"), eq("abc@abc.com"), personalisationCaptor.capture())
     Assertions.assertThat(personalisationCaptor.firstValue["ppFirstName"]).isEqualTo("abc")
     Assertions.assertThat(personalisationCaptor.firstValue["referenceNumber"]).isEqualTo("HAS71263")
-    Assertions.assertThat(personalisationCaptor.firstValue["attendanceUrl"]).isEqualTo("http://example.com/pp/referrals/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080/appointment/sessionNumber/1/feedback")
+    Assertions.assertThat(personalisationCaptor.firstValue["attendanceUrl"]).isEqualTo("http://example.com/pp/referrals/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080/session/1/appointment/12345/feedback")
   }
 
   @Test
@@ -115,6 +115,6 @@ class NotifyActionPlanAppointmentServiceTest {
     verify(emailSender).sendEmail(eq("template"), eq("abc@abc.com"), personalisationCaptor.capture())
     Assertions.assertThat(personalisationCaptor.firstValue["ppFirstName"]).isEqualTo("abc")
     Assertions.assertThat(personalisationCaptor.firstValue["referenceNumber"]).isEqualTo("HAS71263")
-    Assertions.assertThat(personalisationCaptor.firstValue["sessionUrl"]).isEqualTo("http://example.com/pp/referrals/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080/appointment/sessionNumber/1/feedback")
+    Assertions.assertThat(personalisationCaptor.firstValue["sessionUrl"]).isEqualTo("http://example.com/pp/referrals/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080/session/1/appointment/12345/feedback")
   }
 }
