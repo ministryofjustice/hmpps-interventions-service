@@ -404,7 +404,7 @@ class AmendReferralServiceUnitTest {
 
       val updateToReferral = AmendNeedsAndRequirementsDTO(hasAdditionalResponsibilities = true, whenUnavailable = "9-12AM", reasonForChange = "additional responsibilities changed")
 
-      amendReferralService.updateAmendCaringOrEmploymentResponsibilities(referral.id, updateToReferral, jwtAuthenticationToken)
+      amendReferralService.amendCaringOrEmploymentResponsibilities(referral.id, updateToReferral, jwtAuthenticationToken)
 
       val argumentCaptorReferral = argumentCaptor<Referral>()
       verify(referralRepository, atLeast(1)).save(argumentCaptorReferral.capture())
@@ -436,7 +436,7 @@ class AmendReferralServiceUnitTest {
 
       val updateToReferral = AmendNeedsAndRequirementsDTO(hasAdditionalResponsibilities = false, reasonForChange = "additional responsibilities changed")
 
-      amendReferralService.updateAmendCaringOrEmploymentResponsibilities(referral.id, updateToReferral, jwtAuthenticationToken)
+      amendReferralService.amendCaringOrEmploymentResponsibilities(referral.id, updateToReferral, jwtAuthenticationToken)
 
       val argumentCaptorReferral = argumentCaptor<Referral>()
       verify(referralRepository, atLeast(1)).save(argumentCaptorReferral.capture())
@@ -468,7 +468,7 @@ class AmendReferralServiceUnitTest {
 
     val updateToReferral = AmendNeedsAndRequirementsDTO(accessibilityNeeds = "school", reasonForChange = "accessibility need changed")
 
-    amendReferralService.updateAmendAccessibilityNeeds(referral.id, updateToReferral, jwtAuthenticationToken)
+    amendReferralService.amendAccessibilityNeeds(referral.id, updateToReferral, jwtAuthenticationToken)
 
     val argumentCaptorReferral = argumentCaptor<Referral>()
     verify(referralRepository, atLeast(1)).save(argumentCaptorReferral.capture())
@@ -497,7 +497,7 @@ class AmendReferralServiceUnitTest {
 
     val updateToReferral = AmendNeedsAndRequirementsDTO(additionalNeedsInformation = "school", reasonForChange = "identify need changed")
 
-    amendReferralService.updateAmendIdentifyNeeds(referral.id, updateToReferral, jwtAuthenticationToken)
+    amendReferralService.amendIdentifyNeeds(referral.id, updateToReferral, jwtAuthenticationToken)
 
     val argumentCaptorReferral = argumentCaptor<Referral>()
     verify(referralRepository, atLeast(1)).save(argumentCaptorReferral.capture())
@@ -531,7 +531,7 @@ class AmendReferralServiceUnitTest {
 
       val updateToReferral = AmendNeedsAndRequirementsDTO(needsInterpreter = true, interpreterLanguage = "Yoruba", reasonForChange = "interpreter required changing")
 
-      amendReferralService.updateAmendInterpreterRequired(referral.id, updateToReferral, jwtAuthenticationToken)
+      amendReferralService.amendInterpreterRequired(referral.id, updateToReferral, jwtAuthenticationToken)
 
       val argumentCaptorReferral = argumentCaptor<Referral>()
       verify(referralRepository, atLeast(1)).save(argumentCaptorReferral.capture())
@@ -563,7 +563,7 @@ class AmendReferralServiceUnitTest {
 
       val updateToReferral = AmendNeedsAndRequirementsDTO(needsInterpreter = false, reasonForChange = "interpreter required changing")
 
-      amendReferralService.updateAmendInterpreterRequired(referral.id, updateToReferral, jwtAuthenticationToken)
+      amendReferralService.amendInterpreterRequired(referral.id, updateToReferral, jwtAuthenticationToken)
 
       val argumentCaptorReferral = argumentCaptor<Referral>()
       verify(referralRepository, atLeast(1)).save(argumentCaptorReferral.capture())

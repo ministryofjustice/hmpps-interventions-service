@@ -118,9 +118,9 @@ class AmendReferralServiceTest @Autowired constructor(
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
     whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
 
-    amendReferralService.updateAmendCaringOrEmploymentResponsibilities(
+    amendReferralService.amendCaringOrEmploymentResponsibilities(
       referral.id,
-      AmendNeedsAndRequirementsDTO(true, "9-12AM", "", "", null, "", "needs changing"),
+      AmendNeedsAndRequirementsDTO(hasAdditionalResponsibilities = true, whenUnavailable = "9-12AM", reasonForChange = "needs changing"),
       jwtAuthenticationToken
     )
     val changelog = entityManager.entityManager.createQuery("FROM Changelog u WHERE u.referralId = :referralId")
@@ -150,7 +150,7 @@ class AmendReferralServiceTest @Autowired constructor(
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
     whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
 
-    amendReferralService.updateAmendAccessibilityNeeds(
+    amendReferralService.amendAccessibilityNeeds(
       referral.id,
       AmendNeedsAndRequirementsDTO(accessibilityNeeds = "Home", reasonForChange = "needs changing"),
       jwtAuthenticationToken
@@ -178,7 +178,7 @@ class AmendReferralServiceTest @Autowired constructor(
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
     whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
 
-    amendReferralService.updateAmendIdentifyNeeds(
+    amendReferralService.amendIdentifyNeeds(
       referral.id,
       AmendNeedsAndRequirementsDTO(additionalNeedsInformation = "Home", reasonForChange = "needs changing"),
       jwtAuthenticationToken
@@ -206,7 +206,7 @@ class AmendReferralServiceTest @Autowired constructor(
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
     whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
 
-    amendReferralService.updateAmendInterpreterRequired(
+    amendReferralService.amendInterpreterRequired(
       referral.id,
       AmendNeedsAndRequirementsDTO(needsInterpreter = true, interpreterLanguage = "Yoruba", reasonForChange = "needs changing"),
       jwtAuthenticationToken

@@ -136,7 +136,7 @@ class AmendReferralService(
     referralEventPublisher.referralDesiredOutcomesChangedEvent(savedReferral)
   }
 
-  fun updateAmendCaringOrEmploymentResponsibilities(
+  fun amendCaringOrEmploymentResponsibilities(
     referralId: UUID,
     amendNeedsAndRequirementsDTO: AmendNeedsAndRequirementsDTO,
     authentication: JwtAuthenticationToken
@@ -144,12 +144,12 @@ class AmendReferralService(
     val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
 
     val oldValues = mutableListOf<String>()
-    if (referral.hasAdditionalResponsibilities != null) oldValues.add(referral.hasAdditionalResponsibilities.toString())
-    if (referral.whenUnavailable != null) oldValues.add(referral.whenUnavailable!!)
+    referral.hasAdditionalResponsibilities?.let { oldValues.add(referral.hasAdditionalResponsibilities.toString()) }
+    referral.whenUnavailable ?.let { oldValues.add(referral.whenUnavailable!!) }
 
     val newValues = mutableListOf<String>()
     newValues.add(amendNeedsAndRequirementsDTO.hasAdditionalResponsibilities.toString())
-    if (amendNeedsAndRequirementsDTO.whenUnavailable != null) newValues.add(amendNeedsAndRequirementsDTO.whenUnavailable)
+    amendNeedsAndRequirementsDTO.whenUnavailable ?.let { newValues.add(amendNeedsAndRequirementsDTO.whenUnavailable) }
 
     referral.hasAdditionalResponsibilities = amendNeedsAndRequirementsDTO.hasAdditionalResponsibilities
     referral.whenUnavailable = amendNeedsAndRequirementsDTO.whenUnavailable
@@ -179,7 +179,7 @@ class AmendReferralService(
     return changelogRepository.findByReferralIdOrderByChangedAtDesc(referral.id)
   }
 
-  fun updateAmendAccessibilityNeeds(
+  fun amendAccessibilityNeeds(
     referralId: UUID,
     amendNeedsAndRequirementsDTO: AmendNeedsAndRequirementsDTO,
     authentication: JwtAuthenticationToken
@@ -187,10 +187,11 @@ class AmendReferralService(
 
     val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
     val oldValues = mutableListOf<String>()
-    if (referral.accessibilityNeeds != null) oldValues.add(referral.accessibilityNeeds!!)
+
+    referral.accessibilityNeeds?.let { oldValues.add(referral.accessibilityNeeds!!) }
 
     val newValues = mutableListOf<String>()
-    if (amendNeedsAndRequirementsDTO.accessibilityNeeds != null) newValues.add(amendNeedsAndRequirementsDTO.accessibilityNeeds!!)
+    amendNeedsAndRequirementsDTO.accessibilityNeeds?.let { newValues.add(amendNeedsAndRequirementsDTO.accessibilityNeeds!!) }
     referral.accessibilityNeeds = amendNeedsAndRequirementsDTO.accessibilityNeeds
 
     val changelog = Changelog(
@@ -208,13 +209,13 @@ class AmendReferralService(
     referralEventPublisher.referralNeedsAndRequirementsChangedEvent(savedReferral)
   }
 
-  fun updateAmendIdentifyNeeds(referralId: UUID, amendNeedsAndRequirementsDTO: AmendNeedsAndRequirementsDTO, authentication: JwtAuthenticationToken) {
+  fun amendIdentifyNeeds(referralId: UUID, amendNeedsAndRequirementsDTO: AmendNeedsAndRequirementsDTO, authentication: JwtAuthenticationToken) {
     val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
     val oldValues = mutableListOf<String>()
-    if (referral.additionalNeedsInformation != null) oldValues.add(referral.additionalNeedsInformation!!)
+    referral.additionalNeedsInformation?.let { oldValues.add(referral.additionalNeedsInformation!!) }
 
     val newValues = mutableListOf<String>()
-    if (amendNeedsAndRequirementsDTO.additionalNeedsInformation != null) newValues.add(amendNeedsAndRequirementsDTO.additionalNeedsInformation!!)
+    amendNeedsAndRequirementsDTO.additionalNeedsInformation?.let { newValues.add(amendNeedsAndRequirementsDTO.additionalNeedsInformation!!) }
     referral.additionalNeedsInformation = amendNeedsAndRequirementsDTO.additionalNeedsInformation
 
     val changelog = Changelog(
@@ -232,16 +233,16 @@ class AmendReferralService(
     referralEventPublisher.referralNeedsAndRequirementsChangedEvent(savedReferral)
   }
 
-  fun updateAmendInterpreterRequired(referralId: UUID, amendNeedsAndRequirementsDTO: AmendNeedsAndRequirementsDTO, authentication: JwtAuthenticationToken) {
+  fun amendInterpreterRequired(referralId: UUID, amendNeedsAndRequirementsDTO: AmendNeedsAndRequirementsDTO, authentication: JwtAuthenticationToken) {
 
     val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
     val oldValues = mutableListOf<String>()
-    if (referral.needsInterpreter != null) oldValues.add(referral.needsInterpreter.toString())
-    if (referral.interpreterLanguage != null) oldValues.add(referral.interpreterLanguage!!)
+    referral.needsInterpreter?.let { oldValues.add(referral.needsInterpreter.toString()) }
+    referral.interpreterLanguage ?.let { oldValues.add(referral.interpreterLanguage!!) }
 
     val newValues = mutableListOf<String>()
     newValues.add(amendNeedsAndRequirementsDTO.needsInterpreter.toString())
-    if (amendNeedsAndRequirementsDTO.interpreterLanguage != null) newValues.add(amendNeedsAndRequirementsDTO.interpreterLanguage!!)
+    amendNeedsAndRequirementsDTO.interpreterLanguage ?.let { newValues.add(amendNeedsAndRequirementsDTO.interpreterLanguage!!) }
 
     referral.needsInterpreter = amendNeedsAndRequirementsDTO.needsInterpreter
     referral.interpreterLanguage = amendNeedsAndRequirementsDTO.interpreterLanguage
