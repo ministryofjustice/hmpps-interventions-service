@@ -82,6 +82,22 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
         supplierAssessment = supplierAssessment,
         accessibilityNeeds = accessibilityNeeds,
         additionalNeedsInformation = additionalNeedsInformation,
+        referralDetailsHistory = if (referralDetails != null) setOf(
+          referralDetails.let {
+            ReferralDetails(
+              UUID.randomUUID(),
+              null,
+              it!!.referralId,
+              createdAt,
+              createdBy.id,
+              "initial referral details",
+              it.completionDeadline,
+              it.furtherInformation,
+              it.maximumEnforceableDays,
+            )
+          }
+        ) else emptySet()
+
       )
     )
     referral.selectedDesiredOutcomes = desiredOutcomes.map { SelectedDesiredOutcomesMapping(it.serviceCategoryId, it.id) }.toMutableList()
