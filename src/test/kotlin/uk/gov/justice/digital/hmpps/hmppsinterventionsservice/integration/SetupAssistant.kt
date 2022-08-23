@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils
 import org.springframework.data.repository.findByIdOrNull
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AddressDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlanActivity
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
@@ -12,6 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attende
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CaseNote
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ContractType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DeliverySession
@@ -51,6 +53,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentDe
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentDeliveryFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.CaseNoteFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ChangeLogFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFrameworkContractFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
@@ -101,6 +104,7 @@ class SetupAssistant(
   private val supplierAssessmentFactory = SupplierAssessmentFactory()
   private val serviceUserFactory = ServiceUserFactory()
   private val caseNoteFactory = CaseNoteFactory()
+  private val changelogFactory = ChangeLogFactory()
 
   val serviceCategories = serviceCategoryRepository.findAll().associateBy { it.name }
   val npsRegions = npsRegionRepository.findAll().associateBy { it.id }
@@ -246,6 +250,17 @@ class SetupAssistant(
         selectedServiceCategories = selectedServiceCategories,
         completionDeadline = LocalDate.now()
       )
+    )
+  }
+
+  fun createChangeLogEntry(
+    changedAt: OffsetDateTime,
+    referralId: UUID,
+  ): Changelog {
+    val user = createPPUserSecond()
+    val referral = referralRepository.save(referralFactory.createSent(id = referralId, createdBy = user, sentBy = user, intervention = createIntervention()))
+    return changeLogRepository.save(
+      changelogFactory.create(referralId = referral.id, changedAt = changedAt, newVal = ReferralAmendmentDetails(emptyList()), oldVal = ReferralAmendmentDetails(emptyList()), changedBy = user)
     )
   }
 

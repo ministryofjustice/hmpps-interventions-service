@@ -1,3 +1,2 @@
-CREATE TYPE amendTypes AS ENUM ('COMPLEXITY_LEVEL','DESIRED_OUTCOMES');
-
-alter table changelog alter column topic TYPE amendTypes using topic::amendTypes;
+ALTER TYPE amendTypes ADD VALUE 'COMPLETION_DATETIME';
+ALTER TYPE amendTypes ADD VALUE 'MAXIMUM_ENFORCEABLE_DAYS'
