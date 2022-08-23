@@ -15,10 +15,6 @@ interface ReferralRepository : JpaRepository<Referral, UUID>, JpaSpecificationEx
   fun findByIdAndSentAtIsNotNull(id: UUID): Referral?
   fun existsByReferenceNumber(reference: String): Boolean
 
-  // queries for draft referrals
-  fun findByIdAndSentAtIsNull(id: UUID): Referral?
-  fun findByCreatedByIdAndSentAtIsNull(userId: String): List<Referral>
-
   // queries for reporting
   @Query("select r from Referral r where r.sentAt > :from and r.sentAt < :to and r.intervention.dynamicFrameworkContract in :contracts")
   fun serviceProviderReportReferrals(from: OffsetDateTime, to: OffsetDateTime, contracts: Set<DynamicFrameworkContract>, pageable: Pageable): Page<Referral>

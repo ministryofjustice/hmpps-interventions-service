@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance.AppointmentProcessor
@@ -21,13 +20,6 @@ internal class AppointmentProcessorTest {
   private val deliverySessionFactory = DeliverySessionFactory()
   private val appointmentFactory = AppointmentFactory()
   private val supplierAssessmentFactory = SupplierAssessmentFactory()
-
-  @Test
-  fun `will not process draft referrals`() {
-    val referral = referralFactory.createDraft()
-
-    assertThrows<RuntimeException> { processor.process(referral) }
-  }
 
   @Test
   fun `referrals with multiple delivery session and saa appointments can be processed`() {

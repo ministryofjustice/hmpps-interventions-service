@@ -41,7 +41,7 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
     supplierAssessment: SupplierAssessment? = null,
     serviceUserData: ServiceUserData? = null
   ): SentReferralSummary {
-    create(
+    createReferral(
       id = id,
       createdAt = createdAt,
       createdBy = createdBy,

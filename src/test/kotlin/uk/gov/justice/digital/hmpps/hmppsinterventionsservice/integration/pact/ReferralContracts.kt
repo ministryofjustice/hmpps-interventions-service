@@ -124,13 +124,13 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
   )
   fun `create a new draft referral and with desired outcomes and complexity level`() {
     val referral = setupAssistant.createDraftReferral(id = UUID.fromString("037cc90b-beaa-4a32-9ab7-7f79136e1d27"))
-    setupAssistant.fillReferralFields(referral)
+    setupAssistant.fillDraftReferralFields(referral)
   }
 
   @State("There is an existing draft referral with ID of 1219a064-709b-4b6c-a11e-10b8cb3966f6, and it has had a service user selected")
   fun `create a new draft referral with the service user data expected`() {
     val referral = setupAssistant.createDraftReferral(id = UUID.fromString("1219a064-709b-4b6c-a11e-10b8cb3966f6"))
-    setupAssistant.fillReferralFields(referral)
+    setupAssistant.fillDraftReferralFields(referral)
   }
 
   @State("a referral does not exist for user with ID 123344556")
@@ -145,7 +145,7 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
   @State("a draft referral with ID 2a67075a-9c77-4103-9de0-63c4cfe3e8d6 exists and is ready to be sent")
   fun `create referral with 2a67075a id`() {
     val referral = setupAssistant.createDraftReferral(id = UUID.fromString("2a67075a-9c77-4103-9de0-63c4cfe3e8d6"))
-    setupAssistant.fillReferralFields(referral)
+    setupAssistant.fillDraftReferralFields(referral)
   }
   @State("got change log entires successfully")
   fun `got change log entires successfully`() {
@@ -161,6 +161,6 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
     val contract = setupAssistant.createDynamicFrameworkContract(contractType = setupAssistant.contractTypes["WOS"]!!, primeProviderId = "HARMONY_LIVING")
     val intervention = setupAssistant.createIntervention(dynamicFrameworkContract = contract)
     val referral = setupAssistant.createDraftReferral(id = UUID.fromString("06716f8e-f507-42d4-bdcc-44c90e18dbd7"), intervention = intervention)
-    setupAssistant.fillReferralFields(referral)
+    setupAssistant.fillDraftReferralFields(referral)
   }
 }

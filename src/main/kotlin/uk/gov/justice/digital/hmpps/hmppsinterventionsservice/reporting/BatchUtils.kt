@@ -91,7 +91,6 @@ interface SentReferralProcessor<T> : ItemProcessor<Referral, T> {
 
   override fun process(referral: Referral): T? {
     logger.debug("processing referral {}", StructuredArguments.kv("referralId", referral.id))
-    if (referral.sentAt == null) throw RuntimeException("invalid referral passed to sent referral processor; referral has not been sent")
     return processSentReferral(referral)
   }
 }

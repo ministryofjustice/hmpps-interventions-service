@@ -51,7 +51,7 @@ import javax.validation.constraints.NotNull
       name = "serviceUserData",
       attributeNodes = [
         NamedAttributeNode("disabilities"),
-        NamedAttributeNode("referral")
+        NamedAttributeNode("draftReferral")
       ]
     ),
     NamedSubgraph(
@@ -75,7 +75,7 @@ class SentReferralSummary(
   var sentAt: OffsetDateTime,
   var concludedAt: OffsetDateTime? = null,
   var referenceNumber: String,
-  @OneToOne(mappedBy = "referral", cascade = [CascadeType.ALL]) @PrimaryKeyJoinColumn var serviceUserData: ServiceUserData?,
+  @OneToOne(mappedBy = "draftReferral", cascade = [CascadeType.ALL]) @PrimaryKeyJoinColumn var serviceUserData: ServiceUserData?,
   @NotNull @ManyToOne @Fetch(FetchMode.JOIN) val createdBy: AuthUser,
   var endRequestedAt: OffsetDateTime? = null,
   @NotNull @ManyToOne(fetch = FetchType.LAZY) val intervention: Intervention,
