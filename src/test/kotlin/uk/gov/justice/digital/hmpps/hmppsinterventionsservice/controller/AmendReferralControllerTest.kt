@@ -115,7 +115,7 @@ internal class AmendReferralControllerTest {
 
     @Test
     fun `amendNeedsAndRequirements updates details in referral for the correct type`() {
-      val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(true, "9-12AM", "", "", "A reason for change")
+      val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(true, "9-12AM", "", "", null, "", "A reason for change")
       doNothing().whenever(amendReferralService)
         .updateAmendCaringOrEmploymentResponsibilities(eq(referral.id), eq(amendNeedsAndRequirementsDTO), eq(token))
       val returnedValue =
@@ -125,16 +125,16 @@ internal class AmendReferralControllerTest {
 
     @Test
     fun `amendNeedsAndRequirements returns bad request for incorrect correct type for amendReferralService updateAmendCaringOrEmploymentResponsibilities`() {
-      val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(true, "9-12AM", "", "", "A reason for change")
+      val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(true, "9-12AM", "", "", null, "", "A reason for change")
       doNothing().whenever(amendReferralService)
-        .updateAmendAccessibilityNeeds(eq(referral.id), eq(amendNeedsAndRequirementsDTO), eq(token))
+        .updateAmendCaringOrEmploymentResponsibilities(eq(referral.id), eq(amendNeedsAndRequirementsDTO), eq(token))
       val returnedValue =
         amendReferralController.amendNeedsAndRequirements(token, referral.id, "non-existing-type", amendNeedsAndRequirementsDTO)
       assertThat(returnedValue.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
     }
     @Test
     fun `amendNeedsAndRequirements updates details in referral for the correct type  for amendReferralService updateAmendAccessibilityNeeds`() {
-      val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(null, "", "school", "", "A reason for change")
+      val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(null, "", "school", "", null, "", "A reason for change")
       doNothing().whenever(amendReferralService)
         .updateAmendAccessibilityNeeds(eq(referral.id), eq(amendNeedsAndRequirementsDTO), eq(token))
       val returnedValue =
@@ -144,7 +144,7 @@ internal class AmendReferralControllerTest {
 
     @Test
     fun `amendNeedsAndRequirements returns bad request for incorrect correct type  for amendReferralService updateAmendAccessibilityNeeds`() {
-      val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(null, "", "school", "", "A reason for change")
+      val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(null, "", "school", "", null, "", "A reason for change")
       doNothing().whenever(amendReferralService)
         .updateAmendAccessibilityNeeds(eq(referral.id), eq(amendNeedsAndRequirementsDTO), eq(token))
       val returnedValue =
@@ -154,11 +154,20 @@ internal class AmendReferralControllerTest {
 
     @Test
     fun `amendNeedsAndRequirements updates details in referral for the correct type for amendReferralService updateAmendIdentifyNeeds`() {
-      val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(null, "", "", "glorious", "A reason for change")
+      val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(null, "", "", "glorious", null, "", "A reason for change")
       doNothing().whenever(amendReferralService)
-        .updateAmendAccessibilityNeeds(eq(referral.id), eq(amendNeedsAndRequirementsDTO), eq(token))
+        .updateAmendIdentifyNeeds(eq(referral.id), eq(amendNeedsAndRequirementsDTO), eq(token))
       val returnedValue =
         amendReferralController.amendNeedsAndRequirements(token, referral.id, "identify_needs", amendNeedsAndRequirementsDTO)
+      assertThat(returnedValue.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
+    }
+    @Test
+    fun `amendNeedsAndRequirements updates details in referral for the correct type for amendReferralService updateAmendInterpreterRequired`() {
+      val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(null, "", "", "glorious", null, "", "A reason for change")
+      doNothing().whenever(amendReferralService)
+        .updateAmendInterpreterRequired(eq(referral.id), eq(amendNeedsAndRequirementsDTO), eq(token))
+      val returnedValue =
+        amendReferralController.amendNeedsAndRequirements(token, referral.id, "interpreter_required", amendNeedsAndRequirementsDTO)
       assertThat(returnedValue.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
     }
   }

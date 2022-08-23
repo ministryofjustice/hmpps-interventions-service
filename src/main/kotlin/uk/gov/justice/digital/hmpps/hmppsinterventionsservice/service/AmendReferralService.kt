@@ -30,6 +30,7 @@ enum class AmendTopic {
   NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES,
   NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS,
   NEEDS_AND_REQUIREMENTS_ADDITIONAL_INFORMATION,
+  NEEDS_AND_REQUIREMENTS_INTERPRETER_REQUIRED,
 }
 
 @Service
@@ -220,6 +221,35 @@ class AmendReferralService(
       referral.id,
       UUID.randomUUID(),
       AmendTopic.NEEDS_AND_REQUIREMENTS_ADDITIONAL_INFORMATION,
+      ReferralAmendmentDetails(values = oldValues),
+      ReferralAmendmentDetails(values = newValues),
+      amendNeedsAndRequirementsDTO.reasonForChange,
+      OffsetDateTime.now(),
+      userMapper.fromToken(authentication)
+    )
+    changelogRepository.save(changelog)
+    val savedReferral = referralRepository.save(referral)
+    referralEventPublisher.referralNeedsAndRequirementsChangedEvent(savedReferral)
+  }
+
+  fun updateAmendInterpreterRequired(referralId: UUID, amendNeedsAndRequirementsDTO: AmendNeedsAndRequirementsDTO, authentication: JwtAuthenticationToken) {
+
+    val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
+    val oldValues = mutableListOf<String>()
+    if (referral.needsInterpreter != null) oldValues.add(referral.needsInterpreter.toString())
+    if (referral.interpreterLanguage != null) oldValues.add(referral.interpreterLanguage!!)
+
+    val newValues = mutableListOf<String>()
+    newValues.add(amendNeedsAndRequirementsDTO.needsInterpreter.toString())
+    if (amendNeedsAndRequirementsDTO.interpreterLanguage != null) newValues.add(amendNeedsAndRequirementsDTO.interpreterLanguage!!)
+
+    referral.needsInterpreter = amendNeedsAndRequirementsDTO.needsInterpreter
+    referral.interpreterLanguage = amendNeedsAndRequirementsDTO.interpreterLanguage
+
+    val changelog = Changelog(
+      referral.id,
+      UUID.randomUUID(),
+      AmendTopic.NEEDS_AND_REQUIREMENTS_INTERPRETER_REQUIRED,
       ReferralAmendmentDetails(values = oldValues),
       ReferralAmendmentDetails(values = newValues),
       amendNeedsAndRequirementsDTO.reasonForChange,

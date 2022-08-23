@@ -120,7 +120,7 @@ class AmendReferralServiceTest @Autowired constructor(
 
     amendReferralService.updateAmendCaringOrEmploymentResponsibilities(
       referral.id,
-      AmendNeedsAndRequirementsDTO(true, "9-12AM", "", "", "needs changing"),
+      AmendNeedsAndRequirementsDTO(true, "9-12AM", "", "", null, "", "needs changing"),
       jwtAuthenticationToken
     )
     val changelog = entityManager.entityManager.createQuery("FROM Changelog u WHERE u.referralId = :referralId")
@@ -192,5 +192,38 @@ class AmendReferralServiceTest @Autowired constructor(
     assertThat(changelog.reasonForChange).isEqualTo("needs changing")
     val newReferral = referralRepository.findById(referral.id).get()
     assertThat(newReferral.additionalNeedsInformation).isEqualTo("Home")
+  }
+
+  @Test
+  fun `amend needs and requirements for interpreter required `() {
+    val someoneElse = userFactory.create("helper_pp_user", "delius")
+    val user = userFactory.create("pp_user_1", "delius")
+
+    val referral = referralFactory.createSent(
+      needsInterpreter = false,
+      createdBy = someoneElse
+    )
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
+    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+
+    amendReferralService.updateAmendInterpreterRequired(
+      referral.id,
+      AmendNeedsAndRequirementsDTO(needsInterpreter = true, interpreterLanguage = "Yoruba", reasonForChange = "needs changing"),
+      jwtAuthenticationToken
+    )
+    val changelog = entityManager.entityManager.createQuery("FROM Changelog u WHERE u.referralId = :referralId")
+      .setParameter("referralId", referral.id)
+      .singleResult as Changelog
+
+    assertThat(changelog.newVal.values.size).isEqualTo(2)
+    assertThat(changelog.newVal.values).contains("true", "Yoruba")
+    assertThat(changelog.oldVal.values).contains("false")
+
+    assertThat(changelog.reasonForChange).isEqualTo("needs changing")
+
+    val newReferral = referralRepository.findById(referral.id).get()
+
+    assertThat(newReferral.needsInterpreter).isTrue
+    assertThat(newReferral.interpreterLanguage).isEqualTo("Yoruba")
   }
 }
