@@ -51,8 +51,6 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       complexityLevelIds = complexityLevelIds,
       additionalRiskInformation = additionalRiskInformation,
       additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt,
-      completionDeadline = completionDeadline,
-      maximumEnforceableDays = maximumEnforceableDays,
       referralDetails = referralDetail
     )
   }
@@ -81,7 +79,6 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     complexityLevelIds: MutableMap<UUID, UUID>? = null,
     accessibilityNeeds: String? = null,
     additionalNeedsInformation: String? = null,
-    accessibilityNeeds: String? = null,
     completionDeadline: LocalDate? = null,
     maximumEnforceableDays: Int? = null,
     referralDetail: ReferralDetails? = null,
@@ -112,8 +109,6 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       complexityLevelIds = complexityLevelIds,
       accessibilityNeeds = accessibilityNeeds,
       additionalNeedsInformation = additionalNeedsInformation,
-      completionDeadline = completionDeadline,
-      maximumEnforceableDays = maximumEnforceableDays
 
     )
   }
@@ -216,7 +211,6 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       concludedAt = concludedAt,
 
       endOfServiceReport = endOfServiceReport,
-      completionDeadline = completionDeadline
     )
   }
 }

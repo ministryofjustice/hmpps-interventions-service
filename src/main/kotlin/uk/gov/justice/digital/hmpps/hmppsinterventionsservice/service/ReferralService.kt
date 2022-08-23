@@ -493,6 +493,9 @@ class ReferralService(
       }
       AmendTopic.COMPLEXITY_LEVEL -> return
       AmendTopic.DESIRED_OUTCOMES -> return
+      AmendTopic.NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS -> return
+      AmendTopic.NEEDS_AND_REQUIREMENTS_ADDITIONAL_INFORMATION -> return
+      AmendTopic.NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES -> return
     }
   }
 
