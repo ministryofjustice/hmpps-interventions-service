@@ -28,6 +28,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.Code
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.FieldError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.ValidationError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DraftReferralDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
@@ -37,6 +38,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
@@ -45,6 +47,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Sen
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.CancellationReasonFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ChangeLogFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ContractTypeFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DraftOasysRiskInformationFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFrameworkContractFactory
@@ -53,6 +56,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFacto
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
 import java.time.LocalDate
 import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.Optional
 import java.util.UUID
 
@@ -80,6 +84,7 @@ class ReferralServiceUnitTest {
   private val telemetryService: TelemetryService = mock()
   private val draftOasysRiskInformationService: DraftOasysRiskInformationService = mock()
   private val referralDetailsRepository: ReferralDetailsRepository = mock()
+  private val changeLogRepository: ChangelogRepository = mock()
 
   private val referralFactory = ReferralFactory()
   private val authUserFactory = AuthUserFactory()
@@ -89,6 +94,7 @@ class ReferralServiceUnitTest {
   private val interventionFactory = InterventionFactory()
   private val dynamicFrameworkContractFactory = DynamicFrameworkContractFactory()
   private val draftOasysRiskInformationFactory = DraftOasysRiskInformationFactory()
+  private val changeLogFactory = ChangeLogFactory()
 
   private val referralService = ReferralService(
     referralRepository, sentReferralSummariesRepository, authUserRepository, interventionRepository, referralConcluder,
@@ -96,7 +102,7 @@ class ReferralServiceUnitTest {
     deliverySessionRepository, serviceCategoryRepository, referralAccessChecker, userTypeChecker,
     serviceProviderAccessScopeMapper, referralAccessFilter, communityAPIReferralService, serviceUserAccessChecker,
     assessRisksAndNeedsService, communityAPIOffenderService, supplierAssessmentService, hmppsAuthService,
-    telemetryService, draftOasysRiskInformationService, referralDetailsRepository
+    telemetryService, draftOasysRiskInformationService, referralDetailsRepository, changeLogRepository
   )
 
   @Test
@@ -949,6 +955,23 @@ class ReferralServiceUnitTest {
       val captor = ArgumentCaptor.forClass(ReferralDetails::class.java)
       verify(referralDetailsRepository, times(2)).saveAndFlush(captor.capture())
 
+      val oldReferralValue = ReferralAmendmentDetails(listOf(existingDetails.completionDeadline.toString()))
+      val newValue = ReferralAmendmentDetails(listOf(returnedValue?.completionDeadline.toString()))
+      val changelogId = UUID.randomUUID()
+      val changlogReturned = changeLogFactory.create(
+        changelogId,
+        AmendTopic.COMPLETION_DATETIME,
+        referral.id,
+        oldReferralValue,
+        newValue,
+        "completion deadline change", OffsetDateTime.of(2022, 8, 3, 0, 0, 0, 0, ZoneOffset.UTC)
+      )
+
+      whenever(changeLogRepository.save(changlogReturned)).thenReturn(changlogReturned)
+
+      assertThat(changlogReturned).isNotNull
+      assertThat(changlogReturned.id).isEqualTo(changelogId)
+      assertThat(changlogReturned.referralId).isEqualTo(referral.id)
       assertThat(captor.firstValue).isEqualTo(returnedValue)
       assertThat(returnedValue!!.createdAt).isNotEqualTo(existingDetails.createdAt)
       assertThat(returnedValue.createdAt).isNotEqualTo(referral.createdAt)

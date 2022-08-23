@@ -21,10 +21,12 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.FieldError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.ValidationError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DashboardType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DraftReferralDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
@@ -35,6 +37,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Service
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
@@ -81,6 +84,7 @@ class ReferralService(
   val telemetryService: TelemetryService,
   val draftOasysRiskInformationService: DraftOasysRiskInformationService,
   val referralDetailsRepository: ReferralDetailsRepository,
+  val changelogRepository: ChangelogRepository,
 ) {
   companion object {
     private val logger = KotlinLogging.logger {}
@@ -100,6 +104,9 @@ class ReferralService(
   // This is required for Client API access where the authority to access ALL referrals is pre-checked in the controller
   fun getSentReferral(id: UUID): Referral? {
     return referralRepository.findByIdAndSentAtIsNotNull(id)
+  }
+  fun getReferralDetailsById(id: UUID?): ReferralDetails? {
+    return referralDetailsRepository.findByIdOrNull(id)
   }
 
   fun getDraftReferralForUser(id: UUID, user: AuthUser): Referral? {
@@ -406,6 +413,9 @@ class ReferralService(
       return null
     }
 
+    handleChangLog(AmendTopic.COMPLETION_DATETIME, referral, update, actor)
+    handleChangLog(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS, referral, update, actor)
+
     val isDraftUpdate = referral.sentAt == null
     val existingDetails = referralDetailsRepository.findLatestByReferralId(referral.id)
 
@@ -451,6 +461,42 @@ class ReferralService(
     }
 
     return newDetails
+  }
+  private fun proccessChangeLog(ammendTopic: AmendTopic, oldValue: ReferralAmendmentDetails, newValue: ReferralAmendmentDetails, referralId: UUID, actor: AuthUser, update: UpdateReferralDetailsDTO) {
+    val changelog = Changelog(
+      referralId,
+      UUID.randomUUID(),
+      ammendTopic,
+      oldValue,
+      newValue,
+      update.reasonForChange,
+      OffsetDateTime.now(),
+      actor
+    )
+
+    changelogRepository.save(changelog)
+  }
+
+  private fun handleChangLog(topic: AmendTopic, referral: Referral, update: UpdateReferralDetailsDTO, actor: AuthUser) {
+    when (topic) {
+      AmendTopic.COMPLETION_DATETIME -> {
+        val completionDeadline = referral?.completionDeadline
+        val oldValue = ReferralAmendmentDetails(listOf(completionDeadline.toString()))
+        val newValue = ReferralAmendmentDetails(listOf(update.completionDeadline.toString()))
+        proccessChangeLog(AmendTopic.COMPLETION_DATETIME, oldValue, newValue, referral.id, actor, update)
+      }
+      AmendTopic.MAXIMUM_ENFORCEABLE_DAYS -> {
+        val maximumEnforceableDays = referral?.maximumEnforceableDays
+        val oldValue = ReferralAmendmentDetails(listOf(maximumEnforceableDays.toString()))
+        val newValue = ReferralAmendmentDetails(listOf(update.maximumEnforceableDays.toString()))
+        proccessChangeLog(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS, oldValue, newValue, referral.id, actor, update)
+      }
+      AmendTopic.COMPLEXITY_LEVEL -> return
+      AmendTopic.DESIRED_OUTCOMES -> return
+      AmendTopic.NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS -> return
+      AmendTopic.NEEDS_AND_REQUIREMENTS_ADDITIONAL_INFORMATION -> return
+      AmendTopic.NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES -> return
+    }
   }
 
   private fun updateServiceUserNeeds(referral: Referral, update: DraftReferralDTO) {

@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
@@ -10,9 +9,11 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfSe
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -20,6 +21,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
   private val authUserFactory = AuthUserFactory(em)
   private val interventionFactory = InterventionFactory(em)
   private val cancellationReasonFactory = CancellationReasonFactory(em)
+  private val referalDetailsFactory = ReferralDetailsFactory(em)
 
   fun createDraft(
     id: UUID = UUID.randomUUID(),
@@ -33,7 +35,9 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     complexityLevelIds: MutableMap<UUID, UUID>? = null,
     additionalRiskInformation: String? = null,
     additionalRiskInformationUpdatedAt: OffsetDateTime? = null,
-    referralDetails: ReferralDetailsDTO? = null,
+    completionDeadline: LocalDate? = null,
+    maximumEnforceableDays: Int? = null,
+    referralDetail: ReferralDetails? = null
   ): Referral {
     return create(
       id = id,
@@ -47,7 +51,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       complexityLevelIds = complexityLevelIds,
       additionalRiskInformation = additionalRiskInformation,
       additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt,
-      referralDetailsDTO = referralDetails,
+      referralDetails = referralDetail
     )
   }
 
@@ -61,9 +65,9 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     selectedServiceCategories: MutableSet<ServiceCategory>? = null,
     desiredOutcomes: List<DesiredOutcome> = emptyList(),
     actionPlans: MutableList<ActionPlan>? = mutableListOf(),
-    sentAt: OffsetDateTime = OffsetDateTime.now(),
     hasAdditionalResponsibilities: Boolean? = false,
     whenUnavailable: String? = null,
+    sentAt: OffsetDateTime? = OffsetDateTime.now(),
     sentBy: AuthUser = authUserFactory.create(),
     referenceNumber: String? = "JS18726AC",
     supplementaryRiskId: UUID = UUID.randomUUID(),
@@ -75,6 +79,10 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     complexityLevelIds: MutableMap<UUID, UUID>? = null,
     accessibilityNeeds: String? = null,
     additionalNeedsInformation: String? = null,
+    completionDeadline: LocalDate? = null,
+    maximumEnforceableDays: Int? = null,
+    referralDetail: ReferralDetails? = null,
+
   ): Referral {
     return create(
       id = id,
@@ -91,6 +99,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       sentBy = sentBy,
       referenceNumber = referenceNumber,
       supplementaryRiskId = supplementaryRiskId,
+      referralDetails = referralDetail,
       hasAdditionalResponsibilities = hasAdditionalResponsibilities,
       whenUnavailable = whenUnavailable,
 
@@ -174,6 +183,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     concludedAt: OffsetDateTime? = null,
 
     endOfServiceReport: EndOfServiceReport? = null,
+    completionDeadline: LocalDate? = null
   ): Referral {
     return create(
       id = id,

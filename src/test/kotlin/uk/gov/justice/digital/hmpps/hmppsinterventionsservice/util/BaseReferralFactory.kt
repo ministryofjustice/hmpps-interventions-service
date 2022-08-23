@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
@@ -27,7 +26,6 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     serviceUserCRN: String,
     intervention: Intervention,
     relevantSentenceId: Long? = null,
-    referralDetailsDTO: ReferralDetailsDTO? = null,
     desiredOutcomes: List<DesiredOutcome> = emptyList(),
     serviceUserData: ServiceUserData? = null,
     actionPlans: MutableList<ActionPlan>? = null,
@@ -41,36 +39,18 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     sentBy: AuthUser? = null,
     referenceNumber: String? = null,
     supplementaryRiskId: UUID? = null,
-
     assignments: List<ReferralAssignment> = emptyList(),
-
     endRequestedAt: OffsetDateTime? = null,
     endRequestedBy: AuthUser? = null,
     endRequestedReason: CancellationReason? = null,
     endRequestedComments: String? = null,
-
+    referralDetails: ReferralDetails? = null,
     concludedAt: OffsetDateTime? = null,
     supplierAssessment: SupplierAssessment? = null,
     endOfServiceReport: EndOfServiceReport? = null,
     accessibilityNeeds: String? = null,
     additionalNeedsInformation: String? = null,
   ): Referral {
-
-    val referralDetails = referralDetailsDTO?.let {
-      save(
-        ReferralDetails(
-          UUID.randomUUID(),
-          null,
-          it.referralId,
-          createdAt,
-          createdBy.id,
-          "initial referral details",
-          it.completionDeadline,
-          it.furtherInformation,
-          it.maximumEnforceableDays,
-        )
-      )
-    }
 
     val referral = save(
       Referral(
@@ -100,9 +80,24 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
         concludedAt = concludedAt,
         endOfServiceReport = endOfServiceReport,
         supplierAssessment = supplierAssessment,
-        referralDetailsHistory = referralDetails?.let { setOf(it) },
         accessibilityNeeds = accessibilityNeeds,
         additionalNeedsInformation = additionalNeedsInformation,
+        referralDetailsHistory = if (referralDetails != null) setOf(
+          referralDetails.let {
+            ReferralDetails(
+              UUID.randomUUID(),
+              null,
+              it!!.referralId,
+              createdAt,
+              createdBy.id,
+              "initial referral details",
+              it.completionDeadline,
+              it.furtherInformation,
+              it.maximumEnforceableDays,
+            )
+          }
+        ) else emptySet()
+
       )
     )
     referral.selectedDesiredOutcomes = desiredOutcomes.map { SelectedDesiredOutcomesMapping(it.serviceCategoryId, it.id) }.toMutableList()
