@@ -108,12 +108,7 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
       id = referralID,
       createdAt = createdAt,
       createdBy = createdBy,
-      referralDetails = ReferralDetailsDTO.from(
-        referralDetailsFactory.create(
-          referralID, createdAt, createdBy,
-          completionDeadline = LocalDate.of(2021, 2, 12),
-        )
-      )
+      referralDetail = referralDetailsFactory.create(completionDeadline = LocalDate.of(2021, 2, 12), createdBy = createdBy, createdAt = createdAt, referralId = referralID)
     )
 
     val out = json.write(DraftReferralDTO.from(referral))
@@ -173,7 +168,8 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
 
     @Test
     fun `test serialization of additionalRiskInformation in sent referrals`() {
-      val referral = referralFactory.createSent(id = UUID.fromString("3b9ed289-8412-41a9-8291-45e33e60276c"))
+      val id = UUID.fromString("3b9ed289-8412-41a9-8291-45e33e60276c")
+      val referral = referralFactory.createSent(id = id)
 
       val out = json.forView(Views.SentReferral::class.java)
         .write(DraftReferralDTO.from(referral))
@@ -244,15 +240,15 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
       assertThat(referralDTO.desiredOutcomes).hasSize(2)
       assertThat(referralDTO.desiredOutcomes!!.elementAt(0).serviceCategoryId).isEqualTo(uuid1)
       assertThat(referralDTO.desiredOutcomes!!.elementAt(0).desiredOutcomesIds).hasSize(3)
-      assertThat(referralDTO.desiredOutcomes!!.elementAt(0).desiredOutcomesIds!!.elementAt(0)).isEqualTo(uuid1)
-      assertThat(referralDTO.desiredOutcomes!!.elementAt(0).desiredOutcomesIds!!.elementAt(1)).isEqualTo(uuid2)
-      assertThat(referralDTO.desiredOutcomes!!.elementAt(0).desiredOutcomesIds!!.elementAt(2)).isEqualTo(uuid3)
+      assertThat(referralDTO.desiredOutcomes!!.elementAt(0).desiredOutcomesIds.elementAt(0)).isEqualTo(uuid1)
+      assertThat(referralDTO.desiredOutcomes!!.elementAt(0).desiredOutcomesIds.elementAt(1)).isEqualTo(uuid2)
+      assertThat(referralDTO.desiredOutcomes!!.elementAt(0).desiredOutcomesIds.elementAt(2)).isEqualTo(uuid3)
 
       assertThat(referralDTO.desiredOutcomes!!.elementAt(1).serviceCategoryId).isEqualTo(uuid2)
       assertThat(referralDTO.desiredOutcomes!!.elementAt(1).desiredOutcomesIds).hasSize(3)
-      assertThat(referralDTO.desiredOutcomes!!.elementAt(1).desiredOutcomesIds!!.elementAt(0)).isEqualTo(uuid4)
-      assertThat(referralDTO.desiredOutcomes!!.elementAt(1).desiredOutcomesIds!!.elementAt(1)).isEqualTo(uuid5)
-      assertThat(referralDTO.desiredOutcomes!!.elementAt(1).desiredOutcomesIds!!.elementAt(2)).isEqualTo(uuid6)
+      assertThat(referralDTO.desiredOutcomes!!.elementAt(1).desiredOutcomesIds.elementAt(0)).isEqualTo(uuid4)
+      assertThat(referralDTO.desiredOutcomes!!.elementAt(1).desiredOutcomesIds.elementAt(1)).isEqualTo(uuid5)
+      assertThat(referralDTO.desiredOutcomes!!.elementAt(1).desiredOutcomesIds.elementAt(2)).isEqualTo(uuid6)
     }
   }
 }

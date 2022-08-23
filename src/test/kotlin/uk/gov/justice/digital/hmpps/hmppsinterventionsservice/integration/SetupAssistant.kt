@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils
 import org.springframework.data.repository.findByIdOrNull
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AddressDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlanActivity
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
@@ -12,6 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attende
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CaseNote
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ContractType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DeliverySession
@@ -34,6 +36,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.App
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CaseNoteRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ContractTypeRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DesiredOutcomeRepository
@@ -50,6 +53,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentDe
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentDeliveryFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.CaseNoteFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ChangeLogFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFrameworkContractFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
@@ -87,6 +91,7 @@ class SetupAssistant(
   private val appointmentDeliveryAddressRepository: AppointmentDeliveryAddressRepository,
   private val caseNoteRepository: CaseNoteRepository,
   private val referralDetailsRepository: ReferralDetailsRepository,
+  private val changeLogRepository: ChangelogRepository,
 ) {
   private val dynamicFrameworkContractFactory = DynamicFrameworkContractFactory()
   private val interventionFactory = InterventionFactory()
@@ -99,6 +104,7 @@ class SetupAssistant(
   private val supplierAssessmentFactory = SupplierAssessmentFactory()
   private val serviceUserFactory = ServiceUserFactory()
   private val caseNoteFactory = CaseNoteFactory()
+  private val changelogFactory = ChangeLogFactory()
 
   val serviceCategories = serviceCategoryRepository.findAll().associateBy { it.name }
   val npsRegions = npsRegionRepository.findAll().associateBy { it.id }
@@ -116,7 +122,7 @@ class SetupAssistant(
     appointmentDeliveryAddressRepository.deleteAll()
     appointmentDeliveryRepository.deleteAll()
     appointmentRepository.deleteAll()
-
+    changeLogRepository.deleteAll()
     deleteAllReferralDetails()
     referralRepository.deleteAll()
     interventionRepository.deleteAll()
@@ -172,6 +178,10 @@ class SetupAssistant(
 
   fun createPPUser(id: String = "8751622134"): AuthUser {
     val user = AuthUser(id, "delius", "BERNARD.BEAKS")
+    return authUserRepository.save(user)
+  }
+  fun createPPUserSecond(id: String = "2500128586"): AuthUser {
+    val user = AuthUser(id, "delius", "joe.smith")
     return authUserRepository.save(user)
   }
 
@@ -237,15 +247,27 @@ class SetupAssistant(
         createdAt = createdAt,
         createdBy = createdBy,
         serviceUserCRN = serviceUserCRN,
-        selectedServiceCategories = selectedServiceCategories
+        selectedServiceCategories = selectedServiceCategories,
+        completionDeadline = LocalDate.now()
       )
+    )
+  }
+
+  fun createChangeLogEntry(
+    changedAt: OffsetDateTime,
+    referralId: UUID,
+  ): Changelog {
+    val user = createPPUserSecond()
+    val referral = referralRepository.save(referralFactory.createSent(id = referralId, createdBy = user, sentBy = user, intervention = createIntervention()))
+    return changeLogRepository.save(
+      changelogFactory.create(referralId = referral.id, changedAt = changedAt, newVal = ReferralAmendmentDetails(emptyList()), oldVal = ReferralAmendmentDetails(emptyList()), changedBy = user)
     )
   }
 
   fun createEndedReferral(id: UUID = UUID.randomUUID(), intervention: Intervention = createIntervention(), endRequestedReason: CancellationReason? = randomCancellationReason(), endRequestedComments: String? = null): Referral {
     val ppUser = createPPUser()
     val spUser = createSPUser()
-    return referralRepository.save(referralFactory.createEnded(id = id, intervention = intervention, createdBy = ppUser, sentBy = ppUser, endRequestedBy = ppUser, assignments = listOf(ReferralAssignment(OffsetDateTime.now(), spUser, spUser)), endRequestedReason = endRequestedReason, endRequestedComments = endRequestedComments))
+    return referralRepository.save(referralFactory.createEnded(id = id, intervention = intervention, createdBy = ppUser, sentBy = ppUser, endRequestedBy = ppUser, assignments = listOf(ReferralAssignment(OffsetDateTime.now(), spUser, spUser)), endRequestedReason = endRequestedReason, endRequestedComments = endRequestedComments, completionDeadline = LocalDate.now()))
   }
 
   fun createCancelledReferral(id: UUID = UUID.randomUUID(), intervention: Intervention = createIntervention(), endRequestedReason: CancellationReason? = randomCancellationReason(), endRequestedComments: String? = null): Referral {
@@ -266,7 +288,8 @@ class SetupAssistant(
     id: UUID = UUID.randomUUID(),
     intervention: Intervention = createIntervention(),
     ppUser: AuthUser = createPPUser(),
-    sentAt: OffsetDateTime = OffsetDateTime.now()
+    sentAt: OffsetDateTime = OffsetDateTime.now(),
+    completionDeadline: LocalDate = LocalDate.now()
   ): Referral {
     val referral = referralRepository.save(
       referralFactory.createSent(
@@ -275,6 +298,7 @@ class SetupAssistant(
         createdBy = ppUser,
         sentBy = ppUser,
         sentAt = sentAt,
+        completionDeadline = completionDeadline
       )
     )
     referral.supplierAssessment = createSupplierAssessment(referral = referral)
@@ -374,7 +398,8 @@ class SetupAssistant(
       referralFactory.createSent(
         id = id, intervention = intervention, createdBy = ppUser, sentBy = ppUser,
         assignments = listOf(ReferralAssignment(OffsetDateTime.now(), spUser, spUser)),
-        supplierAssessment = supplierAssessmentFactory.createWithNoAppointment()
+        supplierAssessment = supplierAssessmentFactory.createWithNoAppointment(),
+        completionDeadline = LocalDate.now()
       )
     )
   }
@@ -545,7 +570,7 @@ class SetupAssistant(
     referral.needsInterpreter = needsInterpreter
     referral.relevantSentenceId = relevantSentenceId
     referral.whenUnavailable = whenUnavailable
-
+    referral.completionDeadline = completionDeadline
     return referralRepository.save(referral).also {
       val details = referralDetailsRepository.save(
         ReferralDetails(
