@@ -446,7 +446,7 @@ class AppointmentServiceTest {
       val appointmentId = UUID.randomUUID()
       val attended = YES
       val additionalAttendanceInformation = "information"
-      val appointment = appointmentFactory.create(id = appointmentId)
+      val appointment = appointmentFactory.create(id = appointmentId, appointmentTime = OffsetDateTime.now())
       val submittedBy = authUserFactory.create()
 
       whenever(appointmentRepository.save(any())).thenReturn(appointment)
@@ -478,6 +478,21 @@ class AppointmentServiceTest {
         appointmentService.recordAppointmentAttendance(appointment, attended, additionalAttendanceInformation, submittedBy)
       }
       assertThat(error.message).contains("Feedback has already been submitted for this appointment [id=$appointmentId]")
+    }
+
+    @Test
+    fun `appointment attendance cannot be updated if session has a future date`() {
+      val appointmentId = UUID.randomUUID()
+      val attended = YES
+      val additionalAttendanceInformation = "information"
+      val submittedBy = authUserFactory.create()
+      val feedbackSubmittedAt = OffsetDateTime.now()
+      val appointment = appointmentFactory.create(id = appointmentId, appointmentTime = OffsetDateTime.now().plusMonths(2))
+
+      val error = assertThrows<ResponseStatusException> {
+        appointmentService.recordAppointmentAttendance(appointment, attended, additionalAttendanceInformation, submittedBy)
+      }
+      assertThat(error.message).contains("Cannot submit feedback for a future appointment [id=${appointment.id}]")
     }
   }
 

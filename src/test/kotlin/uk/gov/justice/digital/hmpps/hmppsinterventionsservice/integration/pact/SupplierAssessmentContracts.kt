@@ -5,6 +5,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AddressDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.SetupAssistant
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentDeliveryType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
+import java.time.OffsetDateTime
 import java.util.UUID
 
 class SupplierAssessmentContracts(private val setupAssistant: SetupAssistant) {
@@ -47,7 +48,7 @@ class SupplierAssessmentContracts(private val setupAssistant: SetupAssistant) {
   @State("There is an existing sent referral with ID 58963698-0f2e-4d6e-a072-0e2cf351f3b2 and the supplier assessment has been booked but no feedback details have yet been submitted")
   fun `create a sent referral with supplier assessment without any feedback`() {
     val referral = setupAssistant.createSentReferral(id = UUID.fromString("58963698-0f2e-4d6e-a072-0e2cf351f3b2"))
-    setupAssistant.addSupplierAssessmentAppointment(referral.supplierAssessment!!, referral = referral, appointmentDeliveryType = AppointmentDeliveryType.PHONE_CALL)
+    setupAssistant.addSupplierAssessmentAppointment(referral.supplierAssessment!!, referral = referral, appointmentDeliveryType = AppointmentDeliveryType.PHONE_CALL, appointmentTime = OffsetDateTime.now())
   }
 
   @State("There is an existing sent referral with ID caac2a85-578f-4b0b-996d-2893311eb60e and the supplier assessment attendance details have been recorded")

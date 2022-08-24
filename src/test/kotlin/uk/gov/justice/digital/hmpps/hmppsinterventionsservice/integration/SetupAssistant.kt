@@ -325,9 +325,10 @@ class SetupAssistant(
     attended: Attended? = null,
     additionalAttendanceInformation: String? = null,
     attendanceBehaviour: String? = null,
-    notifyPPOfAttendanceBehaviour: Boolean? = null
+    notifyPPOfAttendanceBehaviour: Boolean? = null,
+    appointmentTime: OffsetDateTime = OffsetDateTime.now().plusMonths(2)
   ) {
-    val appointment: Appointment = appointmentFactory.create(createdBy = createPPUser(), referral = referral)
+    val appointment: Appointment = appointmentFactory.create(createdBy = createPPUser(), referral = referral, appointmentTime = appointmentTime)
     if (attended !== null) {
       appointment.attended = attended
       appointment.additionalAttendanceInformation = additionalAttendanceInformation
