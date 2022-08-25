@@ -178,6 +178,12 @@ class AppointmentService(
         "Feedback has already been submitted for this appointment [id=${appointment.id}]"
       )
     }
+    if (appointment.appointmentTime.isAfter(OffsetDateTime.now())) {
+      throw ResponseStatusException(
+        HttpStatus.BAD_REQUEST,
+        "Cannot submit feedback for a future appointment [id=${appointment.id}]"
+      )
+    }
     setAttendanceFields(appointment, attended, additionalAttendanceInformation, submittedBy)
     return appointmentRepository.save(appointment)
   }

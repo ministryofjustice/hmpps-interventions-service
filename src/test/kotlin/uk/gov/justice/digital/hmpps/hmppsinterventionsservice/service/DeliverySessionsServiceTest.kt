@@ -480,7 +480,7 @@ internal class DeliverySessionsServiceTest {
   @Test
   fun `updating session behaviour sets relevant fields`() {
     val actionPlanId = UUID.randomUUID()
-    val session = deliverySessionFactory.createScheduled()
+    val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(any(), any())).thenReturn(session)
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
 
@@ -507,7 +507,7 @@ internal class DeliverySessionsServiceTest {
 
   @Test
   fun `session feedback cant be submitted more than once`() {
-    val session = deliverySessionFactory.createScheduled()
+    val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
     val actionPlanId = UUID.randomUUID()
 
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(session)
@@ -543,7 +543,7 @@ internal class DeliverySessionsServiceTest {
 
   @Test
   fun `session feedback can be submitted and stores time and actor`() {
-    val session = deliverySessionFactory.createScheduled()
+    val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
     val actionPlanId = UUID.randomUUID()
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(
       session
@@ -573,7 +573,7 @@ internal class DeliverySessionsServiceTest {
   @Test
   fun `session feedback emits application events`() {
     val user = createActor()
-    val session = deliverySessionFactory.createScheduled()
+    val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
     val actionPlanId = UUID.randomUUID()
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(
       session
@@ -614,7 +614,7 @@ internal class DeliverySessionsServiceTest {
 
   @Test
   fun `session feedback can be submitted when session not attended`() {
-    val session = deliverySessionFactory.createScheduled()
+    val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
     val actionPlanId = UUID.randomUUID()
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(
       session
@@ -632,7 +632,7 @@ internal class DeliverySessionsServiceTest {
 
   @Test
   fun `session feedback can be submitted when session is attended and there is no behaviour feedback`() {
-    val session = deliverySessionFactory.createScheduled()
+    val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
     val actionPlanId = UUID.randomUUID()
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(
       session
