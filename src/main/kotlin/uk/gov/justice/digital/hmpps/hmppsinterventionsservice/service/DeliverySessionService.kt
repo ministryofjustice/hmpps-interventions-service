@@ -110,7 +110,6 @@ class DeliverySessionService(
       durationInMinutes = durationInMinutes,
       referral = session.referral,
       superseded = attended == null,
-
     )
     return scheduleDeliverySessionAppointment(
       session, appointment, existingAppointment, appointmentTime, durationInMinutes, appointmentDeliveryType, createdBy, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode, attended, additionalAttendanceInformation, notifyProbationPractitioner, behaviourDescription
@@ -224,7 +223,6 @@ class DeliverySessionService(
       createdBy = existingAppointment?.createdBy ?: authUserRepository.save(updatedBy),
       referral = existingAppointment?.referral ?: session.referral,
       superseded = attended == null,
-
     )
     appointmentRepository.saveAndFlush(appointment)
     appointmentService.createOrUpdateAppointmentDeliveryDetails(appointment, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
@@ -265,9 +263,6 @@ class DeliverySessionService(
     additionalInformation: String?
   ): Pair<DeliverySession, Appointment> {
     var sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
-    if (sessionAndAppointment.second.appointmentTime.isAfter(OffsetDateTime.now())) {
-      throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot submit feedback for a future appointment [id=${sessionAndAppointment.second.id}]")
-    }
     var updatedAppointment = appointmentService.recordAppointmentAttendance(sessionAndAppointment.second, attended, additionalInformation, actor)
     return Pair(sessionAndAppointment.first, updatedAppointment)
   }
@@ -322,10 +317,6 @@ class DeliverySessionService(
       throw ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "can't submit session feedback unless attendance has been recorded")
     }
 
-    if (appointment.appointmentTime.isAfter(OffsetDateTime.now())) {
-      throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot submit feedback for a future appointment [id=${appointment.id}]")
-    }
-
     appointment.appointmentFeedbackSubmittedAt = OffsetDateTime.now()
     appointment.appointmentFeedbackSubmittedBy = authUserRepository.save(submitter)
     appointmentRepository.saveAndFlush(appointment)
@@ -343,9 +334,6 @@ class DeliverySessionService(
   fun submitSessionFeedback(referralId: UUID, appointmentId: UUID, submitter: AuthUser): Pair<DeliverySession, Appointment> {
     var sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
     val appointment = sessionAndAppointment.second
-    if (appointment.appointmentTime.isAfter(OffsetDateTime.now())) {
-      throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot submit feedback for a future appointment [id=${appointment.id}]")
-    }
     val updatedAppointment = appointmentService.submitSessionFeedback(appointment, submitter, SERVICE_DELIVERY)
     return Pair(sessionAndAppointment.first, updatedAppointment)
   }
@@ -374,10 +362,10 @@ class DeliverySessionService(
   ) {
     attended?.let {
       setAttendanceFields(appointment, attended, additionalAttendanceInformation, updatedBy)
-      if (attended != Attended.NO) {
+      if (Attended.NO != attended) {
         setBehaviourFields(appointment, behaviourDescription!!, notifyProbationPractitioner!!, updatedBy)
       }
-      setSuperseded(attended, appointment)
+      setSuperseded(attended,appointment)
       this.submitSessionFeedback(session, appointment, updatedBy)
     }
   }
@@ -393,7 +381,7 @@ class DeliverySessionService(
     additionalInformation: String?,
     actor: AuthUser,
   ) {
-    setSuperseded(attended, appointment)
+    setSuperseded(attended,appointment)
     appointment.attended = attended
     additionalInformation?.let { appointment.additionalAttendanceInformation = additionalInformation }
     appointment.attendanceSubmittedAt = OffsetDateTime.now()
