@@ -39,7 +39,7 @@ class ActionPlanContracts(private val setupAssistant: SetupAssistant) {
     "an action plan with ID 345059d4-1697-467b-8914-fedec9957279 exists and has an appointment for which no session feedback has been recorded"
   )
   fun `create an empty draft plan with 2 2 hours appointments`() {
-    val referral = setupAssistant.createSentReferral()
+    val referral = setupAssistant.createSentReferral(sentAt = OffsetDateTime.now().minusDays(1))
     setupAssistant.createActionPlan(
       id = UUID.fromString("345059d4-1697-467b-8914-fedec9957279"),
       numberOfSessions = 2,
