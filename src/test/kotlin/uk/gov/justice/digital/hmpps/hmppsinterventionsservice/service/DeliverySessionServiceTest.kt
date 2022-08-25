@@ -17,7 +17,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
-import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.ValidationError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanAppointmentEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEventPublisher
@@ -82,7 +81,9 @@ class DeliverySessionServiceTest @Autowired constructor(
   @BeforeEach
   fun beforeEach() {
     defaultUser = userFactory.create()
+
   }
+
   @AfterEach
   fun afterEach() {
     appointmentRepository.deleteAll()
