@@ -108,8 +108,7 @@ class DeliverySessionService(
       createdAt = OffsetDateTime.now(),
       appointmentTime = appointmentTime,
       durationInMinutes = durationInMinutes,
-      referral = session.referral,
-      superseded = session.appointments.size >= 1
+      referral = session.referral
     )
     return scheduleDeliverySessionAppointment(
       session, appointment, existingAppointment, appointmentTime, durationInMinutes, appointmentDeliveryType, createdBy, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode, attended, additionalAttendanceInformation, notifyProbationPractitioner, behaviourDescription
@@ -221,11 +220,9 @@ class DeliverySessionService(
       deliusAppointmentId = deliusAppointmentId,
       createdAt = OffsetDateTime.now(),
       createdBy = existingAppointment?.createdBy ?: authUserRepository.save(updatedBy),
-      referral = existingAppointment?.referral ?: session.referral,
-      superseded = session.appointments.size >= 1
+      referral = existingAppointment?.referral ?: session.referral
 
     )
-
     appointmentRepository.saveAndFlush(appointment)
     appointmentService.createOrUpdateAppointmentDeliveryDetails(appointment, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
     session.appointments.add(appointment)
@@ -376,6 +373,8 @@ class DeliverySessionService(
       setAttendanceFields(appointment, attended, additionalAttendanceInformation, updatedBy)
       if (Attended.NO != attended) {
         setBehaviourFields(appointment, behaviourDescription!!, notifyProbationPractitioner!!, updatedBy)
+      } else if (Attended.NO == attended) {
+        appointment.superseded = true
       }
       this.submitSessionFeedback(session, appointment, updatedBy)
     }
