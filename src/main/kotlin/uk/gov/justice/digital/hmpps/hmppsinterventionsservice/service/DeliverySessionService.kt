@@ -373,9 +373,8 @@ class DeliverySessionService(
       setAttendanceFields(appointment, attended, additionalAttendanceInformation, updatedBy)
       if (Attended.NO != attended) {
         setBehaviourFields(appointment, behaviourDescription!!, notifyProbationPractitioner!!, updatedBy)
-      }
-      else if (Attended.NO == attended){
-        appointment.superseded=true
+      } else if (Attended.NO == attended) {
+        appointment.superseded = true
       }
       this.submitSessionFeedback(session, appointment, updatedBy)
     }
