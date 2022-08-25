@@ -617,6 +617,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         assertThat(session.currentAppointment?.notifyPPOfAttendanceBehaviour).isNull()
         assertThat(session.currentAppointment?.attendanceBehaviour).isNull()
 
+
         null
       }
 
