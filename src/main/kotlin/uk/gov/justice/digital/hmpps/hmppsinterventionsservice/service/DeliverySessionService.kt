@@ -108,7 +108,9 @@ class DeliverySessionService(
       createdAt = OffsetDateTime.now(),
       appointmentTime = appointmentTime,
       durationInMinutes = durationInMinutes,
-      referral = session.referral
+      referral = session.referral,
+      superseded = attended == null,
+
     )
     return scheduleDeliverySessionAppointment(
       session, appointment, existingAppointment, appointmentTime, durationInMinutes, appointmentDeliveryType, createdBy, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode, attended, additionalAttendanceInformation, notifyProbationPractitioner, behaviourDescription
@@ -220,7 +222,8 @@ class DeliverySessionService(
       deliusAppointmentId = deliusAppointmentId,
       createdAt = OffsetDateTime.now(),
       createdBy = existingAppointment?.createdBy ?: authUserRepository.save(updatedBy),
-      referral = existingAppointment?.referral ?: session.referral
+      referral = existingAppointment?.referral ?: session.referral,
+      superseded = attended == null,
 
     )
     appointmentRepository.saveAndFlush(appointment)
@@ -371,22 +374,26 @@ class DeliverySessionService(
   ) {
     attended?.let {
       setAttendanceFields(appointment, attended, additionalAttendanceInformation, updatedBy)
-      if (Attended.NO != attended) {
+      if (attended != Attended.NO) {
         setBehaviourFields(appointment, behaviourDescription!!, notifyProbationPractitioner!!, updatedBy)
       }
-      else if (Attended.NO == attended){
-        appointment.superseded=true
-      }
+      setSuperseded(attended, appointment)
       this.submitSessionFeedback(session, appointment, updatedBy)
     }
   }
-
+  private fun setSuperseded(attended: Attended, appointment: Appointment) {
+    when (attended) {
+      Attended.LATE, Attended.YES -> { appointment.superseded = false }
+      Attended.NO -> { appointment.superseded = true }
+    }
+  }
   private fun setAttendanceFields(
     appointment: Appointment,
     attended: Attended,
     additionalInformation: String?,
     actor: AuthUser,
   ) {
+    setSuperseded(attended, appointment)
     appointment.attended = attended
     additionalInformation?.let { appointment.additionalAttendanceInformation = additionalInformation }
     appointment.attendanceSubmittedAt = OffsetDateTime.now()
