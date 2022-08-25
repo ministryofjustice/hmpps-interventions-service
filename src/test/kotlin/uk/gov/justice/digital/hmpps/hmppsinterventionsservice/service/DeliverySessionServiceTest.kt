@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -17,6 +18,7 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.ValidationError
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DeliverySessionAppointmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanAppointmentEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentDeliveryType
@@ -79,7 +81,17 @@ class DeliverySessionServiceTest @Autowired constructor(
   @BeforeEach
   fun beforeEach() {
     defaultUser = userFactory.create()
+
   }
+  @AfterEach
+  fun afterEach(){
+      appointmentRepository.deleteAll()
+      deliverySessionRepository.deleteAll()
+      actionPlanRepository.deleteAll()
+      referralRepository.deleteAll()
+      authUserRepository.deleteAll()
+    }
+
 
   @Nested
   inner class SchedulingNewDeliverySessionAppointment {
@@ -194,7 +206,34 @@ class DeliverySessionServiceTest @Autowired constructor(
       assertThat(error.message).contains("can't schedule new appointment for session; latest appointment has no feedback delivered")
     }
   }
+  @Test
+  fun `superseded flag set to false when pop attended appointment`() {
+    val actionPlan = actionPlanFactory.createApproved(numberOfSessions = 1)
+    val session =deliverySessionFactory.createScheduled(attended = Attended.YES, referral = actionPlan.referral)
 
+    val deliverySession = session.currentAppointment?.attended?.let {
+      deliverySessionService.recordAppointmentAttendance(defaultUser,actionPlan.id,session.sessionNumber,
+        it,"")
+    }
+
+    val appointment =deliverySession?.appointments?.first()
+
+    assertThat(appointment?.superseded).isFalse
+  }
+  @Test
+  fun `superseded flag set to true when pop did not attended appointment`() {
+    val actionPlan = actionPlanFactory.createApproved(numberOfSessions = 1)
+    val session =deliverySessionFactory.createScheduled(attended = Attended.NO, referral = actionPlan.referral)
+
+    val deliverySession = session.currentAppointment?.attended?.let {
+      deliverySessionService.recordAppointmentAttendance(defaultUser,actionPlan.id,session.sessionNumber,
+        it,"")
+    }
+
+    val appointment =deliverySession?.appointments?.first()
+
+    assertThat(appointment?.superseded).isTrue
+  }
   @Nested
   inner class ReschedulingDeliverySessionAppointment {
     @Test
@@ -591,8 +630,79 @@ class DeliverySessionServiceTest @Autowired constructor(
       assertThat(appointment.appointmentFeedbackSubmittedBy).isNotNull
       assertThat(appointment.appointmentDelivery?.appointmentDeliveryType).isNotNull
       assertThat(appointment.appointmentDelivery?.appointmentSessionType).isNotNull
-      assertThat(updatedSession.appointments.first().superseded).isFalse
-      assertThat(updatedSession.appointments.last().superseded).isTrue
+      assertThat(updatedSession.appointments.first { it.attended==Attended.NO && it.superseded}.superseded).isTrue
+    }
+    @Test
+    fun `can create new delivery session appointment for an appointment attended`() {
+      val actionPlan = actionPlanFactory.createApproved(numberOfSessions = 1)
+      val newReferral = actionPlanRepository.findById(actionPlan.id).get()
+      val session = deliverySessionFactory.createScheduled(referral = actionPlan.referral, attended = Attended.NO)
+      whenever(actionPlanAppointmentEventPublisher.sessionFeedbackRecordedEvent(any())).doAnswer {
+        val session = it.getArgument<DeliverySession>(0)
+        assertThat(session.currentAppointment?.appointmentFeedbackSubmittedAt).isNotNull
+        assertThat(session.currentAppointment?.appointmentFeedbackSubmittedBy).isNotNull
+        assertThat(session.currentAppointment?.attended).isEqualTo(Attended.YES)
+        assertThat(session.currentAppointment?.additionalAttendanceInformation).isNull()
+        assertThat(session.currentAppointment?.notifyPPOfAttendanceBehaviour).isTrue
+        assertThat(session.currentAppointment?.attendanceBehaviour).isNotNull
+
+
+        null
+      }
+
+      val updatedSession = deliverySessionService.updateSessionAppointment(
+        actionPlan.id, session.sessionNumber, defaultAppointmentTime, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE,
+        null,
+        null,
+        Attended.YES,
+        null,
+        true,
+        "some description"
+      )
+
+      //verify(communityAPIBookingService).book(eq(session.referral), isNull(), eq(defaultAppointmentTime), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull())
+
+      assertThat(updatedSession.appointments.size).isEqualTo(2)
+      val appointment = updatedSession.currentAppointment!!
+      assertThat(appointment.appointmentTime).isEqualTo(defaultAppointmentTime)
+      assertThat(appointment.durationInMinutes).isEqualTo(defaultDuration)
+      assertThat(appointment.createdBy).isEqualTo(defaultUser)
+      assertThat(appointment.attended).isEqualTo(Attended.YES)
+      assertThat(appointment.additionalAttendanceInformation).isNull()
+      assertThat(appointment.notifyPPOfAttendanceBehaviour).isNotNull
+      assertThat(appointment.attendanceBehaviour).isNotNull
+      assertThat(appointment.appointmentFeedbackSubmittedAt).isNotNull
+      assertThat(appointment.appointmentFeedbackSubmittedBy).isNotNull
+      assertThat(appointment.appointmentDelivery?.appointmentDeliveryType).isNotNull
+      assertThat(appointment.appointmentDelivery?.appointmentSessionType).isNotNull
+      assertThat(updatedSession.appointments.first { it.attended==Attended.YES }.superseded).isFalse
+    }
+    @Test
+    fun`can create new delivery session appointment for an appointment where attendance has not been set`() {
+      val actionPlan = actionPlanFactory.createApproved(numberOfSessions = 1)
+      val session = deliverySessionFactory.createScheduled(referral = actionPlan.referral, attended = Attended.NO)
+      val dateToCheck =OffsetDateTime.now().plusMonths(1)
+      session.currentAppointment?.appointmentFeedbackSubmittedAt = OffsetDateTime.now()
+      val updatedSession = deliverySessionService.scheduleNewDeliverySessionAppointment(session.referral.id, session.sessionNumber, dateToCheck, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE,)
+
+
+      //verify(communityAPIBookingService).book(eq(session.referral), eq(session.currentAppointment), eq(dateToCheck), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull())
+
+      assertThat(updatedSession.appointments.size).isEqualTo(2)
+      val appointment = updatedSession.currentAppointment!!
+      assertThat(appointment.appointmentTime).isEqualTo(dateToCheck)
+      assertThat(appointment.durationInMinutes).isEqualTo(defaultDuration)
+      assertThat(appointment.createdBy).isEqualTo(defaultUser)
+      assertThat(appointment.attended).isNull()
+      assertThat(appointment.additionalAttendanceInformation).isNull()
+      assertThat(appointment.notifyPPOfAttendanceBehaviour).isNull()
+      assertThat(appointment.attendanceBehaviour).isNull()
+      assertThat(appointment.appointmentFeedbackSubmittedAt).isNull()
+      assertThat(appointment.appointmentFeedbackSubmittedBy).isNull()
+      assertThat(appointment.appointmentDelivery?.appointmentDeliveryType).isNotNull
+      assertThat(appointment.appointmentDelivery?.appointmentSessionType).isNotNull
+      assertThat(updatedSession.appointments.first { it.attended==null }.superseded).isTrue
+
     }
 
 //    @Test
