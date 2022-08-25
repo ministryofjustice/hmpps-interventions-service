@@ -1433,6 +1433,7 @@ class ReferralServiceTest @Autowired constructor(
 
     assertThat(referralDetailsValue?.referralId).isEqualTo(referral.id)
     assertThat(referralToUpdate.furtherInformation).isEqualTo(referralDetailsValue?.furtherInformation)
+    assertThat(changeLogReturned.size).isEqualTo(1)
     assertThat(referralToUpdate.completionDeadline).isEqualTo(referralDetailsValue?.completionDeadline)
     assertThat(referralToUpdate.maximumEnforceableDays).isEqualTo(referralDetailsValue?.maximumEnforceableDays)
 
@@ -1445,16 +1446,6 @@ class ReferralServiceTest @Autowired constructor(
     assertThat(changeLogReturned?.firstOrNull()?.oldVal?.values?.get(0)).isEqualTo(referral.completionDeadline.toString())
     assertThat(changeLogReturned?.firstOrNull()?.reasonForChange).isNotBlank
     assertThat(changeLogReturned?.firstOrNull()?.topic).isEqualTo(AmendTopic.COMPLETION_DATETIME)
-
-    assertThat(changeLogReturned?.lastOrNull()?.referralId).isEqualTo(referral.id)
-    assertThat(changeLogReturned?.lastOrNull()?.newVal).isNotNull
-    assertThat(changeLogReturned?.lastOrNull()?.newVal?.values).isNotEmpty
-    assertThat(changeLogReturned?.lastOrNull()?.newVal?.values?.get(0)).isEqualTo(referralDetailsValue?.maximumEnforceableDays.toString())
-    assertThat(changeLogReturned?.lastOrNull()?.oldVal).isNotNull
-    assertThat(changeLogReturned?.lastOrNull()?.oldVal?.values).isNotEmpty
-    assertThat(changeLogReturned?.lastOrNull()?.oldVal?.values?.get(0)).isEqualTo(referral.maximumEnforceableDays.toString())
-    assertThat(changeLogReturned?.lastOrNull()?.reasonForChange).isNotBlank
-    assertThat(changeLogReturned?.lastOrNull()?.topic).isEqualTo(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS)
   }
 
   @Test

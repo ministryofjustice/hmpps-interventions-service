@@ -438,9 +438,11 @@ class ReferralService(
     if (!update.isValidUpdate) {
       return null
     }
-
-    handleChangLog(AmendTopic.COMPLETION_DATETIME, referral, update, actor)
-    handleChangLog(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS, referral, update, actor)
+    if (update.completionDeadline != null) {
+      handleChangLog(AmendTopic.COMPLETION_DATETIME, referral, update, actor)
+    } else {
+      handleChangLog(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS, referral, update, actor)
+    }
 
     val isDraftUpdate = referral.sentAt == null
     val existingDetails = referralDetailsRepository.findLatestByReferralId(referral.id)
