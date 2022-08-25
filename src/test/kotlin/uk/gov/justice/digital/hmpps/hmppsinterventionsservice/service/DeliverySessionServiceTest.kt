@@ -665,7 +665,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       }
 
       val updatedSession = deliverySessionService.updateSessionAppointment(
-        actionPlan.id, session.sessionNumber, defaultAppointmentTime, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE,
+        actionPlan.id, session.sessionNumber, defaultAppointmentTime.minusDays(2), defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE,
         null,
         null,
         Attended.YES,
@@ -678,7 +678,7 @@ class DeliverySessionServiceTest @Autowired constructor(
 
       assertThat(updatedSession.appointments.size).isEqualTo(2)
       val appointment = updatedSession.currentAppointment!!
-      assertThat(appointment.appointmentTime).isEqualTo(defaultAppointmentTime)
+      assertThat(appointment.appointmentTime).isEqualTo(defaultAppointmentTime.minusDays(2))
       assertThat(appointment.durationInMinutes).isEqualTo(defaultDuration)
       assertThat(appointment.createdBy).isEqualTo(defaultUser)
       assertThat(appointment.attended).isEqualTo(Attended.YES)
