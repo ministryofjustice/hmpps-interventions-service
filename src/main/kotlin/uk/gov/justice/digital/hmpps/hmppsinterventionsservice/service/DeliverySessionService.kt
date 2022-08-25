@@ -365,7 +365,7 @@ class DeliverySessionService(
       if (Attended.NO != attended) {
         setBehaviourFields(appointment, behaviourDescription!!, notifyProbationPractitioner!!, updatedBy)
       }
-      setSuperseded(attended,appointment)
+      setSuperseded(attended, appointment)
       this.submitSessionFeedback(session, appointment, updatedBy)
     }
   }
@@ -381,7 +381,7 @@ class DeliverySessionService(
     additionalInformation: String?,
     actor: AuthUser,
   ) {
-    setSuperseded(attended,appointment)
+    setSuperseded(attended, appointment)
     appointment.attended = attended
     additionalInformation?.let { appointment.additionalAttendanceInformation = additionalInformation }
     appointment.attendanceSubmittedAt = OffsetDateTime.now()

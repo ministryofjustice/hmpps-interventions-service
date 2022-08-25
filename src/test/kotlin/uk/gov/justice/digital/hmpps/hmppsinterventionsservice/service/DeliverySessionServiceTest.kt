@@ -17,9 +17,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
-import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.ValidationError
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DeliverySessionAppointmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanAppointmentEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentDeliveryType
@@ -83,7 +81,6 @@ class DeliverySessionServiceTest @Autowired constructor(
   @BeforeEach
   fun beforeEach() {
     defaultUser = userFactory.create()
-
   }
 
   @AfterEach
@@ -211,28 +208,32 @@ class DeliverySessionServiceTest @Autowired constructor(
   @Test
   fun `superseded flag set to false when pop attended appointment`() {
     val actionPlan = actionPlanFactory.createApproved(numberOfSessions = 1)
-    val session =deliverySessionFactory.createScheduled(attended = Attended.YES, referral = actionPlan.referral)
+    val session = deliverySessionFactory.createScheduled(attended = Attended.YES, referral = actionPlan.referral)
 
     val deliverySession = session.currentAppointment?.attended?.let {
-      deliverySessionService.recordAppointmentAttendance(defaultUser,actionPlan.id,session.sessionNumber,
-        it,"")
+      deliverySessionService.recordAppointmentAttendance(
+        defaultUser, actionPlan.id, session.sessionNumber,
+        it, ""
+      )
     }
 
-    val appointment =deliverySession?.appointments?.first()
+    val appointment = deliverySession?.appointments?.first()
 
     assertThat(appointment?.superseded).isFalse
   }
   @Test
   fun `superseded flag set to true when pop did not attended appointment`() {
     val actionPlan = actionPlanFactory.createApproved(numberOfSessions = 1)
-    val session =deliverySessionFactory.createScheduled(attended = Attended.NO, referral = actionPlan.referral)
+    val session = deliverySessionFactory.createScheduled(attended = Attended.NO, referral = actionPlan.referral)
 
     val deliverySession = session.currentAppointment?.attended?.let {
-      deliverySessionService.recordAppointmentAttendance(defaultUser,actionPlan.id,session.sessionNumber,
-        it,"")
+      deliverySessionService.recordAppointmentAttendance(
+        defaultUser, actionPlan.id, session.sessionNumber,
+        it, ""
+      )
     }
 
-    val appointment =deliverySession?.appointments?.first()
+    val appointment = deliverySession?.appointments?.first()
 
     assertThat(appointment?.superseded).isTrue
   }
@@ -350,7 +351,7 @@ class DeliverySessionServiceTest @Autowired constructor(
   inner class RecordAppointmentAttendance {
     @Test
     fun `can record attendance`() {
-      val deliverySession = deliverySessionFactory.createScheduled()
+      val deliverySession = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
       val referral = deliverySession.referral
       val appointment = deliverySession.currentAppointment!!
       val pair = deliverySessionService.recordAppointmentAttendance(referral.id, appointment.id, defaultUser, Attended.YES, "additionalInformation")
@@ -630,7 +631,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       assertThat(appointment.appointmentFeedbackSubmittedBy).isNotNull
       assertThat(appointment.appointmentDelivery?.appointmentDeliveryType).isNotNull
       assertThat(appointment.appointmentDelivery?.appointmentSessionType).isNotNull
-      assertThat(updatedSession.appointments.first { it.attended==Attended.NO && it.superseded}.superseded).isTrue
+      assertThat(updatedSession.appointments.first { it.attended == Attended.NO && it.superseded }.superseded).isTrue
     }
     @Test
     fun `can create new delivery session appointment for an appointment attended`() {
@@ -646,7 +647,6 @@ class DeliverySessionServiceTest @Autowired constructor(
         assertThat(session.currentAppointment?.notifyPPOfAttendanceBehaviour).isTrue
         assertThat(session.currentAppointment?.attendanceBehaviour).isNotNull
 
-
         null
       }
 
@@ -660,7 +660,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         "some description"
       )
 
-      //verify(communityAPIBookingService).book(eq(session.referral), isNull(), eq(defaultAppointmentTime), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull())
+      // verify(communityAPIBookingService).book(eq(session.referral), isNull(), eq(defaultAppointmentTime), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull())
 
       assertThat(updatedSession.appointments.size).isEqualTo(2)
       val appointment = updatedSession.currentAppointment!!
@@ -675,18 +675,17 @@ class DeliverySessionServiceTest @Autowired constructor(
       assertThat(appointment.appointmentFeedbackSubmittedBy).isNotNull
       assertThat(appointment.appointmentDelivery?.appointmentDeliveryType).isNotNull
       assertThat(appointment.appointmentDelivery?.appointmentSessionType).isNotNull
-      assertThat(updatedSession.appointments.first { it.attended==Attended.YES }.superseded).isFalse
+      assertThat(updatedSession.appointments.first { it.attended == Attended.YES }.superseded).isFalse
     }
     @Test
     fun`can create new delivery session appointment for an appointment where attendance has not been set`() {
       val actionPlan = actionPlanFactory.createApproved(numberOfSessions = 1)
       val session = deliverySessionFactory.createScheduled(referral = actionPlan.referral, attended = Attended.NO)
-      val dateToCheck =OffsetDateTime.now().plusMonths(1)
+      val dateToCheck = OffsetDateTime.now().plusMonths(1)
       session.currentAppointment?.appointmentFeedbackSubmittedAt = OffsetDateTime.now()
       val updatedSession = deliverySessionService.scheduleNewDeliverySessionAppointment(session.referral.id, session.sessionNumber, dateToCheck, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE,)
 
-
-      //verify(communityAPIBookingService).book(eq(session.referral), eq(session.currentAppointment), eq(dateToCheck), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull())
+      // verify(communityAPIBookingService).book(eq(session.referral), eq(session.currentAppointment), eq(dateToCheck), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull())
 
       assertThat(updatedSession.appointments.size).isEqualTo(2)
       val appointment = updatedSession.currentAppointment!!
@@ -701,8 +700,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       assertThat(appointment.appointmentFeedbackSubmittedBy).isNull()
       assertThat(appointment.appointmentDelivery?.appointmentDeliveryType).isNotNull
       assertThat(appointment.appointmentDelivery?.appointmentSessionType).isNotNull
-      assertThat(updatedSession.appointments.first { it.attended==null }.superseded).isTrue
-
+      assertThat(updatedSession.appointments.first { it.attended == null }.superseded).isTrue
     }
   }
 }
