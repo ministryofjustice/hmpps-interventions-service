@@ -404,7 +404,7 @@ class AmendReferralServiceUnitTest {
 
       val updateToReferral = AmendNeedsAndRequirementsDTO(hasAdditionalResponsibilities = true, whenUnavailable = "9-12AM", reasonForChange = "additional responsibilities changed")
 
-      amendReferralService.updateAmendCaringOrEmploymentResponsibilities(referral.id, updateToReferral, jwtAuthenticationToken)
+      amendReferralService.amendCaringOrEmploymentResponsibilities(referral.id, updateToReferral, jwtAuthenticationToken)
 
       val argumentCaptorReferral = argumentCaptor<Referral>()
       verify(referralRepository, atLeast(1)).save(argumentCaptorReferral.capture())
@@ -436,7 +436,7 @@ class AmendReferralServiceUnitTest {
 
       val updateToReferral = AmendNeedsAndRequirementsDTO(hasAdditionalResponsibilities = false, reasonForChange = "additional responsibilities changed")
 
-      amendReferralService.updateAmendCaringOrEmploymentResponsibilities(referral.id, updateToReferral, jwtAuthenticationToken)
+      amendReferralService.amendCaringOrEmploymentResponsibilities(referral.id, updateToReferral, jwtAuthenticationToken)
 
       val argumentCaptorReferral = argumentCaptor<Referral>()
       verify(referralRepository, atLeast(1)).save(argumentCaptorReferral.capture())
@@ -468,7 +468,7 @@ class AmendReferralServiceUnitTest {
 
     val updateToReferral = AmendNeedsAndRequirementsDTO(accessibilityNeeds = "school", reasonForChange = "accessibility need changed")
 
-    amendReferralService.updateAmendAccessibilityNeeds(referral.id, updateToReferral, jwtAuthenticationToken)
+    amendReferralService.amendAccessibilityNeeds(referral.id, updateToReferral, jwtAuthenticationToken)
 
     val argumentCaptorReferral = argumentCaptor<Referral>()
     verify(referralRepository, atLeast(1)).save(argumentCaptorReferral.capture())
@@ -497,7 +497,7 @@ class AmendReferralServiceUnitTest {
 
     val updateToReferral = AmendNeedsAndRequirementsDTO(additionalNeedsInformation = "school", reasonForChange = "identify need changed")
 
-    amendReferralService.updateAmendIdentifyNeeds(referral.id, updateToReferral, jwtAuthenticationToken)
+    amendReferralService.amendIdentifyNeeds(referral.id, updateToReferral, jwtAuthenticationToken)
 
     val argumentCaptorReferral = argumentCaptor<Referral>()
     verify(referralRepository, atLeast(1)).save(argumentCaptorReferral.capture())
@@ -511,5 +511,74 @@ class AmendReferralServiceUnitTest {
     val changeLogValues = argumentCaptorChangelog.firstValue
     assertThat(changeLogValues.id).isNotNull
     assertThat(changeLogValues.newVal.values).contains("school")
+  }
+
+  @Nested
+  inner class UpdateNeedsAndRequirementsInterpreterRequired() {
+
+    val authUser = AuthUser("CRN123", "auth", "user")
+
+    @Test
+    fun `has interpreter required is being amended to true and interpreter Language is updated`() {
+
+      whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
+
+      val referral = referralFactory.createSent(
+        needsInterpreter = false
+      )
+      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+      whenever(referralRepository.save(any())).thenReturn(referral)
+
+      val updateToReferral = AmendNeedsAndRequirementsDTO(needsInterpreter = true, interpreterLanguage = "Yoruba", reasonForChange = "interpreter required changing")
+
+      amendReferralService.amendInterpreterRequired(referral.id, updateToReferral, jwtAuthenticationToken)
+
+      val argumentCaptorReferral = argumentCaptor<Referral>()
+      verify(referralRepository, atLeast(1)).save(argumentCaptorReferral.capture())
+
+      val referralValues = argumentCaptorReferral.firstValue
+      assertThat(referralValues.needsInterpreter).isTrue
+      assertThat(referralValues.interpreterLanguage).isEqualTo("Yoruba")
+
+      val argumentCaptorChangelog = argumentCaptor<Changelog>()
+      verify(changelogRepository, atLeast(1)).save(argumentCaptorChangelog.capture())
+
+      val changeLogValues = argumentCaptorChangelog.firstValue
+      assertThat(changeLogValues.id).isNotNull
+      assertThat(changeLogValues.newVal.values).contains("true", "Yoruba")
+      assertThat(changeLogValues.oldVal.values).contains("false")
+    }
+
+    @Test
+    fun `has interpreter required is being amended to false and interpreter Language is set to null`() {
+
+      whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
+
+      val referral = referralFactory.createSent(
+        needsInterpreter = true,
+        interpreterLanguage = "Yoruba"
+      )
+      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+      whenever(referralRepository.save(any())).thenReturn(referral)
+
+      val updateToReferral = AmendNeedsAndRequirementsDTO(needsInterpreter = false, reasonForChange = "interpreter required changing")
+
+      amendReferralService.amendInterpreterRequired(referral.id, updateToReferral, jwtAuthenticationToken)
+
+      val argumentCaptorReferral = argumentCaptor<Referral>()
+      verify(referralRepository, atLeast(1)).save(argumentCaptorReferral.capture())
+
+      val referralValues = argumentCaptorReferral.firstValue
+      assertThat(referralValues.needsInterpreter).isFalse
+      assertThat(referralValues.interpreterLanguage).isNull()
+
+      val argumentCaptorChangelog = argumentCaptor<Changelog>()
+      verify(changelogRepository, atLeast(1)).save(argumentCaptorChangelog.capture())
+
+      val changeLogValues = argumentCaptorChangelog.firstValue
+      assertThat(changeLogValues.id).isNotNull
+      assertThat(changeLogValues.newVal.values).contains("false")
+      assertThat(changeLogValues.oldVal.values).contains("true", "Yoruba")
+    }
   }
 }

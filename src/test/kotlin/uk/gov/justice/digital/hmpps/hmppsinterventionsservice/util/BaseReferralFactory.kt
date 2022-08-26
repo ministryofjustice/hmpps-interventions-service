@@ -51,6 +51,8 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     endOfServiceReport: EndOfServiceReport? = null,
     accessibilityNeeds: String? = null,
     additionalNeedsInformation: String? = null,
+    needsInterpreter: Boolean? = null,
+    interpreterLanguage: String? = null,
   ): Referral {
 
     val referral = save(
@@ -83,6 +85,8 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
         supplierAssessment = supplierAssessment,
         accessibilityNeeds = accessibilityNeeds,
         additionalNeedsInformation = additionalNeedsInformation,
+        needsInterpreter = needsInterpreter,
+        interpreterLanguage = interpreterLanguage,
         referralDetailsHistory = if (referralDetails != null) setOf(
           referralDetails.let {
             ReferralDetails(
