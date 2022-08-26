@@ -83,6 +83,8 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     completionDeadline: LocalDate? = null,
     maximumEnforceableDays: Int? = null,
     referralDetail: ReferralDetails? = null,
+    needsInterpreter: Boolean? = null,
+    interpreterLanguage: String? = null,
 
   ): Referral {
     if (createDraft) {
@@ -119,7 +121,8 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       complexityLevelIds = complexityLevelIds,
       accessibilityNeeds = accessibilityNeeds,
       additionalNeedsInformation = additionalNeedsInformation,
-
+      needsInterpreter = needsInterpreter,
+      interpreterLanguage = interpreterLanguage,
     )
   }
 
