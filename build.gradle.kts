@@ -81,7 +81,7 @@ dependencies {
 
   // aws
   implementation("software.amazon.awssdk:sns:2.17.261")
-  implementation("software.amazon.awssdk:s3:2.17.257")
+  implementation("software.amazon.awssdk:s3:2.17.263")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
