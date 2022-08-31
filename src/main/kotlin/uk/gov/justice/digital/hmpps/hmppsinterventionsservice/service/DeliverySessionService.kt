@@ -109,7 +109,6 @@ class DeliverySessionService(
       appointmentTime = appointmentTime,
       durationInMinutes = durationInMinutes,
       referral = session.referral,
-      superseded = attended == null,
 
     )
     return scheduleDeliverySessionAppointment(
@@ -223,7 +222,7 @@ class DeliverySessionService(
       createdAt = OffsetDateTime.now(),
       createdBy = existingAppointment?.createdBy ?: authUserRepository.save(updatedBy),
       referral = existingAppointment?.referral ?: session.referral,
-      superseded = attended == null,
+      superseded = true,
 
     )
     appointmentRepository.saveAndFlush(appointment)
