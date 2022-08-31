@@ -109,6 +109,7 @@ class DeliverySessionService(
       appointmentTime = appointmentTime,
       durationInMinutes = durationInMinutes,
       referral = session.referral,
+      superseded = attended == null,
 
     )
     return scheduleDeliverySessionAppointment(

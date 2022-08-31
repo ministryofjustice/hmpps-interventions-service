@@ -83,7 +83,6 @@ class DeliverySessionServiceTest @Autowired constructor(
   fun beforeEach() {
     defaultUser = userFactory.create()
   }
-
   @AfterEach
   fun afterEach() {
     appointmentRepository.deleteAll()
@@ -644,7 +643,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       assertThat(appointment.appointmentFeedbackSubmittedBy).isNotNull
       assertThat(appointment.appointmentDelivery?.appointmentDeliveryType).isNotNull
       assertThat(appointment.appointmentDelivery?.appointmentSessionType).isNotNull
-      assertThat(updatedSession.appointments.first { it.attended == Attended.NO }.superseded).isFalse
+      assertThat(updatedSession.appointments.first { it.attended == Attended.NO && it.superseded }.superseded).isTrue
     }
   }
 }
