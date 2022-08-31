@@ -17,6 +17,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.ValidationError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanAppointmentEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEventPublisher
@@ -81,7 +82,6 @@ class DeliverySessionServiceTest @Autowired constructor(
   @BeforeEach
   fun beforeEach() {
     defaultUser = userFactory.create()
-
   }
 
   @AfterEach
@@ -605,10 +605,8 @@ class DeliverySessionServiceTest @Autowired constructor(
     @Test
     fun `can create new delivery session appointment for an appointment did not attend`() {
       val actionPlan = actionPlanFactory.createApproved(numberOfSessions = 1)
-      val newReferral = actionPlanRepository.findById(actionPlan.id).get()
       val session = deliverySessionFactory.createScheduled(referral = actionPlan.referral, attended = Attended.NO)
-      val sessionValue = deliverySessionRepository.findById(session.id).get()
-      val check = deliverySessionRepository.findByReferralIdAndSessionNumber(sessionValue.id, session.sessionNumber)
+
       whenever(actionPlanAppointmentEventPublisher.sessionFeedbackRecordedEvent(any())).doAnswer {
         val session = it.getArgument<DeliverySession>(0)
         assertThat(session.currentAppointment?.appointmentFeedbackSubmittedAt).isNotNull
@@ -617,7 +615,6 @@ class DeliverySessionServiceTest @Autowired constructor(
         assertThat(session.currentAppointment?.additionalAttendanceInformation).isNull()
         assertThat(session.currentAppointment?.notifyPPOfAttendanceBehaviour).isNull()
         assertThat(session.currentAppointment?.attendanceBehaviour).isNull()
-
 
         null
       }
@@ -647,8 +644,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       assertThat(appointment.appointmentFeedbackSubmittedBy).isNotNull
       assertThat(appointment.appointmentDelivery?.appointmentDeliveryType).isNotNull
       assertThat(appointment.appointmentDelivery?.appointmentSessionType).isNotNull
-      assertThat(updatedSession.appointments.first().superseded).isFalse
-      assertThat(updatedSession.appointments.last().superseded).isTrue
+      assertThat(updatedSession.appointments.first { it.attended == Attended.NO }.superseded).isFalse
     }
   }
 }
