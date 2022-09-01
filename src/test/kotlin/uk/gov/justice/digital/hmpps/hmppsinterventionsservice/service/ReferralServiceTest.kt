@@ -97,7 +97,7 @@ class ReferralServiceTest @Autowired constructor(
   val endOfServiceReportRepository: EndOfServiceReportRepository,
   val serviceCategoryRepository: ServiceCategoryRepository,
   val referralDetailsRepository: ReferralDetailsRepository,
-  val changelogRepository: ChangelogRepository
+  val changelogRepository: ChangelogRepository,
   val sentReferralSummariesRepositoryImpl: SentReferralSpecificationExecutor
 ) {
 
@@ -567,16 +567,19 @@ class ReferralServiceTest @Autowired constructor(
     @Test
     fun `returns referrals started by the user in the sorted order`() {
       val user = userFactory.create("pp_user_1", "delius")
-      val startedReferral1 = referralFactory.createSent(createdBy = user)
-      val serviceUserData1 = serviceUserDataFactory.create("Zack", "Synder", startedReferral1)
+      val startDraftReferral1 = referralFactory.createDraft(createdBy = user)
+      val startedReferral1 = referralFactory.createSent(id = startDraftReferral1.id, createdBy = user, createDraft = false)
+      val serviceUserData1 = serviceUserDataFactory.create("Zack", "Synder", startDraftReferral1)
       startedReferral1.serviceUserData = serviceUserData1
       entityManager.refresh(startedReferral1)
-      val startedReferral2 = referralFactory.createSent(createdBy = user)
-      val serviceUserData2 = serviceUserDataFactory.create("Dom", "Barnett", startedReferral2)
+      val startDraftReferral2 = referralFactory.createDraft(createdBy = user)
+      val startedReferral2 = referralFactory.createSent(id = startDraftReferral2.id, createdBy = user, createDraft = false)
+      val serviceUserData2 = serviceUserDataFactory.create("Dom", "Barnett", startDraftReferral2)
       startedReferral2.serviceUserData = serviceUserData2
       entityManager.refresh(startedReferral2)
-      val startedReferral3 = referralFactory.createSent(createdBy = user)
-      val serviceUserData3 = serviceUserDataFactory.create("Alice", "Wonderland", startedReferral3)
+      val startDraftReferral3 = referralFactory.createDraft(createdBy = user)
+      val startedReferral3 = referralFactory.createSent(id = startDraftReferral3.id, createdBy = user)
+      val serviceUserData3 = serviceUserDataFactory.create("Alice", "Wonderland", startDraftReferral3)
       startedReferral3.serviceUserData = serviceUserData3
       entityManager.refresh(startedReferral3)
 
