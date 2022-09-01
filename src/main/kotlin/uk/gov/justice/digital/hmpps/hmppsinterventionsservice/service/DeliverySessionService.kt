@@ -222,7 +222,7 @@ class DeliverySessionService(
       createdBy = existingAppointment?.createdBy ?: authUserRepository.save(updatedBy),
       referral = existingAppointment?.referral ?: session.referral
     )
-    session.appointments.map{appt -> appt.superseded = true }
+    session.appointments.map { appt -> appt.superseded = true }
     appointmentRepository.saveAndFlush(appointment)
     appointmentService.createOrUpdateAppointmentDeliveryDetails(appointment, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
     session.appointments.add(appointment)
