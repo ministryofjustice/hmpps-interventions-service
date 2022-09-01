@@ -220,9 +220,9 @@ class DeliverySessionService(
       deliusAppointmentId = deliusAppointmentId,
       createdAt = OffsetDateTime.now(),
       createdBy = existingAppointment?.createdBy ?: authUserRepository.save(updatedBy),
-      referral = existingAppointment?.referral ?: session.referral,
-      superseded = session.currentAppointment != null && attended == null
+      referral = existingAppointment?.referral ?: session.referral
     )
+    session.appointments.map{appt -> appt.superseded = true }
     appointmentRepository.saveAndFlush(appointment)
     appointmentService.createOrUpdateAppointmentDeliveryDetails(appointment, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
     session.appointments.add(appointment)
@@ -380,7 +380,7 @@ class DeliverySessionService(
   private fun setSuperseded(attended: Attended, appointment: Appointment) {
     when (attended) {
       Attended.LATE, Attended.YES -> { appointment.superseded = false }
-      Attended.NO -> { appointment.superseded = true }
+      else -> return
     }
   }
   private fun setAttendanceFields(

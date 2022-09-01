@@ -644,7 +644,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       assertThat(appointment.appointmentFeedbackSubmittedBy).isNotNull
       assertThat(appointment.appointmentDelivery?.appointmentDeliveryType).isNotNull
       assertThat(appointment.appointmentDelivery?.appointmentSessionType).isNotNull
-      assertThat(updatedSession.appointments.first { it.attended == Attended.NO && it.superseded }.superseded).isTrue
+      assertThat(updatedSession.appointments.first().superseded).isTrue
     }
 
     @Test
@@ -735,7 +735,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       assertThat(appointment.appointmentFeedbackSubmittedBy).isNull()
       assertThat(appointment.appointmentDelivery?.appointmentDeliveryType).isNotNull
       assertThat(appointment.appointmentDelivery?.appointmentSessionType).isNotNull
-      assertThat(updatedSession.appointments.first { it.attended == null }.superseded).isTrue
+      assertThat(updatedSession.appointments.first { it.attended == Attended.NO }.superseded).isTrue
     }
   }
 }
