@@ -221,8 +221,8 @@ class DeliverySessionService(
       createdAt = OffsetDateTime.now(),
       createdBy = existingAppointment?.createdBy ?: authUserRepository.save(updatedBy),
       referral = existingAppointment?.referral ?: session.referral
-
     )
+    session.appointments.map { appt -> appt.superseded = true }
     appointmentRepository.saveAndFlush(appointment)
     appointmentService.createOrUpdateAppointmentDeliveryDetails(appointment, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
     session.appointments.add(appointment)
@@ -371,21 +371,25 @@ class DeliverySessionService(
   ) {
     attended?.let {
       setAttendanceFields(appointment, attended, additionalAttendanceInformation, updatedBy)
-      if (Attended.NO != attended) {
+      if (attended != Attended.NO) {
         setBehaviourFields(appointment, behaviourDescription!!, notifyProbationPractitioner!!, updatedBy)
-      } else if (Attended.NO == attended) {
-        appointment.superseded = true
       }
       this.submitSessionFeedback(session, appointment, updatedBy)
     }
   }
-
+  private fun setSuperseded(attended: Attended, appointment: Appointment) {
+    when (attended) {
+      Attended.LATE, Attended.YES -> { appointment.superseded = false }
+      else -> return
+    }
+  }
   private fun setAttendanceFields(
     appointment: Appointment,
     attended: Attended,
     additionalInformation: String?,
     actor: AuthUser,
   ) {
+    setSuperseded(attended, appointment)
     appointment.attended = attended
     additionalInformation?.let { appointment.additionalAttendanceInformation = additionalInformation }
     appointment.attendanceSubmittedAt = OffsetDateTime.now()
