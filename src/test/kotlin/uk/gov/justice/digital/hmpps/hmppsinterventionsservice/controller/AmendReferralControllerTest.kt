@@ -242,4 +242,64 @@ internal class AmendReferralControllerTest {
       assertThat(returnedChangeLogObject?.size).isEqualTo(0)
     }
   }
+
+  @Nested
+  inner class ChangelogDetails {
+    private val referral = referralFactory.createSent()
+    private val user = authUserFactory.create()
+    private val token = tokenFactory.create(userID = user.id, userName = user.userName, authSource = user.authSource)
+    private val userMapper = mock<UserMapper>()
+
+    @Test
+    fun `getChangelogDetails returns the matched changelog entry`() {
+
+      val changelog = Changelog(
+        referral.id,
+        UUID.randomUUID(),
+        AmendTopic.COMPLEXITY_LEVEL,
+        ReferralAmendmentDetails(mutableListOf("a value")),
+        ReferralAmendmentDetails(mutableListOf("another value")),
+        "A reason",
+        OffsetDateTime.now(),
+        user
+      )
+
+      whenever(amendReferralService.getChangeLogById(changelog.id, token)).thenReturn(changelog)
+      whenever(userMapper.fromToken(any())).thenReturn(user)
+      val userDetail = UserDetail("firstname", "email", "lastname")
+
+      whenever(hmppsAuthService.getUserDetail(eq(user))).thenReturn(userDetail)
+
+      val returnedChangeLogObject = amendReferralController.getChangelogDetails(changelog.id, token)
+
+      assertThat(returnedChangeLogObject.changelogId).isEqualTo(changelog.id)
+      assertThat(returnedChangeLogObject.referralId).isEqualTo(changelog.referralId)
+    }
+
+    @Test
+    fun `getChangelogDetails throws 404 when changelog is not present`() {
+
+      val changelog = Changelog(
+        referral.id,
+        UUID.randomUUID(),
+        AmendTopic.COMPLEXITY_LEVEL,
+        ReferralAmendmentDetails(mutableListOf("a value")),
+        ReferralAmendmentDetails(mutableListOf("another value")),
+        "A reason",
+        OffsetDateTime.now(),
+        user
+      )
+
+      val responseStatusException = ResponseStatusException(HttpStatus.NOT_FOUND, "Change log not found for [id=$changelog.id]")
+      whenever(amendReferralService.getChangeLogById(any(), any()))
+        .thenThrow(responseStatusException)
+
+      val exception = assertThrows<ResponseStatusException> {
+        amendReferralController.getChangelogDetails(referral.id, token)
+      }
+
+      assertThat(exception.status).isEqualTo(HttpStatus.NOT_FOUND)
+      assertThat(exception.reason).isEqualTo("Change log not found for [id=$changelog.id]")
+    }
+  }
 }

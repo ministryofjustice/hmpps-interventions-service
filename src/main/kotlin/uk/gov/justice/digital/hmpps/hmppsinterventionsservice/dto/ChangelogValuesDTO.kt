@@ -18,7 +18,7 @@ data class ChangelogValuesDTO(
 ) {
 
   companion object {
-    var amendTopicDescription = Map.of(
+    private var amendTopicDescription: MutableMap<AmendTopic, String> = Map.of(
       AmendTopic.COMPLEXITY_LEVEL, "Complexity level was changed",
       AmendTopic.DESIRED_OUTCOMES, "Desired outcome was changed",
       AmendTopic.COMPLETION_DATETIME, "Completion date time was changed",
@@ -26,6 +26,7 @@ data class ChangelogValuesDTO(
       AmendTopic.NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS, "Accessibility needs was changed",
       AmendTopic.NEEDS_AND_REQUIREMENTS_ADDITIONAL_INFORMATION, "Additional information was changed",
       AmendTopic.NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES, "Additional responsibilities was changed",
+      AmendTopic.NEEDS_AND_REQUIREMENTS_INTERPRETER_REQUIRED, "Interpreter required was changed"
     )
     fun from(changelog: Changelog, userDetail: UserDetail): ChangelogValuesDTO {
       val dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy 'at' HH:mma")

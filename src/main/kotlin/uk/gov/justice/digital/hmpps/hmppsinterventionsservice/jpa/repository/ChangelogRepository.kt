@@ -5,6 +5,5 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changel
 import java.util.UUID
 
 interface ChangelogRepository : JpaRepository<Changelog, UUID> {
-
   fun findByReferralIdOrderByChangedAtDesc(referralId: UUID): List<Changelog>
 }

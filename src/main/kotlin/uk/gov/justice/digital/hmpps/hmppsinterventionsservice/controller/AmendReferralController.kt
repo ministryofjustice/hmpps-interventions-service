@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOutcomesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogValuesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthService
@@ -73,5 +74,14 @@ class AmendReferralController(
     return amendReferralService.getListOfChangeLogEntries(referral).map {
       ChangelogValuesDTO.from(it, hmppsAuthService.getUserDetail(it.changedBy))
     }
+  }
+
+  @GetMapping("/sent-referral/change-log/{changeLogId}")
+  fun getChangelogDetails(
+    @PathVariable changeLogId: UUID,
+    authentication: JwtAuthenticationToken
+  ): ChangelogDetailsDTO {
+    val changeLog = amendReferralService.getChangeLogById(changeLogId, authentication)
+    return ChangelogDetailsDTO.from(changeLog, hmppsAuthService.getUserDetail(changeLog.changedBy))
   }
 }
