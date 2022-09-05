@@ -8,9 +8,7 @@ Business/domain API to **find, arrange and monitor an intervention** for service
 
 Please see the [quickstart document](doc/quickstart.md).
 
-Common tasks:
-- [Refreshing data from production](doc/tasks-data-refresh.md)
-- [Working with CronJobs](doc/tasks-cronjob.md)
+Common tasks and runbooks are in [the service's technical guidance](https://ministryofjustice.github.io/hmpps-interventions-docs/runbooks/).
 
 ## Architecture
 
