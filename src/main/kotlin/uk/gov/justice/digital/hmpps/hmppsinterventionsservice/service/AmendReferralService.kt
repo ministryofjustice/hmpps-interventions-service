@@ -179,6 +179,11 @@ class AmendReferralService(
     return changelogRepository.findByReferralIdOrderByChangedAtDesc(referral.id)
   }
 
+  fun getChangeLogById(changeLogId: UUID, authentication: JwtAuthenticationToken): Changelog {
+    return changelogRepository.findById(changeLogId)
+      .orElseThrow { throw ResponseStatusException(HttpStatus.NOT_FOUND, "Change log not found for [id=$changeLogId]") }
+  }
+
   fun amendAccessibilityNeeds(
     referralId: UUID,
     amendNeedsAndRequirementsDTO: AmendNeedsAndRequirementsDTO,

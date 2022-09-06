@@ -3,15 +3,18 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
+import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOutcomesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
@@ -24,6 +27,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Int
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ChangeLogFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
@@ -46,6 +50,7 @@ class AmendReferralServiceTest @Autowired constructor(
   private val userFactory = AuthUserFactory(entityManager)
   private val referralFactory = ReferralFactory(entityManager)
   private val serviceCategoryFactory = ServiceCategoryFactory(entityManager)
+  private val changeLogFactory = ChangeLogFactory(entityManager)
   private val referralService: ReferralService = mock()
 
   private val userMapper: UserMapper = mock()
@@ -225,5 +230,64 @@ class AmendReferralServiceTest @Autowired constructor(
 
     assertThat(newReferral.needsInterpreter).isTrue
     assertThat(newReferral.interpreterLanguage).isEqualTo("Yoruba")
+  }
+
+  @Test
+  fun `find changelog by changelogId`() {
+
+    val someoneElse = userFactory.create("helper_pp_user", "delius")
+    val user = userFactory.create("pp_user_1", "delius")
+
+    val referral = referralFactory.createSent(
+      needsInterpreter = false,
+      createdBy = someoneElse
+    )
+
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
+
+    val uuid1 = UUID.randomUUID()
+    val uuid2 = UUID.randomUUID()
+
+    val changelog1 = changeLogFactory.create(
+      id = uuid1,
+      referralId = referral.id,
+      topic = AmendTopic.NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS,
+      oldVal = ReferralAmendmentDetails(listOf("wheelchair")),
+      newVal = ReferralAmendmentDetails(listOf("hearing aid")),
+      changedBy = someoneElse
+    )
+    changeLogFactory.create(
+      id = uuid2,
+      referralId = referral.id,
+      topic = AmendTopic.DESIRED_OUTCOMES,
+      oldVal = ReferralAmendmentDetails(listOf("301ead30-30a4-4c7c-8296-2768abfb59b5")),
+      newVal = ReferralAmendmentDetails(listOf("65924ac6-9724-455b-ad30-906936291421")),
+      changedBy = user
+    )
+
+    val changelog = amendReferralService.getChangeLogById(changelog1.id, jwtAuthenticationToken)
+
+    assertThat(changelog).isEqualTo(changelog1)
+  }
+
+  @Test
+  fun `find changelog throws 404 when changelog is not found`() {
+
+    val someoneElse = userFactory.create("helper_pp_user", "delius")
+    val user = userFactory.create("pp_user_1", "delius")
+
+    val referral = referralFactory.createSent(
+      needsInterpreter = false,
+      createdBy = someoneElse
+    )
+
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
+    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+
+    val uuid1 = UUID.randomUUID()
+    val exception = assertThrows<ResponseStatusException> {
+      amendReferralService.getChangeLogById(uuid1, jwtAuthenticationToken)
+    }
+    assertThat(exception.message).contains("Change log not found for [id=$uuid1]")
   }
 }
