@@ -154,7 +154,7 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
 
   @State("amend needs and requirements intepreter needed updated reason for change")
   fun `amend needs and requirements intepreter needed updated reason for change`() {
-    setupAssistant.createSentReferral(id = UUID.fromString("400be4c6-1aa4-4f52-ae86-cbd5d23309bf"),needsInterpreter = false, interpreterLanguage = "")
+    setupAssistant.createSentReferral(id = UUID.fromString("400be4c6-1aa4-4f52-ae86-cbd5d23309bf"), needsInterpreter = false, interpreterLanguage = "")
   }
 
   @State(
