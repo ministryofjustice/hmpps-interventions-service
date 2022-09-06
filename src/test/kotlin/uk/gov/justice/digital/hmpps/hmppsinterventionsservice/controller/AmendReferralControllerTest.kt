@@ -228,6 +228,7 @@ internal class AmendReferralControllerTest {
       assertThat(returnedChangeLogObject?.size).isEqualTo(2)
       assertThat(returnedChangeLogObject?.get(0)?.changelogId).isEqualTo(changeLogValuesList.get(0).id)
       assertThat(returnedChangeLogObject?.get(0)?.referralId).isEqualTo(changeLogValuesList.get(0).referralId)
+
     }
 
     @Test
