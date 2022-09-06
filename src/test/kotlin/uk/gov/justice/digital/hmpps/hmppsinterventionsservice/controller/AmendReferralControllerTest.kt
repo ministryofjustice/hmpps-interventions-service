@@ -26,10 +26,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFacto
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ChangeLogFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
-import java.time.LocalDate
-import java.time.LocalTime
 import java.time.OffsetDateTime
-import java.time.ZoneOffset
 import java.util.UUID
 
 internal class AmendReferralControllerTest {
@@ -190,9 +187,7 @@ internal class AmendReferralControllerTest {
           eq(token)
         )
       ).thenReturn(referral)
-      val localDate: LocalDate = LocalDate.parse("2022-09-06")
-      val localTime: LocalTime = LocalTime.parse("14:30:30")
-      val date = OffsetDateTime.of(localDate, localTime, ZoneOffset.UTC)
+
       val changeLogValuesList = mutableListOf(
         Changelog(
           referral.id,
@@ -201,7 +196,7 @@ internal class AmendReferralControllerTest {
           ReferralAmendmentDetails(mutableListOf("a value")),
           ReferralAmendmentDetails(mutableListOf("another value")),
           "A reason",
-          date,
+          OffsetDateTime.now(),
           user
         ),
         Changelog(
@@ -211,7 +206,7 @@ internal class AmendReferralControllerTest {
           ReferralAmendmentDetails(mutableListOf("a value 2")),
           ReferralAmendmentDetails(mutableListOf("another value 2")),
           "Another reason",
-          date,
+          OffsetDateTime.now(),
           user
         )
       )
@@ -228,7 +223,6 @@ internal class AmendReferralControllerTest {
       assertThat(returnedChangeLogObject?.size).isEqualTo(2)
       assertThat(returnedChangeLogObject?.get(0)?.changelogId).isEqualTo(changeLogValuesList.get(0).id)
       assertThat(returnedChangeLogObject?.get(0)?.referralId).isEqualTo(changeLogValuesList.get(0).referralId)
-      assertThat(returnedChangeLogObject?.get(0)?.changedAt).isEqualTo("06 Sept 2022 at 02.30 pm")
     }
 
     @Test
