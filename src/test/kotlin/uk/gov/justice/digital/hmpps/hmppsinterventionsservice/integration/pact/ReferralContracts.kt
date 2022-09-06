@@ -152,6 +152,11 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
     setupAssistant.createChangeLogEntry(referralId = UUID.fromString("ac386c25-52c8-41fa-9213-fcf42e24b0b5"), changedAt = OffsetDateTime.parse("2020-12-07T18:02:01.599803Z"))
   }
 
+  @State("amend needs and requirements intepreter needed updated reason for change")
+  fun `amend needs and requirements intepreter needed updated reason for change`() {
+    setupAssistant.createSentReferral(id = UUID.fromString("400be4c6-1aa4-4f52-ae86-cbd5d23309bf"),needsInterpreter = false, interpreterLanguage = "")
+  }
+
   @State(
     "There is an existing draft cohort referral with ID of 06716f8e-f507-42d4-bdcc-44c90e18dbd7, and it has had multiple service categories selected",
     "There is an existing draft cohort referral with ID of 06716f8e-f507-42d4-bdcc-44c90e18dbd7, and it has had desired outcomes selected for multiple service categories",

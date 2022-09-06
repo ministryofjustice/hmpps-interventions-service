@@ -296,7 +296,9 @@ class SetupAssistant(
     intervention: Intervention = createIntervention(),
     ppUser: AuthUser = createPPUser(),
     sentAt: OffsetDateTime = OffsetDateTime.now(),
-    completionDeadline: LocalDate = LocalDate.now()
+    completionDeadline: LocalDate = LocalDate.now(),
+    needsInterpreter: Boolean? = null,
+    interpreterLanguage: String? = null,
   ): Referral {
     createDraftReferral(
       id = id,
@@ -310,7 +312,9 @@ class SetupAssistant(
         createdBy = ppUser,
         sentBy = ppUser,
         sentAt = sentAt,
-        completionDeadline = completionDeadline
+        completionDeadline = completionDeadline,
+        needsInterpreter = needsInterpreter,
+        interpreterLanguage = interpreterLanguage
       )
     )
     referral.supplierAssessment = createSupplierAssessment(referral = referral)
