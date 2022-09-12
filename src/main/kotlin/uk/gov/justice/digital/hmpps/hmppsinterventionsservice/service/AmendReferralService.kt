@@ -10,12 +10,15 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.User
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOutcomesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogUpdateDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SelectedDesiredOutcomesMapping
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ComplexityLevelRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DesiredOutcomeRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import java.time.OffsetDateTime
@@ -40,6 +43,8 @@ class AmendReferralService(
   private val changelogRepository: ChangelogRepository,
   private val referralRepository: ReferralRepository,
   private val serviceCategoryRepository: ServiceCategoryRepository,
+  private val complexityLevelRepository: ComplexityLevelRepository,
+  private val desiredOutcomeRepository: DesiredOutcomeRepository,
   private val userMapper: UserMapper,
   private val referralService: ReferralService
 ) {
@@ -179,9 +184,49 @@ class AmendReferralService(
     return changelogRepository.findByReferralIdOrderByChangedAtDesc(referral.id)
   }
 
-  fun getChangeLogById(changeLogId: UUID, authentication: JwtAuthenticationToken): Changelog {
-    return changelogRepository.findById(changeLogId)
+  fun getChangeLogById(changeLogId: UUID, authentication: JwtAuthenticationToken): ChangelogUpdateDTO {
+    val changelog = changelogRepository.findById(changeLogId)
       .orElseThrow { throw ResponseStatusException(HttpStatus.NOT_FOUND, "Change log not found for [id=$changeLogId]") }
+
+    when (changelog.topic) {
+      AmendTopic.COMPLEXITY_LEVEL -> {
+        val oldComplexityLevel = complexityLevelRepository.findById(UUID.fromString(changelog.oldVal.values[0]))
+        val newComplexityLevel = complexityLevelRepository.findById(UUID.fromString(changelog.newVal.values[0]))
+        return ChangelogUpdateDTO(changelog, oldComplexityLevel.get().title, newComplexityLevel.get().title)
+      }
+      AmendTopic.DESIRED_OUTCOMES -> {
+        val oldDesiredOutcomes = changelog.oldVal.values.map {
+          val desiredOutcome = desiredOutcomeRepository.findById(UUID.fromString(it))
+          desiredOutcome.get().description
+        }.toList()
+        val newDesiredOutcomes = changelog.newVal.values.map {
+          val desiredOutcome = desiredOutcomeRepository.findById(UUID.fromString(it))
+          desiredOutcome.get().description
+        }.toList()
+        return ChangelogUpdateDTO(changelog = changelog, oldDesiredOutcomes = oldDesiredOutcomes, newDesiredOutcomes = newDesiredOutcomes)
+      }
+      AmendTopic.NEEDS_AND_REQUIREMENTS_INTERPRETER_REQUIRED -> {
+        return ChangelogUpdateDTO(
+          changelog = changelog,
+          oldDescription = generateDescription(changelog.oldVal.values),
+          newDescription = generateDescription(changelog.newVal.values)
+        )
+      }
+      AmendTopic.NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES -> {
+        return ChangelogUpdateDTO(
+          changelog = changelog,
+          oldDescription = generateDescription(changelog.oldVal.values),
+          newDescription = generateDescription(changelog.newVal.values)
+        )
+      }
+      else -> {}
+    }
+    return ChangelogUpdateDTO(changelog)
+  }
+
+  private fun generateDescription(values: List<String>): String {
+    val booleanValue = values.first { it == "true" || it == "false" }
+    return if (booleanValue == "true") "Yes-${values.first { it != "true" }}" else "No"
   }
 
   fun amendAccessibilityNeeds(

@@ -82,6 +82,6 @@ class AmendReferralController(
     authentication: JwtAuthenticationToken
   ): ChangelogDetailsDTO {
     val changeLog = amendReferralService.getChangeLogById(changeLogId, authentication)
-    return ChangelogDetailsDTO.from(changeLog, hmppsAuthService.getUserDetail(changeLog.changedBy))
+    return ChangelogDetailsDTO.from(changeLog, hmppsAuthService.getUserDetail(changeLog.changelog.changedBy))
   }
 }

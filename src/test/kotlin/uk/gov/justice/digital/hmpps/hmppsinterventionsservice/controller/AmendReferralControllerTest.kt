@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.User
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOutcomesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogUpdateDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendReferralService
@@ -39,6 +40,7 @@ internal class AmendReferralControllerTest {
   private val tokenFactory = JwtTokenFactory()
   private val referralFactory = ReferralFactory()
   private val authUserFactory = AuthUserFactory()
+  private val changeLogFactory = ChangeLogFactory()
 
   @Nested
   inner class UpdateComplexityLevel {
@@ -189,20 +191,20 @@ internal class AmendReferralControllerTest {
       ).thenReturn(referral)
 
       val changeLogValuesList = mutableListOf(
-        Changelog(
-          referral.id,
+        changeLogFactory.create(
           UUID.randomUUID(),
           AmendTopic.COMPLEXITY_LEVEL,
+          referral.id,
           ReferralAmendmentDetails(mutableListOf("a value")),
           ReferralAmendmentDetails(mutableListOf("another value")),
           "A reason",
           OffsetDateTime.now(),
           user
         ),
-        Changelog(
-          referral.id,
+        changeLogFactory.create(
           UUID.randomUUID(),
           AmendTopic.COMPLEXITY_LEVEL,
+          referral.id,
           ReferralAmendmentDetails(mutableListOf("a value 2")),
           ReferralAmendmentDetails(mutableListOf("another value 2")),
           "Another reason",
@@ -221,8 +223,8 @@ internal class AmendReferralControllerTest {
       val returnedChangeLogObject = amendReferralController.getChangelog(referral.id, token)
 
       assertThat(returnedChangeLogObject?.size).isEqualTo(2)
-      assertThat(returnedChangeLogObject?.get(0)?.changelogId).isEqualTo(changeLogValuesList.get(0).id)
-      assertThat(returnedChangeLogObject?.get(0)?.referralId).isEqualTo(changeLogValuesList.get(0).referralId)
+      assertThat(returnedChangeLogObject?.get(0)?.changelogId).isEqualTo(changeLogValuesList[0].id)
+      assertThat(returnedChangeLogObject?.get(0)?.referralId).isEqualTo(changeLogValuesList[0].referralId)
     }
 
     @Test
@@ -253,10 +255,10 @@ internal class AmendReferralControllerTest {
     @Test
     fun `getChangelogDetails returns the matched changelog entry`() {
 
-      val changelog = Changelog(
-        referral.id,
+      val changelog = changeLogFactory.create(
         UUID.randomUUID(),
-        AmendTopic.COMPLEXITY_LEVEL,
+        AmendTopic.NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS,
+        referral.id,
         ReferralAmendmentDetails(mutableListOf("a value")),
         ReferralAmendmentDetails(mutableListOf("another value")),
         "A reason",
@@ -264,7 +266,8 @@ internal class AmendReferralControllerTest {
         user
       )
 
-      whenever(amendReferralService.getChangeLogById(changelog.id, token)).thenReturn(changelog)
+      val changelogUpdateDTO = ChangelogUpdateDTO(changelog)
+      whenever(amendReferralService.getChangeLogById(changelog.id, token)).thenReturn(changelogUpdateDTO)
       whenever(userMapper.fromToken(any())).thenReturn(user)
       val userDetail = UserDetail("firstname", "email", "lastname")
 
@@ -277,12 +280,107 @@ internal class AmendReferralControllerTest {
     }
 
     @Test
-    fun `getChangelogDetails throws 404 when changelog is not present`() {
+    fun `getChangelogDetails returns the complexity title for complexity level changelog entry`() {
 
-      val changelog = Changelog(
-        referral.id,
+      val changelog = changeLogFactory.create(
         UUID.randomUUID(),
         AmendTopic.COMPLEXITY_LEVEL,
+        referral.id,
+        ReferralAmendmentDetails(mutableListOf("UUID1")),
+        ReferralAmendmentDetails(mutableListOf("UUID2")),
+        "A reason",
+        OffsetDateTime.now(),
+        user
+      )
+
+      val changelogUpdateDTO = ChangelogUpdateDTO(changelog, "oldtitle", "newTitle")
+      whenever(amendReferralService.getChangeLogById(changelog.id, token)).thenReturn(changelogUpdateDTO)
+      whenever(userMapper.fromToken(any())).thenReturn(user)
+      val userDetail = UserDetail("firstname", "email", "lastname")
+
+      whenever(hmppsAuthService.getUserDetail(eq(user))).thenReturn(userDetail)
+
+      val returnedChangeLogObject = amendReferralController.getChangelogDetails(changelog.id, token)
+
+      assertThat(returnedChangeLogObject.changelogId).isEqualTo(changelog.id)
+      assertThat(returnedChangeLogObject.referralId).isEqualTo(changelog.referralId)
+      assertThat(returnedChangeLogObject.oldValue).containsExactly("OLDTITLE")
+      assertThat(returnedChangeLogObject.newValue).containsExactly("NEWTITLE")
+    }
+
+    @Test
+    fun `getChangelogDetails returns the desired outcomes description for desired outcomes changelog entry`() {
+
+      val changelog = changeLogFactory.create(
+        UUID.randomUUID(),
+        AmendTopic.DESIRED_OUTCOMES,
+        referral.id,
+        ReferralAmendmentDetails(mutableListOf("UUID1", "UUID3")),
+        ReferralAmendmentDetails(mutableListOf("UUID2")),
+        "A reason",
+        OffsetDateTime.now(),
+        user
+      )
+
+      val changelogUpdateDTO = ChangelogUpdateDTO(
+        changelog,
+        oldDesiredOutcomes = mutableListOf("desc1", "desc2"),
+        newDesiredOutcomes = mutableListOf("desc3")
+      )
+      whenever(amendReferralService.getChangeLogById(changelog.id, token)).thenReturn(changelogUpdateDTO)
+      whenever(userMapper.fromToken(any())).thenReturn(user)
+      val userDetail = UserDetail("firstname", "email", "lastname")
+
+      whenever(hmppsAuthService.getUserDetail(eq(user))).thenReturn(userDetail)
+
+      val returnedChangeLogObject = amendReferralController.getChangelogDetails(changelog.id, token)
+
+      assertThat(returnedChangeLogObject.changelogId).isEqualTo(changelog.id)
+      assertThat(returnedChangeLogObject.referralId).isEqualTo(changelog.referralId)
+      assertThat(returnedChangeLogObject.oldValue).containsExactlyInAnyOrder("desc1", "desc2")
+      assertThat(returnedChangeLogObject.newValue).containsExactly("desc3")
+    }
+
+    @Test
+    fun `getChangelogDetails returns the amended description for interpreter required changelog entry`() {
+
+      val changelog = changeLogFactory.create(
+        UUID.randomUUID(),
+        AmendTopic.NEEDS_AND_REQUIREMENTS_INTERPRETER_REQUIRED,
+        referral.id,
+        ReferralAmendmentDetails(mutableListOf("true", "spanish")),
+        ReferralAmendmentDetails(mutableListOf("no")),
+        "A reason",
+        OffsetDateTime.now(),
+        user
+      )
+
+      val changelogUpdateDTO = ChangelogUpdateDTO(
+        changelog,
+        oldDescription = "Yes-spanish",
+        newDescription = "No"
+      )
+      whenever(amendReferralService.getChangeLogById(changelog.id, token)).thenReturn(changelogUpdateDTO)
+      whenever(userMapper.fromToken(any())).thenReturn(user)
+      val userDetail = UserDetail("firstname", "email", "lastname")
+
+      whenever(hmppsAuthService.getUserDetail(eq(user))).thenReturn(userDetail)
+
+      val returnedChangeLogObject = amendReferralController.getChangelogDetails(changelog.id, token)
+
+      assertThat(returnedChangeLogObject.changelogId).isEqualTo(changelog.id)
+      assertThat(returnedChangeLogObject.referralId).isEqualTo(changelog.referralId)
+      assertThat(returnedChangeLogObject.oldValue).containsExactly("Yes-spanish")
+      assertThat(returnedChangeLogObject.newValue).containsExactly("No")
+    }
+
+    @Test
+    fun `getChangelogDetails throws 404 when changelog is not present`() {
+
+      val changelog = changeLogFactory.create(
+        UUID.randomUUID(),
+        AmendTopic.COMPLEXITY_LEVEL,
+        referral.id,
         ReferralAmendmentDetails(mutableListOf("a value")),
         ReferralAmendmentDetails(mutableListOf("another value")),
         "A reason",
