@@ -5,6 +5,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,11 +18,14 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndR
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ComplexityLevelRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DesiredOutcomeRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
@@ -31,6 +35,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ChangeLogFact
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
+import java.util.Optional
 import java.util.UUID
 
 @RepositoryTest
@@ -43,6 +48,7 @@ class AmendReferralServiceTest @Autowired constructor(
   val actionPlanRepository: ActionPlanRepository,
   val endOfServiceReportRepository: EndOfServiceReportRepository,
   val serviceCategoryRepository: ServiceCategoryRepository,
+  val desiredOutcomeRepository: DesiredOutcomeRepository,
   val changelogRepository: ChangelogRepository
 ) {
 
@@ -52,6 +58,7 @@ class AmendReferralServiceTest @Autowired constructor(
   private val serviceCategoryFactory = ServiceCategoryFactory(entityManager)
   private val changeLogFactory = ChangeLogFactory(entityManager)
   private val referralService: ReferralService = mock()
+  private val complexityLevelRepository: ComplexityLevelRepository = mock()
 
   private val userMapper: UserMapper = mock()
   private val jwtAuthenticationToken = JwtAuthenticationToken(mock())
@@ -60,6 +67,8 @@ class AmendReferralServiceTest @Autowired constructor(
     changelogRepository,
     referralRepository,
     serviceCategoryRepository,
+    complexityLevelRepository,
+    desiredOutcomeRepository,
     userMapper,
     referralService
   )
@@ -68,6 +77,8 @@ class AmendReferralServiceTest @Autowired constructor(
   fun `clear referrals`() {
     referralRepository.deleteAll()
     changelogRepository.deleteAll()
+    complexityLevelRepository.deleteAll()
+    desiredOutcomeRepository.deleteAll()
   }
 
   @Test
@@ -238,15 +249,21 @@ class AmendReferralServiceTest @Autowired constructor(
     val someoneElse = userFactory.create("helper_pp_user", "delius")
     val user = userFactory.create("pp_user_1", "delius")
 
+    val complexityLevel1 = ComplexityLevel(UUID.randomUUID(), "medium complexity", "some description")
+    val complexityLevel2 = ComplexityLevel(UUID.randomUUID(), "low complexity", "some description")
+
     val referral = referralFactory.createSent(
       needsInterpreter = false,
       createdBy = someoneElse
     )
 
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
+    whenever(complexityLevelRepository.findById(eq(complexityLevel1.id))).thenReturn(Optional.of(complexityLevel1))
+    whenever(complexityLevelRepository.findById(eq(complexityLevel2.id))).thenReturn(Optional.of(complexityLevel2))
 
     val uuid1 = UUID.randomUUID()
     val uuid2 = UUID.randomUUID()
+    val uuid3 = UUID.randomUUID()
 
     val changelog1 = changeLogFactory.create(
       id = uuid1,
@@ -256,8 +273,16 @@ class AmendReferralServiceTest @Autowired constructor(
       newVal = ReferralAmendmentDetails(listOf("hearing aid")),
       changedBy = someoneElse
     )
-    changeLogFactory.create(
+    val changelog2 = changeLogFactory.create(
       id = uuid2,
+      referralId = referral.id,
+      topic = AmendTopic.COMPLEXITY_LEVEL,
+      oldVal = ReferralAmendmentDetails(listOf(complexityLevel1.id.toString())),
+      newVal = ReferralAmendmentDetails(listOf(complexityLevel2.id.toString())),
+      changedBy = user
+    )
+    changeLogFactory.create(
+      id = uuid3,
       referralId = referral.id,
       topic = AmendTopic.DESIRED_OUTCOMES,
       oldVal = ReferralAmendmentDetails(listOf("301ead30-30a4-4c7c-8296-2768abfb59b5")),
@@ -265,9 +290,123 @@ class AmendReferralServiceTest @Autowired constructor(
       changedBy = user
     )
 
+    val changelog = amendReferralService.getChangeLogById(changelog2.id, jwtAuthenticationToken)
+
+    assertThat(changelog.changelog).isEqualTo(changelog2)
+    assertThat(changelog.oldComplexityLevelTitle).isEqualTo(complexityLevel1.title)
+    assertThat(changelog.newComplexityLevelTitle).isEqualTo(complexityLevel2.title)
+  }
+
+  @Test
+  fun `find changelog by changelogId for desired outcomes`() {
+
+    val someoneElse = userFactory.create("helper_pp_user", "delius")
+    val user = userFactory.create("pp_user_1", "delius")
+    val serviceCategoryId = UUID.randomUUID()
+    val desiredOutcome1 = DesiredOutcome(UUID.randomUUID(), "desiredOutcome1", serviceCategoryId = serviceCategoryId)
+    val desiredOutcome2 = DesiredOutcome(UUID.randomUUID(), "desiredOutcome2", serviceCategoryId = serviceCategoryId)
+
+    val serviceCategory = serviceCategoryFactory.create(
+      id = serviceCategoryId,
+      desiredOutcomes = listOf(desiredOutcome1, desiredOutcome2)
+    )
+    val referral = referralFactory.createSent(
+      selectedServiceCategories = mutableSetOf(serviceCategory),
+      desiredOutcomes = mutableListOf(desiredOutcome1, desiredOutcome2),
+      createdBy = someoneElse
+    )
+
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
+
+    val uuid1 = UUID.randomUUID()
+    val uuid3 = UUID.randomUUID()
+
+    val changelog1 = changeLogFactory.create(
+      id = uuid1,
+      referralId = referral.id,
+      topic = AmendTopic.NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS,
+      oldVal = ReferralAmendmentDetails(listOf("018e8ef3-9645-4712-898e-c913e2bb5bd9")),
+      newVal = ReferralAmendmentDetails(listOf("hearing aid")),
+      changedBy = someoneElse
+    )
+    val changelog2 = changeLogFactory.create(
+      id = uuid3,
+      referralId = referral.id,
+      topic = AmendTopic.DESIRED_OUTCOMES,
+      oldVal = ReferralAmendmentDetails(listOf(desiredOutcome1.id.toString())),
+      newVal = ReferralAmendmentDetails(listOf(desiredOutcome2.id.toString())),
+      changedBy = user
+    )
+
+    val changelog = amendReferralService.getChangeLogById(changelog2.id, jwtAuthenticationToken)
+
+    assertThat(changelog.changelog).isEqualTo(changelog2)
+    assertThat(changelog.oldDesiredOutcomes).contains("desiredOutcome1")
+    assertThat(changelog.newDesiredOutcomes).contains("desiredOutcome2")
+  }
+
+  @Test
+  fun `find changelog by changelogId for interpreter required`() {
+
+    val someoneElse = userFactory.create("helper_pp_user", "delius")
+    val user = userFactory.create("pp_user_1", "delius")
+
+    val referral = referralFactory.createSent(
+      needsInterpreter = true,
+      interpreterLanguage = "french",
+      createdBy = someoneElse
+    )
+
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
+
+    val uuid1 = UUID.randomUUID()
+
+    val changelog1 = changeLogFactory.create(
+      id = uuid1,
+      referralId = referral.id,
+      topic = AmendTopic.NEEDS_AND_REQUIREMENTS_INTERPRETER_REQUIRED,
+      oldVal = ReferralAmendmentDetails(listOf("false")),
+      newVal = ReferralAmendmentDetails(listOf("true", "French")),
+      changedBy = someoneElse
+    )
+
     val changelog = amendReferralService.getChangeLogById(changelog1.id, jwtAuthenticationToken)
 
-    assertThat(changelog).isEqualTo(changelog1)
+    assertThat(changelog.changelog).isEqualTo(changelog1)
+    assertThat(changelog.oldDescription).contains("No")
+    assertThat(changelog.newDescription).contains("Yes-French")
+  }
+
+  @Test
+  fun `find changelog by changelogId for employment responsibilities`() {
+
+    val someoneElse = userFactory.create("helper_pp_user", "delius")
+    val user = userFactory.create("pp_user_1", "delius")
+
+    val referral = referralFactory.createSent(
+      needsInterpreter = true,
+      interpreterLanguage = "french",
+      createdBy = someoneElse
+    )
+
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
+
+    val uuid1 = UUID.randomUUID()
+
+    val changelog1 = changeLogFactory.create(
+      id = uuid1,
+      referralId = referral.id,
+      topic = AmendTopic.NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES,
+      oldVal = ReferralAmendmentDetails(listOf("false")),
+      newVal = ReferralAmendmentDetails(listOf("true", "will not available wednesday mornings")),
+      changedBy = someoneElse
+    )
+
+    val changelog = amendReferralService.getChangeLogById(changelog1.id, jwtAuthenticationToken)
+
+    assertThat(changelog.changelog).isEqualTo(changelog1)
+    assertThat(changelog.oldDescription).contains("No")
+    assertThat(changelog.newDescription).contains("Yes-will not available wednesday mornings")
   }
 
   @Test

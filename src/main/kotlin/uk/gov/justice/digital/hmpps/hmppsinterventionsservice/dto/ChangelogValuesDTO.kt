@@ -29,7 +29,7 @@ data class ChangelogValuesDTO(
       AmendTopic.NEEDS_AND_REQUIREMENTS_INTERPRETER_REQUIRED, "Interpreter required was changed"
     )
     fun from(changelog: Changelog, userDetail: UserDetail): ChangelogValuesDTO {
-      val dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy 'at' hh.mm a")
+      val dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy 'at' h.mm a")
       return ChangelogValuesDTO(
         changelogId = changelog.id,
         referralId = changelog.referralId,
