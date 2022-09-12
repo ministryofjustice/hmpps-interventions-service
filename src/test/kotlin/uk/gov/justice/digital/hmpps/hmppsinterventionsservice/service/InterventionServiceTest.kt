@@ -80,7 +80,7 @@ class InterventionServiceTest @Autowired constructor(
     assertThat(interventionDTO!!.title).isEqualTo(intervention.title)
     assertThat(interventionDTO.description).isEqualTo(intervention.description)
     // fixme
-    // when only the nps region is set, the pcc regions are auto populated 
+    // when only the nps region is set, the pcc regions are auto populated
 //    assertThat(interventionDTO.pccRegions.size).isEqualTo(2)
   }
 
