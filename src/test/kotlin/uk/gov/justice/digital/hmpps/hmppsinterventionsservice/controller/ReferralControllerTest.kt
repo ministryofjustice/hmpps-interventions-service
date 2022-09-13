@@ -32,6 +32,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Cancell
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DraftOasysRiskInformationService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DraftReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcluder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ServiceCategoryService
@@ -45,6 +46,7 @@ import java.util.UUID
 import javax.persistence.EntityNotFoundException
 
 internal class ReferralControllerTest {
+  private val draftReferralService = mock<DraftReferralService>()
   private val referralService = mock<ReferralService>()
   private val referralConcluder = mock<ReferralConcluder>()
   private val serviceCategoryService = mock<ServiceCategoryService>()
@@ -56,6 +58,7 @@ internal class ReferralControllerTest {
   private val draftOasysRiskInformationService = mock<DraftOasysRiskInformationService>()
   private val telemetryClient = mock<TelemetryClient>()
   private val referralController = ReferralController(
+    draftReferralService,
     referralService,
     referralConcluder,
     serviceCategoryService,
@@ -76,7 +79,7 @@ internal class ReferralControllerTest {
   @Test
   fun `createDraftReferral handles EntityNotFound exceptions from InterventionsService`() {
     val token = tokenFactory.create()
-    whenever(referralService.createDraftReferral(any(), any(), any(), anyOrNull(), anyOrNull())).thenThrow(EntityNotFoundException::class.java)
+    whenever(draftReferralService.createDraftReferral(any(), any(), any(), anyOrNull(), anyOrNull())).thenThrow(EntityNotFoundException::class.java)
     assertThrows<ServerWebInputException> {
       referralController.createDraftReferral(CreateReferralRequestDTO("CRN20", UUID.randomUUID()), token)
     }
@@ -414,8 +417,8 @@ internal class ReferralControllerTest {
 
       val draftReferral = referralFactory.createDraft()
       val sentReferral = referralFactory.createSent()
-      whenever(referralService.getDraftReferralForUser(draftReferral.id, user)).thenReturn(draftReferral)
-      whenever(referralService.sendDraftReferral(draftReferral, user)).thenReturn(sentReferral)
+      whenever(draftReferralService.getDraftReferralForUser(draftReferral.id, user)).thenReturn(draftReferral)
+      whenever(draftReferralService.sendDraftReferral(draftReferral, user)).thenReturn(sentReferral)
       whenever(referralConcluder.requiresEndOfServiceReportCreation(sentReferral)).thenReturn(false)
       val sentReferralResponse = referralController.sendDraftReferral(
         draftReferral.id,
@@ -495,7 +498,7 @@ internal class ReferralControllerTest {
 
     @Test
     fun `getDraftReferralByID returns a sent referral if it exists`() {
-      whenever(referralService.getDraftReferralForUser(eq(referral.id), any())).thenReturn(referral)
+      whenever(draftReferralService.getDraftReferralForUser(eq(referral.id), any())).thenReturn(referral)
       val draftReferral = referralController.getDraftReferralByID(
         referral.id,
         token,
@@ -513,7 +516,7 @@ internal class ReferralControllerTest {
 
     @Test
     fun `getDraftReferrals returns a list of draft referrals if they exist`() {
-      whenever(referralService.getDraftReferralsForUser(any())).thenReturn(listOf(referral))
+      whenever(draftReferralService.getDraftReferralsForUser(any())).thenReturn(listOf(referral))
       val draftReferrals = referralController.getDraftReferrals(token)
       assertThat(draftReferrals).isNotNull
       assertThat(draftReferrals.count()).isEqualTo(1)

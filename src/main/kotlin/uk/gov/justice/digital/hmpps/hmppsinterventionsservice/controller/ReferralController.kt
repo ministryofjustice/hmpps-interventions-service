@@ -47,6 +47,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SentRef
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DraftOasysRiskInformationService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DraftReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcluder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ServiceCategoryService
@@ -56,6 +57,7 @@ import javax.persistence.EntityNotFoundException
 
 @RestController
 class ReferralController(
+  private val draftReferralService: DraftReferralService,
   private val referralService: ReferralService,
   private val referralConcluder: ReferralConcluder,
   private val serviceCategoryService: ServiceCategoryService,
@@ -96,7 +98,7 @@ class ReferralController(
 
     val draftReferral = getDraftReferralForAuthenticatedUser(authentication, id)
 
-    val sentReferral = referralService.sendDraftReferral(draftReferral, user)
+    val sentReferral = draftReferralService.sendDraftReferral(draftReferral, user)
 
     val location = ServletUriComponentsBuilder
       .fromCurrentContextPath()
@@ -144,7 +146,7 @@ class ReferralController(
     @Nullable @RequestParam(name = "dashboardType", required = false) dashboardTypeSelection: String?,
   ): List<ServiceProviderSentReferralSummaryDTO> {
     val user = userMapper.fromToken(authentication)
-    var dashboardType = dashboardTypeSelection?.let { DashboardType.valueOf(it) }
+    val dashboardType = dashboardTypeSelection?.let { DashboardType.valueOf(it) }
     return referralService.getServiceProviderSummaries(user, dashboardType)
       .map { ServiceProviderSentReferralSummaryDTO.from(it) }.also {
         telemetryClient.trackEvent(
@@ -174,7 +176,7 @@ class ReferralController(
     val user = userMapper.fromToken(authentication)
 
     val referral = try {
-      referralService.createDraftReferral(
+      draftReferralService.createDraftReferral(
         user,
         createReferralRequestDTO.serviceUserCrn,
         createReferralRequestDTO.interventionId,
@@ -203,14 +205,14 @@ class ReferralController(
   fun patchDraftReferralByID(@PathVariable id: UUID, @RequestBody partialUpdate: DraftReferralDTO, authentication: JwtAuthenticationToken): DraftReferralDTO {
     val referralToUpdate = getDraftReferralForAuthenticatedUser(authentication, id)
 
-    val updatedReferral = referralService.updateDraftReferral(referralToUpdate, partialUpdate)
+    val updatedReferral = draftReferralService.updateDraftReferral(referralToUpdate, partialUpdate)
     return DraftReferralDTO.from(updatedReferral)
   }
 
   @PatchMapping("/draft-referral/{id}/complexity-level")
   fun setDraftReferralComplexityLevel(authentication: JwtAuthenticationToken, @PathVariable id: UUID, @RequestBody request: SetComplexityLevelRequestDTO): DraftReferralDTO {
     val referral = getDraftReferralForAuthenticatedUser(authentication, id)
-    val updatedReferral = referralService.updateDraftReferralComplexityLevel(referral, request.serviceCategoryId, request.complexityLevelId)
+    val updatedReferral = draftReferralService.updateDraftReferralComplexityLevel(referral, request.serviceCategoryId, request.complexityLevelId)
     return DraftReferralDTO.from(updatedReferral)
   }
 
@@ -221,7 +223,7 @@ class ReferralController(
     @RequestBody request: SelectedDesiredOutcomesDTO
   ): DraftReferralDTO {
     val referral = getDraftReferralForAuthenticatedUser(authentication, id)
-    val updatedReferral = referralService.updateDraftReferralDesiredOutcomes(referral, request.serviceCategoryId, request.desiredOutcomesIds)
+    val updatedReferral = draftReferralService.updateDraftReferralDesiredOutcomes(referral, request.serviceCategoryId, request.desiredOutcomesIds)
     return DraftReferralDTO.from(updatedReferral)
   }
 
@@ -253,7 +255,7 @@ class ReferralController(
   fun getDraftReferrals(authentication: JwtAuthenticationToken): List<DraftReferralDTO> {
     val user = userMapper.fromToken(authentication)
 
-    return referralService.getDraftReferralsForUser(user).map { DraftReferralDTO.from(it) }
+    return draftReferralService.getDraftReferralsForUser(user).map { DraftReferralDTO.from(it) }
   }
 
   @GetMapping("/service-category/{id}")
@@ -317,7 +319,7 @@ class ReferralController(
 
   private fun getDraftReferralForAuthenticatedUser(authentication: JwtAuthenticationToken, id: UUID): DraftReferral {
     val user = userMapper.fromToken(authentication)
-    return referralService.getDraftReferralForUser(id, user)
+    return draftReferralService.getDraftReferralForUser(id, user)
       ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "draft referral not found [id=$id]")
   }
 

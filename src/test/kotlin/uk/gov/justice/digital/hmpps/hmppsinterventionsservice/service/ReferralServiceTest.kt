@@ -11,13 +11,9 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.provider.Arguments
 import org.mockito.kotlin.any
-import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.spy
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
@@ -30,20 +26,15 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.Refe
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessFilter
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceProviderAccessScope
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceProviderAccessScopeMapper
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceUserAccessChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserTypeChecker
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.ValidationError
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DraftReferralDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SentReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceProvider
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
@@ -62,7 +53,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFac
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.CancellationReasonFactory
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ContractTypeFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFrameworkContractFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
@@ -70,17 +60,13 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralDetai
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SentReferralSummariesFactory
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceProviderFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAssessmentFactory
 import java.time.LocalDate
-import java.time.LocalTime
 import java.time.OffsetDateTime
-import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit
 import java.util.UUID
-import kotlin.random.Random
 
 @RepositoryTest
 class ReferralServiceTest @Autowired constructor(
@@ -98,16 +84,12 @@ class ReferralServiceTest @Autowired constructor(
   val referralDetailsRepository: ReferralDetailsRepository,
   val changelogRepository: ChangelogRepository
 ) {
-
   private val userFactory = AuthUserFactory(entityManager)
   private val interventionFactory = InterventionFactory(entityManager)
   private val contractFactory = DynamicFrameworkContractFactory(entityManager)
   private val serviceProviderFactory = ServiceProviderFactory(entityManager)
   private val referralFactory = ReferralFactory(entityManager)
   private val sentReferralSummariesFactory = SentReferralSummariesFactory(entityManager)
-  private val serviceCategoryFactory = ServiceCategoryFactory(entityManager)
-  private val contractTypeFactory = ContractTypeFactory(entityManager)
-  private val dynamicFrameworkContractFactory = DynamicFrameworkContractFactory(entityManager)
   private val cancellationReasonFactory = CancellationReasonFactory(entityManager)
   private val endOfServiceReportFactory = EndOfServiceReportFactory(entityManager)
   private val actionPlanFactory = ActionPlanFactory(entityManager)
@@ -117,20 +99,14 @@ class ReferralServiceTest @Autowired constructor(
   private val referralDetailsFactory = ReferralDetailsFactory(entityManager)
 
   private val referralEventPublisher: ReferralEventPublisher = mock()
-  private val referenceGenerator: ReferralReferenceGenerator = spy(ReferralReferenceGenerator())
   private val referralConcluder: ReferralConcluder = mock()
   private val referralAccessChecker: ReferralAccessChecker = mock()
   private val userTypeChecker = UserTypeChecker()
   private val serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper = mock()
   private val referralAccessFilter = ReferralAccessFilter(serviceProviderAccessScopeMapper)
-  private val communityAPIReferralService: CommunityAPIReferralService = mock()
-  private val serviceUserAccessChecker: ServiceUserAccessChecker = mock()
-  private val assessRisksAndNeedsService: RisksAndNeedsService = mock()
   private val communityAPIOffenderService: CommunityAPIOffenderService = mock()
-  private val supplierAssessmentService: SupplierAssessmentService = mock()
   private val hmppsAuthService: HMPPSAuthService = mock()
   private val telemetryService: TelemetryService = mock()
-  private val draftOasysRiskInformationService: DraftOasysRiskInformationService = mock()
 
   private val recursiveComparisonConfigurationBuilder = RecursiveComparisonConfiguration.builder()
   private val userMapper: UserMapper = mock()
@@ -144,7 +120,6 @@ class ReferralServiceTest @Autowired constructor(
     interventionRepository,
     referralConcluder,
     referralEventPublisher,
-    referenceGenerator,
     cancellationReasonRepository,
     deliverySessionRepository,
     serviceCategoryRepository,
@@ -152,14 +127,9 @@ class ReferralServiceTest @Autowired constructor(
     userTypeChecker,
     serviceProviderAccessScopeMapper,
     referralAccessFilter,
-    communityAPIReferralService,
-    serviceUserAccessChecker,
-    assessRisksAndNeedsService,
     communityAPIOffenderService,
-    supplierAssessmentService,
     hmppsAuthService,
     telemetryService,
-    draftOasysRiskInformationService,
     referralDetailsRepository,
     changelogRepository
   )
@@ -182,355 +152,6 @@ class ReferralServiceTest @Autowired constructor(
     changelogRepository.deleteAll()
     draftReferralRepository.deleteAll()
     referralRepository.deleteAll()
-  }
-
-  @Nested
-  @DisplayName("create / find / update / send draft referrals")
-  inner class createFindUpdateAndSendDraftReferrals {
-
-    private lateinit var sampleDraftReferral: DraftReferral
-    private lateinit var sampleIntervention: Intervention
-    private lateinit var sampleCohortIntervention: Intervention
-
-    @BeforeEach
-    fun beforeEach() {
-      sampleDraftReferral = SampleData.persistReferral(
-        entityManager,
-        SampleData.sampleDraftReferral("X123456", "Harmony Living")
-      )
-      sampleIntervention = sampleDraftReferral.intervention
-
-      sampleCohortIntervention = SampleData.persistIntervention(
-        entityManager,
-        SampleData.sampleIntervention(
-          dynamicFrameworkContract = SampleData.sampleContract(
-            primeProvider = sampleDraftReferral.intervention.dynamicFrameworkContract.primeProvider,
-            contractType = SampleData.sampleContractType(
-              name = "Personal Wellbeing",
-              code = "PWB",
-              serviceCategories = mutableSetOf(
-                SampleData.sampleServiceCategory(),
-                SampleData.sampleServiceCategory(name = "Social inclusion")
-              )
-            )
-          )
-        )
-      )
-    }
-
-    @Test
-    fun `assignment to a user adds a new assignment record to the trail of assignments`() {
-      val r = referralFactory.createSent()
-      val assigner = userFactory.create(id = "1000", userName = "test-admin@example.org")
-      val assignedTo1 = userFactory.create(id = "5000", userName = "assignee1@example.org")
-      val assignedTo2 = userFactory.create(id = "5001", userName = "assignee2@example.org")
-
-      referralService.assignSentReferral(r, assigner, assignedTo1)
-      referralService.assignSentReferral(r, assigner, assignedTo2)
-
-      with(r.assignments[0]) {
-        assertThat(this.assignedBy).isEqualTo(assigner)
-        assertThat(this.assignedTo).isEqualTo(assignedTo1)
-      }
-      with(r.assignments[1]) {
-        assertThat(this.assignedAt).isAfterOrEqualTo(r.assignments[0].assignedAt)
-        assertThat(this.assignedBy).isEqualTo(assigner)
-        assertThat(this.assignedTo).isEqualTo(assignedTo2)
-      }
-    }
-
-    @Test
-    fun `assignment to a user marks older records superseded`() {
-      val r = referralFactory.createSent()
-      val assigner = userFactory.create(id = "1000", userName = "test-admin@example.org")
-      val assignedTo1 = userFactory.create(id = "5000", userName = "assignee1@example.org")
-      val assignedTo2 = userFactory.create(id = "5001", userName = "assignee2@example.org")
-      val assignedTo3 = userFactory.create(id = "5002", userName = "assignee3@example.org")
-
-      referralService.assignSentReferral(r, assigner, assignedTo1)
-      referralService.assignSentReferral(r, assigner, assignedTo2)
-      referralService.assignSentReferral(r, assigner, assignedTo3)
-
-      assertThat(r.assignments.map { it.superseded })
-        .containsExactly(true, true, false)
-    }
-
-    @Test
-    fun `update cannot overwrite identifier fields`() {
-      val draftReferral = DraftReferralDTO(
-        id = UUID.fromString("ce364949-7301-497b-894d-130f34a98bff"),
-        createdAt = OffsetDateTime.of(LocalDate.of(2020, 12, 1), LocalTime.MIN, ZoneOffset.UTC)
-      )
-
-      val updated = referralService.updateDraftReferral(sampleDraftReferral, draftReferral)
-      assertThat(updated.id).isEqualTo(sampleDraftReferral.id)
-      assertThat(updated.createdAt).isEqualTo(sampleDraftReferral.createdAt)
-    }
-
-    @Test
-    fun `null fields in the update do not overwrite original fields`() {
-      val sentenceId = Random.nextLong()
-      sampleDraftReferral.relevantSentenceId = sentenceId
-      entityManager.persistAndFlush(sampleDraftReferral)
-
-      val draftReferral = DraftReferralDTO(relevantSentenceId = null)
-
-      val updated = referralService.updateDraftReferral(sampleDraftReferral, draftReferral)
-      assertThat(updated.relevantSentenceId).isEqualTo(sentenceId)
-    }
-
-    @Test
-    fun `non-null fields in the update overwrite original fields`() {
-      val existingSentenceId = Random.nextLong()
-      val newSentenceId = Random.nextLong()
-      sampleDraftReferral.relevantSentenceId = existingSentenceId
-      entityManager.persistAndFlush(sampleDraftReferral)
-
-      val draftReferral = DraftReferralDTO(relevantSentenceId = newSentenceId)
-
-      val updated = referralService.updateDraftReferral(sampleDraftReferral, draftReferral)
-      assertThat(updated.relevantSentenceId).isEqualTo(newSentenceId)
-    }
-
-    @Test
-    fun `update mutates the original object`() {
-      val existingSentenceId = Random.nextLong()
-      val newSentenceId = Random.nextLong()
-      sampleDraftReferral.relevantSentenceId = existingSentenceId
-      entityManager.persistAndFlush(sampleDraftReferral)
-
-      val today = LocalDate.now()
-      val draftReferral = DraftReferralDTO(relevantSentenceId = newSentenceId)
-
-      val updated = referralService.updateDraftReferral(sampleDraftReferral, draftReferral)
-      assertThat(updated.relevantSentenceId).isEqualTo(newSentenceId)
-    }
-
-    @Test
-    fun `update successfully persists the updated draft referral`() {
-      val existingSentenceId = Random.nextLong()
-      val newSentenceId = Random.nextLong()
-      sampleDraftReferral.relevantSentenceId = existingSentenceId
-      entityManager.persistAndFlush(sampleDraftReferral)
-
-      val draftReferral = DraftReferralDTO(relevantSentenceId = newSentenceId)
-      referralService.updateDraftReferral(sampleDraftReferral, draftReferral)
-      val savedDraftReferral = referralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
-      assertThat(savedDraftReferral).isNotNull
-      assertThat(savedDraftReferral?.id).isEqualTo(sampleDraftReferral.id)
-      assertThat(savedDraftReferral?.createdAt).isEqualTo(sampleDraftReferral.createdAt)
-      assertThat(savedDraftReferral?.relevantSentenceId).isEqualTo(draftReferral.relevantSentenceId)
-    }
-
-    @Test
-    fun `create and persist non-cohort draft referral`() {
-      val authUser = AuthUser("user_id", "delius", "user_name")
-      val draftReferral = referralService.createDraftReferral(authUser, "X123456", sampleIntervention.id)
-      entityManager.flush()
-
-      val savedDraftReferral = referralService.getDraftReferralForUser(draftReferral.id, authUser)
-      assertThat(savedDraftReferral?.id).isNotNull
-      assertThat(savedDraftReferral?.createdAt).isNotNull
-      assertThat(savedDraftReferral?.createdBy).isEqualTo(authUser)
-      assertThat(savedDraftReferral?.serviceUserCRN).isEqualTo("X123456")
-      assertThat(savedDraftReferral?.selectedServiceCategories).hasSize(1)
-      assertThat(savedDraftReferral?.selectedServiceCategories!!.elementAt(0).id).isEqualTo(
-        sampleIntervention.dynamicFrameworkContract.contractType.serviceCategories.elementAt(
-          0
-        ).id
-      )
-    }
-
-    @Test
-    fun `create and persist cohort draft referral`() {
-      val authUser = AuthUser("user_id", "delius", "user_name")
-      val draftReferral = referralService.createDraftReferral(authUser, "X123456", sampleCohortIntervention.id)
-      entityManager.flush()
-
-      val savedDraftReferral = referralService.getDraftReferralForUser(draftReferral.id, authUser)
-      assertThat(savedDraftReferral).isNotNull
-      assertThat(savedDraftReferral?.id).isNotNull
-      assertThat(savedDraftReferral?.createdAt).isNotNull
-      assertThat(savedDraftReferral?.createdBy).isEqualTo(authUser)
-      assertThat(savedDraftReferral?.serviceUserCRN).isEqualTo("X123456")
-      assertThat(savedDraftReferral?.selectedServiceCategories).isNull()
-    }
-
-    @Test
-    fun `get a draft referral`() {
-      val sentenceId = Random.nextLong()
-      sampleDraftReferral.relevantSentenceId = sentenceId
-      entityManager.persistAndFlush(sampleDraftReferral)
-
-      val savedDraftReferral = referralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
-      assertThat(savedDraftReferral?.id).isEqualTo(sampleDraftReferral.id)
-      assertThat(savedDraftReferral?.createdAt).isEqualTo(sampleDraftReferral.createdAt)
-      assertThat(savedDraftReferral?.relevantSentenceId).isEqualTo(sampleDraftReferral.relevantSentenceId)
-    }
-
-    @Test
-    fun `find by userID returns list of draft referrals`() {
-      val user1 = AuthUser("123", "delius", "bernie.b")
-      val user2 = AuthUser("456", "delius", "sheila.h")
-      val user3 = AuthUser("789", "delius", "tom.myers")
-      referralService.createDraftReferral(user1, "X123456", sampleIntervention.id)
-      referralService.createDraftReferral(user1, "X123456", sampleIntervention.id)
-      referralService.createDraftReferral(user2, "X123456", sampleIntervention.id)
-      entityManager.flush()
-
-      val single = referralService.getDraftReferralsForUser(user2)
-      assertThat(single).hasSize(1)
-
-      val multiple = referralService.getDraftReferralsForUser(user1)
-      assertThat(multiple).hasSize(2)
-
-      val none = referralService.getDraftReferralsForUser(user3)
-      assertThat(none).hasSize(0)
-    }
-
-    @Test
-    fun `completion date must be in the future`() {
-      val update = DraftReferralDTO(completionDeadline = LocalDate.of(2020, 1, 1))
-      val error = assertThrows<ValidationError> {
-        referralService.updateDraftReferral(sampleDraftReferral, update)
-      }
-      assertThat(error.errors.size).isEqualTo(1)
-      assertThat(error.errors[0].field).isEqualTo("completionDeadline")
-    }
-
-    @Test
-    fun `when needsInterpreter is true, interpreterLanguage must be set`() {
-      // this is fine
-      referralService.updateDraftReferral(sampleDraftReferral, DraftReferralDTO(needsInterpreter = false))
-
-      val error = assertThrows<ValidationError> {
-        // this throws ValidationError
-        referralService.updateDraftReferral(sampleDraftReferral, DraftReferralDTO(needsInterpreter = true))
-      }
-      assertThat(error.errors.size).isEqualTo(1)
-      assertThat(error.errors[0].field).isEqualTo("needsInterpreter")
-
-      // this is also fine
-      referralService.updateDraftReferral(
-        sampleDraftReferral,
-        DraftReferralDTO(needsInterpreter = true, interpreterLanguage = "German")
-      )
-    }
-
-    @Test
-    fun `when hasAdditionalResponsibilities is true, whenUnavailable must be set`() {
-      // this is fine
-      referralService.updateDraftReferral(sampleDraftReferral, DraftReferralDTO(hasAdditionalResponsibilities = false))
-
-      val error = assertThrows<ValidationError> {
-        // this throws ValidationError
-        referralService.updateDraftReferral(sampleDraftReferral, DraftReferralDTO(hasAdditionalResponsibilities = true))
-      }
-      assertThat(error.errors.size).isEqualTo(1)
-      assertThat(error.errors[0].field).isEqualTo("hasAdditionalResponsibilities")
-
-      // this is also fine
-      referralService.updateDraftReferral(
-        sampleDraftReferral,
-        DraftReferralDTO(hasAdditionalResponsibilities = true, whenUnavailable = "wednesdays")
-      )
-    }
-
-    @Test
-    fun `multiple errors at once`() {
-      val update = DraftReferralDTO(completionDeadline = LocalDate.of(2020, 1, 1), needsInterpreter = true)
-      val error = assertThrows<ValidationError> {
-        referralService.updateDraftReferral(sampleDraftReferral, update)
-      }
-      assertThat(error.errors.size).isEqualTo(2)
-    }
-
-    @Test
-    fun `the referral isn't actually updated if any of the fields contain validation errors`() {
-      // any invalid fields should mean that no fields are written to the db
-      val update = DraftReferralDTO(
-        // valid field
-        additionalNeedsInformation = "requires wheelchair access",
-        // invalid field
-        completionDeadline = LocalDate.of(2020, 1, 1),
-      )
-      assertThrows<ValidationError> {
-        referralService.updateDraftReferral(sampleDraftReferral, update)
-      }
-
-      entityManager.flush()
-      val draftReferral = referralService.getDraftReferralForUser(
-        sampleDraftReferral.id,
-        userFactory.create()
-      )
-      assertThat(draftReferral?.additionalNeedsInformation).isNull()
-    }
-
-    @Test
-    fun `once a draft referral is sent to referral it's id is still valid in draft referral`() {
-      val user = AuthUser("user_id", "delius", "user_name")
-      val draftReferral = referralService.createDraftReferral(user, "X123456", sampleIntervention.id)
-      draftReferral.additionalRiskInformation = "risk"
-
-      assertThat(referralService.getDraftReferralForUser(draftReferral.id, user)).isNotNull
-
-      referralService.sendDraftReferral(draftReferral, user)
-
-      assertThat(referralService.getDraftReferralForUser(draftReferral.id, user)).isNotNull
-      assertThat(referralService.getSentReferralForUser(draftReferral.id, user)).isNotNull
-    }
-
-    @Test
-    fun `sending a draft referral generates a referral reference number`() {
-      val user = AuthUser("user_id", "delius", "user_name")
-      val draftReferral = referralService.createDraftReferral(user, "X123456", sampleIntervention.id)
-      draftReferral.additionalRiskInformation = "risk"
-
-      val sentReferral = referralService.sendDraftReferral(draftReferral, user)
-      assertThat(sentReferral.referenceNumber).isNotNull
-    }
-
-    @Test
-    fun `sending a draft referral generates a unique reference, even if the previous reference already exists`() {
-      val user = AuthUser("user_id", "delius", "user_name")
-      val draft1 = referralService.createDraftReferral(user, "X123456", sampleIntervention.id)
-      val draft2 = referralService.createDraftReferral(user, "X123456", sampleIntervention.id)
-      draft1.additionalRiskInformation = "risk"
-      draft2.additionalRiskInformation = "risk"
-
-      whenever(referenceGenerator.generate(sampleIntervention.dynamicFrameworkContract.contractType.name))
-        .thenReturn("AA0000ZZ", "AA0000ZZ", "AA0000ZZ", "AA0000ZZ", "BB0000ZZ")
-
-      val sent1 = referralService.sendDraftReferral(draft1, user)
-      assertThat(sent1.referenceNumber).isEqualTo("AA0000ZZ")
-
-      val sent2 = referralService.sendDraftReferral(draft2, user)
-      assertThat(sent2.referenceNumber).isNotEqualTo("AA0000ZZ").isEqualTo("BB0000ZZ")
-    }
-
-    @Test
-    fun `sending a draft referral triggers an event`() {
-      val user = AuthUser("user_id", "delius", "user_name")
-      val draftReferral = referralService.createDraftReferral(user, "X123456", sampleIntervention.id)
-      draftReferral.additionalRiskInformation = "risk"
-
-      val referral = referralService.sendDraftReferral(draftReferral, user)
-      val eventCaptor = argumentCaptor<Referral>()
-      verify(communityAPIReferralService).send(eventCaptor.capture())
-      val capturedReferral = eventCaptor.firstValue
-      assertThat(capturedReferral.id).isEqualTo(referral.id)
-      verify(referralEventPublisher).referralSentEvent(referral)
-    }
-
-    @Test
-    fun `multiple draft referrals can be started by the same user`() {
-      val user = AuthUser("multi_user_id", "delius", "user_name")
-
-      for (i in 1..3) {
-        assertDoesNotThrow { referralService.createDraftReferral(user, "X123456", sampleIntervention.id) }
-      }
-      assertThat(referralService.getDraftReferralsForUser(user)).hasSize(3)
-    }
   }
 
   @Nested
@@ -1306,63 +927,6 @@ class ReferralServiceTest @Autowired constructor(
   }
 
   @Test
-  fun `ensure that desired outcomes are actually removed via orphan removal`() {
-
-    val serviceCategoryId1 = UUID.randomUUID()
-    val serviceCategoryId2 = UUID.randomUUID()
-    val desiredOutcome1 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId1)
-    val desiredOutcome2 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId2)
-    val serviceCategory1 =
-      serviceCategoryFactory.create(id = serviceCategoryId1, desiredOutcomes = mutableListOf(desiredOutcome1))
-    val serviceCategory2 =
-      serviceCategoryFactory.create(id = serviceCategoryId2, desiredOutcomes = mutableListOf(desiredOutcome2))
-
-    val contractType = contractTypeFactory.create(serviceCategories = setOf(serviceCategory1, serviceCategory2))
-    val referral = referralFactory.createDraft(
-      intervention = interventionFactory.create(
-        contract = dynamicFrameworkContractFactory.create(
-          contractType = contractType
-        )
-      ),
-      selectedServiceCategories = setOf(serviceCategory1).toMutableSet(),
-      desiredOutcomes = listOf(desiredOutcome1).toMutableList()
-    )
-    referralService.updateDraftReferral(referral, DraftReferralDTO(serviceCategoryIds = listOf(serviceCategoryId2)))
-
-    draftReferralRepository.flush()
-    val updatedReferral = draftReferralRepository.findById(referral.id).get()
-    assertThat(updatedReferral.selectedServiceCategories).hasSize(1)
-    assertThat(updatedReferral.selectedServiceCategories!!.elementAt(0).id).isEqualTo(serviceCategoryId2)
-    assertThat(updatedReferral.selectedDesiredOutcomes).hasSize(0)
-  }
-
-  @Test
-  fun `ensure that service categories constraint is not thrown when service categories is reselected with an already selected desired outcome`() {
-    val serviceCategoryId = UUID.randomUUID()
-    val desiredOutcome = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId)
-    val serviceCategory =
-      serviceCategoryFactory.create(id = serviceCategoryId, desiredOutcomes = mutableListOf(desiredOutcome))
-
-    val contractType = contractTypeFactory.create(serviceCategories = setOf(serviceCategory))
-    val referral = referralFactory.createDraft(
-      intervention = interventionFactory.create(
-        contract = dynamicFrameworkContractFactory.create(
-          contractType = contractType
-        )
-      ),
-      selectedServiceCategories = setOf(serviceCategory).toMutableSet(),
-      desiredOutcomes = listOf(desiredOutcome).toMutableList(),
-    )
-    referralService.updateDraftReferral(referral, DraftReferralDTO(serviceCategoryIds = listOf(serviceCategoryId)))
-
-    draftReferralRepository.flush()
-    val updatedReferral = draftReferralRepository.findById(referral.id).get()
-    assertThat(updatedReferral.selectedServiceCategories).hasSize(1)
-    assertThat(updatedReferral.selectedServiceCategories!!.elementAt(0).id).isEqualTo(serviceCategoryId)
-    assertThat(updatedReferral.selectedDesiredOutcomes).hasSize(1)
-  }
-
-  @Test
   fun `check when user is not the same as the responsible officer`() {
     val responsibleProbationPractitioner = ResponsibleProbationPractitioner("abc", "abc@abc.com", null, AuthUser("123456", "delius", "TEST_INTERVENTIONS_SP_1"), "def")
     val authUser = AuthUser("123457", "delius", "bernard.beaks")
@@ -1470,7 +1034,7 @@ class ReferralServiceTest @Autowired constructor(
     whenever(userMapper.fromToken(jwtAuthentionToken)).thenReturn(authUser)
 
     val referralToUpdate = UpdateReferralDetailsDTO(20, completionDateToChange, "new information", "we decided 10 days wasn't enough")
-    var referralDetailsReturned = referralService.updateReferralDetails(referral, referralToUpdate, user)
+    val referralDetailsReturned = referralService.updateReferralDetails(referral, referralToUpdate, user)
     val referralDetailsValue = referralService.getReferralDetailsById(referralDetailsReturned?.id)
 
     assertThat(referralDetailsValue?.referralId).isEqualTo(referral.id)
