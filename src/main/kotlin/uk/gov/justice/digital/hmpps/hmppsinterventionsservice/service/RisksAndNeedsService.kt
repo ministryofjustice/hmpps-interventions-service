@@ -102,11 +102,12 @@ class RisksAndNeedsService(
     if (response.statusCode.equals(HttpStatus.CONFLICT)) {
       if (response.body.createdDate != riskCreatedAt.toLocalDateTime()) {
         logger.error(
-          "attempted to update an existing supplementary risk with new data {} {} {} {}",
+          "attempted to update an existing supplementary risk with new data {} {} {} {} {}",
           kv("crn", crn),
           kv("referralId", referralId),
           kv("riskId", response.body.supplementaryRiskId),
-          kv("riskCreatedAt", riskCreatedAt)
+          kv("riskCreatedAt", riskCreatedAt),
+          kv("remoteRiskCreatedAt", response.body.createdDate)
         )
 
         throw WebClientResponseException(409, "Conflict from ARN 'createSupplementaryRisk'", null, null, null)
