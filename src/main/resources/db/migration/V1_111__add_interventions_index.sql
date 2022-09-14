@@ -1,0 +1,1 @@
+create unique index concurrently idx_intervention_dynamic_framework_contract_id on intervention (dynamic_framework_contract_id);
