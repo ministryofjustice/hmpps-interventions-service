@@ -20,16 +20,20 @@ data class ChangelogDetailsDTO(
       var newValue: List<String> = emptyList()
       when (changelog.topic) {
         AmendTopic.COMPLEXITY_LEVEL -> {
-          oldValue = listOf(changelogUpdateDTO.oldComplexityLevelTitle!!.uppercase())
-          newValue = listOf(changelogUpdateDTO.newComplexityLevelTitle!!.uppercase())
+          oldValue = listOf(changelogUpdateDTO.oldValue!!.uppercase())
+          newValue = listOf(changelogUpdateDTO.newValue!!.uppercase())
         }
         AmendTopic.DESIRED_OUTCOMES -> {
-          oldValue = changelogUpdateDTO.oldDesiredOutcomes
-          newValue = changelogUpdateDTO.newDesiredOutcomes
+          oldValue = changelogUpdateDTO.oldValues
+          newValue = changelogUpdateDTO.newValues
+        }
+        AmendTopic.COMPLETION_DATETIME -> {
+          oldValue = listOf(changelogUpdateDTO.oldValue!!)
+          newValue = listOf(changelogUpdateDTO.newValue!!)
         }
         AmendTopic.NEEDS_AND_REQUIREMENTS_INTERPRETER_REQUIRED, AmendTopic.NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES -> {
-          oldValue = listOf(changelogUpdateDTO.oldDescription!!)
-          newValue = listOf(changelogUpdateDTO.newDescription!!)
+          oldValue = listOf(changelogUpdateDTO.oldValue!!)
+          newValue = listOf(changelogUpdateDTO.newValue!!)
         }
         else -> {}
       }
