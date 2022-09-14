@@ -4,10 +4,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changel
 
 data class ChangelogUpdateDTO(
   val changelog: Changelog,
-  val oldComplexityLevelTitle: String? = null,
-  val newComplexityLevelTitle: String? = null,
-  val oldDesiredOutcomes: List<String> = emptyList(),
-  val newDesiredOutcomes: List<String> = emptyList(),
-  val oldDescription: String? = null,
-  val newDescription: String? = null
+  val oldValue: String? = null,
+  val newValue: String? = null,
+  val oldValues: List<String> = emptyList(),
+  val newValues: List<String> = emptyList()
 )

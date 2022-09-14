@@ -18,7 +18,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOu
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogUpdateDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendTopic
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthService
@@ -324,8 +323,8 @@ internal class AmendReferralControllerTest {
 
       val changelogUpdateDTO = ChangelogUpdateDTO(
         changelog,
-        oldDesiredOutcomes = mutableListOf("desc1", "desc2"),
-        newDesiredOutcomes = mutableListOf("desc3")
+        oldValues = mutableListOf("desc1", "desc2"),
+        newValues = mutableListOf("desc3")
       )
       whenever(amendReferralService.getChangeLogById(changelog.id, token)).thenReturn(changelogUpdateDTO)
       whenever(userMapper.fromToken(any())).thenReturn(user)
@@ -357,8 +356,8 @@ internal class AmendReferralControllerTest {
 
       val changelogUpdateDTO = ChangelogUpdateDTO(
         changelog,
-        oldDescription = "Yes-spanish",
-        newDescription = "No"
+        oldValue = "Yes-spanish",
+        newValue = "No"
       )
       whenever(amendReferralService.getChangeLogById(changelog.id, token)).thenReturn(changelogUpdateDTO)
       whenever(userMapper.fromToken(any())).thenReturn(user)

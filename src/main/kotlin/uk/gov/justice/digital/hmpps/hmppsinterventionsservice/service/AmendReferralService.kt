@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Des
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 import javax.transaction.Transactional
 
@@ -192,7 +193,7 @@ class AmendReferralService(
       AmendTopic.COMPLEXITY_LEVEL -> {
         val oldComplexityLevel = complexityLevelRepository.findById(UUID.fromString(changelog.oldVal.values[0]))
         val newComplexityLevel = complexityLevelRepository.findById(UUID.fromString(changelog.newVal.values[0]))
-        return ChangelogUpdateDTO(changelog, oldComplexityLevel.get().title, newComplexityLevel.get().title)
+        return ChangelogUpdateDTO(changelog = changelog, oldValue = oldComplexityLevel.get().title, newValue = newComplexityLevel.get().title)
       }
       AmendTopic.DESIRED_OUTCOMES -> {
         val oldDesiredOutcomes = changelog.oldVal.values.map {
@@ -203,20 +204,33 @@ class AmendReferralService(
           val desiredOutcome = desiredOutcomeRepository.findById(UUID.fromString(it))
           desiredOutcome.get().description
         }.toList()
-        return ChangelogUpdateDTO(changelog = changelog, oldDesiredOutcomes = oldDesiredOutcomes, newDesiredOutcomes = newDesiredOutcomes)
+        return ChangelogUpdateDTO(changelog = changelog, oldValues = oldDesiredOutcomes, newValues = newDesiredOutcomes)
       }
       AmendTopic.NEEDS_AND_REQUIREMENTS_INTERPRETER_REQUIRED -> {
         return ChangelogUpdateDTO(
           changelog = changelog,
-          oldDescription = generateDescription(changelog.oldVal.values),
-          newDescription = generateDescription(changelog.newVal.values)
+          oldValue = generateDescription(changelog.oldVal.values),
+          newValue = generateDescription(changelog.newVal.values)
         )
       }
       AmendTopic.NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES -> {
         return ChangelogUpdateDTO(
           changelog = changelog,
-          oldDescription = generateDescription(changelog.oldVal.values),
-          newDescription = generateDescription(changelog.newVal.values)
+          oldValue = generateDescription(changelog.oldVal.values),
+          newValue = generateDescription(changelog.newVal.values)
+        )
+      }
+      AmendTopic.COMPLETION_DATETIME -> {
+        val originalDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val newDateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
+        val oldDate = originalDateTimeFormatter.parse(changelog.oldVal.values[0])
+        val formattedOldCompletionDate = newDateTimeFormatter.format(oldDate)
+        val newDate = originalDateTimeFormatter.parse(changelog.newVal.values[0])
+        val formattedNewCompletionDate = newDateTimeFormatter.format(newDate)
+        return ChangelogUpdateDTO(
+          changelog = changelog,
+          oldValue = formattedOldCompletionDate,
+          newValue = formattedNewCompletionDate
         )
       }
       else -> {}

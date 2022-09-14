@@ -293,8 +293,8 @@ class AmendReferralServiceTest @Autowired constructor(
     val changelog = amendReferralService.getChangeLogById(changelog2.id, jwtAuthenticationToken)
 
     assertThat(changelog.changelog).isEqualTo(changelog2)
-    assertThat(changelog.oldComplexityLevelTitle).isEqualTo(complexityLevel1.title)
-    assertThat(changelog.newComplexityLevelTitle).isEqualTo(complexityLevel2.title)
+    assertThat(changelog.oldValue).isEqualTo(complexityLevel1.title)
+    assertThat(changelog.newValue).isEqualTo(complexityLevel2.title)
   }
 
   @Test
@@ -341,8 +341,8 @@ class AmendReferralServiceTest @Autowired constructor(
     val changelog = amendReferralService.getChangeLogById(changelog2.id, jwtAuthenticationToken)
 
     assertThat(changelog.changelog).isEqualTo(changelog2)
-    assertThat(changelog.oldDesiredOutcomes).contains("desiredOutcome1")
-    assertThat(changelog.newDesiredOutcomes).contains("desiredOutcome2")
+    assertThat(changelog.oldValues).contains("desiredOutcome1")
+    assertThat(changelog.newValues).contains("desiredOutcome2")
   }
 
   @Test
@@ -373,8 +373,8 @@ class AmendReferralServiceTest @Autowired constructor(
     val changelog = amendReferralService.getChangeLogById(changelog1.id, jwtAuthenticationToken)
 
     assertThat(changelog.changelog).isEqualTo(changelog1)
-    assertThat(changelog.oldDescription).contains("No")
-    assertThat(changelog.newDescription).contains("Yes-French")
+    assertThat(changelog.oldValue).contains("No")
+    assertThat(changelog.newValue).contains("Yes-French")
   }
 
   @Test
@@ -405,8 +405,40 @@ class AmendReferralServiceTest @Autowired constructor(
     val changelog = amendReferralService.getChangeLogById(changelog1.id, jwtAuthenticationToken)
 
     assertThat(changelog.changelog).isEqualTo(changelog1)
-    assertThat(changelog.oldDescription).contains("No")
-    assertThat(changelog.newDescription).contains("Yes-will not available wednesday mornings")
+    assertThat(changelog.oldValue).contains("No")
+    assertThat(changelog.newValue).contains("Yes-will not available wednesday mornings")
+  }
+
+  @Test
+  fun `find changelog by changelogId for completion date`() {
+
+    val someoneElse = userFactory.create("helper_pp_user", "delius")
+    val user = userFactory.create("pp_user_1", "delius")
+
+    val referral = referralFactory.createSent(
+      needsInterpreter = true,
+      interpreterLanguage = "french",
+      createdBy = someoneElse
+    )
+
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
+
+    val uuid1 = UUID.randomUUID()
+
+    val changelog1 = changeLogFactory.create(
+      id = uuid1,
+      referralId = referral.id,
+      topic = AmendTopic.COMPLETION_DATETIME,
+      oldVal = ReferralAmendmentDetails(listOf("2023-02-14")),
+      newVal = ReferralAmendmentDetails(listOf("2023-03-14")),
+      changedBy = someoneElse
+    )
+
+    val changelog = amendReferralService.getChangeLogById(changelog1.id, jwtAuthenticationToken)
+
+    assertThat(changelog.changelog).isEqualTo(changelog1)
+    assertThat(changelog.oldValue).contains("14 Feb 2023")
+    assertThat(changelog.newValue).contains("14 Mar 2023")
   }
 
   @Test
