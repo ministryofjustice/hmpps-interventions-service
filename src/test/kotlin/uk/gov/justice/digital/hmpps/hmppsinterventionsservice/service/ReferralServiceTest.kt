@@ -332,21 +332,22 @@ class ReferralServiceTest @Autowired constructor(
   inner class GetServiceProviderSummaries {
     @Test
     fun `user with multiple providers can see referrals where the providers are subcontractors`() {
-      val userProviders = listOf("test_org_1", "test_org_2").map { id -> serviceProviderFactory.create(id = id, name = id) }
+      val userProviders = listOf("test_org_1", "test_org_2", "test_org_3", "test_org_4", "test_org_5").map { id -> serviceProviderFactory.create(id = id, name = id) }
       val contractWithUserProviderAsPrime = contractFactory.create(primeProvider = userProviders[0])
-      val contractWithUserProviderAsSub = contractFactory.create(subcontractorProviders = setOf(userProviders[0]))
-      val contractWithUserProviderAsBothPrimeAndSub = contractFactory.create(primeProvider = userProviders[0], subcontractorProviders = setOf(userProviders[1]))
+      val contractWithUserProviderAsSub1 = contractFactory.create(subcontractorProviders = setOf(userProviders[1]))
+      val contractWithUserProviderAsSub2 = contractFactory.create(subcontractorProviders = setOf(userProviders[2]))
+      val contractWithUserProviderAsBothPrimeAndSub = contractFactory.create(primeProvider = userProviders[3], subcontractorProviders = setOf(userProviders[4]))
       val contractWithNoUserProviders = contractFactory.create()
 
       val primeRef = referralFactory.createSent(intervention = interventionFactory.create(contract = contractWithUserProviderAsPrime))
       val primeAndSubRef = referralFactory.createSent(intervention = interventionFactory.create(contract = contractWithUserProviderAsBothPrimeAndSub))
-      val refWithAllProvidersBeingSubs = referralFactory.createSent(intervention = interventionFactory.create(contract = contractWithUserProviderAsSub))
-      val subRef = referralFactory.createSent(intervention = interventionFactory.create(contract = contractWithUserProviderAsSub))
+      val refWithAllProvidersBeingSubs = referralFactory.createSent(intervention = interventionFactory.create(contract = contractWithUserProviderAsSub1))
+      val subRef = referralFactory.createSent(intervention = interventionFactory.create(contract = contractWithUserProviderAsSub2))
       val noAccess = referralFactory.createSent(intervention = interventionFactory.create(contract = contractWithNoUserProviders))
 
       val user = userFactory.create("test_user", "auth")
       whenever(serviceProviderAccessScopeMapper.fromUser(user))
-        .thenReturn(ServiceProviderAccessScope(userProviders.toSet(), setOf(contractWithUserProviderAsBothPrimeAndSub, contractWithUserProviderAsPrime, contractWithUserProviderAsSub)))
+        .thenReturn(ServiceProviderAccessScope(userProviders.toSet(), setOf(contractWithUserProviderAsBothPrimeAndSub, contractWithUserProviderAsPrime, contractWithUserProviderAsSub1, contractWithUserProviderAsSub2)))
 
       val result = referralService.getServiceProviderSummaries(user)
       assertThat(result.size).isEqualTo(4)
