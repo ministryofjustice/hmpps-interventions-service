@@ -161,7 +161,7 @@ COMMENT ON TABLE referral_selected_service_category IS 'selected service categor
 
 COMMENT ON TABLE referral_details IS 'details about a referral that can change that are not used to determine state';
 
-COMMENT ON TABLE draft_referral IS 'referral that are draft versions are stored here';
+COMMENT ON TABLE draft_referral IS 'intended to store draft referrals, which have been started but not sent; for technical reasons, this table currently **retains** drafts after they have been sent';
 
 COMMENT ON TABLE changelog IS 'details about any amendments to an existing referral';
 
