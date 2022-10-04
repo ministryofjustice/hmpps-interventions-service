@@ -33,25 +33,25 @@ env:
   - name: POSTGRES_URI
     valueFrom:
       secretKeyRef:
-        name: postgres
+        name: {{ .Values.env_details.postgres_secret }}
         key: rds_instance_endpoint
 
   - name: POSTGRES_DB
     valueFrom:
       secretKeyRef:
-        name: postgres
+        name: {{ .Values.env_details.postgres_secret }}
         key: database_name
 
   - name: POSTGRES_USERNAME
     valueFrom:
       secretKeyRef:
-        name: postgres
+        name: {{ .Values.env_details.postgres_secret }}
         key: database_username
 
   - name: POSTGRES_PASSWORD
     valueFrom:
       secretKeyRef:
-        name: postgres
+        name: {{ .Values.env_details.postgres_secret }}
         key: database_password
 
   - name: AWS_SNS_ACCESSKEYID
