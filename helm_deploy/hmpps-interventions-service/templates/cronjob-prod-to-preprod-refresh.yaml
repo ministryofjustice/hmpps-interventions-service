@@ -68,22 +68,22 @@ spec:
                 - name: DB_NAME_PREPROD
                   valueFrom:
                     secretKeyRef:
-                      name: postgres-preprod
+                      name: postgres14-preprod
                       key: database_name
                 - name: DB_USER_PREPROD
                   valueFrom:
                     secretKeyRef:
-                      name: postgres-preprod
+                      name: postgres14-preprod
                       key: database_username
                 - name: DB_PASS_PREPROD
                   valueFrom:
                     secretKeyRef:
-                      name: postgres-preprod
+                      name: postgres14-preprod
                       key: database_password
                 - name: DB_HOST_PREPROD
                   valueFrom:
                     secretKeyRef:
-                      name: postgres-preprod
+                      name: postgres14-preprod
                       key: rds_instance_address
           restartPolicy: "Never"
           volumes:
