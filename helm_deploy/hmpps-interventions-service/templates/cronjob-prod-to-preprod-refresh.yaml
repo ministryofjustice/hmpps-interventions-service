@@ -48,42 +48,42 @@ spec:
                 - name: DB_NAME
                   valueFrom:
                     secretKeyRef:
-                      name: postgres
+                      name: {{ .Values.env_details.postgres_secret }}
                       key: database_name
                 - name: DB_USER
                   valueFrom:
                     secretKeyRef:
-                      name: postgres
+                      name: {{ .Values.env_details.postgres_secret }}
                       key: database_username
                 - name: DB_PASS
                   valueFrom:
                     secretKeyRef:
-                      name: postgres
+                      name: {{ .Values.env_details.postgres_secret }}
                       key: database_password
                 - name: DB_HOST
                   valueFrom:
                     secretKeyRef:
-                      name: postgres
+                      name: {{ .Values.env_details.postgres_secret }}
                       key: rds_instance_address
                 - name: DB_NAME_PREPROD
                   valueFrom:
                     secretKeyRef:
-                      name: postgres-preprod
+                      name: {{ .Values.env_details.postgres_preprod_refresh_secret }}-preprod
                       key: database_name
                 - name: DB_USER_PREPROD
                   valueFrom:
                     secretKeyRef:
-                      name: postgres-preprod
+                      name: {{ .Values.env_details.postgres_preprod_refresh_secret }}-preprod
                       key: database_username
                 - name: DB_PASS_PREPROD
                   valueFrom:
                     secretKeyRef:
-                      name: postgres-preprod
+                      name: {{ .Values.env_details.postgres_preprod_refresh_secret }}-preprod
                       key: database_password
                 - name: DB_HOST_PREPROD
                   valueFrom:
                     secretKeyRef:
-                      name: postgres-preprod
+                      name: {{ .Values.env_details.postgres_preprod_refresh_secret }}-preprod
                       key: rds_instance_address
           restartPolicy: "Never"
           volumes:

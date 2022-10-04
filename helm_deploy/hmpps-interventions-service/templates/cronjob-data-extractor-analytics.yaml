@@ -18,22 +18,22 @@ spec:
               - name: PGHOST
                 valueFrom:
                   secretKeyRef:
-                    name: postgres
+                    name: {{ .Values.env_details.postgres_secret }}
                     key: rds_instance_address
               - name: PGDATABASE
                 valueFrom:
                   secretKeyRef:
-                    name: postgres
+                    name: {{ .Values.env_details.postgres_secret }}
                     key: database_name
               - name: PGUSER
                 valueFrom:
                   secretKeyRef:
-                    name: postgres
+                    name: {{ .Values.env_details.postgres_secret }}
                     key: database_username
               - name: PGPASSWORD
                 valueFrom:
                   secretKeyRef:
-                    name: postgres
+                    name: {{ .Values.env_details.postgres_secret }}
                     key: database_password
               - name: S3_DESTINATION
                 valueFrom:
