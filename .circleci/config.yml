@@ -77,10 +77,6 @@ jobs:
             flyway clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
             flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration,src/main/resources/db/local"
       - run:
-          name: Validate report SQLs
-          command: |
-            PGPASSWORD="$POSTGRES_PASSWORD" script/validate-report-sql.sh
-      - run:
           name: Validate metadata
           command: |
             PGPASSWORD="$POSTGRES_PASSWORD" script/validate-metadata.sh
@@ -129,10 +125,6 @@ jobs:
           command: |
             flyway clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
             flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration,src/main/resources/db/local"
-      - run:
-          name: Validate report SQLs
-          command: |
-            PGPASSWORD="$POSTGRES_PASSWORD" script/validate-report-sql.sh
       - run:
           name: Validate metadata
           command: |
