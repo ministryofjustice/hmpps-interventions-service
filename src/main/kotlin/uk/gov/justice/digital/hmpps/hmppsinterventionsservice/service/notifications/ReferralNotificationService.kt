@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.AsyncEventExceptionHandling
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.NotifyService
@@ -62,6 +63,7 @@ class ReferralNotificationService(
       }
 
       ReferralEventType.ASSIGNED -> {
+        // event payloads, e.g. ReferralAssignedEvent would make it clearer when assignee can or cannot exist
         val userDetails = hmppsAuthService.getUserDetail(event.referral.currentAssignee!!)
         val location = generateResourceUrl(interventionsUIBaseURL, spReferralDetailsLocation, event.referral.id)
         emailSender.sendEmail(
@@ -76,45 +78,15 @@ class ReferralNotificationService(
       }
 
       ReferralEventType.DESIRED_OUTCOMES_AMENDED -> {
-        val userDetails = hmppsAuthService.getUserDetail(event.referral.currentAssignee!!)
-        val location = generateResourceUrl(interventionsUIBaseURL, spReferralDetailsLocation, event.referral.id)
-        emailSender.sendEmail(
-          desiredOutcomesAmendTemplateID,
-          userDetails.email,
-          mapOf(
-            "sp_first_name" to userDetails.firstName,
-            "referral_number" to event.referral.referenceNumber!!,
-            "referral" to location.toString()
-          )
-        )
+        notifyCaseWorkerThatDetailsChanged(event.type, desiredOutcomesAmendTemplateID, event.referral)
       }
 
       ReferralEventType.NEEDS_AND_REQUIREMENTS_AMENDED -> {
-        val userDetails = hmppsAuthService.getUserDetail(event.referral.currentAssignee!!)
-        val location = generateResourceUrl(interventionsUIBaseURL, spReferralDetailsLocation, event.referral.id)
-        emailSender.sendEmail(
-          needsAndRequirementsAmendTemplateID,
-          userDetails.email,
-          mapOf(
-            "sp_first_name" to userDetails.firstName,
-            "referral_number" to event.referral.referenceNumber!!,
-            "referral" to location.toString()
-          )
-        )
+        notifyCaseWorkerThatDetailsChanged(event.type, needsAndRequirementsAmendTemplateID, event.referral)
       }
 
       ReferralEventType.COMPLEXITY_LEVEL_AMENDED -> {
-        val userDetails = hmppsAuthService.getUserDetail(event.referral.currentAssignee!!)
-        val location = generateResourceUrl(interventionsUIBaseURL, spReferralDetailsLocation, event.referral.id)
-        emailSender.sendEmail(
-          complexityLevelTemplateID,
-          userDetails.email,
-          mapOf(
-            "sp_first_name" to userDetails.firstName,
-            "referral_number" to event.referral.referenceNumber!!,
-            "referral" to location.toString()
-          )
-        )
+        notifyCaseWorkerThatDetailsChanged(event.type, complexityLevelTemplateID, event.referral)
       }
 
       ReferralEventType.DETAILS_AMENDED -> {
@@ -122,6 +94,25 @@ class ReferralNotificationService(
       }
       else -> {}
     }
+  }
+
+  private fun notifyCaseWorkerThatDetailsChanged(event: ReferralEventType, templateId: String, referral: Referral) {
+    if (referral.currentAssignee == null) {
+      logger.warn("cannot notify caseworker about {} for referral {}, the referral is unassigned", event, referral.id)
+      return
+    }
+
+    val userDetails = hmppsAuthService.getUserDetail(referral.currentAssignee!!)
+    val location = generateResourceUrl(interventionsUIBaseURL, spReferralDetailsLocation, referral.id)
+    emailSender.sendEmail(
+      templateId,
+      userDetails.email,
+      mapOf(
+        "sp_first_name" to userDetails.firstName,
+        "referral_number" to referral.referenceNumber!!,
+        "referral" to location.toString()
+      )
+    )
   }
 
   private fun handleDetailsChangedEvent(event: ReferralEvent) {
