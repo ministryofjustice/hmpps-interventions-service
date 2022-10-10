@@ -12,8 +12,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanE
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEventType
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.EndOfServiceReportEvent
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.EndOfServiceReportEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.AsyncEventExceptionHandling
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
@@ -69,36 +67,7 @@ class NotifyActionPlanService(
           mapOf(
             "submitterFirstName" to recipient.firstName,
             "referenceNumber" to event.actionPlan.referral.referenceNumber!!,
-            "actionPlanUrl" to location.toString(),
-          )
-        )
-      }
-    }
-  }
-}
-
-@Service
-class NotifyEndOfServiceReportService(
-  @Value("\${notify.templates.end-of-service-report-submitted}") private val endOfServiceReportSubmittedTemplateID: String,
-  @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
-  @Value("\${interventions-ui.locations.probation-practitioner.end-of-service-report}") private val ppEndOfServiceReportLocation: String,
-  private val emailSender: EmailSender,
-  private val referralService: ReferralService,
-) : ApplicationListener<EndOfServiceReportEvent>, NotifyService {
-
-  @AsyncEventExceptionHandling
-  override fun onApplicationEvent(event: EndOfServiceReportEvent) {
-    when (event.type) {
-      EndOfServiceReportEventType.SUBMITTED -> {
-        val recipient = referralService.getResponsibleProbationPractitioner(event.endOfServiceReport.referral)
-        val location = generateResourceUrl(interventionsUIBaseURL, ppEndOfServiceReportLocation, event.endOfServiceReport.id)
-        emailSender.sendEmail(
-          endOfServiceReportSubmittedTemplateID,
-          recipient.email,
-          mapOf(
-            "ppFirstName" to recipient.firstName,
-            "referralReference" to event.endOfServiceReport.referral.referenceNumber!!,
-            "endOfServiceReportLink" to location.toString(),
+            "actionPlanUrl" to location.toString()
           )
         )
       }

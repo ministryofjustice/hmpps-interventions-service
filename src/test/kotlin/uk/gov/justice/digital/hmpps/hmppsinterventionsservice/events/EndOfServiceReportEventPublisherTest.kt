@@ -9,35 +9,43 @@ import org.mockito.kotlin.whenever
 import org.springframework.context.ApplicationEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.LocationMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller.EndOfServiceReportController
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportFactory
 import java.net.URI
+import java.time.OffsetDateTime
 
 class EndOfServiceReportEventPublisherTest {
-
   private val eventPublisher = mock<ApplicationEventPublisher>()
   private val locationMapper = mock<LocationMapper>()
   private val endOfServiceReportFactory = EndOfServiceReportFactory()
+  private val publisher = EndOfServiceReportEventPublisher(eventPublisher, locationMapper)
 
   @Test
   fun `builds an end of service report submit event and publishes it`() {
-    val endOfServiceReport = endOfServiceReportFactory.create()
+    val submittedAt = OffsetDateTime.now()
+    val submittedBy = AuthUser("submitterId", "submitterSource", "submitterUsername")
+    val endOfServiceReport = endOfServiceReportFactory.create(
+      submittedAt = submittedAt,
+      submittedBy = submittedBy
+    )
 
-    val uri = URI.create("http://localhost/end-of-service-report/${endOfServiceReport.id}")
+    val uri = "http://localhost/end-of-service-report/${endOfServiceReport.id}"
     whenever(locationMapper.expandPathToCurrentContextPathUrl("/end-of-service-report/{id}", endOfServiceReport.id))
-      .thenReturn(uri)
+      .thenReturn(URI.create(uri))
     whenever(locationMapper.getPathFromControllerMethod(EndOfServiceReportController::getEndOfServiceReportById))
       .thenReturn("/end-of-service-report/{id}")
-    val publisher = EndOfServiceReportEventPublisher(eventPublisher, locationMapper)
 
-    publisher.endOfServiceReportSubmittedEvent(endOfServiceReport)
+    publisher.publishSubmittedEvent(endOfServiceReport)
 
-    val eventCaptor = argumentCaptor<EndOfServiceReportEvent>()
+    val eventCaptor = argumentCaptor<EndOfServiceReportSubmittedEvent>()
     verify(eventPublisher).publishEvent(eventCaptor.capture())
     val event = eventCaptor.firstValue
 
     Assertions.assertThat(event.source).isSameAs(publisher)
-    Assertions.assertThat(event.type).isSameAs(EndOfServiceReportEventType.SUBMITTED)
-    Assertions.assertThat(event.endOfServiceReport).isSameAs(endOfServiceReport)
-    Assertions.assertThat(event.detailUrl).isEqualTo(uri.toString())
+    Assertions.assertThat(event.referralId).isNotNull.isEqualTo(endOfServiceReport.referral.id)
+    Assertions.assertThat(event.detailUrl).isEqualTo(uri)
+    Assertions.assertThat(event.endOfServiceReportId).isNotNull.isEqualTo(endOfServiceReport.id)
+    Assertions.assertThat(event.submittedAt).isNotNull.isEqualTo(submittedAt)
+    Assertions.assertThat(event.submittedBy).isNotNull.isEqualTo(submittedBy)
   }
 }

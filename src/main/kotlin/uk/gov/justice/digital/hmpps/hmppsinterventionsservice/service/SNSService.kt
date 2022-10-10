@@ -10,8 +10,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanE
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEventType
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.EndOfServiceReportEvent
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.EndOfServiceReportEventType.SUBMITTED
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.AsyncEventExceptionHandling
@@ -219,28 +217,6 @@ class SNSAppointmentService(
         snsPublisher.publish(referral.id, appointment.appointmentFeedbackSubmittedBy!!, snsEvent)
       }
       else -> {}
-    }
-  }
-}
-
-@Service
-class SNSEndOfServiceReportService(
-  private val snsPublisher: SNSPublisher,
-) : ApplicationListener<EndOfServiceReportEvent>, SNSService {
-
-  @AsyncEventExceptionHandling
-  override fun onApplicationEvent(event: EndOfServiceReportEvent) {
-    when (event.type) {
-      SUBMITTED -> {
-        val snsEvent = EventDTO(
-          "intervention.end-of-service-report.submitted",
-          "An end of service report has been submitted",
-          event.detailUrl,
-          event.endOfServiceReport.submittedAt!!,
-          mapOf("endOfServiceReportId" to event.endOfServiceReport.id, "submittedBy" to (event.endOfServiceReport.submittedBy?.userName!!))
-        )
-        snsPublisher.publish(event.endOfServiceReport.referral.id, event.endOfServiceReport.submittedBy!!, snsEvent)
-      }
     }
   }
 }

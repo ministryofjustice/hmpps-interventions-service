@@ -65,7 +65,7 @@ class EndOfServiceReportService(
     val draftEndOfServiceReport = getEndOfServiceReport(endOfServiceReportId)
     updateDraftEndOfServiceReportAsSubmitted(draftEndOfServiceReport, submittedByUser)
 
-    endOfServiceReportEventPublisher.endOfServiceReportSubmittedEvent(draftEndOfServiceReport)
+    endOfServiceReportEventPublisher.publishSubmittedEvent(draftEndOfServiceReport)
 
     val savedReport = endOfServiceReportRepository.save(draftEndOfServiceReport)
     referralConcluder.concludeIfEligible(savedReport.referral)
