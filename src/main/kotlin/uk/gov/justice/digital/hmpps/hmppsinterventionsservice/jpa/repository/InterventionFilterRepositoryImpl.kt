@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository
 
+import org.springframework.beans.factory.annotation.Value
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DynamicFrameworkContract
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NPSRegion
@@ -14,6 +15,7 @@ import javax.persistence.criteria.Predicate
 import javax.persistence.criteria.Root
 
 class InterventionFilterRepositoryImpl(
+  @Value("\${show-future-interventions}") private val showFutureInterventions: Boolean,
   private val pccRegionRepository: PCCRegionRepository
 ) : InterventionFilterRepository {
 
@@ -94,6 +96,9 @@ class InterventionFilterRepositoryImpl(
   }
 
   private fun filterFutureReferrals(criteriaBuilder: CriteriaBuilder, root: Root<Intervention>, startDate: LocalDate?): Predicate? {
+    if(showFutureInterventions){
+      return null
+    }
     return startDate?.let {
       val expression = root.get<DynamicFrameworkContract>("dynamicFrameworkContract").get<LocalDate>("startDate")
       criteriaBuilder.lessThanOrEqualTo(expression, startDate)
