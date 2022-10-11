@@ -100,7 +100,7 @@ class InterventionFilterRepositoryImpl(
       return null
     }
     return startDate?.let {
-      val expression = root.get<DynamicFrameworkContract>("dynamicFrameworkContract").get<LocalDate>("startDate")
+      val expression = root.get<DynamicFrameworkContract>("dynamicFrameworkContract").get<LocalDate>("referralStartDate")
       criteriaBuilder.lessThanOrEqualTo(expression, startDate)
     }
   }

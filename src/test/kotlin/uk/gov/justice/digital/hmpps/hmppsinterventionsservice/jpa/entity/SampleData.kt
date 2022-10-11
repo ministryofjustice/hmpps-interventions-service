@@ -147,6 +147,7 @@ class SampleData {
       npsRegion: NPSRegion? = null,
       pccRegion: PCCRegion? = null,
       contractReference: String = RandomStringUtils.randomAlphanumeric(8),
+      referralStartDate: LocalDate = LocalDate.of(2020, 12, 1),
     ): DynamicFrameworkContract {
       return DynamicFrameworkContract(
         id = id ?: UUID.randomUUID(),
@@ -161,6 +162,7 @@ class SampleData {
         npsRegion = npsRegion,
         pccRegion = pccRegion,
         contractReference = contractReference,
+        referralStartDate = referralStartDate
       )
     }
 
