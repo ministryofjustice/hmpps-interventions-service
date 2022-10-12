@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionF
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.NPSRegionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.PCCRegionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
+import java.time.LocalDate
 
 @RepositoryTest
 class InterventionFilterRepositoryImplTest @Autowired constructor(
@@ -38,7 +39,6 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
 
     referralRepository.deleteAll()
     interventionRepository.deleteAll()
-
     authUserRepository.deleteAll()
   }
 
@@ -205,5 +205,34 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
       assertThat(it.dynamicFrameworkContract.minimumAge).isEqualTo(18)
       assertThat(it.dynamicFrameworkContract.maximumAge).isEqualTo(29)
     }
+  }
+
+  @Test
+  fun `get interventions with show-future-interventions disabled `() {
+    System.setProperty("show-future-interventions", "false");
+
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now().plusDays(10)))
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now()))
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create()), title = "test Title")
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(npsRegion = npsRegionFactory.create()))
+    val found = interventionFilterRepositoryImpl.findByCriteria(listOf(), null, null, null, null)
+
+    assertThat(found.size).isEqualTo(3)
+    found.forEach {
+      assertThat(it.dynamicFrameworkContract.referralStartDate).isBeforeOrEqualTo(LocalDate.now())
+    }
+  }
+
+  @Test
+  fun `get interventions with show-future-interventions enabled `() {
+    System.setProperty("show-future-interventions", "true");
+
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now().plusDays(10)))
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now()))
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create()), title = "test Title")
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(npsRegion = npsRegionFactory.create()))
+    val found = interventionFilterRepositoryImpl.findByCriteria(listOf(), null, null, null, null)
+
+    assertThat(found.size).isEqualTo(4)
   }
 }
