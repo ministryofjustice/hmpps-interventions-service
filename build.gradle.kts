@@ -74,7 +74,7 @@ dependencies {
   runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.4") // needed for OffsetDateTime for AppInsights
 
   // openapi
-  implementation("org.springdoc:springdoc-openapi-ui:1.6.11")
+  implementation("org.springdoc:springdoc-openapi-ui:1.6.12")
 
   // notifications
   implementation("uk.gov.service.notify:notifications-java-client:3.18.0-RELEASE")
