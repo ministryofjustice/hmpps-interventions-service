@@ -1,8 +1,10 @@
 INSERT INTO contract_type (id, name, code)
+-- PRJ_7680 - DNR-WM
 VALUES ('a19f3da7-c5eb-4936-9f76-f877ddf5c656', 'Dependency and Recovery (West Midlands)', 'DNR-WM')
 ;
 
 INSERT INTO service_category (id, created, name)
+-- PRJ_7680 - D&R West Midlands
 VALUES ('57d3cedb-29f8-4316-9c22-9d6d0631ffab', NOW(), 'Dependency and Recovery (West Midlands)')
 ;
 
