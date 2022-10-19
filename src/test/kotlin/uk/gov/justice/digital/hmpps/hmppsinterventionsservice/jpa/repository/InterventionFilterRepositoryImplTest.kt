@@ -5,13 +5,13 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.test.util.ReflectionTestUtils
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFrameworkContractFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.NPSRegionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.PCCRegionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import java.time.LocalDate
-import java.util.Properties
 
 @RepositoryTest
 class InterventionFilterRepositoryImplTest @Autowired constructor(
@@ -32,6 +32,7 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
 
   @BeforeEach
   fun setup() {
+    ReflectionTestUtils.setField(interventionFilterRepositoryImpl, "showFutureInterventions", false)
     deliverySessionRepository.deleteAll()
     actionPlanRepository.deleteAll()
     endOfServiceReportRepository.deleteAll()
@@ -210,8 +211,6 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
 
   @Test
   fun `get interventions with show-future-interventions disabled `() {
-    System.setProperty("show-future-interventions", "false")
-
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now().plusDays(10)))
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now()))
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create()), title = "test Title")
@@ -226,8 +225,7 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
 
   @Test
   fun `get interventions with show-future-interventions enabled `() {
-    val properties = Properties()
-    properties.setProperty("show-future-interventions", "true")
+    ReflectionTestUtils.setField(interventionFilterRepositoryImpl, "showFutureInterventions", true)
 
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now().plusDays(10)))
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now()))
