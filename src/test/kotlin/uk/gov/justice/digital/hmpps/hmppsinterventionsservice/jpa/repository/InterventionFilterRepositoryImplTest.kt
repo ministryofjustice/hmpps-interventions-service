@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.NPSRegionFact
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.PCCRegionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import java.time.LocalDate
+import java.util.Properties
 
 @RepositoryTest
 class InterventionFilterRepositoryImplTest @Autowired constructor(
@@ -225,7 +226,8 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
 
   @Test
   fun `get interventions with show-future-interventions enabled `() {
-    System.setProperty("show-future-interventions", "true")
+    val properties = Properties()
+    properties.setProperty("show-future-interventions", "true")
 
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now().plusDays(10)))
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now()))
