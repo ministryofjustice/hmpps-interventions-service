@@ -209,7 +209,7 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
 
   @Test
   fun `get interventions with show-future-interventions disabled `() {
-    System.setProperty("show-future-interventions", "false");
+    System.setProperty("show-future-interventions", "false")
 
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now().plusDays(10)))
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now()))
@@ -225,7 +225,7 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
 
   @Test
   fun `get interventions with show-future-interventions enabled `() {
-    System.setProperty("show-future-interventions", "true");
+    System.setProperty("show-future-interventions", "true")
 
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now().plusDays(10)))
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now()))

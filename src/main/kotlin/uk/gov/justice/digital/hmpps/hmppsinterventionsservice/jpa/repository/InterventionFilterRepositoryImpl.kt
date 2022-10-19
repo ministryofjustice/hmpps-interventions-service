@@ -7,7 +7,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NPSRegi
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PCCRegion
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PCCRegionID
 import java.time.LocalDate
-import java.util.*
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 import javax.persistence.criteria.CriteriaBuilder
@@ -96,7 +95,7 @@ class InterventionFilterRepositoryImpl(
   }
 
   private fun filterFutureReferrals(criteriaBuilder: CriteriaBuilder, root: Root<Intervention>, startDate: LocalDate?): Predicate? {
-    if(showFutureInterventions){
+    if (showFutureInterventions) {
       return null
     }
     return startDate?.let {
