@@ -90,6 +90,7 @@ class ReferralService(
   fun getSentReferral(id: UUID): Referral? {
     return referralRepository.findByIdAndSentAtIsNotNull(id)
   }
+
   fun getReferralDetailsById(id: UUID?): ReferralDetails? {
     return referralDetailsRepository.findByIdOrNull(id)
   }
@@ -216,11 +217,6 @@ class ReferralService(
     if (!update.isValidUpdate) {
       return null
     }
-    if (update.completionDeadline != null) {
-      handleChangLog(AmendTopic.COMPLETION_DATETIME, referral, update, actor)
-    } else {
-      handleChangLog(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS, referral, update, actor)
-    }
 
     val isDraftUpdate = referral.sentAt == null
     val existingDetails = referralDetailsRepository.findLatestByReferralId(referral.id)
@@ -232,8 +228,12 @@ class ReferralService(
 
     // if we are updating a draft referral, and there is already a ReferralDetails record,
     // we update it. otherwise, we create a new one to record the changes.
-    val newDetails = if (isDraftUpdate && existingDetails != null) existingDetails else
-      ReferralDetails(
+    var newDetails: ReferralDetails
+
+    if (isDraftUpdate && existingDetails != null)
+      newDetails = existingDetails
+    else {
+      newDetails = ReferralDetails(
         UUID.randomUUID(),
         null,
         referral.id,
@@ -244,6 +244,12 @@ class ReferralService(
         existingDetails?.furtherInformation,
         existingDetails?.maximumEnforceableDays,
       )
+      handleChangLog(
+        existingDetails!!,
+        update,
+        actor
+      )
+    }
 
     update.completionDeadline?.let {
       newDetails.completionDeadline = it
@@ -259,7 +265,7 @@ class ReferralService(
 
     referralDetailsRepository.saveAndFlush(newDetails)
 
-    if (existingDetails !== null && existingDetails !== newDetails) {
+    if (existingDetails !== newDetails) {
       existingDetails.supersededById = newDetails.id
       referralDetailsRepository.saveAndFlush(existingDetails)
 
@@ -268,11 +274,19 @@ class ReferralService(
 
     return newDetails
   }
-  private fun proccessChangeLog(ammendTopic: AmendTopic, oldValue: ReferralAmendmentDetails, newValue: ReferralAmendmentDetails, referralId: UUID, actor: AuthUser, update: UpdateReferralDetailsDTO) {
+
+  private fun processChangeLog(
+    amendTopic: AmendTopic,
+    oldValue: ReferralAmendmentDetails,
+    newValue: ReferralAmendmentDetails,
+    referralId: UUID,
+    actor: AuthUser,
+    update: UpdateReferralDetailsDTO
+  ) {
     val changelog = Changelog(
       referralId,
       UUID.randomUUID(),
-      ammendTopic,
+      amendTopic,
       oldValue,
       newValue,
       update.reasonForChange,
@@ -283,26 +297,15 @@ class ReferralService(
     changelogRepository.save(changelog)
   }
 
-  private fun handleChangLog(topic: AmendTopic, referral: Referral, update: UpdateReferralDetailsDTO, actor: AuthUser) {
-    when (topic) {
-      AmendTopic.COMPLETION_DATETIME -> {
-        val completionDeadline = referral?.completionDeadline
-        val oldValue = ReferralAmendmentDetails(listOf(completionDeadline.toString()))
-        val newValue = ReferralAmendmentDetails(listOf(update.completionDeadline.toString()))
-        proccessChangeLog(AmendTopic.COMPLETION_DATETIME, oldValue, newValue, referral.id, actor, update)
-      }
-      AmendTopic.MAXIMUM_ENFORCEABLE_DAYS -> {
-        val maximumEnforceableDays = referral?.maximumEnforceableDays
-        val oldValue = ReferralAmendmentDetails(listOf(maximumEnforceableDays.toString()))
-        val newValue = ReferralAmendmentDetails(listOf(update.maximumEnforceableDays.toString()))
-        proccessChangeLog(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS, oldValue, newValue, referral.id, actor, update)
-      }
-      AmendTopic.COMPLEXITY_LEVEL -> return
-      AmendTopic.DESIRED_OUTCOMES -> return
-      AmendTopic.NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS -> return
-      AmendTopic.NEEDS_AND_REQUIREMENTS_ADDITIONAL_INFORMATION -> return
-      AmendTopic.NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES -> return
-      AmendTopic.NEEDS_AND_REQUIREMENTS_INTERPRETER_REQUIRED -> return
+  private fun handleChangLog(referralDetails: ReferralDetails, update: UpdateReferralDetailsDTO, actor: AuthUser) {
+    if (update.completionDeadline != null) {
+      val oldValue = ReferralAmendmentDetails(listOf(referralDetails.completionDeadline.toString()))
+      val newValue = ReferralAmendmentDetails(listOf(update.completionDeadline.toString()))
+      processChangeLog(AmendTopic.COMPLETION_DATETIME, oldValue, newValue, referralDetails.referralId, actor, update)
+    } else {
+      val oldValue = ReferralAmendmentDetails(listOf(referralDetails.maximumEnforceableDays.toString()))
+      val newValue = ReferralAmendmentDetails(listOf(update.maximumEnforceableDays.toString()))
+      processChangeLog(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS, oldValue, newValue, referralDetails.referralId, actor, update)
     }
   }
 

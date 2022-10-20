@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Selecte
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -53,6 +54,8 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     additionalNeedsInformation: String? = null,
     needsInterpreter: Boolean? = null,
     interpreterLanguage: String? = null,
+    completionDeadline: LocalDate? = null,
+    maximumEnforceableDays: Int? = null,
   ): Referral {
 
     val referral = save(
@@ -87,6 +90,8 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
         additionalNeedsInformation = additionalNeedsInformation,
         needsInterpreter = needsInterpreter,
         interpreterLanguage = interpreterLanguage,
+        completionDeadline = completionDeadline,
+        maximumEnforceableDays = maximumEnforceableDays,
         referralDetailsHistory = if (referralDetails != null) setOf(
           referralDetails.let {
             ReferralDetails(

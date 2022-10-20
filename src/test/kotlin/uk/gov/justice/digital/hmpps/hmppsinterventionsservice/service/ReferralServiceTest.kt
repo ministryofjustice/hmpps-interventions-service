@@ -970,12 +970,107 @@ class ReferralServiceTest @Autowired constructor(
   }
 
   @Test
-  fun `updateReferralDetails updates futher information and completion deadline update when referral details exists`() {
+  fun `updateReferralDetails updates completion deadline`() {
     val authUser = AuthUser("123457", "delius", "bernard.beaks")
     val user = userFactory.create("pp_user_1", "delius")
     val description = ""
     val id = UUID.randomUUID()
-    val completionDateToChange = LocalDate.of(2022, 7, 1)
+    val existingCompletionDate = LocalDate.of(2022, 10, 21)
+    val completionDateToChange = LocalDate.of(2022, 10, 30)
+    val intervention = interventionFactory.create(description = description)
+    val referral = referralFactory.createSent(
+      createdAt = OffsetDateTime.now(),
+      createdBy = user,
+      id = id,
+      sentAt = OffsetDateTime.now(),
+      serviceUserCRN = "crn",
+      intervention = intervention,
+    )
+    val referralDetails = referralDetailsFactory.create(
+      referralId = id,
+      createdAt = OffsetDateTime.now(),
+      createdBy = authUser,
+      id = UUID.randomUUID(),
+      completionDeadline = existingCompletionDate,
+      saved = true
+    )
+    whenever(userMapper.fromToken(jwtAuthentionToken)).thenReturn(authUser)
+
+    val referralToUpdate = UpdateReferralDetailsDTO(20, completionDateToChange, "new information", "we decided 10 days wasn't enough")
+    val referralDetailsReturned = referralService.updateReferralDetails(referral, referralToUpdate, user)
+    val referralDetailsValue = referralService.getReferralDetailsById(referralDetailsReturned?.id)
+    val changeLogReturned = changelogRepository.findAll().filter { x -> x.referralId == id }
+
+    assertThat(referralDetailsValue?.referralId).isEqualTo(referral.id)
+    assertThat(referralToUpdate.furtherInformation).isEqualTo(referralDetailsValue?.furtherInformation)
+    assertThat(changeLogReturned.size).isEqualTo(1)
+    assertThat(referralToUpdate.completionDeadline).isEqualTo(referralDetailsValue?.completionDeadline)
+
+    assertThat(changeLogReturned.firstOrNull()?.referralId).isEqualTo(referral.id)
+    assertThat(changeLogReturned.firstOrNull()?.newVal).isNotNull
+    assertThat(changeLogReturned.firstOrNull()?.newVal?.values).isNotEmpty
+    assertThat(changeLogReturned.firstOrNull()?.newVal?.values?.get(0)).isEqualTo(referralDetailsValue?.completionDeadline.toString())
+    assertThat(changeLogReturned.firstOrNull()?.oldVal).isNotNull
+    assertThat(changeLogReturned.firstOrNull()?.oldVal?.values).isNotEmpty
+    assertThat(changeLogReturned.firstOrNull()?.oldVal?.values?.get(0)).isEqualTo(referralDetails.completionDeadline.toString())
+    assertThat(changeLogReturned.firstOrNull()?.reasonForChange).isNotBlank
+    assertThat(changeLogReturned.firstOrNull()?.topic).isEqualTo(AmendTopic.COMPLETION_DATETIME)
+  }
+
+  @Test
+  fun `updateReferralDetails updates maximum enforceable days`() {
+    val authUser = AuthUser("123457", "delius", "bernard.beaks")
+    val user = userFactory.create("pp_user_1", "delius")
+    val description = ""
+    val id = UUID.randomUUID()
+    val intervention = interventionFactory.create(description = description)
+    val referral = referralFactory.createSent(
+      createdAt = OffsetDateTime.now(),
+      createdBy = user,
+      id = id,
+      sentAt = OffsetDateTime.now(),
+      serviceUserCRN = "crn",
+      intervention = intervention
+    )
+    val referralDetails = referralDetailsFactory.create(
+      referralId = id,
+      createdAt = OffsetDateTime.now(),
+      createdBy = authUser,
+      id = UUID.randomUUID(),
+      maximumNumberOfEnforceableDays = 15,
+      saved = true
+    )
+    whenever(userMapper.fromToken(jwtAuthentionToken)).thenReturn(authUser)
+
+    val referralToUpdate = UpdateReferralDetailsDTO(20, null, "new information", "we decided 10 days wasn't enough")
+    val referralDetailsReturned = referralService.updateReferralDetails(referral, referralToUpdate, user)
+    val referralDetailsValue = referralService.getReferralDetailsById(referralDetailsReturned?.id)
+    val changeLogReturned = changelogRepository.findAll().filter { x -> x.referralId == id }
+
+    assertThat(referralDetailsValue?.referralId).isEqualTo(referral.id)
+    assertThat(referralToUpdate.furtherInformation).isEqualTo(referralDetailsValue?.furtherInformation)
+    assertThat(changeLogReturned.size).isEqualTo(1)
+    assertThat(referralToUpdate.maximumEnforceableDays).isEqualTo(referralDetailsValue?.maximumEnforceableDays)
+
+    assertThat(changeLogReturned.firstOrNull()?.referralId).isEqualTo(referral.id)
+    assertThat(changeLogReturned.firstOrNull()?.newVal).isNotNull
+    assertThat(changeLogReturned.firstOrNull()?.newVal?.values).isNotEmpty
+    assertThat(changeLogReturned.firstOrNull()?.newVal?.values?.get(0)).isEqualTo("20")
+    assertThat(changeLogReturned.firstOrNull()?.oldVal).isNotNull
+    assertThat(changeLogReturned.firstOrNull()?.oldVal?.values).isNotEmpty
+    assertThat(changeLogReturned.firstOrNull()?.oldVal?.values?.get(0)).isEqualTo(referralDetails.maximumEnforceableDays.toString())
+    assertThat(changeLogReturned.firstOrNull()?.reasonForChange).isNotBlank
+    assertThat(changeLogReturned.firstOrNull()?.topic).isEqualTo(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS)
+  }
+
+  @Test
+  fun `updateReferralDetails updates draft Referrals`() {
+    val authUser = AuthUser("123457", "delius", "bernard.beaks")
+    val user = userFactory.create("pp_user_1", "delius")
+    val description = ""
+    val id = UUID.randomUUID()
+    val existingCompletionDate = LocalDate.of(2022, 10, 21)
+    val completionDateToChange = LocalDate.of(2022, 10, 30)
     val intervention = interventionFactory.create(description = description)
     val referral = referralFactory.createSent(
       createdAt = OffsetDateTime.now(),
@@ -984,63 +1079,25 @@ class ReferralServiceTest @Autowired constructor(
       sentAt = null,
       serviceUserCRN = "crn",
       intervention = intervention,
-      completionDeadline = LocalDate.of(2022, 2, 2),
-      maximumEnforceableDays = 3
-
     )
-    referralDetailsFactory.create(referralId = id, createdAt = OffsetDateTime.now(), createdBy = authUser, id = UUID.randomUUID(), completionDeadline = LocalDate.of(2022, 8, 2), saved = true)
-    whenever(userMapper.fromToken(jwtAuthentionToken)).thenReturn(authUser)
-
-    val referralToUpdate = UpdateReferralDetailsDTO(20, completionDateToChange, "new information", "we decided 10 days wasn't enough")
-    var referralDetailsReturned = referralService.updateReferralDetails(referral, referralToUpdate, user)
-    val referralDetailsValue = referralService.getReferralDetailsById(referralDetailsReturned?.id)
-    val changeLogReturned = changelogRepository.findAll().filter { x -> x.referralId == id }
-
-    assertThat(referralDetailsValue?.referralId).isEqualTo(referral.id)
-    assertThat(referralToUpdate.furtherInformation).isEqualTo(referralDetailsValue?.furtherInformation)
-    assertThat(changeLogReturned.size).isEqualTo(1)
-    assertThat(referralToUpdate.completionDeadline).isEqualTo(referralDetailsValue?.completionDeadline)
-    assertThat(referralToUpdate.maximumEnforceableDays).isEqualTo(referralDetailsValue?.maximumEnforceableDays)
-
-    assertThat(changeLogReturned?.firstOrNull()?.referralId).isEqualTo(referral.id)
-    assertThat(changeLogReturned?.firstOrNull()?.newVal).isNotNull
-    assertThat(changeLogReturned?.firstOrNull()?.newVal?.values).isNotEmpty
-    assertThat(changeLogReturned?.firstOrNull()?.newVal?.values?.get(0)).isEqualTo(referralDetailsValue?.completionDeadline.toString())
-    assertThat(changeLogReturned?.firstOrNull()?.oldVal).isNotNull
-    assertThat(changeLogReturned?.firstOrNull()?.oldVal?.values).isNotEmpty
-    assertThat(changeLogReturned?.firstOrNull()?.oldVal?.values?.get(0)).isEqualTo(referral.completionDeadline.toString())
-    assertThat(changeLogReturned?.firstOrNull()?.reasonForChange).isNotBlank
-    assertThat(changeLogReturned?.firstOrNull()?.topic).isEqualTo(AmendTopic.COMPLETION_DATETIME)
-  }
-
-  @Test
-  fun `updateReferralDetails updates further information and completion deadline update when referral details doesnt exists`() {
-    val authUser = AuthUser("123457", "delius", "bernard.beaks")
-    val user = userFactory.create("pp_user_1", "delius")
-    val description = ""
-    val id = UUID.randomUUID()
-    val completionDate = LocalDate.of(2022, 3, 28)
-    val completionDateToChange = LocalDate.of(2022, 7, 1)
-    val intervention = interventionFactory.create(description = description)
-
-    val referral = referralFactory.createSent(
+    referralDetailsFactory.create(
+      referralId = id,
       createdAt = OffsetDateTime.now(),
-      createdBy = user,
-      id = id,
-      sentAt = OffsetDateTime.now(),
-      serviceUserCRN = "crn",
-      intervention = intervention,
-      completionDeadline = completionDate
+      createdBy = authUser,
+      id = UUID.randomUUID(),
+      completionDeadline = existingCompletionDate,
+      saved = true
     )
     whenever(userMapper.fromToken(jwtAuthentionToken)).thenReturn(authUser)
 
     val referralToUpdate = UpdateReferralDetailsDTO(20, completionDateToChange, "new information", "we decided 10 days wasn't enough")
     val referralDetailsReturned = referralService.updateReferralDetails(referral, referralToUpdate, user)
     val referralDetailsValue = referralService.getReferralDetailsById(referralDetailsReturned?.id)
+    val changeLogReturned = changelogRepository.findAll().filter { x -> x.referralId == id }
 
     assertThat(referralDetailsValue?.referralId).isEqualTo(referral.id)
-    assertThat(referralToUpdate.completionDeadline).isEqualTo(referralDetailsValue?.completionDeadline)
-    assertThat(referralToUpdate.reasonForChange).isEqualTo(referralDetailsValue?.reasonForChange)
     assertThat(referralToUpdate.furtherInformation).isEqualTo(referralDetailsValue?.furtherInformation)
+    assertThat(changeLogReturned.size).isEqualTo(0)
+    assertThat(referralToUpdate.completionDeadline).isEqualTo(referralDetailsValue?.completionDeadline)
   }
 }
