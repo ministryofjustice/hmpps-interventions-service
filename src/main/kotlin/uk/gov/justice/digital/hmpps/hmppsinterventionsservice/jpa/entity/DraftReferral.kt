@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode.JOIN
-import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 import javax.persistence.CascadeType
@@ -37,8 +36,6 @@ class DraftReferral(
   var interpreterLanguage: String? = null,
   var hasAdditionalResponsibilities: Boolean? = null,
   var whenUnavailable: String? = null,
-  var maximumEnforceableDays: Int? = null,
-  var completionDeadline: LocalDate? = null,
 
   var relevantSentenceId: Long? = null,
 

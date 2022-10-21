@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode.JOIN
-import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 import javax.persistence.CascadeType
@@ -61,11 +60,9 @@ class Referral(
   var interpreterLanguage: String? = null,
   var hasAdditionalResponsibilities: Boolean? = null,
   var whenUnavailable: String? = null,
-  var maximumEnforceableDays: Int? = null,
   @ElementCollection
   @CollectionTable(name = "referral_desired_outcome", joinColumns = [JoinColumn(name = "referral_id")])
   var selectedDesiredOutcomes: MutableList<SelectedDesiredOutcomesMapping>? = null,
-  var completionDeadline: LocalDate? = null,
 
   var relevantSentenceId: Long? = null,
 

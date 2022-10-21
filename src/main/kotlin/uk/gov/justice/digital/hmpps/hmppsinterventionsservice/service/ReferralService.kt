@@ -218,38 +218,24 @@ class ReferralService(
       return null
     }
 
-    val isDraftUpdate = referral.sentAt == null
     val existingDetails = referralDetailsRepository.findLatestByReferralId(referral.id)
 
-    // we do not create fully fledged updates for draft referrals. to avoid misleading
-    // created_at timestamps we always ensure draft referral details were 'created at'
-    // the same time as the draft referral itself.
-    val updateTime = if (isDraftUpdate) referral.createdAt else OffsetDateTime.now()
-
-    // if we are updating a draft referral, and there is already a ReferralDetails record,
-    // we update it. otherwise, we create a new one to record the changes.
-    var newDetails: ReferralDetails
-
-    if (isDraftUpdate && existingDetails != null)
-      newDetails = existingDetails
-    else {
-      newDetails = ReferralDetails(
-        UUID.randomUUID(),
-        null,
-        referral.id,
-        updateTime,
-        actor.id,
-        update.reasonForChange,
-        existingDetails?.completionDeadline,
-        existingDetails?.furtherInformation,
-        existingDetails?.maximumEnforceableDays,
-      )
-      handleChangLog(
-        existingDetails!!,
-        update,
-        actor
-      )
-    }
+    val newDetails = ReferralDetails(
+      UUID.randomUUID(),
+      null,
+      referral.id,
+      OffsetDateTime.now(),
+      actor.id,
+      update.reasonForChange,
+      existingDetails?.completionDeadline,
+      existingDetails?.furtherInformation,
+      existingDetails?.maximumEnforceableDays,
+    )
+    logChanges(
+      existingDetails!!,
+      update,
+      actor
+    )
 
     update.completionDeadline?.let {
       newDetails.completionDeadline = it
@@ -297,7 +283,7 @@ class ReferralService(
     changelogRepository.save(changelog)
   }
 
-  private fun handleChangLog(referralDetails: ReferralDetails, update: UpdateReferralDetailsDTO, actor: AuthUser) {
+  private fun logChanges(referralDetails: ReferralDetails, update: UpdateReferralDetailsDTO, actor: AuthUser) {
     if (update.completionDeadline != null) {
       val oldValue = ReferralAmendmentDetails(listOf(referralDetails.completionDeadline.toString()))
       val newValue = ReferralAmendmentDetails(listOf(update.completionDeadline.toString()))

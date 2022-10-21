@@ -90,8 +90,6 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
         additionalNeedsInformation = additionalNeedsInformation,
         needsInterpreter = needsInterpreter,
         interpreterLanguage = interpreterLanguage,
-        completionDeadline = completionDeadline,
-        maximumEnforceableDays = maximumEnforceableDays,
         referralDetailsHistory = if (referralDetails != null) setOf(
           referralDetails.let {
             ReferralDetails(

@@ -605,7 +605,6 @@ class SetupAssistant(
     referral.needsInterpreter = needsInterpreter
     referral.relevantSentenceId = relevantSentenceId
     referral.whenUnavailable = whenUnavailable
-    referral.completionDeadline = completionDeadline
     return referralRepository.save(referral).also {
       val details = referralDetailsRepository.save(
         ReferralDetails(
