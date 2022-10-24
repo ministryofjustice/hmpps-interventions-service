@@ -17,7 +17,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 1,
-  "iteration": 1657529551498,
+  "iteration": 1666606677633,
   "links": [],
   "panels": [
     {
@@ -482,11 +482,65 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "",
+          "alias": "prod_v10",
           "dimensions": {
             "DBInstanceIdentifier": "cloud-platform-e4573fa1c83bbbb9"
           },
           "expression": "",
+          "id": "",
+          "matchExact": true,
+          "metricName": "CPUUtilization",
+          "namespace": "AWS/RDS",
+          "period": "",
+          "refId": "prod_v10",
+          "region": "default",
+          "statistics": [
+            "Average"
+          ]
+        },
+        {
+          "alias": "prod_v14",
+          "dimensions": {
+            "DBInstanceIdentifier": "cloud-platform-d6224bbb698ff221"
+          },
+          "expression": "",
+          "hide": false,
+          "id": "",
+          "matchExact": true,
+          "metricName": "CPUUtilization",
+          "namespace": "AWS/RDS",
+          "period": "",
+          "refId": "prod_v14",
+          "region": "default",
+          "statistics": [
+            "Average"
+          ]
+        },
+        {
+          "alias": "preprod_v10",
+          "dimensions": {
+            "DBInstanceIdentifier": "cloud-platform-a326b0ca8eb97132"
+          },
+          "expression": "",
+          "hide": false,
+          "id": "",
+          "matchExact": true,
+          "metricName": "CPUUtilization",
+          "namespace": "AWS/RDS",
+          "period": "",
+          "refId": "B",
+          "region": "default",
+          "statistics": [
+            "Average"
+          ]
+        },
+        {
+          "alias": "preprod_v14",
+          "dimensions": {
+            "DBInstanceIdentifier": "cloud-platform-6a9cfbef8ecc3a97"
+          },
+          "expression": "",
+          "hide": false,
           "id": "",
           "matchExact": true,
           "metricName": "CPUUtilization",
@@ -503,7 +557,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Production database CPU usage",
+      "title": "Database CPU usage",
       "tooltip": {
         "shared": true,
         "sort": 0,
