@@ -20,7 +20,7 @@ ingress:
 
 env_details:
   contains_live_data: true
-  postgres_secret: postgres
+  postgres_secret: postgres14
 
 env:
   HMPPSAUTH_BASEURL: "https://sign-in-preprod.hmpps.service.justice.gov.uk/auth"
