@@ -46,19 +46,19 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
       createdAt = createdAt,
       createdBy = createdBy,
       serviceUserCRN = serviceUserCRN,
-      relevantSentenceId = relevantSentenceId,
       intervention = intervention,
-      selectedServiceCategories = selectedServiceCategories,
+      relevantSentenceId = relevantSentenceId,
       desiredOutcomes = desiredOutcomes,
+      serviceUserData = serviceUserData,
       actionPlans = actionPlans,
+      selectedServiceCategories = selectedServiceCategories,
       sentAt = sentAt,
       sentBy = sentBy,
       referenceNumber = referenceNumber,
       supplementaryRiskId = supplementaryRiskId,
       assignments = assignments,
       concludedAt = concludedAt,
-      supplierAssessment = supplierAssessment,
-      serviceUserData = serviceUserData
+      supplierAssessment = supplierAssessment
     )
 
     return SentReferralSummary(

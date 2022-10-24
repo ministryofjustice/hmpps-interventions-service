@@ -10,7 +10,7 @@ import java.util.UUID
 class ReferralDetailsFactory(em: TestEntityManager? = null) : EntityFactory(em) {
   fun create(
     referralId: UUID,
-    createdAt: OffsetDateTime,
+    createdAt: OffsetDateTime = OffsetDateTime.now(),
     createdBy: AuthUser,
     id: UUID = UUID.randomUUID(),
     supersededById: UUID? = null,
