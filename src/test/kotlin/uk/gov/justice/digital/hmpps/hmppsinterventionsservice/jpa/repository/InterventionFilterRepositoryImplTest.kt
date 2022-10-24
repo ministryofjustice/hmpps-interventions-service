@@ -211,13 +211,14 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
 
   @Test
   fun `get interventions with show-future-interventions disabled `() {
-    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now().plusDays(10)))
+    val futureIntervention = interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now().plusDays(10)))
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now()))
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create()), title = "test Title")
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(npsRegion = npsRegionFactory.create()))
     val found = interventionFilterRepositoryImpl.findByCriteria(listOf(), null, null, null, null)
 
     assertThat(found.size).isEqualTo(3)
+    assertThat(found).doesNotContain(futureIntervention)
     found.forEach {
       assertThat(it.dynamicFrameworkContract.referralStartDate).isBeforeOrEqualTo(LocalDate.now())
     }
@@ -227,12 +228,13 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
   fun `get interventions with show-future-interventions enabled `() {
     ReflectionTestUtils.setField(interventionFilterRepositoryImpl, "showFutureInterventions", true)
 
-    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now().plusDays(10)))
+    val futureIntervention = interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now().plusDays(10)), title = "future")
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now()))
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create()), title = "test Title")
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(npsRegion = npsRegionFactory.create()))
     val found = interventionFilterRepositoryImpl.findByCriteria(listOf(), null, null, null, null)
 
     assertThat(found.size).isEqualTo(4)
+    assertThat(found).contains(futureIntervention)
   }
 }

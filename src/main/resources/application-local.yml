@@ -60,5 +60,3 @@ spring:
             client-secret: clientsecret
 
 azure.application-insights.instrumentation-key: dummy
-
-show-future-interventions: false

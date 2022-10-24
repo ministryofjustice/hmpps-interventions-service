@@ -14,7 +14,7 @@ import javax.persistence.criteria.Predicate
 import javax.persistence.criteria.Root
 
 class InterventionFilterRepositoryImpl(
-  @Value("\${show-future-interventions}") private val showFutureInterventions: Boolean,
+  @Value("\${overrides.show-future-interventions}") private val showFutureInterventions: Boolean,
   private val pccRegionRepository: PCCRegionRepository
 ) : InterventionFilterRepository {
 
