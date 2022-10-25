@@ -18,7 +18,7 @@ ingress:
 env_details:
   contains_live_data: true
   production_env: true
-  postgres_secret: postgres
+  postgres_secret: postgres14
   postgres_preprod_refresh_secret: postgres14
 
 env:
