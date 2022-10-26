@@ -17,7 +17,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 1,
-  "iteration": 1666606677633,
+  "iteration": 1666785737464,
   "links": [],
   "panels": [
     {
@@ -547,6 +547,24 @@
           "namespace": "AWS/RDS",
           "period": "",
           "refId": "A",
+          "region": "default",
+          "statistics": [
+            "Average"
+          ]
+        },
+        {
+          "alias": "prod_v14_5m_avg",
+          "dimensions": {
+            "DBInstanceIdentifier": "cloud-platform-d6224bbb698ff221"
+          },
+          "expression": "",
+          "hide": false,
+          "id": "",
+          "matchExact": true,
+          "metricName": "CPUUtilization",
+          "namespace": "AWS/RDS",
+          "period": "5m",
+          "refId": "C",
           "region": "default",
           "statistics": [
             "Average"
