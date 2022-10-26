@@ -169,10 +169,10 @@
       "color": {
         "cardColor": "#FADE2A",
         "colorScale": "sqrt",
-        "colorScheme": "interpolateMagma",
+        "colorScheme": "interpolateSpectral",
         "exponent": 0.2,
         "min": null,
-        "mode": "opacity"
+        "mode": "spectrum"
       },
       "dataFormat": "tsbuckets",
       "datasource": null,
@@ -188,7 +188,7 @@
         "y": 1
       },
       "heatmap": {},
-      "hideZeroBuckets": false,
+      "hideZeroBuckets": true,
       "highlightCards": true,
       "id": 18,
       "legend": {
@@ -365,10 +365,10 @@
       "color": {
         "cardColor": "#B877D9",
         "colorScale": "sqrt",
-        "colorScheme": "interpolateMagma",
+        "colorScheme": "interpolateSpectral",
         "exponent": 0.2,
         "min": null,
-        "mode": "opacity"
+        "mode": "spectrum"
       },
       "dataFormat": "tsbuckets",
       "datasource": null,
@@ -384,7 +384,7 @@
         "y": 9
       },
       "heatmap": {},
-      "hideZeroBuckets": false,
+      "hideZeroBuckets": true,
       "highlightCards": true,
       "id": 20,
       "legend": {
@@ -606,10 +606,10 @@
       "color": {
         "cardColor": "#FF9830",
         "colorScale": "sqrt",
-        "colorScheme": "interpolateMagma",
+        "colorScheme": "interpolateSpectral",
         "exponent": 0.2,
         "min": null,
-        "mode": "opacity"
+        "mode": "spectrum"
       },
       "dataFormat": "tsbuckets",
       "datasource": null,
@@ -625,7 +625,7 @@
         "y": 17
       },
       "heatmap": {},
-      "hideZeroBuckets": false,
+      "hideZeroBuckets": true,
       "highlightCards": true,
       "id": 19,
       "legend": {
