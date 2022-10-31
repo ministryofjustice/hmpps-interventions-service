@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: migrate-referral-details-to-changelog
+spec:
+  schedule: "30 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: "Never"
+          containers:
+            - name: referral-details-to-change-log-migration
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              imagePullPolicy: Always
+              args: ["--jobName=changelogMigrationJob"]
+              volumeMounts:
+                - name: heap-dumps
+                  mountPath: /dumps
+  {{- include "deployment.envs" . | nindent 14 }}
+          volumes:
+            - name: heap-dumps
+              emptyDir: {}
