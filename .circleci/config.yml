@@ -22,15 +22,6 @@ _db_docker_config: &db_docker_config
       POSTGRES_PASSWORD: password
       POSTGRES_DB: interventions_ci
 
-_db_docker_config_postgres10: &db_docker_config_postgres10
-  - image: cimg/openjdk:17.0
-    environment:
-      POSTGRES_DB: interventions_ci
-  - image: circleci/postgres:10-alpine-ram
-    environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: interventions_ci
-
 jobs:
   validate:
     executor:
@@ -58,59 +49,6 @@ jobs:
       name: hmpps/java
       tag: "17"
     docker: *db_docker_config
-    steps:
-      - checkout
-      - run:
-          name: Setup flyway and psql
-          command: |
-            wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/7.7.0/flyway-commandline-7.7.0-linux-x64.tar.gz | \
-              tar xvz && sudo ln -s `pwd`/flyway-7.7.0/flyway /usr/local/bin
-            sudo apt update
-            sudo apt install postgresql-client
-      - run:
-          name: Run main migrations then branch migrations to detect clashes
-          command: |
-            flyway clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
-            git reset --hard origin/main
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
-            git reset --hard "$CIRCLE_SHA1"
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
-      - run:
-          name: Run migrations and local seeds
-          command: |
-            flyway clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration,src/main/resources/db/local"
-      - run:
-          name: Validate metadata
-          command: |
-            PGPASSWORD="$POSTGRES_PASSWORD" script/validate-metadata.sh
-
-  validate_postgres10:
-    executor:
-      name: hmpps/java
-      tag: "17"
-    docker: *db_docker_config_postgres10
-    environment:
-      _JAVA_OPTIONS: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=true -Dkotlin.compiler.execution.strategy=in-process
-    steps:
-      - checkout
-      - gradle/with_cache:
-          cache_checksum_file: "build.gradle.kts"
-          cache_key: v2
-          steps:
-            - run: ./gradlew check jacocoTestCoverageVerification
-      - store_test_results:
-          path: build/test-results
-      - store_artifacts:
-          path: build/reports/tests
-      - store_artifacts:
-          path: build/reports/jacoco/test
-
-  validate_db_postgres10:
-    executor:
-      name: hmpps/java
-      tag: "17"
-    docker: *db_docker_config_postgres10
     steps:
       - checkout
       - run:
@@ -249,8 +187,6 @@ workflows:
   build_test_and_deploy:
     unless: << pipeline.parameters.only_pacts >>
     jobs:
-      - validate_postgres10
-      - validate_db_postgres10
       - validate
       - validate_db
       - publish_data:
@@ -288,8 +224,6 @@ workflows:
               only:
                 - main
           requires:
-            - validate_postgres10
-            - validate_db_postgres10
             - validate
             - validate_db
             - publish_data
