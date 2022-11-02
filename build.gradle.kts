@@ -80,7 +80,7 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:3.19.0-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.18.7")
+  implementation("software.amazon.awssdk:sns:2.18.8")
   implementation("software.amazon.awssdk:s3:2.18.7")
 
   // security
