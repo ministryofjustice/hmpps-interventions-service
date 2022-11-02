@@ -28,6 +28,7 @@ class DynamicFrameworkContractFactory(em: TestEntityManager? = null) : EntityFac
     pccRegion: PCCRegion? = null,
     contractReference: String = RandomStringUtils.randomAlphanumeric(8),
     subcontractorProviders: Set<ServiceProvider> = setOf(),
+    referralStartDate: LocalDate = LocalDate.of(2021, 6, 1),
   ): DynamicFrameworkContract {
     return save(
       DynamicFrameworkContract(
@@ -43,7 +44,8 @@ class DynamicFrameworkContractFactory(em: TestEntityManager? = null) : EntityFac
         npsRegion = npsRegion,
         pccRegion = pccRegion,
         contractReference = contractReference,
-        subcontractorProviders = subcontractorProviders
+        subcontractorProviders = subcontractorProviders,
+        referralStartDate = referralStartDate
       )
     )
   }

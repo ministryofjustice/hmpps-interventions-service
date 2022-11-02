@@ -5,11 +5,13 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.test.util.ReflectionTestUtils
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFrameworkContractFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.NPSRegionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.PCCRegionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
+import java.time.LocalDate
 
 @RepositoryTest
 class InterventionFilterRepositoryImplTest @Autowired constructor(
@@ -30,6 +32,7 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
 
   @BeforeEach
   fun setup() {
+    ReflectionTestUtils.setField(interventionFilterRepositoryImpl, "showFutureInterventions", false)
     deliverySessionRepository.deleteAll()
     actionPlanRepository.deleteAll()
     endOfServiceReportRepository.deleteAll()
@@ -38,7 +41,6 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
 
     referralRepository.deleteAll()
     interventionRepository.deleteAll()
-
     authUserRepository.deleteAll()
   }
 
@@ -205,5 +207,34 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
       assertThat(it.dynamicFrameworkContract.minimumAge).isEqualTo(18)
       assertThat(it.dynamicFrameworkContract.maximumAge).isEqualTo(29)
     }
+  }
+
+  @Test
+  fun `get interventions with show-future-interventions disabled `() {
+    val futureIntervention = interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now().plusDays(10)))
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now()))
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create()), title = "test Title")
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(npsRegion = npsRegionFactory.create()))
+    val found = interventionFilterRepositoryImpl.findByCriteria(listOf(), null, null, null, null)
+
+    assertThat(found.size).isEqualTo(3)
+    assertThat(found).doesNotContain(futureIntervention)
+    found.forEach {
+      assertThat(it.dynamicFrameworkContract.referralStartDate).isBeforeOrEqualTo(LocalDate.now())
+    }
+  }
+
+  @Test
+  fun `get interventions with show-future-interventions enabled `() {
+    ReflectionTestUtils.setField(interventionFilterRepositoryImpl, "showFutureInterventions", true)
+
+    val futureIntervention = interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now().plusDays(10)), title = "future")
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralStartDate = LocalDate.now()))
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create()), title = "test Title")
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(npsRegion = npsRegionFactory.create()))
+    val found = interventionFilterRepositoryImpl.findByCriteria(listOf(), null, null, null, null)
+
+    assertThat(found.size).isEqualTo(4)
+    assertThat(found).contains(futureIntervention)
   }
 }

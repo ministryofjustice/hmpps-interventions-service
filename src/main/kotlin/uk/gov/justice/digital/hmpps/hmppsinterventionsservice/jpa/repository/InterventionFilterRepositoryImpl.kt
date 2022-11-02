@@ -1,10 +1,12 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository
 
+import org.springframework.beans.factory.annotation.Value
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DynamicFrameworkContract
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NPSRegion
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PCCRegion
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PCCRegionID
+import java.time.LocalDate
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 import javax.persistence.criteria.CriteriaBuilder
@@ -12,6 +14,7 @@ import javax.persistence.criteria.Predicate
 import javax.persistence.criteria.Root
 
 class InterventionFilterRepositoryImpl(
+  @Value("\${overrides.show-future-interventions}") private val showFutureInterventions: Boolean,
   private val pccRegionRepository: PCCRegionRepository
 ) : InterventionFilterRepository {
 
@@ -28,8 +31,9 @@ class InterventionFilterRepositoryImpl(
     val allowsMalePredicate: Predicate? = getAllowsMalePredicate(criteriaBuilder, root, allowsMale)
     val minimumAgePredicate: Predicate? = getMinimumAgePredicate(criteriaBuilder, root, minimumAge)
     val maximumAgePredicate: Predicate? = getMaximumAgePredicate(criteriaBuilder, root, maximumAge)
+    val startDatePredicate: Predicate? = filterFutureReferrals(criteriaBuilder, root, LocalDate.now())
 
-    val predicates = listOfNotNull(regionPredicate, allowsFemalePredicate, allowsMalePredicate, minimumAgePredicate, maximumAgePredicate)
+    val predicates = listOfNotNull(regionPredicate, allowsFemalePredicate, allowsMalePredicate, minimumAgePredicate, maximumAgePredicate, startDatePredicate)
     val finalPredicate: Predicate = criteriaBuilder.and(*predicates.toTypedArray())
 
     criteriaQuery.where(finalPredicate)
@@ -87,6 +91,16 @@ class InterventionFilterRepositoryImpl(
     return maximumAge?.let {
       val expression = root.get<DynamicFrameworkContract>("dynamicFrameworkContract").get<Int>("maximumAge")
       criteriaBuilder.equal(expression, maximumAge)
+    }
+  }
+
+  private fun filterFutureReferrals(criteriaBuilder: CriteriaBuilder, root: Root<Intervention>, startDate: LocalDate?): Predicate? {
+    if (showFutureInterventions) {
+      return null
+    }
+    return startDate?.let {
+      val expression = root.get<DynamicFrameworkContract>("dynamicFrameworkContract").get<LocalDate>("referralStartDate")
+      criteriaBuilder.lessThanOrEqualTo(expression, startDate)
     }
   }
 }

@@ -48,6 +48,8 @@ data class DynamicFrameworkContract(
   @NotNull val startDate: LocalDate,
   @NotNull val endDate: LocalDate,
 
+  @NotNull val referralStartDate: LocalDate,
+
   @ManyToOne @JoinColumn(name = "nps_region_id")
   val npsRegion: NPSRegion? = null,
 
