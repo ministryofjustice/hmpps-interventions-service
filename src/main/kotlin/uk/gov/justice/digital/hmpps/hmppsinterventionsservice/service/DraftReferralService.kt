@@ -352,11 +352,7 @@ class DraftReferralService(
   }
 
   fun sendDraftReferral(draftReferral: DraftReferral, user: AuthUser): Referral {
-    val referral = createReferral(draftReferral)
-    referral.sentAt = OffsetDateTime.now()
-    referral.sentBy = authUserRepository.save(user)
-
-    referral.referenceNumber = generateReferenceNumber(draftReferral)
+    val referral = createSentReferral(draftReferral, user)
 
     /*
      * This is a temporary solution until a robust asynchronous link is created between Interventions
@@ -376,7 +372,8 @@ class DraftReferralService(
     return sentReferral
   }
 
-  private fun createReferral(draftReferral: DraftReferral): Referral {
+  private fun createSentReferral(draftReferral: DraftReferral, sentByUser: AuthUser): Referral {
+    val sentBy = authUserRepository.save(sentByUser)
     return Referral(
       id = draftReferral.id,
       furtherInformation = draftReferral.furtherInformation,
@@ -395,6 +392,9 @@ class DraftReferralService(
       createdBy = draftReferral.createdBy,
       createdAt = draftReferral.createdAt,
       referralDetailsHistory = draftReferral.referralDetailsHistory,
+      referenceNumber = generateReferenceNumber(draftReferral),
+      sentAt = OffsetDateTime.now(),
+      sentBy = sentBy,
     )
   }
 
