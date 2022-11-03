@@ -47,6 +47,9 @@ class CommunityApiCallError(val httpStatus: HttpStatus, causeMessage: String, va
         category.contains("Cannot find NSI for CRN: _ Sentence: _ and ContractType".toRegex()) -> {
           "This update has not been possible. This is because there's been a change to the referral in non-structured interventions in nDelius. Ask the probation practitioner if anything has changed with the referral or the person on probation"
         }
+        category.contains("Multiple existing URN NSIs found".toRegex()) -> {
+          "There has been an error during creating the Delius NSI. We are aware of this issue. For follow-up, please contact support"
+        }
         category.contains("Multiple existing matching NSIs found".toRegex()) -> {
           "There has been an error during creating the Delius NSI. We are aware of this issue. For follow-up, please contact support"
         }

@@ -51,6 +51,15 @@ internal class CommunityApiCallErrorTest {
     assertThat(
       CommunityApiCallError(
         BAD_REQUEST,
+        "Multiple existing URN NSIs found",
+        "{}",
+        RuntimeException()
+      ).userMessage
+    ).isEqualTo("There has been an error during creating the Delius NSI. We are aware of this issue. For follow-up, please contact support")
+
+    assertThat(
+      CommunityApiCallError(
+        BAD_REQUEST,
         "Multiple existing matching NSIs found",
         "{}",
         RuntimeException()
