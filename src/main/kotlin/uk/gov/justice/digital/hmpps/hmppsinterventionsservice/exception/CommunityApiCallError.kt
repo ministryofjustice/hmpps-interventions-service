@@ -31,6 +31,9 @@ class CommunityApiCallError(val httpStatus: HttpStatus, causeMessage: String, va
   RuntimeException(
     exception
   ) {
+  private val uuidRegex = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".toRegex()
+  private val identifiersRegex = "[A-Z]*[0-9]+".toRegex()
+
   val category = errorCategoryByRemovingIdentifiers(causeMessage)
   val userMessage = when {
     httpStatus.is4xxClientError -> {
@@ -70,6 +73,8 @@ class CommunityApiCallError(val httpStatus: HttpStatus, causeMessage: String, va
   }
 
   private fun errorCategoryByRemovingIdentifiers(message: String): String {
-    return "[A-Z]*[0-9]+".toRegex().replace(message, "_")
+    return message
+      .let { uuidRegex.replace(it, "_") }
+      .let { identifiersRegex.replace(it, "_") }
   }
 }

@@ -46,14 +46,14 @@ internal class CommunityApiCallErrorTest {
       ),
       Example(
         response = BAD_REQUEST,
-        causeMessage = "Multiple existing URN NSIs found",
-        expectedCategory = "Multiple existing URN NSIs found",
+        causeMessage = "Multiple existing URN NSIs found for referral: e2eb5e02-6e6f-4c34-8be9-b0525ea78c5a, NSI IDs: [3182407, 3182408]",
+        expectedCategory = "Multiple existing URN NSIs found for referral: _, NSI IDs: [_, _]",
         expectedUserMessage = "There has been an error during creating the Delius NSI. We are aware of this issue. For follow-up, please contact support",
       ),
       Example(
         response = BAD_REQUEST,
-        causeMessage = "Multiple existing matching NSIs found",
-        expectedCategory = "Multiple existing matching NSIs found",
+        causeMessage = "Multiple existing matching NSIs found for referral: e2eb5e02-6e6f-4c34-8be9-b0525ea78c5a, NSI IDs: [3182407, 3182408]",
+        expectedCategory = "Multiple existing matching NSIs found for referral: _, NSI IDs: [_, _]",
         expectedUserMessage = "There has been an error during creating the Delius NSI. We are aware of this issue. For follow-up, please contact support",
       ),
       Example(
