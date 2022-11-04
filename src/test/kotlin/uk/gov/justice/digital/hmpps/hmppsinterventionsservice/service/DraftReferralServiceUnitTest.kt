@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.mockito.AdditionalAnswers.returnsFirstArg
 import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
@@ -98,6 +99,11 @@ class DraftReferralServiceUnitTest {
     referralDetailsRepository,
     draftOasysRiskInformationService
   )
+
+  @BeforeEach
+  fun setup() {
+    whenever(referralRepository.save(any())).thenAnswer(returnsFirstArg<Referral>())
+  }
 
   @Nested
   inner class UpdateDraftReferralComplexityLevel {
@@ -587,10 +593,6 @@ class DraftReferralServiceUnitTest {
     )
     val authUser = authUserFactory.create()
 
-    val referral = referralFactory.createSent(id = draftReferral.id)
-
-    whenever(referralRepository.save(any())).thenReturn(referral)
-
     val sentReferral = draftReferralService.sendDraftReferral(draftReferral, authUser)
     assertThat(sentReferral.additionalRiskInformation).isNull()
   }
@@ -603,9 +605,7 @@ class DraftReferralServiceUnitTest {
     )
     val authUser = authUserFactory.create()
 
-    val referral = referralFactory.createSent(id = draftReferral.id, supplementaryRiskId = UUID.fromString("05320402-1e4b-4bdf-8db3-cde991359ba2"))
-    whenever(referralRepository.save(any())).thenReturn(referral)
-    whenever(assessRisksAndNeedsService.createSupplementaryRisk(eq(referral.id), any(), any(), anyOrNull(), any(), anyOrNull()))
+    whenever(assessRisksAndNeedsService.createSupplementaryRisk(eq(draftReferral.id), any(), any(), anyOrNull(), any(), anyOrNull()))
       .thenReturn(UUID.fromString("05320402-1e4b-4bdf-8db3-cde991359ba2"))
 
     val sentReferral = draftReferralService.sendDraftReferral(draftReferral, authUser)
@@ -627,16 +627,12 @@ class DraftReferralServiceUnitTest {
     )
 
     @Test
-    fun `correct additional risk information is set if it exists as draft oasys risk information`() {
+    fun `draft oasys risk (redacted risk) is submitted as supplementary risk if it exists`() {
       val draftReferral = referralFactory.createDraft(additionalRiskInformation = "something")
       val authUser = authUserFactory.create()
 
-      val referral = referralFactory.createSent(id = draftReferral.id, supplementaryRiskId = UUID.fromString("05320402-1e4b-4bdf-8db3-cde991359ba2"))
-      whenever(referralRepository.save(any())).thenReturn(referral)
-
-      whenever(draftOasysRiskInformationService.getDraftOasysRiskInformation(referral.id)).thenReturn(draftRisk)
-
-      whenever(assessRisksAndNeedsService.createSupplementaryRisk(eq(referral.id), any(), any(), anyOrNull(), eq("draftOasysAdditionalInformation"), any()))
+      whenever(draftOasysRiskInformationService.getDraftOasysRiskInformation(draftReferral.id)).thenReturn(draftRisk)
+      whenever(assessRisksAndNeedsService.createSupplementaryRisk(eq(draftReferral.id), any(), any(), anyOrNull(), eq("draftOasysAdditionalInformation"), any()))
         .thenReturn(UUID.fromString("05320402-1e4b-4bdf-8db3-cde991359ba2"))
 
       val sentReferral = draftReferralService.sendDraftReferral(draftReferral, authUser)
@@ -644,20 +640,32 @@ class DraftReferralServiceUnitTest {
     }
 
     @Test
-    fun `no exception thrown on empty additional risk if draft risk information exists`() {
-      val draftReferral = referralFactory.createDraft(additionalRiskInformation = null)
+    fun `does not require 'additional risk information' to exist if draft oasys risk (redacted risk) is present`() {
       val authUser = authUserFactory.create()
 
-      val referral = referralFactory.createSent(id = draftReferral.id, supplementaryRiskId = UUID.fromString("05320402-1e4b-4bdf-8db3-cde991359ba2"))
-      whenever(referralRepository.save(any())).thenReturn(referral)
+      val draftReferral = referralFactory.createDraft(additionalRiskInformation = null)
 
-      whenever(draftOasysRiskInformationService.getDraftOasysRiskInformation(referral.id)).thenReturn(draftRisk)
-
-      whenever(assessRisksAndNeedsService.createSupplementaryRisk(eq(referral.id), any(), any(), anyOrNull(), any(), any()))
+      whenever(draftOasysRiskInformationService.getDraftOasysRiskInformation(draftReferral.id)).thenReturn(draftRisk)
+      whenever(assessRisksAndNeedsService.createSupplementaryRisk(eq(draftReferral.id), any(), any(), anyOrNull(), any(), any()))
         .thenReturn(UUID.fromString("05320402-1e4b-4bdf-8db3-cde991359ba2"))
 
       val sentReferral = draftReferralService.sendDraftReferral(draftReferral, authUser)
       assertThat(sentReferral.supplementaryRiskId).isEqualTo(UUID.fromString("05320402-1e4b-4bdf-8db3-cde991359ba2"))
+    }
+
+    @Test
+    fun `additional risk information is submitted as supplementary risk when draft oasys risk (redacted risk) does not exist`() {
+      val riskUpdatedAt = OffsetDateTime.now()
+      val draftReferral = referralFactory.createDraft(
+        additionalRiskInformation = "something",
+        additionalRiskInformationUpdatedAt = riskUpdatedAt
+      )
+
+      val authUser = authUserFactory.create()
+
+      draftReferralService.sendDraftReferral(draftReferral, authUser)
+      verify(assessRisksAndNeedsService, times(1))
+        .createSupplementaryRisk(draftReferral.id, draftReferral.serviceUserCRN, authUser, riskUpdatedAt, "something")
     }
   }
 
@@ -674,37 +682,13 @@ class DraftReferralServiceUnitTest {
   }
 
   @Test
-  fun `submitAdditionalRiskInformation uses appropriate referral fields`() {
-    val timestamp = OffsetDateTime.now()
-    val draftReferral = referralFactory.createDraft(
-      additionalRiskInformation = "something",
-      additionalRiskInformationUpdatedAt = timestamp
-    )
-    val authUser = authUserFactory.create()
-
-    val referral = referralFactory.createSent(id = draftReferral.id)
-
-    whenever(referralRepository.save(any())).thenReturn(referral)
-
-    draftReferralService.sendDraftReferral(draftReferral, authUser)
-    verify(assessRisksAndNeedsService, times(1))
-      .createSupplementaryRisk(referral.id, referral.serviceUserCRN, authUser, timestamp, "something")
-  }
-
-  @Test
   fun `referral is sent to assessRisksAndNeeds before communityApi`() {
     val timestamp = OffsetDateTime.now()
     val draftReferral = referralFactory.createDraft(
       additionalRiskInformation = "something",
       additionalRiskInformationUpdatedAt = timestamp
     )
-    val sentReferral = referralFactory.createSent(
-      id = draftReferral.id,
-      additionalRiskInformationUpdatedAt = timestamp
-    )
     val authUser = authUserFactory.create()
-
-    whenever(referralRepository.save(any())).thenReturn(sentReferral)
 
     val sendReferral = draftReferralService.sendDraftReferral(draftReferral, authUser)
 
@@ -720,11 +704,6 @@ class DraftReferralServiceUnitTest {
 
   @Nested
   inner class UpdateDraftReferralDetails {
-    @BeforeEach
-    fun setup() {
-      whenever(referralRepository.save(any())).thenAnswer { it.arguments[0] }
-    }
-
     @Test
     fun `new referral details have the same created time as the referral`() {
       val draftReferral = referralFactory.createDraft()
