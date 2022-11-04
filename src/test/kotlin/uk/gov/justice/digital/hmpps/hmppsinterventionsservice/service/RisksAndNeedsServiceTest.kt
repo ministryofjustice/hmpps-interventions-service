@@ -62,7 +62,6 @@ internal class RisksAndNeedsServiceTest : LoggingSpyTest(RisksAndNeedsService::c
 
       val risksAndNeedsService = RisksAndNeedsService(
         "/risk/supplementary",
-        true,
         restClient,
       )
 
@@ -96,7 +95,6 @@ internal class RisksAndNeedsServiceTest : LoggingSpyTest(RisksAndNeedsService::c
 
       val risksAndNeedsService = RisksAndNeedsService(
         "/risk/supplementary",
-        true,
         restClient,
       )
 

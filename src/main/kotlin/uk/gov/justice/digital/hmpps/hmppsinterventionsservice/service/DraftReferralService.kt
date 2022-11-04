@@ -403,7 +403,7 @@ class DraftReferralService(
     //  make-referral requests to pass
 
     val oasysRiskInformation = draftOasysRiskInformationService.getDraftOasysRiskInformation(referral.id)
-    val riskId = if (oasysRiskInformation != null && assessRisksAndNeedsService.canPostFullRiskInformation()) {
+    val riskId = if (oasysRiskInformation != null) {
       assessRisksAndNeedsService.createSupplementaryRisk(
         referral.id,
         referral.serviceUserCRN,

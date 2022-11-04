@@ -628,7 +628,6 @@ class DraftReferralServiceUnitTest {
       val referral = referralFactory.createSent(id = draftReferral.id, supplementaryRiskId = UUID.fromString("05320402-1e4b-4bdf-8db3-cde991359ba2"))
       whenever(referralRepository.save(any())).thenReturn(referral)
 
-      whenever(assessRisksAndNeedsService.canPostFullRiskInformation()).thenReturn(true)
       whenever(draftOasysRiskInformationService.getDraftOasysRiskInformation(referral.id)).thenReturn(draftRisk)
 
       whenever(assessRisksAndNeedsService.createSupplementaryRisk(eq(referral.id), any(), any(), anyOrNull(), eq("draftOasysAdditionalInformation"), any()))
@@ -646,27 +645,9 @@ class DraftReferralServiceUnitTest {
       val referral = referralFactory.createSent(id = draftReferral.id, supplementaryRiskId = UUID.fromString("05320402-1e4b-4bdf-8db3-cde991359ba2"))
       whenever(referralRepository.save(any())).thenReturn(referral)
 
-      whenever(assessRisksAndNeedsService.canPostFullRiskInformation()).thenReturn(true)
       whenever(draftOasysRiskInformationService.getDraftOasysRiskInformation(referral.id)).thenReturn(draftRisk)
 
       whenever(assessRisksAndNeedsService.createSupplementaryRisk(eq(referral.id), any(), any(), anyOrNull(), any(), any()))
-        .thenReturn(UUID.fromString("05320402-1e4b-4bdf-8db3-cde991359ba2"))
-
-      val sentReferral = draftReferralService.sendDraftReferral(draftReferral, authUser)
-      assertThat(sentReferral.supplementaryRiskId).isEqualTo(UUID.fromString("05320402-1e4b-4bdf-8db3-cde991359ba2"))
-    }
-
-    @Test
-    fun `only original additional risk information is posted if posting full risk information is disabled`() {
-      val draftReferral = referralFactory.createDraft(additionalRiskInformation = "something")
-      val authUser = authUserFactory.create()
-
-      val referral = referralFactory.createSent(id = draftReferral.id, supplementaryRiskId = UUID.fromString("05320402-1e4b-4bdf-8db3-cde991359ba2"))
-      whenever(referralRepository.save(any())).thenReturn(referral)
-
-      whenever(assessRisksAndNeedsService.canPostFullRiskInformation()).thenReturn(false)
-
-      whenever(assessRisksAndNeedsService.createSupplementaryRisk(eq(referral.id), any(), any(), anyOrNull(), eq("something"), anyOrNull()))
         .thenReturn(UUID.fromString("05320402-1e4b-4bdf-8db3-cde991359ba2"))
 
       val sentReferral = draftReferralService.sendDraftReferral(draftReferral, authUser)
