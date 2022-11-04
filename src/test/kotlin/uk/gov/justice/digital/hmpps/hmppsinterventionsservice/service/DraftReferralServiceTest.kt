@@ -193,7 +193,6 @@ class DraftReferralServiceTest @Autowired constructor(
       sampleDraftReferral.relevantSentenceId = existingSentenceId
       entityManager.persistAndFlush(sampleDraftReferral)
 
-      val today = LocalDate.now()
       val draftReferral = DraftReferralDTO(relevantSentenceId = newSentenceId)
 
       val updated = draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
@@ -365,6 +364,7 @@ class DraftReferralServiceTest @Autowired constructor(
       val user = AuthUser("user_id", "delius", "user_name")
       val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
       draftReferral.additionalRiskInformation = "risk"
+      draftReferral.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
 
       assertThat(draftReferralService.getDraftReferralForUser(draftReferral.id, user)).isNotNull
 
@@ -378,6 +378,7 @@ class DraftReferralServiceTest @Autowired constructor(
       val user = AuthUser("user_id", "delius", "user_name")
       val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
       draftReferral.additionalRiskInformation = "risk"
+      draftReferral.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
 
       val sentReferral = draftReferralService.sendDraftReferral(draftReferral, user)
       assertThat(sentReferral.referenceNumber).isNotNull
@@ -389,7 +390,9 @@ class DraftReferralServiceTest @Autowired constructor(
       val draft1 = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
       val draft2 = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
       draft1.additionalRiskInformation = "risk"
+      draft1.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
       draft2.additionalRiskInformation = "risk"
+      draft2.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
 
       whenever(referenceGenerator.generate(sampleIntervention.dynamicFrameworkContract.contractType.name))
         .thenReturn("AA0000ZZ", "AA0000ZZ", "AA0000ZZ", "AA0000ZZ", "BB0000ZZ")
@@ -406,6 +409,7 @@ class DraftReferralServiceTest @Autowired constructor(
       val user = AuthUser("user_id", "delius", "user_name")
       val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
       draftReferral.additionalRiskInformation = "risk"
+      draftReferral.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
 
       val referral = draftReferralService.sendDraftReferral(draftReferral, user)
       val eventCaptor = argumentCaptor<Referral>()

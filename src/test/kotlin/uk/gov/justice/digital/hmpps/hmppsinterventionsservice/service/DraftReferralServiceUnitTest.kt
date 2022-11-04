@@ -581,7 +581,10 @@ class DraftReferralServiceUnitTest {
 
   @Test
   fun`draft referral risk information is deleted when referral is sent`() {
-    val draftReferral = referralFactory.createDraft(additionalRiskInformation = "something")
+    val draftReferral = referralFactory.createDraft(
+      additionalRiskInformation = "something",
+      additionalRiskInformationUpdatedAt = OffsetDateTime.now()
+    )
     val authUser = authUserFactory.create()
 
     val referral = referralFactory.createSent(id = draftReferral.id)
@@ -594,7 +597,10 @@ class DraftReferralServiceUnitTest {
 
   @Test
   fun `supplementaryRiskId is set when referral is sent`() {
-    val draftReferral = referralFactory.createDraft(additionalRiskInformation = "something")
+    val draftReferral = referralFactory.createDraft(
+      additionalRiskInformation = "something",
+      additionalRiskInformationUpdatedAt = OffsetDateTime.now()
+    )
     val authUser = authUserFactory.create()
 
     val referral = referralFactory.createSent(id = draftReferral.id, supplementaryRiskId = UUID.fromString("05320402-1e4b-4bdf-8db3-cde991359ba2"))

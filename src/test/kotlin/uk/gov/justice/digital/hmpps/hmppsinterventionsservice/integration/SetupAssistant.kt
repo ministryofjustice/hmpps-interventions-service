@@ -647,6 +647,7 @@ class SetupAssistant(
     accessibilityNeeds: String = "She uses a wheelchair",
     additionalNeedsInformation: String = "Alex is currently sleeping on her aunt's sofa",
     additionalRiskInformation: String = "A danger to the elderly",
+    additionalRiskInformationUpdatedAt: OffsetDateTime = OffsetDateTime.now(),
     completionDeadline: LocalDate = LocalDate.of(2021, 4, 1),
     furtherInformation: String = "Some information about the service user",
     hasAdditionalResponsibilities: Boolean = true,
@@ -665,6 +666,7 @@ class SetupAssistant(
     referral.accessibilityNeeds = accessibilityNeeds
     referral.additionalNeedsInformation = additionalNeedsInformation
     referral.additionalRiskInformation = additionalRiskInformation
+    referral.additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt
     referral.complexityLevelIds = complexityLevelIds
     referral.hasAdditionalResponsibilities = hasAdditionalResponsibilities
     referral.interpreterLanguage = interpreterLanguage
