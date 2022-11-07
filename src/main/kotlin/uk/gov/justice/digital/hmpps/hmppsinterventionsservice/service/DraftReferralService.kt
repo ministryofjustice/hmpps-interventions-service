@@ -448,7 +448,6 @@ class DraftReferralService(
     val sentBy = authUserRepository.save(sentByUser)
     return Referral(
       id = draftReferral.id,
-      furtherInformation = draftReferral.furtherInformation,
       additionalNeedsInformation = draftReferral.additionalNeedsInformation,
       additionalRiskInformation = draftReferral.additionalRiskInformation,
       additionalRiskInformationUpdatedAt = draftReferral.additionalRiskInformationUpdatedAt,
