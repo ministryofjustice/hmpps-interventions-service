@@ -69,7 +69,7 @@ dependencies {
   implementation("io.micrometer:micrometer-registry-prometheus")
   implementation("io.sentry:sentry-spring-boot-starter:6.7.0")
   implementation("io.sentry:sentry-logback:6.7.0")
-  implementation("io.github.microutils:kotlin-logging-jvm:3.0.3")
+  implementation("io.github.microutils:kotlin-logging-jvm:3.0.4")
   implementation("net.logstash.logback:logstash-logback-encoder:7.2")
   runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.4") // needed for OffsetDateTime for AppInsights
 
