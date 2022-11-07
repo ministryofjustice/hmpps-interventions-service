@@ -379,7 +379,6 @@ class DraftReferralService(
   private fun createReferral(draftReferral: DraftReferral): Referral {
     return Referral(
       id = draftReferral.id,
-      furtherInformation = draftReferral.furtherInformation,
       additionalNeedsInformation = draftReferral.additionalNeedsInformation,
       additionalRiskInformation = draftReferral.additionalRiskInformation,
       additionalRiskInformationUpdatedAt = draftReferral.additionalRiskInformationUpdatedAt,

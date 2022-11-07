@@ -47,8 +47,6 @@ COMMENT ON COLUMN referral.intervention_id IS 'intervention unique identifier';
 COMMENT ON COLUMN referral.created_at IS 'when the referral was started';
 COMMENT ON COLUMN referral.created_by_id IS 'ID of the person who started the referral';
 COMMENT ON COLUMN referral.service_usercrn IS 'the referred person''s probation Case Reference Number';
-COMMENT ON COLUMN referral.completion_deadline IS 'when the intervention should be completed by';
-COMMENT ON COLUMN referral.further_information IS 'further information about the service user';
 COMMENT ON COLUMN referral.accessibility_needs IS 'accessibility needs of the service user';
 COMMENT ON COLUMN referral.additional_needs_information IS 'further information about the service user''s needs';
 COMMENT ON COLUMN referral.needs_interpreter IS 'whether the service user needs an interpreter';
@@ -58,7 +56,6 @@ COMMENT ON COLUMN referral.when_unavailable IS 'when the service user is unavail
 COMMENT ON COLUMN referral.draft_supplementary_risk IS 'draft supplementary risk information about the service user; this is deleted and stored in ''assess risk and needs'' service when the referral is sent';
 COMMENT ON COLUMN referral.draft_supplementary_risk_updated_at IS 'a timestamp indicating the last time the draft supplementary risk was updated';
 COMMENT ON COLUMN referral.supplementary_risk_id IS 'ID of the supplementary risk information stored in ''assess risks and needs'' service for this referral';
-COMMENT ON COLUMN referral.maximum_enforceable_days IS 'the maximum number of enforceable/RAR days that can be used';
 COMMENT ON COLUMN referral.reference_number IS 'referral number';
 COMMENT ON COLUMN referral.sent_at IS 'when the referral was sent';
 COMMENT ON COLUMN referral.sent_by_id IS 'ID of the person who sent the referral';
@@ -160,6 +157,9 @@ COMMENT ON TABLE referral_complexity_level_ids IS 'selected complexity levels fo
 COMMENT ON TABLE referral_selected_service_category IS 'selected service categories for each referral';
 
 COMMENT ON TABLE referral_details IS 'details about a referral that can change that are not used to determine state';
+COMMENT ON COLUMN referral_details.completion_deadline IS 'when the intervention should be completed by';
+COMMENT ON COLUMN referral_details.further_information IS 'further information about the service user';
+COMMENT ON COLUMN referral_details.maximum_enforceable_days IS 'the maximum number of enforceable/RAR days that can be used';
 
 COMMENT ON TABLE draft_referral IS 'intended to store draft referrals, which have been started but not sent; for technical reasons, this table currently **retains** drafts after they have been sent';
 

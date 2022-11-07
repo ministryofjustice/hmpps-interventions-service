@@ -53,7 +53,6 @@ class Referral(
   @OneToOne(mappedBy = "draftReferral", cascade = [CascadeType.ALL]) @PrimaryKeyJoinColumn var serviceUserData: ServiceUserData? = null,
   @Column(name = "draft_supplementary_risk") var additionalRiskInformation: String? = null,
   @Column(name = "draft_supplementary_risk_updated_at") var additionalRiskInformationUpdatedAt: OffsetDateTime? = null,
-  var furtherInformation: String? = null,
   var additionalNeedsInformation: String? = null,
   var accessibilityNeeds: String? = null,
   var needsInterpreter: Boolean? = null,
