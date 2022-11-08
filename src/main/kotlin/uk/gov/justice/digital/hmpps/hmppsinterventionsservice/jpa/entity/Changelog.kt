@@ -5,8 +5,6 @@ import com.vladmihalcea.hibernate.type.json.JsonBinaryType
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
 import org.hibernate.annotations.Type
-import org.hibernate.annotations.TypeDef
-import org.hibernate.annotations.TypeDefs
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendTopic
 import java.time.OffsetDateTime
@@ -20,12 +18,6 @@ import javax.persistence.ManyToOne
 import javax.validation.constraints.NotNull
 
 @Entity
-@TypeDefs(
-  value = [
-    TypeDef(name = "jsonb", typeClass = JsonBinaryType::class),
-    TypeDef(name = "topic", typeClass = PostgreSQLEnumType::class)
-  ]
-)
 data class Changelog(
   @Column(name = "referral_id") val referralId: UUID,
 
@@ -33,15 +25,17 @@ data class Changelog(
   @Column(name = "changelog_id")
   val id: UUID,
 
-  @Type(type = "topic") @Enumerated(EnumType.STRING)
+  @Type(PostgreSQLEnumType::class)
+  @Column(columnDefinition = "topic")
+  @Enumerated(EnumType.STRING)
   var topic: AmendTopic,
 
-  @Type(type = "jsonb")
-  @Column(name = "old_value")
+  @Type(JsonBinaryType::class)
+  @Column(name = "old_value", columnDefinition = "jsonb")
   val oldVal: ReferralAmendmentDetails,
 
-  @Type(type = "jsonb")
-  @Column(name = "new_value")
+  @Type(JsonBinaryType::class)
+  @Column(name = "new_value", columnDefinition = "jsonb")
   val newVal: ReferralAmendmentDetails,
 
   @Column(name = "reason_for_change")

@@ -5,10 +5,10 @@ import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
 import org.hibernate.annotations.Type
-import org.hibernate.annotations.TypeDef
 import java.time.OffsetDateTime
 import java.util.UUID
 import javax.persistence.CascadeType
+import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.EnumType
 import javax.persistence.Enumerated
@@ -20,9 +20,10 @@ import javax.persistence.PrimaryKeyJoinColumn
 import javax.validation.constraints.NotNull
 
 @Entity
-@TypeDef(name = "attended", typeClass = PostgreSQLEnumType::class)
 data class Appointment(
-  @Type(type = "attended") @Enumerated(EnumType.STRING) var attended: Attended? = null,
+  @Type(PostgreSQLEnumType::class) @Column(columnDefinition = "attended") @Enumerated(EnumType.STRING)
+  var attended: Attended? = null,
+
   var additionalAttendanceInformation: String? = null,
   var attendanceSubmittedAt: OffsetDateTime? = null,
   @ManyToOne @Fetch(FetchMode.JOIN) var attendanceSubmittedBy: AuthUser? = null,
