@@ -288,7 +288,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "max by (container)(rate(container_cpu_usage_seconds_total{namespace='$namespace',container!=\"POD\",container!=\"\"}[5m]))",
+          "expr": "max by (container)(increase(container_cpu_usage_seconds_total{namespace='$namespace',container!=\"POD\",container!=\"\"}[5m]))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -742,7 +742,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "avg by (container)(300*rate(jvm_gc_pause_seconds_sum{namespace='$namespace'}[5m]))",
+          "expr": "avg by (container)(increase(jvm_gc_pause_seconds_sum{namespace='$namespace'}[5m]))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -851,7 +851,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "quantile(0.99, 300*rate(http_client_requests_seconds_sum{namespace='$namespace'}[5m])) by (client_name)",
+          "expr": "quantile(0.99, increase(http_client_requests_seconds_sum{namespace='$namespace'}[5m])) by (client_name)",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -961,7 +961,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "topk(10, quantile(0.99, 300*rate(http_server_requests_seconds_sum{namespace='$namespace'}[5m])) by (uri))",
+          "expr": "topk(10, quantile(0.99, increase(http_server_requests_seconds_sum{namespace='$namespace'}[5m])) by (uri))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -1070,7 +1070,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "quantile(1, 300*rate(http_client_requests_seconds_sum{namespace='$namespace'}[5m])) by (client_name)",
+          "expr": "quantile(1, increase(http_client_requests_seconds_sum{namespace='$namespace'}[5m])) by (client_name)",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -1179,14 +1179,14 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sort_desc(avg(sum by (pod_name) (rate(container_network_receive_bytes_total{namespace='$namespace'}[5m]))))",
+          "expr": "sort_desc(avg(sum by (pod_name) (increase(container_network_receive_bytes_total{namespace='$namespace'}[5m]))))",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "Recv",
           "refId": "A"
         },
         {
-          "expr": "sort_desc(avg(sum by (pod_name) (rate(container_network_transmit_bytes_total{namespace='$namespace'}[5m]))))",
+          "expr": "sort_desc(avg(sum by (pod_name) (increase(container_network_transmit_bytes_total{namespace='$namespace'}[5m]))))",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "Sent",
@@ -1294,7 +1294,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "max(rate(nginx_ingress_controller_requests{status=~\"5..\",exported_namespace=~\"(token-verification-api-prod|hmpps-auth-prod|hmpps-assess-risks-and-needs-prod)\"}[2m])*120) by(exported_service)",
+          "expr": "max(increase(nginx_ingress_controller_requests{status=~\"5..\",exported_namespace=~\"(token-verification-api-prod|hmpps-auth-prod|hmpps-assess-risks-and-needs-prod)\"}[2m])) by(exported_service)",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -1400,7 +1400,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "avg(rate(nginx_ingress_controller_requests{status=~\"5..\",exported_namespace=\"$namespace\"}[1m])*60) by(exported_service,status)",
+          "expr": "avg(increase(nginx_ingress_controller_requests{status=~\"5..\",exported_namespace=\"$namespace\"}[1m])) by(exported_service,status)",
           "format": "time_series",
           "interval": "60s",
           "intervalFactor": 1,
@@ -1511,7 +1511,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "avg(rate(nginx_ingress_controller_requests{status=~\"4..\",exported_namespace=\"$namespace\"}[1m])*60) by(exported_service,status)",
+          "expr": "avg(increase(nginx_ingress_controller_requests{status=~\"4..\",exported_namespace=\"$namespace\"}[1m])) by(exported_service,status)",
           "format": "time_series",
           "interval": "60s",
           "intervalFactor": 1,
@@ -1622,7 +1622,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "avg(rate(nginx_ingress_controller_requests{status=~\"2..|3..\",exported_namespace=\"$namespace\"}[1m])*60) by(exported_service,status)",
+          "expr": "avg(increase(nginx_ingress_controller_requests{status=~\"2..|3..\",exported_namespace=\"$namespace\"}[1m])) by(exported_service,status)",
           "format": "time_series",
           "interval": "60s",
           "intervalFactor": 1,
@@ -1733,7 +1733,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "avg(rate(nginx_ingress_controller_requests{status=~\"423\",exported_namespace=\"$namespace\"}[1m])*60) by(exported_service,status)",
+          "expr": "avg(increase(nginx_ingress_controller_requests{status=~\"423\",exported_namespace=\"$namespace\"}[1m])) by(exported_service,status)",
           "format": "time_series",
           "interval": "60s",
           "intervalFactor": 1,
