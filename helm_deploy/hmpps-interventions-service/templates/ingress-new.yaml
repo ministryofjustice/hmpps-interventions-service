@@ -17,7 +17,11 @@ metadata:
       SecRuleUpdateActionById 959100 "t:none,deny,status:423,logdata:%{SERVER_NAME}"
       SecAction "id:900110,phase:1,nolog,pass,t:none,setvar:tx.inbound_anomaly_score_threshold=50,setvar:tx.outbound_anomaly_score_threshold=50"
 spec:
+  {{- if .Values.env_details.contains_live_data }}
   ingressClassName: modsec
+  {{- else }}
+  ingressClassName: default
+  {{- end }}
   tls:
   {{- range .Values.ingress.hosts }}
   - hosts:
