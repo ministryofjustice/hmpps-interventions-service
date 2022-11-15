@@ -36,23 +36,38 @@ spec:
       http:
         paths:
           - path: /prometheus
+            pathType: ImplementationSpecific
             backend:
-              serviceName: default-http-backend
-              servicePort: 80
+              service:
+                name: default-http-backend
+                port:
+                  number: 80
           - path: /sent-referrals
+            pathType: ImplementationSpecific
             backend:
-              serviceName: {{ $fullName }}-dashboard
-              servicePort: http
+              service:
+                name: {{ $fullName }}-dashboard
+                port:
+                  number: 80
           - path: /reports/service-provider/performance
+            pathType: ImplementationSpecific
             backend:
-              serviceName: {{ $fullName }}-performance-report
-              servicePort: http
+              service:
+                name: {{ $fullName }}-performance-report
+                port:
+                  number: 80
           - path: /
+            pathType: ImplementationSpecific
             backend:
-              serviceName: {{ $fullName }}-api
-              servicePort: http
+              service:
+                name: {{ $fullName }}-api
+                port:
+                  number: 80
           - path: /meta/schema
+            pathType: ImplementationSpecific
             backend:
-              serviceName: {{ $fullName }}-data-dictionary
-              servicePort: http
+              service:
+                name: {{ $fullName }}-data-dictionary
+                port:
+                  number: 80
   {{- end }}
