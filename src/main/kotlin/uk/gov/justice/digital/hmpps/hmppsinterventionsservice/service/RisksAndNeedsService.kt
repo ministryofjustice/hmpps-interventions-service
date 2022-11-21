@@ -56,18 +56,13 @@ data class SupplementaryRiskResponse(
 @Transactional
 class RisksAndNeedsService(
   @Value("\${assess-risks-and-needs.locations.create-supplementary-risk}") private val createSupplementaryRiskLocation: String,
-  @Value("\${assess-risks-and-needs.enable-posting-full-risk}") private val canPostFullRiskInformation: Boolean,
   private val assessRisksAndNeedsClient: RestClient,
 ) {
   companion object : KLogging()
 
-  fun canPostFullRiskInformation(): Boolean {
-    return canPostFullRiskInformation
-  }
-
   fun createSupplementaryRisk(referralId: UUID, crn: String, user: AuthUser, riskCreatedAt: OffsetDateTime, riskInformation: String, redactedRisk: RedactedRisk? = null): UUID {
 
-    val request = if (canPostFullRiskInformation && redactedRisk != null) {
+    val request = if (redactedRisk != null) {
       logger.debug("Sending full supplementary risk information to ARN")
       CreateFullSupplementaryRiskRequest(
         "INTERVENTION_REFERRAL",

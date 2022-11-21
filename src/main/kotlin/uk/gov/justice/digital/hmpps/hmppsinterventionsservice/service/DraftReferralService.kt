@@ -403,7 +403,7 @@ class DraftReferralService(
     //  make-referral requests to pass
 
     val oasysRiskInformation = draftOasysRiskInformationService.getDraftOasysRiskInformation(referral.id)
-    val riskId = if (oasysRiskInformation != null && assessRisksAndNeedsService.canPostFullRiskInformation()) {
+    val riskId = if (oasysRiskInformation != null) {
       assessRisksAndNeedsService.createSupplementaryRisk(
         referral.id,
         referral.serviceUserCRN,
@@ -424,12 +424,7 @@ class DraftReferralService(
       val additionalRiskInformation = referral.additionalRiskInformation
         ?: throw ServerWebInputException("can't submit a referral without risk information")
 
-      val riskSubmittedAt = referral.additionalRiskInformationUpdatedAt
-        ?: run {
-          // this should NEVER happen. i'm not really sure why we have this as a fallback.
-          logger.warn("no additionalRiskInformationUpdatedAt on referral; setting to current time")
-          OffsetDateTime.now()
-        }
+      val riskSubmittedAt = referral.additionalRiskInformationUpdatedAt!!
 
       assessRisksAndNeedsService.createSupplementaryRisk(
         referral.id,
