@@ -17,7 +17,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 1,
-  "iteration": 1668606635617,
+  "iteration": 1669037125622,
   "links": [],
   "panels": [
     {
@@ -697,6 +697,7 @@
       "dashes": false,
       "datasource": "Prometheus",
       "decimals": null,
+      "description": "",
       "fieldConfig": {
         "defaults": {},
         "overrides": []
@@ -710,7 +711,7 @@
         "y": 25
       },
       "hiddenSeries": false,
-      "id": 28,
+      "id": 32,
       "legend": {
         "alignAsTable": false,
         "avg": false,
@@ -742,11 +743,11 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "avg by (container)(increase(jvm_gc_pause_seconds_sum{namespace='$namespace'}[5m]))",
+          "expr": "sum(hikaricp_connections_pending{namespace='$namespace'}) by (service)",
           "format": "time_series",
           "interval": "",
-          "intervalFactor": 2,
-          "legendFormat": "{{ container }}",
+          "intervalFactor": 1,
+          "legendFormat": "{{ service }}",
           "refId": "A"
         }
       ],
@@ -754,7 +755,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Garbage collection time",
+      "title": "Database transactions waiting for connection",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -773,7 +774,7 @@
         {
           "$$hashKey": "object:691",
           "decimals": null,
-          "format": "s",
+          "format": "none",
           "label": null,
           "logBase": 1,
           "max": null,
@@ -915,7 +916,6 @@
       "dashes": false,
       "datasource": "Prometheus",
       "decimals": null,
-      "description": "",
       "fieldConfig": {
         "defaults": {},
         "overrides": []
@@ -929,7 +929,7 @@
         "y": 33
       },
       "hiddenSeries": false,
-      "id": 27,
+      "id": 28,
       "legend": {
         "alignAsTable": false,
         "avg": false,
@@ -961,11 +961,11 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "topk(3,\n  quantile(0.99, \n    increase(http_server_requests_seconds_sum{namespace='$namespace'}[5m])\n    /increase(http_server_requests_seconds_count{namespace='$namespace'}[5m])\n  ) by (uri)\n)",
+          "expr": "avg by (container)(increase(jvm_gc_pause_seconds_sum{namespace='$namespace'}[5m]))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
-          "legendFormat": "{{ uri }}",
+          "legendFormat": "{{ container }}",
           "refId": "A"
         }
       ],
@@ -973,7 +973,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Slowest API requests (99th percentile)",
+      "title": "Garbage collection time",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1126,21 +1126,21 @@
     },
     {
       "aliasColors": {
-        "Limit": "#bf1b00"
+        "Limit": "#bf1b00",
+        "Requested (soft limit)": "#f2c96d"
       },
       "bars": false,
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
       "decimals": null,
+      "description": "",
       "fieldConfig": {
-        "defaults": {
-          "links": []
-        },
+        "defaults": {},
         "overrides": []
       },
       "fill": 1,
-      "fillGradient": 0,
+      "fillGradient": 2,
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -1148,18 +1148,18 @@
         "y": 41
       },
       "hiddenSeries": false,
-      "id": 14,
+      "id": 27,
       "legend": {
-        "alignAsTable": true,
-        "avg": true,
-        "current": true,
-        "max": true,
+        "alignAsTable": false,
+        "avg": false,
+        "current": false,
+        "max": false,
         "min": false,
         "rightSide": false,
         "show": true,
-        "sideWidth": 300,
+        "sideWidth": 450,
         "total": false,
-        "values": true
+        "values": false
       },
       "lines": true,
       "linewidth": 1,
@@ -1179,25 +1179,20 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sort_desc(avg(sum by (pod_name) (increase(container_network_receive_bytes_total{namespace='$namespace'}[5m]))))",
+          "exemplar": true,
+          "expr": "topk(3,\n  quantile(0.99, \n    increase(http_server_requests_seconds_sum{namespace='$namespace'}[5m])\n    /increase(http_server_requests_seconds_count{namespace='$namespace'}[5m])\n  ) by (uri)\n)",
           "format": "time_series",
+          "interval": "",
           "intervalFactor": 2,
-          "legendFormat": "Recv",
+          "legendFormat": "{{ uri }}",
           "refId": "A"
-        },
-        {
-          "expr": "sort_desc(avg(sum by (pod_name) (increase(container_network_transmit_bytes_total{namespace='$namespace'}[5m]))))",
-          "format": "time_series",
-          "intervalFactor": 2,
-          "legendFormat": "Sent",
-          "refId": "B"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Network",
+      "title": "Slowest API requests (99th percentile)",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1214,9 +1209,9 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:423",
+          "$$hashKey": "object:691",
           "decimals": null,
-          "format": "bytes",
+          "format": "s",
           "label": null,
           "logBase": 1,
           "max": null,
@@ -1224,7 +1219,7 @@
           "show": true
         },
         {
-          "$$hashKey": "object:424",
+          "$$hashKey": "object:692",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -1349,15 +1344,17 @@
       }
     },
     {
-      "aliasColors": {},
+      "aliasColors": {
+        "Limit": "#bf1b00"
+      },
       "bars": false,
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
-      "description": "",
+      "decimals": null,
       "fieldConfig": {
         "defaults": {
-          "unit": "short"
+          "links": []
         },
         "overrides": []
       },
@@ -1370,18 +1367,20 @@
         "y": 49
       },
       "hiddenSeries": false,
-      "id": 23,
+      "id": 14,
       "legend": {
-        "avg": false,
-        "current": false,
-        "hideZero": true,
-        "max": false,
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "max": true,
         "min": false,
+        "rightSide": false,
         "show": true,
+        "sideWidth": 300,
         "total": false,
-        "values": false
+        "values": true
       },
-      "lines": false,
+      "lines": true,
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
@@ -1390,8 +1389,8 @@
       },
       "percentage": false,
       "pluginVersion": "7.5.9",
-      "pointradius": 2,
-      "points": true,
+      "pointradius": 5,
+      "points": false,
       "renderer": "flot",
       "seriesOverrides": [],
       "spaceLength": 10,
@@ -1399,31 +1398,30 @@
       "steppedLine": false,
       "targets": [
         {
-          "exemplar": true,
-          "expr": "avg(increase(nginx_ingress_controller_requests{status=~\"5..\",exported_namespace=\"$namespace\"}[1m])) by(exported_service,status)",
+          "expr": "sort_desc(avg(sum by (pod_name) (increase(container_network_receive_bytes_total{namespace='$namespace'}[5m]))))",
           "format": "time_series",
-          "interval": "60s",
-          "intervalFactor": 1,
-          "legendFormat": "{{exported_service}}@{{ status }}",
+          "intervalFactor": 2,
+          "legendFormat": "Recv",
           "refId": "A"
+        },
+        {
+          "expr": "sort_desc(avg(sum by (pod_name) (increase(container_network_transmit_bytes_total{namespace='$namespace'}[5m]))))",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "Sent",
+          "refId": "B"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "5xx responses",
+      "title": "Network",
       "tooltip": {
         "shared": true,
         "sort": 0,
         "value_type": "individual"
       },
-      "transformations": [
-        {
-          "id": "filterByRefId",
-          "options": {}
-        }
-      ],
       "transparent": true,
       "type": "graph",
       "xaxis": {
@@ -1435,16 +1433,17 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:102",
-          "format": "short",
+          "$$hashKey": "object:423",
+          "decimals": null,
+          "format": "bytes",
           "label": null,
           "logBase": 1,
           "max": null,
-          "min": "0.00001",
+          "min": "0",
           "show": true
         },
         {
-          "$$hashKey": "object:103",
+          "$$hashKey": "object:424",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -1592,7 +1591,7 @@
         "y": 57
       },
       "hiddenSeries": false,
-      "id": 24,
+      "id": 23,
       "legend": {
         "avg": false,
         "current": false,
@@ -1622,7 +1621,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "avg(increase(nginx_ingress_controller_requests{status=~\"2..|3..\",exported_namespace=\"$namespace\"}[1m])) by(exported_service,status)",
+          "expr": "avg(increase(nginx_ingress_controller_requests{status=~\"5..\",exported_namespace=\"$namespace\"}[1m])) by(exported_service,status)",
           "format": "time_series",
           "interval": "60s",
           "intervalFactor": 1,
@@ -1634,7 +1633,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "2xx, 3xx responses",
+      "title": "5xx responses",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1793,6 +1792,116 @@
       }
     },
     {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 65
+      },
+      "hiddenSeries": false,
+      "id": 24,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "hideZero": true,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.5.9",
+      "pointradius": 2,
+      "points": true,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "avg(increase(nginx_ingress_controller_requests{status=~\"2..|3..\",exported_namespace=\"$namespace\"}[1m])) by(exported_service,status)",
+          "format": "time_series",
+          "interval": "60s",
+          "intervalFactor": 1,
+          "legendFormat": "{{exported_service}}@{{ status }}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "2xx, 3xx responses",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transformations": [
+        {
+          "id": "filterByRefId",
+          "options": {}
+        }
+      ],
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:102",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": "0.00001",
+          "show": true
+        },
+        {
+          "$$hashKey": "object:103",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
       "cards": {
         "cardPadding": null,
         "cardRound": null
@@ -1933,5 +2042,5 @@
   "timezone": "browser",
   "title": "HMPPS Refer and monitor an intervention",
   "uid": "PyQ91ARnk",
-  "version": 1
+  "version": 4
 }
