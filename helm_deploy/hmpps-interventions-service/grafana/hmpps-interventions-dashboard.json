@@ -17,7 +17,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 1,
-  "iteration": 1666785737464,
+  "iteration": 1668606635617,
   "links": [],
   "panels": [
     {
@@ -851,7 +851,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "quantile(0.99, increase(http_client_requests_seconds_sum{namespace='$namespace'}[5m])) by (client_name)",
+          "expr": "quantile(0.99,\n  increase(http_client_requests_seconds_sum{namespace='$namespace'}[5m])\n  /increase(http_client_requests_seconds_count{namespace='$namespace'}[5m])\n) by (client_name)",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -961,7 +961,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "topk(10, quantile(0.99, increase(http_server_requests_seconds_sum{namespace='$namespace'}[5m])) by (uri))",
+          "expr": "topk(3,\n  quantile(0.99, \n    increase(http_server_requests_seconds_sum{namespace='$namespace'}[5m])\n    /increase(http_server_requests_seconds_count{namespace='$namespace'}[5m])\n  ) by (uri)\n)",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -973,7 +973,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Longest API requests (99th percentile)",
+      "title": "Slowest API requests (99th percentile)",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1070,7 +1070,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "quantile(1, increase(http_client_requests_seconds_sum{namespace='$namespace'}[5m])) by (client_name)",
+          "expr": "quantile(1,\n  increase(http_client_requests_seconds_sum{namespace='$namespace'}[5m])\n  /increase(http_client_requests_seconds_count{namespace='$namespace'}[5m])\n) by (client_name)",
           "format": "time_series",
           "instant": false,
           "interval": "",
