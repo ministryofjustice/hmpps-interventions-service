@@ -95,7 +95,7 @@ dependencies {
   implementation("org.hibernate:hibernate-core:5.6.14.Final")
   implementation("com.vladmihalcea:hibernate-types-55:2.20.0")
   runtimeOnly("org.flywaydb:flyway-core")
-  runtimeOnly("org.postgresql:postgresql:42.5.0")
+  runtimeOnly("org.postgresql:postgresql:42.5.1")
 
   // json and csv
   implementation("com.github.java-json-tools:json-patch:1.13")
