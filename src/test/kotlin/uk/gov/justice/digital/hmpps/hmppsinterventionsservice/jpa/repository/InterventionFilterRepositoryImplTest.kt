@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.NPSRegionFact
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.PCCRegionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import java.time.LocalDate
+import java.time.OffsetDateTime
 
 @RepositoryTest
 class InterventionFilterRepositoryImplTest @Autowired constructor(
@@ -236,5 +237,19 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
 
     assertThat(found.size).isEqualTo(4)
     assertThat(found).contains(futureIntervention)
+  }
+
+  @Test
+  fun `get interventions with an ended contract in the past and one in the future`() {
+    val endedIntervention = interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralEndAt = OffsetDateTime.now().minusDays(1)))
+    val futureEndIntervention = interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralEndAt = OffsetDateTime.now().plusDays(1)))
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create()))
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create()), title = "test Title")
+    interventionFactory.create(contract = dynamicFrameworkContractFactory.create(npsRegion = npsRegionFactory.create()))
+    val found = interventionFilterRepositoryImpl.findByCriteria(listOf(), null, null, null, null)
+
+    assertThat(found.size).isEqualTo(4)
+    assertThat(found).doesNotContain(endedIntervention)
+    assertThat(found).contains(futureEndIntervention)
   }
 }

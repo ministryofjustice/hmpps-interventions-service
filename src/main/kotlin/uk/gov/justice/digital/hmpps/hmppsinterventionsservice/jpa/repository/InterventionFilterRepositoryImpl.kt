@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NPSRegi
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PCCRegion
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PCCRegionID
 import java.time.LocalDate
+import java.time.OffsetDateTime
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 import javax.persistence.criteria.CriteriaBuilder
@@ -32,8 +33,9 @@ class InterventionFilterRepositoryImpl(
     val minimumAgePredicate: Predicate? = getMinimumAgePredicate(criteriaBuilder, root, minimumAge)
     val maximumAgePredicate: Predicate? = getMaximumAgePredicate(criteriaBuilder, root, maximumAge)
     val startDatePredicate: Predicate? = filterFutureReferrals(criteriaBuilder, root, LocalDate.now())
+    val endDatePredicate: Predicate? = removeEndedContracts(criteriaBuilder, root)
 
-    val predicates = listOfNotNull(regionPredicate, allowsFemalePredicate, allowsMalePredicate, minimumAgePredicate, maximumAgePredicate, startDatePredicate)
+    val predicates = listOfNotNull(regionPredicate, allowsFemalePredicate, allowsMalePredicate, minimumAgePredicate, maximumAgePredicate, startDatePredicate, endDatePredicate)
     val finalPredicate: Predicate = criteriaBuilder.and(*predicates.toTypedArray())
 
     criteriaQuery.where(finalPredicate)
@@ -102,5 +104,12 @@ class InterventionFilterRepositoryImpl(
       val expression = root.get<DynamicFrameworkContract>("dynamicFrameworkContract").get<LocalDate>("referralStartDate")
       criteriaBuilder.lessThanOrEqualTo(expression, startDate)
     }
+  }
+
+  private fun removeEndedContracts(criteriaBuilder: CriteriaBuilder, root: Root<Intervention>): Predicate? {
+    val expression = root.get<DynamicFrameworkContract>("dynamicFrameworkContract").get<OffsetDateTime>("referralEndAt")
+    val expiredPredicate = criteriaBuilder.greaterThanOrEqualTo(expression, OffsetDateTime.now())
+    val currentPredicate = criteriaBuilder.isNull(expression)
+    return criteriaBuilder.or(expiredPredicate, currentPredicate)
   }
 }
