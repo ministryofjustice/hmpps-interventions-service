@@ -240,7 +240,7 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
   }
 
   @Test
-  fun `get interventions with an ended contract in the past and one in the future`() {
+  fun `get interventions removes ended contracts from results`() {
     val endedIntervention = interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralEndAt = OffsetDateTime.now().minusDays(1)))
     val futureEndIntervention = interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create(), referralEndAt = OffsetDateTime.now().plusDays(1)))
     interventionFactory.create(contract = dynamicFrameworkContractFactory.create(pccRegion = pccRegionFactory.create()))
