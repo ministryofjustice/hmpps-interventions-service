@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
 import java.time.LocalDate
+import java.time.OffsetDateTime
 import java.util.UUID
 import javax.persistence.Entity
 import javax.persistence.Id
@@ -49,6 +50,7 @@ data class DynamicFrameworkContract(
   @NotNull val endDate: LocalDate,
 
   @NotNull val referralStartDate: LocalDate,
+  var referralEndAt: OffsetDateTime? = null,
 
   @ManyToOne @JoinColumn(name = "nps_region_id")
   val npsRegion: NPSRegion? = null,

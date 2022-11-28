@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NPSRegi
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PCCRegion
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceProvider
 import java.time.LocalDate
+import java.time.OffsetDateTime
 import java.util.UUID
 
 class DynamicFrameworkContractFactory(em: TestEntityManager? = null) : EntityFactory(em) {
@@ -29,6 +30,7 @@ class DynamicFrameworkContractFactory(em: TestEntityManager? = null) : EntityFac
     contractReference: String = RandomStringUtils.randomAlphanumeric(8),
     subcontractorProviders: Set<ServiceProvider> = setOf(),
     referralStartDate: LocalDate = LocalDate.of(2021, 6, 1),
+    referralEndAt: OffsetDateTime? = null,
   ): DynamicFrameworkContract {
     return save(
       DynamicFrameworkContract(
@@ -45,7 +47,8 @@ class DynamicFrameworkContractFactory(em: TestEntityManager? = null) : EntityFac
         pccRegion = pccRegion,
         contractReference = contractReference,
         subcontractorProviders = subcontractorProviders,
-        referralStartDate = referralStartDate
+        referralStartDate = referralStartDate,
+        referralEndAt = referralEndAt
       )
     )
   }
