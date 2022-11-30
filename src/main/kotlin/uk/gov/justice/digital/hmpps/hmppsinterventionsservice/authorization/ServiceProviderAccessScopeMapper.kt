@@ -21,6 +21,7 @@ private data class WorkingScope(
   val providers: MutableSet<ServiceProvider> = mutableSetOf(),
   val contracts: MutableSet<DynamicFrameworkContract> = mutableSetOf(),
   val errors: MutableList<String> = mutableListOf(),
+  val warnings: MutableList<String> = mutableListOf(),
 )
 
 @Component
@@ -54,6 +55,9 @@ class ServiceProviderAccessScopeMapper(
     blockUsersWithoutProviders(workingScope)
     blockUsersWithoutContracts(workingScope)
 
+    if (workingScope.warnings.isNotEmpty()) {
+      trackWarnings(user, workingScope.warnings)
+    }
     if (workingScope.errors.isNotEmpty()) {
       throw AccessError(user, errorMessage, workingScope.errors)
     }
@@ -62,18 +66,35 @@ class ServiceProviderAccessScopeMapper(
       serviceProviders = workingScope.providers,
       contracts = workingScope.contracts,
     ).also {
-      telemetryClient.trackEvent(
-        "InterventionsAuthorizedProvider",
-        mapOf(
-          "userId" to user.id,
-          "userName" to user.userName,
-          "userAuthSource" to user.authSource,
-          "contracts" to it.contracts.joinToString(",") { c -> c.contractReference },
-          "providers" to it.serviceProviders.joinToString(",") { p -> p.id },
-        ),
-        null
-      )
+      trackAuthorization(user, it)
     }
+  }
+
+  private fun trackAuthorization(user: AuthUser, scope: ServiceProviderAccessScope) {
+    telemetryClient.trackEvent(
+      "InterventionsAuthorizedProvider",
+      mapOf(
+        "userId" to user.id,
+        "userName" to user.userName,
+        "userAuthSource" to user.authSource,
+        "contracts" to scope.contracts.joinToString(",") { c -> c.contractReference },
+        "providers" to scope.serviceProviders.joinToString(",") { p -> p.id },
+      ),
+      null
+    )
+  }
+
+  private fun trackWarnings(user: AuthUser, scope: MutableList<String>) {
+    telemetryClient.trackEvent(
+      "InterventionsAuthorizationWarning",
+      mapOf(
+        "userId" to user.id,
+        "userName" to user.userName,
+        "userAuthSource" to user.authSource,
+        "issues" to scope.toString()
+      ),
+      null
+    )
   }
 
   private fun resolveProviders(scope: WorkingScope) {
@@ -81,7 +102,7 @@ class ServiceProviderAccessScopeMapper(
       .filter { it.startsWith(serviceProviderGroupPrefix) }
       .map { it.removePrefix(serviceProviderGroupPrefix) }
 
-    val providers = getProviders(serviceProviderGroups, scope.errors)
+    val providers = getProviders(serviceProviderGroups, scope.warnings)
     scope.providers.addAll(providers)
   }
 
@@ -90,7 +111,7 @@ class ServiceProviderAccessScopeMapper(
       .filter { it.startsWith(contractGroupPrefix) }
       .map { it.removePrefix(contractGroupPrefix) }
 
-    val contracts = getContracts(contractGroups, scope.errors)
+    val contracts = getContracts(contractGroups, scope.warnings)
     scope.contracts.addAll(contracts)
   }
 
@@ -117,20 +138,20 @@ class ServiceProviderAccessScopeMapper(
     }
   }
 
-  private fun getProviders(providerGroups: List<String>, configErrors: MutableList<String>): List<ServiceProvider> {
+  private fun getProviders(providerGroups: List<String>, warnings: MutableList<String>): List<ServiceProvider> {
     val providers = serviceProviderRepository.findAllById(providerGroups)
     val unidentifiedProviders = providerGroups.subtract(providers.map { it.id })
     unidentifiedProviders.forEach { undefinedProvider ->
-      configErrors.add("unidentified provider '$undefinedProvider': group does not exist in the reference data")
+      warnings.add("unidentified provider '$undefinedProvider': group does not exist in the reference data")
     }
     return providers.sortedBy { it.id }
   }
 
-  private fun getContracts(contractGroups: List<String>, configErrors: MutableList<String>): List<DynamicFrameworkContract> {
+  private fun getContracts(contractGroups: List<String>, warnings: MutableList<String>): List<DynamicFrameworkContract> {
     val contracts = dynamicFrameworkContractRepository.findAllByContractReferenceIn(contractGroups)
     val unidentifiedContracts = contractGroups.subtract(contracts.map { it.contractReference })
     unidentifiedContracts.forEach { undefinedContract ->
-      configErrors.add("unidentified contract '$undefinedContract': group does not exist in the reference data")
+      warnings.add("unidentified contract '$undefinedContract': group does not exist in the reference data")
     }
     return contracts.sortedBy { it.contractReference }
   }
