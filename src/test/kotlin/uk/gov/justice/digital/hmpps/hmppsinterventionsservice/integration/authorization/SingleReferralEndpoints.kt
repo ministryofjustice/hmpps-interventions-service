@@ -220,8 +220,6 @@ class SingleReferralEndpoints : IntegrationTestBase() {
     response.expectBody().json(
       """
       {"accessErrors": [
-      "unidentified provider 'BETTER_LTD': group does not exist in the reference data",
-      "unidentified contract '0002': group does not exist in the reference data",
       "no valid service provider groups associated with user",
       "no valid contract groups associated with user"
       ]}
@@ -334,7 +332,6 @@ class SingleReferralEndpoints : IntegrationTestBase() {
     response.expectBody().json(
       """
       {"accessErrors": [
-      "unidentified contract '0002': group does not exist in the reference data",
       "no valid contract groups associated with user"
       ]}
       """.trimIndent()

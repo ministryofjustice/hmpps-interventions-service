@@ -25,7 +25,7 @@ class ServiceProviderAccessScopeMapperTest {
 
   private val hmppsAuthService = mock<HMPPSAuthService>()
   private val serviceProviderRepository = mock<ServiceProviderRepository>()
-  private val dynamicFrameworkContractRepository = mock<DynamicFrameworkContractRepository>()
+  private val contractRepository = mock<DynamicFrameworkContractRepository>()
   private val telemetryClient = mock<TelemetryClient>()
 
   private val spUser =
@@ -37,7 +37,7 @@ class ServiceProviderAccessScopeMapperTest {
     mapper = ServiceProviderAccessScopeMapper(
       hmppsAuthService = hmppsAuthService,
       serviceProviderRepository = serviceProviderRepository,
-      dynamicFrameworkContractRepository = dynamicFrameworkContractRepository,
+      dynamicFrameworkContractRepository = contractRepository,
       userTypeChecker = userTypeChecker,
       telemetryClient = telemetryClient
     )
@@ -72,19 +72,27 @@ class ServiceProviderAccessScopeMapperTest {
 
     @BeforeEach
     fun setup() {
-      whenever(hmppsAuthService.getUserGroups(spUser))
-        .thenReturn(listOf("INT_SP_TEST_P1", "INT_SP_TEST_A2", "INT_CR_TEST_C0001", "INT_CR_TEST_A0002"))
+      whenever(hmppsAuthService.getUserGroups(spUser)).thenReturn(
+        listOf(
+          "INT_SP_TEST_P1",
+          "INT_SP_TEST_A2",
+          "INT_SP_UNKNOWN",
+          "INT_CR_TEST_C0001",
+          "INT_CR_TEST_A0002",
+          "INT_CR_UNDEFINED"
+        )
+      )
 
       val p1 = ServiceProvider(id = "TEST_P1", name = "Test 1 Ltd")
       val p2 = ServiceProvider(id = "TEST_A2", name = "Test 2 Ltd")
       providers = listOf(p1, p2)
-      whenever(serviceProviderRepository.findAllById(listOf("TEST_P1", "TEST_A2")))
+      whenever(serviceProviderRepository.findAllById(listOf("TEST_P1", "TEST_A2", "UNKNOWN")))
         .thenReturn(providers)
 
       val c1 = SampleData.sampleContract(contractReference = "TEST_C0001", primeProvider = p1)
       val c2 = SampleData.sampleContract(contractReference = "TEST_A0002", primeProvider = p2)
       contracts = listOf(c1, c2)
-      whenever(dynamicFrameworkContractRepository.findAllByContractReferenceIn(listOf("TEST_C0001", "TEST_A0002")))
+      whenever(contractRepository.findAllByContractReferenceIn(listOf("TEST_C0001", "TEST_A0002", "UNDEFINED")))
         .thenReturn(contracts)
     }
 
@@ -101,7 +109,7 @@ class ServiceProviderAccessScopeMapperTest {
     }
 
     @Test
-    fun `tracks the event in AppInsights telemetry`() {
+    fun `tracks the successful authorisation event in AppInsights telemetry`() {
       mapper.fromUser(spUser)
       verify(telemetryClient).trackEvent(
         "InterventionsAuthorizedProvider",
@@ -111,6 +119,21 @@ class ServiceProviderAccessScopeMapperTest {
           "userAuthSource" to "auth",
           "contracts" to "TEST_A0002,TEST_C0001",
           "providers" to "TEST_A2,TEST_P1",
+        ),
+        null
+      )
+    }
+
+    @Test
+    fun `emits warning AppInsights telemetry about the undefined provider and contract`() {
+      mapper.fromUser(spUser)
+      verify(telemetryClient).trackEvent(
+        "InterventionsAuthorizationWarning",
+        mapOf(
+          "userId" to "b40ac52d-037d-4732-a3cd-bf5484c6ab6a",
+          "userName" to "test@test.example.org",
+          "userAuthSource" to "auth",
+          "issues" to "[unidentified provider 'UNKNOWN': group does not exist in the reference data, unidentified contract 'UNDEFINED': group does not exist in the reference data]",
         ),
         null
       )
