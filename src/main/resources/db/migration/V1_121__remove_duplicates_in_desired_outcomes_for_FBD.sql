@@ -1,3 +1,5 @@
+DELETE from referral_desired_outcome where desired_outcome_id = 'af1d6c9c-bcdd-4e9f-a778-5c1a1e90163c';
+
 DELETE from desired_outcome where id in (
 'af1d6c9c-bcdd-4e9f-a778-5c1a1e90163c',
 'ff927255-28df-4a1d-8076-9ce18d959442',
