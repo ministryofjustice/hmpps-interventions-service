@@ -60,6 +60,7 @@ class ReferralServiceUnitTest {
   private val telemetryService: TelemetryService = mock()
   private val referralDetailsRepository: ReferralDetailsRepository = mock()
   private val changeLogRepository: ChangelogRepository = mock()
+  private val changeLogUtil: ChangeLogUtil = mock()
 
   private val referralFactory = ReferralFactory()
   private val authUserFactory = AuthUserFactory()
@@ -85,7 +86,8 @@ class ReferralServiceUnitTest {
     hmppsAuthService,
     telemetryService,
     referralDetailsRepository,
-    changeLogRepository
+    changeLogRepository,
+    changeLogUtil
   )
 
   @Test

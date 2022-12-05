@@ -10,7 +10,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Cha
 class ChangelogMigrationWriter(val changelogRepository: ChangelogRepository) : ItemWriter<Changelog?> {
   companion object : KLogging()
   override fun write(items: MutableList<out Changelog?>) {
-    logger().info("writing into the change log table. The total amount of data loaded into changelog is {}", items.size)
-    changelogRepository.saveAll(items.filterNotNull())
+    logger.info("inside the writer, but nothing happens here")
   }
 }

@@ -35,7 +35,7 @@ class ChangelogMigrationJobConfiguration(
     return HibernateCursorItemReaderBuilder<ReferralDetails>()
       .name("changelogMigrationReader")
       .sessionFactory(sessionFactory)
-      .queryString("SELECT r FROM ReferralDetails r")
+      .queryString("select rd from ReferralDetails rd where rd.supersededById is not null order by createdAt ASC")
       .build()
   }
 

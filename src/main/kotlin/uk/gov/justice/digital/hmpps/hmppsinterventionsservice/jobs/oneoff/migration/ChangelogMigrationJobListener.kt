@@ -6,8 +6,10 @@ import org.springframework.batch.core.JobExecutionListener
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendTopic
+import javax.transaction.Transactional
 
 @Component
+@Transactional
 class ChangelogMigrationJobListener(
   val changelogRepository: ChangelogRepository
 ) : JobExecutionListener {
@@ -16,18 +18,18 @@ class ChangelogMigrationJobListener(
   override fun beforeJob(jobExecution: JobExecution) {
     logger.info("Referral Details to Change log Batch Job Starts")
     logger.info("Number of change log items before Job is = {}", changelogRepository.count())
-    val changeLogs = changelogRepository.findAll()
-    val changeLogsFilteredElements = changeLogs.filter { it.topic == AmendTopic.COMPLETION_DATETIME || it.topic == AmendTopic.MAXIMUM_ENFORCEABLE_DAYS }
-    val changelogWithNull = changeLogs.filter { changelog -> changelog.oldVal.values.contains("null") }
-    logger.info("Number of change log items with null value before Job is = {}", changelogWithNull.size)
-    logger.info("Deleting all the change log with COMPLETION_DATETIME and MAXIMUM_ENFORCEABLE_DAYS")
-    changeLogsFilteredElements.forEach { changelogRepository.deleteById(it.id) }
+    val changeLogs = changelogRepository.findByTopicsIn(listOf(AmendTopic.COMPLETION_DATETIME, AmendTopic.MAXIMUM_ENFORCEABLE_DAYS))
+    logger.info("Number of change log items that needs migration is = {}", changeLogs.size)
+    val completionDeadLineDeleted = changelogRepository.deleteByTopic(AmendTopic.COMPLETION_DATETIME)
+    logger.info("No of completion dead lines deleted = {}", completionDeadLineDeleted)
+    val maxEnforceableDaysDeleted = changelogRepository.deleteByTopic(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS)
+    logger.info("No of max enforceable days deleted = {}", maxEnforceableDaysDeleted)
   }
 
   override fun afterJob(jobExecution: JobExecution) {
     logger.info("Referral Details to Change log Batch Job Ends")
     logger.info("Number of change log items after Job is = {}", changelogRepository.count())
-    val changelogWithNull = changelogRepository.findAll().filter { changelog -> changelog.oldVal.values.contains("null") }
-    logger.info("Number of change log items with null value after Job is = {}", changelogWithNull.size)
+    val changeLogs = changelogRepository.findByTopicsIn(listOf(AmendTopic.COMPLETION_DATETIME, AmendTopic.MAXIMUM_ENFORCEABLE_DAYS))
+    logger.info("Number of change log items that was migrated is = {}", changeLogs.size)
   }
 }
