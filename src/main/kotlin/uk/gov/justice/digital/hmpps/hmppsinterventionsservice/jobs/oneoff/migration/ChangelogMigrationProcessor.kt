@@ -9,11 +9,11 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Aut
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendTopic
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ChangeLogUtil
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ChangeLogMigrationService
 
 @Component
 class ChangelogMigrationProcessor(
-  private val changeLogUtil: ChangeLogUtil,
+  private val changeLogMigrationService: ChangeLogMigrationService,
   private val changelogRepository: ChangelogRepository,
   private val referralDetailsRepository: ReferralDetailsRepository,
   private val authUserRepository: AuthUserRepository
@@ -41,7 +41,7 @@ class ChangelogMigrationProcessor(
     // compare what is changed between the two referral details
     logger.info("superseded referral details is = {}", supersededReferralDetails.id)
 
-    return changeLogUtil.logChanges(
+    return changeLogMigrationService.logChanges(
       referralDetails,
       if (referralDetails.completionDeadline != supersededReferralDetails.completionDeadline) supersededReferralDetails.completionDeadline.toString() else supersededReferralDetails.maximumEnforceableDays.toString(),
       if (referralDetails.completionDeadline != supersededReferralDetails.completionDeadline) AmendTopic.COMPLETION_DATETIME else AmendTopic.MAXIMUM_ENFORCEABLE_DAYS,

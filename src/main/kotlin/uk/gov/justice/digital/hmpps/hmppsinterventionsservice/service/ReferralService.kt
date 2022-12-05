@@ -69,7 +69,7 @@ class ReferralService(
   val telemetryService: TelemetryService,
   val referralDetailsRepository: ReferralDetailsRepository,
   val changelogRepository: ChangelogRepository,
-  val changeLogUtil: ChangeLogUtil
+  val changeLogMigrationService: ChangeLogMigrationService
 ) {
   companion object {
     private val logger = KotlinLogging.logger {}
@@ -232,7 +232,7 @@ class ReferralService(
     )
     val amendValue = if (update.completionDeadline != null) update.completionDeadline.toString() else update.maximumEnforceableDays.toString()
     val topic = if (update.completionDeadline != null) AmendTopic.COMPLETION_DATETIME else AmendTopic.MAXIMUM_ENFORCEABLE_DAYS
-    changeLogUtil.logChanges(existingDetails!!, amendValue, topic, actor, update.reasonForChange)
+    changeLogMigrationService.logChanges(existingDetails!!, amendValue, topic, actor, update.reasonForChange)
 
     update.completionDeadline?.let {
       newDetails.completionDeadline = it

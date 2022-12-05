@@ -97,7 +97,7 @@ class ReferralServiceTest @Autowired constructor(
   private val supplierAssessmentFactory = SupplierAssessmentFactory(entityManager)
   private val serviceUserDataFactory = ServiceUserFactory(entityManager)
   private val referralDetailsFactory = ReferralDetailsFactory(entityManager)
-  private val changeLogUtil = ChangeLogUtil(changelogRepository)
+  private val changeLogMigrationService = ChangeLogMigrationService(changelogRepository)
 
   private val referralEventPublisher: ReferralEventPublisher = mock()
   private val referralConcluder: ReferralConcluder = mock()
@@ -133,7 +133,7 @@ class ReferralServiceTest @Autowired constructor(
     telemetryService,
     referralDetailsRepository,
     changelogRepository,
-    changeLogUtil
+    changeLogMigrationService
   )
 
   companion object {

@@ -10,7 +10,7 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 @Component
-class ChangeLogUtil(val changelogRepository: ChangelogRepository) {
+class ChangeLogMigrationService(val changelogRepository: ChangelogRepository) {
 
   fun logChanges(referralDetails: ReferralDetails, amendValue: String, topic: AmendTopic, actor: AuthUser, reasonForChange: String): Changelog {
     return if (topic == AmendTopic.COMPLETION_DATETIME) {
