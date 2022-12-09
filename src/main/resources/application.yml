@@ -61,6 +61,9 @@ spring:
         performance-report:
           page-size: 100
           chunk-size: 20
+      migration:
+        changelog:
+          chunk-size: 50
   data:
     web:
       pageable:

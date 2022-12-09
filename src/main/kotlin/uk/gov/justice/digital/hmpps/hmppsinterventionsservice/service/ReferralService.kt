@@ -15,12 +15,10 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.Serv
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserTypeChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.AccessError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DashboardType
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
@@ -71,6 +69,7 @@ class ReferralService(
   val telemetryService: TelemetryService,
   val referralDetailsRepository: ReferralDetailsRepository,
   val changelogRepository: ChangelogRepository,
+  val changeLogMigrationService: ChangeLogMigrationService
 ) {
   companion object {
     private val logger = KotlinLogging.logger {}
@@ -231,11 +230,9 @@ class ReferralService(
       existingDetails?.furtherInformation,
       existingDetails?.maximumEnforceableDays,
     )
-    logChanges(
-      existingDetails!!,
-      update,
-      actor
-    )
+    val amendValue = if (update.completionDeadline != null) update.completionDeadline.toString() else update.maximumEnforceableDays.toString()
+    val topic = if (update.completionDeadline != null) AmendTopic.COMPLETION_DATETIME else AmendTopic.MAXIMUM_ENFORCEABLE_DAYS
+    changeLogMigrationService.logChanges(existingDetails!!, amendValue, topic, actor, update.reasonForChange)
 
     update.completionDeadline?.let {
       newDetails.completionDeadline = it
@@ -259,40 +256,6 @@ class ReferralService(
     }
 
     return newDetails
-  }
-
-  private fun processChangeLog(
-    amendTopic: AmendTopic,
-    oldValue: ReferralAmendmentDetails,
-    newValue: ReferralAmendmentDetails,
-    referralId: UUID,
-    actor: AuthUser,
-    update: UpdateReferralDetailsDTO
-  ) {
-    val changelog = Changelog(
-      referralId,
-      UUID.randomUUID(),
-      amendTopic,
-      oldValue,
-      newValue,
-      update.reasonForChange,
-      OffsetDateTime.now(),
-      actor
-    )
-
-    changelogRepository.save(changelog)
-  }
-
-  private fun logChanges(referralDetails: ReferralDetails, update: UpdateReferralDetailsDTO, actor: AuthUser) {
-    if (update.completionDeadline != null) {
-      val oldValue = ReferralAmendmentDetails(listOf(referralDetails.completionDeadline.toString()))
-      val newValue = ReferralAmendmentDetails(listOf(update.completionDeadline.toString()))
-      processChangeLog(AmendTopic.COMPLETION_DATETIME, oldValue, newValue, referralDetails.referralId, actor, update)
-    } else {
-      val oldValue = ReferralAmendmentDetails(listOf(referralDetails.maximumEnforceableDays.toString()))
-      val newValue = ReferralAmendmentDetails(listOf(update.maximumEnforceableDays.toString()))
-      processChangeLog(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS, oldValue, newValue, referralDetails.referralId, actor, update)
-    }
   }
 
   fun getCancellationReasons(): List<CancellationReason> {
