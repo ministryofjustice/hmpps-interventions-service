@@ -15,6 +15,7 @@ class ReportingService(
   private val asyncJobLauncher: JobLauncher,
   private val performanceReportJob: Job,
   private val ndmisPerformanceReportJob: Job,
+  private val moveReferralsJob: Job,
   private val serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper,
   private val batchUtils: BatchUtils,
   private val hmppsAuthService: HMPPSAuthService,
@@ -45,4 +46,16 @@ class ReportingService(
         .toJobParameters()
     )
   }
+
+  fun moveReferralsJob(from: String, to: String) {
+    asyncJobLauncher.run(
+      moveReferralsJob,
+      JobParametersBuilder()
+        .addString("timestamp", Instant.now().toEpochMilli().toString())
+        .addString("fromContract", from)
+        .addString("toContract", to)
+        .toJobParameters()
+    )
+  }
+
 }

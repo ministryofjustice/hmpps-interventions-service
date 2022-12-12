@@ -81,7 +81,7 @@ class Referral(
   var complexityLevelIds: MutableMap<UUID, UUID>? = mutableMapOf(),
 
   // required fields
-  @NotNull @ManyToOne(fetch = FetchType.LAZY) val intervention: Intervention,
+  @NotNull @ManyToOne(fetch = FetchType.LAZY) var intervention: Intervention,
   @NotNull val serviceUserCRN: String,
   @NotNull @ManyToOne @Fetch(JOIN) val createdBy: AuthUser,
   @NotNull val createdAt: OffsetDateTime,
