@@ -8,6 +8,8 @@ Business/domain API to **find, arrange and monitor an intervention** for service
 
 Please see the [quickstart document](doc/quickstart.md).
 
+For documentation about configuring one-off or scheduled jobs, see [the components document](doc/components.md).
+
 Common tasks and runbooks are in [the service's technical guidance](https://ministryofjustice.github.io/hmpps-interventions-docs/runbooks/).
 
 ## Architecture
