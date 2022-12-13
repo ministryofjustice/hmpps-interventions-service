@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: transfer-dec2022-womens-referrals
+spec:
+  schedule: "0 3 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: "Never"
+          containers:
+            - name: transfer-dec2022-womens-referrals
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              imagePullPolicy: Always
+              args: ["--jobName=transferReferralsJob", "fromContract=CCS_0001", "toContract=PRJ_7283_S"]
+{{- include "deployment.envs" . | nindent 14 }}
