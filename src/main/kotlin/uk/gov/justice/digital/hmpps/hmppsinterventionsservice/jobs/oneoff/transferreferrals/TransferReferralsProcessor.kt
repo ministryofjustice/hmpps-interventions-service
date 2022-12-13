@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.movereferrals
+package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.transferreferrals
 
 import mu.KLogging
 import net.logstash.logback.argument.StructuredArguments.kv
@@ -17,7 +17,7 @@ import java.util.UUID
 
 @Component
 @JobScope
-class MoveReferralsProcessor(
+class TransferReferralsProcessor(
   private val interventionRepository: InterventionRepository,
   private val referralRepository: ReferralRepository,
   private val caseNoteRepository: CaseNoteRepository,
