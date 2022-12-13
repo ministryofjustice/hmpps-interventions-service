@@ -13,8 +13,7 @@ class TransferReferralsReader(
   @Value("#{jobParameters['fromContract']}") fromContract: String,
   sessionFactory: SessionFactory,
 ) : HibernateCursorItemReader<Referral>() {
-  private val transferSignalSubject = "Authority to transfer case"
-  private val transferSignalText = "On behalf of Advance Charity Ltd, I request and give permission for this referral to be transferred to Women in Prison, as of December 2022."
+  private val transferSignalText = "%Authority to transfer case- On behalf of Advance Charity Ltd, I request and give permission for this referral to be transferred to Women in Prison, as of December 2022.%"
 
   init {
     this.setName("transferReferralsReader")
@@ -22,12 +21,11 @@ class TransferReferralsReader(
     this.setQueryString(
       "SELECT r FROM Referral r JOIN CaseNote n ON n.referral = r " +
         "WHERE r.intervention.dynamicFrameworkContract.contractReference = :fromContract " +
-        "  AND n.subject = :transferSignalSubject AND n.body = :transferSignalText"
+        "  AND n.body like :transferSignalText"
     )
     this.setParameterValues(
       mapOf(
         "fromContract" to fromContract,
-        "transferSignalSubject" to transferSignalSubject,
         "transferSignalText" to transferSignalText
       )
     )

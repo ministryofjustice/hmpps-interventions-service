@@ -24,8 +24,8 @@ internal class TransferReferralsReaderTest @Autowired constructor(
   fun createTransferCaseNote(referral: Referral): CaseNote {
     return setupAssistant.createCaseNote(
       referral = referral,
-      subject = "Authority to transfer case",
-      body = "On behalf of Advance Charity Ltd, I request and give permission for this referral to be transferred to Women in Prison, as of December 2022.",
+      subject = "Irrelevant",
+      body = "Date: some prefix\nAuthority to transfer case- On behalf of Advance Charity Ltd, I request and give permission for this referral to be transferred to Women in Prison, as of December 2022.\nSome postfix",
     )
   }
 
@@ -50,7 +50,7 @@ internal class TransferReferralsReaderTest @Autowired constructor(
   @Test
   fun `skips referrals on the source contract without a transfer case note`() {
     val referralOnSourceContract = createReferralOnSourceContract()
-    setupAssistant.createCaseNote(referral = referralOnSourceContract, subject = "Other", body = "Test")
+    setupAssistant.createCaseNote(referral = referralOnSourceContract, subject = "Irrelevant", body = "Irrelevant")
 
     reader.open(ExecutionContext())
     assertThat(reader.read()).isNull()
