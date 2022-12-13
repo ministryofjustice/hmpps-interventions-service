@@ -20,7 +20,7 @@ class TransferReferralsReader(
     this.setName("transferReferralsReader")
     this.setSessionFactory(sessionFactory)
     this.setQueryString(
-      "SELECT r FROM Referral r JOIN CaseNote n ON n.referralId = r.id " +
+      "SELECT r FROM Referral r JOIN CaseNote n ON n.referral = r " +
         "WHERE r.intervention.dynamicFrameworkContract.contractReference = :fromContract " +
         "  AND n.subject = :transferSignalSubject AND n.body = :transferSignalText"
     )

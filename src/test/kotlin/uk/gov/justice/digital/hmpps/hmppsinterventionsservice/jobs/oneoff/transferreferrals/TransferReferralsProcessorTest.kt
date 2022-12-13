@@ -16,7 +16,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CaseNoteRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFrameworkContractFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import java.time.OffsetDateTime
@@ -40,10 +39,9 @@ internal class TransferReferralsProcessorTest {
 
   private val referralFactory = ReferralFactory()
   private val interventionFactory = InterventionFactory()
-  private val contractFactory = DynamicFrameworkContractFactory()
 
-  private val fromIntervention = interventionFactory.create(contract = contractFactory.create(contractReference = originalContractCode))
-  private val toIntervention = interventionFactory.create(contract = contractFactory.create(contractReference = targetContractCode))
+  private val fromIntervention = interventionFactory.createWithContractCode(originalContractCode)
+  private val toIntervention = interventionFactory.createWithContractCode(targetContractCode)
 
   @BeforeEach
   fun setup() {
