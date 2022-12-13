@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.OnStartupJobLauncherFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
 
 @Configuration
 @EnableBatchProcessing
@@ -70,6 +71,7 @@ class TransferReferralsJobConfiguration(
     )
 
     return jobBuilderFactory["transferReferralsJob"]
+      .incrementer(TimestampIncrementer())
       .validator(validator)
       .listener(listener)
       .start(transferReferralToInterventionStep)
