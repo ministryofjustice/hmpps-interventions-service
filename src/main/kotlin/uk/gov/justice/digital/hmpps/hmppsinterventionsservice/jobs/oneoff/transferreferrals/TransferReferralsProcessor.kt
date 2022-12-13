@@ -21,8 +21,8 @@ class TransferReferralsProcessor(
   private val interventionRepository: InterventionRepository,
   private val referralRepository: ReferralRepository,
   private val caseNoteRepository: CaseNoteRepository,
-  @Value("#{jobParameters['toContract']}") val toContract: String,
   @Value("#{jobParameters['fromContract']}") val fromContract: String,
+  @Value("#{jobParameters['toContract']}") val toContract: String,
 ) : ItemProcessor<Referral, Referral> {
   companion object : KLogging()
 
