@@ -36,18 +36,4 @@ class ReportingController(
     reportingService.generateNdmisPerformanceReport()
     return ResponseEntity.accepted().build()
   }
-
-  @PostMapping("/reports/transferCases")
-  fun transferCases(
-    @RequestBody transferContract: TransferContract,
-  ): ResponseEntity<Any> {
-    reportingService.moveReferralsJob(transferContract.from, transferContract.to)
-    return ResponseEntity.accepted().build()
-  }
-
-  data class TransferContract(
-    val from: String,
-    val to: String,
-  )
-
 }
