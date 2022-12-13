@@ -26,6 +26,6 @@ data class AuthUser(
   }
   companion object {
     // System user to represent the actor for events that are automatically generated
-    val interventionsServiceUser = AuthUser("00000000-0000-0000-0000-000000000000", "fake", "hmpps-interventions-service")
+    val interventionsServiceUser = AuthUser("00000000-0000-0000-0000-000000000000", "urn:hmpps:interventions", "hmpps-interventions-service")
   }
 }

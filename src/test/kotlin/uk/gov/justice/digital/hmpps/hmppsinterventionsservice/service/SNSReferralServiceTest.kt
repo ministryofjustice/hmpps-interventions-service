@@ -141,7 +141,7 @@ internal class SNSReferralServiceTest {
     )
     verify(snsPublisher).publish(
       referralConcludedEvent.referral.id,
-      AuthUser("00000000-0000-0000-0000-000000000000", "fake", "hmpps-interventions-service"),
+      AuthUser("00000000-0000-0000-0000-000000000000", "urn:hmpps:interventions", "hmpps-interventions-service"),
       snsEvent
     )
   }
