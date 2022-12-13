@@ -24,6 +24,9 @@ class MoveReferralsJobConfiguration(
   private val stepBuilderFactory: StepBuilderFactory,
   private val listener: MoveReferralsJobListener,
 ) {
+  private val transferSignalSubject = "Authority to transfer case"
+  private val transferSignalText = "On behalf of Advance Charity Ltd, I request and give permission for this referral to be transferred to Women in Prison, as of December 2022."
+
   @Bean
   @JobScope
   fun moveReferralsReader(
@@ -34,10 +37,16 @@ class MoveReferralsJobConfiguration(
     return HibernateCursorItemReaderBuilder<Referral>()
       .name("moveReferralsReader")
       .sessionFactory(sessionFactory)
-      .queryString("select r from Referral r where r.intervention.dynamicFrameworkContract.contractReference = :fromContract")
+      .queryString(
+        "SELECT r FROM Referral r JOIN CaseNote n ON n.referralId = r.id " +
+          "WHERE r.intervention.dynamicFrameworkContract.contractReference = :fromContract " +
+          "  AND n.subject = :transferSignalSubject AND n.body = :transferSignalText"
+      )
       .parameterValues(
         mapOf(
           "fromContract" to fromContract,
+          "transferSignalSubject" to transferSignalSubject,
+          "transferSignalText" to transferSignalText
         )
       )
       .build()
