@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.movereferrals
+package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.movereferrals
 
 import mu.KLogging
 import net.logstash.logback.argument.StructuredArguments.kv
@@ -6,12 +6,14 @@ import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.item.ItemProcessor
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.*
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.*
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.CaseNoteService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CaseNote
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CaseNoteRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import java.time.OffsetDateTime
-import java.util.*
+import java.util.UUID
 
 @Component
 @JobScope
@@ -19,7 +21,7 @@ class MoveReferralsProcessor(
   private val interventionRepository: InterventionRepository,
   private val referralRepository: ReferralRepository,
   private val caseNoteRepository: CaseNoteRepository,
-  @Value("#{jobParameters['toContract']}")  val toContract: String,
+  @Value("#{jobParameters['toContract']}") val toContract: String,
   @Value("#{jobParameters['fromContract']}") val fromContract: String,
 ) : ItemProcessor<Referral, Referral> {
   companion object : KLogging()

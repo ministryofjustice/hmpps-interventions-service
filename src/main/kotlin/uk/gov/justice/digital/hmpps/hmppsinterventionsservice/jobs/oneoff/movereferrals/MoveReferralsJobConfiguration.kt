@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.movereferrals
+package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.movereferrals
 
 import org.hibernate.SessionFactory
 import org.springframework.batch.core.Job
@@ -8,26 +8,14 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.job.DefaultJobParametersValidator
-import org.springframework.batch.item.ItemProcessor
 import org.springframework.batch.item.ItemWriter
-import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider
 import org.springframework.batch.item.database.HibernateCursorItemReader
-import org.springframework.batch.item.database.JdbcBatchItemWriter
 import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder
-import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder
-import org.springframework.batch.item.file.FlatFileItemWriter
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.io.FileSystemResource
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUtils
-import java.util.*
-
 
 @Configuration
 @EnableBatchProcessing
@@ -54,7 +42,6 @@ class MoveReferralsJobConfiguration(
       )
       .build()
   }
-
 
   @Bean
   fun moveReferralsJob(updateInterventionIdStep: Step): Job {
