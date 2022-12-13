@@ -27,7 +27,7 @@ class MoveReferralsProcessor(
   companion object : KLogging()
 
   override fun process(referral: Referral): Referral {
-    logger.debug("processing referral {}", kv("referralId", referral.id))
+    logger.info("processing referral {} for transfer", kv("referralId", referral.id))
     addCaseNoteEntry(referral)
     return updateReferralIntervention(referral)
   }
@@ -42,8 +42,8 @@ class MoveReferralsProcessor(
     val caseNote = CaseNote(
       id = UUID.randomUUID(),
       referral = referral,
-      subject = "Authority to transfer case",
-      body = "On behalf of Advance Charity Ltd, I request and give permission for this referral to be transferred to Women in Prison, as of December 2022.",
+      subject = "Case transferred",
+      body = "Automated transfer from contract $fromContract to contract $toContract",
       sentBy = AuthUser.interventionsServiceUser,
       sentAt = OffsetDateTime.now(),
     )
