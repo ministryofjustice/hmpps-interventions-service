@@ -39,11 +39,13 @@ class TransferReferralsProcessor(
   }
 
   fun addCaseNoteEntry(referral: Referral) {
+    val fromIntervention = interventionRepository.findByDynamicFrameworkContractContractReference(fromContract)
+    val toIntervention = interventionRepository.findByDynamicFrameworkContractContractReference(toContract)
     val caseNote = CaseNote(
       id = UUID.randomUUID(),
       referral = referral,
       subject = "Case transferred",
-      body = "Automated transfer from contract $fromContract to contract $toContract",
+      body = "Automated transfer from ${fromIntervention.title} to ${toIntervention.title}",
       sentBy = AuthUser.interventionsServiceUser,
       sentAt = OffsetDateTime.now(),
     )

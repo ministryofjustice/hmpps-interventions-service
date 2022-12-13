@@ -33,8 +33,8 @@ class InterventionFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     )
   }
 
-  fun createWithContractCode(contractReference: String): Intervention {
+  fun createWithContractCode(contractReference: String, title: String = "Sheffield Housing Services"): Intervention {
     val contract = dynamicFrameworkContractFactory.create(contractReference = contractReference)
-    return create(contract = contract)
+    return create(contract = contract, title = title)
   }
 }

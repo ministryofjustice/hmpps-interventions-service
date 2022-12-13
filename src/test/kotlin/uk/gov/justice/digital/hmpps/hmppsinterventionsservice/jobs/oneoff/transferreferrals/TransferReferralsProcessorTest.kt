@@ -40,8 +40,8 @@ internal class TransferReferralsProcessorTest {
   private val referralFactory = ReferralFactory()
   private val interventionFactory = InterventionFactory()
 
-  private val fromIntervention = interventionFactory.createWithContractCode(originalContractCode)
-  private val toIntervention = interventionFactory.createWithContractCode(targetContractCode)
+  private val fromIntervention = interventionFactory.createWithContractCode(originalContractCode, title = "Source Intervention")
+  private val toIntervention = interventionFactory.createWithContractCode(targetContractCode, title = "Target Intervention")
 
   @BeforeEach
   fun setup() {
@@ -70,7 +70,7 @@ internal class TransferReferralsProcessorTest {
     val caseNoteCaptor = argumentCaptor<CaseNote>()
     verify(caseNoteRepository).save(caseNoteCaptor.capture())
     assertThat(caseNoteCaptor.firstValue.subject).isEqualTo("Case transferred")
-    assertThat(caseNoteCaptor.firstValue.body).isEqualTo("Automated transfer from contract FROM to contract TO")
+    assertThat(caseNoteCaptor.firstValue.body).isEqualTo("Automated transfer from Source Intervention to Target Intervention")
     assertThat(caseNoteCaptor.firstValue.sentBy).isEqualTo(AuthUser.interventionsServiceUser)
     assertThat(caseNoteCaptor.firstValue.sentAt).isCloseTo(
       OffsetDateTime.now(), TemporalUnitWithinOffset(1, ChronoUnit.MINUTES)
