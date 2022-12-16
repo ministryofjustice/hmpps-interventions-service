@@ -60,3 +60,9 @@ If you want to populate your local database with seeded values from [local data 
 ```
 SPRING_PROFILES_ACTIVE=local,seed ./gradlew bootRun
 ```
+
+## Migrating the local database
+
+If the `hmpps-interventions-service` DB on `localhost` isn't fully migrated, run either:
+- `./gradlew bootRun` or run it with local profile in IDE (the service database is migrated on startup)
+- `FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK=false flyway migrate -url=jdbc:postgresql://localhost:5432/interventions -user=postgres -password=password -locations=src/main/resources/db/migration` from the service directory
