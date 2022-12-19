@@ -27,4 +27,10 @@ For both kind of jobs, running locally:
 SPRING_PROFILES_ACTIVE=local ./gradlew bootRun --args='--jobName=changelogMigrationJob'
 ```
 
+To pass in arguments, use `key=value` pairs:
+
+```bash
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun --args='--jobName=transferReferralsJob fromContract=FROM toContract=TO'
+```
+
 To run on environments, assuming a `CronJob`, please see [triggering scheduled jobs](https://ministryofjustice.github.io/hmpps-interventions-docs/runbooks/trigger-scheduled-jobs.html) from the runbook.

@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration
 
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
@@ -88,4 +89,7 @@ abstract class IntegrationTestBase {
     )
     setupAssistant.cleanAll()
   }
+
+  @AfterEach
+  fun cleanup() = setupAssistant.cleanAll()
 }
