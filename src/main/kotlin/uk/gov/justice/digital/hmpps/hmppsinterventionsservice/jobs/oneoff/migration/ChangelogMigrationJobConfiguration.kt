@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Configuration
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.OnStartupJobLauncherFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
 
 @Configuration
 @EnableBatchProcessing
@@ -49,6 +50,7 @@ class ChangelogMigrationJobConfiguration(
   @Bean
   fun changelogMigrationJob(migrateChangelogStep: Step): Job {
     return jobBuilderFactory["changelogMigrationJob"]
+      .incrementer(TimestampIncrementer())
       .listener(jobListener)
       .start(migrateChangelogStep)
       .build()
