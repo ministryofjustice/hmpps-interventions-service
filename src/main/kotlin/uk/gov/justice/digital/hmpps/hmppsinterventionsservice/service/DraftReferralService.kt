@@ -164,7 +164,7 @@ class DraftReferralService(
         null,
         referral.id,
         referral.createdAt,
-        actor.id,
+        authUserRepository.save(actor).id,
         update.reasonForChange,
       )
 
