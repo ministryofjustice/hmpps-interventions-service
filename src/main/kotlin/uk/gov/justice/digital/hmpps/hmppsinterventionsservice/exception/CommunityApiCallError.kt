@@ -17,20 +17,14 @@ res.body={"status":400,"developerMessage":"Cannot find NSI for CRN: M190420 Sent
 res.body=409 Conflict from POST https://community-api-secure.probation.service.justice.gov.uk/secure/offenders/crn/E188275/sentence/1503090023/appointments/context/commissioned-rehabilitation-services
 6) Reschedule appointment conflict
 res.body=409 Conflict from POST https://community-api-secure.probation.service.justice.gov.uk/secure/offenders/crn/D889766/appointments/1761440075/reschedule/context/commissioned-rehabilitation-services
-
-Error categories after (Replace [A-Z]*[0-9]+ with _ and Replace '[A-Z0-9]*' with '_')
-=====================================================================================
-1) Contact type '_' requires an outcome type as the contact date is in the past '_-_-_'
-2) Validation failure: startTime endTime must be after or equal to startTime, endTime endTime must be after or equal to startTime"
-3) CRN: _ EventId: _ has multiple referral requirements
-4) Cannot find NSI for CRN: _ Sentence: _ and ContractType ACC
-5) _ Conflict from POST https://community-api-secure.probation.service.justice.gov.uk/secure/offenders/crn/_/sentence/_/appointments/context/commissioned-rehabilitation-services
-6) _ Conflict from POST https://community-api-secure.probation.service.justice.gov.uk/secure/offenders/crn/_/appointments/_/reschedule/context/commissioned-rehabilitation-services*/
-
+*/
 class CommunityApiCallError(val httpStatus: HttpStatus, causeMessage: String, val responseBody: String, val exception: Throwable) :
   RuntimeException(
     exception
   ) {
+  private val uuidRegex = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".toRegex()
+  private val identifiersRegex = "[A-Z]*[0-9]+".toRegex()
+
   val category = errorCategoryByRemovingIdentifiers(causeMessage)
   val userMessage = when {
     httpStatus.is4xxClientError -> {
@@ -46,6 +40,9 @@ class CommunityApiCallError(val httpStatus: HttpStatus, causeMessage: String, va
         }
         category.contains("Cannot find NSI for CRN: _ Sentence: _ and ContractType".toRegex()) -> {
           "This update has not been possible. This is because there's been a change to the referral in non-structured interventions in nDelius. Ask the probation practitioner if anything has changed with the referral or the person on probation"
+        }
+        category.contains("Multiple existing URN NSIs found".toRegex()) -> {
+          "There has been an error during creating the Delius NSI. We are aware of this issue. For follow-up, please contact support"
         }
         category.contains("Multiple existing matching NSIs found".toRegex()) -> {
           "There has been an error during creating the Delius NSI. We are aware of this issue. For follow-up, please contact support"
@@ -67,6 +64,8 @@ class CommunityApiCallError(val httpStatus: HttpStatus, causeMessage: String, va
   }
 
   private fun errorCategoryByRemovingIdentifiers(message: String): String {
-    return "[A-Z]*[0-9]+".toRegex().replace(message, "_")
+    return message
+      .let { uuidRegex.replace(it, "_") }
+      .let { identifiersRegex.replace(it, "_") }
   }
 }
