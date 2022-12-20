@@ -209,6 +209,7 @@ class ReferralServiceUnitTest {
       )
 
       whenever(referralDetailsRepository.findLatestByReferralId(referral.id)).thenReturn(existingDetails)
+      whenever(authUserRepository.save(referral.createdBy)).thenReturn(referral.createdBy)
 
       val returnedValue = referralService.updateReferralDetails(
         referral,
