@@ -224,7 +224,7 @@ class ReferralService(
       null,
       referral.id,
       OffsetDateTime.now(),
-      actor.id,
+      authUserRepository.save(actor).id,
       update.reasonForChange,
       existingDetails?.completionDeadline,
       existingDetails?.furtherInformation,

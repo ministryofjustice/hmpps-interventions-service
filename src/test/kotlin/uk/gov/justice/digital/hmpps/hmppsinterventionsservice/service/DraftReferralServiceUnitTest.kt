@@ -710,7 +710,7 @@ class DraftReferralServiceUnitTest {
 
       // there is no existing referral details for this referral id
       whenever(referralDetailsRepository.findLatestByReferralId(draftReferral.id)).thenReturn(null)
-
+      whenever(authUserRepository.save(draftReferral.createdBy)).thenReturn(draftReferral.createdBy)
       whenever(draftReferralRepository.save(any())).thenReturn(draftReferral)
 
       draftReferralService.updateDraftReferral(
@@ -789,6 +789,7 @@ class DraftReferralServiceUnitTest {
 
       whenever(referralDetailsRepository.findLatestByReferralId(draftReferral.id)).thenReturn(null)
       whenever(draftReferralRepository.save(any())).thenReturn(draftReferral)
+      whenever(authUserRepository.save(draftReferral.createdBy)).thenReturn(draftReferral.createdBy)
 
       draftReferralService.updateDraftReferral(
         draftReferral,
