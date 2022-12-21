@@ -24,7 +24,7 @@ class ActionPlanRepositoryTest @Autowired constructor(
   private val referralFactory = ReferralFactory(entityManager)
 
   @Test
-  fun `count number of attempted appointments`() {
+  fun `count number of appointments with recorded attendances`() {
     val referral1 = referralFactory.createSent()
     (1..4).forEach {
       deliverySessionFactory.createAttended(referral = referral1, sessionNumber = it)
@@ -32,8 +32,8 @@ class ActionPlanRepositoryTest @Autowired constructor(
     val referral2 = referralFactory.createSent()
     deliverySessionFactory.createAttended(referral = referral2)
 
-    assertThat(actionPlanRepository.countNumberOfAttemptedSessions(referral1.id)).isEqualTo(4)
-    assertThat(actionPlanRepository.countNumberOfAttemptedSessions(referral2.id)).isEqualTo(1)
+    assertThat(actionPlanRepository.countNumberOfSessionsWithAttendanceRecord(referral1.id)).isEqualTo(4)
+    assertThat(actionPlanRepository.countNumberOfSessionsWithAttendanceRecord(referral2.id)).isEqualTo(1)
   }
 
   @Test

@@ -47,8 +47,8 @@ class ReferralConcluder(
     if (deliveredFirstSubstantiveAppointment(referral) && endRequested)
       return true
 
-    val numberOfAttemptedSessions = countSessionsAttempted(referral)
-    val allSessionsHaveAttendance = totalNumberOfSessions == numberOfAttemptedSessions
+    val numberOfSessionsWithAttendanceRecord = countSessionsWithAttendanceRecord(referral)
+    val allSessionsHaveAttendance = totalNumberOfSessions == numberOfSessionsWithAttendanceRecord
     if (allSessionsHaveAttendance)
       return true
 
@@ -63,10 +63,10 @@ class ReferralConcluder(
     if (!deliveredFirstSubstantiveAppointment(referral))
       return CANCELLED
 
-    val numberOfAttemptedSessions = countSessionsAttempted(referral)
+    val numberOfSessionsWithAttendanceRecord = countSessionsWithAttendanceRecord(referral)
     val totalNumberOfSessions = referral.currentActionPlan?.numberOfSessions ?: 0
-    val someSessionsHaveNoAttendance = totalNumberOfSessions > numberOfAttemptedSessions
-    val allSessionsHaveAttendance = totalNumberOfSessions == numberOfAttemptedSessions
+    val someSessionsHaveNoAttendance = totalNumberOfSessions > numberOfSessionsWithAttendanceRecord
+    val allSessionsHaveAttendance = totalNumberOfSessions == numberOfSessionsWithAttendanceRecord
     val hasSubmittedEndOfServiceReport = referral.endOfServiceReport?.submittedAt?.let { true } ?: false
 
     if (someSessionsHaveNoAttendance && hasSubmittedEndOfServiceReport)
@@ -78,8 +78,8 @@ class ReferralConcluder(
     return null
   }
 
-  private fun countSessionsAttempted(referral: Referral): Int {
-    return actionPlanRepository.countNumberOfAttemptedSessions(referral.id)
+  private fun countSessionsWithAttendanceRecord(referral: Referral): Int {
+    return actionPlanRepository.countNumberOfSessionsWithAttendanceRecord(referral.id)
   }
 
   private fun countSessionsAttended(referral: Referral): Int {
