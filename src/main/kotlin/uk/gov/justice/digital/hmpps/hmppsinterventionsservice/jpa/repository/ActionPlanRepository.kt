@@ -14,7 +14,7 @@ interface ActionPlanRepository : JpaRepository<ActionPlan, UUID> {
       "where sesh.referral.id = :referralId and appt.attended is not null " +
       "and appt.appointmentFeedbackSubmittedAt is not null and appt.superseded is false"
   )
-  fun countNumberOfAttemptedSessions(referralId: UUID): Int
+  fun countNumberOfSessionsWithAttendanceRecord(referralId: UUID): Int
 
   @Query(
     "select count(sesh) from DeliverySession sesh join sesh.appointments appt " +
