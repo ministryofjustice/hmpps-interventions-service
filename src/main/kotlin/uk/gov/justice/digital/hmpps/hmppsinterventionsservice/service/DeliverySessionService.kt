@@ -176,7 +176,7 @@ class DeliverySessionService(
     deliverySession.appointments.add(appointmentToSchedule)
     return deliverySessionRepository.saveAndFlush(deliverySession).also {
       // Occurring after saving the session to ensure that session has the latest appointment attached when publishing the session feedback event.
-      setAttendanceAndBehaviourIfHistoricAppointment(deliverySession, appointmentToSchedule, appointmentTime, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, scheduledBy)
+      setAttendanceAndBehaviourIfHistoricAppointment(deliverySession, appointmentToSchedule, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, scheduledBy)
     }
   }
 
@@ -228,7 +228,7 @@ class DeliverySessionService(
     deliverySessionRepository.save(session)
     return deliverySessionRepository.save(session).also {
       // Occuring after saving the session to ensure that session has the latest appointment attached when publishing the session feedback event.
-      setAttendanceAndBehaviourIfHistoricAppointment(session, appointment, appointmentTime, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, updatedBy)
+      setAttendanceAndBehaviourIfHistoricAppointment(session, appointment, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, updatedBy)
     }
   }
 
@@ -357,7 +357,6 @@ class DeliverySessionService(
   private fun setAttendanceAndBehaviourIfHistoricAppointment(
     session: DeliverySession,
     appointment: Appointment,
-    appointmentTime: OffsetDateTime,
     attended: Attended?,
     additionalAttendanceInformation: String?,
     behaviourDescription: String?,
