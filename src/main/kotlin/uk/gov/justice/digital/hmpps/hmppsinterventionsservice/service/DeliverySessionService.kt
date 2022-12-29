@@ -260,11 +260,11 @@ class DeliverySessionService(
     attended: Attended,
     additionalInformation: String?
   ): Pair<DeliverySession, Appointment> {
-    var sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
+    val sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
     if (sessionAndAppointment.second.appointmentTime.isAfter(OffsetDateTime.now())) {
       throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot submit feedback for a future appointment [id=${sessionAndAppointment.second.id}]")
     }
-    var updatedAppointment = appointmentService.recordAppointmentAttendance(sessionAndAppointment.second, attended, additionalInformation, actor)
+    val updatedAppointment = appointmentService.recordAppointmentAttendance(sessionAndAppointment.second, attended, additionalInformation, actor)
     return Pair(sessionAndAppointment.first, updatedAppointment)
   }
 
@@ -296,8 +296,8 @@ class DeliverySessionService(
     behaviourDescription: String,
     notifyProbationPractitioner: Boolean,
   ): Pair<DeliverySession, Appointment> {
-    var sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
-    var updatedAppointment = appointmentService.recordBehaviour(sessionAndAppointment.second, behaviourDescription, notifyProbationPractitioner, actor)
+    val sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
+    val updatedAppointment = appointmentService.recordBehaviour(sessionAndAppointment.second, behaviourDescription, notifyProbationPractitioner, actor)
     return Pair(sessionAndAppointment.first, updatedAppointment)
   }
 
@@ -337,7 +337,7 @@ class DeliverySessionService(
   }
 
   fun submitSessionFeedback(referralId: UUID, appointmentId: UUID, submitter: AuthUser): Pair<DeliverySession, Appointment> {
-    var sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
+    val sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
     val appointment = sessionAndAppointment.second
     if (appointment.appointmentTime.isAfter(OffsetDateTime.now())) {
       throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot submit feedback for a future appointment [id=${appointment.id}]")
