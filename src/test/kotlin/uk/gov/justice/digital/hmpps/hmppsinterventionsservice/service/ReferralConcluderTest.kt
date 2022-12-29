@@ -12,7 +12,7 @@ import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportFactory
@@ -20,9 +20,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFacto
 import java.time.OffsetDateTime
 
 internal class ReferralConcluderTest {
-
   private val referralRepository: ReferralRepository = mock()
-  private val actionPlanRepository: ActionPlanRepository = mock()
+  private val deliverySessionRepository: DeliverySessionRepository = mock()
   private val referralEventPublisher: ReferralEventPublisher = mock()
 
   private val referralFactory = ReferralFactory()
@@ -30,7 +29,7 @@ internal class ReferralConcluderTest {
   private val endOfServiceReportFactory = EndOfServiceReportFactory()
 
   private val referralConcluder = ReferralConcluder(
-    referralRepository, actionPlanRepository, referralEventPublisher
+    referralRepository, deliverySessionRepository, referralEventPublisher
   )
 
   private fun createReferralWithSessions(totalSessions: Int, attendedOrLate: Int, didNotAttend: Int): Referral {
@@ -39,8 +38,8 @@ internal class ReferralConcluderTest {
 
     val actionPlan = actionPlanFactory.create(numberOfSessions = totalSessions)
     val referral = referralFactory.createSent(actionPlans = mutableListOf(actionPlan))
-    whenever(actionPlanRepository.countNumberOfAttendedSessions(referral.id)).thenReturn(attendedOrLate)
-    whenever(actionPlanRepository.countNumberOfSessionsWithAttendanceRecord(referral.id)).thenReturn(attendedOrLate + didNotAttend)
+    whenever(deliverySessionRepository.countNumberOfAttendedSessions(referral.id)).thenReturn(attendedOrLate)
+    whenever(deliverySessionRepository.countNumberOfSessionsWithAttendanceRecord(referral.id)).thenReturn(attendedOrLate + didNotAttend)
     return referral
   }
 
@@ -166,7 +165,7 @@ internal class ReferralConcluderTest {
     val actionPlan = actionPlanFactory.create(numberOfSessions = 2)
     val endOfServiceReport = endOfServiceReportFactory.create()
     val referralWithActionPlanAndSomeSessionsWithAttendanceRecord = referralFactory.createEnded(actionPlans = mutableListOf(actionPlan), endOfServiceReport = endOfServiceReport)
-    whenever(actionPlanRepository.countNumberOfAttendedSessions(referralWithActionPlanAndSomeSessionsWithAttendanceRecord.id)).thenReturn(1)
+    whenever(deliverySessionRepository.countNumberOfAttendedSessions(referralWithActionPlanAndSomeSessionsWithAttendanceRecord.id)).thenReturn(1)
 
     val endOfServiceReportCreationRequired = referralConcluder.requiresEndOfServiceReportCreation(referralWithActionPlanAndSomeSessionsWithAttendanceRecord)
 
@@ -179,7 +178,7 @@ internal class ReferralConcluderTest {
 
     val actionPlan = actionPlanFactory.create(numberOfSessions = 2)
     val referralWithActionPlanAndSomeSessionsWithAttendanceRecord = referralFactory.createEnded(actionPlans = mutableListOf(actionPlan), endOfServiceReport = null)
-    whenever(actionPlanRepository.countNumberOfAttendedSessions(referralWithActionPlanAndSomeSessionsWithAttendanceRecord.id)).thenReturn(2)
+    whenever(deliverySessionRepository.countNumberOfAttendedSessions(referralWithActionPlanAndSomeSessionsWithAttendanceRecord.id)).thenReturn(2)
 
     val endOfServiceReportCreationRequired = referralConcluder.requiresEndOfServiceReportCreation(referralWithActionPlanAndSomeSessionsWithAttendanceRecord)
 
@@ -192,7 +191,7 @@ internal class ReferralConcluderTest {
 
     val actionPlan = actionPlanFactory.create(numberOfSessions = 2)
     val referralWithActionPlanAndSomeSessionsWithAttendanceRecord = referralFactory.createEnded(actionPlans = mutableListOf(actionPlan), endOfServiceReport = null)
-    whenever(actionPlanRepository.countNumberOfAttendedSessions(referralWithActionPlanAndSomeSessionsWithAttendanceRecord.id)).thenReturn(1)
+    whenever(deliverySessionRepository.countNumberOfAttendedSessions(referralWithActionPlanAndSomeSessionsWithAttendanceRecord.id)).thenReturn(1)
 
     val endOfServiceReportCreationRequired = referralConcluder.requiresEndOfServiceReportCreation(referralWithActionPlanAndSomeSessionsWithAttendanceRecord)
 
@@ -208,7 +207,7 @@ internal class ReferralConcluderTest {
     val endOfServiceReportCreationRequired = referralConcluder.requiresEndOfServiceReportCreation(referralWithActionPlanAndSomeSessionsWithAttendanceRecord)
 
     assertThat(endOfServiceReportCreationRequired).isFalse
-    verifyNoInteractions(actionPlanRepository, referralRepository, referralEventPublisher)
+    verifyNoInteractions(deliverySessionRepository, referralRepository, referralEventPublisher)
   }
 
   @Test
@@ -216,7 +215,7 @@ internal class ReferralConcluderTest {
 
     val actionPlan = actionPlanFactory.create(numberOfSessions = 2)
     val referralWithActionPlanAndSomeSessionsWithAttendanceRecord = referralFactory.createSent(actionPlans = mutableListOf(actionPlan))
-    whenever(actionPlanRepository.countNumberOfAttendedSessions(actionPlan.id)).thenReturn(0)
+    whenever(deliverySessionRepository.countNumberOfAttendedSessions(actionPlan.id)).thenReturn(0)
 
     val endOfServiceReportCreationRequired = referralConcluder.requiresEndOfServiceReportCreation(referralWithActionPlanAndSomeSessionsWithAttendanceRecord)
 
@@ -229,8 +228,8 @@ internal class ReferralConcluderTest {
 
     val actionPlan = actionPlanFactory.create(numberOfSessions = 2)
     val referralWithActionPlanAndSomeSessionsWithAttendanceRecord = referralFactory.createSent(actionPlans = mutableListOf(actionPlan))
-    whenever(actionPlanRepository.countNumberOfAttendedSessions(actionPlan.id)).thenReturn(0)
-    whenever(actionPlanRepository.countNumberOfSessionsWithAttendanceRecord(actionPlan.id)).thenReturn(1)
+    whenever(deliverySessionRepository.countNumberOfAttendedSessions(actionPlan.id)).thenReturn(0)
+    whenever(deliverySessionRepository.countNumberOfSessionsWithAttendanceRecord(actionPlan.id)).thenReturn(1)
 
     val endOfServiceReportCreationRequired = referralConcluder.requiresEndOfServiceReportCreation(referralWithActionPlanAndSomeSessionsWithAttendanceRecord)
 
