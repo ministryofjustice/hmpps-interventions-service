@@ -420,6 +420,10 @@ class DeliverySessionService(
     }
   }
 
+  @Deprecated(
+    "looking up by action plan ID is no longer necessary",
+    ReplaceWith("getDeliverySessionOrThrowException(referralId, sessionNumber)")
+  )
   fun getDeliverySessionByActionPlanIdOrThrowException(actionPlanId: UUID, sessionNumber: Int): DeliverySession =
     getDeliverySessionByActionPlanId(actionPlanId, sessionNumber)
       ?: throw EntityNotFoundException("Action plan session not found [actionPlanId=$actionPlanId, sessionNumber=$sessionNumber]")
@@ -431,6 +435,10 @@ class DeliverySessionService(
   private fun getDeliverySession(referralId: UUID, sessionNumber: Int) =
     deliverySessionRepository.findByReferralIdAndSessionNumber(referralId, sessionNumber)
 
+  @Deprecated(
+    "looking up by action plan ID is no longer necessary",
+    ReplaceWith("getDeliverySession(referralId, sessionNumber)")
+  )
   private fun getDeliverySessionByActionPlanId(actionPlanId: UUID, sessionNumber: Int) =
     deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)
 
