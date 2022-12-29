@@ -8,7 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType.COMPLETED
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType.PREMATURELY_ENDED
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import java.time.OffsetDateTime
 import java.util.Objects.nonNull
@@ -18,7 +18,7 @@ import javax.transaction.Transactional
 @Transactional
 class ReferralConcluder(
   val referralRepository: ReferralRepository,
-  val actionPlanRepository: ActionPlanRepository,
+  val deliverySessionRepository: DeliverySessionRepository,
   val referralEventPublisher: ReferralEventPublisher,
 ) {
   companion object {
@@ -79,11 +79,11 @@ class ReferralConcluder(
   }
 
   private fun countSessionsWithAttendanceRecord(referral: Referral): Int {
-    return actionPlanRepository.countNumberOfSessionsWithAttendanceRecord(referral.id)
+    return deliverySessionRepository.countNumberOfSessionsWithAttendanceRecord(referral.id)
   }
 
   private fun countSessionsAttended(referral: Referral): Int {
-    return actionPlanRepository.countNumberOfAttendedSessions(referral.id)
+    return deliverySessionRepository.countNumberOfAttendedSessions(referral.id)
   }
 
   private fun deliveredFirstSubstantiveAppointment(referral: Referral): Boolean {
