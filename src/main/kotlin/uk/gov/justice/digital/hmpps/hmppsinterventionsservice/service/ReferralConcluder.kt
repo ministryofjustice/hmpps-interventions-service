@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
-import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
@@ -21,10 +20,6 @@ class ReferralConcluder(
   val deliverySessionRepository: DeliverySessionRepository,
   val referralEventPublisher: ReferralEventPublisher,
 ) {
-  companion object {
-    private val logger = KotlinLogging.logger {}
-  }
-
   fun concludeIfEligible(referral: Referral) {
     val concludedEventType = getConcludedEventType(referral)
 
