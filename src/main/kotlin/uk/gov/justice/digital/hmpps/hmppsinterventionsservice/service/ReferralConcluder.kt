@@ -6,8 +6,11 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import java.time.OffsetDateTime
-import java.util.Objects.nonNull
 import javax.transaction.Transactional
+
+enum class DeliveryState {
+  NOT_DELIVERING_YET, MISSING_FIRST_SUBSTANTIVE_APPOINTMENT, IN_PROGRESS, COMPLETED
+}
 
 enum class ReferralConcludedState {
   CANCELLED, PREMATURELY_ENDED, COMPLETED
@@ -30,47 +33,40 @@ class ReferralConcluder(
     }
   }
 
-  fun requiresEndOfServiceReportCreation(referral: Referral): Boolean {
-    if (referral.endOfServiceReport != null)
-      return false
-
-    val totalNumberOfSessions = referral.currentActionPlan?.numberOfSessions ?: 0
-    if (totalNumberOfSessions == 0)
-      return false
-
-    val endRequested = referral.endRequestedAt != null
-    if (deliveredFirstSubstantiveAppointment(referral) && endRequested)
-      return true
+  private fun deliveryState(referral: Referral): DeliveryState {
+    val approvedActionPlan = referral.currentActionPlan ?: return DeliveryState.NOT_DELIVERING_YET
+    if (!deliveredFirstSubstantiveAppointment(referral)) return DeliveryState.MISSING_FIRST_SUBSTANTIVE_APPOINTMENT
 
     val numberOfSessionsWithAttendanceRecord = countSessionsWithAttendanceRecord(referral)
-    val allSessionsHaveAttendance = totalNumberOfSessions == numberOfSessionsWithAttendanceRecord
-    if (allSessionsHaveAttendance)
-      return true
+    val allSessionsHaveAttendance = approvedActionPlan.numberOfSessions == numberOfSessionsWithAttendanceRecord
+    return if (allSessionsHaveAttendance)
+      DeliveryState.COMPLETED
+    else
+      DeliveryState.IN_PROGRESS
+  }
 
-    return false
+  fun requiresEndOfServiceReportCreation(referral: Referral): Boolean {
+    if (referral.endOfServiceReport != null) return false
+
+    return when (deliveryState(referral)) {
+      DeliveryState.NOT_DELIVERING_YET,
+      DeliveryState.MISSING_FIRST_SUBSTANTIVE_APPOINTMENT -> false
+
+      DeliveryState.IN_PROGRESS -> true
+      DeliveryState.COMPLETED -> true
+    }
   }
 
   private fun getConcludedEventType(referral: Referral): ReferralConcludedState? {
-    val hasActionPlan = nonNull(referral.currentActionPlan)
-    if (!hasActionPlan)
-      return ReferralConcludedState.CANCELLED
-
-    if (!deliveredFirstSubstantiveAppointment(referral))
-      return ReferralConcludedState.CANCELLED
-
-    val numberOfSessionsWithAttendanceRecord = countSessionsWithAttendanceRecord(referral)
-    val totalNumberOfSessions = referral.currentActionPlan?.numberOfSessions ?: 0
-    val someSessionsHaveNoAttendance = totalNumberOfSessions > numberOfSessionsWithAttendanceRecord
-    val allSessionsHaveAttendance = totalNumberOfSessions == numberOfSessionsWithAttendanceRecord
     val hasSubmittedEndOfServiceReport = referral.endOfServiceReport?.submittedAt?.let { true } ?: false
 
-    if (someSessionsHaveNoAttendance && hasSubmittedEndOfServiceReport)
-      return ReferralConcludedState.PREMATURELY_ENDED
+    return when (deliveryState(referral)) {
+      DeliveryState.NOT_DELIVERING_YET,
+      DeliveryState.MISSING_FIRST_SUBSTANTIVE_APPOINTMENT -> ReferralConcludedState.CANCELLED
 
-    if (allSessionsHaveAttendance && hasSubmittedEndOfServiceReport)
-      return ReferralConcludedState.COMPLETED
-
-    return null
+      DeliveryState.IN_PROGRESS -> if (hasSubmittedEndOfServiceReport) ReferralConcludedState.PREMATURELY_ENDED else null
+      DeliveryState.COMPLETED -> if (hasSubmittedEndOfServiceReport) ReferralConcludedState.COMPLETED else null
+    }
   }
 
   private fun countSessionsWithAttendanceRecord(referral: Referral): Int {
