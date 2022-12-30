@@ -7,24 +7,24 @@ import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.CommunityAPIClient
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.SNSPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEvent
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralConcludedEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.AsyncEventExceptionHandling
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.CommunityAPIService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.NotificationCreateRequestDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralEndRequest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.SNSService
 
 @Service
 class ReferralConcludedListener(
   private val snsPublisher: SNSPublisher,
-) : ApplicationListener<ReferralEvent>, SNSService {
+) : ApplicationListener<ReferralConcludedEvent>, SNSService {
   @AsyncEventExceptionHandling
-  override fun onApplicationEvent(event: ReferralEvent) {
+  override fun onApplicationEvent(event: ReferralConcludedEvent) {
     when (event.type) {
-      ReferralEventType.CANCELLED -> {
+      ReferralConcludedState.CANCELLED -> {
         val snsEvent = EventDTO(
           "intervention.referral.cancelled",
           "A referral has been cancelled",
@@ -34,7 +34,8 @@ class ReferralConcludedListener(
         )
         snsPublisher.publish(event.referral.id, event.referral.endRequestedBy!!, snsEvent)
       }
-      ReferralEventType.PREMATURELY_ENDED -> {
+
+      ReferralConcludedState.PREMATURELY_ENDED -> {
         val snsEvent = EventDTO(
           "intervention.referral.prematurely-ended",
           "A referral has been ended prematurely",
@@ -44,7 +45,8 @@ class ReferralConcludedListener(
         )
         snsPublisher.publish(event.referral.id, event.referral.endRequestedBy!!, snsEvent)
       }
-      ReferralEventType.COMPLETED -> {
+
+      ReferralConcludedState.COMPLETED -> {
         val snsEvent = EventDTO(
           "intervention.referral.completed",
           "A referral has been completed",
@@ -55,7 +57,6 @@ class ReferralConcludedListener(
         // This is a system generated event at present and as such the actor will represent this
         snsPublisher.publish(event.referral.id, AuthUser.interventionsServiceUser, snsEvent)
       }
-      else -> {}
     }
   }
 }
@@ -69,10 +70,10 @@ class ReferralConcludedIntegrationListener(
   @Value("\${community-api.locations.notification-request}") private val communityAPINotificationLocation: String,
   @Value("\${community-api.integration-context}") private val integrationContext: String,
   private val communityAPIClient: CommunityAPIClient,
-) : ApplicationListener<ReferralEvent>, CommunityAPIService {
-  override fun onApplicationEvent(event: ReferralEvent) {
+) : ApplicationListener<ReferralConcludedEvent>, CommunityAPIService {
+  override fun onApplicationEvent(event: ReferralConcludedEvent) {
     when (event.type) {
-      ReferralEventType.CANCELLED,
+      ReferralConcludedState.CANCELLED,
       -> {
         val url = UriComponentsBuilder.fromHttpUrl(interventionsUIBaseURL)
           .path(ppReferralDetailsLocation)
@@ -82,8 +83,8 @@ class ReferralConcludedIntegrationListener(
         postReferralEndRequest(event, url)
       }
 
-      ReferralEventType.PREMATURELY_ENDED,
-      ReferralEventType.COMPLETED,
+      ReferralConcludedState.PREMATURELY_ENDED,
+      ReferralConcludedState.COMPLETED,
       -> {
 
         // This should be an independent event based notification
@@ -99,12 +100,10 @@ class ReferralConcludedIntegrationListener(
 
         postReferralEndRequest(event, url)
       }
-
-      else -> {}
     }
   }
 
-  private fun postReferralEndRequest(event: ReferralEvent, url: String) {
+  private fun postReferralEndRequest(event: ReferralConcludedEvent, url: String) {
     val referralEndRequest = ReferralEndRequest(
       event.referral.intervention.dynamicFrameworkContract.contractType.code,
       event.referral.sentAt!!,

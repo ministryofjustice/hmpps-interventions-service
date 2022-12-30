@@ -8,16 +8,13 @@ import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.CommunityAPIClient
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.SNSPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEvent
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType.CANCELLED
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType.COMPLETED
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType.PREMATURELY_ENDED
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralConcludedEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.NotificationCreateRequestDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralEndRequest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
@@ -30,12 +27,12 @@ private val concludedAtDefault = OffsetDateTime.of(2020, 2, 2, 2, 2, 2, 2, ZoneO
 private val submittedAtDefault = OffsetDateTime.of(2020, 3, 3, 3, 3, 3, 3, ZoneOffset.UTC)
 
 private fun referralConcludedEvent(
-  eventType: ReferralEventType,
+  eventType: ReferralConcludedState,
   endOfServiceReport: EndOfServiceReport? = null
-): ReferralEvent {
+): ReferralConcludedEvent {
   val referralFactory = ReferralFactory()
   val authUserFactory = AuthUserFactory()
-  return ReferralEvent(
+  return ReferralConcludedEvent(
     "source",
     eventType,
     referralFactory.createEnded(
@@ -64,7 +61,7 @@ internal class ReferralConcludedListenerTest {
 
   @Test
   fun `publishes referral cancelled event message`() {
-    val referralConcludedEvent = referralConcludedEvent(CANCELLED)
+    val referralConcludedEvent = referralConcludedEvent(ReferralConcludedState.CANCELLED)
     listener.onApplicationEvent(referralConcludedEvent)
     val snsEvent = EventDTO(
       "intervention.referral.cancelled",
@@ -82,7 +79,7 @@ internal class ReferralConcludedListenerTest {
 
   @Test
   fun `publishes referral prematurely ended event message`() {
-    val referralConcludedEvent = referralConcludedEvent(PREMATURELY_ENDED)
+    val referralConcludedEvent = referralConcludedEvent(ReferralConcludedState.PREMATURELY_ENDED)
     listener.onApplicationEvent(referralConcludedEvent)
     val snsEvent = EventDTO(
       "intervention.referral.prematurely-ended",
@@ -100,7 +97,7 @@ internal class ReferralConcludedListenerTest {
 
   @Test
   fun `publishes referral completed event message with actor as Interventions service user`() {
-    val referralConcludedEvent = referralConcludedEvent(COMPLETED)
+    val referralConcludedEvent = referralConcludedEvent(ReferralConcludedState.COMPLETED)
     listener.onApplicationEvent(referralConcludedEvent)
     val snsEvent = EventDTO(
       "intervention.referral.completed",
@@ -131,7 +128,7 @@ internal class ReferralConcludedIntegrationListenerTest {
 
   @Test
   fun `notify cancelled referral`() {
-    val event = referralConcludedEvent(CANCELLED)
+    val event = referralConcludedEvent(ReferralConcludedState.CANCELLED)
     communityAPIService.onApplicationEvent(event)
 
     verify(communityAPIClient).makeAsyncPostRequest(
@@ -151,7 +148,7 @@ internal class ReferralConcludedIntegrationListenerTest {
 
   @Test
   fun `notify prematurely ended referral`() {
-    val event = referralConcludedEvent(PREMATURELY_ENDED, endOfServiceReport = endOfServiceReport)
+    val event = referralConcludedEvent(ReferralConcludedState.PREMATURELY_ENDED, endOfServiceReport)
     communityAPIService.onApplicationEvent(event)
 
     val inOrder = inOrder(communityAPIClient)
@@ -186,13 +183,13 @@ internal class ReferralConcludedIntegrationListenerTest {
 
   @Test
   fun `notify prematurely ended throws exception when no end of service report exists`() {
-    val event = referralConcludedEvent(PREMATURELY_ENDED)
+    val event = referralConcludedEvent(ReferralConcludedState.PREMATURELY_ENDED)
     assertThrows<IllegalStateException> { communityAPIService.onApplicationEvent(event) }
   }
 
   @Test
   fun `notify completed referral`() {
-    val event = referralConcludedEvent(COMPLETED, endOfServiceReport = endOfServiceReport)
+    val event = referralConcludedEvent(ReferralConcludedState.COMPLETED, endOfServiceReport)
     communityAPIService.onApplicationEvent(event)
 
     val inOrder = inOrder(communityAPIClient)
@@ -227,7 +224,7 @@ internal class ReferralConcludedIntegrationListenerTest {
 
   @Test
   fun `notify cancelled referral throws exception when no end of service report exists`() {
-    val event = referralConcludedEvent(COMPLETED)
+    val event = referralConcludedEvent(ReferralConcludedState.COMPLETED)
     assertThrows<IllegalStateException> { communityAPIService.onApplicationEvent(event) }
   }
 

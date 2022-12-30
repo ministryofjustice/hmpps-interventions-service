@@ -10,9 +10,10 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AuthUserDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState
 
 enum class ReferralEventType {
-  SENT, ASSIGNED, CANCELLED, PREMATURELY_ENDED, COMPLETED, DETAILS_AMENDED, COMPLEXITY_LEVEL_AMENDED, DESIRED_OUTCOMES_AMENDED, NEEDS_AND_REQUIREMENTS_AMENDED
+  SENT, ASSIGNED, DETAILS_AMENDED, COMPLEXITY_LEVEL_AMENDED, DESIRED_OUTCOMES_AMENDED, NEEDS_AND_REQUIREMENTS_AMENDED
 }
 
 class ReferralEvent(
@@ -24,6 +25,17 @@ class ReferralEvent(
 ) : ApplicationEvent(source) {
   override fun toString(): String {
     return "ReferralEvent(type=$type, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
+  }
+}
+
+class ReferralConcludedEvent(
+  source: Any,
+  val type: ReferralConcludedState,
+  val referral: Referral,
+  val detailUrl: String,
+) : ApplicationEvent(source) {
+  override fun toString(): String {
+    return "ReferralConcludedEvent(type=$type, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
   }
 }
 
@@ -54,9 +66,9 @@ class ReferralEventPublisher(
     applicationEventPublisher.publishEvent(ReferralEvent(this, ReferralEventType.NEEDS_AND_REQUIREMENTS_AMENDED, referral, getSentReferralURL(referral)))
   }
 
-  fun referralConcludedEvent(referral: Referral, eventType: ReferralEventType) {
+  fun referralConcludedEvent(referral: Referral, eventType: ReferralConcludedState) {
     referral.currentAssignee ?: logger.warn("Concluding referral has no current assignment ${referral.id} for event type $eventType")
-    applicationEventPublisher.publishEvent(ReferralEvent(this, eventType, referral, getSentReferralURL(referral)))
+    applicationEventPublisher.publishEvent(ReferralConcludedEvent(this, eventType, referral, getSentReferralURL(referral)))
   }
 
   fun referralDetailsChangedEvent(referral: Referral, newDetails: ReferralDetails, previousDetails: ReferralDetails) {

@@ -10,7 +10,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
@@ -51,7 +50,7 @@ internal class ReferralConcluderTest {
     referralConcluder.concludeIfEligible(referralWithNoActionPlan)
 
     verifySaveWithConcludedAtSet(referralWithNoActionPlan, timeAtStart)
-    verifyEventPublished(referralWithNoActionPlan, ReferralEventType.CANCELLED)
+    verifyEventPublished(referralWithNoActionPlan, ReferralConcludedState.CANCELLED)
   }
 
   @Test
@@ -63,7 +62,7 @@ internal class ReferralConcluderTest {
     referralConcluder.concludeIfEligible(referralWithActionPlanAndNoSessionsWithAttendanceRecord)
 
     verifySaveWithConcludedAtSet(referralWithActionPlanAndNoSessionsWithAttendanceRecord, timeAtStart)
-    verifyEventPublished(referralWithActionPlanAndNoSessionsWithAttendanceRecord, ReferralEventType.CANCELLED)
+    verifyEventPublished(referralWithActionPlanAndNoSessionsWithAttendanceRecord, ReferralConcludedState.CANCELLED)
   }
 
   @Test
@@ -75,7 +74,7 @@ internal class ReferralConcluderTest {
     referralConcluder.concludeIfEligible(referralWithActionPlanAndNoSessionsWithAttendanceRecord)
 
     verifySaveWithConcludedAtSet(referralWithActionPlanAndNoSessionsWithAttendanceRecord, timeAtStart)
-    verifyEventPublished(referralWithActionPlanAndNoSessionsWithAttendanceRecord, ReferralEventType.CANCELLED)
+    verifyEventPublished(referralWithActionPlanAndNoSessionsWithAttendanceRecord, ReferralConcludedState.CANCELLED)
   }
 
   @Test
@@ -88,7 +87,7 @@ internal class ReferralConcluderTest {
     referralConcluder.concludeIfEligible(referralWithActionPlanAndSomeSessionsWithAttendanceRecord)
 
     verifySaveWithConcludedAtSet(referralWithActionPlanAndSomeSessionsWithAttendanceRecord, timeAtStart)
-    verifyEventPublished(referralWithActionPlanAndSomeSessionsWithAttendanceRecord, ReferralEventType.PREMATURELY_ENDED)
+    verifyEventPublished(referralWithActionPlanAndSomeSessionsWithAttendanceRecord, ReferralConcludedState.PREMATURELY_ENDED)
   }
 
   @Test
@@ -101,7 +100,7 @@ internal class ReferralConcluderTest {
     referralConcluder.concludeIfEligible(referralWithActionPlanAndSomeSessionsWithAttendanceRecord)
 
     verifySaveWithConcludedAtSet(referralWithActionPlanAndSomeSessionsWithAttendanceRecord, timeAtStart)
-    verifyEventPublished(referralWithActionPlanAndSomeSessionsWithAttendanceRecord, ReferralEventType.COMPLETED)
+    verifyEventPublished(referralWithActionPlanAndSomeSessionsWithAttendanceRecord, ReferralConcludedState.COMPLETED)
   }
 
   @Test
@@ -114,7 +113,7 @@ internal class ReferralConcluderTest {
     referralConcluder.concludeIfEligible(referralWithActionPlanAndSomeSessionsWithAttendanceRecord)
 
     verifySaveWithConcludedAtSet(referralWithActionPlanAndSomeSessionsWithAttendanceRecord, timeAtStart)
-    verifyEventPublished(referralWithActionPlanAndSomeSessionsWithAttendanceRecord, ReferralEventType.COMPLETED)
+    verifyEventPublished(referralWithActionPlanAndSomeSessionsWithAttendanceRecord, ReferralConcludedState.COMPLETED)
   }
 
   @Test
@@ -237,7 +236,7 @@ internal class ReferralConcluderTest {
     verifyNoInteractions(referralRepository, referralEventPublisher)
   }
 
-  private fun verifyEventPublished(referralWithNoActionPlan: Referral, value: ReferralEventType) {
+  private fun verifyEventPublished(referralWithNoActionPlan: Referral, value: ReferralConcludedState) {
     verify(referralEventPublisher).referralConcludedEvent(same(referralWithNoActionPlan), same(value))
   }
 

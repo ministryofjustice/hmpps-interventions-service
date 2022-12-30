@@ -1,18 +1,17 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
-import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType.CANCELLED
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType.COMPLETED
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType.PREMATURELY_ENDED
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import java.time.OffsetDateTime
 import java.util.Objects.nonNull
 import javax.transaction.Transactional
+
+enum class ReferralConcludedState {
+  CANCELLED, PREMATURELY_ENDED, COMPLETED
+}
 
 @Service
 @Transactional
@@ -21,10 +20,6 @@ class ReferralConcluder(
   val deliverySessionRepository: DeliverySessionRepository,
   val referralEventPublisher: ReferralEventPublisher,
 ) {
-  companion object {
-    private val logger = KotlinLogging.logger {}
-  }
-
   fun concludeIfEligible(referral: Referral) {
     val concludedEventType = getConcludedEventType(referral)
 
@@ -55,13 +50,13 @@ class ReferralConcluder(
     return false
   }
 
-  private fun getConcludedEventType(referral: Referral): ReferralEventType? {
+  private fun getConcludedEventType(referral: Referral): ReferralConcludedState? {
     val hasActionPlan = nonNull(referral.currentActionPlan)
     if (!hasActionPlan)
-      return CANCELLED
+      return ReferralConcludedState.CANCELLED
 
     if (!deliveredFirstSubstantiveAppointment(referral))
-      return CANCELLED
+      return ReferralConcludedState.CANCELLED
 
     val numberOfSessionsWithAttendanceRecord = countSessionsWithAttendanceRecord(referral)
     val totalNumberOfSessions = referral.currentActionPlan?.numberOfSessions ?: 0
@@ -70,10 +65,10 @@ class ReferralConcluder(
     val hasSubmittedEndOfServiceReport = referral.endOfServiceReport?.submittedAt?.let { true } ?: false
 
     if (someSessionsHaveNoAttendance && hasSubmittedEndOfServiceReport)
-      return PREMATURELY_ENDED
+      return ReferralConcludedState.PREMATURELY_ENDED
 
     if (allSessionsHaveAttendance && hasSubmittedEndOfServiceReport)
-      return COMPLETED
+      return ReferralConcludedState.COMPLETED
 
     return null
   }
