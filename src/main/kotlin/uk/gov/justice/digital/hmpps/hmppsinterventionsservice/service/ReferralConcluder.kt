@@ -8,11 +8,15 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Ref
 import java.time.OffsetDateTime
 import javax.transaction.Transactional
 
-enum class DeliveryState(val requiresEndOfServiceReport: Boolean) {
-  NOT_DELIVERING_YET(false),
-  MISSING_FIRST_SUBSTANTIVE_APPOINTMENT(false),
-  IN_PROGRESS(true),
-  COMPLETED(true),
+enum class DeliveryState(val requiresEndOfServiceReport: Boolean, val concludedState: ReferralConcludedState) {
+  NOT_DELIVERING_YET(false, ReferralConcludedState.CANCELLED),
+  MISSING_FIRST_SUBSTANTIVE_APPOINTMENT(false, ReferralConcludedState.CANCELLED),
+  IN_PROGRESS(true, ReferralConcludedState.PREMATURELY_ENDED),
+  COMPLETED(true, ReferralConcludedState.COMPLETED),
+}
+
+enum class ReferralEndState {
+  AWAITING_END_OF_SERVICE_REPORT, CAN_CONCLUDE
 }
 
 enum class ReferralConcludedState {
@@ -27,12 +31,12 @@ class ReferralConcluder(
   val referralEventPublisher: ReferralEventPublisher,
 ) {
   fun concludeIfEligible(referral: Referral) {
-    val concludedEventType = getConcludedEventType(referral)
+    val endState = endState(referral)
 
-    if (concludedEventType != null) {
+    if (endState == ReferralEndState.CAN_CONCLUDE) {
       referral.concludedAt = OffsetDateTime.now()
       referralRepository.save(referral)
-      referralEventPublisher.referralConcludedEvent(referral, concludedEventType)
+      referralEventPublisher.referralConcludedEvent(referral, deliveryState(referral).concludedState)
     }
   }
 
@@ -53,16 +57,11 @@ class ReferralConcluder(
     return deliveryState(referral).requiresEndOfServiceReport
   }
 
-  private fun getConcludedEventType(referral: Referral): ReferralConcludedState? {
-    val hasSubmittedEndOfServiceReport = referral.endOfServiceReport?.submittedAt?.let { true } ?: false
-
-    return when (deliveryState(referral)) {
-      DeliveryState.NOT_DELIVERING_YET,
-      DeliveryState.MISSING_FIRST_SUBSTANTIVE_APPOINTMENT -> ReferralConcludedState.CANCELLED
-
-      DeliveryState.IN_PROGRESS -> if (hasSubmittedEndOfServiceReport) ReferralConcludedState.PREMATURELY_ENDED else null
-      DeliveryState.COMPLETED -> if (hasSubmittedEndOfServiceReport) ReferralConcludedState.COMPLETED else null
-    }
+  private fun endState(referral: Referral): ReferralEndState {
+    return if (deliveryState(referral).requiresEndOfServiceReport && referral.endOfServiceReport?.submittedAt == null)
+      ReferralEndState.AWAITING_END_OF_SERVICE_REPORT
+    else
+      ReferralEndState.CAN_CONCLUDE
   }
 
   private fun countSessionsWithAttendanceRecord(referral: Referral): Int {
