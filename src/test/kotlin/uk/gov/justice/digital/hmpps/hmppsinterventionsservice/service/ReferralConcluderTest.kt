@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentCaptor
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.firstValue
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.same
@@ -35,7 +36,7 @@ internal class ReferralConcluderTest {
     assertThat(attendedOrLate + didNotAttend).isLessThanOrEqualTo(totalSessions)
       .withFailMessage("test setup error: the sum of attended and did not attend sessions must not be greater than the total sessions")
 
-    val actionPlan = actionPlanFactory.create(numberOfSessions = totalSessions)
+    val actionPlan = actionPlanFactory.createApproved(numberOfSessions = totalSessions)
     val referral = referralFactory.createSent(actionPlans = mutableListOf(actionPlan))
     whenever(deliverySessionRepository.countNumberOfAttendedSessions(referral.id)).thenReturn(attendedOrLate)
     whenever(deliverySessionRepository.countNumberOfSessionsWithAttendanceRecord(referral.id)).thenReturn(attendedOrLate + didNotAttend)
@@ -117,6 +118,20 @@ internal class ReferralConcluderTest {
   }
 
   @Test
+  fun `concludes referral as completed when all sessions are attended, even if there is an action plan revision with more sessions`() {
+    val timeAtStart = OffsetDateTime.now()
+    val referral = createReferralWithSessions(totalSessions = 2, attendedOrLate = 2, didNotAttend = 0).also {
+      it.endOfServiceReport = endOfServiceReportFactory.create(submittedAt = OffsetDateTime.now())
+      it.actionPlans?.add(actionPlanFactory.createSubmitted(numberOfSessions = 10, referral = it))
+    }
+
+    referralConcluder.concludeIfEligible(referral)
+
+    verifySaveWithConcludedAtSet(referral, timeAtStart)
+    verifyEventPublished(referral, ReferralConcludedState.COMPLETED)
+  }
+
+  @Test
   fun `does not conclude a referral when ending a referral with some sessions with recorded attendances and an end of service report has not been submitted`() {
     val referralWithActionPlanAndSomeSessionsWithAttendanceRecord =
       createReferralWithSessions(totalSessions = 2, attendedOrLate = 1, didNotAttend = 0)
@@ -160,8 +175,7 @@ internal class ReferralConcluderTest {
 
   @Test
   fun `should not flag end of service report as required when one has already been created`() {
-
-    val actionPlan = actionPlanFactory.create(numberOfSessions = 2)
+    val actionPlan = actionPlanFactory.createApproved(numberOfSessions = 2)
     val endOfServiceReport = endOfServiceReportFactory.create()
     val referralWithActionPlanAndSomeSessionsWithAttendanceRecord = referralFactory.createEnded(actionPlans = mutableListOf(actionPlan), endOfServiceReport = endOfServiceReport)
     whenever(deliverySessionRepository.countNumberOfAttendedSessions(referralWithActionPlanAndSomeSessionsWithAttendanceRecord.id)).thenReturn(1)
@@ -174,8 +188,7 @@ internal class ReferralConcluderTest {
 
   @Test
   fun `should flag end of service report as required if it doesn't exist and when all sessions have been attended`() {
-
-    val actionPlan = actionPlanFactory.create(numberOfSessions = 2)
+    val actionPlan = actionPlanFactory.createApproved(numberOfSessions = 2)
     val referralWithActionPlanAndSomeSessionsWithAttendanceRecord = referralFactory.createEnded(actionPlans = mutableListOf(actionPlan), endOfServiceReport = null)
     whenever(deliverySessionRepository.countNumberOfAttendedSessions(referralWithActionPlanAndSomeSessionsWithAttendanceRecord.id)).thenReturn(2)
 
@@ -188,7 +201,7 @@ internal class ReferralConcluderTest {
   @Test
   fun `should flag end of service report as required if it doesn't exist and when at least one session has been attended and end has been requested`() {
 
-    val actionPlan = actionPlanFactory.create(numberOfSessions = 2)
+    val actionPlan = actionPlanFactory.createApproved(numberOfSessions = 2)
     val referralWithActionPlanAndSomeSessionsWithAttendanceRecord = referralFactory.createEnded(actionPlans = mutableListOf(actionPlan), endOfServiceReport = null)
     whenever(deliverySessionRepository.countNumberOfAttendedSessions(referralWithActionPlanAndSomeSessionsWithAttendanceRecord.id)).thenReturn(1)
 
@@ -200,7 +213,6 @@ internal class ReferralConcluderTest {
 
   @Test
   fun `should not flag end of service report as required when action plan is missing`() {
-
     val referralWithActionPlanAndSomeSessionsWithAttendanceRecord = referralFactory.createSent(actionPlans = null)
 
     val endOfServiceReportCreationRequired = referralConcluder.requiresEndOfServiceReportCreation(referralWithActionPlanAndSomeSessionsWithAttendanceRecord)
@@ -211,8 +223,7 @@ internal class ReferralConcluderTest {
 
   @Test
   fun `should not flag end of service report as required when no sessions have been attended`() {
-
-    val actionPlan = actionPlanFactory.create(numberOfSessions = 2)
+    val actionPlan = actionPlanFactory.createApproved(numberOfSessions = 2)
     val referralWithActionPlanAndSomeSessionsWithAttendanceRecord = referralFactory.createSent(actionPlans = mutableListOf(actionPlan))
     whenever(deliverySessionRepository.countNumberOfAttendedSessions(actionPlan.id)).thenReturn(0)
 
@@ -224,8 +235,7 @@ internal class ReferralConcluderTest {
 
   @Test
   fun `should not flag end of service report as required when having only non-attended sessions`() {
-
-    val actionPlan = actionPlanFactory.create(numberOfSessions = 2)
+    val actionPlan = actionPlanFactory.createApproved(numberOfSessions = 2)
     val referralWithActionPlanAndSomeSessionsWithAttendanceRecord = referralFactory.createSent(actionPlans = mutableListOf(actionPlan))
     whenever(deliverySessionRepository.countNumberOfAttendedSessions(actionPlan.id)).thenReturn(0)
     whenever(deliverySessionRepository.countNumberOfSessionsWithAttendanceRecord(actionPlan.id)).thenReturn(1)
@@ -237,7 +247,7 @@ internal class ReferralConcluderTest {
   }
 
   private fun verifyEventPublished(referralWithNoActionPlan: Referral, value: ReferralConcludedState) {
-    verify(referralEventPublisher).referralConcludedEvent(same(referralWithNoActionPlan), same(value))
+    verify(referralEventPublisher).referralConcludedEvent(same(referralWithNoActionPlan), eq(value))
   }
 
   private fun verifySaveWithConcludedAtSet(referralWithNoActionPlan: Referral, timeAtStart: OffsetDateTime?) {

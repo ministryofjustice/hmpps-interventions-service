@@ -41,7 +41,7 @@ class ReferralConcluder(
   }
 
   private fun deliveryState(referral: Referral): DeliveryState {
-    val approvedActionPlan = referral.currentActionPlan ?: return DeliveryState.NOT_DELIVERING_YET
+    val approvedActionPlan = referral.approvedActionPlan ?: return DeliveryState.NOT_DELIVERING_YET
     if (!deliveredFirstSubstantiveAppointment(referral)) return DeliveryState.MISSING_FIRST_SUBSTANTIVE_APPOINTMENT
 
     val numberOfSessionsWithAttendanceRecord = countSessionsWithAttendanceRecord(referral)
