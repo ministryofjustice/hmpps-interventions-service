@@ -53,6 +53,7 @@ class ReferralConcluder(
   }
 
   fun requiresEndOfServiceReportCreation(referral: Referral): Boolean {
+    // integration smell: we disable 'creation' for the UI if there is a started end-of-service report
     if (referral.endOfServiceReport != null) return false
     return deliveryState(referral).requiresEndOfServiceReport
   }
