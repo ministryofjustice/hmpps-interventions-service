@@ -205,7 +205,6 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     concludedAt: OffsetDateTime? = null,
 
     endOfServiceReport: EndOfServiceReport? = null,
-    completionDeadline: LocalDate? = null
   ): Referral {
     createDraft(
       id = id,

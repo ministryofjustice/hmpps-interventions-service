@@ -25,21 +25,27 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID
 
-internal class ReferralConcludedListenerTest {
-  private val snsPublisher = mock<SNSPublisher>()
-  private val referralFactory = ReferralFactory()
-  private val authUserFactory = AuthUserFactory()
+private val sentAtDefault = OffsetDateTime.of(2020, 1, 1, 1, 1, 1, 1, ZoneOffset.UTC)
+private val concludedAtDefault = OffsetDateTime.of(2020, 2, 2, 2, 2, 2, 2, ZoneOffset.UTC)
+private val submittedAtDefault = OffsetDateTime.of(2020, 3, 3, 3, 3, 3, 3, ZoneOffset.UTC)
 
-  private val listener = ReferralConcludedListener(snsPublisher)
-
-  private fun referralConcludedEvent(eventType: ReferralEventType) = ReferralEvent(
+private fun referralConcludedEvent(
+  eventType: ReferralEventType,
+  endOfServiceReport: EndOfServiceReport? = null
+): ReferralEvent {
+  val referralFactory = ReferralFactory()
+  val authUserFactory = AuthUserFactory()
+  return ReferralEvent(
     "source",
     eventType,
     referralFactory.createEnded(
       id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
       referenceNumber = "HAS71263",
-      concludedAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00"),
+      relevantSentenceId = 123456789,
+      sentAt = sentAtDefault,
+      concludedAt = concludedAtDefault,
       endRequestedBy = AuthUser("ecd7b8d690", "irrelevant", "irrelevant"),
+      endOfServiceReport = endOfServiceReport,
       assignments = listOf(
         ReferralAssignment(
           OffsetDateTime.parse("2020-12-04T10:42:43+00:00"),
@@ -50,6 +56,11 @@ internal class ReferralConcludedListenerTest {
     ),
     "http://localhost:8080/sent-referral/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"
   )
+}
+
+internal class ReferralConcludedListenerTest {
+  private val snsPublisher = mock<SNSPublisher>()
+  private val listener = ReferralConcludedListener(snsPublisher)
 
   @Test
   fun `publishes referral cancelled event message`() {
@@ -108,11 +119,6 @@ internal class ReferralConcludedListenerTest {
 
 internal class ReferralConcludedIntegrationListenerTest {
   private val communityAPIClient = mock<CommunityAPIClient>()
-
-  private val sentAtDefault = OffsetDateTime.of(2020, 1, 1, 1, 1, 1, 1, ZoneOffset.UTC)
-  private val concludedAtDefault = OffsetDateTime.of(2020, 2, 2, 2, 2, 2, 2, ZoneOffset.UTC)
-  private val submittedAtDefault = OffsetDateTime.of(2020, 3, 3, 3, 3, 3, 3, ZoneOffset.UTC)
-
   private val communityAPIService = ReferralConcludedIntegrationListener(
     "http://testUrl",
     "/pp/referral/{id}",
@@ -125,7 +131,7 @@ internal class ReferralConcludedIntegrationListenerTest {
 
   @Test
   fun `notify cancelled referral`() {
-    val event = getEvent(CANCELLED, concludedAtDefault)
+    val event = referralConcludedEvent(CANCELLED)
     communityAPIService.onApplicationEvent(event)
 
     verify(communityAPIClient).makeAsyncPostRequest(
@@ -145,7 +151,7 @@ internal class ReferralConcludedIntegrationListenerTest {
 
   @Test
   fun `notify prematurely ended referral`() {
-    val event = getEvent(PREMATURELY_ENDED, concludedAtDefault, endOfServiceReport)
+    val event = referralConcludedEvent(PREMATURELY_ENDED, endOfServiceReport = endOfServiceReport)
     communityAPIService.onApplicationEvent(event)
 
     val inOrder = inOrder(communityAPIClient)
@@ -180,13 +186,13 @@ internal class ReferralConcludedIntegrationListenerTest {
 
   @Test
   fun `notify prematurely ended throws exception when no end of service report exists`() {
-    val event = getEvent(PREMATURELY_ENDED, concludedAtDefault)
+    val event = referralConcludedEvent(PREMATURELY_ENDED)
     assertThrows<IllegalStateException> { communityAPIService.onApplicationEvent(event) }
   }
 
   @Test
   fun `notify completed referral`() {
-    val event = getEvent(COMPLETED, concludedAtDefault, endOfServiceReport)
+    val event = referralConcludedEvent(COMPLETED, endOfServiceReport = endOfServiceReport)
     communityAPIService.onApplicationEvent(event)
 
     val inOrder = inOrder(communityAPIClient)
@@ -221,30 +227,9 @@ internal class ReferralConcludedIntegrationListenerTest {
 
   @Test
   fun `notify cancelled referral throws exception when no end of service report exists`() {
-    val event = getEvent(COMPLETED, concludedAtDefault)
+    val event = referralConcludedEvent(COMPLETED)
     assertThrows<IllegalStateException> { communityAPIService.onApplicationEvent(event) }
   }
-
-  private fun getEvent(
-    referralEventType: ReferralEventType,
-    concludedAt: OffsetDateTime? = null,
-    endOfServiceReport: EndOfServiceReport? = null
-  ): ReferralEvent =
-    ReferralEvent(
-      "source",
-      referralEventType,
-      SampleData.sampleReferral(
-        id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
-        referenceNumber = "HAS71263",
-        crn = "X123456",
-        relevantSentenceId = 123456789,
-        serviceProviderName = "Harmony Living",
-        sentAt = sentAtDefault,
-        concludedAt = concludedAt,
-        endOfServiceReport = endOfServiceReport,
-      ),
-      "http://localhost:8080/sent-referral/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"
-    )
 
   private val endOfServiceReport =
     SampleData.sampleEndOfServiceReport(
