@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.listeners
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.CommunityAPIClient
@@ -15,7 +14,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.NotificationCreateRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralEndRequest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import java.time.OffsetDateTime
@@ -60,7 +58,7 @@ internal class ReferralConcludedListenerTest {
   private val listener = ReferralConcludedListener(snsPublisher)
 
   @Test
-  fun `publishes referral cancelled event message`() {
+  fun `publishes referral cancelled domain event`() {
     val referralConcludedEvent = referralConcludedEvent(ReferralConcludedState.CANCELLED)
     listener.onApplicationEvent(referralConcludedEvent)
     val snsEvent = EventDTO(
@@ -78,7 +76,7 @@ internal class ReferralConcludedListenerTest {
   }
 
   @Test
-  fun `publishes referral prematurely ended event message`() {
+  fun `publishes referral prematurely ended domain event`() {
     val referralConcludedEvent = referralConcludedEvent(ReferralConcludedState.PREMATURELY_ENDED)
     listener.onApplicationEvent(referralConcludedEvent)
     val snsEvent = EventDTO(
@@ -96,7 +94,7 @@ internal class ReferralConcludedListenerTest {
   }
 
   @Test
-  fun `publishes referral completed event message with actor as Interventions service user`() {
+  fun `publishes referral completed domain event with actor as Interventions service user`() {
     val referralConcludedEvent = referralConcludedEvent(ReferralConcludedState.COMPLETED)
     listener.onApplicationEvent(referralConcludedEvent)
     val snsEvent = EventDTO(
@@ -116,44 +114,20 @@ internal class ReferralConcludedListenerTest {
 
 internal class ReferralConcludedIntegrationListenerTest {
   private val communityAPIClient = mock<CommunityAPIClient>()
-  private val communityAPIService = ReferralConcludedIntegrationListener(
+  private val listener = ReferralConcludedIntegrationListener(
     "http://testUrl",
-    "/pp/referral/{id}",
     "/pp/referral/{id}/end-of-service-report",
-    "secure/offenders/crn/{crn}/referral/end/context/{contextName}",
     "secure/offenders/crn/{crn}/sentence/{sentenceId}/notifications/context/{contextName}",
     "commissioned-rehabilitation-services",
     communityAPIClient
   )
 
   @Test
-  fun `notify cancelled referral`() {
-    val event = referralConcludedEvent(ReferralConcludedState.CANCELLED)
-    communityAPIService.onApplicationEvent(event)
-
-    verify(communityAPIClient).makeAsyncPostRequest(
-      "secure/offenders/crn/X123456/referral/end/context/commissioned-rehabilitation-services",
-      ReferralEndRequest(
-        "ACC",
-        sentAtDefault,
-        concludedAtDefault,
-        123456789,
-        event.referral.id,
-        "CANCELLED",
-        "Referral Ended for Accommodation Referral HAS71263 with Prime Provider Harmony Living\n" +
-          "http://testUrl/pp/referral/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
-      )
-    )
-  }
-
-  @Test
-  fun `notify prematurely ended referral`() {
+  fun `notifies Delius that an end of service report has been submitted on a prematurely ended referral`() {
     val event = referralConcludedEvent(ReferralConcludedState.PREMATURELY_ENDED, endOfServiceReport)
-    communityAPIService.onApplicationEvent(event)
+    listener.onApplicationEvent(event)
 
-    val inOrder = inOrder(communityAPIClient)
-
-    inOrder.verify(communityAPIClient).makeSyncPostRequest(
+    verify(communityAPIClient).makeSyncPostRequest(
       "secure/offenders/crn/X123456/sentence/123456789/notifications/context/commissioned-rehabilitation-services",
       NotificationCreateRequestDTO(
         "ACC",
@@ -165,36 +139,20 @@ internal class ReferralConcludedIntegrationListenerTest {
       ),
       Unit::class.java
     )
-
-    inOrder.verify(communityAPIClient).makeAsyncPostRequest(
-      "secure/offenders/crn/X123456/referral/end/context/commissioned-rehabilitation-services",
-      ReferralEndRequest(
-        "ACC",
-        sentAtDefault,
-        concludedAtDefault,
-        123456789,
-        event.referral.id,
-        "PREMATURELY_ENDED",
-        "Referral Ended for Accommodation Referral HAS71263 with Prime Provider Harmony Living\n" +
-          "http://testUrl/pp/referral/120b1a45-8ac7-4920-b05b-acecccf4734b/end-of-service-report",
-      )
-    )
   }
 
   @Test
-  fun `notify prematurely ended throws exception when no end of service report exists`() {
+  fun `throws exception when called without end-of-service report on a prematurely ended referral`() {
     val event = referralConcludedEvent(ReferralConcludedState.PREMATURELY_ENDED)
-    assertThrows<IllegalStateException> { communityAPIService.onApplicationEvent(event) }
+    assertThrows<IllegalStateException> { listener.onApplicationEvent(event) }
   }
 
   @Test
-  fun `notify completed referral`() {
+  fun `notifies Delius that an end of service report has been submitted on a completed referral`() {
     val event = referralConcludedEvent(ReferralConcludedState.COMPLETED, endOfServiceReport)
-    communityAPIService.onApplicationEvent(event)
+    listener.onApplicationEvent(event)
 
-    val inOrder = inOrder(communityAPIClient)
-
-    inOrder.verify(communityAPIClient).makeSyncPostRequest(
+    verify(communityAPIClient).makeSyncPostRequest(
       "secure/offenders/crn/X123456/sentence/123456789/notifications/context/commissioned-rehabilitation-services",
       NotificationCreateRequestDTO(
         "ACC",
@@ -206,26 +164,12 @@ internal class ReferralConcludedIntegrationListenerTest {
       ),
       Unit::class.java
     )
-
-    inOrder.verify(communityAPIClient).makeAsyncPostRequest(
-      "secure/offenders/crn/X123456/referral/end/context/commissioned-rehabilitation-services",
-      ReferralEndRequest(
-        "ACC",
-        sentAtDefault,
-        concludedAtDefault,
-        123456789,
-        event.referral.id,
-        "COMPLETED",
-        "Referral Ended for Accommodation Referral HAS71263 with Prime Provider Harmony Living\n" +
-          "http://testUrl/pp/referral/120b1a45-8ac7-4920-b05b-acecccf4734b/end-of-service-report",
-      )
-    )
   }
 
   @Test
-  fun `notify cancelled referral throws exception when no end of service report exists`() {
+  fun `throws exception when called without end-of-service report on a completed referral`() {
     val event = referralConcludedEvent(ReferralConcludedState.COMPLETED)
-    assertThrows<IllegalStateException> { communityAPIService.onApplicationEvent(event) }
+    assertThrows<IllegalStateException> { listener.onApplicationEvent(event) }
   }
 
   private val endOfServiceReport =

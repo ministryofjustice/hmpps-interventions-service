@@ -28,6 +28,17 @@ class ReferralEvent(
   }
 }
 
+class ReferralEndingEvent(
+  source: Any,
+  val state: ReferralConcludedState,
+  val referral: Referral,
+  val detailUrl: String,
+) : ApplicationEvent(source) {
+  override fun toString(): String {
+    return "ReferralEndRequestedEvent(state=$state, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
+  }
+}
+
 class ReferralConcludedEvent(
   source: Any,
   val type: ReferralConcludedState,
@@ -66,8 +77,11 @@ class ReferralEventPublisher(
     applicationEventPublisher.publishEvent(ReferralEvent(this, ReferralEventType.NEEDS_AND_REQUIREMENTS_AMENDED, referral, getSentReferralURL(referral)))
   }
 
+  fun referralEndingEvent(referral: Referral, eventType: ReferralConcludedState) {
+    applicationEventPublisher.publishEvent(ReferralEndingEvent(this, eventType, referral, getSentReferralURL(referral)))
+  }
+
   fun referralConcludedEvent(referral: Referral, eventType: ReferralConcludedState) {
-    referral.currentAssignee ?: logger.warn("Concluding referral has no current assignment ${referral.id} for event type $eventType")
     applicationEventPublisher.publishEvent(ReferralConcludedEvent(this, eventType, referral, getSentReferralURL(referral)))
   }
 

@@ -14,7 +14,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfSe
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.CommunityAPIService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.NotificationCreateRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralEndRequest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.SNSService
 
 @Service
@@ -64,61 +63,25 @@ class ReferralConcludedListener(
 @Service
 class ReferralConcludedIntegrationListener(
   @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
-  @Value("\${interventions-ui.locations.probation-practitioner.referral-details}") private val ppReferralDetailsLocation: String,
   @Value("\${interventions-ui.locations.probation-practitioner.end-of-service-report}") private val ppEndOfServiceReportLocation: String,
-  @Value("\${community-api.locations.ended-referral}") private val communityAPIEndedReferralLocation: String,
   @Value("\${community-api.locations.notification-request}") private val communityAPINotificationLocation: String,
   @Value("\${community-api.integration-context}") private val integrationContext: String,
   private val communityAPIClient: CommunityAPIClient,
 ) : ApplicationListener<ReferralConcludedEvent>, CommunityAPIService {
   override fun onApplicationEvent(event: ReferralConcludedEvent) {
+    // this really is just the "end of service report submitted" event now
     when (event.type) {
-      ReferralConcludedState.CANCELLED,
-      -> {
-        val url = UriComponentsBuilder.fromHttpUrl(interventionsUIBaseURL)
-          .path(ppReferralDetailsLocation)
-          .buildAndExpand(event.referral.id)
-          .toString()
-
-        postReferralEndRequest(event, url)
-      }
-
+      ReferralConcludedState.CANCELLED -> {}
       ReferralConcludedState.PREMATURELY_ENDED,
       ReferralConcludedState.COMPLETED,
       -> {
-
         // This should be an independent event based notification
         // However a race condition arises with the referral end
         // notification. To Avoid a NSI not found in community-api
         // this must be sent and processed before referral end
         postSyncNotificationRequest(event.referral.endOfServiceReport)
-
-        val url = UriComponentsBuilder.fromHttpUrl(interventionsUIBaseURL)
-          .path(ppEndOfServiceReportLocation)
-          .buildAndExpand(event.referral.endOfServiceReport!!.id)
-          .toString()
-
-        postReferralEndRequest(event, url)
       }
     }
-  }
-
-  private fun postReferralEndRequest(event: ReferralConcludedEvent, url: String) {
-    val referralEndRequest = ReferralEndRequest(
-      event.referral.intervention.dynamicFrameworkContract.contractType.code,
-      event.referral.sentAt!!,
-      event.referral.concludedAt!!,
-      event.referral.relevantSentenceId!!,
-      event.referral.id,
-      event.type.name,
-      getNotes(event.referral, url, "Referral Ended"),
-    )
-
-    val communityApiSentReferralPath = UriComponentsBuilder.fromPath(communityAPIEndedReferralLocation)
-      .buildAndExpand(event.referral.serviceUserCRN, integrationContext)
-      .toString()
-
-    communityAPIClient.makeAsyncPostRequest(communityApiSentReferralPath, referralEndRequest)
   }
 
   private fun postSyncNotificationRequest(endOfServiceReport: EndOfServiceReport?) {
