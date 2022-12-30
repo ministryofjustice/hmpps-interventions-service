@@ -8,8 +8,11 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Ref
 import java.time.OffsetDateTime
 import javax.transaction.Transactional
 
-enum class DeliveryState {
-  NOT_DELIVERING_YET, MISSING_FIRST_SUBSTANTIVE_APPOINTMENT, IN_PROGRESS, COMPLETED
+enum class DeliveryState(val requiresEndOfServiceReport: Boolean) {
+  NOT_DELIVERING_YET(false),
+  MISSING_FIRST_SUBSTANTIVE_APPOINTMENT(false),
+  IN_PROGRESS(true),
+  COMPLETED(true),
 }
 
 enum class ReferralConcludedState {
@@ -47,14 +50,7 @@ class ReferralConcluder(
 
   fun requiresEndOfServiceReportCreation(referral: Referral): Boolean {
     if (referral.endOfServiceReport != null) return false
-
-    return when (deliveryState(referral)) {
-      DeliveryState.NOT_DELIVERING_YET,
-      DeliveryState.MISSING_FIRST_SUBSTANTIVE_APPOINTMENT -> false
-
-      DeliveryState.IN_PROGRESS -> true
-      DeliveryState.COMPLETED -> true
-    }
+    return deliveryState(referral).requiresEndOfServiceReport
   }
 
   private fun getConcludedEventType(referral: Referral): ReferralConcludedState? {
