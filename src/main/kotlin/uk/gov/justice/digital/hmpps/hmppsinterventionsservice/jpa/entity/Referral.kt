@@ -19,6 +19,7 @@ import javax.persistence.ManyToMany
 import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
 import javax.persistence.OneToOne
+import javax.persistence.OrderBy
 import javax.persistence.PrePersist
 import javax.persistence.PrimaryKeyJoinColumn
 import javax.persistence.Table
@@ -66,7 +67,8 @@ class Referral(
 
   var relevantSentenceId: Long? = null,
 
-  @OneToMany(fetch = FetchType.LAZY) @JoinColumn(name = "referral_id") var actionPlans: MutableList<ActionPlan>? = null,
+  @OneToMany(fetch = FetchType.LAZY) @OrderBy("createdAt")
+  @JoinColumn(name = "referral_id") var actionPlans: MutableList<ActionPlan>? = null,
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
