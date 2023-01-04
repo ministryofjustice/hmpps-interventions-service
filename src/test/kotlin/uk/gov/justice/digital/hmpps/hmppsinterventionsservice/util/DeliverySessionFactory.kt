@@ -106,21 +106,8 @@ class DeliverySessionFactory(em: TestEntityManager? = null) : EntityFactory(em) 
     id: UUID = UUID.randomUUID(),
     referral: Referral,
     sessionNumber: Int = 1,
-    createdAt: OffsetDateTime = OffsetDateTime.now(),
-    createdBy: AuthUser = referral.createdBy,
-    appointmentTime: OffsetDateTime = OffsetDateTime.now().plusMonths(1),
-    durationInMinutes: Int = 120,
-    deliusAppointmentId: Long? = null,
-    attended: Attended? = Attended.YES,
-    attendanceSubmittedAt: OffsetDateTime? = createdAt,
-    attendanceSubmittedBy: AuthUser? = createdBy,
-    additionalAttendanceInformation: String? = null,
-    notifyPPOfAttendanceBehaviour: Boolean? = false,
-    appointmentFeedbackSubmittedAt: OffsetDateTime? = attendanceSubmittedAt,
-    appointmentFeedbackSubmittedBy: AuthUser? = createdBy,
-    appointment: MutableSet<Appointment> = mutableSetOf<Appointment>()
+    appointment: MutableSet<Appointment> = mutableSetOf()
   ): DeliverySession {
-
     return save(
       DeliverySession(
         id = id,

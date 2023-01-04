@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
@@ -177,7 +176,7 @@ class DeliverySessionService(
     deliverySession.appointments.add(appointmentToSchedule)
     return deliverySessionRepository.saveAndFlush(deliverySession).also {
       // Occurring after saving the session to ensure that session has the latest appointment attached when publishing the session feedback event.
-      setAttendanceAndBehaviourIfHistoricAppointment(deliverySession, appointmentToSchedule, appointmentTime, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, scheduledBy)
+      setAttendanceAndBehaviourIfHistoricAppointment(deliverySession, appointmentToSchedule, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, scheduledBy)
     }
   }
 
@@ -229,7 +228,7 @@ class DeliverySessionService(
     deliverySessionRepository.save(session)
     return deliverySessionRepository.save(session).also {
       // Occuring after saving the session to ensure that session has the latest appointment attached when publishing the session feedback event.
-      setAttendanceAndBehaviourIfHistoricAppointment(session, appointment, appointmentTime, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, updatedBy)
+      setAttendanceAndBehaviourIfHistoricAppointment(session, appointment, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, updatedBy)
     }
   }
 
@@ -261,11 +260,11 @@ class DeliverySessionService(
     attended: Attended,
     additionalInformation: String?
   ): Pair<DeliverySession, Appointment> {
-    var sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
+    val sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
     if (sessionAndAppointment.second.appointmentTime.isAfter(OffsetDateTime.now())) {
       throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot submit feedback for a future appointment [id=${sessionAndAppointment.second.id}]")
     }
-    var updatedAppointment = appointmentService.recordAppointmentAttendance(sessionAndAppointment.second, attended, additionalInformation, actor)
+    val updatedAppointment = appointmentService.recordAppointmentAttendance(sessionAndAppointment.second, attended, additionalInformation, actor)
     return Pair(sessionAndAppointment.first, updatedAppointment)
   }
 
@@ -297,8 +296,8 @@ class DeliverySessionService(
     behaviourDescription: String,
     notifyProbationPractitioner: Boolean,
   ): Pair<DeliverySession, Appointment> {
-    var sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
-    var updatedAppointment = appointmentService.recordBehaviour(sessionAndAppointment.second, behaviourDescription, notifyProbationPractitioner, actor)
+    val sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
+    val updatedAppointment = appointmentService.recordBehaviour(sessionAndAppointment.second, behaviourDescription, notifyProbationPractitioner, actor)
     return Pair(sessionAndAppointment.first, updatedAppointment)
   }
 
@@ -338,7 +337,7 @@ class DeliverySessionService(
   }
 
   fun submitSessionFeedback(referralId: UUID, appointmentId: UUID, submitter: AuthUser): Pair<DeliverySession, Appointment> {
-    var sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
+    val sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
     val appointment = sessionAndAppointment.second
     if (appointment.appointmentTime.isAfter(OffsetDateTime.now())) {
       throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot submit feedback for a future appointment [id=${appointment.id}]")
@@ -355,14 +354,9 @@ class DeliverySessionService(
     return getDeliverySessionOrThrowException(referralId, sessionNumber)
   }
 
-  fun getSession(deliverySessionId: UUID): DeliverySession {
-    return deliverySessionRepository.findByIdOrNull(deliverySessionId) ?: throw EntityNotFoundException("Delivery session not found [deliverySessionId=$deliverySessionId]")
-  }
-
   private fun setAttendanceAndBehaviourIfHistoricAppointment(
     session: DeliverySession,
     appointment: Appointment,
-    appointmentTime: OffsetDateTime,
     attended: Attended?,
     additionalAttendanceInformation: String?,
     behaviourDescription: String?,
