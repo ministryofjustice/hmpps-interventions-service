@@ -183,6 +183,7 @@ workflows:
     jobs:
       - pact_check_and_publish:
           consumer_tags: << pipeline.parameters.pact_consumer_tags >>
+          context: [hmpps-common-vars]
 
   build_test_and_deploy:
     unless: << pipeline.parameters.only_pacts >>
