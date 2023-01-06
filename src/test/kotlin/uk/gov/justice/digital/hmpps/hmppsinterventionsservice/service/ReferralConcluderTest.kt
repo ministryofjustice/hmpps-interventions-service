@@ -51,78 +51,66 @@ internal class ReferralConcluderTest {
     val endingWith: ReferralConcludedState? = null,
     val concludesWith: ReferralConcludedState? = null,
   )
-  data class Example(
-    val state: WhenInState,
-    val beforeCancel: ExpectThat,
-    val afterCancel: ExpectThat,
-    val afterEoSR: ExpectThat? = null,
-  )
 
   companion object {
+    private val notStarted = named(
+      "no sessions have any attendance",
+      WhenInState(attendedOrLate = 0, notAttended = 0, notStarted = 1)
+    )
+    private val finishedNoFSA = named(
+      "finished delivery, without first substantive appointment (FSA)",
+      WhenInState(attendedOrLate = 0, notAttended = 1, notStarted = 0)
+    )
+    private val inProgressNoFSA = named(
+      "in-progress delivery, without first substantive appointment (FSA)",
+      WhenInState(attendedOrLate = 0, notAttended = 1, notStarted = 1)
+    )
+    private val inProgressWithFSA = named(
+      "in-progress delivery, with first substantive appointment (FSA)",
+      WhenInState(attendedOrLate = 1, notAttended = 0, notStarted = 1)
+    )
+    private val finishedWithDidNotAttendWithFSA = named(
+      "finished delivery, some missed sessions, with first substantive appointment (FSA)",
+      WhenInState(attendedOrLate = 1, notAttended = 1, notStarted = 0)
+    )
+    private val finishedAllAttended = named(
+      "finished delivery, fully attended delivery",
+      WhenInState(attendedOrLate = 2, notAttended = 0, notStarted = 0)
+    )
+
     @JvmStatic
-    fun examples(): Stream<Arguments> = Stream.of(
+    fun inProgressExamples(): Stream<Arguments> = Stream.of(
+      arguments(notStarted, ExpectThat(requiresEoSR = false)),
+      arguments(finishedNoFSA, ExpectThat(requiresEoSR = false)),
+      arguments(inProgressNoFSA, ExpectThat(requiresEoSR = false)),
+      arguments(inProgressWithFSA, ExpectThat(requiresEoSR = false)),
+      arguments(finishedWithDidNotAttendWithFSA, ExpectThat(requiresEoSR = true)),
+      arguments(finishedAllAttended, ExpectThat(requiresEoSR = true)),
+    )
+
+    @JvmStatic
+    fun afterCancelExamples(): Stream<Arguments> = Stream.of(
+      arguments(notStarted, ExpectThat(requiresEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED)),
+      arguments(finishedNoFSA, ExpectThat(requiresEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED)),
+      arguments(inProgressNoFSA, ExpectThat(requiresEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED)),
+      arguments(inProgressWithFSA, ExpectThat(requiresEoSR = true, endingWith = PREMATURELY_ENDED)),
+      arguments(finishedWithDidNotAttendWithFSA, ExpectThat(requiresEoSR = true, endingWith = COMPLETED)),
+      arguments(finishedAllAttended, ExpectThat(requiresEoSR = true, endingWith = COMPLETED)),
+    )
+
+    @JvmStatic
+    fun afterEoSRSubmittedExamples(): Stream<Arguments> = Stream.of(
       arguments(
-        named(
-          "no sessions have any attendance",
-          Example(
-            state = WhenInState(attendedOrLate = 0, notAttended = 0, notStarted = 1),
-            beforeCancel = ExpectThat(requiresEoSR = false),
-            afterCancel = ExpectThat(requiresEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED),
-          )
-        )
+        inProgressWithFSA,
+        ExpectThat(requiresEoSR = false, endingWith = PREMATURELY_ENDED, concludesWith = PREMATURELY_ENDED)
       ),
       arguments(
-        named(
-          "finished delivery, without first substantive appointment (FSA)",
-          Example(
-            state = WhenInState(attendedOrLate = 0, notAttended = 1, notStarted = 0),
-            beforeCancel = ExpectThat(requiresEoSR = false),
-            afterCancel = ExpectThat(requiresEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED),
-          )
-        )
+        finishedWithDidNotAttendWithFSA,
+        ExpectThat(requiresEoSR = false, endingWith = COMPLETED, concludesWith = COMPLETED)
       ),
       arguments(
-        named(
-          "in-progress delivery, without first substantive appointment (FSA)",
-          Example(
-            state = WhenInState(attendedOrLate = 0, notAttended = 1, notStarted = 1),
-            beforeCancel = ExpectThat(requiresEoSR = false),
-            afterCancel = ExpectThat(requiresEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED),
-          )
-        )
-      ),
-      arguments(
-        named(
-          "in-progress delivery, with first substantive appointment (FSA)",
-          Example(
-            state = WhenInState(attendedOrLate = 1, notAttended = 0, notStarted = 1),
-            beforeCancel = ExpectThat(requiresEoSR = false),
-            afterCancel = ExpectThat(requiresEoSR = true, endingWith = PREMATURELY_ENDED),
-            afterEoSR = ExpectThat(requiresEoSR = false, endingWith = PREMATURELY_ENDED, concludesWith = PREMATURELY_ENDED),
-          )
-        )
-      ),
-      arguments(
-        named(
-          "finished delivery, some missed sessions, with first substantive appointment (FSA)",
-          Example(
-            state = WhenInState(attendedOrLate = 1, notAttended = 1, notStarted = 0),
-            beforeCancel = ExpectThat(requiresEoSR = true),
-            afterCancel = ExpectThat(requiresEoSR = true, endingWith = COMPLETED),
-            afterEoSR = ExpectThat(requiresEoSR = false, endingWith = COMPLETED, concludesWith = COMPLETED),
-          )
-        )
-      ),
-      arguments(
-        named(
-          "finished delivery, fully attended delivery",
-          Example(
-            state = WhenInState(attendedOrLate = 2, notAttended = 0, notStarted = 0),
-            beforeCancel = ExpectThat(requiresEoSR = true),
-            afterCancel = ExpectThat(requiresEoSR = true, endingWith = COMPLETED),
-            afterEoSR = ExpectThat(requiresEoSR = false, endingWith = COMPLETED, concludesWith = COMPLETED),
-          )
-        )
+        finishedAllAttended,
+        ExpectThat(requiresEoSR = false, endingWith = COMPLETED, concludesWith = COMPLETED)
       ),
     )
   }
@@ -139,54 +127,57 @@ internal class ReferralConcluderTest {
     return referral
   }
 
-  @ParameterizedTest(name = "{displayName} {index}: {0}")
-  @MethodSource("examples")
-  fun `in-progress referral EoSR check`(example: Example) {
-    val referral = createReferralWithSessions(example.state)
+  @ParameterizedTest
+  @MethodSource("inProgressExamples")
+  fun `in-progress referral EoSR check`(state: WhenInState, expectation: ExpectThat) {
+    val referral = createReferralWithSessions(state)
 
-    assertThat(concluder.requiresEndOfServiceReportCreation(referral)).isEqualTo(example.beforeCancel.requiresEoSR)
+    assertThat(concluder.requiresEndOfServiceReportCreation(referral))
+      .describedAs("requires end-of-service report")
+      .isEqualTo(expectation.requiresEoSR)
   }
 
-  @ParameterizedTest(name = "{displayName} {index}: {0}")
-  @MethodSource("examples")
-  fun `cancelled referrals EoSR check`(example: Example) {
-    val referral = createReferralWithSessions(example.state)
+  @ParameterizedTest
+  @MethodSource("afterCancelExamples")
+  fun `cancelled referrals EoSR check`(state: WhenInState, expectation: ExpectThat) {
+    val referral = createReferralWithSessions(state)
     // not great -- this should be a service for atomic operation
     referral.endRequestedAt = OffsetDateTime.now()
     referral.endRequestedBy = AuthUser.interventionsServiceUser
     referral.endRequestedReason = CancellationReason("TST", "Test")
 
-    assertThat(concluder.requiresEndOfServiceReportCreation(referral)).isEqualTo(example.afterCancel.requiresEoSR)
+    assertThat(concluder.requiresEndOfServiceReportCreation(referral))
+      .describedAs("requires end-of-service report")
+      .isEqualTo(expectation.requiresEoSR)
   }
 
-  @ParameterizedTest(name = "{displayName} {index}: {0}")
-  @MethodSource("examples")
-  fun `cancelled referrals event check`(example: Example) {
-    val referral = createReferralWithSessions(example.state)
+  @ParameterizedTest
+  @MethodSource("afterCancelExamples")
+  fun `cancelled referrals event check`(state: WhenInState, expectation: ExpectThat) {
+    val referral = createReferralWithSessions(state)
     // not great -- this should be a service for atomic operation
     referral.endRequestedAt = OffsetDateTime.now()
     referral.endRequestedBy = AuthUser.interventionsServiceUser
     referral.endRequestedReason = CancellationReason("TST", "Test")
 
     concluder.concludeIfEligible(referral)
-    verifyEndingWith(referral, example.afterCancel.endingWith)
-    verifyConcludesWith(referral, example.afterCancel.concludesWith)
+    verifyEndingWith(referral, expectation.endingWith)
+    verifyConcludesWith(referral, expectation.concludesWith)
   }
 
-  @ParameterizedTest(name = "{displayName} {index}: {0}")
-  @MethodSource("examples")
-  fun `referrals with submitted end-of-service reports`(example: Example) {
-    if (example.afterEoSR == null) {
-      return
-    }
-
-    val referral = createReferralWithSessions(example.state)
+  @ParameterizedTest
+  @MethodSource("afterEoSRSubmittedExamples")
+  fun `referrals with submitted end-of-service reports`(state: WhenInState, expectation: ExpectThat) {
+    val referral = createReferralWithSessions(state)
     referral.endOfServiceReport = endOfServiceReportFactory.create(referral = referral, submittedAt = OffsetDateTime.now())
 
-    assertThat(concluder.requiresEndOfServiceReportCreation(referral)).isEqualTo(example.afterEoSR.requiresEoSR)
+    assertThat(concluder.requiresEndOfServiceReportCreation(referral))
+      .describedAs("requires end-of-service report")
+      .isEqualTo(expectation.requiresEoSR)
+
     concluder.concludeIfEligible(referral)
-    verifyEndingWith(referral, example.afterEoSR.endingWith)
-    verifyConcludesWith(referral, example.afterEoSR.concludesWith)
+    verifyEndingWith(referral, expectation.endingWith)
+    verifyConcludesWith(referral, expectation.concludesWith)
   }
 
   private fun verifyEndingWith(referral: Referral, endingWith: ReferralConcludedState?) {
@@ -200,8 +191,6 @@ internal class ReferralConcluderTest {
   private fun verifyConcludesWith(referral: Referral, concludesWith: ReferralConcludedState?) {
     if (concludesWith != null) {
       verifySaveWithConcludedAtSet(referral)
-    }
-    if (concludesWith != null) {
       verify(referralEventPublisher).referralConcludedEvent(same(referral), eq(concludesWith))
     } else {
       verify(referralEventPublisher, never()).referralConcludedEvent(same(referral), any())
