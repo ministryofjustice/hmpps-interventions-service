@@ -45,7 +45,7 @@ internal class ReferralConcluderTest {
     referralRepository, deliverySessionRepository, referralEventPublisher
   )
 
-  data class WhenInState(val attendedOrLate: Int, val notAttended: Int, val notStarted: Int)
+  data class WhenInState(val attendedOrLate: Int, val notAttended: Int, val withoutOutcome: Int)
   data class ExpectThat(
     val requiresEoSR: Boolean,
     val endingWith: ReferralConcludedState? = null,
@@ -55,47 +55,50 @@ internal class ReferralConcluderTest {
   companion object {
     private val notStarted = named(
       "no sessions have any attendance",
-      WhenInState(attendedOrLate = 0, notAttended = 0, notStarted = 1)
+      WhenInState(attendedOrLate = 0, notAttended = 0, withoutOutcome = 1)
     )
-    private val finishedNoFSA = named(
+    private val allSessionsHaveOutcomeNoFSA = named(
       "finished delivery, without first substantive appointment (FSA)",
-      WhenInState(attendedOrLate = 0, notAttended = 1, notStarted = 0)
+      WhenInState(attendedOrLate = 0, notAttended = 1, withoutOutcome = 0)
     )
     private val inProgressNoFSA = named(
       "in-progress delivery, without first substantive appointment (FSA)",
-      WhenInState(attendedOrLate = 0, notAttended = 1, notStarted = 1)
+      WhenInState(attendedOrLate = 0, notAttended = 1, withoutOutcome = 1)
     )
     private val inProgressWithFSA = named(
       "in-progress delivery, with first substantive appointment (FSA)",
-      WhenInState(attendedOrLate = 1, notAttended = 0, notStarted = 1)
+      WhenInState(attendedOrLate = 1, notAttended = 0, withoutOutcome = 1)
     )
-    private val finishedWithDidNotAttendWithFSA = named(
-      "finished delivery, some missed sessions, with first substantive appointment (FSA)",
-      WhenInState(attendedOrLate = 1, notAttended = 1, notStarted = 0)
+    private val allSessionsHaveOutcomeSomeDNAWithFSA = named(
+      "finished delivery, some missed/did not attend (DNA) sessions, with first substantive appointment (FSA)",
+      WhenInState(attendedOrLate = 1, notAttended = 1, withoutOutcome = 0)
     )
-    private val finishedAllAttended = named(
+    private val allSessionsHaveOutcomeAllAttendedWithFSA = named(
       "finished delivery, fully attended delivery",
-      WhenInState(attendedOrLate = 2, notAttended = 0, notStarted = 0)
+      WhenInState(attendedOrLate = 2, notAttended = 0, withoutOutcome = 0)
     )
 
     @JvmStatic
     fun inProgressExamples(): Stream<Arguments> = Stream.of(
       arguments(notStarted, ExpectThat(requiresEoSR = false)),
-      arguments(finishedNoFSA, ExpectThat(requiresEoSR = false)),
+      arguments(allSessionsHaveOutcomeNoFSA, ExpectThat(requiresEoSR = false)),
       arguments(inProgressNoFSA, ExpectThat(requiresEoSR = false)),
       arguments(inProgressWithFSA, ExpectThat(requiresEoSR = false)),
-      arguments(finishedWithDidNotAttendWithFSA, ExpectThat(requiresEoSR = true)),
-      arguments(finishedAllAttended, ExpectThat(requiresEoSR = true)),
+      arguments(allSessionsHaveOutcomeSomeDNAWithFSA, ExpectThat(requiresEoSR = true)),
+      arguments(allSessionsHaveOutcomeAllAttendedWithFSA, ExpectThat(requiresEoSR = true)),
     )
 
     @JvmStatic
     fun afterCancelExamples(): Stream<Arguments> = Stream.of(
       arguments(notStarted, ExpectThat(requiresEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED)),
-      arguments(finishedNoFSA, ExpectThat(requiresEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED)),
+      arguments(
+        allSessionsHaveOutcomeNoFSA,
+        ExpectThat(requiresEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED)
+      ),
       arguments(inProgressNoFSA, ExpectThat(requiresEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED)),
       arguments(inProgressWithFSA, ExpectThat(requiresEoSR = true, endingWith = PREMATURELY_ENDED)),
-      arguments(finishedWithDidNotAttendWithFSA, ExpectThat(requiresEoSR = true, endingWith = COMPLETED)),
-      arguments(finishedAllAttended, ExpectThat(requiresEoSR = true, endingWith = COMPLETED)),
+      arguments(allSessionsHaveOutcomeSomeDNAWithFSA, ExpectThat(requiresEoSR = true, endingWith = COMPLETED)),
+      arguments(allSessionsHaveOutcomeAllAttendedWithFSA, ExpectThat(requiresEoSR = true, endingWith = COMPLETED)),
     )
 
     @JvmStatic
@@ -105,18 +108,18 @@ internal class ReferralConcluderTest {
         ExpectThat(requiresEoSR = false, endingWith = PREMATURELY_ENDED, concludesWith = PREMATURELY_ENDED)
       ),
       arguments(
-        finishedWithDidNotAttendWithFSA,
+        allSessionsHaveOutcomeSomeDNAWithFSA,
         ExpectThat(requiresEoSR = false, endingWith = COMPLETED, concludesWith = COMPLETED)
       ),
       arguments(
-        finishedAllAttended,
+        allSessionsHaveOutcomeAllAttendedWithFSA,
         ExpectThat(requiresEoSR = false, endingWith = COMPLETED, concludesWith = COMPLETED)
       ),
     )
   }
 
   private fun createReferralWithSessions(state: WhenInState): Referral {
-    val totalSessions = state.attendedOrLate + state.notAttended + state.notStarted
+    val totalSessions = state.attendedOrLate + state.notAttended + state.withoutOutcome
 
     val actionPlan = actionPlanFactory.createApproved(numberOfSessions = totalSessions)
     val referral = referralFactory.createSent(actionPlans = mutableListOf(actionPlan))
@@ -169,7 +172,8 @@ internal class ReferralConcluderTest {
   @MethodSource("afterEoSRSubmittedExamples")
   fun `referrals with submitted end-of-service reports`(state: WhenInState, expectation: ExpectThat) {
     val referral = createReferralWithSessions(state)
-    referral.endOfServiceReport = endOfServiceReportFactory.create(referral = referral, submittedAt = OffsetDateTime.now())
+    referral.endOfServiceReport =
+      endOfServiceReportFactory.create(referral = referral, submittedAt = OffsetDateTime.now())
 
     assertThat(concluder.requiresEndOfServiceReportCreation(referral))
       .describedAs("requires end-of-service report")
