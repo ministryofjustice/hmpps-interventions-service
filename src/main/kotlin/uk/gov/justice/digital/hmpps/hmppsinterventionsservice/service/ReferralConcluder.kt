@@ -9,11 +9,15 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Ref
 import java.time.OffsetDateTime
 import javax.transaction.Transactional
 
-enum class DeliveryState(val requiresEndOfServiceReport: Boolean, val concludedState: ReferralConcludedState) {
-  NOT_DELIVERING_YET(false, ReferralConcludedState.CANCELLED),
-  MISSING_FIRST_SUBSTANTIVE_APPOINTMENT(false, ReferralConcludedState.CANCELLED),
-  IN_PROGRESS(true, ReferralConcludedState.PREMATURELY_ENDED),
-  COMPLETED(true, ReferralConcludedState.COMPLETED),
+enum class DeliveryState(
+  val requiresEndOfServiceReport: Boolean,
+  val inProgress: Boolean,
+  val concludedState: ReferralConcludedState
+) {
+  NOT_DELIVERING_YET(false, true, ReferralConcludedState.CANCELLED),
+  MISSING_FIRST_SUBSTANTIVE_APPOINTMENT(false, true, ReferralConcludedState.CANCELLED),
+  IN_PROGRESS(true, true, ReferralConcludedState.PREMATURELY_ENDED),
+  COMPLETED(true, false, ReferralConcludedState.COMPLETED),
 }
 
 enum class ReferralEndState {
@@ -66,7 +70,12 @@ class ReferralConcluder(
   fun requiresEndOfServiceReportCreation(referral: Referral): Boolean {
     // integration smell: we disable 'creation' for the UI if there is a started end-of-service report
     if (referral.endOfServiceReport != null) return false
-    return deliveryState(referral).requiresEndOfServiceReport
+
+    val state = deliveryState(referral)
+    val notCancelled = referral.endRequestedAt == null
+    if (state.inProgress && notCancelled) return false
+
+    return state.requiresEndOfServiceReport
   }
 
   private fun endState(deliveryState: DeliveryState, endOfServiceReport: EndOfServiceReport?): ReferralEndState {
