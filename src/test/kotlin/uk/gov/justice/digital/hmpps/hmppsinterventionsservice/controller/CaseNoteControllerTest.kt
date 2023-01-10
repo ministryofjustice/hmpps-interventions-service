@@ -45,6 +45,7 @@ class CaseNoteControllerTest {
       val referralId = caseNote.referral.id
       val createCaseNoteDTO = CreateCaseNoteDTO(referralId = referralId, subject = "subject", body = "body")
 
+      whenever(authUserRepository.save(any())).thenReturn(user)
       whenever(referralService.getSentReferralForUser(id = referralId, user = user)).thenReturn(referralFactory.createSent(id = referralId))
       whenever(caseNoteService.createCaseNote(referralId = referralId, subject = "subject", body = "body", sentByUser = user)).thenReturn(caseNote)
 
@@ -59,6 +60,7 @@ class CaseNoteControllerTest {
       val referralId = caseNote.referral.id
       val createCaseNoteDTO = CreateCaseNoteDTO(referralId = referralId, subject = "subject", body = "body")
       whenever(referralService.getSentReferralForUser(id = referralId, user = user)).thenReturn(null)
+      whenever(authUserRepository.save(any())).thenReturn(user)
       val e = assertThrows<ResponseStatusException> {
         caseNoteController.createCaseNote(createCaseNoteDTO, userToken)
       }
@@ -78,6 +80,7 @@ class CaseNoteControllerTest {
       val caseNote = caseNoteFactory.create(subject = "subject", body = "body")
       whenever(referralService.getSentReferralForUser(id = referralId, user = user)).thenReturn(referralFactory.createSent(id = referralId))
       whenever(caseNoteService.findByReferral(referralId, pageable = pageable)).thenReturn(PageImpl(listOf(caseNote)))
+      whenever(authUserRepository.save(any())).thenReturn(user)
 
       val caseNotes = caseNoteController.getCaseNotes(pageable, referralId = referralId, authentication = userToken)
       assertThat(caseNotes.numberOfElements).isEqualTo(1)
@@ -94,6 +97,7 @@ class CaseNoteControllerTest {
       val referralId = UUID.randomUUID()
 
       whenever(referralService.getSentReferralForUser(id = referralId, user = user)).thenReturn(null)
+      whenever(authUserRepository.save(any())).thenReturn(user)
 
       val e = assertThrows<ResponseStatusException> {
         caseNoteController.getCaseNotes(Pageable.ofSize(1), referralId = referralId, authentication = userToken)
@@ -109,6 +113,7 @@ class CaseNoteControllerTest {
     fun `can get an individual case note`() {
       val id = UUID.randomUUID()
       val caseNote = caseNoteFactory.create(id = id, subject = "subject", body = "body")
+      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
       whenever(caseNoteService.getCaseNoteForUser(id, caseNote.sentBy)).thenReturn(caseNote)
 
       val caseNoteDTO = caseNoteController.getCaseNote(id, tokenFactory.create(caseNote.sentBy))
@@ -118,6 +123,7 @@ class CaseNoteControllerTest {
     @Test
     fun `returns not found when the case note does not exist`() {
       whenever(caseNoteService.getCaseNoteForUser(any(), any())).thenReturn(null)
+      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
 
       val e = assertThrows<EntityNotFoundException> {
         caseNoteController.getCaseNote(UUID.randomUUID(), tokenFactory.create(authUserFactory.createSP()))
