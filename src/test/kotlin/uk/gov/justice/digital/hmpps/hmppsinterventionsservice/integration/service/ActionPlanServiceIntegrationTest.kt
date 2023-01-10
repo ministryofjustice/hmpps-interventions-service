@@ -3,9 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.servi
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.ActionPlanValidator
@@ -14,7 +12,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.Integr
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DeliverySessionService
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 
 class ActionPlanServiceIntegrationTest @Autowired constructor(
   val actionPlanValidator: ActionPlanValidator,
