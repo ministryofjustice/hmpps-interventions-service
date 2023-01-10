@@ -20,6 +20,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState.CANCELLED
@@ -34,6 +35,7 @@ import java.util.stream.Stream
 
 internal class ReferralConcluderTest {
   private val referralRepository: ReferralRepository = mock()
+  private val actionPlanRepository: ActionPlanRepository = mock()
   private val deliverySessionRepository: DeliverySessionRepository = mock()
   private val referralEventPublisher: ReferralEventPublisher = mock()
 
@@ -42,7 +44,7 @@ internal class ReferralConcluderTest {
   private val endOfServiceReportFactory = EndOfServiceReportFactory()
 
   private val concluder = ReferralConcluder(
-    referralRepository, deliverySessionRepository, referralEventPublisher
+    referralRepository, deliverySessionRepository, actionPlanRepository, referralEventPublisher
   )
 
   data class WhenInState(val attendedOrLate: Int, val notAttended: Int, val withoutOutcome: Int)

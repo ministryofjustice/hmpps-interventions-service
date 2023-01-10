@@ -1,15 +1,19 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
+import org.springframework.web.util.UriComponentsBuilder
 import java.lang.RuntimeException
 import java.net.URI
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.findAnnotation
 
 @Component
-class LocationMapper {
+class LocationMapper(
+  @Value("\${interventions-api.baseurl}") private val interventionsApiBaseUrl: String
+) {
   // This method appends the path onto the end of the current requests URL
   // e.g. current request URL http://interventions.go.uk/draft-referral + path referral/{id}
   //      returns http://interventions.go.uk/draft-referral/referral/1123456
@@ -21,7 +25,11 @@ class LocationMapper {
   // e.g. current request URL http://interventions.go.uk/draft-referral + path referral/{id}
   //      returns http://interventions.go.uk/referral/1123456
   fun expandPathToCurrentContextPathUrl(path: String, vararg uriVariableValues: Any): URI {
-    return ServletUriComponentsBuilder.fromCurrentContextPath().path(path).buildAndExpand(*uriVariableValues).toUri()
+    return UriComponentsBuilder
+      .fromHttpUrl(interventionsApiBaseUrl)
+      .path(path)
+      .buildAndExpand(*uriVariableValues)
+      .toUri()
   }
 
   fun getPathFromControllerMethod(method: KFunction<*>): String {
