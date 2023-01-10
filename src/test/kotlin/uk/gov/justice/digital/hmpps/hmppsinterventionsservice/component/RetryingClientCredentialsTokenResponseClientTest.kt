@@ -47,7 +47,7 @@ class RetryingClientCredentialsTokenResponseClientTest : LoggingSpyTest(Retrying
 
     val tokenConfig = TokenRequestConfig(
       connectTimeoutMs = 50,
-      readTimeoutMs = 50,
+      readTimeoutMs = 100,
       retries = 3,
       retryDelayMs = 0,
     )
