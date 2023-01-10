@@ -12,10 +12,8 @@ import org.springframework.batch.item.ItemWriter
 import org.springframework.batch.item.database.HibernateCursorItemReader
 import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.OnStartupJobLauncherFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
@@ -26,13 +24,8 @@ class ChangelogMigrationJobConfiguration(
   private val jobBuilderFactory: JobBuilderFactory,
   private val stepBuilderFactory: StepBuilderFactory,
   private val jobListener: ChangelogMigrationJobListener,
-  private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
   @Value("\${spring.batch.jobs.migration.changelog.chunk-size}") private val chunkSize: Int
 ) {
-  @Bean
-  fun changelogMigrationJobLauncher(changelogMigrationJob: Job): ApplicationRunner {
-    return onStartupJobLauncherFactory.makeBatchLauncher(changelogMigrationJob)
-  }
 
   @Bean
   @JobScope
