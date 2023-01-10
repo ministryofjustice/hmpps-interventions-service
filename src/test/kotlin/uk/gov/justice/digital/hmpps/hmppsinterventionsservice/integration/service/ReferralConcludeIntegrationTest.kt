@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.*
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcluder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
@@ -23,11 +20,12 @@ import java.time.OffsetDateTime
 class ReferralConcludeIntegrationTest @Autowired constructor(
   val entityManager: TestEntityManager,
   val referralRepository: ReferralRepository,
+  val actionPlanRepository: ActionPlanRepository,
   val deliverySessionRepository: DeliverySessionRepository,
   val authUserRepository: AuthUserRepository,
   val appointmentRepository: AppointmentRepository,
 
-) {
+  ) {
   private val actionPlanFactory = ActionPlanFactory(entityManager)
   private val appointmentFactory = AppointmentFactory(entityManager)
   private val deliverySessionFactory = DeliverySessionFactory(entityManager)
@@ -41,7 +39,7 @@ class ReferralConcludeIntegrationTest @Autowired constructor(
 
   @Test
   fun `an action plan number of sessions should be the same even with more than one appointment`() {
-    val referralConcludeCheck = ReferralConcluder(referralRepository, deliverySessionRepository, referralEventPublisher)
+    val referralConcludeCheck = ReferralConcluder(referralRepository, deliverySessionRepository, actionPlanRepository, referralEventPublisher)
     val actionPlan = actionPlanFactory.createApproved(numberOfSessions = 1)
     actionPlan.referral.actionPlans = mutableListOf(actionPlan)
 
