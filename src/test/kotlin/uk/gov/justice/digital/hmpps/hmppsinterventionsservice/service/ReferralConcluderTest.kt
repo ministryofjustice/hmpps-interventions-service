@@ -47,7 +47,7 @@ internal class ReferralConcluderTest {
 
   data class WhenInState(val attendedOrLate: Int, val notAttended: Int, val withoutOutcome: Int)
   data class ExpectThat(
-    val requiresEoSR: Boolean,
+    val canStartEoSR: Boolean,
     val endingWith: ReferralConcludedState? = null,
     val concludesWith: ReferralConcludedState? = null,
   )
@@ -80,40 +80,40 @@ internal class ReferralConcluderTest {
 
     @JvmStatic
     fun inProgressExamples(): Stream<Arguments> = Stream.of(
-      arguments(notStarted, ExpectThat(requiresEoSR = false)),
-      arguments(allSessionsHaveOutcomeNoFSA, ExpectThat(requiresEoSR = false)),
-      arguments(inProgressNoFSA, ExpectThat(requiresEoSR = false)),
-      arguments(inProgressWithFSA, ExpectThat(requiresEoSR = false)),
-      arguments(allSessionsHaveOutcomeSomeDNAWithFSA, ExpectThat(requiresEoSR = true)),
-      arguments(allSessionsHaveOutcomeAllAttendedWithFSA, ExpectThat(requiresEoSR = true)),
+      arguments(notStarted, ExpectThat(canStartEoSR = false)),
+      arguments(allSessionsHaveOutcomeNoFSA, ExpectThat(canStartEoSR = false)),
+      arguments(inProgressNoFSA, ExpectThat(canStartEoSR = false)),
+      arguments(inProgressWithFSA, ExpectThat(canStartEoSR = false)),
+      arguments(allSessionsHaveOutcomeSomeDNAWithFSA, ExpectThat(canStartEoSR = true)),
+      arguments(allSessionsHaveOutcomeAllAttendedWithFSA, ExpectThat(canStartEoSR = true)),
     )
 
     @JvmStatic
     fun afterCancelExamples(): Stream<Arguments> = Stream.of(
-      arguments(notStarted, ExpectThat(requiresEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED)),
+      arguments(notStarted, ExpectThat(canStartEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED)),
       arguments(
         allSessionsHaveOutcomeNoFSA,
-        ExpectThat(requiresEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED)
+        ExpectThat(canStartEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED)
       ),
-      arguments(inProgressNoFSA, ExpectThat(requiresEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED)),
-      arguments(inProgressWithFSA, ExpectThat(requiresEoSR = true, endingWith = PREMATURELY_ENDED)),
-      arguments(allSessionsHaveOutcomeSomeDNAWithFSA, ExpectThat(requiresEoSR = true, endingWith = COMPLETED)),
-      arguments(allSessionsHaveOutcomeAllAttendedWithFSA, ExpectThat(requiresEoSR = true, endingWith = COMPLETED)),
+      arguments(inProgressNoFSA, ExpectThat(canStartEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED)),
+      arguments(inProgressWithFSA, ExpectThat(canStartEoSR = true, endingWith = PREMATURELY_ENDED)),
+      arguments(allSessionsHaveOutcomeSomeDNAWithFSA, ExpectThat(canStartEoSR = true, endingWith = COMPLETED)),
+      arguments(allSessionsHaveOutcomeAllAttendedWithFSA, ExpectThat(canStartEoSR = true, endingWith = COMPLETED)),
     )
 
     @JvmStatic
     fun afterEoSRSubmittedExamples(): Stream<Arguments> = Stream.of(
       arguments(
         inProgressWithFSA,
-        ExpectThat(requiresEoSR = false, endingWith = PREMATURELY_ENDED, concludesWith = PREMATURELY_ENDED)
+        ExpectThat(canStartEoSR = false, endingWith = PREMATURELY_ENDED, concludesWith = PREMATURELY_ENDED)
       ),
       arguments(
         allSessionsHaveOutcomeSomeDNAWithFSA,
-        ExpectThat(requiresEoSR = false, endingWith = COMPLETED, concludesWith = COMPLETED)
+        ExpectThat(canStartEoSR = false, endingWith = COMPLETED, concludesWith = COMPLETED)
       ),
       arguments(
         allSessionsHaveOutcomeAllAttendedWithFSA,
-        ExpectThat(requiresEoSR = false, endingWith = COMPLETED, concludesWith = COMPLETED)
+        ExpectThat(canStartEoSR = false, endingWith = COMPLETED, concludesWith = COMPLETED)
       ),
     )
   }
@@ -137,7 +137,7 @@ internal class ReferralConcluderTest {
 
     assertThat(concluder.requiresEndOfServiceReportCreation(referral))
       .describedAs("requires end-of-service report")
-      .isEqualTo(expectation.requiresEoSR)
+      .isEqualTo(expectation.canStartEoSR)
   }
 
   @ParameterizedTest
@@ -151,7 +151,7 @@ internal class ReferralConcluderTest {
 
     assertThat(concluder.requiresEndOfServiceReportCreation(referral))
       .describedAs("requires end-of-service report")
-      .isEqualTo(expectation.requiresEoSR)
+      .isEqualTo(expectation.canStartEoSR)
   }
 
   @ParameterizedTest
@@ -177,7 +177,7 @@ internal class ReferralConcluderTest {
 
     assertThat(concluder.requiresEndOfServiceReportCreation(referral))
       .describedAs("requires end-of-service report")
-      .isEqualTo(expectation.requiresEoSR)
+      .isEqualTo(expectation.canStartEoSR)
 
     concluder.concludeIfEligible(referral)
     verifyEndingWith(referral, expectation.endingWith)
