@@ -129,6 +129,8 @@ internal class ReferralConcluderTest {
       .thenReturn(state.attendedOrLate)
     whenever(deliverySessionRepository.countNumberOfSessionsWithAttendanceRecord(referral.id))
       .thenReturn(state.attendedOrLate + state.notAttended)
+    whenever(actionPlanRepository.findAllByReferralIdAndApprovedAtIsNotNull(referral.id))
+      .thenReturn(referral.actionPlans)
     return referral
   }
 
