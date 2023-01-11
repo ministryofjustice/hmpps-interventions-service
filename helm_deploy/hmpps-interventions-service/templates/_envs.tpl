@@ -121,5 +121,5 @@ env:
         key: bucket_name
 
   - name: INTERVENTIONSAPI_BASEURL
-      value: "{{ .Values.ingress.hosts[0] }}"
+    value: "{{ index .Values.ingress.hosts 0 }}"
 {{- end -}}
