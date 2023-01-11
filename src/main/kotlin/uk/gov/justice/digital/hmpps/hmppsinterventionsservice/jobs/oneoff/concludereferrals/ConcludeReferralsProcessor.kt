@@ -20,5 +20,4 @@ class ConcludeReferralsProcessor(
     referralConcluder.concludeIfEligible(referral)
     return referral
   }
-
 }

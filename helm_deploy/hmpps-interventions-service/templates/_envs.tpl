@@ -119,4 +119,7 @@ env:
       secretKeyRef:
         name: reporting-s3-bucket
         key: bucket_name
+
+  - name: INTERVENTIONSAPI_BASEURL
+      value: "{{ .Values.ingress.hosts[0] }}"
 {{- end -}}
