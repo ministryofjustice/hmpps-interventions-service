@@ -17,7 +17,7 @@ internal class ConcludeReferralsReaderTest @Autowired constructor(
   @Test
   fun `finds referrals that have no attended sessions and have a cancellation request`() {
     val endedReferral = setupAssistant.createEndedReferral()
-    setupAssistant.createDeliverySession(1,120, OffsetDateTime.parse("2021-05-13T13:30:00+01:00"), Attended.NO, referral = endedReferral)
+    setupAssistant.createDeliverySession(1, 120, OffsetDateTime.parse("2021-05-13T13:30:00+01:00"), Attended.NO, referral = endedReferral)
 
     reader.open(ExecutionContext())
     assertThat(reader.read()?.id).isEqualTo(endedReferral.id)
@@ -26,7 +26,7 @@ internal class ConcludeReferralsReaderTest @Autowired constructor(
   @Test
   fun `skips referrals that have attended sessions and have a cancellation request`() {
     val endedReferral = setupAssistant.createEndedReferral()
-    setupAssistant.createDeliverySession(1,120, OffsetDateTime.parse("2021-05-13T13:30:00+01:00"), Attended.YES, referral = endedReferral)
+    setupAssistant.createDeliverySession(1, 120, OffsetDateTime.parse("2021-05-13T13:30:00+01:00"), Attended.YES, referral = endedReferral)
 
     reader.open(ExecutionContext())
     assertThat(reader.read()).isNull()
@@ -35,7 +35,7 @@ internal class ConcludeReferralsReaderTest @Autowired constructor(
   @Test
   fun `skips referrals that have already been concluded`() {
     val completedReferral = setupAssistant.createCompletedReferral()
-    setupAssistant.createDeliverySession(1,120, OffsetDateTime.parse("2021-05-13T13:30:00+01:00"), Attended.NO, referral = completedReferral)
+    setupAssistant.createDeliverySession(1, 120, OffsetDateTime.parse("2021-05-13T13:30:00+01:00"), Attended.NO, referral = completedReferral)
 
     reader.open(ExecutionContext())
     assertThat(reader.read()).isNull()
