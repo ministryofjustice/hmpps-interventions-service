@@ -172,6 +172,7 @@ jobs:
           command: |
             wget https://github.com/mikefarah/yq/releases/download/v4.9.6/yq_linux_amd64.tar.gz -O - |\
               tar xz && mv yq_linux_amd64 yq
+            helm dependency update "$CIRCLE_PROJECT_REPONAME"
             helm template "$CIRCLE_PROJECT_REPONAME" "$CIRCLE_PROJECT_REPONAME" --values=values-dev.yaml | \
               ./yq e 'select(.kind != "Service" and .kind != "Ingress")' - | \
               kubectl apply --dry-run=server -f -

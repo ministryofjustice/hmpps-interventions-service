@@ -3,3 +3,8 @@ appVersion: "1.0"
 description: A Helm chart for Kubernetes
 name: hmpps-interventions-service
 version: 0.1.0
+
+dependencies:
+  - name: generic-data-analytics-extractor
+    version: 0.1.4
+    repository: https://ministryofjustice.github.io/hmpps-helm-charts

@@ -1,0 +1,6 @@
+dependencies:
+- name: generic-data-analytics-extractor
+  repository: https://ministryofjustice.github.io/hmpps-helm-charts
+  version: 0.1.4
+digest: sha256:e50863b3f2d3f79ef358a6907875f5fe7e308aa05292dc8f080d3cbe9864e02b
+generated: "2023-01-11T09:57:09.048475Z"
