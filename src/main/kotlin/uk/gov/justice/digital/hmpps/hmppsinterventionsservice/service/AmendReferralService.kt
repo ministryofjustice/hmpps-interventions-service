@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
+import org.springframework.context.annotation.Lazy
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
@@ -12,9 +13,12 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOu
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogUpdateDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SelectedDesiredOutcomesMapping
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ComplexityLevelRepository
@@ -47,7 +51,7 @@ class AmendReferralService(
   private val complexityLevelRepository: ComplexityLevelRepository,
   private val desiredOutcomeRepository: DesiredOutcomeRepository,
   private val userMapper: UserMapper,
-  private val referralService: ReferralService
+  @Lazy private val referralService: ReferralService
 ) {
 
   fun updateComplexityLevel(referralId: UUID, update: AmendComplexityLevelDTO, serviceCategoryId: UUID, authentication: JwtAuthenticationToken) {
@@ -238,6 +242,39 @@ class AmendReferralService(
     return ChangelogUpdateDTO(changelog)
   }
 
+  private fun processChangeLog(
+    amendTopic: AmendTopic,
+    oldValue: ReferralAmendmentDetails,
+    newValue: ReferralAmendmentDetails,
+    referralId: UUID,
+    actor: AuthUser,
+    update: UpdateReferralDetailsDTO
+  ) {
+    val changelog = Changelog(
+      referralId,
+      UUID.randomUUID(),
+      amendTopic,
+      oldValue,
+      newValue,
+      update.reasonForChange,
+      OffsetDateTime.now(),
+      actor
+    )
+
+    changelogRepository.save(changelog)
+  }
+
+  fun logChanges(referralDetails: ReferralDetails, update: UpdateReferralDetailsDTO, actor: AuthUser) {
+    if (update.completionDeadline != null) {
+      val oldValue = ReferralAmendmentDetails(listOf(referralDetails.completionDeadline.toString()))
+      val newValue = ReferralAmendmentDetails(listOf(update.completionDeadline.toString()))
+      processChangeLog(AmendTopic.COMPLETION_DATETIME, oldValue, newValue, referralDetails.referralId, actor, update)
+    } else {
+      val oldValue = ReferralAmendmentDetails(listOf(referralDetails.maximumEnforceableDays.toString()))
+      val newValue = ReferralAmendmentDetails(listOf(update.maximumEnforceableDays.toString()))
+      processChangeLog(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS, oldValue, newValue, referralDetails.referralId, actor, update)
+    }
+  }
   private fun generateDescription(values: List<String>): String {
     val booleanValue = values.first { it == "true" || it == "false" }
     return if (booleanValue == "true") "Yes-${values.first { it != "true" }}" else "No"

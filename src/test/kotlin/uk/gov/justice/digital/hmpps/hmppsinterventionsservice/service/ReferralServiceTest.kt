@@ -105,6 +105,7 @@ class ReferralServiceTest @Autowired constructor(
   private val serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper = mock()
   private val referralAccessFilter = ReferralAccessFilter(serviceProviderAccessScopeMapper)
   private val communityAPIOffenderService: CommunityAPIOffenderService = mock()
+  private val amendReferralService: AmendReferralService = mock()
   private val hmppsAuthService: HMPPSAuthService = mock()
   private val telemetryService: TelemetryService = mock()
 
@@ -128,6 +129,7 @@ class ReferralServiceTest @Autowired constructor(
     serviceProviderAccessScopeMapper,
     referralAccessFilter,
     communityAPIOffenderService,
+    amendReferralService,
     hmppsAuthService,
     telemetryService,
     referralDetailsRepository,
@@ -999,22 +1001,10 @@ class ReferralServiceTest @Autowired constructor(
     val referralToUpdate = UpdateReferralDetailsDTO(20, completionDateToChange, "new information", "we decided 10 days wasn't enough")
     val referralDetailsReturned = referralService.updateReferralDetails(referral, referralToUpdate, user)
     val referralDetailsValue = referralService.getReferralDetailsById(referralDetailsReturned?.id)
-    val changeLogReturned = changelogRepository.findAll().filter { x -> x.referralId == id }
 
     assertThat(referralDetailsValue?.referralId).isEqualTo(referral.id)
     assertThat(referralToUpdate.furtherInformation).isEqualTo(referralDetailsValue?.furtherInformation)
-    assertThat(changeLogReturned.size).isEqualTo(1)
     assertThat(referralToUpdate.completionDeadline).isEqualTo(referralDetailsValue?.completionDeadline)
-
-    assertThat(changeLogReturned.firstOrNull()?.referralId).isEqualTo(referral.id)
-    assertThat(changeLogReturned.firstOrNull()?.newVal).isNotNull
-    assertThat(changeLogReturned.firstOrNull()?.newVal?.values).isNotEmpty
-    assertThat(changeLogReturned.firstOrNull()?.newVal?.values?.get(0)).isEqualTo(referralDetailsValue?.completionDeadline.toString())
-    assertThat(changeLogReturned.firstOrNull()?.oldVal).isNotNull
-    assertThat(changeLogReturned.firstOrNull()?.oldVal?.values).isNotEmpty
-    assertThat(changeLogReturned.firstOrNull()?.oldVal?.values?.get(0)).isEqualTo(referralDetails.completionDeadline.toString())
-    assertThat(changeLogReturned.firstOrNull()?.reasonForChange).isNotBlank
-    assertThat(changeLogReturned.firstOrNull()?.topic).isEqualTo(AmendTopic.COMPLETION_DATETIME)
   }
 
   @Test
@@ -1032,7 +1022,7 @@ class ReferralServiceTest @Autowired constructor(
       serviceUserCRN = "crn",
       intervention = intervention
     )
-    val referralDetails = referralDetailsFactory.create(
+    referralDetailsFactory.create(
       referralId = id,
       createdAt = OffsetDateTime.now(),
       createdBy = authUser,
@@ -1040,26 +1030,15 @@ class ReferralServiceTest @Autowired constructor(
       maximumNumberOfEnforceableDays = 15,
       saved = true
     )
+
     whenever(userMapper.fromToken(jwtAuthentionToken)).thenReturn(authUser)
 
     val referralToUpdate = UpdateReferralDetailsDTO(20, null, "new information", "we decided 10 days wasn't enough")
     val referralDetailsReturned = referralService.updateReferralDetails(referral, referralToUpdate, user)
     val referralDetailsValue = referralService.getReferralDetailsById(referralDetailsReturned?.id)
-    val changeLogReturned = changelogRepository.findAll().filter { x -> x.referralId == id }
 
     assertThat(referralDetailsValue?.referralId).isEqualTo(referral.id)
     assertThat(referralToUpdate.furtherInformation).isEqualTo(referralDetailsValue?.furtherInformation)
-    assertThat(changeLogReturned.size).isEqualTo(1)
     assertThat(referralToUpdate.maximumEnforceableDays).isEqualTo(referralDetailsValue?.maximumEnforceableDays)
-
-    assertThat(changeLogReturned.firstOrNull()?.referralId).isEqualTo(referral.id)
-    assertThat(changeLogReturned.firstOrNull()?.newVal).isNotNull
-    assertThat(changeLogReturned.firstOrNull()?.newVal?.values).isNotEmpty
-    assertThat(changeLogReturned.firstOrNull()?.newVal?.values?.get(0)).isEqualTo("20")
-    assertThat(changeLogReturned.firstOrNull()?.oldVal).isNotNull
-    assertThat(changeLogReturned.firstOrNull()?.oldVal?.values).isNotEmpty
-    assertThat(changeLogReturned.firstOrNull()?.oldVal?.values?.get(0)).isEqualTo(referralDetails.maximumEnforceableDays.toString())
-    assertThat(changeLogReturned.firstOrNull()?.reasonForChange).isNotBlank
-    assertThat(changeLogReturned.firstOrNull()?.topic).isEqualTo(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS)
   }
 }

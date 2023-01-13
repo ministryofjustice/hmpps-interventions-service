@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
 import mu.KotlinLogging
 import net.logstash.logback.argument.StructuredArguments.kv
+import org.springframework.context.annotation.Lazy
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.domain.Specification.not
@@ -15,12 +16,10 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.Serv
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserTypeChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.AccessError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DashboardType
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
@@ -67,6 +66,7 @@ class ReferralService(
   val serviceProviderUserAccessScopeMapper: ServiceProviderAccessScopeMapper,
   val referralAccessFilter: ReferralAccessFilter,
   val communityAPIOffenderService: CommunityAPIOffenderService,
+  @Lazy val amendReferralService: AmendReferralService,
   val hmppsAuthService: HMPPSAuthService,
   val telemetryService: TelemetryService,
   val referralDetailsRepository: ReferralDetailsRepository,
@@ -231,7 +231,8 @@ class ReferralService(
       existingDetails?.furtherInformation,
       existingDetails?.maximumEnforceableDays,
     )
-    logChanges(
+
+    amendReferralService.logChanges(
       existingDetails!!,
       update,
       actor
@@ -259,40 +260,6 @@ class ReferralService(
     }
 
     return newDetails
-  }
-
-  private fun processChangeLog(
-    amendTopic: AmendTopic,
-    oldValue: ReferralAmendmentDetails,
-    newValue: ReferralAmendmentDetails,
-    referralId: UUID,
-    actor: AuthUser,
-    update: UpdateReferralDetailsDTO
-  ) {
-    val changelog = Changelog(
-      referralId,
-      UUID.randomUUID(),
-      amendTopic,
-      oldValue,
-      newValue,
-      update.reasonForChange,
-      OffsetDateTime.now(),
-      actor
-    )
-
-    changelogRepository.save(changelog)
-  }
-
-  private fun logChanges(referralDetails: ReferralDetails, update: UpdateReferralDetailsDTO, actor: AuthUser) {
-    if (update.completionDeadline != null) {
-      val oldValue = ReferralAmendmentDetails(listOf(referralDetails.completionDeadline.toString()))
-      val newValue = ReferralAmendmentDetails(listOf(update.completionDeadline.toString()))
-      processChangeLog(AmendTopic.COMPLETION_DATETIME, oldValue, newValue, referralDetails.referralId, actor, update)
-    } else {
-      val oldValue = ReferralAmendmentDetails(listOf(referralDetails.maximumEnforceableDays.toString()))
-      val newValue = ReferralAmendmentDetails(listOf(update.maximumEnforceableDays.toString()))
-      processChangeLog(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS, oldValue, newValue, referralDetails.referralId, actor, update)
-    }
   }
 
   fun getCancellationReasons(): List<CancellationReason> {
