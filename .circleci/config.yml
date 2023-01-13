@@ -214,7 +214,7 @@ workflows:
               ignore: [main]
       - hmpps/trivy_pipeline_scan:
           name: vulnerability_scan
-          additional_args: --debug --timeout 20m
+          additional_args: --debug --offline-scan
           requires: [build_docker, build_and_publish_docker]
       - hmpps/deploy_env:
           name: deploy_dev
@@ -294,7 +294,7 @@ workflows:
             - veracode-credentials
       - hmpps/trivy_latest_scan:
           slack_channel: "interventions-dev-notifications"
-          additional_args: --debug --timeout 20m
+          additional_args: --debug --timeout 30m
           context: [hmpps-common-vars]
       - hmpps/gradle_owasp_dependency_check:
           cache_key: "v2-bump"
