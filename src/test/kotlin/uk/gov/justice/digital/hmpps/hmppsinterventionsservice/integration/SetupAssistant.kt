@@ -508,6 +508,7 @@ class SetupAssistant(
     attendanceInfo: String? = null,
     behaviour: String? = null,
     notifyPPOfBehaviour: Boolean? = null,
+    appointmentFeedbackSubmittedAt: OffsetDateTime? = null,
     appointmentDeliveryType: AppointmentDeliveryType? = null,
     appointmentSessionType: AppointmentSessionType = AppointmentSessionType.ONE_TO_ONE,
     appointmentDeliveryAddress: AddressDTO? = null,
@@ -526,6 +527,7 @@ class SetupAssistant(
       attendanceBehaviour = behaviour,
       attendanceBehaviourSubmittedAt = if (behaviour != null) now else null,
       notifyPPOfAttendanceBehaviour = notifyPPOfBehaviour,
+      appointmentFeedbackSubmittedAt = appointmentFeedbackSubmittedAt,
       referral = referral
     )
     appointmentRepository.save(appointment)
