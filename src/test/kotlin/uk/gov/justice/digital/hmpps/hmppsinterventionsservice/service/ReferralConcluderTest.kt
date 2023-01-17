@@ -23,6 +23,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.findLatestApprovedActionPlan
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState.CANCELLED
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState.COMPLETED
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState.PREMATURELY_ENDED
@@ -131,6 +132,8 @@ internal class ReferralConcluderTest {
       .thenReturn(state.attendedOrLate + state.notAttended)
     whenever(actionPlanRepository.findAllByReferralIdAndApprovedAtIsNotNull(referral.id))
       .thenReturn(referral.actionPlans)
+    whenever(actionPlanRepository.findLatestApprovedActionPlan(referral.id))
+      .thenReturn(actionPlan)
     return referral
   }
 

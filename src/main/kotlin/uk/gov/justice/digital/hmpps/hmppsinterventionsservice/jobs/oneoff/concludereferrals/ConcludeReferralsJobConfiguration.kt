@@ -28,16 +28,8 @@ class ConcludeReferralsJobConfiguration(
 
   @Bean
   fun concludeReferralsJob(concludeReferralToInterventionStep: Step): Job {
-    val validator = DefaultJobParametersValidator()
-    validator.setRequiredKeys(
-      arrayOf(
-        "timestamp",
-      )
-    )
-
     return jobBuilderFactory["concludeReferralsJob"]
       .incrementer(TimestampIncrementer())
-      .validator(validator)
       .start(concludeReferralToInterventionStep)
       .build()
   }
