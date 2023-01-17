@@ -20,7 +20,7 @@ class ConcludeReferralsProcessor(
   override fun process(referral: Referral): Referral {
     logger.info("processing referral {} for conclude", kv("referralId", referral.id))
     val numberOfSessionsWithAttendanceRecord = deliverySessionRepository.countNumberOfSessionsWithAttendanceRecord(referral.id)
-    val numberOfSessionsWithNoAttendance = deliverySessionRepository.countNumberOfNoAttendedSessions(referral.id)
+    val numberOfSessionsWithNoAttendance = deliverySessionRepository.countNumberOfNotAttendedSessions(referral.id)
     if (numberOfSessionsWithAttendanceRecord == numberOfSessionsWithNoAttendance) {
       referralConcluder.concludeIfEligible(referral)
     }

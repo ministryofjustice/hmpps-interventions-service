@@ -18,7 +18,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.Timestam
 class ConcludeReferralsJobConfiguration(
   private val jobBuilderFactory: JobBuilderFactory,
   private val stepBuilderFactory: StepBuilderFactory,
-  private val listener: ConcludeReferralsJobListener,
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
 ) {
 
@@ -39,7 +38,6 @@ class ConcludeReferralsJobConfiguration(
     return jobBuilderFactory["concludeReferralsJob"]
       .incrementer(TimestampIncrementer())
       .validator(validator)
-      .listener(listener)
       .start(concludeReferralToInterventionStep)
       .build()
   }

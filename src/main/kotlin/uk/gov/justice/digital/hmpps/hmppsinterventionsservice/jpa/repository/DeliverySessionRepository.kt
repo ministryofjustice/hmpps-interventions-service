@@ -42,5 +42,5 @@ interface DeliverySessionRepository : JpaRepository<DeliverySession, UUID> {
       "where sesh.referral.id = :referralId and appt.attended in ('NO') " +
       "and appt.appointmentFeedbackSubmittedAt is not null"
   )
-  fun countNumberOfNoAttendedSessions(referralId: UUID): Int
+  fun countNumberOfNotAttendedSessions(referralId: UUID): Int
 }
