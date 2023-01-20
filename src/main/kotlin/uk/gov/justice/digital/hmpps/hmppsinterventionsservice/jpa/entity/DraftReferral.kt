@@ -1,8 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
+import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode.JOIN
 import org.hibernate.annotations.Type
+import org.hibernate.annotations.TypeDef
 import java.time.OffsetDateTime
 import java.util.UUID
 import javax.persistence.CascadeType
@@ -30,6 +32,7 @@ enum class PersonCurrentLocationType {
 }
 
 @Entity
+@TypeDef(name = "person_current_location_type", typeClass = PostgreSQLEnumType::class)
 @Table(name = "draft_referral", indexes = [Index(columnList = "created_by_id")])
 class DraftReferral(
   // draft referral fields
