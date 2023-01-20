@@ -56,11 +56,11 @@ class ReferralServiceUnitTest {
   private val referralAccessFilter: ReferralAccessFilter = mock()
   private val userTypeChecker: UserTypeChecker = mock()
   private val communityAPIOffenderService: CommunityAPIOffenderService = mock()
+  private val amendReferralService: AmendReferralService = mock()
   private val hmppsAuthService: HMPPSAuthService = mock()
   private val telemetryService: TelemetryService = mock()
   private val referralDetailsRepository: ReferralDetailsRepository = mock()
   private val changeLogRepository: ChangelogRepository = mock()
-  private val changeLogMigrationService: ChangeLogMigrationService = mock()
 
   private val referralFactory = ReferralFactory()
   private val authUserFactory = AuthUserFactory()
@@ -83,11 +83,11 @@ class ReferralServiceUnitTest {
     serviceProviderAccessScopeMapper,
     referralAccessFilter,
     communityAPIOffenderService,
+    amendReferralService,
     hmppsAuthService,
     telemetryService,
     referralDetailsRepository,
-    changeLogRepository,
-    changeLogMigrationService
+    changeLogRepository
   )
 
   @Test

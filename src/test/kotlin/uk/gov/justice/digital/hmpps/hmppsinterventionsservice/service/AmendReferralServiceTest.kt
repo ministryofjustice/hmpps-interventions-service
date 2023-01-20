@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.User
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOutcomesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
@@ -32,9 +33,12 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Ref
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ChangeLogFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralDetailsFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
+import java.time.OffsetDateTime
 import java.util.Optional
 import java.util.UUID
 
@@ -55,6 +59,8 @@ class AmendReferralServiceTest @Autowired constructor(
   private val referralEventPublisher: ReferralEventPublisher = mock()
   private val userFactory = AuthUserFactory(entityManager)
   private val referralFactory = ReferralFactory(entityManager)
+  private val interventionFactory = InterventionFactory(entityManager)
+  private val referralDetailsFactory = ReferralDetailsFactory(entityManager)
   private val serviceCategoryFactory = ServiceCategoryFactory(entityManager)
   private val changeLogFactory = ChangeLogFactory(entityManager)
   private val referralService: ReferralService = mock()
@@ -460,5 +466,50 @@ class AmendReferralServiceTest @Autowired constructor(
       amendReferralService.getChangeLogById(uuid1, jwtAuthenticationToken)
     }
     assertThat(exception.message).contains("Change log not found for [id=$uuid1]")
+  }
+  @Test
+  fun `log change writes changelog data`() {
+    val user = userFactory.create("pp_user_1", "delius")
+    val description = "15 days is never enough"
+    val id = UUID.randomUUID()
+    val intervention = interventionFactory.create(description = description)
+
+    val referral = referralFactory.createSent(
+      createdAt = OffsetDateTime.now(),
+      createdBy = user,
+      id = id,
+      sentAt = OffsetDateTime.now(),
+      serviceUserCRN = "crn",
+      intervention = intervention
+    )
+    val referralDetails = referralDetailsFactory.create(
+      referralId = id,
+      createdAt = OffsetDateTime.now(),
+      createdBy = user,
+      id = UUID.randomUUID(),
+      maximumNumberOfEnforceableDays = 15,
+      saved = true
+    )
+
+    val referralToUpdate = UpdateReferralDetailsDTO(20, null, "new information", "we decided 10 days wasn't enough")
+
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
+    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+
+    val uuid1 = UUID.randomUUID()
+
+    amendReferralService.logChanges(referralDetails, referralToUpdate, user)
+    val changeLogReturned = changelogRepository.findAll().filter { x -> x.referralId == id }
+    assertThat(changeLogReturned.size).isEqualTo(1)
+
+    assertThat(changeLogReturned.firstOrNull()?.referralId).isEqualTo(referral.id)
+    assertThat(changeLogReturned.firstOrNull()?.newVal).isNotNull
+    assertThat(changeLogReturned.firstOrNull()?.newVal?.values).isNotEmpty
+    assertThat(changeLogReturned.firstOrNull()?.newVal?.values?.get(0)).isEqualTo("20")
+    assertThat(changeLogReturned.firstOrNull()?.oldVal).isNotNull
+    assertThat(changeLogReturned.firstOrNull()?.oldVal?.values).isNotEmpty
+    assertThat(changeLogReturned.firstOrNull()?.oldVal?.values?.get(0)).isEqualTo(referralDetails.maximumEnforceableDays.toString())
+    assertThat(changeLogReturned.firstOrNull()?.reasonForChange).isNotBlank
+    assertThat(changeLogReturned.firstOrNull()?.topic).isEqualTo(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS)
   }
 }

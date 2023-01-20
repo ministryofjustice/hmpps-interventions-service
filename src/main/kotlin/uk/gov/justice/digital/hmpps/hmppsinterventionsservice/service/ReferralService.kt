@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
 import mu.KotlinLogging
 import net.logstash.logback.argument.StructuredArguments.kv
+import org.springframework.context.annotation.Lazy
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.domain.Specification.not
@@ -65,11 +66,11 @@ class ReferralService(
   val serviceProviderUserAccessScopeMapper: ServiceProviderAccessScopeMapper,
   val referralAccessFilter: ReferralAccessFilter,
   val communityAPIOffenderService: CommunityAPIOffenderService,
+  @Lazy val amendReferralService: AmendReferralService,
   val hmppsAuthService: HMPPSAuthService,
   val telemetryService: TelemetryService,
   val referralDetailsRepository: ReferralDetailsRepository,
   val changelogRepository: ChangelogRepository,
-  val changeLogMigrationService: ChangeLogMigrationService
 ) {
   companion object {
     private val logger = KotlinLogging.logger {}
@@ -230,9 +231,12 @@ class ReferralService(
       existingDetails?.furtherInformation,
       existingDetails?.maximumEnforceableDays,
     )
-    val amendValue = if (update.completionDeadline != null) update.completionDeadline.toString() else update.maximumEnforceableDays.toString()
-    val topic = if (update.completionDeadline != null) AmendTopic.COMPLETION_DATETIME else AmendTopic.MAXIMUM_ENFORCEABLE_DAYS
-    changeLogMigrationService.logChanges(existingDetails!!, amendValue, topic, actor, update.reasonForChange)
+
+    amendReferralService.logChanges(
+      existingDetails!!,
+      update,
+      actor
+    )
 
     update.completionDeadline?.let {
       newDetails.completionDeadline = it
