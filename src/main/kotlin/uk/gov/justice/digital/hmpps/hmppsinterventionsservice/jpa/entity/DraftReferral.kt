@@ -46,7 +46,7 @@ class DraftReferral(
 
   var relevantSentenceId: Long? = null,
 
-  @Type(type = "attended") @Enumerated(EnumType.STRING) var personCurrentLocationType: PersonCurrentLocationType? = null,
+  @Type(type = "person_current_location_type") @Enumerated(EnumType.STRING) var personCurrentLocationType: PersonCurrentLocationType? = null,
   var personCustodyPrisonId: String? = null,
 
   @ManyToMany(fetch = FetchType.LAZY)
