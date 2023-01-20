@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SelectedDesiredOutcomesMapping
@@ -108,6 +109,7 @@ class DraftReferralService(
     updateServiceUserNeeds(referral, update)
     updateDraftRiskInformation(referral, update)
     updateServiceCategoryDetails(referral, update)
+    updatePersonCurrentLocation(referral, update)
 
     // this field doesn't fit into any other categories - is this a smell?
     update.relevantSentenceId?.let {
@@ -183,6 +185,16 @@ class DraftReferralService(
     referralDetailsRepository.saveAndFlush(newDetails)
 
     return newDetails
+  }
+
+  fun updatePersonCurrentLocation(draftReferral: DraftReferral, update: DraftReferralDTO) {
+    update.personCurrentLocationType?.let {
+      if (it == PersonCurrentLocationType.CUSTODY) {
+        draftReferral.personCustodyPrisonId =
+          update.personCustodyPrisonId ?: throw ServerWebInputException("current location cannot be updated: no custody prison id selected.")
+      }
+      draftReferral.personCurrentLocationType = it
+    }
   }
 
   private fun updateServiceUserNeeds(draftReferral: DraftReferral, update: DraftReferralDTO) {

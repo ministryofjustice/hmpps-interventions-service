@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode.JOIN
+import org.hibernate.annotations.Type
 import java.time.OffsetDateTime
 import java.util.UUID
 import javax.persistence.CascadeType
@@ -9,6 +10,8 @@ import javax.persistence.CollectionTable
 import javax.persistence.Column
 import javax.persistence.ElementCollection
 import javax.persistence.Entity
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
 import javax.persistence.FetchType
 import javax.persistence.Id
 import javax.persistence.Index
@@ -21,6 +24,10 @@ import javax.persistence.OneToOne
 import javax.persistence.PrimaryKeyJoinColumn
 import javax.persistence.Table
 import javax.validation.constraints.NotNull
+
+enum class PersonCurrentLocationType {
+  CUSTODY, COMMUNITY
+}
 
 @Entity
 @Table(name = "draft_referral", indexes = [Index(columnList = "created_by_id")])
@@ -38,6 +45,9 @@ class DraftReferral(
   var whenUnavailable: String? = null,
 
   var relevantSentenceId: Long? = null,
+
+  @Type(type = "attended") @Enumerated(EnumType.STRING) var personCurrentLocationType: PersonCurrentLocationType? = null,
+  var personCustodyPrisonId: String? = null,
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(

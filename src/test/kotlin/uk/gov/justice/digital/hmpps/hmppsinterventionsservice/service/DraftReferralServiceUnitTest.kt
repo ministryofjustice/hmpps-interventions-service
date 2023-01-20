@@ -30,6 +30,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
@@ -107,6 +108,27 @@ class DraftReferralServiceUnitTest {
 
   @Nested
   inner class UpdateDraftReferralComplexityLevel {
+    @Test
+    fun `cant set person current location when no person custody prison id has been selected`() {
+      val referral = referralFactory.createDraft()
+      val update = DraftReferralDTO(personCurrentLocationType = PersonCurrentLocationType.CUSTODY)
+      val e = assertThrows<ServerWebInputException> {
+        draftReferralService.updatePersonCurrentLocation(referral, update)
+      }
+
+      assertThat(e.message.equals("current location cannot be updated: no custody prison id selected."))
+    }
+
+    @Test
+    fun `can set person current location when person custody prison id has been selected`() {
+      val referral = referralFactory.createDraft()
+      val update = DraftReferralDTO(personCurrentLocationType = PersonCurrentLocationType.CUSTODY, personCustodyPrisonId = "ABC")
+      draftReferralService.updatePersonCurrentLocation(referral, update)
+
+      assertThat(referral.personCurrentLocationType).isEqualTo(PersonCurrentLocationType.CUSTODY)
+      assertThat(referral.personCustodyPrisonId).isEqualTo("ABC")
+    }
+
     @Test
     fun `cant set complexity level when no service categories have been selected`() {
       val referral = referralFactory.createDraft()
