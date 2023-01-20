@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.mockito.AdditionalAnswers
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -14,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.CaseNoteDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.CreateCaseNoteDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.CaseNoteService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
@@ -113,7 +115,7 @@ class CaseNoteControllerTest {
     fun `can get an individual case note`() {
       val id = UUID.randomUUID()
       val caseNote = caseNoteFactory.create(id = id, subject = "subject", body = "body")
-      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
+      whenever(authUserRepository.save(any())).then(AdditionalAnswers.returnsFirstArg<AuthUser>())
       whenever(caseNoteService.getCaseNoteForUser(id, caseNote.sentBy)).thenReturn(caseNote)
 
       val caseNoteDTO = caseNoteController.getCaseNote(id, tokenFactory.create(caseNote.sentBy))
