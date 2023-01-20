@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.springframework.web.server.ResponseStatusException
@@ -65,6 +66,7 @@ internal class DeliverySessionControllerTest {
 
       val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null)
 
+      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
       whenever(
         sessionsService.getDeliverySessionByActionPlanIdOrThrowException(
           actionPlanId,
@@ -107,6 +109,7 @@ internal class DeliverySessionControllerTest {
       val behaviourDTO = RecordAppointmentBehaviourDTO("behaviour", false)
       val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, attendanceDTO, behaviourDTO)
 
+      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
       whenever(
         sessionsService.getDeliverySessionByActionPlanIdOrThrowException(
           actionPlanId,
@@ -158,6 +161,7 @@ internal class DeliverySessionControllerTest {
         referral = deliverySession.referral,
       )
       deliverySession.appointments.add(newAppointment)
+      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
       whenever(sessionsService.getDeliverySessionByActionPlanIdOrThrowException(actionPlanId, sessionNumber)).thenReturn(deliverySession)
       whenever(
         sessionsService.updateSessionAppointment(
@@ -214,6 +218,7 @@ internal class DeliverySessionControllerTest {
 
       whenever(referralService.getSentReferral(referralId)).thenReturn(deliverySession.referral)
       whenever(sessionsService.getSessions(referralId)).thenReturn(listOf(deliverySession))
+      whenever(authUserRepository.save(any())).thenReturn(user)
 
       val sessionResponse = sessionsController.getDeliverySessionAppointment(referralId, appointmentId, userToken)
 
@@ -227,6 +232,7 @@ internal class DeliverySessionControllerTest {
       val appointmentId = deliverySession.id
 
       whenever(referralService.getSentReferral(referralId)).thenReturn(null)
+      whenever(authUserRepository.save(any())).thenReturn(user)
 
       val e = assertThrows<ResponseStatusException> { sessionsController.getDeliverySessionAppointment(referralId, appointmentId, userToken) }
       assertThat(e.reason).contains("sent referral not found")
@@ -241,6 +247,7 @@ internal class DeliverySessionControllerTest {
 
       whenever(referralService.getSentReferral(referralId)).thenReturn(deliverySession.referral)
       whenever(sessionsService.getSessions(referralId)).thenReturn(listOf(deliverySession))
+      whenever(authUserRepository.save(any())).thenReturn(user)
 
       val e = assertThrows<EntityNotFoundException> { sessionsController.getDeliverySessionAppointment(referralId, appointmentId, userToken) }
       assertThat(e.message).contains("Delivery session appointment not found")
@@ -258,6 +265,7 @@ internal class DeliverySessionControllerTest {
 
       whenever(referralService.getSentReferral(referralId)).thenReturn(deliverySession.referral)
       whenever(sessionsService.getSessions(referralId)).thenReturn(listOf(deliverySession))
+      whenever(authUserRepository.save(any())).thenReturn(user)
 
       val sessionsResponse = sessionsController.getDeliverySessionAppointments(referralId, userToken)
 
@@ -270,6 +278,7 @@ internal class DeliverySessionControllerTest {
       val referralId = UUID.randomUUID()
 
       whenever(referralService.getSentReferral(referralId)).thenReturn(null)
+      whenever(authUserRepository.save(any())).thenReturn(user)
 
       val e = assertThrows<ResponseStatusException> { sessionsController.getDeliverySessionAppointments(referralId, userToken) }
       assertThat(e.reason).contains("sent referral not found")
@@ -311,6 +320,8 @@ internal class DeliverySessionControllerTest {
         update.additionalAttendanceInformation
       )
     ).thenReturn(updatedSession)
+
+    whenever(authUserRepository.save(any())).thenReturn(user)
 
     val sessionResponse = sessionsController.recordAttendance(actionPlan.id, sessionNumber, update, userToken)
 

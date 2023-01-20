@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.mockito.AdditionalAnswers
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -14,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.CaseNoteDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.CreateCaseNoteDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.CaseNoteService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
@@ -45,6 +47,7 @@ class CaseNoteControllerTest {
       val referralId = caseNote.referral.id
       val createCaseNoteDTO = CreateCaseNoteDTO(referralId = referralId, subject = "subject", body = "body")
 
+      whenever(authUserRepository.save(any())).thenReturn(user)
       whenever(referralService.getSentReferralForUser(id = referralId, user = user)).thenReturn(referralFactory.createSent(id = referralId))
       whenever(caseNoteService.createCaseNote(referralId = referralId, subject = "subject", body = "body", sentByUser = user)).thenReturn(caseNote)
 
@@ -59,6 +62,7 @@ class CaseNoteControllerTest {
       val referralId = caseNote.referral.id
       val createCaseNoteDTO = CreateCaseNoteDTO(referralId = referralId, subject = "subject", body = "body")
       whenever(referralService.getSentReferralForUser(id = referralId, user = user)).thenReturn(null)
+      whenever(authUserRepository.save(any())).thenReturn(user)
       val e = assertThrows<ResponseStatusException> {
         caseNoteController.createCaseNote(createCaseNoteDTO, userToken)
       }
@@ -78,6 +82,7 @@ class CaseNoteControllerTest {
       val caseNote = caseNoteFactory.create(subject = "subject", body = "body")
       whenever(referralService.getSentReferralForUser(id = referralId, user = user)).thenReturn(referralFactory.createSent(id = referralId))
       whenever(caseNoteService.findByReferral(referralId, pageable = pageable)).thenReturn(PageImpl(listOf(caseNote)))
+      whenever(authUserRepository.save(any())).thenReturn(user)
 
       val caseNotes = caseNoteController.getCaseNotes(pageable, referralId = referralId, authentication = userToken)
       assertThat(caseNotes.numberOfElements).isEqualTo(1)
@@ -94,6 +99,7 @@ class CaseNoteControllerTest {
       val referralId = UUID.randomUUID()
 
       whenever(referralService.getSentReferralForUser(id = referralId, user = user)).thenReturn(null)
+      whenever(authUserRepository.save(any())).thenReturn(user)
 
       val e = assertThrows<ResponseStatusException> {
         caseNoteController.getCaseNotes(Pageable.ofSize(1), referralId = referralId, authentication = userToken)
@@ -109,6 +115,7 @@ class CaseNoteControllerTest {
     fun `can get an individual case note`() {
       val id = UUID.randomUUID()
       val caseNote = caseNoteFactory.create(id = id, subject = "subject", body = "body")
+      whenever(authUserRepository.save(any())).then(AdditionalAnswers.returnsFirstArg<AuthUser>())
       whenever(caseNoteService.getCaseNoteForUser(id, caseNote.sentBy)).thenReturn(caseNote)
 
       val caseNoteDTO = caseNoteController.getCaseNote(id, tokenFactory.create(caseNote.sentBy))
@@ -118,6 +125,7 @@ class CaseNoteControllerTest {
     @Test
     fun `returns not found when the case note does not exist`() {
       whenever(caseNoteService.getCaseNoteForUser(any(), any())).thenReturn(null)
+      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
 
       val e = assertThrows<EntityNotFoundException> {
         caseNoteController.getCaseNote(UUID.randomUUID(), tokenFactory.create(authUserFactory.createSP()))

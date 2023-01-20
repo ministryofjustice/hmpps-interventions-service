@@ -33,7 +33,7 @@ class UserMapper(
       throw AccessDeniedException("could not map auth token to user: $errors")
     }
 
-    return AuthUser(id = userID, authSource = authSource, userName = userName)
+    return authUserRepository.save(AuthUser(id = userID, authSource = authSource, userName = userName))
   }
 
   fun fromId(id: String): AuthUser {
