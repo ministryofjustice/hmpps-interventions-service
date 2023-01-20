@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleD
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
+import java.time.OffsetDateTime
 
 @RepositoryTest
 class ActionPlanRepositoryTest @Autowired constructor(
@@ -30,6 +31,21 @@ class ActionPlanRepositoryTest @Autowired constructor(
 
     val savedPlanFirstActivity = savedPlan.get().activities.first()
     assertThat(actionPlanFirstActivity.description).isEqualTo(savedPlanFirstActivity.description)
+  }
+
+  @Test
+  fun `finds latest approved action plan`() {
+    val referral = referralFactory.createSent()
+    val user = authUserFactory.create(id = "referral_repository_test_user_id")
+
+    val oldestActionPlan = SampleData.sampleActionPlan(referral = referral, createdBy = user, approvedAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00"))
+    val newerActionPlan = SampleData.sampleActionPlan(referral = referral, createdBy = user, approvedAt = OffsetDateTime.parse("2020-12-05T10:42:43+00:00"))
+    val latestActionPlan = SampleData.sampleActionPlan(referral = referral, createdBy = user, approvedAt = OffsetDateTime.parse("2020-12-06T10:42:43+00:00"))
+    actionPlanRepository.saveAll(listOf(oldestActionPlan, newerActionPlan, latestActionPlan))
+
+    val result = actionPlanRepository.findLatestApprovedActionPlan(referral.id)
+
+    assertThat(result?.approvedAt).isEqualTo(latestActionPlan.approvedAt)
   }
 
   private fun buildAndPersistActionPlan(): ActionPlan {

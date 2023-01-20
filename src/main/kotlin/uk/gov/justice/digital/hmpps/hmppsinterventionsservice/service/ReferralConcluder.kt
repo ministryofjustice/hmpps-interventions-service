@@ -4,8 +4,10 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.findLatestApprovedActionPlan
 import java.time.OffsetDateTime
 import javax.transaction.Transactional
 
@@ -33,6 +35,7 @@ enum class ReferralConcludedState {
 class ReferralConcluder(
   val referralRepository: ReferralRepository,
   val deliverySessionRepository: DeliverySessionRepository,
+  val actionPlanRepository: ActionPlanRepository,
   val referralEventPublisher: ReferralEventPublisher,
 ) {
   fun concludeIfEligible(referral: Referral) {
@@ -56,7 +59,8 @@ class ReferralConcluder(
   }
 
   private fun deliveryState(referral: Referral): DeliveryState {
-    val approvedActionPlan = referral.approvedActionPlan ?: return DeliveryState.NOT_DELIVERING_YET
+    val approvedActionPlan =
+      actionPlanRepository.findLatestApprovedActionPlan(referral.id) ?: return DeliveryState.NOT_DELIVERING_YET
     if (!deliveredFirstSubstantiveAppointment(referral)) return DeliveryState.MISSING_FIRST_SUBSTANTIVE_APPOINTMENT
 
     val numberOfSessionsWithAttendanceRecord = countSessionsWithAttendanceRecord(referral)

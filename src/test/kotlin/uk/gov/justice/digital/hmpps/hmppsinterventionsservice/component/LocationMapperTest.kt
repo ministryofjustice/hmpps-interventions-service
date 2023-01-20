@@ -12,7 +12,7 @@ import org.springframework.web.context.request.ServletRequestAttributes
 import java.util.UUID
 
 internal class LocationMapperTest {
-  private val locationMapper = LocationMapper()
+  private val locationMapper = LocationMapper("http://localhost:8070")
   private var request = MockHttpServletRequest()
 
   @BeforeEach
