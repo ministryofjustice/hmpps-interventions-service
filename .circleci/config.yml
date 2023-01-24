@@ -17,7 +17,7 @@ _db_docker_config: &db_docker_config
   - image: cimg/openjdk:17.0
     environment:
       POSTGRES_DB: interventions_ci
-  - image: cimg/postgres:14.2
+  - image: cimg/postgres:15.1
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: interventions_ci
