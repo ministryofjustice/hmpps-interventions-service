@@ -14,7 +14,7 @@ orbs:
   mem: circleci/rememborb@0.0.1
 
 _db_docker_config: &db_docker_config
-  - image: cimg/openjdk:17.0
+  - image: cimg/openjdk:19.0
     environment:
       POSTGRES_DB: interventions_ci
   - image: cimg/postgres:14.2
