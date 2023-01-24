@@ -21,6 +21,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftRe
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralLocation
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SelectedDesiredOutcomesMapping
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
@@ -28,6 +29,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Del
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralLocationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import java.time.LocalDate
@@ -56,6 +58,7 @@ class DraftReferralService(
   val hmppsAuthService: HMPPSAuthService,
   val referralDetailsRepository: ReferralDetailsRepository,
   val draftOasysRiskInformationService: DraftOasysRiskInformationService,
+  val referralLocationRepository: ReferralLocationRepository
 ) {
   companion object {
     private val logger = KotlinLogging.logger {}
@@ -376,6 +379,7 @@ class DraftReferralService(
      * duplicate NSIs in nDelius on user retry.
      */
     submitAdditionalRiskInformation(referral, user)
+    createReferralLocation(draftReferral)
     communityAPIReferralService.send(referral)
 
     val sentReferral = referralRepository.save(referral)
@@ -407,6 +411,17 @@ class DraftReferralService(
       referenceNumber = generateReferenceNumber(draftReferral),
       sentAt = OffsetDateTime.now(),
       sentBy = sentBy,
+    )
+  }
+
+  private fun createReferralLocation(draftReferral: DraftReferral) {
+    referralLocationRepository.save(
+      ReferralLocation(
+        id = UUID.randomUUID(),
+        referralId = draftReferral.id,
+        type = draftReferral.personCurrentLocationType ?: throw ServerWebInputException("can't submit a referral without current location"),
+        prisonId = draftReferral.personCustodyPrisonId
+      )
     )
   }
 

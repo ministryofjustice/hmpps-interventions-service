@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Desired
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
@@ -127,6 +128,8 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     complexityLevelIds: MutableMap<UUID, UUID>? = null,
     additionalRiskInformation: String? = null,
     additionalRiskInformationUpdatedAt: OffsetDateTime? = null,
+    personCurrentLocationType: PersonCurrentLocationType? = null,
+    personCustodyPrisonId: String? = null
   ): DraftReferral {
     val draftReferral = DraftReferral(
       id = id,
@@ -135,6 +138,8 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
       serviceUserCRN = serviceUserCRN,
       intervention = intervention,
       relevantSentenceId = relevantSentenceId,
+      personCurrentLocationType = personCurrentLocationType,
+      personCustodyPrisonId = personCustodyPrisonId,
       serviceUserData = serviceUserData,
       selectedServiceCategories = selectedServiceCategories,
       complexityLevelIds = complexityLevelIds,
