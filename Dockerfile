@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jre-alpine AS builder
+FROM eclipse-temurin:17.0.5_8-jre-alpine AS builder
 
 WORKDIR /app
 
@@ -23,7 +23,7 @@ RUN ./gradlew assemble
 
 
 # ---
-FROM eclipse-temurin:17-jre-alpine AS final
+FROM eclipse-temurin:17.0.5_8-jre-alpine AS final
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
 # force a rebuild of `apk upgrade` below by invalidating the BUILD_NUMBER env variable on every commit
