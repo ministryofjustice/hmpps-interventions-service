@@ -1,6 +1,14 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["github>ministryofjustice/hmpps-renovate-config:base"],
+  "major": {
+    "ignoreDeps": [
+      "cimg/openjdk",
+      "cimg/postgres",
+      "eclipse-temurin",
+      "postgres"
+    ]
+  },
   "packageRules": [
     {
       "matchManagers": ["gradle"],
