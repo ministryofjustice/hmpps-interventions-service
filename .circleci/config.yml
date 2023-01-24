@@ -10,7 +10,7 @@ parameters:
 
 orbs:
   hmpps: ministryofjustice/hmpps@6.3.0
-  gradle: circleci/gradle@2.2.0
+  gradle: circleci/gradle@3.0.0
   mem: circleci/rememborb@0.0.1
 
 _db_docker_config: &db_docker_config
@@ -33,7 +33,7 @@ jobs:
     steps:
       - checkout
       - gradle/with_cache:
-          cache_checksum_file: "build.gradle.kts"
+          deps_checksum_file: "build.gradle.kts"
           cache_key: v2
           steps:
             - run: ./gradlew check jacocoTestCoverageVerification
@@ -126,7 +126,7 @@ jobs:
     steps:
       - checkout
       - gradle/with_cache:
-          cache_checksum_file: "build.gradle.kts"
+          deps_checksum_file: "build.gradle.kts"
           cache_key: v2
           steps:
             - run:
