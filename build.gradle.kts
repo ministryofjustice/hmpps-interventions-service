@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.1-beta-1"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.1"
   kotlin("plugin.spring") version "1.8.0"
   id("org.jetbrains.kotlin.plugin.jpa") version "1.8.0"
   id("jacoco")
@@ -16,7 +16,7 @@ configurations {
 }
 
 jacoco {
-  toolVersion = "0.8.7"
+  toolVersion = "0.8.8"
 }
 
 tasks {
@@ -101,7 +101,7 @@ dependencies {
   implementation("com.github.java-json-tools:json-patch:1.13")
   implementation("org.apache.commons:commons-csv:1.9.0")
 
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.3.17")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.4.4")
   testImplementation("com.squareup.okhttp3:okhttp:4.10.0")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
   testImplementation("org.mockito:mockito-inline:5.0.0")
