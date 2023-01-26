@@ -5,15 +5,17 @@
     {
       "matchManagers": ["gradle"],
       "matchUpdateTypes": ["patch", "minor"],
-      "groupName": "all gradle dependencies"
+      "groupName": "all gradle dependencies",
     },
     {
+      // upgrading these is a team decision
       "matchPackageNames": ["cimg/openjdk", "eclipse-temurin"],
-      "allowedVersions": "<=17"
+      "allowedVersions": "<=17",
     },
     {
+      // match to production postgres version in https://github.com/ministryofjustice/cloud-platform-environments/blob/main/namespaces/live.cloud-platform.service.justice.gov.uk/hmpps-interventions-prod/resources/rds-postgres14.tf
       "matchPackageNames": ["cimg/postgres", "postgres"],
-      "allowedVersions": "<=14"
-    }
+      "allowedVersions": "<=14",
+    },
   ]
 }
