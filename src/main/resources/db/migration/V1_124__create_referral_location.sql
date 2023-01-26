@@ -5,7 +5,7 @@ CREATE TABLE referral_location (
     prison_id text,
 
     primary key (id),
-    constraint fk_referral_location_referral_id foreign key (referral_id) references draft_referral
+    constraint fk_referral_location_referral_id foreign key (referral_id) references referral
 );
 
 INSERT INTO metadata (table_name, column_name, sensitive, domain_data) VALUES ('referral_location','id',FALSE, TRUE);

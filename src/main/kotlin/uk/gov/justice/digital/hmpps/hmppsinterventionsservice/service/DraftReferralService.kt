@@ -191,13 +191,8 @@ class DraftReferralService(
   }
 
   fun updatePersonCurrentLocation(draftReferral: DraftReferral, update: DraftReferralDTO) {
-    update.personCurrentLocationType?.let {
-      if (it == PersonCurrentLocationType.CUSTODY) {
-        draftReferral.personCustodyPrisonId =
-          update.personCustodyPrisonId ?: throw ServerWebInputException("current location cannot be updated: no custody prison id selected.")
-      }
-      draftReferral.personCurrentLocationType = it
-    }
+    draftReferral.personCurrentLocationType = update.personCurrentLocationType
+    draftReferral.personCustodyPrisonId = update.personCustodyPrisonId
   }
 
   private fun updateServiceUserNeeds(draftReferral: DraftReferral, update: DraftReferralDTO) {
@@ -325,6 +320,12 @@ class DraftReferralService(
   private fun validateDraftReferralUpdate(draftReferral: DraftReferral, update: DraftReferralDTO) {
     val errors = mutableListOf<FieldError>()
 
+    update.personCurrentLocationType?.let {
+      if (it == PersonCurrentLocationType.CUSTODY && update.personCustodyPrisonId == null) {
+        errors.add(FieldError(field = "personCustodyPrisonId", error = Code.CONDITIONAL_FIELD_MUST_BE_SET))
+      }
+    }
+
     update.completionDeadline?.let {
       if (it.isBefore(LocalDate.now())) {
         errors.add(FieldError(field = "completionDeadline", error = Code.DATE_MUST_BE_IN_THE_FUTURE))
@@ -379,10 +380,10 @@ class DraftReferralService(
      * duplicate NSIs in nDelius on user retry.
      */
     submitAdditionalRiskInformation(referral, user)
-    createReferralLocation(draftReferral)
     communityAPIReferralService.send(referral)
 
     val sentReferral = referralRepository.save(referral)
+    createReferralLocation(draftReferral)
     eventPublisher.referralSentEvent(sentReferral)
     supplierAssessmentService.createSupplierAssessment(referral)
     return sentReferral

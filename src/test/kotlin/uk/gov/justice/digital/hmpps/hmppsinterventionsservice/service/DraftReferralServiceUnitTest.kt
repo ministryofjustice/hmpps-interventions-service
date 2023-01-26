@@ -728,18 +728,21 @@ class DraftReferralServiceUnitTest {
     fun `cant set person current location when no person custody prison id has been selected`() {
       val referral = referralFactory.createDraft()
       val update = DraftReferralDTO(personCurrentLocationType = PersonCurrentLocationType.CUSTODY)
-      val e = assertThrows<ServerWebInputException> {
-        draftReferralService.updatePersonCurrentLocation(referral, update)
+      val e = assertThrows<ValidationError> {
+        draftReferralService.updateDraftReferral(referral, update)
       }
 
-      assertThat(e.message.equals("current location cannot be updated: no custody prison id selected."))
+      assertThat(e.message).isEqualTo("draft referral update invalid")
+      assertThat(e.errors[0]).isEqualTo(FieldError(field = "personCustodyPrisonId", error = Code.CONDITIONAL_FIELD_MUST_BE_SET))
     }
 
     @Test
     fun `can set person current location when person custody prison id has been selected`() {
       val referral = referralFactory.createDraft()
       val update = DraftReferralDTO(personCurrentLocationType = PersonCurrentLocationType.CUSTODY, personCustodyPrisonId = "ABC")
-      draftReferralService.updatePersonCurrentLocation(referral, update)
+
+      whenever(draftReferralRepository.save(any())).thenReturn(referral)
+      draftReferralService.updateDraftReferral(referral, update)
 
       assertThat(referral.personCurrentLocationType).isEqualTo(PersonCurrentLocationType.CUSTODY)
       assertThat(referral.personCustodyPrisonId).isEqualTo("ABC")
