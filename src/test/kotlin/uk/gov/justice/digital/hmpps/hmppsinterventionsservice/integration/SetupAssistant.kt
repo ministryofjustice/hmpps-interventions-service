@@ -23,6 +23,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Dynamic
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NPSRegion
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
@@ -47,6 +48,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.End
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.NPSRegionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralLocationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceProviderRepository
@@ -95,6 +97,7 @@ class SetupAssistant(
   private val caseNoteRepository: CaseNoteRepository,
   private val referralDetailsRepository: ReferralDetailsRepository,
   private val changeLogRepository: ChangelogRepository,
+  private val referralLocationRepository: ReferralLocationRepository,
 ) {
   private val dynamicFrameworkContractFactory = DynamicFrameworkContractFactory()
   private val interventionFactory = InterventionFactory()
@@ -121,6 +124,7 @@ class SetupAssistant(
     supplierAssessmentRepository.deleteAll()
     actionPlanRepository.deleteAll()
 
+    referralLocationRepository.deleteAll()
     endOfServiceReportRepository.deleteAll()
     appointmentDeliveryAddressRepository.deleteAll()
     appointmentDeliveryRepository.deleteAll()
@@ -658,6 +662,8 @@ class SetupAssistant(
     needsInterpreter: Boolean = true,
     relevantSentenceId: Long = 2600295124,
     whenUnavailable: String = "She works Mondays 9am - midday",
+    personCurrentLocationType: PersonCurrentLocationType? = PersonCurrentLocationType.CUSTODY,
+    personCustodyPrisonId: String? = "ABC"
   ): DraftReferral {
     referral.selectedServiceCategories = selectedServiceCategories.toMutableSet()
     // required to satisfy foreign key constrains on desired outcomes and complexity levels
@@ -675,6 +681,8 @@ class SetupAssistant(
     referral.needsInterpreter = needsInterpreter
     referral.relevantSentenceId = relevantSentenceId
     referral.whenUnavailable = whenUnavailable
+    referral.personCurrentLocationType = personCurrentLocationType
+    referral.personCustodyPrisonId = personCustodyPrisonId
 
     return draftReferralRepository.save(referral).also {
       val details = referralDetailsRepository.save(
