@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
 import mu.KotlinLogging
 import net.logstash.logback.argument.StructuredArguments
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ServerWebInputException
@@ -18,8 +19,10 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralLocation
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SelectedDesiredOutcomesMapping
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
@@ -27,6 +30,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Del
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralLocationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import java.time.LocalDate
@@ -55,6 +59,8 @@ class DraftReferralService(
   val hmppsAuthService: HMPPSAuthService,
   val referralDetailsRepository: ReferralDetailsRepository,
   val draftOasysRiskInformationService: DraftOasysRiskInformationService,
+  val referralLocationRepository: ReferralLocationRepository,
+  @Value("\${feature-flags.current-location.enabled}") private val currentLocationEnabled: Boolean
 ) {
   companion object {
     private val logger = KotlinLogging.logger {}
@@ -108,6 +114,9 @@ class DraftReferralService(
     updateServiceUserNeeds(referral, update)
     updateDraftRiskInformation(referral, update)
     updateServiceCategoryDetails(referral, update)
+    if (currentLocationEnabled) {
+      updatePersonCurrentLocation(referral, update)
+    }
 
     // this field doesn't fit into any other categories - is this a smell?
     update.relevantSentenceId?.let {
@@ -183,6 +192,11 @@ class DraftReferralService(
     referralDetailsRepository.saveAndFlush(newDetails)
 
     return newDetails
+  }
+
+  fun updatePersonCurrentLocation(draftReferral: DraftReferral, update: DraftReferralDTO) {
+    draftReferral.personCurrentLocationType = update.personCurrentLocationType
+    draftReferral.personCustodyPrisonId = update.personCustodyPrisonId
   }
 
   private fun updateServiceUserNeeds(draftReferral: DraftReferral, update: DraftReferralDTO) {
@@ -310,6 +324,14 @@ class DraftReferralService(
   private fun validateDraftReferralUpdate(draftReferral: DraftReferral, update: DraftReferralDTO) {
     val errors = mutableListOf<FieldError>()
 
+    if (currentLocationEnabled) {
+      update.personCurrentLocationType?.let {
+        if (it == PersonCurrentLocationType.CUSTODY && update.personCustodyPrisonId == null) {
+          errors.add(FieldError(field = "personCustodyPrisonId", error = Code.CONDITIONAL_FIELD_MUST_BE_SET))
+        }
+      }
+    }
+
     update.completionDeadline?.let {
       if (it.isBefore(LocalDate.now())) {
         errors.add(FieldError(field = "completionDeadline", error = Code.DATE_MUST_BE_IN_THE_FUTURE))
@@ -367,6 +389,7 @@ class DraftReferralService(
     communityAPIReferralService.send(referral)
 
     val sentReferral = referralRepository.save(referral)
+    createReferralLocation(draftReferral)
     eventPublisher.referralSentEvent(sentReferral)
     supplierAssessmentService.createSupplierAssessment(referral)
     return sentReferral
@@ -396,6 +419,20 @@ class DraftReferralService(
       sentAt = OffsetDateTime.now(),
       sentBy = sentBy,
     )
+  }
+
+  private fun createReferralLocation(draftReferral: DraftReferral) {
+    if (currentLocationEnabled) {
+      referralLocationRepository.save(
+        ReferralLocation(
+          id = UUID.randomUUID(),
+          referralId = draftReferral.id,
+          type = draftReferral.personCurrentLocationType
+            ?: throw ServerWebInputException("can't submit a referral without current location"),
+          prisonId = draftReferral.personCustodyPrisonId
+        )
+      )
+    }
   }
 
   private fun submitAdditionalRiskInformation(referral: Referral, user: AuthUser) {

@@ -203,3 +203,7 @@ webclient:
 
 overrides:
   show-future-interventions: false
+
+feature-flags:
+  current-location:
+    enabled: true

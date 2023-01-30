@@ -30,6 +30,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
@@ -37,6 +38,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Del
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralLocationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
@@ -70,6 +72,7 @@ class DraftReferralServiceUnitTest {
   private val hmppsAuthService: HMPPSAuthService = mock()
   private val draftOasysRiskInformationService: DraftOasysRiskInformationService = mock()
   private val referralDetailsRepository: ReferralDetailsRepository = mock()
+  private val referralLocationRepository: ReferralLocationRepository = mock()
 
   private val referralFactory = ReferralFactory()
   private val authUserFactory = AuthUserFactory()
@@ -78,6 +81,7 @@ class DraftReferralServiceUnitTest {
   private val interventionFactory = InterventionFactory()
   private val dynamicFrameworkContractFactory = DynamicFrameworkContractFactory()
   private val draftOasysRiskInformationFactory = DraftOasysRiskInformationFactory()
+  private var currentLocationEnabled: Boolean = true
 
   private val draftReferralService = DraftReferralService(
     referralRepository,
@@ -97,7 +101,9 @@ class DraftReferralServiceUnitTest {
     supplierAssessmentService,
     hmppsAuthService,
     referralDetailsRepository,
-    draftOasysRiskInformationService
+    draftOasysRiskInformationService,
+    referralLocationRepository,
+    currentLocationEnabled
   )
 
   @BeforeEach
@@ -589,7 +595,9 @@ class DraftReferralServiceUnitTest {
   fun`draft referral risk information is deleted when referral is sent`() {
     val draftReferral = referralFactory.createDraft(
       additionalRiskInformation = "something",
-      additionalRiskInformationUpdatedAt = OffsetDateTime.now()
+      additionalRiskInformationUpdatedAt = OffsetDateTime.now(),
+      personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
+      personCustodyPrisonId = "ABC"
     )
     val authUser = authUserFactory.create()
 
@@ -601,7 +609,9 @@ class DraftReferralServiceUnitTest {
   fun `supplementaryRiskId is set when referral is sent`() {
     val draftReferral = referralFactory.createDraft(
       additionalRiskInformation = "something",
-      additionalRiskInformationUpdatedAt = OffsetDateTime.now()
+      additionalRiskInformationUpdatedAt = OffsetDateTime.now(),
+      personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
+      personCustodyPrisonId = "ABC"
     )
     val authUser = authUserFactory.create()
 
@@ -628,7 +638,11 @@ class DraftReferralServiceUnitTest {
 
     @Test
     fun `draft oasys risk (redacted risk) is submitted as supplementary risk if it exists`() {
-      val draftReferral = referralFactory.createDraft(additionalRiskInformation = "something")
+      val draftReferral = referralFactory.createDraft(
+        additionalRiskInformation = "something",
+        personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
+        personCustodyPrisonId = "ABC"
+      )
       val authUser = authUserFactory.create()
 
       whenever(draftOasysRiskInformationService.getDraftOasysRiskInformation(draftReferral.id)).thenReturn(draftRisk)
@@ -643,7 +657,11 @@ class DraftReferralServiceUnitTest {
     fun `does not require 'additional risk information' to exist if draft oasys risk (redacted risk) is present`() {
       val authUser = authUserFactory.create()
 
-      val draftReferral = referralFactory.createDraft(additionalRiskInformation = null)
+      val draftReferral = referralFactory.createDraft(
+        additionalRiskInformation = null,
+        personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
+        personCustodyPrisonId = "ABC"
+      )
 
       whenever(draftOasysRiskInformationService.getDraftOasysRiskInformation(draftReferral.id)).thenReturn(draftRisk)
       whenever(assessRisksAndNeedsService.createSupplementaryRisk(eq(draftReferral.id), any(), any(), anyOrNull(), any(), any()))
@@ -658,7 +676,9 @@ class DraftReferralServiceUnitTest {
       val riskUpdatedAt = OffsetDateTime.now()
       val draftReferral = referralFactory.createDraft(
         additionalRiskInformation = "something",
-        additionalRiskInformationUpdatedAt = riskUpdatedAt
+        additionalRiskInformationUpdatedAt = riskUpdatedAt,
+        personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
+        personCustodyPrisonId = "ABC"
       )
 
       val authUser = authUserFactory.create()
@@ -686,7 +706,9 @@ class DraftReferralServiceUnitTest {
     val timestamp = OffsetDateTime.now()
     val draftReferral = referralFactory.createDraft(
       additionalRiskInformation = "something",
-      additionalRiskInformationUpdatedAt = timestamp
+      additionalRiskInformationUpdatedAt = timestamp,
+      personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
+      personCustodyPrisonId = "ABC"
     )
     val authUser = authUserFactory.create()
 
@@ -700,6 +722,33 @@ class DraftReferralServiceUnitTest {
     inOrder.verify(communityAPIReferralService, times(1)).send(eventCaptor.capture())
     val capturedReferral = eventCaptor.firstValue
     assertThat(capturedReferral.id).isEqualTo(sendReferral.id)
+  }
+
+  @Nested
+  inner class UpdateCurrentLocation {
+    @Test
+    fun `cant set person current location when no person custody prison id has been selected`() {
+      val referral = referralFactory.createDraft()
+      val update = DraftReferralDTO(personCurrentLocationType = PersonCurrentLocationType.CUSTODY)
+      val e = assertThrows<ValidationError> {
+        draftReferralService.updateDraftReferral(referral, update)
+      }
+
+      assertThat(e.message).isEqualTo("draft referral update invalid")
+      assertThat(e.errors[0]).isEqualTo(FieldError(field = "personCustodyPrisonId", error = Code.CONDITIONAL_FIELD_MUST_BE_SET))
+    }
+
+    @Test
+    fun `can set person current location when person custody prison id has been selected`() {
+      val referral = referralFactory.createDraft()
+      val update = DraftReferralDTO(personCurrentLocationType = PersonCurrentLocationType.CUSTODY, personCustodyPrisonId = "ABC")
+
+      whenever(draftReferralRepository.save(any())).thenReturn(referral)
+      draftReferralService.updateDraftReferral(referral, update)
+
+      assertThat(referral.personCurrentLocationType).isEqualTo(PersonCurrentLocationType.CUSTODY)
+      assertThat(referral.personCustodyPrisonId).isEqualTo("ABC")
+    }
   }
 
   @Nested

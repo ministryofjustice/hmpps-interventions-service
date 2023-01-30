@@ -27,6 +27,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUse
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
@@ -36,6 +37,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Dra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralLocationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
@@ -64,6 +66,7 @@ class DraftReferralServiceTest @Autowired constructor(
   val endOfServiceReportRepository: EndOfServiceReportRepository,
   val serviceCategoryRepository: ServiceCategoryRepository,
   val referralDetailsRepository: ReferralDetailsRepository,
+  val referralLocationRepository: ReferralLocationRepository
 ) {
   private val userFactory = AuthUserFactory(entityManager)
   private val interventionFactory = InterventionFactory(entityManager)
@@ -84,6 +87,7 @@ class DraftReferralServiceTest @Autowired constructor(
   private val supplierAssessmentService: SupplierAssessmentService = mock()
   private val hmppsAuthService: HMPPSAuthService = mock()
   private val draftOasysRiskInformationService: DraftOasysRiskInformationService = mock()
+  private var currentLocationEnabled: Boolean = true
 
   private val draftReferralService = DraftReferralService(
     referralRepository,
@@ -103,7 +107,9 @@ class DraftReferralServiceTest @Autowired constructor(
     supplierAssessmentService,
     hmppsAuthService,
     referralDetailsRepository,
-    draftOasysRiskInformationService
+    draftOasysRiskInformationService,
+    referralLocationRepository,
+    currentLocationEnabled
   )
 
   @AfterEach
@@ -114,6 +120,7 @@ class DraftReferralServiceTest @Autowired constructor(
     authUserRepository.deleteAll()
     draftReferralRepository.deleteAll()
     referralRepository.deleteAll()
+    referralLocationRepository.deleteAll()
   }
 
   @Nested
@@ -365,6 +372,8 @@ class DraftReferralServiceTest @Autowired constructor(
       val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
       draftReferral.additionalRiskInformation = "risk"
       draftReferral.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
+      draftReferral.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
+      draftReferral.personCustodyPrisonId = "ABC"
 
       assertThat(draftReferralService.getDraftReferralForUser(draftReferral.id, user)).isNotNull
 
@@ -379,9 +388,29 @@ class DraftReferralServiceTest @Autowired constructor(
       val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
       draftReferral.additionalRiskInformation = "risk"
       draftReferral.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
+      draftReferral.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
+      draftReferral.personCustodyPrisonId = "ABC"
 
       val sentReferral = draftReferralService.sendDraftReferral(draftReferral, user)
       assertThat(sentReferral.referenceNumber).isNotNull
+    }
+
+    @Test
+    fun `sending a draft referral creates a referral location`() {
+      val user = AuthUser("user_id", "delius", "user_name")
+      val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
+      draftReferral.additionalRiskInformation = "risk"
+      draftReferral.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
+
+      val personCurrentLocationType = PersonCurrentLocationType.CUSTODY
+      val personCustodyPrisonId = "ABC"
+      draftReferral.personCurrentLocationType = personCurrentLocationType
+      draftReferral.personCustodyPrisonId = personCustodyPrisonId
+
+      val sentReferral = draftReferralService.sendDraftReferral(draftReferral, user)
+      assertThat(referralLocationRepository.findByReferralId(sentReferral.id)?.referralId).isEqualTo(sentReferral.id)
+      assertThat(referralLocationRepository.findByReferralId(sentReferral.id)?.prisonId).isEqualTo(personCustodyPrisonId)
+      assertThat(referralLocationRepository.findByReferralId(sentReferral.id)?.type).isEqualTo(personCurrentLocationType)
     }
 
     @Test
@@ -391,8 +420,12 @@ class DraftReferralServiceTest @Autowired constructor(
       val draft2 = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
       draft1.additionalRiskInformation = "risk"
       draft1.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
+      draft1.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
+      draft1.personCustodyPrisonId = "ABC"
       draft2.additionalRiskInformation = "risk"
       draft2.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
+      draft2.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
+      draft2.personCustodyPrisonId = "ABC"
 
       whenever(referenceGenerator.generate(sampleIntervention.dynamicFrameworkContract.contractType.name))
         .thenReturn("AA0000ZZ", "AA0000ZZ", "AA0000ZZ", "AA0000ZZ", "BB0000ZZ")
@@ -410,6 +443,8 @@ class DraftReferralServiceTest @Autowired constructor(
       val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
       draftReferral.additionalRiskInformation = "risk"
       draftReferral.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
+      draftReferral.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
+      draftReferral.personCustodyPrisonId = "ABC"
 
       val referral = draftReferralService.sendDraftReferral(draftReferral, user)
       val eventCaptor = argumentCaptor<Referral>()

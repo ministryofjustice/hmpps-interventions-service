@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Desired
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
@@ -38,7 +39,9 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     additionalRiskInformationUpdatedAt: OffsetDateTime? = null,
     completionDeadline: LocalDate? = null,
     maximumEnforceableDays: Int? = null,
-    referralDetail: ReferralDetails? = null
+    referralDetail: ReferralDetails? = null,
+    personCurrentLocationType: PersonCurrentLocationType? = null,
+    personCustodyPrisonId: String? = null
   ): DraftReferral {
     return createDraftReferral(
       id = id,
@@ -52,7 +55,9 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       complexityLevelIds = complexityLevelIds,
       additionalRiskInformation = additionalRiskInformation,
       additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt,
-      referralDetails = referralDetail
+      referralDetails = referralDetail,
+      personCurrentLocationType = personCurrentLocationType,
+      personCustodyPrisonId = personCustodyPrisonId
     )
   }
 
