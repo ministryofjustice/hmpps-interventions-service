@@ -114,7 +114,9 @@ class DraftReferralService(
     updateServiceUserNeeds(referral, update)
     updateDraftRiskInformation(referral, update)
     updateServiceCategoryDetails(referral, update)
-    updatePersonCurrentLocation(referral, update)
+    if (currentLocationEnabled) {
+      updatePersonCurrentLocation(referral, update)
+    }
 
     // this field doesn't fit into any other categories - is this a smell?
     update.relevantSentenceId?.let {
