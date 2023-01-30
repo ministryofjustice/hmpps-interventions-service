@@ -81,6 +81,7 @@ class DraftReferralServiceUnitTest {
   private val interventionFactory = InterventionFactory()
   private val dynamicFrameworkContractFactory = DynamicFrameworkContractFactory()
   private val draftOasysRiskInformationFactory = DraftOasysRiskInformationFactory()
+  private var currentLocationEnabled: Boolean = true
 
   private val draftReferralService = DraftReferralService(
     referralRepository,
@@ -101,7 +102,8 @@ class DraftReferralServiceUnitTest {
     hmppsAuthService,
     referralDetailsRepository,
     draftOasysRiskInformationService,
-    referralLocationRepository
+    referralLocationRepository,
+    currentLocationEnabled
   )
 
   @BeforeEach

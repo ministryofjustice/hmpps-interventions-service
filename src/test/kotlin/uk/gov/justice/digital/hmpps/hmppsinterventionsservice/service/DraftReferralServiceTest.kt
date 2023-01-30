@@ -87,6 +87,7 @@ class DraftReferralServiceTest @Autowired constructor(
   private val supplierAssessmentService: SupplierAssessmentService = mock()
   private val hmppsAuthService: HMPPSAuthService = mock()
   private val draftOasysRiskInformationService: DraftOasysRiskInformationService = mock()
+  private var currentLocationEnabled: Boolean = true
 
   private val draftReferralService = DraftReferralService(
     referralRepository,
@@ -107,7 +108,8 @@ class DraftReferralServiceTest @Autowired constructor(
     hmppsAuthService,
     referralDetailsRepository,
     draftOasysRiskInformationService,
-    referralLocationRepository
+    referralLocationRepository,
+    currentLocationEnabled
   )
 
   @AfterEach
@@ -406,9 +408,9 @@ class DraftReferralServiceTest @Autowired constructor(
       draftReferral.personCustodyPrisonId = personCustodyPrisonId
 
       val sentReferral = draftReferralService.sendDraftReferral(draftReferral, user)
-      assertThat(referralLocationRepository.findByReferralId(sentReferral.id).referralId).isEqualTo(sentReferral.id)
-      assertThat(referralLocationRepository.findByReferralId(sentReferral.id).prisonId).isEqualTo(personCustodyPrisonId)
-      assertThat(referralLocationRepository.findByReferralId(sentReferral.id).type).isEqualTo(personCurrentLocationType)
+      assertThat(referralLocationRepository.findByReferralId(sentReferral.id)?.referralId).isEqualTo(sentReferral.id)
+      assertThat(referralLocationRepository.findByReferralId(sentReferral.id)?.prisonId).isEqualTo(personCustodyPrisonId)
+      assertThat(referralLocationRepository.findByReferralId(sentReferral.id)?.type).isEqualTo(personCurrentLocationType)
     }
 
     @Test

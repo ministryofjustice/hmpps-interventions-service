@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
 import mu.KotlinLogging
 import net.logstash.logback.argument.StructuredArguments
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ServerWebInputException
@@ -58,7 +59,8 @@ class DraftReferralService(
   val hmppsAuthService: HMPPSAuthService,
   val referralDetailsRepository: ReferralDetailsRepository,
   val draftOasysRiskInformationService: DraftOasysRiskInformationService,
-  val referralLocationRepository: ReferralLocationRepository
+  val referralLocationRepository: ReferralLocationRepository,
+  @Value("\${feature-flags.current-location.enabled}") private val currentLocationEnabled: Boolean
 ) {
   companion object {
     private val logger = KotlinLogging.logger {}
@@ -320,9 +322,11 @@ class DraftReferralService(
   private fun validateDraftReferralUpdate(draftReferral: DraftReferral, update: DraftReferralDTO) {
     val errors = mutableListOf<FieldError>()
 
-    update.personCurrentLocationType?.let {
-      if (it == PersonCurrentLocationType.CUSTODY && update.personCustodyPrisonId == null) {
-        errors.add(FieldError(field = "personCustodyPrisonId", error = Code.CONDITIONAL_FIELD_MUST_BE_SET))
+    if (currentLocationEnabled) {
+      update.personCurrentLocationType?.let {
+        if (it == PersonCurrentLocationType.CUSTODY && update.personCustodyPrisonId == null) {
+          errors.add(FieldError(field = "personCustodyPrisonId", error = Code.CONDITIONAL_FIELD_MUST_BE_SET))
+        }
       }
     }
 
@@ -416,14 +420,17 @@ class DraftReferralService(
   }
 
   private fun createReferralLocation(draftReferral: DraftReferral) {
-    referralLocationRepository.save(
-      ReferralLocation(
-        id = UUID.randomUUID(),
-        referralId = draftReferral.id,
-        type = draftReferral.personCurrentLocationType ?: throw ServerWebInputException("can't submit a referral without current location"),
-        prisonId = draftReferral.personCustodyPrisonId
+    if (currentLocationEnabled) {
+      referralLocationRepository.save(
+        ReferralLocation(
+          id = UUID.randomUUID(),
+          referralId = draftReferral.id,
+          type = draftReferral.personCurrentLocationType
+            ?: throw ServerWebInputException("can't submit a referral without current location"),
+          prisonId = draftReferral.personCustodyPrisonId
+        )
       )
-    )
+    }
   }
 
   private fun submitAdditionalRiskInformation(referral: Referral, user: AuthUser) {

@@ -5,5 +5,5 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import java.util.UUID
 
 interface ReferralLocationRepository : JpaRepository<ReferralLocation, UUID> {
-  fun findByReferralId(referralId: UUID): ReferralLocation
+  fun findByReferralId(referralId: UUID): ReferralLocation?
 }
