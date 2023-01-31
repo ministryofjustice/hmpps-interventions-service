@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
+import kotlin.io.path.createTempDirectory
+import kotlin.io.path.pathString
 
 @Component
 class NdmisPerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
@@ -23,8 +25,12 @@ class NdmisPerformanceReportJobConfigurationTest : IntegrationTestBase() {
   @Autowired
   lateinit var jobLauncher: NdmisPerformanceJobLauncherTestUtils
 
+  private val outputDir = createTempDirectory("test")
+
   fun executeJob(): JobExecution {
-    val parameters = JobParametersBuilder().toJobParameters()
+    val parameters = JobParametersBuilder()
+      .addString("outputPath", outputDir.pathString)
+      .toJobParameters()
     val parametersWithTimestamp = TimestampIncrementer().getNext(parameters)
     return jobLauncher.launchJob(parametersWithTimestamp)
   }

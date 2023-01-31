@@ -25,6 +25,9 @@ import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.Date
+import kotlin.io.path.createTempDirectory
+import kotlin.io.path.name
+import kotlin.io.path.pathString
 
 @Component
 class BatchUtils {
@@ -113,6 +116,20 @@ class TimestampIncrementer : JobParametersIncrementer {
 
     return JobParametersBuilder(params)
       .addLong("timestamp", Instant.now().epochSecond)
+      .toJobParameters()
+  }
+}
+
+class OutputPathIncrementer : JobParametersIncrementer {
+  override fun getNext(inputParams: JobParameters?): JobParameters {
+    val params = inputParams ?: JobParameters()
+
+    if (params.parameters["outputPath"] != null) {
+      return params
+    }
+
+    return JobParametersBuilder(params)
+      .addString("outputPath", createTempDirectory().pathString)
       .toJobParameters()
   }
 }
