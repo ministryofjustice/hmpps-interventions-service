@@ -195,8 +195,10 @@ class DraftReferralService(
   }
 
   fun updatePersonCurrentLocation(draftReferral: DraftReferral, update: DraftReferralDTO) {
-    draftReferral.personCurrentLocationType = update.personCurrentLocationType
-    draftReferral.personCustodyPrisonId = update.personCustodyPrisonId
+    update.personCurrentLocationType?.let {
+      draftReferral.personCurrentLocationType = it
+      draftReferral.personCustodyPrisonId = if (it == PersonCurrentLocationType.CUSTODY) update.personCustodyPrisonId else null
+    }
   }
 
   private fun updateServiceUserNeeds(draftReferral: DraftReferral, update: DraftReferralDTO) {
