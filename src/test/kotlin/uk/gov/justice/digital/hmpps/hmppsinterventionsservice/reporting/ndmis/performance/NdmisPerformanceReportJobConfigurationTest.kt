@@ -11,11 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
+import java.time.OffsetDateTime
 import kotlin.io.path.createTempDirectory
-import kotlin.io.path.fileSize
-import kotlin.io.path.listDirectoryEntries
-import kotlin.io.path.name
 import kotlin.io.path.pathString
 
 @Component
@@ -40,13 +39,23 @@ class NdmisPerformanceReportJobConfigurationTest : IntegrationTestBase() {
 
   @Test
   fun `job writes non-empty CSV export files`() {
+    val referral = setupAssistant.createSentReferral().also { setupAssistant.fillReferralFields(it) }
+    setupAssistant.createDeliverySession(
+      sessionNumber = 1,
+      duration = 60,
+      appointmentTime = OffsetDateTime.now(),
+      attended = Attended.YES,
+      referral = referral,
+    )
+
     val execution = executeJob()
     assertThat(execution.exitStatus).isEqualTo(ExitStatus.COMPLETED)
-    assertThat(outputDir.listDirectoryEntries().filter { it.fileSize() > 0 }.map { it.name })
-      .containsExactlyInAnyOrder(
-        "crs_performance_report-v2-referrals.csv",
-        "crs_performance_report-v2-complexity.csv",
-        "crs_performance_report-v2-appointments.csv",
-      )
+
+    assertThat(outputDir.resolve("crs_performance_report-v2-referrals.csv"))
+      .content().contains(referral.referenceNumber)
+    assertThat(outputDir.resolve("crs_performance_report-v2-complexity.csv"))
+      .content().contains(referral.referenceNumber)
+    assertThat(outputDir.resolve("crs_performance_report-v2-appointments.csv"))
+      .content().contains(referral.referenceNumber)
   }
 }
