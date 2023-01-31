@@ -9,6 +9,8 @@ data class UpdateReferralDetailsDTO(
   val maximumEnforceableDays: Int?,
   val completionDeadline: LocalDate?,
   val furtherInformation: String?,
+  val expectedReleaseDate: LocalDate?,
+  val expectedReleaseDateMissingReason: String?,
   val reasonForChange: String,
 ) {
   val isValidUpdate: Boolean get() = maximumEnforceableDays != null || completionDeadline !== null || furtherInformation !== null

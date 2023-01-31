@@ -106,6 +106,8 @@ class DraftReferralService(
         update.maximumEnforceableDays,
         update.completionDeadline,
         update.furtherInformation,
+        update.expectedReleaseDate,
+        update.expectedReleaseDateMissingReason,
         "initial referral details",
       ),
       referral.createdBy,
@@ -116,6 +118,7 @@ class DraftReferralService(
     updateServiceCategoryDetails(referral, update)
     if (currentLocationEnabled) {
       updatePersonCurrentLocation(referral, update)
+      updatePersonExpectedReleaseDate(referral, update)
     }
 
     // this field doesn't fit into any other categories - is this a smell?
@@ -199,6 +202,11 @@ class DraftReferralService(
       draftReferral.personCurrentLocationType = it
       draftReferral.personCustodyPrisonId = if (it == PersonCurrentLocationType.CUSTODY) update.personCustodyPrisonId else null
     }
+  }
+
+  fun updatePersonExpectedReleaseDate(draftReferral: DraftReferral, update: DraftReferralDTO) {
+    draftReferral.expectedReleaseDate = update.expectedReleaseDate
+    draftReferral.expectedReleaseDateMissingReason = update.expectedReleaseDateMissingReason
   }
 
   private fun updateServiceUserNeeds(draftReferral: DraftReferral, update: DraftReferralDTO) {

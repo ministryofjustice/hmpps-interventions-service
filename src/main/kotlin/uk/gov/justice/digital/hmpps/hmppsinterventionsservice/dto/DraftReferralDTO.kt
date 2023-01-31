@@ -49,7 +49,9 @@ data class DraftReferralDTO(
   val interventionId: UUID? = null,
   val contractTypeName: String? = null,
   val personCurrentLocationType: PersonCurrentLocationType? = null,
-  val personCustodyPrisonId: String? = null
+  val personCustodyPrisonId: String? = null,
+  val expectedReleaseDate: LocalDate? = null,
+  val expectedReleaseDateMissingReason: String? = null
 ) {
   companion object {
     fun from(referral: DraftReferral): DraftReferralDTO {
@@ -88,7 +90,9 @@ data class DraftReferralDTO(
         interventionId = referral.intervention.id,
         contractTypeName = referral.intervention.dynamicFrameworkContract.contractType.name,
         personCurrentLocationType = referral.personCurrentLocationType,
-        personCustodyPrisonId = referral.personCustodyPrisonId
+        personCustodyPrisonId = referral.personCustodyPrisonId,
+        expectedReleaseDate = referral.expectedReleaseDate,
+        expectedReleaseDateMissingReason = referral.expectedReleaseDateMissingReason
       )
     }
     @Deprecated("deprecated as we will be using from(referral: DraftReferral) in the future")
