@@ -183,7 +183,7 @@ class NdmisPerformanceReportJobConfiguration(
     listOf(referralReportFilename, complexityReportFilename, appointmentReportFilename).forEach { file ->
       val path = Path.of(outputPath).resolve(file)
       s3Service.publishFileToS3(ndmisS3Bucket, path, pathPrefix, acl = ObjectCannedACL.BUCKET_OWNER_FULL_CONTROL)
-      path.toFile().delete()
+      path.toFile().deleteOnExit()
     }
     RepeatStatus.FINISHED
   }
