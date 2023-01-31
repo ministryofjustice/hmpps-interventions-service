@@ -389,7 +389,7 @@ class DraftReferralService(
     communityAPIReferralService.send(referral)
 
     val sentReferral = referralRepository.save(referral)
-    createReferralLocation(draftReferral)
+    createReferralLocation(draftReferral, sentReferral)
     eventPublisher.referralSentEvent(sentReferral)
     supplierAssessmentService.createSupplierAssessment(referral)
     return sentReferral
@@ -421,17 +421,18 @@ class DraftReferralService(
     )
   }
 
-  private fun createReferralLocation(draftReferral: DraftReferral) {
+  private fun createReferralLocation(draftReferral: DraftReferral, referral: Referral) {
     if (currentLocationEnabled) {
-      referralLocationRepository.save(
+      referral.referralLocation = referralLocationRepository.save(
         ReferralLocation(
           id = UUID.randomUUID(),
-          referralId = draftReferral.id,
+          referral = referral,
           type = draftReferral.personCurrentLocationType
             ?: throw ServerWebInputException("can't submit a referral without current location"),
           prisonId = draftReferral.personCustodyPrisonId
         )
       )
+      referralRepository.save(referral)
     }
   }
 

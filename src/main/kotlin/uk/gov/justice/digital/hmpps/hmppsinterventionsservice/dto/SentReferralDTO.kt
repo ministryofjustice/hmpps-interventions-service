@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto
 
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -26,6 +27,8 @@ class SentReferralDTO(
   val supplementaryRiskId: UUID,
   val endOfServiceReportCreationRequired: Boolean,
   val createdBy: AuthUserDTO,
+  val personCurrentLocationType: PersonCurrentLocationType?,
+  val personCustodyPrisonId: String?
 ) {
   companion object {
     fun from(referral: Referral, endOfServiceReportRequired: Boolean, draftReferral: DraftReferral? = null): SentReferralDTO {
@@ -49,6 +52,8 @@ class SentReferralDTO(
         concludedAt = referral.concludedAt,
         supplementaryRiskId = referral.supplementaryRiskId!!,
         endOfServiceReportCreationRequired = endOfServiceReportRequired,
+        personCurrentLocationType = referral.referralLocation?.let { it.type },
+        personCustodyPrisonId = referral.referralLocation?.let { it.prisonId },
         createdBy = AuthUserDTO.from(referral.createdBy)
       )
     }

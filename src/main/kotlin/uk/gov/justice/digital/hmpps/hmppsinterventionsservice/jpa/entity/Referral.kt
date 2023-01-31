@@ -91,6 +91,7 @@ class Referral(
 
   @OneToOne(mappedBy = "referral") @Fetch(JOIN) var endOfServiceReport: EndOfServiceReport? = null,
   @OneToOne(mappedBy = "referral") @Fetch(JOIN) var supplierAssessment: SupplierAssessment? = null,
+  @OneToOne(mappedBy = "referral") @Fetch(JOIN) var referralLocation: ReferralLocation? = null,
 
   @OneToMany(fetch = FetchType.LAZY) @JoinColumn(name = "referral_id")
   private val referralDetailsHistory: Set<ReferralDetails>? = null,
