@@ -408,9 +408,26 @@ class DraftReferralServiceTest @Autowired constructor(
       draftReferral.personCustodyPrisonId = personCustodyPrisonId
 
       val sentReferral = draftReferralService.sendDraftReferral(draftReferral, user)
-      assertThat(referralLocationRepository.findByReferralId(sentReferral.id)?.referralId).isEqualTo(sentReferral.id)
+      assertThat(referralLocationRepository.findByReferralId(sentReferral.id)?.referral).isEqualTo(sentReferral)
       assertThat(referralLocationRepository.findByReferralId(sentReferral.id)?.prisonId).isEqualTo(personCustodyPrisonId)
       assertThat(referralLocationRepository.findByReferralId(sentReferral.id)?.type).isEqualTo(personCurrentLocationType)
+    }
+
+    @Test
+    fun `sending a draft referral creates a referral with referral location`() {
+      val user = AuthUser("user_id", "delius", "user_name")
+      val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
+      draftReferral.additionalRiskInformation = "risk"
+      draftReferral.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
+
+      val personCurrentLocationType = PersonCurrentLocationType.CUSTODY
+      val personCustodyPrisonId = "ABC"
+      draftReferral.personCurrentLocationType = personCurrentLocationType
+      draftReferral.personCustodyPrisonId = personCustodyPrisonId
+
+      val sentReferral = draftReferralService.sendDraftReferral(draftReferral, user)
+      assertThat(referralRepository.findById(sentReferral.id).get().referralLocation?.prisonId).isEqualTo(personCustodyPrisonId)
+      assertThat(referralRepository.findById(sentReferral.id).get().referralLocation?.type).isEqualTo(personCurrentLocationType)
     }
 
     @Test

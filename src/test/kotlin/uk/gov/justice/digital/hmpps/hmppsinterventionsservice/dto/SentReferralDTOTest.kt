@@ -9,6 +9,8 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest
 import org.springframework.boot.test.json.JacksonTester
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralLocation
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
@@ -237,6 +239,28 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
         "endRequestedComments": null,
         "endOfServiceReportCreationRequired": false,
         "concludedAt": "2021-01-13T21:57:13Z"
+      }
+    }
+    """
+    )
+  }
+
+  @Test
+  fun `sent referral DTO includes referral location fields`() {
+    val referral = referralFactory.createSent()
+    referral.referralLocation = ReferralLocation(
+      id = UUID.randomUUID(),
+      referral = referral,
+      type = PersonCurrentLocationType.CUSTODY,
+      prisonId = "ABC"
+    )
+
+    val out = json.write(SentReferralDTO.from(referral, false))
+    Assertions.assertThat(out).isEqualToJson(
+      """
+      {
+        "personCurrentLocationType": "CUSTODY",
+        "personCustodyPrisonId": "ABC"
       }
     }
     """
