@@ -87,6 +87,8 @@ data class DraftReferralDTO(
           ?.sorted(),
         interventionId = referral.intervention.id,
         contractTypeName = referral.intervention.dynamicFrameworkContract.contractType.name,
+        personCurrentLocationType = referral.personCurrentLocationType,
+        personCustodyPrisonId = referral.personCustodyPrisonId
       )
     }
     @Deprecated("deprecated as we will be using from(referral: DraftReferral) in the future")
