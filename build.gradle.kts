@@ -105,4 +105,5 @@ dependencies {
   testImplementation("com.squareup.okhttp3:okhttp:4.10.0")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
   testImplementation("org.mockito:mockito-inline:5.1.1")
+  testImplementation("org.springframework.batch:spring-batch-test")
 }
