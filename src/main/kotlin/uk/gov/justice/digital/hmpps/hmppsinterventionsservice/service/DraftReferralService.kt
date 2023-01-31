@@ -195,7 +195,7 @@ class DraftReferralService(
   }
 
   fun updatePersonCurrentLocation(draftReferral: DraftReferral, update: DraftReferralDTO) {
-    update.personCurrentLocationType?.let{
+    update.personCurrentLocationType?.let {
       draftReferral.personCurrentLocationType = it
       draftReferral.personCustodyPrisonId = if (it == PersonCurrentLocationType.CUSTODY) update.personCustodyPrisonId else null
     }
