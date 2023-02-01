@@ -591,12 +591,14 @@ class SetupAssistant(
     maximumEnforceableDays: Int = 10,
     needsInterpreter: Boolean = true,
     relevantSentenceId: Long = 2600295124,
-    whenUnavailable: String = "She works Mondays 9am - midday"
+    whenUnavailable: String = "She works Mondays 9am - midday",
+    expectedReleaseDate: LocalDate = LocalDate.of(2050,11,1)
   ): Referral {
     referral.selectedServiceCategories = selectedServiceCategories.toMutableSet()
     // required to satisfy foreign key constrains on desired outcomes and complexity levels
     val draftReferral = serviceUserData.draftReferral!!
     draftReferral.serviceUserData = serviceUserData
+    draftReferral.expectedReleaseDate = expectedReleaseDate
     draftReferralRepository.save(draftReferral)
     referralRepository.saveAndFlush(referral)
 
@@ -663,7 +665,8 @@ class SetupAssistant(
     relevantSentenceId: Long = 2600295124,
     whenUnavailable: String = "She works Mondays 9am - midday",
     personCurrentLocationType: PersonCurrentLocationType? = PersonCurrentLocationType.CUSTODY,
-    personCustodyPrisonId: String? = "ABC"
+    personCustodyPrisonId: String? = "ABC",
+    expectedReleaseDate: LocalDate? = LocalDate.of(2050,11,1)
   ): DraftReferral {
     referral.selectedServiceCategories = selectedServiceCategories.toMutableSet()
     // required to satisfy foreign key constrains on desired outcomes and complexity levels
@@ -683,6 +686,7 @@ class SetupAssistant(
     referral.whenUnavailable = whenUnavailable
     referral.personCurrentLocationType = personCurrentLocationType
     referral.personCustodyPrisonId = personCustodyPrisonId
+    referral.expectedReleaseDate = expectedReleaseDate
 
     return draftReferralRepository.save(referral).also {
       val details = referralDetailsRepository.save(

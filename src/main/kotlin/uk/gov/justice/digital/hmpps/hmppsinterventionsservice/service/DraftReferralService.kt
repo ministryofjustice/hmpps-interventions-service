@@ -331,6 +331,20 @@ class DraftReferralService(
     return referralAccessFilter.probationPractitionerReferrals(referrals, user)
   }
 
+  private fun validateSendReferralCandidate(draftReferral: DraftReferral) {
+
+    if (currentLocationEnabled) {
+      draftReferral.personCurrentLocationType?.let {
+        if (it == PersonCurrentLocationType.CUSTODY &&
+          draftReferral.expectedReleaseDate == null &&
+          draftReferral.expectedReleaseDateMissingReason == null
+        ) {
+          throw ServerWebInputException("cannot submit a referral for a person in custody without either expected release date or reason")
+        }
+      }
+    }
+  }
+
   private fun validateDraftReferralUpdate(draftReferral: DraftReferral, update: DraftReferralDTO) {
     val errors = mutableListOf<FieldError>()
 
@@ -378,12 +392,21 @@ class DraftReferralService(
       }
     }
 
+    update.hasExpectedReleaseDate?.let {
+      if (it && update.expectedReleaseDate == null && update.expectedReleaseDateMissingReason == null) {
+        errors.add(FieldError(field = "expectedReleaseDate", error = Code.CONDITIONAL_FIELD_MUST_BE_SET))
+      }
+    }
+
     if (errors.isNotEmpty()) {
       throw ValidationError("draft referral update invalid", errors)
     }
   }
 
   fun sendDraftReferral(draftReferral: DraftReferral, user: AuthUser): Referral {
+
+    validateSendReferralCandidate(draftReferral)
+
     val referral = createSentReferral(draftReferral, user)
 
     /*
