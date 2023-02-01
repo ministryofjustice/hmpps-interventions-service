@@ -629,7 +629,7 @@ class DraftReferralServiceUnitTest {
       personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
       personCustodyPrisonId = "ABC"
     )
-    draftReferral.expectedReleaseDate = LocalDate.of(2050,11,1)
+    draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
     val authUser = authUserFactory.create()
 
     val sentReferral = draftReferralService.sendDraftReferral(draftReferral, authUser)
@@ -644,7 +644,7 @@ class DraftReferralServiceUnitTest {
       personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
       personCustodyPrisonId = "ABC"
     )
-    draftReferral.expectedReleaseDate = LocalDate.of(2050,11,1)
+    draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
     val authUser = authUserFactory.create()
 
     whenever(assessRisksAndNeedsService.createSupplementaryRisk(eq(draftReferral.id), any(), any(), anyOrNull(), any(), anyOrNull()))
@@ -675,7 +675,7 @@ class DraftReferralServiceUnitTest {
         personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
         personCustodyPrisonId = "ABC"
       )
-      draftReferral.expectedReleaseDate = LocalDate.of(2050,11,1)
+      draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
       val authUser = authUserFactory.create()
 
       whenever(draftOasysRiskInformationService.getDraftOasysRiskInformation(draftReferral.id)).thenReturn(draftRisk)
@@ -695,7 +695,7 @@ class DraftReferralServiceUnitTest {
         personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
         personCustodyPrisonId = "ABC"
       )
-      draftReferral.expectedReleaseDate = LocalDate.of(2050,11,1)
+      draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
 
       whenever(draftOasysRiskInformationService.getDraftOasysRiskInformation(draftReferral.id)).thenReturn(draftRisk)
       whenever(assessRisksAndNeedsService.createSupplementaryRisk(eq(draftReferral.id), any(), any(), anyOrNull(), any(), any()))
@@ -714,7 +714,7 @@ class DraftReferralServiceUnitTest {
         personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
         personCustodyPrisonId = "ABC"
       )
-      draftReferral.expectedReleaseDate = LocalDate.of(2050,11,1)
+      draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
 
       val authUser = authUserFactory.create()
 
@@ -745,7 +745,7 @@ class DraftReferralServiceUnitTest {
       personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
       personCustodyPrisonId = "ABC"
     )
-    draftReferral.expectedReleaseDate = LocalDate.of(2050,11,1)
+    draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
     val authUser = authUserFactory.create()
 
     val sendReferral = draftReferralService.sendDraftReferral(draftReferral, authUser)

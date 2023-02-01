@@ -592,7 +592,7 @@ class SetupAssistant(
     needsInterpreter: Boolean = true,
     relevantSentenceId: Long = 2600295124,
     whenUnavailable: String = "She works Mondays 9am - midday",
-    expectedReleaseDate: LocalDate = LocalDate.of(2050,11,1)
+    expectedReleaseDate: LocalDate = LocalDate.of(2050, 11, 1)
   ): Referral {
     referral.selectedServiceCategories = selectedServiceCategories.toMutableSet()
     // required to satisfy foreign key constrains on desired outcomes and complexity levels
@@ -666,7 +666,7 @@ class SetupAssistant(
     whenUnavailable: String = "She works Mondays 9am - midday",
     personCurrentLocationType: PersonCurrentLocationType? = PersonCurrentLocationType.CUSTODY,
     personCustodyPrisonId: String? = "ABC",
-    expectedReleaseDate: LocalDate? = LocalDate.of(2050,11,1)
+    expectedReleaseDate: LocalDate? = LocalDate.of(2050, 11, 1)
   ): DraftReferral {
     referral.selectedServiceCategories = selectedServiceCategories.toMutableSet()
     // required to satisfy foreign key constrains on desired outcomes and complexity levels
