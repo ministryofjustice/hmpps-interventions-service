@@ -67,11 +67,11 @@ dependencies {
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
-  implementation("io.sentry:sentry-spring-boot-starter:6.12.1")
-  implementation("io.sentry:sentry-logback:6.12.1")
+  implementation("io.sentry:sentry-spring-boot-starter:6.13.0")
+  implementation("io.sentry:sentry-logback:6.13.0")
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.4")
   implementation("net.logstash.logback:logstash-logback-encoder:7.2")
-  runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.1") // needed for OffsetDateTime for AppInsights
+  runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2") // needed for OffsetDateTime for AppInsights
 
   // openapi
   implementation("org.springdoc:springdoc-openapi-ui:1.6.14")
@@ -80,8 +80,8 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:3.19.0-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.19.24")
-  implementation("software.amazon.awssdk:s3:2.19.24")
+  implementation("software.amazon.awssdk:sns:2.19.28")
+  implementation("software.amazon.awssdk:s3:2.19.28")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -95,7 +95,7 @@ dependencies {
   implementation("org.hibernate:hibernate-core:5.6.14.Final")
   implementation("com.vladmihalcea:hibernate-types-55:2.21.1")
   runtimeOnly("org.flywaydb:flyway-core")
-  runtimeOnly("org.postgresql:postgresql:42.5.1")
+  runtimeOnly("org.postgresql:postgresql:42.5.2")
 
   // json and csv
   implementation("com.github.java-json-tools:json-patch:1.13")
@@ -104,5 +104,5 @@ dependencies {
   testImplementation("au.com.dius.pact.provider:junit5spring:4.4.4")
   testImplementation("com.squareup.okhttp3:okhttp:4.10.0")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
-  testImplementation("org.mockito:mockito-inline:5.0.0")
+  testImplementation("org.mockito:mockito-inline:5.1.1")
 }
