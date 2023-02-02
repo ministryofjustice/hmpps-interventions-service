@@ -50,7 +50,7 @@ data class DraftReferralDTO(
   val contractTypeName: String? = null,
   val personCurrentLocationType: PersonCurrentLocationType? = null,
   val personCustodyPrisonId: String? = null,
-  val hasExpectedReleaseDate: Boolean? = false,
+  val hasExpectedReleaseDate: Boolean? = null,
   val expectedReleaseDate: LocalDate? = null,
   val expectedReleaseDateMissingReason: String? = null
 ) {
