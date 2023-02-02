@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -252,7 +253,9 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
       id = UUID.randomUUID(),
       referral = referral,
       type = PersonCurrentLocationType.CUSTODY,
-      prisonId = "ABC"
+      prisonId = "ABC" ,
+      expectedReleaseDate = LocalDate.of(2050, 1, 1),
+      expectedReleaseDateMissingReason = null
     )
 
     val out = json.write(SentReferralDTO.from(referral, false))
@@ -263,6 +266,30 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
         "personCustodyPrisonId": "ABC"
       }
     }
+    """
+    )
+  }
+
+  @Test
+  fun `sent referral DTO includes expected release date and missing reason`() {
+    val referral = referralFactory.createSent()
+    referral.referralLocation = ReferralLocation(
+      id = UUID.randomUUID(),
+      referral = referral,
+      type = PersonCurrentLocationType.CUSTODY,
+      prisonId = "ABC",
+      expectedReleaseDate = LocalDate.of(2050, 1, 1),
+      expectedReleaseDateMissingReason = "Looking for a reason"
+    )
+
+    val out = json.write(SentReferralDTO.from(referral, false))
+    Assertions.assertThat(out).isEqualToJson(
+      """
+      {
+        "expectedReleaseDate": "2050-01-01",
+        "expectedReleaseDateMissingReason": "Looking for a reason"
+      }
+    )
     """
     )
   }

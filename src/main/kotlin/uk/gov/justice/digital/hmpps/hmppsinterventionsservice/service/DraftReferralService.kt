@@ -462,7 +462,9 @@ class DraftReferralService(
           referral = referral,
           type = draftReferral.personCurrentLocationType
             ?: throw ServerWebInputException("can't submit a referral without current location"),
-          prisonId = draftReferral.personCustodyPrisonId
+          prisonId = draftReferral.personCustodyPrisonId,
+          expectedReleaseDate = draftReferral.expectedReleaseDate,
+          expectedReleaseDateMissingReason = draftReferral.expectedReleaseDateMissingReason
         )
       )
       referralRepository.save(referral)
