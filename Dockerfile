@@ -1,8 +1,8 @@
-FROM eclipse-temurin:17.0.6_10-jre-focal AS builder
+FROM --platform=${BUILDPLATFORM:-linux/amd64} eclipse-temurin:17.0.6_10-jre-focal AS builder
 
 WORKDIR /app
 
-ENV GRADLE_OPTS="-Dorg.gradle.daemon=false"
+ENV JAVA_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
 
 # download most dependencies
 # exclude generateGitProperties -- .git folder is not copied to allow caching
