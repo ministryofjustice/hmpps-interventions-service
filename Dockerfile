@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17.0.6_10-jre-alpine AS builder
+FROM eclipse-temurin:17.0.6_10-jre-focal AS builder
 
 WORKDIR /app
 
@@ -23,17 +23,19 @@ RUN ./gradlew assemble
 
 
 # ---
-FROM eclipse-temurin:17.0.6_10-jre-alpine AS final
+FROM eclipse-temurin:17.0.6_10-jre-focal AS final
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
 # force a rebuild of `apk upgrade` below by invalidating the BUILD_NUMBER env variable on every commit
 ARG BUILD_NUMBER
 ENV BUILD_NUMBER ${BUILD_NUMBER:-1_0_0}
 
-RUN apk upgrade --no-cache && \
-     apk add --no-cache \
-       curl \
-       tzdata
+RUN apt-get update && \
+    apt-get -y upgrade && \
+    apt-get install -y \
+      curl \
+      tzdata \
+    && rm -rf /var/lib/apt/lists/*
 
 ENV TZ=Europe/London
 RUN ln -snf "/usr/share/zoneinfo/$TZ" /etc/localtime && echo "$TZ" > /etc/timezone
