@@ -253,7 +253,7 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
       id = UUID.randomUUID(),
       referral = referral,
       type = PersonCurrentLocationType.CUSTODY,
-      prisonId = "ABC" ,
+      prisonId = "ABC",
       expectedReleaseDate = LocalDate.of(2050, 1, 1),
       expectedReleaseDateMissingReason = null
     )
