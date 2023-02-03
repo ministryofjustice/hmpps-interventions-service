@@ -7,6 +7,12 @@ parameters:
   pact_consumer_tags:
     type: string
     default: main
+  alerts-slack-channel:
+    type: string
+    default: interventions-dev-notifications
+  releases-slack-channel:
+    type: string
+    default: interventions
 
 orbs:
   hmpps: ministryofjustice/hmpps@7.1.0
@@ -212,13 +218,14 @@ workflows:
               ignore: [main]
       - hmpps/trivy_latest_scan:
           name: vulnerability_scan
+          slack_channel: << pipeline.parameters.alerts-slack-channel >>
           additional_args: --debug --offline-scan
           requires: [build_and_publish_docker]
       - hmpps/deploy_env:
           name: deploy_dev
           env: "dev"
           slack_notification: true
-          slack_channel_name: "interventions-dev-notifications"
+          slack_channel_name: << pipeline.parameters.alerts-slack-channel >>
           k8s_deployment_name: hmpps-interventions-service-api
           filters:
             branches:
@@ -243,7 +250,7 @@ workflows:
           name: deploy_preprod
           env: "preprod"
           slack_notification: true
-          slack_channel_name: "interventions-dev-notifications"
+          slack_channel_name: << pipeline.parameters.alerts-slack-channel >>
           k8s_deployment_name: hmpps-interventions-service-api
           requires: [deploy_dev]
           context:
@@ -262,7 +269,7 @@ workflows:
           name: deploy_prod
           env: "prod"
           slack_notification: true
-          slack_channel_name: "interventions"
+          slack_channel_name: << pipeline.parameters.releases-slack-channel >>
           k8s_deployment_name: hmpps-interventions-service-api
           requires:
             - approve_prod
@@ -286,15 +293,15 @@ workflows:
     jobs:
       - hmpps/veracode_policy_scan:
           teams: hmpps-interventions
-          slack_channel: "interventions-dev-notifications"
+          slack_channel: << pipeline.parameters.alerts-slack-channel >>
           context:
             - hmpps-common-vars
             - veracode-credentials
       - hmpps/trivy_latest_scan:
-          slack_channel: "interventions-dev-notifications"
+          slack_channel: << pipeline.parameters.alerts-slack-channel >>
           additional_args: --debug --timeout 30m
           context: [hmpps-common-vars]
       - hmpps/gradle_owasp_dependency_check:
           cache_key: "v2-bump"
-          slack_channel: "interventions-dev-notifications"
+          slack_channel: << pipeline.parameters.alerts-slack-channel >>
           context: [hmpps-common-vars]
