@@ -210,10 +210,10 @@ workflows:
           filters:
             branches:
               ignore: [main]
-      - hmpps/trivy_pipeline_scan:
+      - hmpps/trivy_latest_scan:
           name: vulnerability_scan
           additional_args: --debug --offline-scan
-          requires: [build_docker, build_and_publish_docker]
+          requires: [build_and_publish_docker]
       - hmpps/deploy_env:
           name: deploy_dev
           env: "dev"
