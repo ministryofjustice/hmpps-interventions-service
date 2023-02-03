@@ -5,6 +5,7 @@ import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode.JOIN
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.TypeDef
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 import javax.persistence.CascadeType
@@ -67,6 +68,9 @@ class DraftReferral(
   @ElementCollection
   @CollectionTable(name = "referral_complexity_level_ids", joinColumns = [JoinColumn(name = "referral_id")])
   var complexityLevelIds: MutableMap<UUID, UUID>? = null,
+
+  @Column(name = "person_expected_release_date") var expectedReleaseDate: LocalDate? = null,
+  @Column(name = "person_expected_release_date_missing_reason") var expectedReleaseDateMissingReason: String? = null,
 
   // required fields
   @NotNull @ManyToOne(fetch = FetchType.LAZY) val intervention: Intervention,

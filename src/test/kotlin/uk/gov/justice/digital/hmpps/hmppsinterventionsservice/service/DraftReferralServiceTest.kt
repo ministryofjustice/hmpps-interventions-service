@@ -374,6 +374,7 @@ class DraftReferralServiceTest @Autowired constructor(
       draftReferral.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
       draftReferral.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
       draftReferral.personCustodyPrisonId = "ABC"
+      draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
 
       assertThat(draftReferralService.getDraftReferralForUser(draftReferral.id, user)).isNotNull
 
@@ -390,6 +391,7 @@ class DraftReferralServiceTest @Autowired constructor(
       draftReferral.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
       draftReferral.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
       draftReferral.personCustodyPrisonId = "ABC"
+      draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
 
       val sentReferral = draftReferralService.sendDraftReferral(draftReferral, user)
       assertThat(sentReferral.referenceNumber).isNotNull
@@ -406,6 +408,7 @@ class DraftReferralServiceTest @Autowired constructor(
       val personCustodyPrisonId = "ABC"
       draftReferral.personCurrentLocationType = personCurrentLocationType
       draftReferral.personCustodyPrisonId = personCustodyPrisonId
+      draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
 
       val sentReferral = draftReferralService.sendDraftReferral(draftReferral, user)
       assertThat(referralLocationRepository.findByReferralId(sentReferral.id)?.referral).isEqualTo(sentReferral)
@@ -424,6 +427,7 @@ class DraftReferralServiceTest @Autowired constructor(
       val personCustodyPrisonId = "ABC"
       draftReferral.personCurrentLocationType = personCurrentLocationType
       draftReferral.personCustodyPrisonId = personCustodyPrisonId
+      draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
 
       val sentReferral = draftReferralService.sendDraftReferral(draftReferral, user)
       assertThat(referralRepository.findById(sentReferral.id).get().referralLocation?.prisonId).isEqualTo(personCustodyPrisonId)
@@ -439,10 +443,12 @@ class DraftReferralServiceTest @Autowired constructor(
       draft1.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
       draft1.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
       draft1.personCustodyPrisonId = "ABC"
+      draft1.expectedReleaseDate = LocalDate.of(2050, 11, 1)
       draft2.additionalRiskInformation = "risk"
       draft2.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
       draft2.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
       draft2.personCustodyPrisonId = "ABC"
+      draft2.expectedReleaseDate = LocalDate.of(2050, 11, 1)
 
       whenever(referenceGenerator.generate(sampleIntervention.dynamicFrameworkContract.contractType.name))
         .thenReturn("AA0000ZZ", "AA0000ZZ", "AA0000ZZ", "AA0000ZZ", "BB0000ZZ")
@@ -462,6 +468,7 @@ class DraftReferralServiceTest @Autowired constructor(
       draftReferral.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
       draftReferral.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
       draftReferral.personCustodyPrisonId = "ABC"
+      draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
 
       val referral = draftReferralService.sendDraftReferral(draftReferral, user)
       val eventCaptor = argumentCaptor<Referral>()

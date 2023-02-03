@@ -106,6 +106,8 @@ class DraftReferralService(
         update.maximumEnforceableDays,
         update.completionDeadline,
         update.furtherInformation,
+        update.expectedReleaseDate,
+        update.expectedReleaseDateMissingReason,
         "initial referral details",
       ),
       referral.createdBy,
@@ -116,6 +118,7 @@ class DraftReferralService(
     updateServiceCategoryDetails(referral, update)
     if (currentLocationEnabled) {
       updatePersonCurrentLocation(referral, update)
+      updatePersonExpectedReleaseDate(referral, update)
     }
 
     // this field doesn't fit into any other categories - is this a smell?
@@ -199,6 +202,11 @@ class DraftReferralService(
       draftReferral.personCurrentLocationType = it
       draftReferral.personCustodyPrisonId = if (it == PersonCurrentLocationType.CUSTODY) update.personCustodyPrisonId else null
     }
+  }
+
+  fun updatePersonExpectedReleaseDate(draftReferral: DraftReferral, update: DraftReferralDTO) {
+    draftReferral.expectedReleaseDate = update.expectedReleaseDate
+    draftReferral.expectedReleaseDateMissingReason = update.expectedReleaseDateMissingReason
   }
 
   private fun updateServiceUserNeeds(draftReferral: DraftReferral, update: DraftReferralDTO) {
@@ -323,6 +331,20 @@ class DraftReferralService(
     return referralAccessFilter.probationPractitionerReferrals(referrals, user)
   }
 
+  private fun validateSendReferralCandidate(draftReferral: DraftReferral) {
+
+    if (currentLocationEnabled) {
+      draftReferral.personCurrentLocationType?.let {
+        if (it == PersonCurrentLocationType.CUSTODY &&
+          draftReferral.expectedReleaseDate == null &&
+          draftReferral.expectedReleaseDateMissingReason == null
+        ) {
+          throw ServerWebInputException("cannot submit a referral for a person in custody without either expected release date or reason")
+        }
+      }
+    }
+  }
+
   private fun validateDraftReferralUpdate(draftReferral: DraftReferral, update: DraftReferralDTO) {
     val errors = mutableListOf<FieldError>()
 
@@ -370,12 +392,21 @@ class DraftReferralService(
       }
     }
 
+    update.hasExpectedReleaseDate?.let {
+      if (it && update.expectedReleaseDate == null && update.expectedReleaseDateMissingReason == null) {
+        errors.add(FieldError(field = "expectedReleaseDate", error = Code.CONDITIONAL_FIELD_MUST_BE_SET))
+      }
+    }
+
     if (errors.isNotEmpty()) {
       throw ValidationError("draft referral update invalid", errors)
     }
   }
 
   fun sendDraftReferral(draftReferral: DraftReferral, user: AuthUser): Referral {
+
+    validateSendReferralCandidate(draftReferral)
+
     val referral = createSentReferral(draftReferral, user)
 
     /*
@@ -431,7 +462,9 @@ class DraftReferralService(
           referral = referral,
           type = draftReferral.personCurrentLocationType
             ?: throw ServerWebInputException("can't submit a referral without current location"),
-          prisonId = draftReferral.personCustodyPrisonId
+          prisonId = draftReferral.personCustodyPrisonId,
+          expectedReleaseDate = draftReferral.expectedReleaseDate,
+          expectedReleaseDateMissingReason = draftReferral.expectedReleaseDateMissingReason
         )
       )
       referralRepository.save(referral)

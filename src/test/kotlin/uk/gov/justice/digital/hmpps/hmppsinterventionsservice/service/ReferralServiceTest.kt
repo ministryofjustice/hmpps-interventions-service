@@ -979,6 +979,7 @@ class ReferralServiceTest @Autowired constructor(
     val id = UUID.randomUUID()
     val existingCompletionDate = LocalDate.of(2022, 10, 21)
     val completionDateToChange = LocalDate.of(2022, 10, 30)
+    val expectedreleaseDate = LocalDate.of(2023, 12, 31)
     val intervention = interventionFactory.create(description = description)
     val referral = referralFactory.createSent(
       createdAt = OffsetDateTime.now(),
@@ -998,7 +999,7 @@ class ReferralServiceTest @Autowired constructor(
     )
     whenever(userMapper.fromToken(jwtAuthentionToken)).thenReturn(authUser)
 
-    val referralToUpdate = UpdateReferralDetailsDTO(20, completionDateToChange, "new information", "we decided 10 days wasn't enough")
+    val referralToUpdate = UpdateReferralDetailsDTO(20, completionDateToChange, "new information", expectedreleaseDate, null, "we decided 10 days wasn't enough")
     val referralDetailsReturned = referralService.updateReferralDetails(referral, referralToUpdate, user)
     val referralDetailsValue = referralService.getReferralDetailsById(referralDetailsReturned?.id)
 
@@ -1033,7 +1034,7 @@ class ReferralServiceTest @Autowired constructor(
 
     whenever(userMapper.fromToken(jwtAuthentionToken)).thenReturn(authUser)
 
-    val referralToUpdate = UpdateReferralDetailsDTO(20, null, "new information", "we decided 10 days wasn't enough")
+    val referralToUpdate = UpdateReferralDetailsDTO(20, null, "new information", null, null, "we decided 10 days wasn't enough")
     val referralDetailsReturned = referralService.updateReferralDetails(referral, referralToUpdate, user)
     val referralDetailsValue = referralService.getReferralDetailsById(referralDetailsReturned?.id)
 

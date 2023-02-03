@@ -491,7 +491,7 @@ class AmendReferralServiceTest @Autowired constructor(
       saved = true
     )
 
-    val referralToUpdate = UpdateReferralDetailsDTO(20, null, "new information", "we decided 10 days wasn't enough")
+    val referralToUpdate = UpdateReferralDetailsDTO(20, null, "new information", null, null, "we decided 10 days wasn't enough")
 
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
     whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
