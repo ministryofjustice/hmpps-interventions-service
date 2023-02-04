@@ -221,6 +221,8 @@ workflows:
           slack_channel: << pipeline.parameters.alerts-slack-channel >>
           additional_args: --debug --offline-scan
           requires: [build_and_publish_docker]
+          context:
+            - hmpps-common-vars
       - hmpps/deploy_env:
           name: deploy_dev
           env: "dev"
