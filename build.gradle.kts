@@ -1,7 +1,7 @@
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.1"
-  kotlin("plugin.spring") version "1.8.0"
-  id("org.jetbrains.kotlin.plugin.jpa") version "1.8.0"
+  kotlin("plugin.spring") version "1.8.10"
+  id("org.jetbrains.kotlin.plugin.jpa") version "1.8.10"
   id("jacoco")
 }
 
@@ -80,8 +80,8 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:3.19.0-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.19.28")
-  implementation("software.amazon.awssdk:s3:2.19.28")
+  implementation("software.amazon.awssdk:sns:2.19.31")
+  implementation("software.amazon.awssdk:s3:2.19.31")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -95,13 +95,13 @@ dependencies {
   implementation("org.hibernate:hibernate-core:5.6.14.Final")
   implementation("com.vladmihalcea:hibernate-types-55:2.21.1")
   runtimeOnly("org.flywaydb:flyway-core")
-  runtimeOnly("org.postgresql:postgresql:42.5.2")
+  runtimeOnly("org.postgresql:postgresql:42.5.3")
 
   // json and csv
   implementation("com.github.java-json-tools:json-patch:1.13")
-  implementation("org.apache.commons:commons-csv:1.9.0")
+  implementation("org.apache.commons:commons-csv:1.10.0")
 
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.4.4")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.4.5")
   testImplementation("com.squareup.okhttp3:okhttp:4.10.0")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
   testImplementation("org.mockito:mockito-inline:5.1.1")
