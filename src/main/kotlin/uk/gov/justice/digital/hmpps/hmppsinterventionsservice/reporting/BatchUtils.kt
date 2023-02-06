@@ -8,7 +8,6 @@ import org.springframework.batch.core.JobParametersBuilder
 import org.springframework.batch.core.JobParametersIncrementer
 import org.springframework.batch.core.step.skip.SkipPolicy
 import org.springframework.batch.item.ItemProcessor
-import org.springframework.batch.item.ItemWriter
 import org.springframework.batch.item.file.FlatFileHeaderCallback
 import org.springframework.batch.item.file.FlatFileItemWriter
 import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder
@@ -25,6 +24,8 @@ import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.Date
+import kotlin.io.path.createTempDirectory
+import kotlin.io.path.pathString
 
 @Component
 class BatchUtils {
@@ -95,14 +96,6 @@ interface SentReferralProcessor<T> : ItemProcessor<Referral, T> {
   }
 }
 
-class LoggingWriter<T> : ItemWriter<T> {
-  companion object : KLogging()
-
-  override fun write(items: MutableList<out T>) {
-    logger.info(items.toString())
-  }
-}
-
 class TimestampIncrementer : JobParametersIncrementer {
   override fun getNext(inputParams: JobParameters?): JobParameters {
     val params = inputParams ?: JobParameters()
@@ -113,6 +106,20 @@ class TimestampIncrementer : JobParametersIncrementer {
 
     return JobParametersBuilder(params)
       .addLong("timestamp", Instant.now().epochSecond)
+      .toJobParameters()
+  }
+}
+
+class OutputPathIncrementer : JobParametersIncrementer {
+  override fun getNext(inputParams: JobParameters?): JobParameters {
+    val params = inputParams ?: JobParameters()
+
+    if (params.parameters["outputPath"] != null) {
+      return params
+    }
+
+    return JobParametersBuilder(params)
+      .addString("outputPath", createTempDirectory().pathString)
       .toJobParameters()
   }
 }
@@ -139,8 +146,9 @@ class CsvLineAggregator<T>(fieldsToExtract: List<String>) : ExtractorLineAggrega
     )
   }
 
-  private val csvPrinter = CSVFormat.DEFAULT
-    .withRecordSeparator("") // the underlying aggregator adds line separators for us
+  private val csvPrinter = CSVFormat.DEFAULT.builder()
+    .setRecordSeparator("") // the underlying aggregator adds line separators for us
+    .build()
 
   override fun doAggregate(fields: Array<out Any>): String {
     val out = StringBuilder()

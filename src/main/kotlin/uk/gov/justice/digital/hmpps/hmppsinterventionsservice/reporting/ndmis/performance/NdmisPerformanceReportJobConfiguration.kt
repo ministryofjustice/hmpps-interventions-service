@@ -27,10 +27,10 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.OnStar
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUtils
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.NPESkipPolicy
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.OutputPathIncrementer
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.S3Service
-import java.io.File
-import kotlin.io.path.createTempDirectory
+import java.nio.file.Path
 
 @Configuration
 @EnableBatchProcessing
@@ -45,16 +45,12 @@ class NdmisPerformanceReportJobConfiguration(
   @Value("\${spring.batch.jobs.ndmis.performance-report.chunk-size}") private val chunkSize: Int,
 ) {
   companion object : KLogging()
+
   private val pathPrefix = "dfinterventions/dfi/csv/reports/"
   private val referralReportFilename = "crs_performance_report-v2-referrals.csv"
   private val complexityReportFilename = "crs_performance_report-v2-complexity.csv"
   private val appointmentReportFilename = "crs_performance_report-v2-appointments.csv"
-
   private val skipPolicy = NPESkipPolicy()
-  private val tmpDir = createTempDirectory()
-  private val referralReportPath = tmpDir.resolve(referralReportFilename)
-  private val complexityReportPath = tmpDir.resolve(complexityReportFilename)
-  private val appointmentsReportPath = tmpDir.resolve(appointmentReportFilename)
 
   @Bean
   fun ndmisPerformanceReportJobLauncher(ndmisPerformanceReportJob: Job): ApplicationRunner {
@@ -76,10 +72,10 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   @StepScope
-  fun ndmisReferralsWriter(): FlatFileItemWriter<ReferralsData> {
+  fun ndmisReferralsWriter(@Value("#{jobParameters['outputPath']}") outputPath: String): FlatFileItemWriter<ReferralsData> {
     return batchUtils.csvFileWriter(
       "ndmisReferralsPerformanceReportWriter",
-      FileSystemResource(referralReportPath),
+      FileSystemResource(Path.of(outputPath).resolve(referralReportFilename)),
       ReferralsData.headers,
       ReferralsData.fields
     )
@@ -87,10 +83,10 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   @StepScope
-  fun ndmisComplexityWriter(): FlatFileItemWriter<Collection<ComplexityData>> {
+  fun ndmisComplexityWriter(@Value("#{jobParameters['outputPath']}") outputPath: String): FlatFileItemWriter<Collection<ComplexityData>> {
     return batchUtils.recursiveCollectionCsvFileWriter(
       "ndmisComplexityPerformanceReportWriter",
-      FileSystemResource(complexityReportPath),
+      FileSystemResource(Path.of(outputPath).resolve(complexityReportFilename)),
       ComplexityData.headers,
       ComplexityData.fields
     )
@@ -98,10 +94,10 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   @StepScope
-  fun ndmisAppointmentWriter(): FlatFileItemWriter<Collection<AppointmentData>> {
+  fun ndmisAppointmentWriter(@Value("#{jobParameters['outputPath']}") outputPath: String): FlatFileItemWriter<Collection<AppointmentData>> {
     return batchUtils.recursiveCollectionCsvFileWriter(
       "ndmisAppointmentPerformanceReportWriter",
-      FileSystemResource(appointmentsReportPath),
+      FileSystemResource(Path.of(outputPath).resolve(appointmentReportFilename)),
       AppointmentData.headers,
       AppointmentData.fields
     )
@@ -111,19 +107,17 @@ class NdmisPerformanceReportJobConfiguration(
   fun ndmisPerformanceReportJob(
     ndmisWriteReferralToCsvStep: Step,
     ndmisWriteComplexityToCsvStep: Step,
-    ndmisWriteAppointmentToCsvStep: Step
+    ndmisWriteAppointmentToCsvStep: Step,
+    pushToS3Step: Step,
   ): Job {
     val validator = DefaultJobParametersValidator()
-    validator.setRequiredKeys(
-      arrayOf(
-        "timestamp",
-      )
-    )
+    validator.setRequiredKeys(arrayOf("timestamp", "outputPath"))
 
     return jobBuilderFactory["ndmisPerformanceReportJob"]
       // this incrementer adds a timestamp parameter meaning we can
       // re-run the job with the same commandline params multiple times
       .incrementer(TimestampIncrementer())
+      .incrementer(OutputPathIncrementer())
       .validator(validator)
       .start(ndmisWriteReferralToCsvStep)
       .next(ndmisWriteComplexityToCsvStep)
@@ -180,13 +174,17 @@ class NdmisPerformanceReportJobConfiguration(
       .build()
   }
 
-  private val pushToS3Step = stepBuilderFactory["pushToS3Step"]
-    .tasklet { _: StepContribution, _: ChunkContext ->
-      listOf(referralReportPath, complexityReportPath, appointmentsReportPath).forEach { path ->
-        s3Service.publishFileToS3(ndmisS3Bucket, path, pathPrefix, acl = ObjectCannedACL.BUCKET_OWNER_FULL_CONTROL)
-        File(path.toString()).delete()
-      }
-      RepeatStatus.FINISHED
+  @Bean
+  @JobScope
+  fun pushToS3Step(@Value("#{jobParameters['outputPath']}") outputPath: String): Step =
+    stepBuilderFactory["pushToS3Step"].tasklet(pushFilesToS3(outputPath)).build()
+
+  private fun pushFilesToS3(outputPath: String) = { _: StepContribution, _: ChunkContext ->
+    listOf(referralReportFilename, complexityReportFilename, appointmentReportFilename).forEach { file ->
+      val path = Path.of(outputPath).resolve(file)
+      s3Service.publishFileToS3(ndmisS3Bucket, path, pathPrefix, acl = ObjectCannedACL.BUCKET_OWNER_FULL_CONTROL)
+      path.toFile().deleteOnExit()
     }
-    .build()
+    RepeatStatus.FINISHED
+  }
 }
