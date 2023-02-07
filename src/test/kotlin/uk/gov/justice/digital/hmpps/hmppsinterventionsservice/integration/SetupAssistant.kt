@@ -272,10 +272,10 @@ class SetupAssistant(
     )
   }
 
-  fun createEndedReferral(id: UUID = UUID.randomUUID(), intervention: Intervention = createIntervention(), endRequestedReason: CancellationReason? = randomCancellationReason(), endRequestedComments: String? = null): Referral {
+  fun createEndedReferral(id: UUID = UUID.randomUUID(), intervention: Intervention = createIntervention(), endRequestedReason: CancellationReason? = randomCancellationReason(), endRequestedComments: String? = null, personCurrentLocationType: PersonCurrentLocationType? = null, personCustodyPrisonId: String? = null): Referral {
     val ppUser = createPPUser()
     val spUser = createSPUser()
-    draftReferralRepository.save(referralFactory.createDraft(id = id, intervention = intervention, createdBy = ppUser))
+    draftReferralRepository.save(referralFactory.createDraft(id = id, intervention = intervention, createdBy = ppUser, personCustodyPrisonId = personCustodyPrisonId, personCurrentLocationType = personCurrentLocationType))
     return referralRepository.save(referralFactory.createEnded(id = id, intervention = intervention, createdBy = ppUser, sentBy = ppUser, endRequestedBy = ppUser, assignments = listOf(ReferralAssignment(OffsetDateTime.now(), spUser, spUser)), endRequestedReason = endRequestedReason, endRequestedComments = endRequestedComments))
   }
 
