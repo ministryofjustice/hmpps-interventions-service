@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.pact
 
 import au.com.dius.pact.provider.junitsupport.State
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.SetupAssistant
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -16,6 +17,8 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
     val referral = setupAssistant.createEndedReferral(
       id = UUID.fromString("c5554f8f-aac6-4eaf-ba70-63281de35685"),
       endRequestedComments = "Alex was arrested for driving without insurance and immediately recalled",
+      personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
+      personCustodyPrisonId = "aaa",
     )
     setupAssistant.fillReferralFields(referral)
   }
