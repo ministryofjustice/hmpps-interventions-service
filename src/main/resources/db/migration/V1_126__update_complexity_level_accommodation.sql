@@ -1,0 +1,1 @@
+update complexity_level set description='Service user is at risk of homelessness/is homeless, or will be on release from prison. Service user has had some success in maintaining a tenancy but may have additional needs e.g. Learning Difficulties and/or Learning Disabilities or other challenges currently.' where id = '110f2405-d944-4c15-836c-0c6684e2aa78'
