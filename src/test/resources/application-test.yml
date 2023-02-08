@@ -9,7 +9,7 @@ pactbroker:
   host: pact-broker-prod.apps.live-1.cloud-platform.service.justice.gov.uk
   scheme: https
   consumerversionselectors:
-    tags: IPB-4/knowing-custody-status
+    tags: main
 
 spring:
   jpa:
