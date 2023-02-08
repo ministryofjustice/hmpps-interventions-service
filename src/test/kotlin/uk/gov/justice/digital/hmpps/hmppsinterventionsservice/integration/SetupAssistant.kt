@@ -330,12 +330,11 @@ class SetupAssistant(
         interpreterLanguage = interpreterLanguage,
       )
     )
-    referral.referralLocation = createReferralLocation(referral = referral, personCurrentLocationType, personCustodyPrisonId)
     referral.supplierAssessment = createSupplierAssessment(referral = referral)
     return referral
   }
 
-   private fun createReferralLocation(referral: Referral, type: PersonCurrentLocationType = PersonCurrentLocationType.CUSTODY, prisonId: String? = "bbb"): ReferralLocation {
+   private fun createReferralLocation(referral: Referral, type: PersonCurrentLocationType = PersonCurrentLocationType.CUSTODY, prisonId: String? = "aaa"): ReferralLocation {
     return referralLocationRepository.save(
       ReferralLocation(
         UUID.randomUUID(),
@@ -620,7 +619,7 @@ class SetupAssistant(
       UUID.randomUUID(),
       referral = referral,
       type = PersonCurrentLocationType.CUSTODY,
-      prisonId = "bbb",
+      prisonId = "aaa",
       expectedReleaseDate = null,
       expectedReleaseDateMissingReason = null
     )
@@ -630,6 +629,9 @@ class SetupAssistant(
     val draftReferral = serviceUserData.draftReferral!!
     draftReferral.serviceUserData = serviceUserData
     draftReferral.expectedReleaseDate = expectedReleaseDate
+    draftReferral.personCurrentLocationType = referralLocation.type
+    draftReferral.personCustodyPrisonId = referralLocation.prisonId
+    draftReferral.expectedReleaseDate =  referralLocation.expectedReleaseDate
     draftReferralRepository.save(draftReferral)
     referralRepository.saveAndFlush(referral)
 
@@ -646,6 +648,7 @@ class SetupAssistant(
     referral.whenUnavailable = whenUnavailable
     referral.referralLocation = referralLocation
     return referralRepository.save(referral).also {
+      referralLocationRepository.save(referralLocation)
       val details = referralDetailsRepository.save(
         ReferralDetails(
           UUID.randomUUID(),

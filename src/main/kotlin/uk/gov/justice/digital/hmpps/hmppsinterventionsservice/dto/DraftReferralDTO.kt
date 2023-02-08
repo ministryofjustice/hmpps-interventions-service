@@ -132,6 +132,10 @@ data class DraftReferralDTO(
           ?.sorted(),
         interventionId = referral.intervention.id,
         contractTypeName = referral.intervention.dynamicFrameworkContract.contractType.name,
+        personCurrentLocationType = referral.referralLocation?.type,
+        personCustodyPrisonId = referral.referralLocation?.prisonId,
+        expectedReleaseDate = referral.referralLocation?.expectedReleaseDate,
+        expectedReleaseDateMissingReason = referral.referralLocation?.expectedReleaseDateMissingReason
       )
     }
   }

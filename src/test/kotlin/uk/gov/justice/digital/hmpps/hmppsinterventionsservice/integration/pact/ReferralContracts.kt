@@ -146,7 +146,7 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
       id = UUID.fromString("81d754aa-d868-4347-9c0f-50690773014e"),
       ppUser = setupAssistant.createPPUserSecond(),
       personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
-      personCustodyPrisonId = "bbb"
+      personCustodyPrisonId = "aaa"
     )
     setupAssistant.fillReferralFields(referral)
   }
