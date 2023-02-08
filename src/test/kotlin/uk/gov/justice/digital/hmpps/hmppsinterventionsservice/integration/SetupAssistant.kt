@@ -334,7 +334,7 @@ class SetupAssistant(
     return referral
   }
 
-   private fun createReferralLocation(referral: Referral, type: PersonCurrentLocationType = PersonCurrentLocationType.CUSTODY, prisonId: String? = "aaa"): ReferralLocation {
+  private fun createReferralLocation(referral: Referral, type: PersonCurrentLocationType = PersonCurrentLocationType.CUSTODY, prisonId: String? = "aaa"): ReferralLocation {
     return referralLocationRepository.save(
       ReferralLocation(
         UUID.randomUUID(),
@@ -631,7 +631,7 @@ class SetupAssistant(
     draftReferral.expectedReleaseDate = expectedReleaseDate
     draftReferral.personCurrentLocationType = referralLocation.type
     draftReferral.personCustodyPrisonId = referralLocation.prisonId
-    draftReferral.expectedReleaseDate =  referralLocation.expectedReleaseDate
+    draftReferral.expectedReleaseDate = referralLocation.expectedReleaseDate
     draftReferralRepository.save(draftReferral)
     referralRepository.saveAndFlush(referral)
 
