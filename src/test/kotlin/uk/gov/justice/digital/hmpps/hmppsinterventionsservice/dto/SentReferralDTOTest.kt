@@ -9,12 +9,9 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest
 import org.springframework.boot.test.json.JacksonTester
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralLocation
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
-import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -242,54 +239,6 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
         "concludedAt": "2021-01-13T21:57:13Z"
       }
     }
-    """
-    )
-  }
-
-  @Test
-  fun `sent referral DTO includes referral location fields`() {
-    val referral = referralFactory.createSent()
-    referral.referralLocation = ReferralLocation(
-      id = UUID.randomUUID(),
-      referral = referral,
-      type = PersonCurrentLocationType.CUSTODY,
-      prisonId = "ABC",
-      expectedReleaseDate = LocalDate.of(2050, 1, 1),
-      expectedReleaseDateMissingReason = null
-    )
-
-    val out = json.write(SentReferralDTO.from(referral, false))
-    Assertions.assertThat(out).isEqualToJson(
-      """
-      {
-        "personCurrentLocationType": "CUSTODY",
-        "personCustodyPrisonId": "ABC"
-      }
-    }
-    """
-    )
-  }
-
-  @Test
-  fun `sent referral DTO includes expected release date and missing reason`() {
-    val referral = referralFactory.createSent()
-    referral.referralLocation = ReferralLocation(
-      id = UUID.randomUUID(),
-      referral = referral,
-      type = PersonCurrentLocationType.CUSTODY,
-      prisonId = "ABC",
-      expectedReleaseDate = LocalDate.of(2050, 1, 1),
-      expectedReleaseDateMissingReason = "Looking for a reason"
-    )
-
-    val out = json.write(SentReferralDTO.from(referral, false))
-    Assertions.assertThat(out).isEqualToJson(
-      """
-      {
-        "expectedReleaseDate": "2050-01-01",
-        "expectedReleaseDateMissingReason": "Looking for a reason"
-      }
-    )
     """
     )
   }

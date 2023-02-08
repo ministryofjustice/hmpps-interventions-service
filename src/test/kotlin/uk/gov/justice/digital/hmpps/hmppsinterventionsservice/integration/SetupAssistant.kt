@@ -27,6 +27,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonC
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralLocation
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SelectedDesiredOutcomesMapping
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
@@ -247,6 +248,8 @@ class SetupAssistant(
     createdAt: OffsetDateTime = OffsetDateTime.now(),
     serviceUserCRN: String = "X123456",
     selectedServiceCategories: MutableSet<ServiceCategory>? = null,
+    personCurrentLocationType: PersonCurrentLocationType? = null,
+    personCustodyPrisonId: String? = null
   ): DraftReferral {
     return draftReferralRepository.save(
       referralFactory.createDraft(
@@ -256,7 +259,9 @@ class SetupAssistant(
         createdBy = createdBy,
         serviceUserCRN = serviceUserCRN,
         selectedServiceCategories = selectedServiceCategories,
-        completionDeadline = LocalDate.now()
+        completionDeadline = LocalDate.now(),
+        personCurrentLocationType = personCurrentLocationType,
+        personCustodyPrisonId = personCustodyPrisonId
       )
     )
   }
@@ -303,11 +308,15 @@ class SetupAssistant(
     completionDeadline: LocalDate = LocalDate.now(),
     needsInterpreter: Boolean? = null,
     interpreterLanguage: String? = null,
+    personCurrentLocationType: PersonCurrentLocationType = PersonCurrentLocationType.CUSTODY,
+    personCustodyPrisonId: String? = null
   ): Referral {
     createDraftReferral(
       id = id,
       intervention = intervention,
-      createdBy = ppUser
+      createdBy = ppUser,
+      personCurrentLocationType = personCurrentLocationType,
+      personCustodyPrisonId = personCustodyPrisonId
     )
     val referral = referralRepository.save(
       referralFactory.createSent(
@@ -318,11 +327,24 @@ class SetupAssistant(
         sentAt = sentAt,
         completionDeadline = completionDeadline,
         needsInterpreter = needsInterpreter,
-        interpreterLanguage = interpreterLanguage
+        interpreterLanguage = interpreterLanguage,
       )
     )
     referral.supplierAssessment = createSupplierAssessment(referral = referral)
     return referral
+  }
+
+  private fun createReferralLocation(referral: Referral, type: PersonCurrentLocationType = PersonCurrentLocationType.CUSTODY, prisonId: String? = "aaa"): ReferralLocation {
+    return referralLocationRepository.save(
+      ReferralLocation(
+        UUID.randomUUID(),
+        referral = referral,
+        type = type,
+        prisonId = prisonId,
+        expectedReleaseDate = null,
+        expectedReleaseDateMissingReason = null
+      )
+    )
   }
 
   fun addSupplierAssessmentAppointment(
@@ -592,13 +614,24 @@ class SetupAssistant(
     needsInterpreter: Boolean = true,
     relevantSentenceId: Long = 2600295124,
     whenUnavailable: String = "She works Mondays 9am - midday",
-    expectedReleaseDate: LocalDate = LocalDate.of(2050, 11, 1)
+    expectedReleaseDate: LocalDate = LocalDate.of(2050, 11, 1),
+    referralLocation: ReferralLocation = ReferralLocation(
+      UUID.randomUUID(),
+      referral = referral,
+      type = PersonCurrentLocationType.CUSTODY,
+      prisonId = "aaa",
+      expectedReleaseDate = null,
+      expectedReleaseDateMissingReason = null
+    )
   ): Referral {
     referral.selectedServiceCategories = selectedServiceCategories.toMutableSet()
     // required to satisfy foreign key constrains on desired outcomes and complexity levels
     val draftReferral = serviceUserData.draftReferral!!
     draftReferral.serviceUserData = serviceUserData
     draftReferral.expectedReleaseDate = expectedReleaseDate
+    draftReferral.personCurrentLocationType = referralLocation.type
+    draftReferral.personCustodyPrisonId = referralLocation.prisonId
+    draftReferral.expectedReleaseDate = referralLocation.expectedReleaseDate
     draftReferralRepository.save(draftReferral)
     referralRepository.saveAndFlush(referral)
 
@@ -613,7 +646,9 @@ class SetupAssistant(
     referral.needsInterpreter = needsInterpreter
     referral.relevantSentenceId = relevantSentenceId
     referral.whenUnavailable = whenUnavailable
+    referral.referralLocation = referralLocation
     return referralRepository.save(referral).also {
+      referralLocationRepository.save(referralLocation)
       val details = referralDetailsRepository.save(
         ReferralDetails(
           UUID.randomUUID(),
@@ -665,7 +700,7 @@ class SetupAssistant(
     relevantSentenceId: Long = 2600295124,
     whenUnavailable: String = "She works Mondays 9am - midday",
     personCurrentLocationType: PersonCurrentLocationType? = PersonCurrentLocationType.CUSTODY,
-    personCustodyPrisonId: String? = "ABC",
+    personCustodyPrisonId: String? = "test",
     expectedReleaseDate: LocalDate? = LocalDate.of(2050, 11, 1)
   ): DraftReferral {
     referral.selectedServiceCategories = selectedServiceCategories.toMutableSet()

@@ -141,13 +141,18 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
 
   @State("There is an existing sent referral with ID of 81d754aa-d868-4347-9c0f-50690773014e")
   fun `create sent referral 81d754aa`() {
-    val referral = setupAssistant.createSentReferral(id = UUID.fromString("81d754aa-d868-4347-9c0f-50690773014e"), ppUser = setupAssistant.createPPUserSecond())
+    val referral = setupAssistant.createSentReferral(
+      id = UUID.fromString("81d754aa-d868-4347-9c0f-50690773014e"),
+      ppUser = setupAssistant.createPPUserSecond(),
+      personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
+      personCustodyPrisonId = "aaa"
+    )
     setupAssistant.fillReferralFields(referral)
   }
 
   @State("a draft referral with ID 2a67075a-9c77-4103-9de0-63c4cfe3e8d6 exists and is ready to be sent")
   fun `create referral with 2a67075a id`() {
-    val referral = setupAssistant.createDraftReferral(id = UUID.fromString("2a67075a-9c77-4103-9de0-63c4cfe3e8d6"))
+    val referral = setupAssistant.createDraftReferral(id = UUID.fromString("2a67075a-9c77-4103-9de0-63c4cfe3e8d6"), personCurrentLocationType = PersonCurrentLocationType.CUSTODY, personCustodyPrisonId = "test")
     setupAssistant.fillDraftReferralFields(referral)
   }
   @State("got change log entires successfully")
