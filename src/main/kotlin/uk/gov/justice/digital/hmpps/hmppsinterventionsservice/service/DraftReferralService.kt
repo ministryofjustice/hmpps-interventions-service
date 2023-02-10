@@ -54,6 +54,7 @@ class DraftReferralService(
   val serviceCategoryRepository: ServiceCategoryRepository,
   val userTypeChecker: UserTypeChecker,
   val communityAPIReferralService: CommunityAPIReferralService,
+  val communityAPIOffenderService: CommunityAPIOffenderService,
   val assessRisksAndNeedsService: RisksAndNeedsService,
   val supplierAssessmentService: SupplierAssessmentService,
   val hmppsAuthService: HMPPSAuthService,
@@ -439,6 +440,7 @@ class DraftReferralService(
 
     val sentReferral = referralRepository.save(referral)
     createReferralLocation(draftReferral, sentReferral)
+    storeNomisCustodyLocation(sentReferral)
     eventPublisher.referralSentEvent(sentReferral)
     supplierAssessmentService.createSupplierAssessment(referral)
     return sentReferral
@@ -484,6 +486,10 @@ class DraftReferralService(
       )
       referralRepository.save(referral)
     }
+  }
+
+  private fun storeNomisCustodyLocation(referral: Referral) {
+    val offenderNomsNumber = communityAPIOffenderService.getOffenderNomsNumber(referral.serviceUserCRN)
   }
 
   private fun submitAdditionalRiskInformation(referral: Referral, user: AuthUser) {

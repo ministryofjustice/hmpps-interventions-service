@@ -34,6 +34,10 @@ private data class StaffDetailsResponse(
   val staffIdentifier: Long,
 )
 
+private data class OffenderNomsNumberResponse(
+  val offenderNomsNumber: String?
+)
+
 private data class ContactableHumanResponse(
   val forenames: String?,
   val surname: String?,
@@ -53,6 +57,7 @@ class CommunityAPIOffenderService(
   @Value("\${community-api.locations.managed-offenders}") private val managedOffendersLocation: String,
   @Value("\${community-api.locations.staff-details}") private val staffDetailsLocation: String,
   @Value("\${community-api.locations.offender-managers}") private val offenderManagersLocation: String,
+  @Value("\${community-api.locations.offender-identifiers}") private val offenderIdentifiersLocation: String,
   private val communityApiClient: RestClient,
   private val telemetryService: TelemetryService,
 ) {
@@ -107,6 +112,24 @@ class CommunityAPIOffenderService(
       }
       .block()
       ?.staffIdentifier
+  }
+
+  fun getOffenderNomsNumber(crn: String): String? {
+    val offenderIdentifiersPath = UriComponentsBuilder.fromPath(offenderIdentifiersLocation)
+      .buildAndExpand(crn)
+      .toString()
+
+    return communityApiClient.get(offenderIdentifiersPath)
+      .retrieve()
+      .bodyToMono(OffenderNomsNumberResponse::class.java)
+      .onErrorResume(WebClientResponseException::class.java) { e ->
+        when (e.statusCode) {
+          HttpStatus.NOT_FOUND -> Mono.empty()
+          else -> Mono.error(e)
+        }
+      }
+        .block()
+        ?.offenderNomsNumber
   }
 
   fun getResponsibleOfficer(crn: String): ResponsibleOfficer {
