@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.pact
 import au.com.dius.pact.provider.junitsupport.State
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.SetupAssistant
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -19,6 +20,7 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
       endRequestedComments = "Alex was arrested for driving without insurance and immediately recalled",
       personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
       personCustodyPrisonId = "aaa",
+      expectedReleaseDate = LocalDate.now().plusDays(1)
     )
     setupAssistant.fillReferralFields(referral)
   }
@@ -145,14 +147,20 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
       id = UUID.fromString("81d754aa-d868-4347-9c0f-50690773014e"),
       ppUser = setupAssistant.createPPUserSecond(),
       personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
-      personCustodyPrisonId = "aaa"
+      personCustodyPrisonId = "aaa",
+      expectedReleaseDate = LocalDate.now().plusDays(1)
     )
     setupAssistant.fillReferralFields(referral)
   }
 
   @State("a draft referral with ID 2a67075a-9c77-4103-9de0-63c4cfe3e8d6 exists and is ready to be sent")
   fun `create referral with 2a67075a id`() {
-    val referral = setupAssistant.createDraftReferral(id = UUID.fromString("2a67075a-9c77-4103-9de0-63c4cfe3e8d6"), personCurrentLocationType = PersonCurrentLocationType.CUSTODY, personCustodyPrisonId = "test")
+    val referral = setupAssistant.createDraftReferral(
+      id = UUID.fromString("2a67075a-9c77-4103-9de0-63c4cfe3e8d6"),
+      personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
+      personCustodyPrisonId = "test",
+      expectedReleaseDate = LocalDate.now().plusDays(1)
+    )
     setupAssistant.fillDraftReferralFields(referral)
   }
   @State("got change log entires successfully")

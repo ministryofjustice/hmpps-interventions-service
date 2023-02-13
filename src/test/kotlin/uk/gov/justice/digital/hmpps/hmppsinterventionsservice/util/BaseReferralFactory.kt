@@ -129,7 +129,8 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     additionalRiskInformation: String? = null,
     additionalRiskInformationUpdatedAt: OffsetDateTime? = null,
     personCurrentLocationType: PersonCurrentLocationType? = null,
-    personCustodyPrisonId: String? = null
+    personCustodyPrisonId: String? = null,
+    expectedReleaseDate: LocalDate? = null
   ): DraftReferral {
     val draftReferral = DraftReferral(
       id = id,
@@ -140,6 +141,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
       relevantSentenceId = relevantSentenceId,
       personCurrentLocationType = personCurrentLocationType,
       personCustodyPrisonId = personCustodyPrisonId,
+      expectedReleaseDate = expectedReleaseDate,
       serviceUserData = serviceUserData,
       selectedServiceCategories = selectedServiceCategories,
       complexityLevelIds = complexityLevelIds,

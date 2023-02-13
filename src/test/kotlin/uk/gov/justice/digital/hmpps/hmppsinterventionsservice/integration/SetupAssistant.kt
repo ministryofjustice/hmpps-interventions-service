@@ -249,7 +249,8 @@ class SetupAssistant(
     serviceUserCRN: String = "X123456",
     selectedServiceCategories: MutableSet<ServiceCategory>? = null,
     personCurrentLocationType: PersonCurrentLocationType? = null,
-    personCustodyPrisonId: String? = null
+    personCustodyPrisonId: String? = null,
+    expectedReleaseDate: LocalDate? = null
   ): DraftReferral {
     return draftReferralRepository.save(
       referralFactory.createDraft(
@@ -261,7 +262,8 @@ class SetupAssistant(
         selectedServiceCategories = selectedServiceCategories,
         completionDeadline = LocalDate.now(),
         personCurrentLocationType = personCurrentLocationType,
-        personCustodyPrisonId = personCustodyPrisonId
+        personCustodyPrisonId = personCustodyPrisonId,
+        expectedReleaseDate = expectedReleaseDate
       )
     )
   }
@@ -277,10 +279,10 @@ class SetupAssistant(
     )
   }
 
-  fun createEndedReferral(id: UUID = UUID.randomUUID(), intervention: Intervention = createIntervention(), endRequestedReason: CancellationReason? = randomCancellationReason(), endRequestedComments: String? = null, personCurrentLocationType: PersonCurrentLocationType? = null, personCustodyPrisonId: String? = null): Referral {
+  fun createEndedReferral(id: UUID = UUID.randomUUID(), intervention: Intervention = createIntervention(), endRequestedReason: CancellationReason? = randomCancellationReason(), endRequestedComments: String? = null, personCurrentLocationType: PersonCurrentLocationType? = null, personCustodyPrisonId: String? = null, expectedReleaseDate: LocalDate? = null): Referral {
     val ppUser = createPPUser()
     val spUser = createSPUser()
-    draftReferralRepository.save(referralFactory.createDraft(id = id, intervention = intervention, createdBy = ppUser, personCustodyPrisonId = personCustodyPrisonId, personCurrentLocationType = personCurrentLocationType))
+    draftReferralRepository.save(referralFactory.createDraft(id = id, intervention = intervention, createdBy = ppUser, personCustodyPrisonId = personCustodyPrisonId, personCurrentLocationType = personCurrentLocationType, expectedReleaseDate = expectedReleaseDate))
     return referralRepository.save(referralFactory.createEnded(id = id, intervention = intervention, createdBy = ppUser, sentBy = ppUser, endRequestedBy = ppUser, assignments = listOf(ReferralAssignment(OffsetDateTime.now(), spUser, spUser)), endRequestedReason = endRequestedReason, endRequestedComments = endRequestedComments))
   }
 
@@ -309,14 +311,16 @@ class SetupAssistant(
     needsInterpreter: Boolean? = null,
     interpreterLanguage: String? = null,
     personCurrentLocationType: PersonCurrentLocationType = PersonCurrentLocationType.CUSTODY,
-    personCustodyPrisonId: String? = null
+    personCustodyPrisonId: String? = null,
+    expectedReleaseDate: LocalDate? = null
   ): Referral {
     createDraftReferral(
       id = id,
       intervention = intervention,
       createdBy = ppUser,
       personCurrentLocationType = personCurrentLocationType,
-      personCustodyPrisonId = personCustodyPrisonId
+      personCustodyPrisonId = personCustodyPrisonId,
+      expectedReleaseDate = expectedReleaseDate
     )
     val referral = referralRepository.save(
       referralFactory.createSent(
@@ -614,13 +618,12 @@ class SetupAssistant(
     needsInterpreter: Boolean = true,
     relevantSentenceId: Long = 2600295124,
     whenUnavailable: String = "She works Mondays 9am - midday",
-    expectedReleaseDate: LocalDate = LocalDate.of(2050, 11, 1),
     referralLocation: ReferralLocation = ReferralLocation(
       UUID.randomUUID(),
       referral = referral,
       type = PersonCurrentLocationType.CUSTODY,
       prisonId = "aaa",
-      expectedReleaseDate = null,
+      expectedReleaseDate = LocalDate.now().plusDays(1),
       expectedReleaseDateMissingReason = null
     )
   ): Referral {
@@ -628,7 +631,7 @@ class SetupAssistant(
     // required to satisfy foreign key constrains on desired outcomes and complexity levels
     val draftReferral = serviceUserData.draftReferral!!
     draftReferral.serviceUserData = serviceUserData
-    draftReferral.expectedReleaseDate = expectedReleaseDate
+    draftReferral.expectedReleaseDate = referralLocation.expectedReleaseDate
     draftReferral.personCurrentLocationType = referralLocation.type
     draftReferral.personCustodyPrisonId = referralLocation.prisonId
     draftReferral.expectedReleaseDate = referralLocation.expectedReleaseDate

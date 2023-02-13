@@ -41,7 +41,8 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     maximumEnforceableDays: Int? = null,
     referralDetail: ReferralDetails? = null,
     personCurrentLocationType: PersonCurrentLocationType? = null,
-    personCustodyPrisonId: String? = null
+    personCustodyPrisonId: String? = null,
+    expectedReleaseDate: LocalDate? = null
   ): DraftReferral {
     return createDraftReferral(
       id = id,
@@ -57,7 +58,8 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt,
       referralDetails = referralDetail,
       personCurrentLocationType = personCurrentLocationType,
-      personCustodyPrisonId = personCustodyPrisonId
+      personCustodyPrisonId = personCustodyPrisonId,
+      expectedReleaseDate = expectedReleaseDate
     )
   }
 
