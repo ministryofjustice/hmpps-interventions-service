@@ -1,0 +1,68 @@
+{
+  "internal_contract_id": "308c0396-44b2-4cb6-82bf-f25cb27ababa",
+  "contract_reference": "PRJ_7647",
+  "contract_type_id": "FBD-NE",
+  "region": {
+    "nps_region_code": "A",
+    "pcc_region_code": null
+  },
+  "eligibility": {
+    "allows_female": false,
+    "allows_male": true,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "ST_GILES_WISE_LTD",
+    "subcontractor_codes": [
+      "RETHINK_MI_LTD",
+      "ST_GILES_TRUST",
+      "THE_WISE_GROUP_LTD"
+    ]
+  },
+  "internal_intervention_id": "5575e6bf-0eac-4da7-be1c-5ec89a9bbc3b",
+  "intervention_title": "Finance,Benefit and Debt in Custody in the North East",
+  "short_description": "Services are available to all adult males  pre-release who are sentenced.   These services can be delivered at any point during the custodial element of the sentence and can be accessed by all people sentenced, regardless of the location they will be released to.  Interventions commenced in custody, but not completed prior to release, may continue in the community until the intervention is completed under the same referral. \n\nAny Sessions delivered as part of  a mandated Licence or Post Sentence Supervision appointment will be Enforceable. \n\nServices will be offered as  High complexity.\n\nDelivery methods include skills-building, support and advocacy and advice/, guidance/information.  \nInterventions will be tailored to meet the specific needs of the individual to enable them to make progress towards their agreed outcomes, as identified in their  Action Plan and will aim to secure one or more of the following outcomes:  \n\n•\tthe person referred’s financial management skills are developed and/or enhanced, including online banking skills\n•\tthe person referred can successfully navigate the benefits system\n•\tPathways are established to help the person referred to maintain and sustain an income, safely manage money and reduce debt\n•\tthe person referred has access to appropriate financial products, advice and/or services\n•\tthe person referred gains quick access to universal credit, including pre-release referrals\n•\tthe person referred is supported to complete tasks that they would not otherwise be able to do whilst being in custody e.g. support with banking or debt management",
+  "activities": [
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Financial Management",
+      "delivery_method": "1:1",
+      "delivery_location": "HMP Durham HMP Holme House HMP Northumberland HMP Deerbolt HMP Kirklevington Grange HMP Frankland"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Benefits",
+      "delivery_method": "1:1",
+      "delivery_location": "HMP Durham HMP Holme House HMP Northumberland HMP Deerbolt HMP Kirklevington Grange HMP Frankland"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Money Management",
+      "delivery_method": "1:1",
+      "delivery_location": "HMP Durham HMP Holme House HMP Northumberland HMP Deerbolt HMP Kirklevington Grange HMP Frankland"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Access to advice",
+      "delivery_method": "1:1",
+      "delivery_location": "HMP Durham HMP Holme House HMP Northumberland HMP Deerbolt HMP Kirklevington Grange HMP Frankland"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Access to benefits",
+      "delivery_method": "1:1",
+      "delivery_location": "HMP Durham HMP Holme House HMP Northumberland HMP Deerbolt HMP Kirklevington Grange HMP Frankland"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Custody Support",
+      "delivery_method": "1:1",
+      "delivery_location": "HMP Durham HMP Holme House HMP Northumberland HMP Deerbolt HMP Kirklevington Grange HMP Frankland"
+    }
+  ]
+}

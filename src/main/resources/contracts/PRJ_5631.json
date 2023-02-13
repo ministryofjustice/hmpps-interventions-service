@@ -1,0 +1,45 @@
+{
+  "internal_contract_id": "0deeff8b-df60-4dbe-a904-45b0c1f6d891",
+  "contract_reference": "PRJ_5631",
+  "contract_type_id": "PWB",
+  "region": {
+    "nps_region_code": null,
+    "pcc_region_code": "durham"
+  },
+  "eligibility": {
+    "allows_female": false,
+    "allows_male": true,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "ST_GILES_WISE_GRP",
+    "subcontractor_codes": [
+      "NEPACS",
+      "RETHINK_MI_LTD",
+      "ST_GILES_TRUST",
+      "THE_WISE_GROUP_LTD"
+    ]
+  },
+  "internal_intervention_id": "5712ef65-a131-4701-a005-20f4103eeca3",
+  "intervention_title": "Personal Wellbeing Services in Durham",
+  "short_description": "A holistic service which addresses the following rehabilitative needs: Emotional Wellbeing, Family and Significant Others, Lifestyle and Associates and Social Inclusion.  \nServices are available for all adult male Service Users, irrespective of risk level or complexity level, on a Community/ Suspended Sentence Order with a RAR or on Licence/Post-Sentence Supervision The Social Inclusion ‘mentoring’ service will also be available pre-release for those who will be released under Probation supervision.  Appointments which are part of sentence delivery will be enforceable.   \nA range of approaches will be used including: \ndirect delivery of interventions, support and advocacy, and advice and guidance. Interventions will be tailored to reflect the complexity of an individual Service User’s needs.   \n\nInterventions will be tailored to reflect the complexity of needs and should aim to secure one or more of the following outcomes for Service Users:  \nimproved pro-social self-identity and ability to access community-based support networks  \nsustained engagement in pro-social leisure interests and purposeful activities \nreduced engagement with pro-criminal associates and activities  \na decreased reliance on negative peer relationships or networks, such as organised crime groups or extremism groups.  \nengaged in their community and able to make a positive contribution.  \npositive family relationships and avoids harmful relationships are developed or maintained. \nconfident and responsible parenting behaviours are demonstrated (where applicable).  \nImproved ability to develop positive intimate relationships including communication, resilience, negotiation and assertiveness skills. \npositive coping strategies in the event of temporary or irretrievable breakdown of familial or other relationships are demonstrated. \ncompliance with any voluntary or mandatory family or relationship-focused therapeutic/behavioural change programmes.  \ndevelopment of:   \ncoping skills and strategies to regulate mood and demonstrate perspective-taking and self-care by avoiding risky situations.  \nlevels of self-efficacy, resilience and confidence  \nability to access and engage with mental health services.  \nability to recognise and manage triggers to worsening wellbeing.  \nability to build and maintain appropriate social interactions.  \ncompliance with any medication/treatment/therapy programmes  \nsocial networks to reduce initial social isolation are developed or sustained.  \nearly post-release engagement with community-based services is secured.  \nresilience and perseverance to cope with challenges and barriers on return to the community is developed ",
+  "activities": [
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Family Relationships Course",
+      "delivery_method": "Group, 1-2-1, Online",
+      "delivery_location": "Nottingham, Mansfield, Derby, Buxton, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Empowerment Support",
+      "delivery_method": "Group, 1-2-1, Virtual (pre-recorder)",
+      "delivery_location": "Nottingham, Mansfield, Derby, Buxton, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness"
+    }
+  ]
+}

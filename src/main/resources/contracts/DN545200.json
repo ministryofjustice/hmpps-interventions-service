@@ -1,0 +1,36 @@
+{
+  "internal_contract_id": "3ee80341-b449-45a1-8190-8e1c2690ae69",
+  "contract_reference": "DN545200",
+  "contract_type_id": "MTR",
+  "region": {
+    "nps_region_code": "L",
+    "pcc_region_code": null
+  },
+  "eligibility": {
+    "allows_female": true,
+    "allows_male": true,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "COMMUNITY_LED_INIT",
+    "subcontractor_codes": [
+
+    ]
+  },
+  "internal_intervention_id": "d09b9c4a-e374-4121-a522-5718bacd676a",
+  "intervention_title": "CLI - Peer Support",
+  "short_description": "The service is to deliver a Peer Support service in Manchester, Salford, Trafford. Oldham, Tameside, Stockport, Bolton, Bury, Rochdale Wigan.   The Probation practitioner will identify complexity levels and send the completed referral to CLI via the Refer & Monitor  system.\n\nCLI will engage with and provide intensive support to PoP; offering needs-led, emotional and practical support around accommodation and finance, health and well-being, motivation, family and relationships, accessing services, building confidence and self-esteem. \n\nCLI provide personalised 1:1 Peer Mentoring support to work alongside people and guide them on their desistance or recovery journey.  This mentoring relationships provide the practical and emotional support needed to make and sustain positive change. \n\nCLI can support with:\n\n•Advice on accessing support in the community - GP, Drug & Alcohol, Mental Health, Dentist\n•Finances, benefit and/or debt support \n•Navigating the housing system; housing benefit support, housing advice\n•Building routine/structure with positive activities in the community\n•Support/advice on employment; how to access support in the community\n•Support to access Courses/Education\n•Support with attending appointments\n•Person-centred provision motivating/supporting/empowering individuals to change direction\n\nEligibility Criteria - All people on Probation (PoP), male and female, aged 18+\n\nComplexity Levels:\n\nLow complexity - Service User has worries or issues and feels unable to cope but is not socially isolated and interacts with others. Service User has no known psychological issues or history of depression and poor mental health\n\nMedium complexity - Service User has diagnosed documented psychological problems that are being managed well but requires support to maintain engagement. Service User has coping strategies but needs assistance. Service User shows signs of stress in meetings and requires support to effectively engage.\n\nHigh complexity - Service User has suffered psychological and mental health problems over a period of time which is documented and needs significant level of support to engage with service provision. Service User is socially isolated and struggles with numerous aspects of daily life.\n\nCLI Mentors will be co-located in each Probation Office on a date and time agreed to meet the needs of each individual Centre.",
+  "activities": [
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Peer Support",
+      "delivery_method": "One to one",
+      "delivery_location": "Manchester, Oldham, Trafford, Salford, Tameside, Bury, Bolton Rochdale, Wigan, Stockport"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "internal_contract_id": "350f014f-e556-4099-a52a-764cb6093f83",
+  "contract_reference": "PRJ_7648",
+  "contract_type_id": "FBD-NW",
+  "region": {
+    "nps_region_code": "B",
+    "pcc_region_code": null
+  },
+  "eligibility": {
+    "allows_female": false,
+    "allows_male": true,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2022-12-05",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "ST_GILES_WISE_LTD",
+    "subcontractor_codes": [
+      "THE_WISE_GROUP_LTD",
+      "RETHINK_MI_LTD",
+      "IMO_CHARITY",
+      "ROTUNDA"
+    ]
+  },
+  "internal_intervention_id": "b022c6a6-307f-4bf1-a290-91323156ef58",
+  "intervention_title": "Finance Benefit & Debt Services in the North West",
+  "short_description": "Services are available for all adult males on probation either:\n\n-\ton a Community Sentence or Suspended Sentence Order and subject to a Rehabilitation Activity Requirement (RAR) whereby a specified number of RAR Activity Days will be allocated.\n-\tpre-release to people who are sentenced.\n-\treleased on licence and post-sentence supervision.\n\nServices are available to all adult males pre-release who are sentenced.These services can be delivered at any point during the custodial element of the sentence and can be accessed by all people sentenced, regardless of the location they will be released to.  Interventions commenced in custody, but not completed prior to release, may continue in the community until the intervention is completed under the same referral.\n\nServices can be delivered as part of a Rehabilitation Activity Requirement (RAR) whereby a specified number of RAR Activity Days will be allocated by the Probation Service for those subject to a Community Sentence or Suspended Sentence Order. Any Sessions delivered as part of a RAR Activity Day or as a mandated Licence or Post Sentence Supervision appointment will be Enforceable.\nServices are offered as High complexity.\nA range of delivery methods need to be used including designing and delivery, support and advocacy and advice, guidance and information.\nInterventions must be tailored to meet the specific needs of each Person(s) on Probation to enable them to make progress towards their agreed outcomes, as identified in the Person(s) on Probations Action Plan and aim to secure one or more of the following outcomes: \n\n•\tthe person referred’s financial management skills are developed and/or enhanced, including online banking skills\n•\tthe person referred can successfully navigate the benefits system\n•\tPathways are established to help the person referred to maintain and sustain an income, safely manage money and reduce debt\n•\tthe person referred has access to appropriate financial products, advice and/or services\n•\tthe person referred gains quick access to universal credit, including pre-release referrals\n•\tthe person referred is supported to complete tasks that they would not otherwise be able to do whilst being in custody e.g. support with banking or debt management",
+  "activities": [
+    {
+      "need_area": "Financial Management",
+      "activity": "High Complexity",
+      "delivery_method": "1:1",
+      "delivery_location": "HMP Preston HMP Altcourse HMP Liverpool HMP Risley (On site) HMP Thorncross (in reach) HMP Haverigg (on site) HMP Lancaster Farms (on site) HMP Kirkham (in-reach) HMP Garth (in reach) HMP Wymott (in reach) West Cheshire - Chester / Northwich East Cheshire - Runcorn / Crewe / Macclesfield Warrington & Halton - Warrington Knowsley & St Helens - St Helens / Huyton / Knowsley / Prescot, Sefton - Bootle Liverpool North - Bootle / Old Swan, Cumbria - Workington / Borrow / Carlise / Penrith / Kendal Wirral - Birkenhead North West Lancashire - Blackpool Blackburn - Blackburn with Darwen East Lancashire - Accrington / Burnley Central Lanashire - Chorley / Preston/ Skelmersdale"
+    },
+    {
+      "need_area": "Benefits",
+      "activity": "High Complexity",
+      "delivery_method": "1:1",
+      "delivery_location": "HMP Preston HMP Altcourse HMP Liverpool HMP Risley (On site) HMP Thorncross (in reach) HMP Haverigg (on site) HMP Lancaster Farms (on site) HMP Kirkham (in-reach) HMP Garth (in reach) HMP Wymott (in reach) West Cheshire - Chester / Northwich East Cheshire - Runcorn / Crewe / Macclesfield Warrington & Halton - Warrington Knowsley & St Helens - St Helens / Huyton / Knowsley / Prescot, Sefton - Bootle Liverpool North - Bootle / Old Swan, Cumbria - Workington / Borrow / Carlise / Penrith / Kendal Wirral - Birkenhead North West Lancashire - Blackpool Blackburn - Blackburn with Darwen East Lancashire - Accrington / Burnley Central Lanashire - Chorley / Preston/ Skelmersdale"
+    },
+    {
+      "need_area": "Money Management",
+      "activity": "High Complexity",
+      "delivery_method": "1:1",
+      "delivery_location": "HMP Preston HMP Altcourse HMP Liverpool HMP Risley (On site) HMP Thorncross (in reach) HMP Haverigg (on site) HMP Lancaster Farms (on site) HMP Kirkham (in-reach) HMP Garth (in reach) HMP Wymott (in reach) West Cheshire - Chester / Northwich East Cheshire - Runcorn / Crewe / Macclesfield Warrington & Halton - Warrington Knowsley & St Helens - St Helens / Huyton / Knowsley / Prescot, Sefton - Bootle Liverpool North - Bootle / Old Swan, Cumbria - Workington / Borrow / Carlise / Penrith / Kendal Wirral - Birkenhead North West Lancashire - Blackpool Blackburn - Blackburn with Darwen East Lancashire - Accrington / Burnley Central Lanashire - Chorley / Preston/ Skelmersdale"
+    },
+    {
+      "need_area": "Access to advice",
+      "activity": "High Complexity",
+      "delivery_method": "1:1",
+      "delivery_location": "HMP Preston HMP Altcourse HMP Liverpool HMP Risley (On site) HMP Thorncross (in reach) HMP Haverigg (on site) HMP Lancaster Farms (on site) HMP Kirkham (in-reach) HMP Garth (in reach) HMP Wymott (in reach) West Cheshire - Chester / Northwich East Cheshire - Runcorn / Crewe / Macclesfield Warrington & Halton - Warrington Knowsley & St Helens - St Helens / Huyton / Knowsley / Prescot, Sefton - Bootle Liverpool North - Bootle / Old Swan, Cumbria - Workington / Borrow / Carlise / Penrith / Kendal Wirral - Birkenhead North West Lancashire - Blackpool Blackburn - Blackburn with Darwen East Lancashire - Accrington / Burnley Central Lanashire - Chorley / Preston/ Skelmersdale"
+    },
+    {
+      "need_area": "Access to benefits",
+      "activity": "High Complexity",
+      "delivery_method": "1:1",
+      "delivery_location": "HMP Preston HMP Altcourse HMP Liverpool HMP Risley (On site) HMP Thorncross (in reach) HMP Haverigg (on site) HMP Lancaster Farms (on site) HMP Kirkham (in-reach) HMP Garth (in reach) HMP Wymott (in reach) West Cheshire - Chester / Northwich East Cheshire - Runcorn / Crewe / Macclesfield Warrington & Halton - Warrington Knowsley & St Helens - St Helens / Huyton / Knowsley / Prescot, Sefton - Bootle Liverpool North - Bootle / Old Swan, Cumbria - Workington / Borrow / Carlise / Penrith / Kendal Wirral - Birkenhead North West Lancashire - Blackpool Blackburn - Blackburn with Darwen East Lancashire - Accrington / Burnley Central Lanashire - Chorley / Preston/ Skelmersdale"
+    },
+    {
+      "need_area": "Custody Support",
+      "activity": "High Complexity",
+      "delivery_method": "1:1",
+      "delivery_location": "HMP Preston HMP Altcourse HMP Liverpool HMP Risley (On site) HMP Thorncross (in reach) HMP Haverigg (on site) HMP Lancaster Farms (on site) HMP Kirkham (in-reach) HMP Garth (in reach) HMP Wymott (in reach)"
+    }
+  ]
+}

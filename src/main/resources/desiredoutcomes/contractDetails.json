@@ -1,0 +1,31 @@
+[
+  {
+    "contract_type": "Accommodation",
+    "contract_code": "ACC",
+    "service_category": "Accommodation",
+    "desired_outcomes": [
+      "All barriers as identified in the Service user action plan, for example financial, behavioural, physical, mental or offence-type related), to obtaining or sustaining accommodation, are successfully removed.",
+      "Service user makes progress in obtaining accommodation.",
+      "Service user is helped to secure social or supported housing.",
+      "Service user is helped to secure a tenancy in the private rented sector (PRS).",
+      "Service user is helped to sustain existing accommodation.",
+      "Service user is prevented from becoming homeless.",
+      "Service user at risk of losing their tenancy are successfully helped to retain it.",
+      "Intervention ends before the Service user has sustained accommodation for three months, but s/he has a strong prospect of sustaining it for at least three months (including for those serving custodial sentences of less than 6 months)."
+    ],
+    "complexity_levels": [
+      {
+        "severity": "LOW",
+        "description": "Service user has some capacity and means to secure and/or maintain suitable accommodation but requires some support and guidance to do so."
+      },
+      {
+        "severity": "MEDIUM",
+        "description": "Service user is at risk of homelessness/is homeless, or will be on release from prison. Service user has had some success in maintaining a tenancy but may have additional needs e.g. Learning Difficulties and/or Learning Disabilities or other challenges currently."
+      },
+      {
+        "severity":"HIGH",
+        "description": "Service user is homeless or in temporary/unstable accommodation, or will be on release from prison. Service user has poor accommodation history, complex needs and limited skills to secure or sustain a tenancy."
+      }
+    ]
+  }
+]

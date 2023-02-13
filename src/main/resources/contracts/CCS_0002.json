@@ -1,0 +1,258 @@
+{
+  "internal_contract_id": "e48620cb-bed9-4468-94d4-ae6fc6304548",
+  "contract_reference": "CCS_0002",
+  "contract_type_id": "WOS",
+  "region": {
+    "nps_region_code": "J",
+    "pcc_region_code": null
+  },
+  "eligibility": {
+    "allows_female": true,
+    "allows_male": false,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": "2022-12-01T12:00:00+00:00"
+  },
+  "providers": {
+    "prime_provider_code": "WOMEN_IN_PRISON",
+    "subcontractor_codes": [
+
+    ]
+  },
+  "internal_intervention_id": "49921343-519b-4f69-9d0e-6c6330748e7c",
+  "intervention_title": "Women's Services for London (south)",
+  "short_description": "Women in Prison only support women living or returning to the following London boroughs: Bromley, Croydon, Lambeth, Lewisham, Merton, Southwark, Sutton, Wandsworth.                                                                                                                                                                                                                                                                                             \n\nA holistic service for women which secure improved outcomes in relation to the following rehabilitative needs:  \n•        Accommodation \n•        ETE  \n•        Dependency and Recovery  \n•        Finance, Benefits and Debt  \n•        Emotional Wellbeing   \n•        Family and Significant Others \n•        Lifestyle and Associates \n•        Social Inclusion, including mentoring \n \nThe Women's Specific Service is intended to ensure that the Interventions are responsive to the specific needs and characteristics of Women Service Users. The service will be delivered in an environment which is safe and suitable for women and by staff who are trained in trauma-informed and trauma-responsive approaches and also in women-only group(s) and/or with the option for woman member of the Supplier Personnel. \n \nServices are available for female Service Users, irrespective of risk level or complexity level, on a Community/ Suspended Sentence Order with a RAR or on Licence/Post-Sentence Supervision. The Accommodation and Social Inclusion ‘mentoring’ service will also be delivered pre-release for those who will be released under Probation supervision (to be consistent with accommodation one).   Appointments which are part of sentence delivery will be enforceable. \n \nA range of approaches will be used including direct delivery of interventions, support and advocacy, and advice and guidance. Interventions need to be tailored to reflect the complexity of an individual woman’s needs and to recognise and respond to barriers (including child-care commitments, social isolation, religion, language and other cultural barriers, sexual orientation, domestic abuse, involvement with the sex industry, childhood sexual & physical abuse, controlling coercive relationships; substance dependency and lack of self-esteem) to achieving personal change.",
+  "activities": [
+    {
+      "need_area": "Accommodation",
+      "activity": "Homelessness prevention and management",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Finding new/suitable accommodation",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Tenancy Management",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Housing Benefit Assistance",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Tailored practical housing support",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Peer mentor supprt applying for education/training opportunities",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Applying for education/training opportunities",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Job application guidance",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Tailored practical ETE support",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Substance misuse advice and guidance",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Substance misuse practical support",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Coffee Morning",
+      "delivery_method": "Group",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Substance misuse emotional support",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Substance misuse risk management",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Addiction clinic",
+      "delivery_method": "Group",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Mindfulness workshop",
+      "delivery_method": "Group",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Benefit applications and management",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Money management",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Debt management",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Peer mentor emotional support",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Emotional Support",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Mental health support",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Mental health risk management",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Mindfulness workshop",
+      "delivery_method": "Group",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Coffee Morning",
+      "delivery_method": "Group",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Domestic abuse advice and guidance, and support.",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Domestic abuse risk management",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Domestic abuse legal remedies",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Childcare proceedings supoprt advice and guidance",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Legal support regarding child contact and childcare proceedings",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Emotional support regarding child removal and childcare proceedings",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Peer Mentor Lifestyle support",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Lifestyle support",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Weekly Drop In",
+      "delivery_method": "Group",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Coffee Morning",
+      "delivery_method": "Group",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Theatre Workshops",
+      "delivery_method": "Group",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Art Fridays",
+      "delivery_method": "Group",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Reducing barriers to social inclusion",
+      "delivery_method": "One to one",
+      "delivery_location": "Lambeth, Wandsworth, Croydon, Sutton, Lewisham, Southwark, Bromley, Merton"
+    }
+  ]
+}

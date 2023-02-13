@@ -1,0 +1,79 @@
+{
+  "internal_contract_id": "d16c95ef-d571-4370-8f5d-bbf2aef466fd",
+  "contract_reference": "PRJ_6267",
+  "contract_type_id": "ACC",
+  "region": {
+    "nps_region_code": "C",
+    "pcc_region_code": null
+  },
+  "eligibility": {
+    "allows_female": false,
+    "allows_male": true,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "SHELTER",
+    "subcontractor_codes": [
+      "ST_GILES_TRUST",
+      "NACRO"
+    ]
+  },
+  "internal_intervention_id": "bdeae720-f18a-47f5-9a13-8efe92b9eeb0",
+  "intervention_title": "Accommodation Services for Yorkshire and The Humber",
+  "short_description": "Services are available for all adult male Service Users, irrespective of risk level or complexity level, on a Community/ Suspended Sentence Order with a RAR or on Licence/Post-Sentence Supervision. They are also available to be delivered pre-release for those who will be under Probation supervision on release. Appointments which are part of sentence delivery will be enforceable.\nA range of approaches need to be used including: direct delivery of interventions, support and advocacy, and advice and guidance.\nInterventions need to be tailored to reflect the complexity of a Service User’s needs and should aim to secure one or more of the following outcomes:\n· All barriers as identified in the Service User Action Plan, for example financial, behavioural, physical, mental or offence-type related), to obtaining or sustaining accommodation, are successfully removed\n· Service User makes progress in obtaining accommodation\n· Service User is helped to secure social or supported housing\n· Service User is helped to secure a tenancy in the private rented sector (PRS)\n· Service User is helped to sustain existing accommodation\n· Service User is prevented from becoming homeless\n· Service User at risk of losing their tenancy are successfully helped to retain it\n· Service User has Settled Accommodation for at least three months (including for those serving custodial sentences of less than 6 months)\n· Service User has a strong prospect of sustaining Settled Accommodation for at least three months (including for those serving custodial sentences of less than 6 months)",
+  "activities": [
+    {
+      "need_area": "Accommodation",
+      "activity": "Being a good tenant programme",
+      "delivery_method": "Group, 1-2-1, Online",
+      "delivery_location": "Nottingham, Mansfield, Derby, Buxton, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Housing retention advocacy",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Nottingham, Mansfield, Derby, Buxton, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Securing accommodation: low intensity",
+      "delivery_method": "1-2-1, Group",
+      "delivery_location": "Barnsley, Rotherham, Sheffield, Doncaster, Leeds, Wakefield, Huddersfield, Dewsbury, Bradford, Halifax, York, Scarborough, Harrogate, Northallerton, Skipton, Hull, Bridlington, Goole, Beverley, Grimsby, Scunthorpe"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Maintaining accommodation: low intensity",
+      "delivery_method": "1-2-1, Group",
+      "delivery_location": "Barnsley, Rotherham, Sheffield, Doncaster, Leeds, Wakefield, Huddersfield, Dewsbury, Bradford, Halifax, York, Scarborough, Harrogate, Northallerton, Skipton, Hull, Bridlington, Goole, Beverley, Grimsby, Scunthorpe"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Securing accommodation: medium intensity",
+      "delivery_method": "1-2-1, Group",
+      "delivery_location": "Barnsley, Rotherham, Sheffield, Doncaster, Leeds, Wakefield, Huddersfield, Dewsbury, Bradford, Halifax, York, Scarborough, Harrogate, Northallerton, Skipton, Hull, Bridlington, Goole, Beverley, Grimsby, Scunthorpe"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Maintaining accommodation: medium intensity",
+      "delivery_method": "Group, 1-2-1, Online",
+      "delivery_location": "Barnsley, Rotherham, Sheffield, Doncaster, Leeds, Wakefield, Huddersfield, Dewsbury, Bradford, Halifax, York, Scarborough, Harrogate, Northallerton, Skipton, Hull, Bridlington, Goole, Beverley, Grimsby, Scunthorpe"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Securing and maintaining accommodation: High complexity",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Barnsley, Rotherham, Sheffield, Doncaster, Leeds, Wakefield, Huddersfield, Dewsbury, Bradford, Halifax, York, Scarborough, Harrogate, Northallerton, Skipton, Hull, Bridlington, Goole, Beverley, Grimsby, Scunthorpe"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Pre-release activity",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Barnsley, Rotherham, Sheffield, Doncaster, Leeds, Wakefield, Huddersfield, Dewsbury, Bradford, Halifax, York, Scarborough, Harrogate, Northallerton, Skipton, Hull, Bridlington, Goole, Beverley, Grimsby, Scunthorpe"
+    }
+  ]
+}

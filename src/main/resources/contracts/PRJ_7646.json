@@ -1,0 +1,150 @@
+{
+  "internal_contract_id": "303582d1-4ec6-44d0-a6ae-39f25776ea60",
+  "contract_reference": "PRJ_7646",
+  "contract_type_id": "FBD-L",
+  "region": {
+    "nps_region_code": "J",
+    "pcc_region_code": null
+  },
+  "eligibility": {
+    "allows_female": false,
+    "allows_male": true,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "CATCH_22_CHARITY_LTD",
+    "subcontractor_codes": [
+
+    ]
+  },
+  "internal_intervention_id": "a7dd65bf-76b0-4866-b1c3-4eb6cea762f8",
+  "intervention_title": "Finance, Benefit and Debt Services in London",
+  "short_description": "Services are available for all adult males on probation either on a Community Sentence or Suspended Sentence Order or released on licence or Post Sentence Supervision.  Services can be delivered as part of a Rehabilitation Activity Requirement (RAR) whereby a specified number of RAR Activity Days will be allocated by the Probation Service for those subject to a Community Sentence or Suspended Sentence Order. Any Sessions delivered as part of a RAR Activity Day or as a mandated Licence or Post Sentence Supervision appointment will be Enforceable. \n\nServices are offered as either Low, Medium or High complexity.\n\nA range of delivery methods need to be used including:  designing and delivery, support and advocacy and advice, guidance and information.  \n\nInterventions must be tailored to meet the specific needs of each Person(s) on Probation to enable them to make progress towards  their agreed outcomes, as identified in the Person(s) on Probation's Action Plan and aim to secure one or more of the following outcomes:  \n\nPerson(s) on probation has access to appropriate financial products, advice and/or services. \n\nPathways are established to help person(s) on probation maintain and sustain an income, safely manage money and reduce debt. \n\nPerson(s) on probation financial management skills are developed and/or enhanced, including online banking skills.  \n\nPerson(s) on probation can successfully navigate the benefits system. \n\nPerson(s) on probation gains quick access to universal credit.",
+  "activities": [
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Essential Digital Skills: Digital Foundation Skills",
+      "delivery_method": "Digital one-to-one learning, Face-to-face one-to-one delivery",
+      "delivery_location": "Bexley (heath), Borough, Canning Town (Stratford), Clerkenwell, Croydon, Ealing, Enfield, Hackney (Stoke Newington), Hornchurch , Hounslow, Ilford, Kings Cross, Lewisham, Orpington, Richmond, Shepherds Bush, Stockwell, Stratford, Tottenham, Tower Hamlets, Uxbridge, Walthamstow, Wandsworth, West Hendon , Willesden, Wimbledon"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Essential Digital Skills: Communicating",
+      "delivery_method": "Digital one-to-one learning, Face-to-face one-to-one delivery",
+      "delivery_location": "Bexley (heath), Borough, Canning Town (Stratford), Clerkenwell, Croydon, Ealing, Enfield, Hackney (Stoke Newington), Hornchurch , Hounslow, Ilford, Kings Cross, Lewisham, Orpington, Richmond, Shepherds Bush, Stockwell, Stratford, Tottenham, Tower Hamlets, Uxbridge, Walthamstow, Wandsworth, West Hendon , Willesden, Wimbledon"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Essential Digital Skills: Handling information and content",
+      "delivery_method": "Digital one-to-one learning, Face-to-face one-to-one delivery",
+      "delivery_location": "Bexley (heath), Borough, Canning Town (Stratford), Clerkenwell, Croydon, Ealing, Enfield, Hackney (Stoke Newington), Hornchurch , Hounslow, Ilford, Kings Cross, Lewisham, Orpington, Richmond, Shepherds Bush, Stockwell, Stratford, Tottenham, Tower Hamlets, Uxbridge, Walthamstow, Wandsworth, West Hendon , Willesden, Wimbledon"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Essential Digital Skills: Transacting",
+      "delivery_method": "Digital one-to-one learning, Face-to-face one-to-one delivery",
+      "delivery_location": "Bexley (heath), Borough, Canning Town (Stratford), Clerkenwell, Croydon, Ealing, Enfield, Hackney (Stoke Newington), Hornchurch , Hounslow, Ilford, Kings Cross, Lewisham, Orpington, Richmond, Shepherds Bush, Stockwell, Stratford, Tottenham, Tower Hamlets, Uxbridge, Walthamstow, Wandsworth, West Hendon , Willesden, Wimbledon"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Essential Digital Skills: Problem solving",
+      "delivery_method": "Digital one-to-one learning, Face-to-face one-to-one delivery",
+      "delivery_location": "Bexley (heath), Borough, Canning Town (Stratford), Clerkenwell, Croydon, Ealing, Enfield, Hackney (Stoke Newington), Hornchurch , Hounslow, Ilford, Kings Cross, Lewisham, Orpington, Richmond, Shepherds Bush, Stockwell, Stratford, Tottenham, Tower Hamlets, Uxbridge, Walthamstow, Wandsworth, West Hendon , Willesden, Wimbledon"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Essential Digital Skills: Being safe and legal online",
+      "delivery_method": "Digital one-to-one learning, Face-to-face one-to-one delivery",
+      "delivery_location": "Bexley (heath), Borough, Canning Town (Stratford), Clerkenwell, Croydon, Ealing, Enfield, Hackney (Stoke Newington), Hornchurch , Hounslow, Ilford, Kings Cross, Lewisham, Orpington, Richmond, Shepherds Bush, Stockwell, Stratford, Tottenham, Tower Hamlets, Uxbridge, Walthamstow, Wandsworth, West Hendon , Willesden, Wimbledon"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Communication 101",
+      "delivery_method": "Digital group learning, Digital one-to-one learning, Face-to-face group delivery, Face-to-face one-to-one delivery",
+      "delivery_location": "Bexley (heath), Borough, Canning Town (Stratford), Clerkenwell, Croydon, Ealing, Enfield, Hackney (Stoke Newington), Hornchurch , Hounslow, Ilford, Kings Cross, Lewisham, Orpington, Richmond, Shepherds Bush, Stockwell, Stratford, Tottenham, Tower Hamlets, Uxbridge, Walthamstow, Wandsworth, West Hendon , Willesden, Wimbledon"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Confidence 101",
+      "delivery_method": "Digital group learning, Digital one-to-one learning, Face-to-face group delivery, Face-to-face one-to-one delivery",
+      "delivery_location": "Bexley (heath), Borough, Canning Town (Stratford), Clerkenwell, Croydon, Ealing, Enfield, Hackney (Stoke Newington), Hornchurch , Hounslow, Ilford, Kings Cross, Lewisham, Orpington, Richmond, Shepherds Bush, Stockwell, Stratford, Tottenham, Tower Hamlets, Uxbridge, Walthamstow, Wandsworth, West Hendon , Willesden, Wimbledon"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Stress 101",
+      "delivery_method": "Digital group learning, Digital one-to-one learning, Face-to-face group delivery, Face-to-face one-to-one delivery",
+      "delivery_location": "Bexley (heath), Borough, Canning Town (Stratford), Clerkenwell, Croydon, Ealing, Enfield, Hackney (Stoke Newington), Hornchurch , Hounslow, Ilford, Kings Cross, Lewisham, Orpington, Richmond, Shepherds Bush, Stockwell, Stratford, Tottenham, Tower Hamlets, Uxbridge, Walthamstow, Wandsworth, West Hendon , Willesden, Wimbledon"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Goal Setting",
+      "delivery_method": "Digital group learning, Digital one-to-one learning, Face-to-face group delivery, Face-to-face one-to-one delivery",
+      "delivery_location": "Bexley (heath), Borough, Canning Town (Stratford), Clerkenwell, Croydon, Ealing, Enfield, Hackney (Stoke Newington), Hornchurch , Hounslow, Ilford, Kings Cross, Lewisham, Orpington, Richmond, Shepherds Bush, Stockwell, Stratford, Tottenham, Tower Hamlets, Uxbridge, Walthamstow, Wandsworth, West Hendon , Willesden, Wimbledon"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Anxiety 101",
+      "delivery_method": "Digital group learning, Digital one-to-one learning, Face-to-face group delivery, Face-to-face one-to-one delivery",
+      "delivery_location": "Bexley (heath), Borough, Canning Town (Stratford), Clerkenwell, Croydon, Ealing, Enfield, Hackney (Stoke Newington), Hornchurch , Hounslow, Ilford, Kings Cross, Lewisham, Orpington, Richmond, Shepherds Bush, Stockwell, Stratford, Tottenham, Tower Hamlets, Uxbridge, Walthamstow, Wandsworth, West Hendon , Willesden, Wimbledon"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Solve it",
+      "delivery_method": "Digital group learning, Digital one-to-one learning, Face-to-face group delivery, Face-to-face one-to-one delivery",
+      "delivery_location": "Bexley (heath), Borough, Canning Town (Stratford), Clerkenwell, Croydon, Ealing, Enfield, Hackney (Stoke Newington), Hornchurch , Hounslow, Ilford, Kings Cross, Lewisham, Orpington, Richmond, Shepherds Bush, Stockwell, Stratford, Tottenham, Tower Hamlets, Uxbridge, Walthamstow, Wandsworth, West Hendon , Willesden, Wimbledon"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Using Money Day-To-Day",
+      "delivery_method": "Digital group learning, Digital one-to-one learning, Face-to-face group delivery, Face-to-face one-to-one delivery",
+      "delivery_location": "Bexley (heath), Borough, Canning Town (Stratford), Clerkenwell, Croydon, Ealing, Enfield, Hackney (Stoke Newington), Hornchurch , Hounslow, Ilford, Kings Cross, Lewisham, Orpington, Richmond, Shepherds Bush, Stockwell, Stratford, Tottenham, Tower Hamlets, Uxbridge, Walthamstow, Wandsworth, West Hendon , Willesden, Wimbledon"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Budgeting basics",
+      "delivery_method": "Digital group learning, Digital one-to-one learning, Face-to-face group delivery, Face-to-face one-to-one delivery",
+      "delivery_location": "Bexley (heath), Borough, Canning Town (Stratford), Clerkenwell, Croydon, Ealing, Enfield, Hackney (Stoke Newington), Hornchurch , Hounslow, Ilford, Kings Cross, Lewisham, Orpington, Richmond, Shepherds Bush, Stockwell, Stratford, Tottenham, Tower Hamlets, Uxbridge, Walthamstow, Wandsworth, West Hendon , Willesden, Wimbledon"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Taking control of your money",
+      "delivery_method": "Digital group learning, Digital one-to-one learning, Face-to-face group delivery, Face-to-face one-to-one delivery",
+      "delivery_location": "Bexley (heath), Borough, Canning Town (Stratford), Clerkenwell, Croydon, Ealing, Enfield, Hackney (Stoke Newington), Hornchurch , Hounslow, Ilford, Kings Cross, Lewisham, Orpington, Richmond, Shepherds Bush, Stockwell, Stratford, Tottenham, Tower Hamlets, Uxbridge, Walthamstow, Wandsworth, West Hendon , Willesden, Wimbledon"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Financial support & advocacy",
+      "delivery_method": "Digital one-to-one learning, Face-to-face one-to-one delivery",
+      "delivery_location": "Bexley (heath), Borough, Canning Town (Stratford), Clerkenwell, Croydon, Ealing, Enfield, Hackney (Stoke Newington), Hornchurch , Hounslow, Ilford, Kings Cross, Lewisham, Orpington, Richmond, Shepherds Bush, Stockwell, Stratford, Tottenham, Tower Hamlets, Uxbridge, Walthamstow, Wandsworth, West Hendon , Willesden, Wimbledon"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Appealing benefit entitlement decisions",
+      "delivery_method": "Face-to-face one-to-one delivery",
+      "delivery_location": "Bexley (heath), Borough, Canning Town (Stratford), Clerkenwell, Croydon, Ealing, Enfield, Hackney (Stoke Newington), Hornchurch , Hounslow, Ilford, Kings Cross, Lewisham, Orpington, Richmond, Shepherds Bush, Stockwell, Stratford, Tottenham, Tower Hamlets, Uxbridge, Walthamstow, Wandsworth, West Hendon , Willesden, Wimbledon"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Discretionary housing payments",
+      "delivery_method": "Face-to-face one-to-one delivery",
+      "delivery_location": "Bexley (heath), Borough, Canning Town (Stratford), Clerkenwell, Croydon, Ealing, Enfield, Hackney (Stoke Newington), Hornchurch , Hounslow, Ilford, Kings Cross, Lewisham, Orpington, Richmond, Shepherds Bush, Stockwell, Stratford, Tottenham, Tower Hamlets, Uxbridge, Walthamstow, Wandsworth, West Hendon , Willesden, Wimbledon"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Managing court fines",
+      "delivery_method": "Face-to-face one-to-one delivery",
+      "delivery_location": "Bexley (heath), Borough, Canning Town (Stratford), Clerkenwell, Croydon, Ealing, Enfield, Hackney (Stoke Newington), Hornchurch , Hounslow, Ilford, Kings Cross, Lewisham, Orpington, Richmond, Shepherds Bush, Stockwell, Stratford, Tottenham, Tower Hamlets, Uxbridge, Walthamstow, Wandsworth, West Hendon , Willesden, Wimbledon"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Dealing with and managing debt",
+      "delivery_method": "Face-to-face one-to-one delivery",
+      "delivery_location": "Bexley (heath), Borough, Canning Town (Stratford), Clerkenwell, Croydon, Ealing, Enfield, Hackney (Stoke Newington), Hornchurch , Hounslow, Ilford, Kings Cross, Lewisham, Orpington, Richmond, Shepherds Bush, Stockwell, Stratford, Tottenham, Tower Hamlets, Uxbridge, Walthamstow, Wandsworth, West Hendon , Willesden, Wimbledon"
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+{
+  "internal_contract_id": "bfe8d1fe-3290-43a2-a6e2-7a4af5960ca4",
+  "contract_reference": "CCS_0001",
+  "contract_type_id": "WOS",
+  "region": {
+    "nps_region_code": "J",
+    "pcc_region_code": null
+  },
+  "eligibility": {
+    "allows_female": true,
+    "allows_male": false,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": "2022-12-01T12:00:00+00:00"
+  },
+  "providers": {
+    "prime_provider_code": "ADVANCE_CHARITY",
+    "subcontractor_codes": [
+
+    ]
+  },
+  "internal_intervention_id": "2d898791-38f1-4c69-9ab8-bb38539d8c1f",
+  "intervention_title": "Women's Services for London (north)",
+  "short_description": "Advance Minerva only support women living or returning to the following London boroughs: Barking and Dagenham, Barnet,Bexley, Brent, Camden, Ealing, Enfield, Greenwich, Hackney, Hammersmith and Fulham, Haringey, Harrow, Havering, Hillingdon, Hounslow, Islington, Kensington and Chelsea, Kingston, Newham, Redbridge, Richmond, Tower Hamlets, Waltham Forest, Westminster.                                                                                                                                                                          \n \nA holistic service for women which secure improved outcomes in relation to the following rehabilitative needs:  \n•        Accommodation \n•        ETE  \n•        Dependency and Recovery  \n•        Finance, Benefits and Debt  \n•        Emotional Wellbeing   \n•        Family and Significant Others \n•        Lifestyle and Associates \n•        Social Inclusion, including mentoring \n \nThe Women's Specific Service is intended to ensure that the Interventions are responsive to the specific needs and characteristics of Women Service Users. The service will be delivered in an environment which is safe and suitable for women and by staff who are trained in trauma-informed and trauma-responsive approaches and also in women-only group(s) and/or with the option for woman member of the Supplier Personnel. \n \nServices are available for female Service Users, irrespective of risk level or complexity level, on a Community/ Suspended Sentence Order with a RAR or on Licence/Post-Sentence Supervision. The Accommodation and Social Inclusion ‘mentoring’ service will also be delivered pre-release for those who will be released under Probation supervision (to be consistent with accommodation one).   Appointments which are part of sentence delivery will be enforceable. \n \nA range of approaches will be used including direct delivery of interventions, support and advocacy, and advice and guidance. Interventions need to be tailored to reflect the complexity of an individual woman’s needs and to recognise and respond to barriers (including child-care commitments, social isolation, religion, language and other cultural barriers, sexual orientation, domestic abuse, involvement with the sex industry, childhood sexual & physical abuse, controlling coercive relationships; substance dependency and lack of self-esteem) to achieving personal change.",
+  "activities": [
+    {
+      "need_area": "Accommodation",
+      "activity": "Homelessness prevention",
+      "delivery_method": "1-2-1; Group where appropriate",
+      "delivery_location": "West London, North London, East London"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Overcoming barriers",
+      "delivery_method": "1-2-1; Group where appropriate",
+      "delivery_location": "West London, North London, East London"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Tenancy sustainment",
+      "delivery_method": "1-2-1; Group where appropriate",
+      "delivery_location": "West London, North London, East London"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Securing appropriate accommodation",
+      "delivery_method": "1-2-1; Group where appropriate",
+      "delivery_location": "West London, North London, East London"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Benefit applications",
+      "delivery_method": "1-2-1; Group where appropriate",
+      "delivery_location": "West London, North London, East London"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Debt support",
+      "delivery_method": "1-2-1; Group where appropriate",
+      "delivery_location": "West London, North London, East London"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Finance management",
+      "delivery_method": "1-2-1; Group where appropriate",
+      "delivery_location": "West London, North London, East London"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Education",
+      "delivery_method": "1-2-1; Group where appropriate",
+      "delivery_location": "West London, North London, East London"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Training",
+      "delivery_method": "1-2-1; Group where appropriate",
+      "delivery_location": "West London, North London, East London"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Employment",
+      "delivery_method": "1-2-1; Group where appropriate",
+      "delivery_location": "West London, North London, East London"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Dependency support",
+      "delivery_method": "1-2-1; Group where appropriate",
+      "delivery_location": "West London, North London, East London"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Recovery support",
+      "delivery_method": "1-2-1; Group where appropriate",
+      "delivery_location": "West London, North London, East London"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Emotional wellbeing",
+      "delivery_method": "1-2-1; Group where appropriate",
+      "delivery_location": "West London, North London, East London"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Mental health",
+      "delivery_method": "1-2-1; Group where appropriate",
+      "delivery_location": "West London, North London, East London"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Children & Famillies",
+      "delivery_method": "1-2-1; Group where appropriate",
+      "delivery_location": "West London, North London, East London"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Healthy relationships",
+      "delivery_method": "1-2-1; Group where appropriate",
+      "delivery_location": "West London, North London, East London"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Healthy lifestyle",
+      "delivery_method": "1-2-1; Group where appropriate",
+      "delivery_location": "West London, North London, East London"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Social Inclusion",
+      "delivery_method": "1-2-1; Group where appropriate",
+      "delivery_location": "West London, North London, East London"
+    }
+  ]
+}

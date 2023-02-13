@@ -1,0 +1,278 @@
+{
+  "internal_contract_id": "8b34f0f1-96ae-4930-bf3a-b9b26fd8b8a2",
+  "contract_reference": "PRJ_5819",
+  "contract_type_id": "WOS",
+  "region": {
+    "nps_region_code": null,
+    "pcc_region_code": "sussex"
+  },
+  "eligibility": {
+    "allows_female": true,
+    "allows_male": false,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "BWC",
+    "subcontractor_codes": [
+      "SHELTER",
+      "CHANGE_GROW_LIVE_LTD",
+      "WORKING_CHANCE_LTD"
+    ]
+  },
+  "internal_intervention_id": "5c6e569e-f202-46a8-9a18-8f46633a748d",
+  "intervention_title": "Women's Services in Sussex",
+  "short_description": "A holistic service for women which secure improved outcomes in relation to the following rehabilitative needs:  \n•\tAccommodation \n•\tETE  \n•\tDependency and Recovery  \n•\tFinance, Benefits and Debt  \n•\tEmotional Wellbeing   \n•\tFamily and Significant Others \n•\tLifestyle and Associates \n•\tSocial Inclusion, including mentoring \n \nThe Women's Specific Service is intended to ensure that the Interventions are responsive to the specific needs and characteristics of Women Service Users. The service will be delivered in an environment which is safe and suitable for women and by staff who are trained in trauma-informed and trauma-responsive approaches and also in women-only group(s) and/or with the option for woman member of the Supplier Personnel. \n \nServices are available for female Service Users, irrespective of risk level or complexity level, on a Community/ Suspended Sentence Order with a RAR or on Licence/Post-Sentence Supervision. The Accommodation and Social Inclusion ‘mentoring’ service will also be delivered pre-release for those who will be released under Probation supervision (to be consistent with accommodation one).   Appointments which are part of sentence delivery will be enforceable. \n \nA range of approaches will be used including direct delivery of interventions, support and advocacy, and advice and guidance. Interventions need to be tailored to reflect the complexity of an individual woman’s needs and to recognise and respond to barriers (including child-care commitments, social isolation, religion, language and other cultural barriers, sexual orientation, domestic abuse, involvement with the sex industry, childhood sexual & physical abuse, controlling coercive relationships; substance dependency and lack of self-esteem) to achieving personal change.",
+  "activities": [
+    {
+      "need_area": "Accommodation",
+      "activity": "Onward referral for emergencies",
+      "delivery_method": "1-2-1, Group, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Bespoke gender-specific support",
+      "delivery_method": "1-2-1, Group, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Overcoming barriers",
+      "delivery_method": "1-2-1, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Addressing underlying causes",
+      "delivery_method": "1-2-1, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Bespoke gender-specific support",
+      "delivery_method": "1-2-1, Group, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Homelessness prevention",
+      "delivery_method": "1-2-1, Group, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Securing appropriate accommodation",
+      "delivery_method": "1-2-1, Group, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Emergency support",
+      "delivery_method": "1-2-1, Group, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Advocacy and referrals",
+      "delivery_method": "1-2-1, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Job application support",
+      "delivery_method": "1-2-1, Group, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Service User Forums",
+      "delivery_method": "Group",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Volunteering opportunities",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Nursery, clothes and expenses support",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "ETE development workshops",
+      "delivery_method": "Group",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Recovery support",
+      "delivery_method": "1-2-1, Online",
+      "delivery_location": "Brighton, Eastbourne, and St Leonards-on-Sea"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Specialst dependancy support",
+      "delivery_method": "1-2-1, Online",
+      "delivery_location": "Brighton, Eastbourne, and St Leonards-on-Sea"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Increased awareness and understanding",
+      "delivery_method": "1-2-1, Group, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Debt and financial support",
+      "delivery_method": "1-2-1, Group, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Financial exploitation support",
+      "delivery_method": "1-2-1, Group, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Onward referral for debt support",
+      "delivery_method": "1-2-1, Group, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Finance management",
+      "delivery_method": "1-2-1, Group, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Financial relief",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Therapy",
+      "delivery_method": "1-2-1, Group, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Psychosocial support",
+      "delivery_method": "1-2-1, Group, Online",
+      "delivery_location": "Brighton"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "50+ referral routes",
+      "delivery_method": "1-2-1, Group",
+      "delivery_location": "Brighton"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Support for suicidal ideation and self harm",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Emotional support",
+      "delivery_method": "1-2-1, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Gender-based violence informed support",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Safety planning",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Family law support",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Childcare support",
+      "delivery_method": "1-2-1, Group",
+      "delivery_location": "Brighton"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Familial relationship support",
+      "delivery_method": "Group",
+      "delivery_location": "Brighton"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Onward referral for familial support",
+      "delivery_method": "Group",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea and Worthing"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Peer relationship support",
+      "delivery_method": "Group, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea and Worthing"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Onward referral for continued recovery",
+      "delivery_method": "1-2-1; Group or online when necessary",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Community and belonging",
+      "delivery_method": "Group, Online",
+      "delivery_location": "Brighton"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Pro-social programmes",
+      "delivery_method": "1-2-1, Group, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Social inclusion support",
+      "delivery_method": "1-2-1, Group, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Identifying pro-social goals",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Social connection activities",
+      "delivery_method": "Groups, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea and Worthing"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Navigation and transition support",
+      "delivery_method": "1-2-1, Group, Online",
+      "delivery_location": "Brighton, Eastbourne, St Leonards-on-Sea, Worthing and Crawley"
+    }
+  ]
+}

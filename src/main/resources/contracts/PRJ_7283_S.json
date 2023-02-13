@@ -1,0 +1,204 @@
+{
+  "internal_contract_id": "ecb4c70a-b126-47da-bf9b-af6ff932de81",
+  "contract_reference": "PRJ_7283_S",
+  "contract_type_id": "WOS",
+  "region": {
+    "nps_region_code": "J",
+    "pcc_region_code": null
+  },
+  "eligibility": {
+    "allows_female": true,
+    "allows_male": false,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2022-12-02",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "WOMEN_IN_PRISON",
+    "subcontractor_codes": [
+      "PECAN"
+    ]
+  },
+  "internal_intervention_id": "bdabfee5-4aa2-4695-ba08-588e537ea3da",
+  "intervention_title": "Women's Specific Services for London (S/SE)",
+  "short_description": "Accommodation Service\tUser has some capacity and means to secure and/or maintain suitable accommodation but requires support and guidance to do so.\nEducation,Training and Employment\tService User has satisfactory basic numeracy & literacy skils. The Service User has previously been employed though there may be gaps with periods of inactivity due to redundancy/periods of imprisonment .There has been no critical development need to find a new job in their previous field of competence.The Service User values benefits of working , but needs guidance to re-enter the workforce,change jobs or career path.\nDependency and Recovery\tService User who is highly motivated & have had sustained period of abstinence . Service User has successfully engaged in a period of treatment but requires support to sustain recovery.\nFinance, Benefit and Debt\tService User is not overly reliant on friends/family or others to supplement daily living expenses or regular outgoings. Service User's circumstances may be currently leading to significant financial pressure but they are able to support themeselves through legitimate means .Including those invoved in the gambling culture through relevant referrals & signposting to appropriate support organisations.\nLifestyle and Associates\tService User lacks confidence to engage in community activities  and/or spend a significant amount of time alone. Service User recognises the value of strong pro-social support groups but is struggling to develop these fully. Service User has got one or more close friends not involved in criminal activity and/or spends limited time each week with non-offending peers or some affiliation to non- offending groups & activities, but does not have a central role . Service User may recognise that some lifestyle choices & associations have affected their behaviour & may trigger re-offending , such as illegal drug use, alcohol, gambling, peer choice, limited medium & long term goals.\nFamily &Significant others\tService User has positive contact with some family or some significant others  & may have positive support of family members .Service User has previously lost contact with family & recently renewed contacts but there remains some difficulties.\nEmotional Wellbeing\tService User has worries or issues & feels unable to cope but is not socially isolated & interacts with others. Service User has no known psychological issues or history of depression & mental health.\nSocial Inclusion\tUp to 4 sessions for low complexity Service Users ( including 1 to be undertaken prior to Srvice User's release which can be virtual contact). A service User is low risk of reoffending .They have limited family support or engagement with community services & there may be barriers to achieving community integration.",
+  "activities": [
+    {
+      "need_area": "ETE",
+      "activity": "Workshops,one-to-one support and advice providing assessment tools o target the right people. Self-management",
+      "delivery_method": "1:1 support, groupwork, drop ins",
+      "delivery_location": "Hubs across South London (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth) and remote delivery"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Develop new skills, and self management",
+      "delivery_method": "Drop Ins,one-to-one sessions, referrals and signposts",
+      "delivery_location": "Hubs across South London (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth) and remote delivery, community one-to-one meetings"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Work experience and training",
+      "delivery_method": "1:1 support , groupwork",
+      "delivery_location": "One-to-one support in hubs, communities and remote (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth)"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Secure and sustain tenancies",
+      "delivery_method": "1:1 support , groupwork, drop ins",
+      "delivery_location": "In custody (Prisons-Bronzefield, Peterborough, Downview, Send, East Sutton Park) and community(Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth) via hubs, in the community and remote"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Women only housing in London",
+      "delivery_method": "1:1 support, drop ins and community",
+      "delivery_location": "In custody (Prisons-Bronzefield, Peterborough, Downview, Send, East Sutton Park) and community(Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth) via hubs, in the community and remote"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Drop In at Bronzefeild",
+      "delivery_method": "1:1, Support,. Drop ins and community",
+      "delivery_location": "In custody (Prisons-Bronzefield, Peterborough, Downview, Send, East Sutton Park) and community(Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth) via hubs, in the community and remote"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Housing referrals and signposts",
+      "delivery_method": "1:1 support , groupwork",
+      "delivery_location": "In custody (Prisons-Bronzefield, Peterborough, Downview, Send, East Sutton Park) and community(Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth) via hubs, in the community and remote"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Partnership and pathways to address factos relevent to reoffending and promoting desistance",
+      "delivery_method": "1:1 support, groupwork, drop ins",
+      "delivery_location": "In community (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth) via hubs, in the community and remote"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Partnership and pathways to address factos relevent to reoffending and promoting desistance",
+      "delivery_method": "1:1 support",
+      "delivery_location": "In community (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth) via hubs, in the community and remote"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "problem solving, to address factos relevent to reoffending and promoting desistance",
+      "delivery_method": "1:1 support, groupwork, drop ins",
+      "delivery_location": "In community (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth) via hubs, in the community and remote"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "",
+      "delivery_method": "1:1 support,groupwork,drop ins, community support",
+      "delivery_location": "In community (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth) via hubs, in the community and remote"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Internal services , supporting with thinking attitudes abd behaviours",
+      "delivery_method": "1:1 support, groupwork, drop ins",
+      "delivery_location": "In community (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth) via hubs, in the community and remote"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "12-step recovery groups to address factos relevent to reoffending and promoting desistance",
+      "delivery_method": "1:1 support, groupwork, drop ins",
+      "delivery_location": "Hubs across South London (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth), remote and community support"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Partnership working and pathways, to address factos relevent to reoffending and promoting desistance",
+      "delivery_method": "1:1 support,groupwork,drop ins",
+      "delivery_location": "Hubs across South London (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth), remote and community support"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Well-being and safety",
+      "delivery_method": "1:1 support,groupwork,drop ins",
+      "delivery_location": "Hubs across South London (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth), remote and community support"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Well being- attitudes and behaviour",
+      "delivery_method": "1:1 support,groupwork,drop ins",
+      "delivery_location": "Hubs across South London (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth), remote and community support"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Parenting courses , better relationship outcomes",
+      "delivery_method": "1:1 support ,groupworks , community support",
+      "delivery_location": "Hubs across South London (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth), remote and community support"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Out of hours support and immediate/emergency support for families",
+      "delivery_method": "1:1 support, drop ins and community",
+      "delivery_location": "Hubs across South London (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth), remote and community support"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Advice and guidance around VAWG",
+      "delivery_method": "1:1 support, groupwork, community support",
+      "delivery_location": "Hubs across South London (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth), remote and community support"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Partnership and pathways",
+      "delivery_method": "1:1 support, groupwork, community support",
+      "delivery_location": "Hubs across South London (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth), remote and community support"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "LGBTQIA & Communites safety support , targeting the right people",
+      "delivery_method": "1:1 support, community support",
+      "delivery_location": "Hubs across South London (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth), remote and community support"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "motivate and enagage, address factors relevent to reoffending and desistance",
+      "delivery_method": "1;1 support, groupwork,comminity support",
+      "delivery_location": "Hubs across South London (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth), remote and community support"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Partnership & Pathways",
+      "delivery_method": "1:1 support, groupwork,community support",
+      "delivery_location": "Hubs across South London (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth), remote and community support"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Counselling support",
+      "delivery_method": "1:1 support,groupwork,drop ins ,community",
+      "delivery_location": "Hubs across South London (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth), remote and community support"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Peer, Mentors, support around thinking,attitudes and offending behaviours",
+      "delivery_method": "1:1 support,groupwork,drop ins, community support",
+      "delivery_location": "Hubs across South London (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth), remote and community support"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "social networks, self-management",
+      "delivery_method": "1;1 support, groupwork,commuinity support",
+      "delivery_location": "Hubs across South London (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth), remote and community support"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Foreign National, motivate and engage individuals",
+      "delivery_method": "1:1 support,groupwork,community and custody support",
+      "delivery_location": "Hubs across South London (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth), remote and community support and in custody (Prisons-Bronzefield, Peterborough, Downview, Send, East Sutton Park)"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Diability Rights, assessment tools to target the right people",
+      "delivery_method": "1:1 support,groupwork,community and custody support",
+      "delivery_location": "Hubs across South London (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth), remote and community support and in custody (Prisons-Bronzefield, Peterborough, Downview, Send, East Sutton Park)"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Bespoke Training & support around problem solving, self management",
+      "delivery_method": "1:1 support,groupwork,community and custody support",
+      "delivery_location": "Hubs across South London (Bexley, Bromley, Croydon, Greenwich, Lambeth, Lewisham, Merton, Southwark, Sutton and Wandsworth), remote and community support and in custody (Prisons-Bronzefield, Peterborough, Downview, Send, East Sutton Park)"
+    }
+  ]
+}

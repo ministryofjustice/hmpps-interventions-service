@@ -1,0 +1,145 @@
+{
+  "internal_contract_id": "35a03d0b-6a81-4f42-8a6d-d9273d8f215c",
+  "contract_reference": "PRJ_5466",
+  "contract_type_id": "ETE",
+  "region": {
+    "nps_region_code": "F",
+    "pcc_region_code": null
+  },
+  "eligibility": {
+    "allows_female": false,
+    "allows_male": true,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "INGEUS_UK_LIMITED",
+    "subcontractor_codes": [
+      "CHANGE_GROW_LIVE_LTD",
+      "LEONARD_CHESHIRE"
+    ]
+  },
+  "internal_intervention_id": "5c4f9e30-8393-4571-8582-77e99164019d",
+  "intervention_title": "ETE Services for the East Midlands",
+  "short_description": "Services are available for all adult male Service Users, irrespective of risk level or complexity level, on a Community/ Suspended Sentence Order with a RAR or on Licence/Post-Sentence Supervision. They will not be delivered pre-release. Appointments which are part of sentence delivery will be enforceable.\nA range of approaches need to be used including: \ndirect delivery of interventions, support and advocacy, and advice and guidance.\nInterventions need to be tailored to reflect the complexity of a Service User’s needs and should aim to secure one or more of the following outcomes:\n· Service User's obtain suitable training, education and employment.\n· Service User overcomes barriers to obtaining/maintaining suitable training, education and employment.\n· Service User's maintain suitable training, education and employment.\n· Service User's demonstrate improvement in the skills and attitude which enable self-development and increase employability.",
+  "activities": [
+    {
+      "need_area": "ETE",
+      "activity": "Employability Skills",
+      "delivery_method": "Group, 1-2-1, Online",
+      "delivery_location": "Nottingham City, Mansfield, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness, Derby, Chesterfield, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Disclosure",
+      "delivery_method": "Group, 1-2-1, Online",
+      "delivery_location": "Nottingham City, Mansfield, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness, Derby, Chesterfield, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Motivation and Confidence",
+      "delivery_method": "Group, 1-2-1, Online",
+      "delivery_location": "Nottingham City, Mansfield, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness, Derby, Chesterfield, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Job Applications",
+      "delivery_method": "Group, 1-2-1, Online",
+      "delivery_location": "Nottingham City, Mansfield, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness, Derby, Chesterfield, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Interview Skills",
+      "delivery_method": "Group, 1-2-1, Online",
+      "delivery_location": "Nottingham City, Mansfield, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness, Derby, Chesterfield, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "CV Production",
+      "delivery_method": "Group, 1-2-1, Online",
+      "delivery_location": "Nottingham City, Mansfield, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness, Derby, Chesterfield, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Job, Training and Education Club",
+      "delivery_method": "Group, 1-2-1, Online",
+      "delivery_location": "Nottingham City, Mansfield, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness, Derby, Chesterfield, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Existing Employer Advocacy",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Nottingham City, Mansfield, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness, Derby, Chesterfield, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "ETE options and their impact on benefits",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Nottingham City, Mansfield, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness, Derby, Chesterfield, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Employment Brokerage",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Nottingham City, Mansfield, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness, Derby, Chesterfield, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Support Service Users to secure accreditations required for entry into relevant markets.",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Nottingham City, Mansfield, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness, Derby, Chesterfield, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Literacy and Numeracy Skills",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Nottingham City, Mansfield, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness, Derby, Chesterfield, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Funding",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Nottingham City, Mansfield, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness, Derby, Chesterfield, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Apprenticeships and Placements",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Nottingham City, Mansfield, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness, Derby, Chesterfield, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Learning Needs Assessments",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Nottingham City, Mansfield, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness, Derby, Chesterfield, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Enhanced physical and learning difficulties / disabilities support.",
+      "delivery_method": "Group, 1-2-1, Online",
+      "delivery_location": "Nottingham City, Mansfield, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness, Derby, Chesterfield, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Voluntary placements",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Nottingham City, Mansfield, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness, Derby, Chesterfield, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Enhanced Sexual, Violence, Fraud/Deception Support",
+      "delivery_method": "Group, 1-2-1, Online",
+      "delivery_location": "Nottingham City, Mansfield, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness, Derby, Chesterfield, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "One Stop Shop",
+      "delivery_method": "Group, 1-2-1, Online",
+      "delivery_location": "Nottingham City, Mansfield, Leicester, Loughborough, Boston, Grantham, Lincoln, Skegness, Derby, Chesterfield, Other NPS locations dependant on demand and availability of resource."
+    }
+  ]
+}

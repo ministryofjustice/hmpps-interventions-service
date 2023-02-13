@@ -518,7 +518,7 @@ class SetupAssistant(
     val primeProvider = serviceProviderRepository.save(serviceProviderFactory.create(id = primeProviderId, name = primeProviderId))
     val serviceProviders = subContractorServiceProviderIds.map {
       serviceProviderRepository.save(serviceProviderFactory.create(id = it, name = it))
-    }.toSet()
+    }.toMutableSet()
 
     val contract = dynamicFrameworkContractFactory.create(
       id = id,

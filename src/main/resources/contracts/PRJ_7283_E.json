@@ -1,0 +1,144 @@
+{
+  "internal_contract_id": "1a6d0fd8-4dd1-4eb1-b0f4-7934e717b2b8",
+  "contract_reference": "PRJ_7283_E",
+  "contract_type_id": "WOS",
+  "region": {
+    "nps_region_code": "J",
+    "pcc_region_code": null
+  },
+  "eligibility": {
+    "allows_female": true,
+    "allows_male": false,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2022-12-02",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "ADVANCE_CHARITY",
+    "subcontractor_codes": [
+      "HIBISCUS_INIT",
+      "HOUSING_4_WOMEN",
+      "WORKING_CHANCE_LTD",
+      "CLEAN_BREAK",
+      "SAFE_GROUND",
+      "INSPIRIT_T_D",
+      "BIRTH_COMPANIONS"
+    ]
+  },
+  "internal_intervention_id": "989d1748-c61e-4e66-9fc4-62118e4cd114",
+  "intervention_title": "Women's Specific Services for London (E/NE)",
+  "short_description": "Accommodation Service\tUser has some capacity and means to secure and/or maintain suitable accommodation but requires support and guidance to do so.\nEducation,Training and Employment\tService User has satisfactory basic numeracy & literacy skils. The Service User has previously been employed though there may be gaps with periods of inactivity due to redundancy/periods of imprisonment .There has been no critical development need to find a new job in their previous field of competence.The Service User values benefits of working , but needs guidance to re-enter the workforce,change jobs or career path.\nDependency and Recovery\tService User who is highly motivated & have had sustained period of abstinence . Service User has successfully engaged in a period of treatment but requires support to sustain recovery.\nFinance, Benefit and Debt\tService User is not overly reliant on friends/family or others to supplement daily living expenses or regular outgoings. Service User's circumstances may be currently leading to significant financial pressure but they are able to support themeselves through legitimate means .Including those invoved in the gambling culture through relevant referrals & signposting to appropriate support organisations.\nLifestyle and Associates\tService User lacks confidence to engage in community activities  and/or spend a significant amount of time alone. Service User recognises the value of strong pro-social support groups but is struggling to develop these fully. Service User has got one or more close friends not involved in criminal activity and/or spends limited time each week with non-offending peers or some affiliation to non- offending groups & activities, but does not have a central role . Service User may recognise that some lifestyle choices & associations have affected their behaviour & may trigger re-offending , such as illegal drug use, alcohol, gambling, peer choice, limited medium & long term goals.\nFamily &Significant others\tService User has positive contact with some family or some significant others  & may have positive support of family members .Service User has previously lost contact with family & recently renewed contacts but there remains some difficulties.\nEmotional Wellbeing\tService User has worries or issues & feels unable to cope but is not socially isolated & interacts with others. Service User has no known psychological issues or history of depression & mental health.\nSocial Inclusion\tUp to 4 sessions for low complexity Service Users ( including 1 to be undertaken prior to Srvice User's release which can be virtual contact). A service User is low risk of reoffending .They have limited family support or engagement with community services & there may be barriers to achieving community integration.",
+  "activities": [
+    {
+      "need_area": "Accommodation",
+      "activity": "Homelessness prevention",
+      "delivery_method": "1:1",
+      "delivery_location": "Custody and community, All Lot 2 boroughs ( Barking, City of London, Dagenham, Enfield, Hackney, Haringey, Havering, Newham, Redbridge, Tower Hamlets and Waltham Forest) and at the following prisons Downview, Send, Peterborough, East Sutton Park and Bronzefield."
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Overcoming barriers",
+      "delivery_method": "1:1",
+      "delivery_location": "Custody and community, All Lot 2 boroughs ( Barking, City of London, Dagenham, Enfield, Hackney, Haringey, Havering, Newham, Redbridge, Tower Hamlets and Waltham Forest) and at the following prisons Downview, Send, Peterborough, East Sutton Park and Bronzefield."
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Tenancy sustainment",
+      "delivery_method": "1:1",
+      "delivery_location": "Custody and community, All Lot 2 boroughs ( Barking, City of London, Dagenham, Enfield, Hackney, Haringey, Havering, Newham, Redbridge, Tower Hamlets and Waltham Forest) and at the following prisons Downview, Send, Peterborough, East Sutton Park and Bronzefield."
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Securing appropriate accommodation",
+      "delivery_method": "1:1",
+      "delivery_location": "Custody and community, All Lot 2 boroughs ( Barking, City of London, Dagenham, Enfield, Hackney, Haringey, Havering, Newham, Redbridge, Tower Hamlets and Waltham Forest) and at the following prisons Downview, Send, Peterborough, East Sutton Park and Bronzefield."
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Benefit applications",
+      "delivery_method": "1:1",
+      "delivery_location": "Community, All Lot 2 boroughs( Barking, City of London, Dagenham, Enfield, Hackney, Haringey, Havering, Newham, Redbridge, Tower Hamlets and Waltham Forest)"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Debt support",
+      "delivery_method": "1:1",
+      "delivery_location": "Community, All Lot 2 boroughs ( Barking, City of London, Dagenham, Enfield, Hackney, Haringey, Havering, Newham, Redbridge, Tower Hamlets and Waltham Forest)"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Finance management",
+      "delivery_method": "1:1",
+      "delivery_location": "Community, All Lot 2 boroughs ( Barking, City of London, Dagenham, Enfield, Hackney, Haringey, Havering, Newham, Redbridge, Tower Hamlets and Waltham Forest)"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Education",
+      "delivery_method": "1:1",
+      "delivery_location": "Community, All Lot 2 boroughs ( Barking, City of London, Dagenham, Enfield, Hackney, Haringey, Havering, Newham, Redbridge, Tower Hamlets and Waltham Forest)"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Training",
+      "delivery_method": "1:1",
+      "delivery_location": "Community, All Lot 2 boroughs ( Barking, City of London, Dagenham, Enfield, Hackney, Haringey, Havering, Newham, Redbridge, Tower Hamlets and Waltham Forest)"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Employment",
+      "delivery_method": "1:1",
+      "delivery_location": "Community, All Lot 2 boroughs ( Barking, City of London, Dagenham, Enfield, Hackney, Haringey, Havering, Newham, Redbridge, Tower Hamlets and Waltham Forest)"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Dependency support",
+      "delivery_method": "1:1",
+      "delivery_location": "Community, All Lot 2 boroughs ( Barking, City of London, Dagenham, Enfield, Hackney, Haringey, Havering, Newham, Redbridge, Tower Hamlets and Waltham Forest)"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Recovery support",
+      "delivery_method": "1:1",
+      "delivery_location": "Community, All Lot 2 boroughs ( Barking, City of London, Dagenham, Enfield, Hackney, Haringey, Havering, Newham, Redbridge, Tower Hamlets and Waltham Forest)"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Emotional wellbeing",
+      "delivery_method": "1:1 and Group",
+      "delivery_location": "Community, All Lot 2 boroughs ( Barking, City of London, Dagenham, Enfield, Hackney, Haringey, Havering, Newham, Redbridge, Tower Hamlets and Waltham Forest)"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Mental health",
+      "delivery_method": "1:1",
+      "delivery_location": "Community, All Lot 2 boroughs ( Barking, City of London, Dagenham, Enfield, Hackney, Haringey, Havering, Newham, Redbridge, Tower Hamlets and Waltham Forest)"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Children & Famillies",
+      "delivery_method": "1:1",
+      "delivery_location": "Community, All Lot 2 boroughs ( Barking, City of London, Dagenham, Enfield, Hackney, Haringey, Havering, Newham, Redbridge, Tower Hamlets and Waltham Forest)"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Healthy relationships",
+      "delivery_method": "1:1",
+      "delivery_location": "Community, All Lot 2 boroughs ( Barking, City of London, Dagenham, Enfield, Hackney, Haringey, Havering, Newham, Redbridge, Tower Hamlets and Waltham Forest)"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Healthy lifestyle",
+      "delivery_method": "1:1 and Group",
+      "delivery_location": "Community, All Lot 2 boroughs ( Barking, City of London, Dagenham, Enfield, Hackney, Haringey, Havering, Newham, Redbridge, Tower Hamlets and Waltham Forest)"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Social Inclusion",
+      "delivery_method": "1:1 and Group",
+      "delivery_location": "Custody, delivered at these prisons, Downview, Send, Peterborough, East Sutton Park and Bronzefield for women returning to these boroughs Barking, City of London, Dagenham, Enfield, Hackney, Haringey, Havering, Newham, Redbridge, Tower Hamlets and Waltham Forest"
+    }
+  ]
+}

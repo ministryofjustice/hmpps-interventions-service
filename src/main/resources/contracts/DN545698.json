@@ -1,0 +1,103 @@
+{
+  "internal_contract_id": "767024f3-6aa5-4ca6-a3fa-dddd4b5c4d99",
+  "contract_reference": "DN545698",
+  "contract_type_id": "ACC",
+  "region": {
+    "nps_region_code": "L",
+    "pcc_region_code": null
+  },
+  "eligibility": {
+    "allows_female": true,
+    "allows_male": true,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "INGEUS_UK_LIMITED",
+    "subcontractor_codes": [
+      "MANCHESTER_ATHENA",
+      "ACORN"
+    ]
+  },
+  "internal_intervention_id": "2cee9965-0247-4459-9e68-40bc73984eaa",
+  "intervention_title": "GM - Accommodation Support Service",
+  "short_description": "This is the GMIRS Accommodation Service delivered by Ingeus.\n\nServices are available for people on probation on licence/post-sentence supervision. From April 2022 there is an opportunity if referral numbers stay within agreed levels that this will be extended to community referrals for those Service Users who are subject to a Community Order or a Suspended Sentence order. They will also be delivered pre-release for those who will be under probation supervision on release. Appointments which are part of sentence delivery will be enforceable.\n\nA range of approaches will be used including: direct delivery of interventions, support and advocacy, advice and guidance. \n\nInterventions will be tailored to reflect the complexity of a person on probation’s needs and should aim to secure one or more of the following outcomes:\n•\tPeople on probation obtain or maintain suitable accommodation\n•\tPeople on probation overcome barriers to obtaining/maintaining suitable accommodation\n•\tPeople on probation are prevented from becoming homeless.\n\nCore Activities \n\nThe Supplier should provide the following activities and deliver those activities applicable to each Person on Probation as set out in each Action Plan and which are tailored for each Person on Probation’s specific needs and Complexity Level.\n\nFor the low complexity cohort, the Supplier is only expected to provide professional advice and signposting to the Probation Practitioner. This may be in the form of direct telephone advice line. \n\nFor those that are assessed as medium or high complexity it is expected that the Supplier will take an active caseload supporting the individual at point of reception, focusing on providing support pre-release and will continue to provide support in the community towards the end of sentence in order to progress sustainable accommodation outcomes with the individual. \n\nPre-Release expectations\n\tSupport to avoid or manage accommodation arrears through direct negotiation, or advice on options for the Person on Probation to undertake, and the provision of follow-up support.\n\n\tAdvocacy and liaison with accommodation providers to maintain accommodation and mitigate the risk of eviction.\n\n\tAdvocacy and Advice to enable Person on Probation to access accommodation via a range of identified housing pathways including, but not limited to, Local Authorities, Housing Providers, National and Local charities and voluntary organisations, Private Landlords.\n\n\tSupport to understand and comply with any tenancy obligations, including liaison with the housing provider if required.\n\n\tSupport and assistance with completion of accommodation applications and provision of additional information as required.\n\n\tSupport and Guidance (Including liaison) to ensure continuation of an existing tenancy.\n\n\tProvide Advice, Information and Guidance to relinquish, maintain where appropriate or secure tenancies and other housing provision.\n\n\tSupport and Deliver work to avoid and reduce housing related debt being accrued and/or homelessness on release.  \n\n\tSupport and assistance with the completion of applications for Housing Benefit and other related benefits.\n\n\tSupport to access rent and bond schemes by providing information and assisting the Person on Probation throughout the application process as required.\n\n\tSupport to obtain accommodation for Persons on Probation due for release at Licence Expiry Date/Sentence End Date in partnership with the Probation Practitioner",
+  "activities": [
+    {
+      "need_area": "Accommodation",
+      "activity": "Support for maintaining tenancy",
+      "delivery_method": "One to one",
+      "delivery_location": "Across GM Prisons and GM PDU offices"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Support to relinquish tenancy and",
+      "delivery_method": "One to one",
+      "delivery_location": "Across GM Prisons and GM PDU offices"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Support to secure new tenancies on release",
+      "delivery_method": "One to one",
+      "delivery_location": "Across GM Prisons and GM PDU offices"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Support with completion of accommodation applications",
+      "delivery_method": "One to one",
+      "delivery_location": "Across GM Prisons and GM PDU offices"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Support with Duty to refer",
+      "delivery_method": "One to one",
+      "delivery_location": "Across GM Prisons and GM PDU offices"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Emergency support",
+      "delivery_method": "One to one",
+      "delivery_location": "Across GM Prisons and GM PDU offices"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Work with partners to achieve result",
+      "delivery_method": "One to one",
+      "delivery_location": "Across GM Prisons and GM PDU offices"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Assess need and access to relevant support service",
+      "delivery_method": "One to one",
+      "delivery_location": "Across GM Prisons and GM PDU offices"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Secure accommodation on release",
+      "delivery_method": "One to one",
+      "delivery_location": "Across GM Prisons and GM PDU offices"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Support individuals in the to achieve sustainable accommodation",
+      "delivery_method": "One to one",
+      "delivery_location": "Across GM Prisons and GM PDU offices"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Supporting individuals at key transition points",
+      "delivery_method": "One to one",
+      "delivery_location": "Across GM Prisons and GM PDU offices"
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Support with move on from temporary accommodation to secure settled accommodation",
+      "delivery_method": "One to one",
+      "delivery_location": "Across GM Prisons and GM PDU offices"
+    }
+  ]
+}

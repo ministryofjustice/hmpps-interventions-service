@@ -6,4 +6,5 @@ import java.util.UUID
 
 interface ServiceCategoryRepository : CrudRepository<ServiceCategory, UUID> {
   fun findByIdIn(serviceCategoryIds: List<UUID>): Set<ServiceCategory>
+  fun findByName(name: String): ServiceCategory?
 }

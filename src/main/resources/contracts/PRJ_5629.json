@@ -1,0 +1,133 @@
+{
+  "internal_contract_id": "9bb92fef-1361-4d9b-9111-c39550caf0f3",
+  "contract_reference": "PRJ_5629",
+  "contract_type_id": "PWB",
+  "region": {
+    "nps_region_code": null,
+    "pcc_region_code": "northumbria"
+  },
+  "eligibility": {
+    "allows_female": false,
+    "allows_male": true,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "INGEUS_UK_LIMITED",
+    "subcontractor_codes": [
+      "CHANGE_GROW_LIVE_LTD",
+      "PACT_FUTURES_CIC"
+    ]
+  },
+  "internal_intervention_id": "d81acbce-dab6-4028-8058-7fbf526f0b58",
+  "intervention_title": "Personal Wellbeing Services in Northumbria",
+  "short_description": "A holistic service which addresses the following rehabilitative needs: Emotional Wellbeing, Family and Significant Others, Lifestyle and Associates and Social Inclusion. \n \nServices are available for all adult male Service Users, irrespective of risk level or complexity level, on a Community/ Suspended Sentence Order with a RAR or on Licence/Post-Sentence Supervision The Social Inclusion ‘mentoring’ service will also be available pre-release for those who will be released under Probation supervision.  Appointments which are part of sentence delivery will be enforceable. \n \nA range of approaches will be used including:\ndirect delivery of interventions, support and advocacy, and advice and guidance. Interventions will be tailored to reflect the complexity of an individual Service User’s needs. \n \nInterventions will be tailored to reflect the complexity of needs and should aim to secure one or more of the following outcomes for Service Users: \n•        improved pro-social self-identity and ability to access community-based support networks \n•        sustained engagement in pro-social leisure interests and purposeful activities \n•        reduced engagement with pro-criminal associates and activities \n•        a decreased reliance on negative peer relationships or networks, such as organised crime groups or extremism groups. \n•        engaged in their community and able to make a positive contribution. \n•        positive family relationships and avoids harmful relationships are developed or maintained.  \n•        confident and responsible parenting behaviours are demonstrated (where applicable). \n•        Improved ability to develop positive intimate relationships including communication, resilience, negotiation and assertiveness skills.  \n•        positive coping strategies in the event of temporary or irretrievable breakdown of familial or other relationships are demonstrated.  \n•        compliance with any voluntary or mandatory family or relationship-focused therapeutic/behavioural change programmes. \n•        development of:  \n        coping skills and strategies to regulate mood and demonstrate perspective-taking and self-care by avoiding risky situations. \n        levels of self-efficacy, resilience and confidence \n        ability to access and engage with mental health services. \n        ability to recognise and manage triggers to worsening wellbeing. \n        ability to build and maintain appropriate social interactions. \n•        compliance with any medication/treatment/therapy programmes \n•        social networks to reduce initial social isolation are developed or sustained. \n•        early post-release engagement with community-based services is secured. \n•        resilience and perseverance to cope with challenges and barriers on return to the community is developed",
+  "activities": [
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Managing Me",
+      "delivery_method": "Group, 1-2-1, Online",
+      "delivery_location": "Gateshead, Sunderland, South Shields, Newcastle, Ashington, North Shields"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Emotional Resilience",
+      "delivery_method": "Group, 1-2-1, Online",
+      "delivery_location": "Gateshead, Sunderland, South Shields, Newcastle, Ashington, North Shields"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Health Trainer Support",
+      "delivery_method": "1-2-1, Online",
+      "delivery_location": "Gateshead, Sunderland, South Shields, Newcastle, Ashington, North Shields"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Foundations of Wellbeing",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gateshead, Sunderland, South Shields, Newcastle, Ashington, North Shields"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Adult Transitions",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gateshead, Sunderland, South Shields, Newcastle, Ashington, North Shields"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Get a Life not a Knife",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gateshead, Sunderland, South Shields, Newcastle, Ashington, North Shields"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Individual and/or family casework",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gateshead, Sunderland, South Shields, Newcastle, Ashington, North Shields"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Building stronger families",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gateshead, Sunderland, South Shields, Newcastle, Ashington, North Shields"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Being Home",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gateshead, Sunderland, South Shields, Newcastle, Ashington, North Shields"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Dads Reconnected",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gateshead, Sunderland, South Shields, Newcastle, Ashington, North Shields"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Personal Wellbeing Mentor Support",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Gateshead, Sunderland, South Shields, Newcastle, Ashington, North Shields"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Ingeus Peer Mentor Academy",
+      "delivery_method": "Group",
+      "delivery_location": "Gateshead, Sunderland, South Shields, Newcastle, Ashington, North Shields"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Transition and Hope",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gateshead, Sunderland, South Shields, Newcastle, Ashington, North Shields"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Reset",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gateshead, Sunderland, South Shields, Newcastle, Ashington, North Shields"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Departure Lounges",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gateshead, Sunderland, South Shields, Newcastle, Ashington, North Shields"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Arts and Performance",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gateshead, Sunderland, South Shields, Newcastle, Ashington, North Shields"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Positive Interaction",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gateshead, Sunderland, South Shields, Newcastle, Ashington, North Shields"
+    }
+  ]
+}

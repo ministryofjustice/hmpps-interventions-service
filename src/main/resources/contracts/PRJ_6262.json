@@ -1,0 +1,102 @@
+{
+  "internal_contract_id": "960d69b3-eaa2-42e7-b8f6-f1eee85d3e50",
+  "contract_reference": "PRJ_6262",
+  "contract_type_id": "ACC",
+  "region": {
+    "nps_region_code": "H",
+    "pcc_region_code": null
+  },
+  "eligibility": {
+    "allows_female": false,
+    "allows_male": true,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "INGEUS_UK_LIMITED",
+    "subcontractor_codes": [
+
+    ]
+  },
+  "internal_intervention_id": "e4c81676-c001-49d0-9d4e-2936b1a235b1",
+  "intervention_title": "Accommodation Services for South Central",
+  "short_description": "Services are available for all adult male Service Users, irrespective of risk level or complexity level, on a Community/ Suspended Sentence Order with a RAR or on Licence/Post-Sentence Supervision. They are also available to be delivered pre-release for those who will be under Probation supervision on release. Appointments which are part of sentence delivery will be enforceable. \nA range of approaches need to be used including direct delivery of interventions, support and advocacy, and advice and guidance. \nInterventions need to be tailored to reflect the complexity of a Service User’s needs and should aim to secure one or more of the following outcomes: \n· All barriers as identified in the Service User Action Plan, for example financial, behavioural, physical, mental or offence-type related), to obtaining or sustaining accommodation, are successfully removed. \n\n· Service User makes progress in obtaining accommodation. \n\n· Service User is helped to secure social or supported housing. \n\n· Service User is helped to secure a tenancy in the private rented sector (PRS) \n\n· Service User is helped to sustain existing accommodation. \n\n· Service User is prevented from becoming homeless. \n\n· Service User at risk of losing their tenancy are successfully helped to retain it \n\n· Service User has Settled Accommodation for at least three months (including for those serving custodial sentences of less than 6 months) \n\n· Service User has a strong prospect of sustaining Settled Accommodation for at least three months (including for those serving custodial sentences of less than 6 months)",
+  "activities": [
+    {
+      "need_area": "Accommodation",
+      "activity": "Accessing Accommodation (low)",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gosport, Havant, Basingstoke, Southampton, New Forest/Lymington, Portsmouth, Isle of Wight, Oxford, Bicester, High Wycombe, Milton Keynes (Bletchley), Aylesbury, Slough, Bracknell, Reading, Newbury, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Tenancy and Eviction Support (low)",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gosport, Havant, Basingstoke, Southampton, New Forest/Lymington, Portsmouth, Isle of Wight, Oxford, Bicester, High Wycombe, Milton Keynes (Bletchley), Aylesbury, Slough, Bracknell, Reading, Newbury, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Budgeting, Benefits and Arrears (low)",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gosport, Havant, Basingstoke, Southampton, New Forest/Lymington, Portsmouth, Isle of Wight, Oxford, Bicester, High Wycombe, Milton Keynes (Bletchley), Aylesbury, Slough, Bracknell, Reading, Newbury, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Accessing Accommodation (medium)",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gosport, Havant, Basingstoke, Southampton, New Forest/Lymington, Portsmouth, Isle of Wight, Oxford, Bicester, High Wycombe, Milton Keynes (Bletchley), Aylesbury, Slough, Bracknell, Reading, Newbury, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Budgeting, Benefits and Arrears (medium)",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gosport, Havant, Basingstoke, Southampton, New Forest/Lymington, Portsmouth, Isle of Wight, Oxford, Bicester, High Wycombe, Milton Keynes (Bletchley), Aylesbury, Slough, Bracknell, Reading, Newbury, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Tenancy and Eviction Support (medium)",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gosport, Havant, Basingstoke, Southampton, New Forest/Lymington, Portsmouth, Isle of Wight, Oxford, Bicester, High Wycombe, Milton Keynes (Bletchley), Aylesbury, Slough, Bracknell, Reading, Newbury, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Accessing Accommodation (high)",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gosport, Havant, Basingstoke, Southampton, New Forest/Lymington, Portsmouth, Isle of Wight, Oxford, Bicester, High Wycombe, Milton Keynes (Bletchley), Aylesbury, Slough, Bracknell, Reading, Newbury, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Specialised Accommodation Need (high)",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gosport, Havant, Basingstoke, Southampton, New Forest/Lymington, Portsmouth, Isle of Wight, Oxford, Bicester, High Wycombe, Milton Keynes (Bletchley), Aylesbury, Slough, Bracknell, Reading, Newbury, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Tenancy Liaison (custody)",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gosport, Havant, Basingstoke, Southampton, New Forest/Lymington, Portsmouth, Isle of Wight, Oxford, Bicester, High Wycombe, Milton Keynes (Bletchley), Aylesbury, Slough, Bracknell, Reading, Newbury, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Tenancy on Release (custody)",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gosport, Havant, Basingstoke, Southampton, New Forest/Lymington, Portsmouth, Isle of Wight, Oxford, Bicester, High Wycombe, Milton Keynes (Bletchley), Aylesbury, Slough, Bracknell, Reading, Newbury, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Homelessness and Emergency Support at Release (custody)",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gosport, Havant, Basingstoke, Southampton, New Forest/Lymington, Portsmouth, Isle of Wight, Oxford, Bicester, High Wycombe, Milton Keynes (Bletchley), Aylesbury, Slough, Bracknell, Reading, Newbury, Other NPS locations dependant on demand and availability of resource."
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Accommodation Clinic",
+      "delivery_method": "Group, 1-2-1",
+      "delivery_location": "Gosport, Havant, Basingstoke, Southampton, New Forest/Lymington, Portsmouth, Isle of Wight, Oxford, Bicester, High Wycombe, Milton Keynes (Bletchley), Aylesbury, Slough, Bracknell, Reading, Newbury, Other NPS locations dependant on demand and availability of resource."
+    }
+  ]
+}
