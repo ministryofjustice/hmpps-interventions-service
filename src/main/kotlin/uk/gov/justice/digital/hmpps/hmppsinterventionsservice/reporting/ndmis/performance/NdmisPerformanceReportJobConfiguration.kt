@@ -114,10 +114,7 @@ class NdmisPerformanceReportJobConfiguration(
     validator.setRequiredKeys(arrayOf("timestamp", "outputPath"))
 
     return jobBuilderFactory["ndmisPerformanceReportJob"]
-      // this incrementer adds a timestamp parameter meaning we can
-      // re-run the job with the same commandline params multiple times
-      .incrementer(TimestampIncrementer())
-      .incrementer(OutputPathIncrementer())
+      .incrementer { parameters -> OutputPathIncrementer().getNext(TimestampIncrementer().getNext(parameters)) }
       .validator(validator)
       .start(ndmisWriteReferralToCsvStep)
       .next(ndmisWriteComplexityToCsvStep)
