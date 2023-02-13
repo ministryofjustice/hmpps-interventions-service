@@ -55,6 +55,7 @@ class DraftReferralService(
   val userTypeChecker: UserTypeChecker,
   val communityAPIReferralService: CommunityAPIReferralService,
   val communityAPIOffenderService: CommunityAPIOffenderService,
+  val prisonerOffenderSearchService: PrisonerOffenderSearchService,
   val assessRisksAndNeedsService: RisksAndNeedsService,
   val supplierAssessmentService: SupplierAssessmentService,
   val hmppsAuthService: HMPPSAuthService,
@@ -489,7 +490,7 @@ class DraftReferralService(
   }
 
   private fun storeNomisCustodyLocation(referral: Referral) {
-    val offenderNomsNumber = communityAPIOffenderService.getOffenderNomsNumber(referral.serviceUserCRN)
+    val offenderNomsId = communityAPIOffenderService.getOffenderNomsId(referral.serviceUserCRN)
   }
 
   private fun submitAdditionalRiskInformation(referral: Referral, user: AuthUser) {

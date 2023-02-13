@@ -180,6 +180,10 @@ assess-risks-and-needs:
   locations:
     create-supplementary-risk: "/risks/supplementary"
 
+prisoner-offender-search:
+  locations:
+    prisoner: "/prisoner/{nomsId}"
+
 aws:
   s3:
     storage:

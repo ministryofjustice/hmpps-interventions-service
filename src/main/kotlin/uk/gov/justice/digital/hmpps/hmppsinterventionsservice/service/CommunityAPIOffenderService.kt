@@ -34,8 +34,8 @@ private data class StaffDetailsResponse(
   val staffIdentifier: Long,
 )
 
-private data class OffenderNomsNumberResponse(
-  val offenderNomsNumber: String?
+private data class OffenderNomsIdResponse(
+  val offenderNomsId: String?
 )
 
 private data class ContactableHumanResponse(
@@ -114,22 +114,22 @@ class CommunityAPIOffenderService(
       ?.staffIdentifier
   }
 
-  fun getOffenderNomsNumber(crn: String): String? {
+  fun getOffenderNomsId(crn: String): String? {
     val offenderIdentifiersPath = UriComponentsBuilder.fromPath(offenderIdentifiersLocation)
       .buildAndExpand(crn)
       .toString()
 
     return communityApiClient.get(offenderIdentifiersPath)
       .retrieve()
-      .bodyToMono(OffenderNomsNumberResponse::class.java)
+      .bodyToMono(OffenderNomsIdResponse::class.java)
       .onErrorResume(WebClientResponseException::class.java) { e ->
         when (e.statusCode) {
           HttpStatus.NOT_FOUND -> Mono.empty()
           else -> Mono.error(e)
         }
       }
-        .block()
-        ?.offenderNomsNumber
+      .block()
+      ?.offenderNomsId
   }
 
   fun getResponsibleOfficer(crn: String): ResponsibleOfficer {

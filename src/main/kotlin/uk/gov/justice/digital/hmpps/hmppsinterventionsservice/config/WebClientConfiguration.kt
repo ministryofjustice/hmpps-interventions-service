@@ -28,6 +28,7 @@ class WebClientConfiguration(
   @Value("\${community-api.baseurl}") private val communityApiBaseUrl: String,
   @Value("\${hmppsauth.baseurl}") private val hmppsAuthBaseUrl: String,
   @Value("\${assess-risks-and-needs.baseurl}") private val assessRisksAndNeedsBaseUrl: String,
+  @Value("\${prisoner-offender-search.baseurl}") private val prisonerOffenderSearchApiUrl: String,
   private val webClientBuilder: WebClient.Builder,
   private val retryingClientCredentialsTokenResponseClient: RetryingClientCredentialsTokenResponseClient,
 ) {
@@ -53,6 +54,14 @@ class WebClientConfiguration(
   fun communityApiClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient {
     return RestClient(
       createAuthorizedWebClient(authorizedClientManager, communityApiBaseUrl),
+      interventionsClientRegistrationId
+    )
+  }
+
+  @Bean
+  fun prisonerOffenderSearchClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient {
+    return RestClient(
+      createAuthorizedWebClient(authorizedClientManager, prisonerOffenderSearchApiUrl),
       interventionsClientRegistrationId
     )
   }

@@ -83,6 +83,8 @@ class DraftReferralServiceTest @Autowired constructor(
   private val referralAccessFilter = ReferralAccessFilter(serviceProviderAccessScopeMapper)
   private val communityAPIReferralService: CommunityAPIReferralService = mock()
   private val serviceUserAccessChecker: ServiceUserAccessChecker = mock()
+  private val communityAPIOffenderService: CommunityAPIOffenderService = mock()
+  private val prisonerOffenderSearchService: PrisonerOffenderSearchService = mock()
   private val assessRisksAndNeedsService: RisksAndNeedsService = mock()
   private val supplierAssessmentService: SupplierAssessmentService = mock()
   private val hmppsAuthService: HMPPSAuthService = mock()
@@ -103,6 +105,8 @@ class DraftReferralServiceTest @Autowired constructor(
     serviceCategoryRepository,
     userTypeChecker,
     communityAPIReferralService,
+    communityAPIOffenderService,
+    prisonerOffenderSearchService,
     assessRisksAndNeedsService,
     supplierAssessmentService,
     hmppsAuthService,
