@@ -205,8 +205,8 @@ class DraftReferralService(
   }
 
   fun updatePersonExpectedReleaseDate(draftReferral: DraftReferral, update: DraftReferralDTO) {
-    draftReferral.expectedReleaseDate = update.expectedReleaseDate
-    draftReferral.expectedReleaseDateMissingReason = update.expectedReleaseDateMissingReason
+    update.expectedReleaseDate?.let { draftReferral.expectedReleaseDate = it }
+    update.expectedReleaseDateMissingReason?.let { draftReferral.expectedReleaseDateMissingReason = it }
   }
 
   private fun updateServiceUserNeeds(draftReferral: DraftReferral, update: DraftReferralDTO) {
