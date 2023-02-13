@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.1"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.3"
   kotlin("plugin.spring") version "1.8.10"
   id("org.jetbrains.kotlin.plugin.jpa") version "1.8.10"
   id("jacoco")
@@ -67,8 +67,8 @@ dependencies {
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
-  implementation("io.sentry:sentry-spring-boot-starter:6.13.0")
-  implementation("io.sentry:sentry-logback:6.13.0")
+  implementation("io.sentry:sentry-spring-boot-starter:6.13.1")
+  implementation("io.sentry:sentry-logback:6.13.1")
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
   implementation("net.logstash.logback:logstash-logback-encoder:7.2")
   runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2") // needed for OffsetDateTime for AppInsights
@@ -80,8 +80,8 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:3.19.0-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.19.31")
-  implementation("software.amazon.awssdk:s3:2.19.31")
+  implementation("software.amazon.awssdk:sns:2.20.2")
+  implementation("software.amazon.awssdk:s3:2.20.2")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -92,7 +92,7 @@ dependencies {
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
-  implementation("org.hibernate:hibernate-core:5.6.14.Final")
+  implementation("org.hibernate:hibernate-core:5.6.15.Final")
   implementation("com.vladmihalcea:hibernate-types-55:2.21.1")
   runtimeOnly("org.flywaydb:flyway-core")
   runtimeOnly("org.postgresql:postgresql:42.5.3")
