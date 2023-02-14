@@ -490,7 +490,11 @@ class DraftReferralService(
   }
 
   private fun storeNomisCustodyLocation(referral: Referral) {
-    val offenderNomsId = communityAPIOffenderService.getOffenderNomsId(referral.serviceUserCRN)
+    val offenderNomsId =
+      communityAPIOffenderService.getOffenderIdentifiers(referral.serviceUserCRN)?.primaryIdentifiers?.nomsNumber
+    offenderNomsId?.let {
+      val prisoner = prisonerOffenderSearchService.getPrisonerById(it)
+    }
   }
 
   private fun submitAdditionalRiskInformation(referral: Referral, user: AuthUser) {
