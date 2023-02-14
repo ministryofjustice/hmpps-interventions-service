@@ -223,6 +223,99 @@ class DraftReferralServiceTest @Autowired constructor(
     }
 
     @Test
+    fun `updates prison location in the draft referral`() {
+      sampleDraftReferral.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
+      sampleDraftReferral.personCustodyPrisonId = "ABC"
+      sampleDraftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
+      entityManager.persistAndFlush(sampleDraftReferral)
+
+      val draftReferral = DraftReferralDTO(personCurrentLocationType = PersonCurrentLocationType.CUSTODY, personCustodyPrisonId = "DNI")
+      draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
+      val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
+      assertThat(savedDraftReferral).isNotNull
+      assertThat(savedDraftReferral?.id).isEqualTo(sampleDraftReferral.id)
+      assertThat(savedDraftReferral?.personCustodyPrisonId).isEqualTo("DNI")
+    }
+
+    @Test
+    fun `updates expected release date information to null if the persons location changes from custody to community`() {
+      sampleDraftReferral.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
+      sampleDraftReferral.personCustodyPrisonId = "ABC"
+      sampleDraftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
+      entityManager.persistAndFlush(sampleDraftReferral)
+
+      val draftReferral = DraftReferralDTO(personCurrentLocationType = PersonCurrentLocationType.COMMUNITY)
+      draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
+      val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
+      assertThat(savedDraftReferral).isNotNull
+      assertThat(savedDraftReferral?.id).isEqualTo(sampleDraftReferral.id)
+      assertThat(savedDraftReferral?.personCurrentLocationType).isEqualTo(PersonCurrentLocationType.COMMUNITY)
+      assertThat(savedDraftReferral?.expectedReleaseDate).isNull()
+    }
+
+    @Test
+    fun `updates expected release date in the draft referral`() {
+      sampleDraftReferral.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
+      sampleDraftReferral.personCustodyPrisonId = "ABC"
+      sampleDraftReferral.expectedReleaseDate = LocalDate.now().plusDays(10)
+      entityManager.persistAndFlush(sampleDraftReferral)
+
+      val draftReferral = DraftReferralDTO(expectedReleaseDate = LocalDate.now().plusDays(8))
+      draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
+      val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
+      assertThat(savedDraftReferral).isNotNull
+      assertThat(savedDraftReferral?.id).isEqualTo(sampleDraftReferral.id)
+      assertThat(savedDraftReferral?.expectedReleaseDate).isEqualTo(LocalDate.now().plusDays(8))
+    }
+
+    @Test
+    fun `updates expected release date unknown reason in the draft referral`() {
+      sampleDraftReferral.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
+      sampleDraftReferral.personCustodyPrisonId = "ABC"
+      sampleDraftReferral.expectedReleaseDateMissingReason = "It will be known pretty soon"
+      entityManager.persistAndFlush(sampleDraftReferral)
+
+      val draftReferral = DraftReferralDTO(expectedReleaseDateMissingReason = "It will be tomorrow")
+      draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
+      val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
+      assertThat(savedDraftReferral).isNotNull
+      assertThat(savedDraftReferral?.id).isEqualTo(sampleDraftReferral.id)
+      assertThat(savedDraftReferral?.expectedReleaseDateMissingReason).isEqualTo("It will be tomorrow")
+    }
+
+    @Test
+    fun `updates expected release date to null if expected release date not confirmed yet`() {
+      sampleDraftReferral.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
+      sampleDraftReferral.personCustodyPrisonId = "ABC"
+      sampleDraftReferral.expectedReleaseDate = LocalDate.now().plusDays(10)
+      entityManager.persistAndFlush(sampleDraftReferral)
+
+      val draftReferral = DraftReferralDTO(expectedReleaseDateMissingReason = "It will be known tomorrow")
+      draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
+      val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
+      assertThat(savedDraftReferral).isNotNull
+      assertThat(savedDraftReferral?.id).isEqualTo(sampleDraftReferral.id)
+      assertThat(savedDraftReferral?.expectedReleaseDateMissingReason).isEqualTo("It will be known tomorrow")
+      assertThat(savedDraftReferral?.expectedReleaseDate).isNull()
+    }
+
+    @Test
+    fun `updates expected release date unknown reason to null if expected release date is confirmed`() {
+      sampleDraftReferral.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
+      sampleDraftReferral.personCustodyPrisonId = "ABC"
+      sampleDraftReferral.expectedReleaseDateMissingReason = "It will be known tomorrow"
+      entityManager.persistAndFlush(sampleDraftReferral)
+
+      val draftReferral = DraftReferralDTO(expectedReleaseDate = LocalDate.now().plusDays(8))
+      draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
+      val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
+      assertThat(savedDraftReferral).isNotNull
+      assertThat(savedDraftReferral?.id).isEqualTo(sampleDraftReferral.id)
+      assertThat(savedDraftReferral?.expectedReleaseDateMissingReason).isNull()
+      assertThat(savedDraftReferral?.expectedReleaseDate).isEqualTo(LocalDate.now().plusDays(8))
+    }
+
+    @Test
     fun `create and persist non-cohort draft referral`() {
       val authUser = AuthUser("user_id", "delius", "user_name")
       val draftReferral = draftReferralService.createDraftReferral(authUser, "X123456", sampleIntervention.id)
