@@ -200,13 +200,29 @@ class DraftReferralService(
   fun updatePersonCurrentLocation(draftReferral: DraftReferral, update: DraftReferralDTO) {
     update.personCurrentLocationType?.let {
       draftReferral.personCurrentLocationType = it
-      draftReferral.personCustodyPrisonId = if (it == PersonCurrentLocationType.CUSTODY) update.personCustodyPrisonId else null
+      if (it == PersonCurrentLocationType.CUSTODY) {
+        draftReferral.personCustodyPrisonId = update.personCustodyPrisonId
+      } else {
+        draftReferral.personCustodyPrisonId = null
+        draftReferral.expectedReleaseDate = null
+        draftReferral.expectedReleaseDateMissingReason = null
+      }
     }
   }
 
   fun updatePersonExpectedReleaseDate(draftReferral: DraftReferral, update: DraftReferralDTO) {
-    update.expectedReleaseDate?.let { draftReferral.expectedReleaseDate = it }
-    update.expectedReleaseDateMissingReason?.let { draftReferral.expectedReleaseDateMissingReason = it }
+    if (update.expectedReleaseDate != null || update.expectedReleaseDateMissingReason != null) {
+      if (update.expectedReleaseDate != null) {
+        draftReferral.expectedReleaseDate = update.expectedReleaseDate
+      } else if (draftReferral.expectedReleaseDate != null) {
+        draftReferral.expectedReleaseDate = null
+      }
+      if (update.expectedReleaseDateMissingReason != null) {
+        draftReferral.expectedReleaseDateMissingReason = update.expectedReleaseDateMissingReason
+      } else if (draftReferral.expectedReleaseDateMissingReason != null) {
+        draftReferral.expectedReleaseDateMissingReason = null
+      }
+    }
   }
 
   private fun updateServiceUserNeeds(draftReferral: DraftReferral, update: DraftReferralDTO) {
