@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
+import com.microsoft.applicationinsights.TelemetryClient
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -15,6 +16,10 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.http.HttpRequest
+import org.springframework.lang.Nullable
+import org.springframework.web.reactive.function.client.WebClientResponseException
+import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessFilter
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceProviderAccessScopeMapper
@@ -90,6 +95,7 @@ class DraftReferralServiceTest @Autowired constructor(
   private val hmppsAuthService: HMPPSAuthService = mock()
   private val draftOasysRiskInformationService: DraftOasysRiskInformationService = mock()
   private var currentLocationEnabled: Boolean = true
+  private val telemetryClient = mock<TelemetryClient>()
 
   private val draftReferralService = DraftReferralService(
     referralRepository,
@@ -113,6 +119,7 @@ class DraftReferralServiceTest @Autowired constructor(
     referralDetailsRepository,
     draftOasysRiskInformationService,
     referralLocationRepository,
+    telemetryClient,
     currentLocationEnabled
   )
 
@@ -467,11 +474,7 @@ class DraftReferralServiceTest @Autowired constructor(
     fun `once a draft referral is sent to referral it's id is still valid in draft referral`() {
       val user = AuthUser("user_id", "delius", "user_name")
       val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
-      draftReferral.additionalRiskInformation = "risk"
-      draftReferral.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
-      draftReferral.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
-      draftReferral.personCustodyPrisonId = "ABC"
-      draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
+      setDraftReferralRequiredFields(draftReferral)
 
       assertThat(draftReferralService.getDraftReferralForUser(draftReferral.id, user)).isNotNull
 
@@ -484,11 +487,7 @@ class DraftReferralServiceTest @Autowired constructor(
     fun `sending a draft referral generates a referral reference number`() {
       val user = AuthUser("user_id", "delius", "user_name")
       val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
-      draftReferral.additionalRiskInformation = "risk"
-      draftReferral.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
-      draftReferral.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
-      draftReferral.personCustodyPrisonId = "ABC"
-      draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
+      setDraftReferralRequiredFields(draftReferral)
 
       val sentReferral = draftReferralService.sendDraftReferral(draftReferral, user)
       assertThat(sentReferral.referenceNumber).isNotNull
@@ -498,37 +497,114 @@ class DraftReferralServiceTest @Autowired constructor(
     fun `sending a draft referral creates a referral location`() {
       val user = AuthUser("user_id", "delius", "user_name")
       val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
-      draftReferral.additionalRiskInformation = "risk"
-      draftReferral.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
-
-      val personCurrentLocationType = PersonCurrentLocationType.CUSTODY
-      val personCustodyPrisonId = "ABC"
-      draftReferral.personCurrentLocationType = personCurrentLocationType
-      draftReferral.personCustodyPrisonId = personCustodyPrisonId
-      draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
+      setDraftReferralRequiredFields(draftReferral)
 
       val sentReferral = draftReferralService.sendDraftReferral(draftReferral, user)
       assertThat(referralLocationRepository.findByReferralId(sentReferral.id)?.referral).isEqualTo(sentReferral)
-      assertThat(referralLocationRepository.findByReferralId(sentReferral.id)?.prisonId).isEqualTo(personCustodyPrisonId)
-      assertThat(referralLocationRepository.findByReferralId(sentReferral.id)?.type).isEqualTo(personCurrentLocationType)
+      assertThat(referralLocationRepository.findByReferralId(sentReferral.id)?.prisonId).isEqualTo(draftReferral.personCustodyPrisonId)
+      assertThat(referralLocationRepository.findByReferralId(sentReferral.id)?.type).isEqualTo(draftReferral.personCurrentLocationType)
     }
 
     @Test
     fun `sending a draft referral creates a referral with referral location`() {
       val user = AuthUser("user_id", "delius", "user_name")
       val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
-      draftReferral.additionalRiskInformation = "risk"
-      draftReferral.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
-
-      val personCurrentLocationType = PersonCurrentLocationType.CUSTODY
-      val personCustodyPrisonId = "ABC"
-      draftReferral.personCurrentLocationType = personCurrentLocationType
-      draftReferral.personCustodyPrisonId = personCustodyPrisonId
-      draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
+      setDraftReferralRequiredFields(draftReferral)
 
       val sentReferral = draftReferralService.sendDraftReferral(draftReferral, user)
-      assertThat(referralRepository.findById(sentReferral.id).get().referralLocation?.prisonId).isEqualTo(personCustodyPrisonId)
-      assertThat(referralRepository.findById(sentReferral.id).get().referralLocation?.type).isEqualTo(personCurrentLocationType)
+      assertThat(referralRepository.findById(sentReferral.id).get().referralLocation?.prisonId).isEqualTo(draftReferral.personCustodyPrisonId)
+      assertThat(referralRepository.findById(sentReferral.id).get().referralLocation?.type).isEqualTo(draftReferral.personCurrentLocationType)
+    }
+
+    @Test
+    fun `sending a draft referral updates referral location with corresponding nomis data`() {
+      val user = AuthUser("user_id", "delius", "user_name")
+      val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
+      setDraftReferralRequiredFields(draftReferral)
+
+      val stubNomsNumber = "N123"
+      whenever(communityAPIOffenderService.getOffenderIdentifiers(draftReferral.serviceUserCRN))
+        .thenReturn(Mono.just(OffenderIdentifiersResponse(PrimaryIdentifiersResponse(stubNomsNumber))))
+      whenever(prisonerOffenderSearchService.getPrisonerById(stubNomsNumber))
+        .thenReturn(Mono.just(mockPrisoner(draftReferral.personCustodyPrisonId as String, draftReferral.expectedReleaseDate as LocalDate)))
+
+      val sentReferral = draftReferralService.sendDraftReferral(draftReferral, user)
+      assertThat(sentReferral.referralLocation?.nomisPrisonId).isEqualTo(draftReferral.personCustodyPrisonId)
+      assertThat(sentReferral.referralLocation?.nomisReleaseDate).isEqualTo(draftReferral.expectedReleaseDate)
+    }
+
+    @Test
+    fun `verifying custody location entries sends tracking events with matching comparison results`() {
+      val user = AuthUser("user_id", "delius", "user_name")
+      val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
+      setDraftReferralRequiredFields(draftReferral)
+
+      val stubNomsNumber = "N123"
+      whenever(communityAPIOffenderService.getOffenderIdentifiers(draftReferral.serviceUserCRN))
+        .thenReturn(Mono.just(OffenderIdentifiersResponse(PrimaryIdentifiersResponse(stubNomsNumber))))
+      whenever(prisonerOffenderSearchService.getPrisonerById(stubNomsNumber))
+        .thenReturn(Mono.just(mockPrisoner(draftReferral.personCustodyPrisonId as String, draftReferral.expectedReleaseDate as LocalDate)))
+
+      draftReferralService.sendDraftReferral(draftReferral, user)
+      verify(telemetryClient).trackEvent(
+        "CustodyLocationVerification",
+        mapOf(
+          "status" to "ok",
+          "prisonId" to DraftReferralService.MatchType.MATCH.name,
+          "releaseDate" to DraftReferralService.MatchType.MATCH.name
+        ),
+        null
+      )
+    }
+
+    @Test
+    fun `verifying custody location entries sends tracking events with non matching comparison results`() {
+      val user = AuthUser("user_id", "delius", "user_name")
+      val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
+      setDraftReferralRequiredFields(draftReferral)
+
+      val stubNomsNumber = "N123"
+      val differentPrisonId = "AAA"
+      val differentReleaseDate = LocalDate.now()
+      whenever(communityAPIOffenderService.getOffenderIdentifiers(draftReferral.serviceUserCRN))
+        .thenReturn(Mono.just(OffenderIdentifiersResponse(PrimaryIdentifiersResponse(stubNomsNumber))))
+      whenever(prisonerOffenderSearchService.getPrisonerById(stubNomsNumber))
+        .thenReturn(Mono.just(mockPrisoner(differentPrisonId, differentReleaseDate)))
+
+      draftReferralService.sendDraftReferral(draftReferral, user)
+      verify(telemetryClient).trackEvent(
+        "CustodyLocationVerification",
+        mapOf(
+          "status" to "ok",
+          "prisonId" to DraftReferralService.MatchType.NO_MATCH.name,
+          "releaseDate" to DraftReferralService.MatchType.NO_MATCH.name
+        ),
+        null
+      )
+    }
+
+    @Test
+    fun `verifying custody location entries sends tracking events with error status and reasons`() {
+      val user = AuthUser("user_id", "delius", "user_name")
+      val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
+      setDraftReferralRequiredFields(draftReferral)
+
+      val stubNomsNumber = "N123"
+      whenever(communityAPIOffenderService.getOffenderIdentifiers(draftReferral.serviceUserCRN))
+        .thenReturn(Mono.just(OffenderIdentifiersResponse(PrimaryIdentifiersResponse(stubNomsNumber))))
+      whenever(prisonerOffenderSearchService.getPrisonerById(stubNomsNumber))
+        .thenReturn(Mono.error(WebClientResponseException(404, "", null, null, null, null)))
+
+      draftReferralService.sendDraftReferral(draftReferral, user)
+      verify(telemetryClient).trackEvent(
+        "CustodyLocationVerification",
+        mapOf(
+          "status" to "error",
+          "errorStatusCode" to 404.toString(),
+          "errorReason" to "Not Found"
+        ),
+        null
+      )
     }
 
     @Test
@@ -536,16 +612,8 @@ class DraftReferralServiceTest @Autowired constructor(
       val user = AuthUser("user_id", "delius", "user_name")
       val draft1 = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
       val draft2 = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
-      draft1.additionalRiskInformation = "risk"
-      draft1.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
-      draft1.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
-      draft1.personCustodyPrisonId = "ABC"
-      draft1.expectedReleaseDate = LocalDate.of(2050, 11, 1)
-      draft2.additionalRiskInformation = "risk"
-      draft2.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
-      draft2.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
-      draft2.personCustodyPrisonId = "ABC"
-      draft2.expectedReleaseDate = LocalDate.of(2050, 11, 1)
+      setDraftReferralRequiredFields(draft1)
+      setDraftReferralRequiredFields(draft2)
 
       whenever(referenceGenerator.generate(sampleIntervention.dynamicFrameworkContract.contractType.name))
         .thenReturn("AA0000ZZ", "AA0000ZZ", "AA0000ZZ", "AA0000ZZ", "BB0000ZZ")
@@ -561,11 +629,7 @@ class DraftReferralServiceTest @Autowired constructor(
     fun `sending a draft referral triggers an event`() {
       val user = AuthUser("user_id", "delius", "user_name")
       val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
-      draftReferral.additionalRiskInformation = "risk"
-      draftReferral.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
-      draftReferral.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
-      draftReferral.personCustodyPrisonId = "ABC"
-      draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
+      setDraftReferralRequiredFields(draftReferral)
 
       val referral = draftReferralService.sendDraftReferral(draftReferral, user)
       val eventCaptor = argumentCaptor<Referral>()
@@ -641,4 +705,32 @@ class DraftReferralServiceTest @Autowired constructor(
     assertThat(updatedReferral.selectedServiceCategories!!.elementAt(0).id).isEqualTo(serviceCategoryId)
     assertThat(updatedReferral.selectedDesiredOutcomes).hasSize(1)
   }
+
+  private fun setDraftReferralRequiredFields(
+    draftReferral: DraftReferral,
+    additionalRiskInformation: String ?= "risk",
+    additionalRiskInformationUpdatedAt: OffsetDateTime ?= OffsetDateTime.now(),
+    personCurrentLocationType: PersonCurrentLocationType ?= PersonCurrentLocationType.CUSTODY,
+    personCustodyPrisonId: String ?= "ABC",
+    expectedReleaseDate: LocalDate ?= LocalDate.of(2050, 11, 1)
+  ) {
+    draftReferral.additionalRiskInformation = additionalRiskInformation
+    draftReferral.additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt
+    draftReferral.personCurrentLocationType = personCurrentLocationType
+    draftReferral.personCustodyPrisonId =  personCustodyPrisonId
+    draftReferral.expectedReleaseDate = expectedReleaseDate
+  }
+
+  private fun mockPrisoner(prisonId: String, expectedReleaseDate: LocalDate) =
+    Prisoner(
+      prisonId,
+      expectedReleaseDate,
+      expectedReleaseDate,
+      expectedReleaseDate,
+      expectedReleaseDate,
+      expectedReleaseDate,
+      expectedReleaseDate,
+      expectedReleaseDate,
+      expectedReleaseDate
+    )
 }

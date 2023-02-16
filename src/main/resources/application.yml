@@ -211,4 +211,4 @@ overrides:
 
 feature-flags:
   current-location:
-    enabled: false
+    enabled: true

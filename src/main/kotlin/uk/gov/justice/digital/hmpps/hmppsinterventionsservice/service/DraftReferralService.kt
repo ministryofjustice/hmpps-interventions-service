@@ -1,12 +1,15 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
+import com.microsoft.applicationinsights.TelemetryClient
 import mu.KotlinLogging
 import net.logstash.logback.argument.StructuredArguments
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ServerWebInputException
+import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessFilter
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceUserAccessChecker
@@ -62,11 +65,16 @@ class DraftReferralService(
   val referralDetailsRepository: ReferralDetailsRepository,
   val draftOasysRiskInformationService: DraftOasysRiskInformationService,
   val referralLocationRepository: ReferralLocationRepository,
+  val telemetryClient: TelemetryClient,
   @Value("\${feature-flags.current-location.enabled}") private val currentLocationEnabled: Boolean
 ) {
   companion object {
     private val logger = KotlinLogging.logger {}
     private const val maxReferenceNumberTries = 10
+  }
+
+  enum class MatchType {
+    MATCH, NO_MATCH, UNDETERMINED
   }
 
   fun createDraftReferral(
@@ -441,7 +449,7 @@ class DraftReferralService(
 
     val sentReferral = referralRepository.save(referral)
     createReferralLocation(draftReferral, sentReferral)
-    storeNomisCustodyLocation(sentReferral)
+    verifyCustodyLocationEntries(sentReferral)
     eventPublisher.referralSentEvent(sentReferral)
     supplierAssessmentService.createSupplierAssessment(referral)
     return sentReferral
@@ -489,11 +497,74 @@ class DraftReferralService(
     }
   }
 
-  private fun storeNomisCustodyLocation(referral: Referral) {
-    val offenderNomsId =
-      communityAPIOffenderService.getOffenderIdentifiers(referral.serviceUserCRN)?.primaryIdentifiers?.nomsNumber
+  private fun verifyCustodyLocationEntries(referral: Referral) {
+    val compare = { a: String?, b: String? ->
+      when {
+        a == null || b == null -> MatchType.UNDETERMINED.name
+        a == b -> MatchType.MATCH.name
+        a != b -> MatchType.NO_MATCH.name
+        else -> MatchType.UNDETERMINED.name
+      }
+    }
+
+    val offenderNomsId = communityAPIOffenderService.getOffenderIdentifiers(referral.serviceUserCRN)
+      .onErrorResume(WebClientResponseException::class.java) { e ->
+        telemetryClient.trackEvent(
+          "CustodyLocationVerification",
+          mapOf(
+            "status" to "error",
+            "errorStatusCode" to e.rawStatusCode.toString(),
+            "errorReason" to e.statusCode.reasonPhrase
+          ),
+          null
+        )
+        Mono.empty()
+      }
+      .block()?.primaryIdentifiers?.nomsNumber
+
     offenderNomsId?.let {
       val prisoner = prisonerOffenderSearchService.getPrisonerById(it)
+        .onErrorResume(WebClientResponseException::class.java) { e ->
+          telemetryClient.trackEvent(
+            "CustodyLocationVerification",
+            mapOf(
+              "status" to "error",
+              "errorStatusCode" to e.rawStatusCode.toString(),
+              "errorReason" to e.statusCode.reasonPhrase
+            ),
+            null
+          )
+          Mono.empty()
+        }
+        .block()
+
+      prisoner?.let {
+        val referralLocation = referralLocationRepository.findByReferralId(referral.id)
+        referralLocation?.let {
+          with(prisoner) {
+            it.nomisPrisonId = prisonId
+            it.nomisReleaseDate = releaseDate
+            it.nomisConfirmedReleaseDate = confirmedReleaseDate
+            it.nomisNonDtoReleaseDate = nonDtoReleaseDate
+            it.nomisAutomaticReleaseDate = automaticReleaseDate
+            it.nomisPostRecallReleaseDate = postRecallReleaseDate
+            it.nomisConditionalReleaseDate = conditionalReleaseDate
+            it.nomisActualParoleDate = actualParoleDate
+            it.nomisDischargeDate = dischargeDate
+
+            telemetryClient.trackEvent(
+              "CustodyLocationVerification",
+              mapOf(
+                "status" to "ok",
+                "prisonId" to compare(it.nomisPrisonId as String, it.prisonId),
+                "releaseDate" to compare(it.nomisReleaseDate.toString(), it.expectedReleaseDate.toString())
+              ),
+              null
+            )
+          }
+          referralLocationRepository.save(referralLocation)
+        }
+      }
     }
   }
 

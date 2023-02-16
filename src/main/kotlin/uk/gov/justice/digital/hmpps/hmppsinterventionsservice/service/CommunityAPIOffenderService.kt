@@ -118,7 +118,7 @@ class CommunityAPIOffenderService(
       ?.staffIdentifier
   }
 
-  fun getOffenderIdentifiers(crn: String): OffenderIdentifiersResponse? {
+  fun getOffenderIdentifiers(crn: String): Mono<OffenderIdentifiersResponse> {
     val offenderIdentifiersPath = UriComponentsBuilder.fromPath(offenderIdentifiersLocation)
       .buildAndExpand(crn)
       .toString()
@@ -126,13 +126,6 @@ class CommunityAPIOffenderService(
     return communityApiClient.get(offenderIdentifiersPath)
       .retrieve()
       .bodyToMono(OffenderIdentifiersResponse::class.java)
-      .onErrorResume(WebClientResponseException::class.java) { e ->
-        when (e.statusCode) {
-          HttpStatus.NOT_FOUND -> Mono.empty()
-          else -> Mono.error(e)
-        }
-      }
-      .block()
   }
 
   fun getResponsibleOfficer(crn: String): ResponsibleOfficer {

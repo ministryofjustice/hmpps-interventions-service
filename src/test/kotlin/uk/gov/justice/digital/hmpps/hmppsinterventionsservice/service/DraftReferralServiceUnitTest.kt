@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
+import com.microsoft.applicationinsights.TelemetryClient
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -84,6 +85,7 @@ class DraftReferralServiceUnitTest {
   private val interventionFactory = InterventionFactory()
   private val dynamicFrameworkContractFactory = DynamicFrameworkContractFactory()
   private val draftOasysRiskInformationFactory = DraftOasysRiskInformationFactory()
+  private val telemetryClient = mock<TelemetryClient>()
   private var currentLocationEnabled: Boolean = true
 
   private val draftReferralService = DraftReferralService(
@@ -108,6 +110,7 @@ class DraftReferralServiceUnitTest {
     referralDetailsRepository,
     draftOasysRiskInformationService,
     referralLocationRepository,
+    telemetryClient,
     currentLocationEnabled
   )
 
