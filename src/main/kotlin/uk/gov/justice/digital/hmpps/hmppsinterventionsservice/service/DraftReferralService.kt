@@ -499,6 +499,7 @@ class DraftReferralService(
 
   private fun verifyCustodyLocationEntries(referral: Referral) {
     val eventName = "CustodyLocationVerification"
+    var eventProperties: Map<String, String> = emptyMap()
     val compare = { a: String?, b: String? ->
       when {
         a == null || b == null -> MatchType.UNDETERMINED.name
@@ -510,14 +511,10 @@ class DraftReferralService(
 
     val offenderNomsId = communityAPIOffenderService.getOffenderIdentifiers(referral.serviceUserCRN)
       .onErrorResume(WebClientResponseException::class.java) { e ->
-        telemetryClient.trackEvent(
-          eventName,
-          mapOf(
-            "status" to "error",
-            "errorStatusCode" to e.rawStatusCode.toString(),
-            "errorReason" to e.statusCode.reasonPhrase
-          ),
-          null
+        eventProperties = mapOf(
+          "result" to "error",
+          "errorStatusCode" to e.rawStatusCode.toString(),
+          "errorReason" to e.statusCode.reasonPhrase
         )
         Mono.empty()
       }
@@ -526,14 +523,10 @@ class DraftReferralService(
     offenderNomsId?.let {
       val prisoner = prisonerOffenderSearchService.getPrisonerById(it)
         .onErrorResume(WebClientResponseException::class.java) { e ->
-          telemetryClient.trackEvent(
-            eventName,
-            mapOf(
-              "status" to "error",
-              "errorStatusCode" to e.rawStatusCode.toString(),
-              "errorReason" to e.statusCode.reasonPhrase
-            ),
-            null
+          eventProperties = mapOf(
+            "result" to "error",
+            "errorStatusCode" to e.rawStatusCode.toString(),
+            "errorReason" to e.statusCode.reasonPhrase
           )
           Mono.empty()
         }
@@ -553,20 +546,27 @@ class DraftReferralService(
             it.nomisActualParoleDate = actualParoleDate
             it.nomisDischargeDate = dischargeDate
 
-            telemetryClient.trackEvent(
-              eventName,
-              mapOf(
-                "status" to "success",
-                "prisonId" to compare(it.nomisPrisonId as String, it.prisonId),
-                "releaseDate" to compare(it.nomisReleaseDate.toString(), it.expectedReleaseDate.toString())
-              ),
-              null
+            eventProperties = mapOf(
+              "result" to "success",
+              "prisonId" to compare(it.nomisPrisonId as String, it.prisonId),
+              "releaseDate" to compare(it.nomisReleaseDate.toString(), it.expectedReleaseDate.toString())
             )
           }
           referralLocationRepository.save(referralLocation)
         }
+      } ?: run {
+        if (eventProperties.isEmpty()) eventProperties = mapOf(
+          "result" to "undetermined",
+          "reason" to "Prisoner not found for NOMS id: $offenderNomsId"
+        )
       }
+    } ?: run {
+      if (eventProperties.isEmpty()) eventProperties = mapOf(
+        "result" to "undetermined",
+        "reason" to "NOMS id not found for CRN: ${referral.serviceUserCRN}"
+      )
     }
+    telemetryClient.trackEvent(eventName, eventProperties, null)
   }
 
   private fun submitAdditionalRiskInformation(referral: Referral, user: AuthUser) {

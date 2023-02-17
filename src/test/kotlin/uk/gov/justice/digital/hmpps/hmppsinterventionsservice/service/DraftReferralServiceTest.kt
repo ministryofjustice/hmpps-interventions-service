@@ -9,8 +9,10 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
+import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -163,6 +165,7 @@ class DraftReferralServiceTest @Autowired constructor(
           )
         )
       )
+      whenever(communityAPIOffenderService.getOffenderIdentifiers(any())).thenReturn(Mono.empty())
     }
 
     @Test
@@ -547,7 +550,7 @@ class DraftReferralServiceTest @Autowired constructor(
       verify(telemetryClient).trackEvent(
         "CustodyLocationVerification",
         mapOf(
-          "status" to "ok",
+          "result" to "success",
           "prisonId" to DraftReferralService.MatchType.MATCH.name,
           "releaseDate" to DraftReferralService.MatchType.MATCH.name
         ),
@@ -573,7 +576,7 @@ class DraftReferralServiceTest @Autowired constructor(
       verify(telemetryClient).trackEvent(
         "CustodyLocationVerification",
         mapOf(
-          "status" to "ok",
+          "result" to "success",
           "prisonId" to DraftReferralService.MatchType.NO_MATCH.name,
           "releaseDate" to DraftReferralService.MatchType.NO_MATCH.name
         ),
@@ -582,7 +585,7 @@ class DraftReferralServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `verifying custody location entries sends tracking events with error status and reasons`() {
+    fun `verifying custody location entries sends tracking events with error status and reason`() {
       val user = AuthUser("user_id", "delius", "user_name")
       val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
       setDraftReferralRequiredFields(draftReferral)
@@ -597,9 +600,34 @@ class DraftReferralServiceTest @Autowired constructor(
       verify(telemetryClient).trackEvent(
         "CustodyLocationVerification",
         mapOf(
-          "status" to "error",
+          "result" to "error",
           "errorStatusCode" to 404.toString(),
           "errorReason" to "Not Found"
+        ),
+        null
+      )
+      verify(telemetryClient, never()).trackEvent(
+        "CustodyLocationVerification",
+        mapOf(
+          "result" to "undetermined",
+          "reason" to "Prisoner not found for NOMS id: $stubNomsNumber"
+        ),
+        null
+      )
+    }
+
+    @Test
+    fun `verifying custody location entries sends tracking events with undetermined reasons`() {
+      val user = AuthUser("user_id", "delius", "user_name")
+      val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
+      setDraftReferralRequiredFields(draftReferral)
+
+      draftReferralService.sendDraftReferral(draftReferral, user)
+      verify(telemetryClient).trackEvent(
+        "CustodyLocationVerification",
+        mapOf(
+          "result" to "undetermined",
+          "reason" to "NOMS id not found for CRN: X123456"
         ),
         null
       )

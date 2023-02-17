@@ -20,6 +20,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.web.server.ServerWebInputException
+import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessFilter
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceUserAccessChecker
@@ -117,6 +118,7 @@ class DraftReferralServiceUnitTest {
   @BeforeEach
   fun setup() {
     whenever(referralRepository.save(any())).thenAnswer(returnsFirstArg<Referral>())
+    whenever(communityAPIOffenderService.getOffenderIdentifiers(any())).thenReturn(Mono.empty())
   }
 
   @Nested
