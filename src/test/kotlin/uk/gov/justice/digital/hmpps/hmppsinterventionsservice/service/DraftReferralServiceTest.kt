@@ -16,8 +16,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
-import org.springframework.http.HttpRequest
-import org.springframework.lang.Nullable
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessChecker
@@ -708,16 +706,16 @@ class DraftReferralServiceTest @Autowired constructor(
 
   private fun setDraftReferralRequiredFields(
     draftReferral: DraftReferral,
-    additionalRiskInformation: String ?= "risk",
-    additionalRiskInformationUpdatedAt: OffsetDateTime ?= OffsetDateTime.now(),
-    personCurrentLocationType: PersonCurrentLocationType ?= PersonCurrentLocationType.CUSTODY,
-    personCustodyPrisonId: String ?= "ABC",
-    expectedReleaseDate: LocalDate ?= LocalDate.of(2050, 11, 1)
+    additionalRiskInformation: String ? = "risk",
+    additionalRiskInformationUpdatedAt: OffsetDateTime ? = OffsetDateTime.now(),
+    personCurrentLocationType: PersonCurrentLocationType ? = PersonCurrentLocationType.CUSTODY,
+    personCustodyPrisonId: String ? = "ABC",
+    expectedReleaseDate: LocalDate ? = LocalDate.of(2050, 11, 1)
   ) {
     draftReferral.additionalRiskInformation = additionalRiskInformation
     draftReferral.additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt
     draftReferral.personCurrentLocationType = personCurrentLocationType
-    draftReferral.personCustodyPrisonId =  personCustodyPrisonId
+    draftReferral.personCustodyPrisonId = personCustodyPrisonId
     draftReferral.expectedReleaseDate = expectedReleaseDate
   }
 
