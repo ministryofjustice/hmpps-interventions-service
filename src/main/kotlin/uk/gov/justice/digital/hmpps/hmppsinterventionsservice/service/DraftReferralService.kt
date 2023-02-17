@@ -498,6 +498,7 @@ class DraftReferralService(
   }
 
   private fun verifyCustodyLocationEntries(referral: Referral) {
+    val eventName = "CustodyLocationVerification"
     val compare = { a: String?, b: String? ->
       when {
         a == null || b == null -> MatchType.UNDETERMINED.name
@@ -510,7 +511,7 @@ class DraftReferralService(
     val offenderNomsId = communityAPIOffenderService.getOffenderIdentifiers(referral.serviceUserCRN)
       .onErrorResume(WebClientResponseException::class.java) { e ->
         telemetryClient.trackEvent(
-          "CustodyLocationVerification",
+          eventName,
           mapOf(
             "status" to "error",
             "errorStatusCode" to e.rawStatusCode.toString(),
@@ -526,7 +527,7 @@ class DraftReferralService(
       val prisoner = prisonerOffenderSearchService.getPrisonerById(it)
         .onErrorResume(WebClientResponseException::class.java) { e ->
           telemetryClient.trackEvent(
-            "CustodyLocationVerification",
+            eventName,
             mapOf(
               "status" to "error",
               "errorStatusCode" to e.rawStatusCode.toString(),
@@ -553,9 +554,9 @@ class DraftReferralService(
             it.nomisDischargeDate = dischargeDate
 
             telemetryClient.trackEvent(
-              "CustodyLocationVerification",
+              eventName,
               mapOf(
-                "status" to "ok",
+                "status" to "success",
                 "prisonId" to compare(it.nomisPrisonId as String, it.prisonId),
                 "releaseDate" to compare(it.nomisReleaseDate.toString(), it.expectedReleaseDate.toString())
               ),

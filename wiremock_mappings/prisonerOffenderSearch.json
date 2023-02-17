@@ -1,0 +1,23 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/prisoner/([a-zA-Z0-9/-]*)"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "prisonId": "MDI",
+      "releaseDate": "2023-05-02",
+      "confirmedReleaseDate": "2023-05-01",
+      "nonDtoReleaseDate": "2023-05-01",
+      "automaticReleaseDate": "2023-05-01",
+      "postRecallReleaseDate": "2023-05-01",
+      "conditionalReleaseDate": "2023-05-01",
+      "actualParoleDate": "2023-05-01",
+      "dischargeDate": "2020-05-01"
+    }
+  }
+}
