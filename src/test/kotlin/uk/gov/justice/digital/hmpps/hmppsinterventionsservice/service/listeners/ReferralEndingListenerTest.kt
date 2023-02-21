@@ -7,6 +7,8 @@ import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.CommunityAPIClient
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.SNSPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.PersonIdentifier
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEndingEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
@@ -31,6 +33,7 @@ private fun referralEndingEvent(state: ReferralConcludedState): ReferralEndingEv
       id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
       referenceNumber = "HAS71263",
       relevantSentenceId = 123456789,
+      serviceUserCRN = "T123000",
       sentAt = sentAtDefault,
       endRequestedAt = cancelledAtDefault,
       endRequestedBy = AuthUser("ecd7b8d690", "irrelevant", "irrelevant"),
@@ -74,7 +77,12 @@ internal class ReferralEndingListenerTest {
         "referralId" to "68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
         "referralURN" to "urn:hmpps:interventions-referral:68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
         "referralProbationUserURL" to "http://testUrl/pp/referral/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
-      )
+      ),
+      personReference = PersonReference(
+        identifiers = listOf(
+          PersonIdentifier(type = "CRN", value = "T123000")
+        )
+      ),
     )
     verify(snsPublisher).publish(event.referral.id, AuthUser.interventionsServiceUser, eventPayload)
   }
@@ -86,7 +94,7 @@ internal class ReferralEndingListenerTest {
     listener.onApplicationEvent(event)
 
     verify(communityAPIClient).makeAsyncPostRequest(
-      "secure/offenders/crn/X123456/referral/end/context/commissioned-rehabilitation-services",
+      "secure/offenders/crn/T123000/referral/end/context/commissioned-rehabilitation-services",
       ReferralEndRequest(
         contractType = "ACC",
         startedAt = sentAtDefault,

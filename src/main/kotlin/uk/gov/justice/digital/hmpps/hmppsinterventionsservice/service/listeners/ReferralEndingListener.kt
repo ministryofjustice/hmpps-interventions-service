@@ -7,6 +7,7 @@ import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.CommunityAPIClient
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.SNSPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEndingEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.CommunityAPIService
@@ -40,6 +41,7 @@ class ReferralEndingListener(
         "referralURN" to event.referral.urn,
         "referralProbationUserURL" to referralDetailsUrl(event.referral.id),
       ),
+      personReference = PersonReference.crn(event.referral.serviceUserCRN),
     )
     snsPublisher.publish(event.referral.id, AuthUser.interventionsServiceUser, snsEvent)
   }
