@@ -250,11 +250,11 @@ class ReferralService(
       newDetails.maximumEnforceableDays = it
     }
 
-    referralDetailsRepository.saveAndFlush(newDetails)
+    referralDetailsRepository.save(newDetails)
 
     if (existingDetails !== newDetails) {
       existingDetails.supersededById = newDetails.id
-      referralDetailsRepository.saveAndFlush(existingDetails)
+      referralDetailsRepository.save(existingDetails)
 
       eventPublisher.referralDetailsChangedEvent(referral, newDetails, existingDetails)
     }

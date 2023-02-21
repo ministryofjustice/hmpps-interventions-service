@@ -189,7 +189,7 @@ class ReferralServiceUnitTest {
       val update = UpdateReferralDetailsDTO(null, null, null, null, null, reasonForChange = "blah blah")
       val returnedValue = referralService.updateReferralDetails(referral, update, referral.createdBy)
 
-      verify(referralDetailsRepository, times(0)).saveAndFlush(any())
+      verify(referralDetailsRepository, times(0)).save(any())
       assertThat(returnedValue).isNull()
     }
 
@@ -218,7 +218,7 @@ class ReferralServiceUnitTest {
       )
 
       val captor = ArgumentCaptor.forClass(ReferralDetails::class.java)
-      verify(referralDetailsRepository, times(2)).saveAndFlush(captor.capture())
+      verify(referralDetailsRepository, times(2)).save(captor.capture())
 
       val oldReferralValue = ReferralAmendmentDetails(listOf(existingDetails.completionDeadline.toString()))
       val newValue = ReferralAmendmentDetails(listOf(returnedValue?.completionDeadline.toString()))
