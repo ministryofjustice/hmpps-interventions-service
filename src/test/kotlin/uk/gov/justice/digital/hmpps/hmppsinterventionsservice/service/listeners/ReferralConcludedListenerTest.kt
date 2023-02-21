@@ -2,6 +2,8 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.listeners
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.CommunityAPIClient
@@ -39,7 +41,6 @@ private fun referralConcludedEvent(
       relevantSentenceId = 123456789,
       sentAt = sentAtDefault,
       concludedAt = concludedAtDefault,
-      endRequestedBy = AuthUser("ecd7b8d690", "irrelevant", "irrelevant"),
       endOfServiceReport = endOfServiceReport,
       assignments = listOf(
         ReferralAssignment(
@@ -57,58 +58,22 @@ internal class ReferralConcludedListenerTest {
   private val snsPublisher = mock<SNSPublisher>()
   private val listener = ReferralConcludedListener(snsPublisher)
 
-  @Test
-  fun `publishes referral cancelled domain event`() {
-    val referralConcludedEvent = referralConcludedEvent(ReferralConcludedState.CANCELLED)
+  @ParameterizedTest
+  @EnumSource(ReferralConcludedState::class)
+  fun `publishes referral concluded event`(state: ReferralConcludedState) {
+    val referralConcludedEvent = referralConcludedEvent(state)
     listener.onApplicationEvent(referralConcludedEvent)
     val snsEvent = EventDTO(
-      "intervention.referral.cancelled",
-      "A referral has been cancelled",
+      "intervention.referral.concluded",
+      "The referral has concluded, no more work is needed",
       "http://localhost:8080" + "/sent-referral/${referralConcludedEvent.referral.id}",
       referralConcludedEvent.referral.concludedAt!!,
-      mapOf("referralId" to UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"))
+      mapOf(
+        "deliveryState" to state.name,
+        "referralId" to UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
+      )
     )
-    verify(snsPublisher).publish(
-      referralConcludedEvent.referral.id,
-      referralConcludedEvent.referral.endRequestedBy!!,
-      snsEvent
-    )
-  }
-
-  @Test
-  fun `publishes referral prematurely ended domain event`() {
-    val referralConcludedEvent = referralConcludedEvent(ReferralConcludedState.PREMATURELY_ENDED)
-    listener.onApplicationEvent(referralConcludedEvent)
-    val snsEvent = EventDTO(
-      "intervention.referral.prematurely-ended",
-      "A referral has been ended prematurely",
-      "http://localhost:8080" + "/sent-referral/${referralConcludedEvent.referral.id}",
-      referralConcludedEvent.referral.concludedAt!!,
-      mapOf("referralId" to UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"))
-    )
-    verify(snsPublisher).publish(
-      referralConcludedEvent.referral.id,
-      referralConcludedEvent.referral.endRequestedBy!!,
-      snsEvent
-    )
-  }
-
-  @Test
-  fun `publishes referral completed domain event with actor as Interventions service user`() {
-    val referralConcludedEvent = referralConcludedEvent(ReferralConcludedState.COMPLETED)
-    listener.onApplicationEvent(referralConcludedEvent)
-    val snsEvent = EventDTO(
-      "intervention.referral.completed",
-      "A referral has been completed",
-      "http://localhost:8080" + "/sent-referral/${referralConcludedEvent.referral.id}",
-      referralConcludedEvent.referral.concludedAt!!,
-      mapOf("referralId" to UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"))
-    )
-    verify(snsPublisher).publish(
-      referralConcludedEvent.referral.id,
-      AuthUser("00000000-0000-0000-0000-000000000000", "urn:hmpps:interventions", "hmpps-interventions-service"),
-      snsEvent
-    )
+    verify(snsPublisher).publish(referralConcludedEvent.referral.id, AuthUser.interventionsServiceUser, snsEvent)
   }
 }
 
