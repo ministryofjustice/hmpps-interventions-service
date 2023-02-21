@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto
 
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import java.util.UUID
@@ -33,22 +32,9 @@ data class ServiceCategoryFullDTO(
       return ServiceCategoryFullDTO(
         id = serviceCategory.id,
         name = serviceCategory.name,
-        complexityLevels = addComplexityLevelsInOrderOfComplexity(serviceCategory.complexityLevels),
+        complexityLevels = serviceCategory.complexityLevels.map { ComplexityLevelDTO(it.id, it.title, it.description) },
         desiredOutcomes = serviceCategory.desiredOutcomes.map { DesiredOutcomeDTO(it.id, it.description) },
       )
-    }
-    private fun addComplexityLevelsInOrderOfComplexity(complexityLevels: List<ComplexityLevel>): List<ComplexityLevelDTO> {
-      val complexityLevelsDTO = mutableListOf<ComplexityLevelDTO>()
-      val lowComplexityLevel = complexityLevels.find { it.title == "Low complexity" }
-      val mediumComplexityLevel = complexityLevels.find { it.title == "Medium complexity" }
-      val highComplexityLevel = complexityLevels.find { it.title == "High complexity" }
-      if (lowComplexityLevel != null)
-        complexityLevelsDTO.add(ComplexityLevelDTO(lowComplexityLevel.id, lowComplexityLevel.title, lowComplexityLevel.description))
-      if (mediumComplexityLevel != null)
-        complexityLevelsDTO.add(ComplexityLevelDTO(mediumComplexityLevel.id, mediumComplexityLevel.title, mediumComplexityLevel.description))
-      if (highComplexityLevel != null)
-        complexityLevelsDTO.add(ComplexityLevelDTO(highComplexityLevel.id, highComplexityLevel.title, highComplexityLevel.description))
-      return complexityLevelsDTO
     }
   }
 }

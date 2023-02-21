@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.json.JsonTest
 import org.springframework.boot.test.json.JacksonTester
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevelTitle
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
 import java.util.UUID
@@ -19,9 +20,9 @@ class ServiceCategoryFullDTOTest(@Autowired private val json: JacksonTester<Serv
     val serviceCategory = serviceCategoryFactory.create(
       id = UUID.fromString("e30c24e5-3aa7-4820-82ee-b028909876e6"),
       complexityLevels = listOf(
-        ComplexityLevel(UUID.fromString("11c6d1f1-a22e-402a-b343-e57595876857"), "Low complexity", "Low complexity"),
-        ComplexityLevel(UUID.fromString("11c6d1f1-a22e-402a-b343-e57595876858"), "Medium complexity", "Medium complexity"),
-        ComplexityLevel(UUID.fromString("11c6d1f1-a22e-402a-b343-e57595876859"), "High complexity", "High complexity")
+        ComplexityLevel(UUID.fromString("11c6d1f1-a22e-402a-b343-e57595876857"), "Low complexity", "Low complexity", ComplexityLevelTitle.LOW_COMPLEXITY),
+        ComplexityLevel(UUID.fromString("11c6d1f1-a22e-402a-b343-e57595876858"), "Medium complexity", "Medium complexity", ComplexityLevelTitle.MEDIUM_COMPLEXITY),
+        ComplexityLevel(UUID.fromString("11c6d1f1-a22e-402a-b343-e57595876859"), "High complexity", "High complexity", ComplexityLevelTitle.HIGH_COMPLEXITY)
       ),
       desiredOutcomes = listOf(DesiredOutcome(UUID.fromString("5a9d6e60-c314-4bf9-bf1e-b42b366b9398"), "good accommodation", UUID.fromString("e30c24e5-3aa7-4820-82ee-b028909876e6")))
     )
@@ -60,8 +61,8 @@ class ServiceCategoryFullDTOTest(@Autowired private val json: JacksonTester<Serv
     val serviceCategory = serviceCategoryFactory.create(
       id = UUID.fromString("e30c24e5-3aa7-4820-82ee-b028909876e6"),
       complexityLevels = listOf(
-        ComplexityLevel(UUID.fromString("11c6d1f1-a22e-402a-b343-e57595876857"), "Low complexity", "Low complexity"),
-        ComplexityLevel(UUID.fromString("11c6d1f1-a22e-402a-b343-e57595876859"), "High complexity", "High complexity")
+        ComplexityLevel(UUID.fromString("11c6d1f1-a22e-402a-b343-e57595876857"), "Low complexity", "Low complexity", ComplexityLevelTitle.LOW_COMPLEXITY),
+        ComplexityLevel(UUID.fromString("11c6d1f1-a22e-402a-b343-e57595876859"), "High complexity", "High complexity", ComplexityLevelTitle.HIGH_COMPLEXITY)
       ),
       desiredOutcomes = listOf(DesiredOutcome(UUID.fromString("5a9d6e60-c314-4bf9-bf1e-b42b366b9398"), "good accommodation", UUID.fromString("e30c24e5-3aa7-4820-82ee-b028909876e6")))
     )

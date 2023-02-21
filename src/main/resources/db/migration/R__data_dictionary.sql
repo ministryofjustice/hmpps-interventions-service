@@ -167,4 +167,6 @@ COMMENT ON TABLE changelog IS 'details about any amendments to an existing refer
 
 COMMENT ON TABLE referral_location IS 'details about the service user''s current location';
 
+COMMENT ON TABLE complexity_level IS 'adding a new column of type Enum to maintain order';
+
 -- some definitions are in V1_34__document_contract_table.sql; needs lifting
