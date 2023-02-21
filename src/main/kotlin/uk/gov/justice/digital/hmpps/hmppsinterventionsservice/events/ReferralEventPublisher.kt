@@ -35,7 +35,7 @@ class ReferralEndingEvent(
   val detailUrl: String,
 ) : ApplicationEvent(source) {
   override fun toString(): String {
-    return "ReferralEndRequestedEvent(state=$state, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
+    return "ReferralEndingEvent(state=$state, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
   }
 }
 
