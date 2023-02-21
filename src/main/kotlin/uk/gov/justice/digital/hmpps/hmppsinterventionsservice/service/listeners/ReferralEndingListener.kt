@@ -12,7 +12,7 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 @Service
-class ReferralEndingIntegrationListener(
+class ReferralEndingListener(
   @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
   @Value("\${interventions-ui.locations.probation-practitioner.referral-details}") private val ppReferralDetailsLocation: String,
   @Value("\${community-api.locations.ended-referral}") private val communityAPIEndedReferralLocation: String,

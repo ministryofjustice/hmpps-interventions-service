@@ -43,9 +43,9 @@ private fun referralEndingEvent(state: ReferralConcludedState): ReferralEndingEv
   )
 }
 
-internal class ReferralEndingIntegrationListenerTest {
+internal class ReferralEndingListenerTest {
   private val communityAPIClient = mock<CommunityAPIClient>()
-  private val listener = ReferralEndingIntegrationListener(
+  private val listener = ReferralEndingListener(
     "http://testUrl",
     "/pp/referral/{id}",
     "secure/offenders/crn/{crn}/referral/end/context/{contextName}",
