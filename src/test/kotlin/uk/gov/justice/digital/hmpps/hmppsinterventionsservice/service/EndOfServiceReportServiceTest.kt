@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.mockito.AdditionalAnswers
 import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.any
 import org.mockito.kotlin.firstValue
@@ -175,11 +176,10 @@ class EndOfServiceReportServiceTest {
     val authUser = AuthUser("CRN123", "auth", "user")
 
     val endOfServiceReport = endOfServiceReportFactory.create(id = endOfServiceReportId)
-    val referral = referralFactory.createSent()
 
     whenever(endOfServiceReportRepository.findById(any())).thenReturn(of(endOfServiceReport))
-    whenever(endOfServiceReportRepository.save(any())).thenReturn(endOfServiceReport)
-    whenever(authUserRepository.save(any())).thenReturn(authUser)
+    whenever(endOfServiceReportRepository.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg<EndOfServiceReport>())
+    whenever(authUserRepository.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg<AuthUser>())
 
     val argumentCaptor: ArgumentCaptor<EndOfServiceReport> = ArgumentCaptor.forClass(EndOfServiceReport::class.java)
     endOfServiceReportService.submitEndOfServiceReport(endOfServiceReportId, authUser)

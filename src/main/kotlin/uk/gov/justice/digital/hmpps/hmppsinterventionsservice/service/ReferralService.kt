@@ -207,10 +207,8 @@ class ReferralService(
     referral.endRequestedReason = reason
     comments?.let { referral.endRequestedComments = it }
 
-    val savedReferral = referralRepository.save(referral)
-    referralConcluder.concludeIfEligible(referral)
-
-    return savedReferral
+    return referralRepository.save(referral)
+      .also { referralConcluder.concludeIfEligible(it) }
   }
 
   fun updateReferralDetails(referral: Referral, update: UpdateReferralDetailsDTO, actor: AuthUser): ReferralDetails? {

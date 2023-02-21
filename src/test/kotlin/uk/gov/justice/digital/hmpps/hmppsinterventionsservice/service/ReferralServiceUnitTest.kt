@@ -4,6 +4,7 @@ import io.netty.handler.timeout.ReadTimeoutException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.mockito.AdditionalAnswers
 import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.any
 import org.mockito.kotlin.firstValue
@@ -19,7 +20,9 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.User
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
@@ -114,8 +117,8 @@ class ReferralServiceUnitTest {
     val cancellationReason = cancellationReasonFactory.create()
     val cancellationComments = "comment"
 
-    whenever(authUserRepository.save(authUser)).thenReturn(authUser)
-    whenever(referralRepository.save(any())).thenReturn(referralFactory.createEnded(endRequestedComments = cancellationComments))
+    whenever(authUserRepository.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg<AuthUser>())
+    whenever(referralRepository.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg<Referral>())
 
     referralService.requestReferralEnd(referral, authUser, cancellationReason, cancellationComments)
 
