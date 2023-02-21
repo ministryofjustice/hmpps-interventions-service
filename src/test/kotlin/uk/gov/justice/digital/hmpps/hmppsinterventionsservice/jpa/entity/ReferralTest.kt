@@ -16,6 +16,13 @@ internal class ReferralTest {
   private val authUserFactory = AuthUserFactory()
   private val actionPlanFactory = ActionPlanFactory()
 
+  @Test
+  fun `referral URN contains the ID`() {
+    val uuid = UUID.fromString("70ce237c-9b9c-4028-aae5-52c4622b22ca")
+    val referral = referralFactory.createSent(id = uuid)
+    assertThat(referral.urn).isEqualTo("urn:hmpps:interventions-referral:70ce237c-9b9c-4028-aae5-52c4622b22ca")
+  }
+
   @Nested
   inner class Assignments {
     @Test

@@ -96,6 +96,9 @@ class Referral(
   @OneToMany(fetch = FetchType.LAZY) @JoinColumn(name = "referral_id")
   private val referralDetailsHistory: Set<ReferralDetails>? = null,
 ) {
+  val urn: String
+    get() = "urn:hmpps:interventions-referral:$id"
+
   val approvedActionPlan: ActionPlan?
     get() = actionPlans?.filter { it.approvedAt != null }?.maxByOrNull { it.approvedAt!! }
 
