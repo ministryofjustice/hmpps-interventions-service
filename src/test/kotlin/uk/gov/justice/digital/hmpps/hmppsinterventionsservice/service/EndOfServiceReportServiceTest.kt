@@ -18,21 +18,18 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Aut
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportFactory
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import java.util.Optional.empty
 import java.util.Optional.of
 import java.util.UUID
 import javax.persistence.EntityNotFoundException
 
 class EndOfServiceReportServiceTest {
-
   private val authUserRepository: AuthUserRepository = mock()
   private val referralRepository: ReferralRepository = mock()
   private val endOfServiceReportRepository: EndOfServiceReportRepository = mock()
   private val endOfServiceReportEventPublisher: EndOfServiceReportEventPublisher = mock()
   private val referralConcluder: ReferralConcluder = mock()
 
-  private val referralFactory = ReferralFactory()
   private val endOfServiceReportFactory = EndOfServiceReportFactory()
 
   private val endOfServiceReportService = EndOfServiceReportService(
@@ -47,7 +44,7 @@ class EndOfServiceReportServiceTest {
     val endOfServiceReport = SampleData.sampleEndOfServiceReport(outcomes = mutableSetOf(), referral = referral)
 
     whenever(authUserRepository.save(authUser)).thenReturn(authUser)
-    whenever(referralRepository.getOne(referral.id)).thenReturn(referral)
+    whenever(referralRepository.getReferenceById(referral.id)).thenReturn(referral)
     whenever(endOfServiceReportRepository.save(any())).thenReturn(endOfServiceReport)
     whenever(referralRepository.save(any())).thenReturn(referral)
 
@@ -60,9 +57,9 @@ class EndOfServiceReportServiceTest {
   fun `referral not found when creating end of service report`() {
     val authUser = AuthUser("CRN123", "auth", "user")
     val referralId = UUID.randomUUID()
-    whenever(referralRepository.getOne(referralId)).thenThrow(EntityNotFoundException::class.java)
+    whenever(referralRepository.getReferenceById(referralId)).thenThrow(EntityNotFoundException::class.java)
 
-    val exception = Assertions.assertThrows(EntityNotFoundException::class.java) {
+    Assertions.assertThrows(EntityNotFoundException::class.java) {
       endOfServiceReportService.createEndOfServiceReport(referralId, authUser)
     }
   }
@@ -145,7 +142,7 @@ class EndOfServiceReportServiceTest {
   }
 
   @Test
-  fun `successfully update end of service report where dersired outcome already exists`() {
+  fun `successfully update end of service report where desired outcome already exists`() {
     val referral = SampleData.sampleReferral(crn = "CRN123", serviceProviderName = "Service Provider")
     val endOfServiceReport = SampleData.sampleEndOfServiceReport(referral = referral)
     val desiredOutcome = endOfServiceReport.outcomes.elementAt(0).desiredOutcome
@@ -175,7 +172,6 @@ class EndOfServiceReportServiceTest {
     val authUser = AuthUser("CRN123", "auth", "user")
 
     val endOfServiceReport = endOfServiceReportFactory.create(id = endOfServiceReportId)
-    val referral = referralFactory.createSent()
 
     whenever(endOfServiceReportRepository.findById(any())).thenReturn(of(endOfServiceReport))
     whenever(endOfServiceReportRepository.save(any())).thenReturn(endOfServiceReport)
