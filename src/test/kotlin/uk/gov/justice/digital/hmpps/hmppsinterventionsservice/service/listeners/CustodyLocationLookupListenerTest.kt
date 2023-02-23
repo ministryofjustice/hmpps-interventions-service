@@ -108,7 +108,7 @@ internal class CustodyLocationLookupListenerTest {
       "CustodyLocationLookup",
       mapOf(
         "result" to "prisoner search failed",
-        "exception" to e.message,
+        "exception" to e.toString(),
         "crn" to serviceUserCRN
       ),
       null

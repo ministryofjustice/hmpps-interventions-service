@@ -25,7 +25,7 @@ class CustodyLocationLookupListener(
       .onErrorResume { e: Throwable ->
         eventProperties = mapOf(
           "result" to "noms lookup failed",
-          "exception" to e.message.toString(),
+          "exception" to e.toString(),
           "crn" to event.serviceUserCRN
         )
         Mono.empty()
@@ -37,7 +37,7 @@ class CustodyLocationLookupListener(
         .onErrorResume(WebClientResponseException::class.java) { e ->
           eventProperties = mapOf(
             "result" to "prisoner search failed",
-            "exception" to e.message.toString(),
+            "exception" to e.toString(),
             "crn" to event.serviceUserCRN
           )
           Mono.empty()
