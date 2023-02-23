@@ -5,7 +5,8 @@ import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Mono
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.CustodyLocationLookupEvent
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEvent
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralLocationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.CommunityAPIOffenderService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.PrisonerOffenderSearchService
@@ -16,17 +17,22 @@ class CustodyLocationLookupListener(
   val prisonerOffenderSearchService: PrisonerOffenderSearchService,
   val referralLocationRepository: ReferralLocationRepository,
   val telemetryClient: TelemetryClient
-) : ApplicationListener<CustodyLocationLookupEvent> {
-  override fun onApplicationEvent(event: CustodyLocationLookupEvent) {
+) : ApplicationListener<ReferralEvent> {
+  override fun onApplicationEvent(event: ReferralEvent) {
+    if (event.type != ReferralEventType.SENT) {
+      return
+    }
     val eventName = "CustodyLocationLookup"
     var eventProperties: Map<String, String> = emptyMap()
+    val serviceUserCRN = event.referral.serviceUserCRN
+    val referralId = event.referral.id
 
-    val offenderNomsId = communityAPIOffenderService.getOffenderIdentifiers(event.serviceUserCRN)
+    val offenderNomsId = communityAPIOffenderService.getOffenderIdentifiers(serviceUserCRN)
       .onErrorResume { e: Throwable ->
         eventProperties = mapOf(
           "result" to "noms lookup failed",
           "exception" to e.toString(),
-          "crn" to event.serviceUserCRN
+          "crn" to serviceUserCRN
         )
         Mono.empty()
       }
@@ -38,14 +44,14 @@ class CustodyLocationLookupListener(
           eventProperties = mapOf(
             "result" to "prisoner search failed",
             "exception" to e.toString(),
-            "crn" to event.serviceUserCRN
+            "crn" to serviceUserCRN
           )
           Mono.empty()
         }
         .block()
 
       prisoner?.let {
-        val referralLocation = referralLocationRepository.findByReferralId(event.referralId)
+        val referralLocation = referralLocationRepository.findByReferralId(referralId)
         referralLocation?.let {
           with(prisoner) {
             it.nomisPrisonId = prisonId
@@ -60,7 +66,7 @@ class CustodyLocationLookupListener(
 
             eventProperties = mapOf(
               "result" to if (it.nomisPrisonId == it.prisonId) "match" else "no match",
-              "crn" to event.serviceUserCRN
+              "crn" to serviceUserCRN
             )
           }
           referralLocationRepository.save(referralLocation)
@@ -69,13 +75,13 @@ class CustodyLocationLookupListener(
         if (eventProperties.isEmpty()) eventProperties = mapOf(
           "result" to "prisoner not found",
           "noms" to offenderNomsId,
-          "crn" to event.serviceUserCRN
+          "crn" to serviceUserCRN
         )
       }
     } ?: run {
       if (eventProperties.isEmpty()) eventProperties = mapOf(
         "result" to "noms not found",
-        "crn" to event.serviceUserCRN
+        "crn" to serviceUserCRN
       )
     }
     telemetryClient.trackEvent(eventName, eventProperties, null)

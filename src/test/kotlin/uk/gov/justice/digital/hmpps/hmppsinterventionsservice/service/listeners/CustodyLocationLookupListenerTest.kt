@@ -9,8 +9,10 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Mono
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.CustodyLocationLookupEvent
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEvent
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralLocation
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralLocationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.CommunityAPIOffenderService
@@ -20,6 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.Prisoner
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.PrisonerOffenderSearchService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import java.time.LocalDate
+import java.time.OffsetDateTime
 import java.util.UUID
 
 @RepositoryTest
@@ -50,7 +53,7 @@ internal class CustodyLocationLookupListenerTest {
     whenever(referralLocationRepository.findByReferralId(referralId))
       .thenReturn(mockReferralLocation(personCustodyPrisonId, expectedReleaseDate))
 
-    custodyLocationLookupListener.onApplicationEvent(custodyLocationLookupEvent(referralId, serviceUserCRN))
+    custodyLocationLookupListener.onApplicationEvent(referralSentEvent(referralId, serviceUserCRN))
 
     verify(telemetryClient).trackEvent(
       "CustodyLocationLookup",
@@ -78,7 +81,7 @@ internal class CustodyLocationLookupListenerTest {
     whenever(referralLocationRepository.findByReferralId(referralId))
       .thenReturn(mockReferralLocation(differentPrisonId, expectedReleaseDate))
 
-    custodyLocationLookupListener.onApplicationEvent(custodyLocationLookupEvent(referralId, serviceUserCRN))
+    custodyLocationLookupListener.onApplicationEvent(referralSentEvent(referralId, serviceUserCRN))
 
     verify(telemetryClient).trackEvent(
       "CustodyLocationLookup",
@@ -102,7 +105,7 @@ internal class CustodyLocationLookupListenerTest {
     whenever(prisonerOffenderSearchService.getPrisonerById(nomsNumber))
       .thenReturn(Mono.error(e))
 
-    custodyLocationLookupListener.onApplicationEvent(custodyLocationLookupEvent(referralId, serviceUserCRN))
+    custodyLocationLookupListener.onApplicationEvent(referralSentEvent(referralId, serviceUserCRN))
 
     verify(telemetryClient).trackEvent(
       "CustodyLocationLookup",
@@ -131,7 +134,7 @@ internal class CustodyLocationLookupListenerTest {
 
     whenever(communityAPIOffenderService.getOffenderIdentifiers(any())).thenReturn(Mono.empty())
 
-    custodyLocationLookupListener.onApplicationEvent(custodyLocationLookupEvent(referralId, serviceUserCRN))
+    custodyLocationLookupListener.onApplicationEvent(referralSentEvent(referralId, serviceUserCRN))
     verify(telemetryClient).trackEvent(
       "CustodyLocationLookup",
       mapOf(
@@ -141,14 +144,6 @@ internal class CustodyLocationLookupListenerTest {
       null
     )
   }
-
-  private fun custodyLocationLookupEvent(referralId: UUID, serviceUserCRN: String): CustodyLocationLookupEvent =
-    CustodyLocationLookupEvent(
-      this,
-      referralId,
-      serviceUserCRN,
-      "testUrl"
-    )
 
   private fun mockPrisoner(prisonId: String, expectedReleaseDate: LocalDate) =
     Prisoner(
@@ -172,4 +167,21 @@ internal class CustodyLocationLookupListenerTest {
       expectedReleaseDate = expectedReleaseDate,
       expectedReleaseDateMissingReason = null
     )
+
+  private fun referralSentEvent(referralId: UUID, serviceUserCRN: String): ReferralEvent {
+    val referral = Referral(
+      id = referralId,
+      referenceNumber = null,
+      serviceUserCRN = serviceUserCRN,
+      createdBy = mock(),
+      createdAt = OffsetDateTime.now(),
+      intervention = mock()
+    )
+    return ReferralEvent(
+      this,
+      ReferralEventType.SENT,
+      referral,
+      "irrelevant-for-this-test"
+    )
+  }
 }

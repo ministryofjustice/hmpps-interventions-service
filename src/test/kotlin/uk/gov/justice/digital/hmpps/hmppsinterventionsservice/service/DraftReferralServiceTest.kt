@@ -545,16 +545,6 @@ class DraftReferralServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `sending a draft referral triggers a custody location lookup event`() {
-      val user = AuthUser("user_id", "delius", "user_name")
-      val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
-      setDraftReferralRequiredFields(draftReferral)
-
-      val referral = draftReferralService.sendDraftReferral(draftReferral, user)
-      verify(referralEventPublisher).custodyLocationLookupEvent(referral)
-    }
-
-    @Test
     fun `multiple draft referrals can be started by the same user`() {
       val user = AuthUser("multi_user_id", "delius", "user_name")
 

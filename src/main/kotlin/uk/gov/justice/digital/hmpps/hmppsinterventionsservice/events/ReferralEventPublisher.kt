@@ -11,7 +11,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralDetail
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState
-import java.util.UUID
 
 enum class ReferralEventType {
   SENT, ASSIGNED, DETAILS_AMENDED, COMPLEXITY_LEVEL_AMENDED, DESIRED_OUTCOMES_AMENDED, NEEDS_AND_REQUIREMENTS_AMENDED
@@ -48,17 +47,6 @@ class ReferralConcludedEvent(
 ) : ApplicationEvent(source) {
   override fun toString(): String {
     return "ReferralConcludedEvent(type=$type, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
-  }
-}
-
-class CustodyLocationLookupEvent(
-  source: Any,
-  val referralId: UUID,
-  val serviceUserCRN: String,
-  val detailUrl: String,
-) : ApplicationEvent(source) {
-  override fun toString(): String {
-    return "CustodyLocationLookupEvent(serviceUserCRN=$serviceUserCRN, referralId=$referralId, detailUrl='$detailUrl', source=$source)"
   }
 }
 
@@ -111,10 +99,6 @@ class ReferralEventPublisher(
         )
       )
     )
-  }
-
-  fun custodyLocationLookupEvent(referral: Referral) {
-    applicationEventPublisher.publishEvent(CustodyLocationLookupEvent(this, referral.id, referral.serviceUserCRN, getSentReferralURL(referral)))
   }
 
   private fun getSentReferralURL(referral: Referral): String {
