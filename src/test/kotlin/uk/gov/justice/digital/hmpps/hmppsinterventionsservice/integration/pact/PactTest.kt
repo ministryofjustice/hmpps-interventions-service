@@ -13,7 +13,6 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.whenever
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
-import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceProviderAccessScope
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceProviderAccessScopeMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AuthUserDTO
@@ -69,7 +68,6 @@ class PactTest : IntegrationTestBase() {
         ),
       )
     )
-    whenever(communityAPIOffenderService.getOffenderIdentifiers(any())).thenReturn(Mono.empty())
 
     context.addStateChangeHandlers(
       ActionPlanContracts(setupAssistant),

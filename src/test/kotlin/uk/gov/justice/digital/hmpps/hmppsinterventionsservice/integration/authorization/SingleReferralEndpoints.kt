@@ -9,7 +9,6 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
 import org.springframework.boot.test.mock.mockito.MockBean
-import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.CreateReferralRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
@@ -90,8 +89,6 @@ class SingleReferralEndpoints : IntegrationTestBase() {
   fun `pp user cannot access limited access offender referrals`(request: Request) {
     val user = setupAssistant.createPPUser()
     val token = createEncodedTokenForUser(user)
-
-    whenever(mockCommunityAPIOffenderService.getOffenderIdentifiers(any())).thenReturn(Mono.empty())
 
     setLimitedAccessCRNs("X999999")
     val referral1 = setupAssistant.createDraftReferral(serviceUserCRN = "X000000")

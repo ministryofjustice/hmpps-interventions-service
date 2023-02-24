@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
-import com.microsoft.applicationinsights.TelemetryClient
 import mu.KotlinLogging
 import net.logstash.logback.argument.StructuredArguments
 import org.springframework.beans.factory.annotation.Value
@@ -63,7 +62,6 @@ class DraftReferralService(
   val referralDetailsRepository: ReferralDetailsRepository,
   val draftOasysRiskInformationService: DraftOasysRiskInformationService,
   val referralLocationRepository: ReferralLocationRepository,
-  val telemetryClient: TelemetryClient,
   @Value("\${feature-flags.current-location.enabled}") private val currentLocationEnabled: Boolean
 ) {
   companion object {

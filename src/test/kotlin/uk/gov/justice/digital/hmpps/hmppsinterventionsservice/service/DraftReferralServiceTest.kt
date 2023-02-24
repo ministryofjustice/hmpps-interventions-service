@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
-import com.microsoft.applicationinsights.TelemetryClient
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -91,7 +90,6 @@ class DraftReferralServiceTest @Autowired constructor(
   private val hmppsAuthService: HMPPSAuthService = mock()
   private val draftOasysRiskInformationService: DraftOasysRiskInformationService = mock()
   private var currentLocationEnabled: Boolean = true
-  private val telemetryClient = mock<TelemetryClient>()
 
   private val draftReferralService = DraftReferralService(
     referralRepository,
@@ -115,7 +113,6 @@ class DraftReferralServiceTest @Autowired constructor(
     referralDetailsRepository,
     draftOasysRiskInformationService,
     referralLocationRepository,
-    telemetryClient,
     currentLocationEnabled
   )
 

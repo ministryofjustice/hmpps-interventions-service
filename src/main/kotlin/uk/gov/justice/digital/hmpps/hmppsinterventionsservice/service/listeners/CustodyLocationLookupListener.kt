@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.listeners
 import com.microsoft.applicationinsights.TelemetryClient
 import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Service
-import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
@@ -23,67 +22,65 @@ class CustodyLocationLookupListener(
       return
     }
     val eventName = "CustodyLocationLookup"
-    var eventProperties: Map<String, String> = emptyMap()
+    var errorProperties: Map<String, String> = emptyMap()
     val serviceUserCRN = event.referral.serviceUserCRN
     val referralId = event.referral.id
 
     val offenderNomsId = communityAPIOffenderService.getOffenderIdentifiers(serviceUserCRN)
       .onErrorResume { e: Throwable ->
-        eventProperties = mapOf(
-          "result" to "noms lookup failed",
-          "exception" to e.toString(),
-          "crn" to serviceUserCRN
-        )
+        errorProperties = mapOf("result" to "noms lookup failed", "exception" to e.toString(), "crn" to serviceUserCRN)
         Mono.empty()
       }
       .block()?.primaryIdentifiers?.nomsNumber
 
-    offenderNomsId?.let {
-      val prisoner = prisonerOffenderSearchService.getPrisonerById(it)
-        .onErrorResume(WebClientResponseException::class.java) { e ->
-          eventProperties = mapOf(
-            "result" to "prisoner search failed",
-            "exception" to e.toString(),
+    if (offenderNomsId == null) {
+      if (errorProperties.isEmpty()) {
+        telemetryClient.trackEvent(eventName, mapOf("result" to "noms not found", "crn" to serviceUserCRN), null)
+      } else {
+        telemetryClient.trackEvent(eventName, errorProperties, null)
+      }
+      return
+    }
+
+    val prisoner = prisonerOffenderSearchService.getPrisonerById(offenderNomsId)
+      .onErrorResume { e: Throwable ->
+        errorProperties = mapOf("result" to "prisoner search failed", "exception" to e.toString(), "crn" to serviceUserCRN)
+        Mono.empty()
+      }
+      .block()
+
+    if (prisoner == null) {
+      if (errorProperties.isEmpty()) {
+        telemetryClient.trackEvent(eventName, mapOf("result" to "prisoner not found", "noms" to offenderNomsId, "crn" to serviceUserCRN), null)
+      } else {
+        telemetryClient.trackEvent(eventName, errorProperties, null)
+      }
+      return
+    }
+
+    val referralLocation = referralLocationRepository.findByReferralId(referralId)
+    referralLocation?.let {
+      with(prisoner) {
+        it.nomisPrisonId = prisonId
+        it.nomisReleaseDate = releaseDate
+        it.nomisConfirmedReleaseDate = confirmedReleaseDate
+        it.nomisNonDtoReleaseDate = nonDtoReleaseDate
+        it.nomisAutomaticReleaseDate = automaticReleaseDate
+        it.nomisPostRecallReleaseDate = postRecallReleaseDate
+        it.nomisConditionalReleaseDate = conditionalReleaseDate
+        it.nomisActualParoleDate = actualParoleDate
+        it.nomisDischargeDate = dischargeDate
+
+        telemetryClient.trackEvent(
+          eventName,
+          mapOf(
+            "result" to if (it.nomisPrisonId == it.prisonId) "match" else "no match",
             "crn" to serviceUserCRN
-          )
-          Mono.empty()
-        }
-        .block()
-
-      prisoner?.let {
-        val referralLocation = referralLocationRepository.findByReferralId(referralId)
-        referralLocation?.let {
-          with(prisoner) {
-            it.nomisPrisonId = prisonId
-            it.nomisReleaseDate = releaseDate
-            it.nomisConfirmedReleaseDate = confirmedReleaseDate
-            it.nomisNonDtoReleaseDate = nonDtoReleaseDate
-            it.nomisAutomaticReleaseDate = automaticReleaseDate
-            it.nomisPostRecallReleaseDate = postRecallReleaseDate
-            it.nomisConditionalReleaseDate = conditionalReleaseDate
-            it.nomisActualParoleDate = actualParoleDate
-            it.nomisDischargeDate = dischargeDate
-
-            eventProperties = mapOf(
-              "result" to if (it.nomisPrisonId == it.prisonId) "match" else "no match",
-              "crn" to serviceUserCRN
-            )
-          }
-          referralLocationRepository.save(referralLocation)
-        }
-      } ?: run {
-        if (eventProperties.isEmpty()) eventProperties = mapOf(
-          "result" to "prisoner not found",
-          "noms" to offenderNomsId,
-          "crn" to serviceUserCRN
+          ),
+          null
         )
       }
-    } ?: run {
-      if (eventProperties.isEmpty()) eventProperties = mapOf(
-        "result" to "noms not found",
-        "crn" to serviceUserCRN
-      )
+      referralLocationRepository.save(referralLocation)
     }
-    telemetryClient.trackEvent(eventName, eventProperties, null)
   }
 }
