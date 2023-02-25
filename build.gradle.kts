@@ -6,10 +6,6 @@ plugins {
   id("jacoco")
 }
 
-repositories {
-  mavenCentral()
-}
-
 configurations {
   testImplementation {
     exclude(group = "org.junit.vintage")
@@ -21,7 +17,6 @@ jacoco {
 }
 
 tasks {
-
   withType<KotlinCompile> {
     kotlinOptions {
       jvmTarget = JavaVersion.VERSION_17.toString()
@@ -74,6 +69,10 @@ dependencyManagement {
   }
 }
 
+repositories {
+  maven { url = uri("https://repo.spring.io/milestone") }
+  mavenCentral()
+}
 dependencies {
   // batch processing
   implementation("org.springframework.boot:spring-boot-starter-batch")
@@ -90,6 +89,7 @@ dependencies {
 
   // openapi
   implementation("org.springdoc:springdoc-openapi-ui:1.7.0")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
 
   // notifications
   implementation("uk.gov.service.notify:notifications-java-client:4.1.0-RELEASE")
@@ -108,7 +108,7 @@ dependencies {
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
-  implementation("org.hibernate:hibernate-core:5.6.15.Final")
+  implementation("org.hibernate:hibernate-core:6.1.7.Final")
   implementation("com.vladmihalcea:hibernate-types-55:2.21.1")
   runtimeOnly("org.flywaydb:flyway-core")
   runtimeOnly("org.postgresql:postgresql:42.6.0")

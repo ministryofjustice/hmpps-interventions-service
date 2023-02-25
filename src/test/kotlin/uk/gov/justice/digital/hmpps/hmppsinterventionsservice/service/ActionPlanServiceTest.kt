@@ -34,7 +34,7 @@ import java.time.OffsetDateTime
 import java.util.Optional.empty
 import java.util.Optional.of
 import java.util.UUID
-import javax.persistence.EntityNotFoundException
+import jakarta.persistence.EntityNotFoundException
 
 internal class ActionPlanServiceTest {
 

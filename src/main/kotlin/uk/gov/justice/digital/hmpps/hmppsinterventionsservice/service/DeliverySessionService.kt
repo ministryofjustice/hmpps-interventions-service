@@ -24,8 +24,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Ref
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
 import java.util.UUID
-import javax.persistence.EntityExistsException
-import javax.persistence.EntityNotFoundException
+import jakarta.persistence.EntityExistsException
+import jakarta.persistence.EntityNotFoundException
 
 @Service
 @Transactional

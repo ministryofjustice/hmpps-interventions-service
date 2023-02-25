@@ -17,7 +17,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.CreateCaseNote
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.CaseNoteService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
 import java.util.UUID
-import javax.persistence.EntityNotFoundException
+import jakarta.persistence.EntityNotFoundException
 
 @RestController
 class CaseNoteController(

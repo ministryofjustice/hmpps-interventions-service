@@ -28,8 +28,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFacto
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import java.time.OffsetDateTime
 import java.util.UUID
-import javax.persistence.EntityExistsException
-import javax.persistence.EntityNotFoundException
+import jakarta.persistence.EntityExistsException
+import jakarta.persistence.EntityNotFoundException
 
 @RepositoryTest
 class AppointmentServiceRepositoryTest @Autowired constructor(

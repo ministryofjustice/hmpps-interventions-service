@@ -14,8 +14,8 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.CommunityApiCallError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
-import javax.persistence.EntityExistsException
-import javax.persistence.EntityNotFoundException
+import jakarta.persistence.EntityExistsException
+import jakarta.persistence.EntityNotFoundException
 
 enum class Code {
   FIELD_CANNOT_BE_CHANGED,

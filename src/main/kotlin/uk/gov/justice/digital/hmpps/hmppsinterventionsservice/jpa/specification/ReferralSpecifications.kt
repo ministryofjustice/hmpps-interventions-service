@@ -10,8 +10,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
 import java.time.OffsetDateTime
-import java.util.UUID
-import javax.persistence.criteria.JoinType
+import jakarta.persistence.criteria.JoinType
 
 class ReferralSpecifications {
   companion object {

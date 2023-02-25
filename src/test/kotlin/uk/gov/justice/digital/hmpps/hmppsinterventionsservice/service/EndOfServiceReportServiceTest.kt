@@ -23,7 +23,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceR
 import java.util.Optional.empty
 import java.util.Optional.of
 import java.util.UUID
-import javax.persistence.EntityNotFoundException
+import jakarta.persistence.EntityNotFoundException
 
 class EndOfServiceReportServiceTest {
   private val authUserRepository: AuthUserRepository = mock()

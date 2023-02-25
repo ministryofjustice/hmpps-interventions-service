@@ -36,8 +36,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DeliverySessi
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import java.time.OffsetDateTime
 import java.util.UUID
-import javax.persistence.EntityExistsException
-import javax.persistence.EntityNotFoundException
+import jakarta.persistence.EntityExistsException
+import jakarta.persistence.EntityNotFoundException
 
 internal class DeliverySessionsServiceTest {
 

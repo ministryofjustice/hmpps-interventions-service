@@ -3,8 +3,8 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
 import java.time.OffsetDateTime
-import javax.persistence.Embeddable
-import javax.persistence.ManyToOne
+import jakarta.persistence.Embeddable
+import jakarta.persistence.ManyToOne
 
 @Embeddable
 class ReferralAssignment(

@@ -24,7 +24,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.CaseNoteFacto
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import java.util.UUID
-import javax.persistence.EntityNotFoundException
+import jakarta.persistence.EntityNotFoundException
 
 class CaseNoteControllerTest {
   private val caseNoteFactory = CaseNoteFactory()
