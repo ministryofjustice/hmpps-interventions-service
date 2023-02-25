@@ -1,13 +1,13 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
-import org.hibernate.annotations.Fetch
-import org.hibernate.annotations.FetchMode
-import java.time.OffsetDateTime
-import java.util.UUID
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.ManyToOne
 import jakarta.validation.constraints.NotNull
+import org.hibernate.annotations.Fetch
+import org.hibernate.annotations.FetchMode
+import java.time.OffsetDateTime
+import java.util.UUID
 
 @Entity
 class DraftOasysRiskInformation(

@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
+import jakarta.persistence.EntityNotFoundException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -34,7 +35,6 @@ import java.time.OffsetDateTime
 import java.util.Optional.empty
 import java.util.Optional.of
 import java.util.UUID
-import jakarta.persistence.EntityNotFoundException
 
 internal class ActionPlanServiceTest {
 

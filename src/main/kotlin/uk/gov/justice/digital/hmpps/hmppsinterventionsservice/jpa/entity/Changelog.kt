@@ -2,18 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType
-import org.hibernate.annotations.Fetch
-import org.hibernate.annotations.FetchMode
-import org.hibernate.type.YesNoConverter
-import jakarta.persistence.Convert
-import org.hibernate.type.YesNoConverter
-import jakarta.persistence.ConvertDef
-import org.hibernate.type.YesNoConverter
-import jakarta.persistence.ConvertDefs
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendTopic
-import java.time.OffsetDateTime
-import java.util.UUID
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -21,6 +9,12 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.ManyToOne
 import jakarta.validation.constraints.NotNull
+import org.hibernate.annotations.Fetch
+import org.hibernate.annotations.FetchMode
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendTopic
+import java.time.OffsetDateTime
+import java.util.UUID
 
 @Entity
 @TypeDefs(

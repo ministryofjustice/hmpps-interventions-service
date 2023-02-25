@@ -1,11 +1,11 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
-import java.time.LocalDate
-import java.time.OffsetDateTime
-import java.util.UUID
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
+import java.time.LocalDate
+import java.time.OffsetDateTime
+import java.util.UUID
 
 @Entity
 data class ReferralDetails(

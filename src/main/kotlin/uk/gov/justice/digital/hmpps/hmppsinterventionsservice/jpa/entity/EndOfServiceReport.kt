@@ -1,9 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
-import org.hibernate.annotations.Fetch
-import org.hibernate.annotations.FetchMode
-import java.time.OffsetDateTime
-import java.util.UUID
 import jakarta.persistence.CollectionTable
 import jakarta.persistence.ElementCollection
 import jakarta.persistence.Entity
@@ -14,6 +10,10 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
+import org.hibernate.annotations.Fetch
+import org.hibernate.annotations.FetchMode
+import java.time.OffsetDateTime
+import java.util.UUID
 
 @Entity
 @Table(name = "end_of_service_report")

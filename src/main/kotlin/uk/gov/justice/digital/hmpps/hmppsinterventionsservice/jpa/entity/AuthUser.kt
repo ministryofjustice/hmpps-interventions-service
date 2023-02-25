@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
-import java.util.Objects
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.validation.constraints.NotNull
+import java.util.Objects
 
 @Entity
 data class AuthUser(

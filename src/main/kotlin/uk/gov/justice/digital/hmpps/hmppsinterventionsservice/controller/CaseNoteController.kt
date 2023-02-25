@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller
 
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
@@ -18,7 +19,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.CreateCaseNote
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.CaseNoteService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
 import java.util.UUID
-import jakarta.persistence.EntityNotFoundException
 
 @RestController
 @PreAuthorize("hasRole('ROLE_PROBATION') or hasRole('ROLE_CRS_PROVIDER') or hasRole('ROLE_INTERVENTIONS_API_READ_ALL')")

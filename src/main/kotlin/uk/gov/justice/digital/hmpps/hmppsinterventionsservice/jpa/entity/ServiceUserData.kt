@@ -1,12 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
 import com.vladmihalcea.hibernate.type.array.ListArrayType
-import org.hibernate.type.YesNoConverter
-import jakarta.persistence.Convert
-import org.hibernate.type.YesNoConverter
-import jakarta.persistence.ConvertDef
-import java.time.LocalDate
-import java.util.UUID
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
@@ -14,6 +8,8 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.MapsId
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
+import java.time.LocalDate
+import java.util.UUID
 
 @Entity
 @Table(name = "referral_service_user_data")

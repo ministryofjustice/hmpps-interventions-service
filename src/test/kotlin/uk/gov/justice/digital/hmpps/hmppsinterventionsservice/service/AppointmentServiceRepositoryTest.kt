@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
+import jakarta.persistence.EntityExistsException
+import jakarta.persistence.EntityNotFoundException
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -28,8 +30,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFacto
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import java.time.OffsetDateTime
 import java.util.UUID
-import jakarta.persistence.EntityExistsException
-import jakarta.persistence.EntityNotFoundException
 
 @RepositoryTest
 class AppointmentServiceRepositoryTest @Autowired constructor(

@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
+import jakarta.persistence.EntityExistsException
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -24,8 +26,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Ref
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
 import java.util.UUID
-import jakarta.persistence.EntityExistsException
-import jakarta.persistence.EntityNotFoundException
 
 @Service
 @Transactional
