@@ -16,7 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NoSessi
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import java.time.OffsetDateTime
 import java.util.UUID
-import javax.validation.constraints.NotNull
+import jakarta.validation.constraints.NotNull
 
 @Service
 @Transactional

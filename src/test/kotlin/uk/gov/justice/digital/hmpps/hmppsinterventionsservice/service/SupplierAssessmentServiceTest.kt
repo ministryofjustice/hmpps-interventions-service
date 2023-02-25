@@ -27,7 +27,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAsses
 import java.time.OffsetDateTime
 import java.util.Optional.empty
 import java.util.UUID
-import javax.persistence.EntityNotFoundException
+import jakarta.persistence.EntityNotFoundException
 
 class SupplierAssessmentServiceTest {
   private val supplierAssessmentRepository: SupplierAssessmentRepository = mock()

@@ -5,10 +5,9 @@ import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2Res
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.config.web.servlet.invoke
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
@@ -24,13 +23,14 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.TokenVer
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity(prePostEnabled = true)
 class ResourceServerConfiguration(private val tokenVerifier: TokenVerifier) : WebSecurityConfigurerAdapter() {
-  override fun configure(http: HttpSecurity) {
+  @Bean
+  fun filterChain(http: HttpSecurity): SecurityFilterChain {
     http {
       csrf { disable() }
       sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
-      authorizeRequests {
+      authorizeHttpRequests {
         authorize("/health/**", permitAll)
         authorize("/prometheus/**", permitAll)
         authorize("/info", permitAll)

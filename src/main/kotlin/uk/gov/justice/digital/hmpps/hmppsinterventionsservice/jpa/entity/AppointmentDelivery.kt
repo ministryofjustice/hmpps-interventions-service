@@ -1,18 +1,19 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType
-import org.hibernate.annotations.Type
-import org.hibernate.annotations.TypeDef
-import org.hibernate.annotations.TypeDefs
+import jakarta.persistence.Convert
+import jakarta.persistence.ConvertDef
+import org.hibernate.type.YesNoConverter
+import jakarta.persistence.ConvertDefs
 import java.util.UUID
-import javax.persistence.CascadeType
-import javax.persistence.Entity
-import javax.persistence.EnumType
-import javax.persistence.Enumerated
-import javax.persistence.Id
-import javax.persistence.OneToOne
-import javax.persistence.PrimaryKeyJoinColumn
-import javax.validation.constraints.NotNull
+import jakarta.persistence.CascadeType
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.Id
+import jakarta.persistence.OneToOne
+import jakarta.persistence.PrimaryKeyJoinColumn
+import jakarta.validation.constraints.NotNull
 
 @Entity
 @TypeDefs(

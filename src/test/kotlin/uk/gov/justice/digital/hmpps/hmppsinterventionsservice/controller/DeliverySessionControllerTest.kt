@@ -34,7 +34,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFacto
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.validator.AppointmentValidator
 import java.time.OffsetDateTime
 import java.util.UUID
-import javax.persistence.EntityNotFoundException
+import jakarta.persistence.EntityNotFoundException
 
 internal class DeliverySessionControllerTest {
   private val sessionsService = mock<DeliverySessionService>()

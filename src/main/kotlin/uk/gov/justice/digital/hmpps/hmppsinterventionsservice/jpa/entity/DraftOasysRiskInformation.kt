@@ -4,10 +4,10 @@ import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
 import java.time.OffsetDateTime
 import java.util.UUID
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.ManyToOne
-import javax.validation.constraints.NotNull
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.ManyToOne
+import jakarta.validation.constraints.NotNull
 
 @Entity
 class DraftOasysRiskInformation(

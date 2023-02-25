@@ -8,11 +8,11 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PCCRegi
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PCCRegionID
 import java.time.LocalDate
 import java.time.OffsetDateTime
-import javax.persistence.EntityManager
-import javax.persistence.PersistenceContext
-import javax.persistence.criteria.CriteriaBuilder
-import javax.persistence.criteria.Predicate
-import javax.persistence.criteria.Root
+import jakarta.persistence.EntityManager
+import jakarta.persistence.PersistenceContext
+import jakarta.persistence.criteria.CriteriaBuilder
+import jakarta.persistence.criteria.Predicate
+import jakarta.persistence.criteria.Root
 
 class InterventionFilterRepositoryImpl(
   @Value("\${overrides.show-future-interventions}") private val showFutureInterventions: Boolean,
