@@ -22,6 +22,7 @@ import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode.JOIN
+import org.hibernate.annotations.Type
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -31,7 +32,6 @@ enum class PersonCurrentLocationType {
 }
 
 @Entity
-@TypeDef(name = "person_current_location_type", typeClass = PostgreSQLEnumType::class)
 @Table(name = "draft_referral", indexes = [Index(columnList = "created_by_id")])
 class DraftReferral(
   // draft referral fields
@@ -47,9 +47,11 @@ class DraftReferral(
 
   var relevantSentenceId: Long? = null,
 
-  @Type(type = "person_current_location_type")
   @Enumerated(EnumType.STRING)
+  @Column(columnDefinition = "person_current_location_type")
+  @Type(PostgreSQLEnumType::class)
   var personCurrentLocationType: PersonCurrentLocationType? = null,
+
   var personCustodyPrisonId: String? = null,
 
   @ManyToMany(fetch = FetchType.LAZY)

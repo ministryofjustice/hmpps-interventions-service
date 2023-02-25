@@ -1,12 +1,8 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType
-import jakarta.persistence.Convert
-import jakarta.persistence.ConvertDef
-import org.hibernate.type.YesNoConverter
-import jakarta.persistence.ConvertDefs
-import java.util.UUID
 import jakarta.persistence.CascadeType
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
@@ -14,26 +10,26 @@ import jakarta.persistence.Id
 import jakarta.persistence.OneToOne
 import jakarta.persistence.PrimaryKeyJoinColumn
 import jakarta.validation.constraints.NotNull
+import org.hibernate.annotations.Type
 import java.util.UUID
 
 @Entity
-@TypeDefs(
-  value = [
-    TypeDef(name = "appointment_delivery_type", typeClass = PostgreSQLEnumType::class),
-    TypeDef(name = "appointment_session_type", typeClass = PostgreSQLEnumType::class),
-  ],
-)
 data class AppointmentDelivery(
   @Id
   var appointmentId: UUID,
-  @Type(type = "appointment_delivery_type")
+
+  @Column(columnDefinition = "appointment_delivery_type")
   @Enumerated(EnumType.STRING)
+  @Type(PostgreSQLEnumType::class)
   @NotNull
   var appointmentDeliveryType: AppointmentDeliveryType,
+
   // TODO: Transform to @NotNull this change is live
-  @Type(type = "appointment_session_type")
+  @Column(columnDefinition = "appointment_session_type")
   @Enumerated(EnumType.STRING)
+  @Type(PostgreSQLEnumType::class)
   var appointmentSessionType: AppointmentSessionType? = null,
+
   var npsOfficeCode: String? = null,
   @OneToOne(cascade = [CascadeType.ALL])
   @PrimaryKeyJoinColumn
@@ -45,7 +41,6 @@ enum class AppointmentDeliveryType {
   VIDEO_CALL,
   IN_PERSON_MEETING_PROBATION_OFFICE,
   IN_PERSON_MEETING_OTHER,
-  ;
 }
 
 enum class AppointmentSessionType {
