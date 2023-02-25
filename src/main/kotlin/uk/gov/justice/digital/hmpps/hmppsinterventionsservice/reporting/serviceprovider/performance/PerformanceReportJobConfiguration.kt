@@ -1,21 +1,22 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance
 
-import org.hibernate.SessionFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.JobScope
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.job.DefaultJobParametersValidator
+import org.springframework.batch.core.job.builder.JobBuilder
+import org.springframework.batch.core.repository.JobRepository
+import org.springframework.batch.core.step.builder.StepBuilder
 import org.springframework.batch.item.ItemProcessor
-import org.springframework.batch.item.database.HibernateCursorItemReader
-import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder
+import org.springframework.batch.item.database.JpaCursorItemReader
+import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.FileSystemResource
+import org.springframework.transaction.PlatformTransactionManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUtils
 import java.util.Date
@@ -23,8 +24,8 @@ import java.util.Date
 @Configuration
 @EnableBatchProcessing
 class PerformanceReportJobConfiguration(
-  private val jobBuilderFactory: JobBuilderFactory,
-  private val stepBuilderFactory: StepBuilderFactory,
+  private val jobRepository: JobRepository,
+  private val transactionManager: PlatformTransactionManager,
   private val batchUtils: BatchUtils,
   private val listener: PerformanceReportJobListener,
   @Value("\${spring.batch.jobs.service-provider.performance-report.page-size}") private val pageSize: Int,
@@ -36,12 +37,10 @@ class PerformanceReportJobConfiguration(
     @Value("#{jobParameters['contractReferences']}") contractReferences: String,
     @Value("#{jobParameters['from']}") from: Date,
     @Value("#{jobParameters['to']}") to: Date,
-    sessionFactory: SessionFactory,
-  ): HibernateCursorItemReader<Referral> {
+  ): JpaCursorItemReader<Referral> {
     // this reader returns referral entities which need processing for the report.
-    return HibernateCursorItemReaderBuilder<Referral>()
+    return JpaCursorItemReaderBuilder<Referral>()
       .name("performanceReportReader")
-      .sessionFactory(sessionFactory)
       .queryString("select r from Referral r where r.sentAt > :from and r.sentAt < :to and r.intervention.dynamicFrameworkContract.contractReference in :contractReferences")
       .parameterValues(
         mapOf(
@@ -79,7 +78,7 @@ class PerformanceReportJobConfiguration(
       ),
     )
 
-    return jobBuilderFactory["performanceReportJob"]
+    return JobBuilder("performanceReportJob", jobRepository)
       .validator(validator)
       .listener(listener)
       .start(writeToCsvStep)
@@ -88,12 +87,12 @@ class PerformanceReportJobConfiguration(
 
   @Bean
   fun writeToCsvStep(
-    reader: HibernateCursorItemReader<Referral>,
+    reader: JpaCursorItemReader<Referral>,
     processor: ItemProcessor<Referral, PerformanceReportData>,
     writer: FlatFileItemWriter<PerformanceReportData>,
   ): Step {
-    return stepBuilderFactory.get("writeToCsvStep")
-      .chunk<Referral, PerformanceReportData>(chunkSize)
+    return StepBuilder("writeToCsvStep", jobRepository)
+      .chunk<Referral, PerformanceReportData>(chunkSize, transactionManager)
       .reader(reader)
       .processor(processor)
       .writer(writer)
