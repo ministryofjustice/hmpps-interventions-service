@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
@@ -11,7 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFacto
 
 data class MockedResponse(
   val path: String,
-  val status: HttpStatus,
+  val status: HttpStatusCode,
   val responseBody: String,
 )
 

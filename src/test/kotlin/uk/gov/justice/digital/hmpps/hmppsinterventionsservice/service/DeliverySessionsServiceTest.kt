@@ -549,7 +549,7 @@ internal class DeliverySessionsServiceTest {
     val exception = assertThrows(ResponseStatusException::class.java) {
       deliverySessionsService.submitAppointmentFeedback(actionPlanId, 1, actor)
     }
-    assertThat(exception.status).isEqualTo(HttpStatus.CONFLICT)
+    assertThat(exception.statusCode).isEqualTo(HttpStatus.CONFLICT)
   }
 
   @Test
@@ -566,7 +566,7 @@ internal class DeliverySessionsServiceTest {
     val exception = assertThrows(ResponseStatusException::class.java) {
       deliverySessionsService.submitAppointmentFeedback(actionPlanId, 1, actor)
     }
-    assertThat(exception.status).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY)
+    assertThat(exception.statusCode).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY)
   }
 
   @Test

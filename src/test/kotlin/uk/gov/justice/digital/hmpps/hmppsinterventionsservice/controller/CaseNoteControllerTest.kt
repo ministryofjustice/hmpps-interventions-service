@@ -67,7 +67,7 @@ class CaseNoteControllerTest {
       val e = assertThrows<ResponseStatusException> {
         caseNoteController.createCaseNote(createCaseNoteDTO, userToken)
       }
-      assertThat(e.status).isEqualTo(HttpStatus.BAD_REQUEST)
+      assertThat(e.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
       assertThat(e.message).contains("sent referral not found")
     }
   }
@@ -105,7 +105,7 @@ class CaseNoteControllerTest {
       val e = assertThrows<ResponseStatusException> {
         caseNoteController.getCaseNotes(Pageable.ofSize(1), referralId = referralId, authentication = userToken)
       }
-      assertThat(e.status).isEqualTo(HttpStatus.NOT_FOUND)
+      assertThat(e.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
       assertThat(e.message).contains("sent referral not found")
     }
   }

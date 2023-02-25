@@ -34,6 +34,6 @@ class CancellationReasonMapperTest {
     val exception = assertThrows<ResponseStatusException> {
       cancellationReasonMapper.mapCancellationReasonIdToCancellationReason("aaa")
     }
-    assertThat(exception.status).isEqualTo(HttpStatus.BAD_REQUEST)
+    assertThat(exception.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
   }
 }
