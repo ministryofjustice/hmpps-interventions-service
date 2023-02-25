@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component
 
 import mu.KLogging
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.boot.web.client.RestTemplateCustomizer
@@ -22,7 +21,6 @@ import org.springframework.security.oauth2.core.http.converter.OAuth2AccessToken
 import org.springframework.stereotype.Component
 import java.time.Duration
 
-@ConstructorBinding
 @ConfigurationProperties(prefix = "spring.security.oauth2.client.provider.hmppsauth.token-request")
 data class TokenRequestConfig(
   val connectTimeoutMs: Long,

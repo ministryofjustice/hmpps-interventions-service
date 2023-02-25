@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -26,7 +25,6 @@ data class S3BucketConfiguration(
   )
 }
 
-@ConstructorBinding
 @ConfigurationProperties(prefix = "aws.s3")
 class S3Buckets(
   val storage: S3BucketConfiguration,
