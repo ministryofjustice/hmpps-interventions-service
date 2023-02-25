@@ -1,6 +1,8 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.microsoft.applicationinsights.TelemetryClient
 import mu.KLogging
 import org.springframework.beans.factory.annotation.Value
@@ -23,6 +25,11 @@ class SNSPublisher(
 ) {
   companion object : KLogging()
 
+  init {
+    objectMapper.registerModule(JavaTimeModule())
+    objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+  }
+
   fun publish(referralId: UUID, actor: AuthUserDTO, event: EventDTO) {
     if (enabled) {
       buildRequestAndPublish(event)
@@ -31,6 +38,7 @@ class SNSPublisher(
     }
     sendCustomEvent(referralId, actor, event.eventType)
   }
+
   fun publish(referralId: UUID, actor: AuthUser, event: EventDTO) {
     return publish(referralId, AuthUserDTO.from(actor), event)
   }

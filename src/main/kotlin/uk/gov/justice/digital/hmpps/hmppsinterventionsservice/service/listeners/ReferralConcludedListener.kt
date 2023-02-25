@@ -22,41 +22,17 @@ class ReferralConcludedListener(
 ) : ApplicationListener<ReferralConcludedEvent>, SNSService {
   @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: ReferralConcludedEvent) {
-    when (event.type) {
-      ReferralConcludedState.CANCELLED -> {
-        val snsEvent = EventDTO(
-          "intervention.referral.cancelled",
-          "A referral has been cancelled",
-          event.detailUrl,
-          event.referral.concludedAt!!,
-          mapOf("referralId" to event.referral.id)
-        )
-        snsPublisher.publish(event.referral.id, event.referral.endRequestedBy!!, snsEvent)
-      }
-
-      ReferralConcludedState.PREMATURELY_ENDED -> {
-        val snsEvent = EventDTO(
-          "intervention.referral.prematurely-ended",
-          "A referral has been ended prematurely",
-          event.detailUrl,
-          event.referral.concludedAt!!,
-          mapOf("referralId" to event.referral.id)
-        )
-        snsPublisher.publish(event.referral.id, event.referral.endRequestedBy!!, snsEvent)
-      }
-
-      ReferralConcludedState.COMPLETED -> {
-        val snsEvent = EventDTO(
-          "intervention.referral.completed",
-          "A referral has been completed",
-          event.detailUrl,
-          event.referral.concludedAt!!,
-          mapOf("referralId" to event.referral.id)
-        )
-        // This is a system generated event at present and as such the actor will represent this
-        snsPublisher.publish(event.referral.id, AuthUser.interventionsServiceUser, snsEvent)
-      }
-    }
+    val snsEvent = EventDTO(
+      "intervention.referral.concluded",
+      "The referral has concluded, no more work is needed",
+      event.detailUrl,
+      event.referral.concludedAt!!,
+      mapOf(
+        "deliveryState" to event.type.name,
+        "referralId" to event.referral.id,
+      )
+    )
+    snsPublisher.publish(event.referral.id, AuthUser.interventionsServiceUser, snsEvent)
   }
 }
 
