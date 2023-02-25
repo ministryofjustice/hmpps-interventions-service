@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.3"
   kotlin("plugin.spring") version "1.8.10"
@@ -20,6 +21,12 @@ jacoco {
 }
 
 tasks {
+
+  withType<KotlinCompile> {
+    kotlinOptions {
+      jvmTarget = JavaVersion.VERSION_17.toString()
+    }
+  }
   test {
     useJUnitPlatform {
       exclude("**/*PactTest*")
