@@ -4,12 +4,10 @@ import com.fasterxml.jackson.annotation.JsonValue
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
-import org.hibernate.type.YesNoConverter
-import jakarta.persistence.Convert
-import jakarta.persistence.ConvertDef
 import java.time.OffsetDateTime
 import java.util.UUID
 import jakarta.persistence.CascadeType
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
@@ -19,18 +17,15 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToOne
 import jakarta.persistence.PrimaryKeyJoinColumn
 import jakarta.validation.constraints.NotNull
-import org.hibernate.annotations.Fetch
-import org.hibernate.annotations.FetchMode
-import java.time.OffsetDateTime
-import java.util.UUID
+import org.hibernate.annotations.Type
 
 @Entity
-@TypeDef(name = "attended", typeClass = PostgreSQLEnumType::class)
-@TypeDef(name = "no_session_reason_type", typeClass = PostgreSQLEnumType::class)
 data class Appointment(
-  @Type(type = "attended")
   @Enumerated(EnumType.STRING)
+  @Column(columnDefinition = "attended")
+  @Type(PostgreSQLEnumType::class)
   var attended: Attended? = null,
+
   var additionalAttendanceInformation: String? = null,
   var attendanceFailureInformation: String? = null,
   var attendanceSubmittedAt: OffsetDateTime? = null,
