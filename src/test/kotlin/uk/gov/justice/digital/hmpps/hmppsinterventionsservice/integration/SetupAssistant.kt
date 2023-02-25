@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration
 
-import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils
+import org.apache.commons.lang3.RandomStringUtils
 import org.springframework.data.repository.findByIdOrNull
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AddressDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails

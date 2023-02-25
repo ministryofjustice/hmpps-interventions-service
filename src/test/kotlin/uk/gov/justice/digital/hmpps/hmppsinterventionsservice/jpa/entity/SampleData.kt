@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
-import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils
+import org.apache.commons.lang3.RandomStringUtils
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
