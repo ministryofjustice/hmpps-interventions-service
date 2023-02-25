@@ -58,7 +58,7 @@ internal class AmendReferralControllerTest {
       val exception = assertThrows<ResponseStatusException> {
         amendReferralController.updateComplexityLevel(serviceCategoryUUID, referral.id, complexityLevel, token)
       }
-      assertThat(exception.status).isEqualTo(HttpStatus.BAD_REQUEST)
+      assertThat(exception.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
       assertThat(exception.reason).isEqualTo("sent referral not found [id=${referral.id}]")
     }
 
@@ -79,9 +79,7 @@ internal class AmendReferralControllerTest {
     private val user = authUserFactory.create()
     private val token = tokenFactory.create(userID = user.id, userName = user.userName, authSource = user.authSource)
     private val serviceCategoryUUID = UUID.randomUUID()
-    private val desiredOutcomesUUID = UUID.randomUUID()
     private val newDesiredOutcomesUUID = UUID.randomUUID()
-    private val changeLogFactory = ChangeLogFactory()
 
     @Test
     fun `amendDesiredOutcomes do not update if no referral exists`() {
@@ -93,7 +91,7 @@ internal class AmendReferralControllerTest {
       val exception = assertThrows<ResponseStatusException> {
         amendReferralController.amendDesiredOutcomes(token, referral.id, serviceCategoryUUID, amendDesiredOutcomesDTO)
       }
-      assertThat(exception.status).isEqualTo(HttpStatus.BAD_REQUEST)
+      assertThat(exception.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
       assertThat(exception.reason).isEqualTo("sent referral not found [id=${referral.id}]")
     }
 
@@ -392,7 +390,7 @@ internal class AmendReferralControllerTest {
         amendReferralController.getChangelogDetails(referral.id, token)
       }
 
-      assertThat(exception.status).isEqualTo(HttpStatus.NOT_FOUND)
+      assertThat(exception.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
       assertThat(exception.reason).isEqualTo("Change log not found for [id=$changelog.id]")
     }
   }

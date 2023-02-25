@@ -85,7 +85,7 @@ internal class ReferralControllerTest {
           token,
         )
       }
-      assertThat(e.status).isEqualTo(HttpStatus.NOT_FOUND)
+      assertThat(e.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
       assertThat(e.message).contains("\"sent referral not found")
     }
 
@@ -282,7 +282,7 @@ internal class ReferralControllerTest {
     }
 
     @Test
-    fun `thros error when invalid dashboardType provided`() {
+    fun `throws error when invalid dashboardType provided`() {
       whenever(referralService.getServiceProviderSummaries(any(), any())).thenReturn(emptyList())
       whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
       assertThrows<IllegalArgumentException> {
@@ -305,7 +305,7 @@ internal class ReferralControllerTest {
         tokenFactory.create(),
       )
     }
-    assertThat(e.status).isEqualTo(HttpStatus.NOT_FOUND)
+    assertThat(e.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
   }
 
   @Test
@@ -361,7 +361,7 @@ internal class ReferralControllerTest {
     val e = assertThrows<ResponseStatusException> {
       referralController.endSentReferral(UUID.randomUUID(), endReferralDTO, token)
     }
-    assertThat(e.status).isEqualTo(HttpStatus.NOT_FOUND)
+    assertThat(e.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
   }
 
   @Test
@@ -400,7 +400,7 @@ internal class ReferralControllerTest {
     val e = assertThrows<ResponseStatusException> {
       referralController.getSupplierAssessmentAppointment(referralId, token)
     }
-    assertThat(e.status).isEqualTo(HttpStatus.NOT_FOUND)
+    assertThat(e.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
     assertThat(e.message).contains("sent referral not found [id=$referralId]")
   }
 

@@ -6,6 +6,7 @@ import jakarta.persistence.EntityExistsException
 import jakarta.persistence.EntityNotFoundException
 import mu.KLogging
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -95,7 +96,8 @@ class ErrorConfiguration(private val telemetryClient: TelemetryClient) {
   @ExceptionHandler(ResponseStatusException::class)
   fun handleResponseException(e: ResponseStatusException): ResponseEntity<ErrorResponse> {
     logger.info("internal exception", e)
-    return errorResponse(e.status, e.status.reasonPhrase, e.reason)
+    val status = HttpStatus.resolve(e.statusCode.value())
+    return errorResponse(e.statusCode, status?.reasonPhrase ?: e.reason, e.reason)
   }
 
   @ExceptionHandler(java.lang.Exception::class)
@@ -155,7 +157,7 @@ class ErrorConfiguration(private val telemetryClient: TelemetryClient) {
     )
   }
 
-  fun userMessageForWebClientException(status: HttpStatus?): String? {
+  fun userMessageForWebClientException(status: HttpStatusCode?): String? {
     return when {
       status == null -> null
       status == HttpStatus.CONFLICT -> null
@@ -166,7 +168,7 @@ class ErrorConfiguration(private val telemetryClient: TelemetryClient) {
   }
 
   private fun errorResponse(
-    status: HttpStatus,
+    status: HttpStatusCode,
     summary: String,
     description: String?,
     userMessage: String? = null,

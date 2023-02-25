@@ -359,7 +359,7 @@ class AmendReferralServiceUnitTest {
       val e = assertThrows<ResponseStatusException> {
         amendReferralService.getSentReferralForAuthenticatedUser(referralId, token)
       }
-      assertThat(e.status).isEqualTo(HttpStatus.NOT_FOUND)
+      assertThat(e.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
       assertThat(e.message).contains("sent referral not found [id=$referralId]")
     }
 
