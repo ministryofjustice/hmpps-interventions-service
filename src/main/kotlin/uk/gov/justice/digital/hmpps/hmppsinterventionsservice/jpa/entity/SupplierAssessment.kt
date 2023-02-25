@@ -1,8 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
-import org.hibernate.annotations.Fetch
-import org.hibernate.annotations.FetchMode
-import java.util.UUID
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
 import jakarta.persistence.Id
@@ -12,6 +9,9 @@ import jakarta.persistence.OneToMany
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
+import org.hibernate.annotations.Fetch
+import org.hibernate.annotations.FetchMode
+import java.util.UUID
 
 @Entity
 @Table(name = "supplier_assessment")

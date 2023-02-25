@@ -1,9 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
-import org.hibernate.annotations.Fetch
-import org.hibernate.annotations.FetchMode.JOIN
-import java.time.OffsetDateTime
-import java.util.UUID
 import jakarta.persistence.CascadeType
 import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column
@@ -24,6 +20,10 @@ import jakarta.persistence.PrePersist
 import jakarta.persistence.PrimaryKeyJoinColumn
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
+import org.hibernate.annotations.Fetch
+import org.hibernate.annotations.FetchMode.JOIN
+import java.time.OffsetDateTime
+import java.util.UUID
 
 @Embeddable
 class SelectedDesiredOutcomesMapping(

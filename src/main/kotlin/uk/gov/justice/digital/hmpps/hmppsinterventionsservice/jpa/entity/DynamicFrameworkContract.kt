@@ -1,8 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
-import java.time.LocalDate
-import java.time.OffsetDateTime
-import java.util.UUID
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
@@ -13,6 +10,9 @@ import jakarta.persistence.NamedAttributeNode
 import jakarta.persistence.NamedEntityGraph
 import jakarta.persistence.NamedSubgraph
 import jakarta.validation.constraints.NotNull
+import java.time.LocalDate
+import java.time.OffsetDateTime
+import java.util.UUID
 
 @NamedEntityGraph(
   name = "entity-dynamicFrameWorkContract-graph",

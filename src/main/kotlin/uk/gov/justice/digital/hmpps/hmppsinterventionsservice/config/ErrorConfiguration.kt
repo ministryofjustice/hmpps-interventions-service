@@ -2,6 +2,8 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.microsoft.applicationinsights.TelemetryClient
+import jakarta.persistence.EntityExistsException
+import jakarta.persistence.EntityNotFoundException
 import mu.KLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -14,8 +16,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.CommunityApiCallError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
-import jakarta.persistence.EntityExistsException
-import jakarta.persistence.EntityNotFoundException
 
 enum class Code {
   FIELD_CANNOT_BE_CHANGED,

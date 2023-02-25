@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller
 
+import jakarta.persistence.EntityNotFoundException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -24,7 +25,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.CaseNoteFacto
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import java.util.UUID
-import jakarta.persistence.EntityNotFoundException
 
 class CaseNoteControllerTest {
   private val caseNoteFactory = CaseNoteFactory()

@@ -19,6 +19,10 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToOne
 import jakarta.persistence.PrimaryKeyJoinColumn
 import jakarta.validation.constraints.NotNull
+import org.hibernate.annotations.Fetch
+import org.hibernate.annotations.FetchMode
+import java.time.OffsetDateTime
+import java.util.UUID
 
 @Entity
 @TypeDef(name = "attended", typeClass = PostgreSQLEnumType::class)

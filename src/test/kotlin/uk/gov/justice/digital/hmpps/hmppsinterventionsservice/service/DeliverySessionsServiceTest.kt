@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
+import jakarta.persistence.EntityExistsException
+import jakarta.persistence.EntityNotFoundException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
@@ -36,8 +38,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DeliverySessi
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import java.time.OffsetDateTime
 import java.util.UUID
-import jakarta.persistence.EntityExistsException
-import jakarta.persistence.EntityNotFoundException
 
 internal class DeliverySessionsServiceTest {
 
