@@ -54,8 +54,6 @@ class DraftReferralService(
   val serviceCategoryRepository: ServiceCategoryRepository,
   val userTypeChecker: UserTypeChecker,
   val communityAPIReferralService: CommunityAPIReferralService,
-  val communityAPIOffenderService: CommunityAPIOffenderService,
-  val prisonerOffenderSearchService: PrisonerOffenderSearchService,
   val assessRisksAndNeedsService: RisksAndNeedsService,
   val supplierAssessmentService: SupplierAssessmentService,
   val hmppsAuthService: HMPPSAuthService,
