@@ -68,8 +68,6 @@ class DraftReferralServiceUnitTest {
   private val communityAPIReferralService: CommunityAPIReferralService = mock()
   private val userTypeChecker: UserTypeChecker = mock()
   private val serviceUserAccessChecker: ServiceUserAccessChecker = mock()
-  private val communityAPIOffenderService: CommunityAPIOffenderService = mock()
-  private val prisonerOffenderSearchService: PrisonerOffenderSearchService = mock()
   private val assessRisksAndNeedsService: RisksAndNeedsService = mock()
   private val supplierAssessmentService: SupplierAssessmentService = mock()
   private val hmppsAuthService: HMPPSAuthService = mock()
@@ -100,8 +98,6 @@ class DraftReferralServiceUnitTest {
     serviceCategoryRepository,
     userTypeChecker,
     communityAPIReferralService,
-    communityAPIOffenderService,
-    prisonerOffenderSearchService,
     assessRisksAndNeedsService,
     supplierAssessmentService,
     hmppsAuthService,
