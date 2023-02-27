@@ -2,8 +2,8 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Complexity
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevelTitle
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance.ComplexityProcessor
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
@@ -17,7 +17,7 @@ internal class ComplexityProcessorTest {
 
   @Test
   fun `referral with single selected service category correctly returns a complexityData object`() {
-    val complexityLevel = ComplexityLevel(UUID.randomUUID(), "high", "description1", ComplexityLevelTitle.HIGH_COMPLEXITY)
+    val complexityLevel = ComplexityLevel(UUID.randomUUID(), "high", "description1", Complexity.HIGH)
     val serviceCategory1 = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel))
     val referral = referralFactory.createSent(selectedServiceCategories = mutableSetOf(serviceCategory1))
     referral.complexityLevelIds = mutableMapOf(serviceCategory1.id to complexityLevel.id)
@@ -35,8 +35,8 @@ internal class ComplexityProcessorTest {
 
   @Test
   fun `referral with multiple selected service category correctly returns a complexityData object`() {
-    val complexityLevel1 = ComplexityLevel(UUID.randomUUID(), "high", "description1", ComplexityLevelTitle.HIGH_COMPLEXITY)
-    val complexityLevel2 = ComplexityLevel(UUID.randomUUID(), "medium", "description1", ComplexityLevelTitle.MEDIUM_COMPLEXITY)
+    val complexityLevel1 = ComplexityLevel(UUID.randomUUID(), "high", "description1", Complexity.HIGH)
+    val complexityLevel2 = ComplexityLevel(UUID.randomUUID(), "medium", "description1", Complexity.MEDIUM)
     val serviceCategory1 = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel1))
     val serviceCategory2 = serviceCategoryFactory.create(name = "Lifestyle and Associates", complexityLevels = listOf(complexityLevel2))
     val referral = referralFactory.createSent(selectedServiceCategories = mutableSetOf(serviceCategory1, serviceCategory2))

@@ -28,8 +28,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.FieldError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.ValidationError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DraftReferralDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Complexity
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevelTitle
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
@@ -163,7 +163,7 @@ class DraftReferralServiceUnitTest {
 
     @Test
     fun `cant set complexity level when its invalid for the service category`() {
-      val complexityLevel = ComplexityLevel(UUID.randomUUID(), "title", "description", ComplexityLevelTitle.LOW_COMPLEXITY)
+      val complexityLevel = ComplexityLevel(UUID.randomUUID(), "title", "description", Complexity.LOW)
       val serviceCategory = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel))
       val referral = referralFactory.createDraft(selectedServiceCategories = mutableSetOf(serviceCategory))
 
@@ -182,7 +182,7 @@ class DraftReferralServiceUnitTest {
 
     @Test
     fun `can set complexity level for the first time`() {
-      val complexityLevel = ComplexityLevel(UUID.randomUUID(), "title", "description", ComplexityLevelTitle.LOW_COMPLEXITY)
+      val complexityLevel = ComplexityLevel(UUID.randomUUID(), "title", "description", Complexity.LOW)
       val serviceCategory = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel))
       val referral = referralFactory.createDraft(selectedServiceCategories = mutableSetOf(serviceCategory))
 
@@ -202,8 +202,8 @@ class DraftReferralServiceUnitTest {
 
     @Test
     fun `can update an already selected complexity level`() {
-      val complexityLevel1 = ComplexityLevel(UUID.randomUUID(), "1", "description", ComplexityLevelTitle.LOW_COMPLEXITY)
-      val complexityLevel2 = ComplexityLevel(UUID.randomUUID(), "2", "description", ComplexityLevelTitle.MEDIUM_COMPLEXITY)
+      val complexityLevel1 = ComplexityLevel(UUID.randomUUID(), "1", "description", Complexity.LOW)
+      val complexityLevel2 = ComplexityLevel(UUID.randomUUID(), "2", "description", Complexity.MEDIUM)
       val serviceCategory = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel1, complexityLevel2))
       val referral = referralFactory.createDraft(
         selectedServiceCategories = mutableSetOf(serviceCategory),
@@ -329,8 +329,8 @@ class DraftReferralServiceUnitTest {
     @Test
     fun `updating selected service category with new set removes complexity level for existing service categories`() {
 
-      val complexityLevel1 = ComplexityLevel(UUID.randomUUID(), "title", "description", ComplexityLevelTitle.LOW_COMPLEXITY)
-      val complexityLevel2 = ComplexityLevel(UUID.randomUUID(), "title", "description", ComplexityLevelTitle.MEDIUM_COMPLEXITY)
+      val complexityLevel1 = ComplexityLevel(UUID.randomUUID(), "title", "description", Complexity.LOW)
+      val complexityLevel2 = ComplexityLevel(UUID.randomUUID(), "title", "description", Complexity.MEDIUM)
       val serviceCategory1 = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel1))
       val serviceCategory2 = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel2))
 
@@ -358,7 +358,7 @@ class DraftReferralServiceUnitTest {
     @Test
     fun `updating selected service category with same set doesn't remove complexity level for same service categories`() {
 
-      val complexityLevel1 = ComplexityLevel(UUID.randomUUID(), "title", "description", ComplexityLevelTitle.LOW_COMPLEXITY)
+      val complexityLevel1 = ComplexityLevel(UUID.randomUUID(), "title", "description", Complexity.LOW)
       val serviceCategory1 = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel1))
 
       val contractType = contractTypeFactory.create(serviceCategories = setOf(serviceCategory1))

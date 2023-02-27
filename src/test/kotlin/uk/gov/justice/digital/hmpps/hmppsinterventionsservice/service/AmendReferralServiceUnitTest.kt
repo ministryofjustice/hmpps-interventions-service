@@ -24,8 +24,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendm
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Complexity
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevelTitle
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
@@ -317,8 +317,8 @@ class AmendReferralServiceUnitTest {
       val complexityLevelId1 = UUID.randomUUID()
       val complexityLevelId2 = UUID.randomUUID()
 
-      val complexityLevel1 = ComplexityLevel(complexityLevelId1, "1", "description", ComplexityLevelTitle.LOW_COMPLEXITY)
-      val complexityLevel2 = ComplexityLevel(complexityLevelId2, "2", "description", ComplexityLevelTitle.MEDIUM_COMPLEXITY)
+      val complexityLevel1 = ComplexityLevel(complexityLevelId1, "1", "description", Complexity.LOW)
+      val complexityLevel2 = ComplexityLevel(complexityLevelId2, "2", "description", Complexity.MEDIUM)
 
       val serviceCategory = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel1, complexityLevel2))
 
@@ -369,7 +369,7 @@ class AmendReferralServiceUnitTest {
 
       val complexityLevelId1 = UUID.randomUUID()
 
-      val complexityLevel1 = ComplexityLevel(complexityLevelId1, "1", "description", ComplexityLevelTitle.LOW_COMPLEXITY)
+      val complexityLevel1 = ComplexityLevel(complexityLevelId1, "1", "description", Complexity.LOW)
 
       val serviceCategory = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel1))
 

@@ -21,12 +21,12 @@ data class ComplexityLevel(
   @Id val id: UUID,
   val title: String,
   val description: String,
-  @Type(type = "complexities") @Enumerated(EnumType.STRING) @Column(name = "complexity_level_title")
-  val complexityLevelTitle: ComplexityLevelTitle,
+  @Type(type = "complexities") @Enumerated(EnumType.STRING) @Column(name = "complexity")
+  val complexity: Complexity,
 )
 
-enum class ComplexityLevelTitle {
-  LOW_COMPLEXITY,
-  MEDIUM_COMPLEXITY,
-  HIGH_COMPLEXITY;
+enum class Complexity {
+  LOW,
+  MEDIUM,
+  HIGH;
 }

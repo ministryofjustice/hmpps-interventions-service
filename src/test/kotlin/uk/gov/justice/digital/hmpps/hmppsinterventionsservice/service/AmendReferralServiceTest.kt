@@ -19,8 +19,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendm
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Complexity
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevelTitle
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
@@ -256,8 +256,8 @@ class AmendReferralServiceTest @Autowired constructor(
     val someoneElse = userFactory.create("helper_pp_user", "delius")
     val user = userFactory.create("pp_user_1", "delius")
 
-    val complexityLevel1 = ComplexityLevel(UUID.randomUUID(), "medium complexity", "some description", ComplexityLevelTitle.MEDIUM_COMPLEXITY)
-    val complexityLevel2 = ComplexityLevel(UUID.randomUUID(), "low complexity", "some description", ComplexityLevelTitle.LOW_COMPLEXITY)
+    val complexityLevel1 = ComplexityLevel(UUID.randomUUID(), "medium complexity", "some description", Complexity.MEDIUM)
+    val complexityLevel2 = ComplexityLevel(UUID.randomUUID(), "low complexity", "some description", Complexity.LOW)
 
     val referral = referralFactory.createSent(
       needsInterpreter = false,
