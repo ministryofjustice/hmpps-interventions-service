@@ -74,27 +74,27 @@ dependencies {
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
-  implementation("io.sentry:sentry-spring-boot-starter:6.13.1")
-  implementation("io.sentry:sentry-logback:6.13.1")
+  implementation("io.sentry:sentry-spring-boot-starter:6.14.0")
+  implementation("io.sentry:sentry-logback:6.14.0")
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
-  implementation("net.logstash.logback:logstash-logback-encoder:7.2")
+  implementation("net.logstash.logback:logstash-logback-encoder:7.3")
   runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2") // needed for OffsetDateTime for AppInsights
 
   // openapi
   implementation("org.springdoc:springdoc-openapi-ui:1.6.14")
 
   // notifications
-  implementation("uk.gov.service.notify:notifications-java-client:3.19.0-RELEASE")
+  implementation("uk.gov.service.notify:notifications-java-client:3.19.1-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.20.2")
-  implementation("software.amazon.awssdk:s3:2.20.2")
+  implementation("software.amazon.awssdk:sns:2.20.13")
+  implementation("software.amazon.awssdk:s3:2.20.12")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-  implementation("com.nimbusds:oauth2-oidc-sdk:10.5.1")
+  implementation("com.nimbusds:oauth2-oidc-sdk:10.7")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -102,13 +102,13 @@ dependencies {
   implementation("org.hibernate:hibernate-core:5.6.15.Final")
   implementation("com.vladmihalcea:hibernate-types-55:2.21.1")
   runtimeOnly("org.flywaydb:flyway-core")
-  runtimeOnly("org.postgresql:postgresql:42.5.3")
+  runtimeOnly("org.postgresql:postgresql:42.5.4")
 
   // json and csv
   implementation("com.github.java-json-tools:json-patch:1.13")
   implementation("org.apache.commons:commons-csv:1.10.0")
 
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.4.5")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.5.0")
   testImplementation("com.squareup.okhttp3:okhttp:4.10.0")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
   testImplementation("org.mockito:mockito-inline:5.1.1")
