@@ -2,6 +2,8 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
+import org.hibernate.annotations.FilterJoinTable
+import org.hibernate.annotations.Where
 import java.util.UUID
 import javax.persistence.Entity
 import javax.persistence.Id
@@ -21,9 +23,11 @@ data class DeliverySession(
     joinColumns = [JoinColumn(name = "delivery_session_id")],
     inverseJoinColumns = [JoinColumn(name = "appointment_id")]
   )
-  @NotNull @OneToMany @Fetch(FetchMode.JOIN) val appointments: MutableSet<Appointment> = mutableSetOf(),
+  @NotNull @OneToMany @Fetch(FetchMode.JOIN)
+  @FilterJoinTable(name = "apptmntNotSuperseded", condition = "superseded = false")
+  @Where(clause = "superseded = false")
+  val appointments: MutableSet<Appointment> = mutableSetOf(),
   @NotNull val sessionNumber: Int,
-
   @ManyToOne val referral: Referral,
   @Id val id: UUID,
 ) {
