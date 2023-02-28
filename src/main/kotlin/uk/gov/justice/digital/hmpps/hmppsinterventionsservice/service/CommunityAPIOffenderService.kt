@@ -34,6 +34,14 @@ private data class StaffDetailsResponse(
   val staffIdentifier: Long,
 )
 
+data class OffenderIdentifiersResponse(
+  val primaryIdentifiers: PrimaryIdentifiersResponse?
+)
+
+data class PrimaryIdentifiersResponse(
+  val nomsNumber: String?
+)
+
 private data class ContactableHumanResponse(
   val forenames: String?,
   val surname: String?,
@@ -53,6 +61,7 @@ class CommunityAPIOffenderService(
   @Value("\${community-api.locations.managed-offenders}") private val managedOffendersLocation: String,
   @Value("\${community-api.locations.staff-details}") private val staffDetailsLocation: String,
   @Value("\${community-api.locations.offender-managers}") private val offenderManagersLocation: String,
+  @Value("\${community-api.locations.offender-identifiers}") private val offenderIdentifiersLocation: String,
   private val communityApiClient: RestClient,
   private val telemetryService: TelemetryService,
 ) {
@@ -107,6 +116,16 @@ class CommunityAPIOffenderService(
       }
       .block()
       ?.staffIdentifier
+  }
+
+  fun getOffenderIdentifiers(crn: String): Mono<OffenderIdentifiersResponse> {
+    val offenderIdentifiersPath = UriComponentsBuilder.fromPath(offenderIdentifiersLocation)
+      .buildAndExpand(crn)
+      .toString()
+
+    return communityApiClient.get(offenderIdentifiersPath)
+      .retrieve()
+      .bodyToMono(OffenderIdentifiersResponse::class.java)
   }
 
   fun getResponsibleOfficer(crn: String): ResponsibleOfficer {

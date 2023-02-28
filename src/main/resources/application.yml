@@ -149,6 +149,7 @@ community-api:
     managed-offenders: "/secure/staff/staffIdentifier/{staffIdentifier}/managedOffenders"
     staff-details: "/secure/staff/username/{username}"
     offender-managers: "/secure/offenders/crn/{crn}/allOffenderManagers"
+    offender-identifiers: "/secure/offenders/crn/{crn}/identifiers"
   appointments:
     bookings:
       enabled: true
@@ -178,6 +179,10 @@ hmppsauth:
 assess-risks-and-needs:
   locations:
     create-supplementary-risk: "/risks/supplementary"
+
+prisoner-offender-search:
+  locations:
+    prisoner: "/prisoner/{nomsId}"
 
 aws:
   s3:

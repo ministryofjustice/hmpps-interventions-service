@@ -28,6 +28,7 @@ env:
   COMMUNITYAPI_BASEURL: "https://community-api-secure.pre-prod.delius.probation.hmpps.dsd.io"
   COMMUNITYAPI_APPOINTMENTS_OUTCOME_ENABLED: "true"
   ASSESSRISKSANDNEEDS_BASEURL: "https://assess-risks-and-needs-preprod.hmpps.service.justice.gov.uk"
+  PRISONEROFFENDERSEARCH_BASEURL: "https://prisoner-offender-search-preprod.prison.service.justice.gov.uk"
   SENTRY_ENVIRONMENT: "preprod"
   AWS_S3_STORAGE_ENABLED: "true"
   AWS_S3_NDMIS_ENABLED: "true"
