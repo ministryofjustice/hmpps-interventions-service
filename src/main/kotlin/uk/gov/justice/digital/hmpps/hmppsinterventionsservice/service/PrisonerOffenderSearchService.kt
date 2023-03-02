@@ -9,14 +9,14 @@ import java.time.LocalDate
 
 data class Prisoner(
   val prisonId: String,
-  val releaseDate: LocalDate,
-  val confirmedReleaseDate: LocalDate,
-  val nonDtoReleaseDate: LocalDate,
-  val automaticReleaseDate: LocalDate,
-  val postRecallReleaseDate: LocalDate,
-  val conditionalReleaseDate: LocalDate,
-  val actualParoleDate: LocalDate,
-  val dischargeDate: LocalDate
+  val releaseDate: LocalDate?,
+  val confirmedReleaseDate: LocalDate?,
+  val nonDtoReleaseDate: LocalDate?,
+  val automaticReleaseDate: LocalDate?,
+  val postRecallReleaseDate: LocalDate?,
+  val conditionalReleaseDate: LocalDate?,
+  val actualParoleDate: LocalDate?,
+  val dischargeDate: LocalDate?
 )
 
 @Service
