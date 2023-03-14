@@ -38,7 +38,7 @@ services:
       - ./src/main/resources/db/local/init:/docker-entrypoint-initdb.d:ro
 
   wiremock:
-    image: wiremock/wiremock:2.32.0
+    image: wiremock/wiremock:2.35.0
     networks:
       - hmpps
     restart: always
