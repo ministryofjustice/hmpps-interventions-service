@@ -26,7 +26,9 @@ class LinkSupersededAppointmentsProcessorTest : IntegrationTestBase() {
     val activeReferral = setupAssistant.createAssignedReferral()
     val deliverySession = setupAssistant.createDeliverySession(1, duration = 1, OffsetDateTime.now().plusWeeks(1), referral = activeReferral)
     val supersededAppointment = deliverySession.appointments.first()
+
     setupAssistant.setSuperseded(supersededAppointment, deliverySession)
+
     val newId = UUID.randomUUID()
     val newAppointment = setupAssistant.createAppointment(activeReferral, id = newId, superseded = false)
 
