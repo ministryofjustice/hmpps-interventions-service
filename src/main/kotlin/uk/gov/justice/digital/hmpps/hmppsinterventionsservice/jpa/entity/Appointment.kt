@@ -22,23 +22,34 @@ import javax.validation.constraints.NotNull
 @Entity
 @TypeDef(name = "attended", typeClass = PostgreSQLEnumType::class)
 data class Appointment(
-  @Type(type = "attended") @Enumerated(EnumType.STRING) var attended: Attended? = null,
+  @Type(type = "attended")
+  @Enumerated(EnumType.STRING)
+  var attended: Attended? = null,
   var additionalAttendanceInformation: String? = null,
   var attendanceSubmittedAt: OffsetDateTime? = null,
-  @ManyToOne @Fetch(FetchMode.JOIN) var attendanceSubmittedBy: AuthUser? = null,
+  @ManyToOne
+  @Fetch(FetchMode.JOIN)
+  var attendanceSubmittedBy: AuthUser? = null,
 
   var attendanceBehaviour: String? = null,
   var attendanceBehaviourSubmittedAt: OffsetDateTime? = null,
-  @ManyToOne @Fetch(FetchMode.JOIN) var attendanceBehaviourSubmittedBy: AuthUser? = null,
+  @ManyToOne
+  @Fetch(FetchMode.JOIN)
+  var attendanceBehaviourSubmittedBy: AuthUser? = null,
 
   var notifyPPOfAttendanceBehaviour: Boolean? = null,
 
   var appointmentFeedbackSubmittedAt: OffsetDateTime? = null,
-  @ManyToOne @Fetch(FetchMode.JOIN) var appointmentFeedbackSubmittedBy: AuthUser? = null,
+  @ManyToOne
+  @Fetch(FetchMode.JOIN)
+  var appointmentFeedbackSubmittedBy: AuthUser? = null,
 
   var deliusAppointmentId: Long? = null,
 
-  @NotNull @ManyToOne @Fetch(FetchMode.JOIN) val createdBy: AuthUser,
+  @NotNull
+  @ManyToOne
+  @Fetch(FetchMode.JOIN)
+  val createdBy: AuthUser,
   @NotNull val createdAt: OffsetDateTime,
   var appointmentTime: OffsetDateTime,
   var durationInMinutes: Int,
@@ -49,7 +60,9 @@ data class Appointment(
 
   @ManyToOne(fetch = FetchType.LAZY) var referral: Referral,
   var superseded: Boolean = false,
-  @Id val id: UUID,
+  @Id var id: UUID,
+  var supersededByAppointmentId: UUID? = null,
+  var stale: Boolean = false,
 ) {
   override fun equals(other: Any?): Boolean {
     if (other == null || other !is Appointment) {
@@ -67,7 +80,8 @@ data class Appointment(
 enum class Attended {
   YES,
   LATE,
-  NO;
+  NO,
+  ;
 
   @JsonValue
   open fun toLower(): String? {
@@ -77,5 +91,5 @@ enum class Attended {
 
 enum class AppointmentType {
   SERVICE_DELIVERY,
-  SUPPLIER_ASSESSMENT;
+  SUPPLIER_ASSESSMENT,
 }
