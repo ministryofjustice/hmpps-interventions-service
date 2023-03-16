@@ -6,9 +6,8 @@ import org.junit.jupiter.api.Test
 import org.springframework.batch.item.ExecutionContext
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.markstaleappointments.LinkSupersededAppointmentsReader
 import java.time.OffsetDateTime
-import java.util.*
+import java.util.UUID
 
 class MarkStaleAppointmentsReaderTest @Autowired constructor(
   sessionFactory: SessionFactory,
