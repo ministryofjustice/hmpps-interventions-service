@@ -12,6 +12,7 @@ class AppointmentCleaner(
   val appointmentRepository: AppointmentRepository,
   val deliverySessionRepository: DeliverySessionRepository,
 ) {
+  @Transactional
   fun linkIfSuperseded(appointment: Appointment): Appointment {
     val isSuperseded = appointment.superseded
     val result: Appointment
@@ -30,7 +31,7 @@ class AppointmentCleaner(
     }
     return result
   }
-
+  @Transactional
   fun markAppoinmentAsStale(appointment: Appointment): Appointment {
     appointment.stale = true
     appointmentRepository.save(appointment)

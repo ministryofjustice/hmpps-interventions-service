@@ -797,4 +797,14 @@ class SetupAssistant(
     deliverySessionRepository.save(deliverySession)
     return appointment
   }
+  fun changeAppointmentId(targetAppointment: Appointment, deliverySession: DeliverySession) {
+    targetAppointment.id = UUID.fromString("82e2fbbe-1bb4-4967-8ee6-81aa072fd44b")
+    appointmentRepository.save(targetAppointment)
+    deliverySessionRepository.save(deliverySession)
+  }
+  fun setSuperseded(supersededAppointment: Appointment, deliverySession: DeliverySession, superseded: Boolean = true) {
+    supersededAppointment.superseded = superseded
+    appointmentRepository.save(supersededAppointment)
+    deliverySessionRepository.save(deliverySession)
+  }
 }
