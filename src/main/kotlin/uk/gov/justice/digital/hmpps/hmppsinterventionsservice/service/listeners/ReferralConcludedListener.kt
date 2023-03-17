@@ -7,6 +7,7 @@ import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.CommunityAPIClient
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.SNSPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralConcludedEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.AsyncEventExceptionHandling
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
@@ -30,7 +31,8 @@ class ReferralConcludedListener(
       mapOf(
         "deliveryState" to event.type.name,
         "referralId" to event.referral.id,
-      )
+      ),
+      PersonReference.crn(event.referral.serviceUserCRN)
     )
     snsPublisher.publish(event.referral.id, AuthUser.interventionsServiceUser, snsEvent)
   }

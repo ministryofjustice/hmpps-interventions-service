@@ -5,6 +5,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.SNSPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
@@ -44,7 +45,8 @@ internal class SNSActionPlanServiceTest {
       mapOf(
         "actionPlanId" to UUID.fromString("77df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
         "submittedBy" to actionPlanSubmittedEvent.actionPlan.submittedBy!!.userName
-      )
+      ),
+      PersonReference.crn(actionPlanSubmittedEvent.actionPlan.referral.serviceUserCRN)
     )
     verify(snsPublisher).publish(
       actionPlanSubmittedEvent.actionPlan.referral.id,

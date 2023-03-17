@@ -5,6 +5,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.SNSPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
@@ -56,7 +57,8 @@ internal class SNSReferralServiceTest {
       "A referral has been sent to a Service Provider",
       "http://localhost:8080" + "/sent-referral/${referralSentEvent.referral.id}",
       referralSentEvent.referral.sentAt!!,
-      mapOf("referralId" to UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"))
+      mapOf("referralId" to UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080")),
+      PersonReference.crn(referralSentEvent.referral.serviceUserCRN)
     )
     verify(snsPublisher).publish(referralSentEvent.referral.id, referralSentEvent.referral.sentBy!!, snsEvent)
   }
@@ -69,7 +71,8 @@ internal class SNSReferralServiceTest {
       "A referral has been assigned to a caseworker / service provider",
       "http://localhost:8080" + "/sent-referral/${referralSentEvent.referral.id}",
       referralSentEvent.referral.sentAt!!,
-      mapOf("referralId" to UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"), "assignedTo" to "abc123")
+      mapOf("referralId" to UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"), "assignedTo" to "abc123"),
+      PersonReference.crn(referralSentEvent.referral.serviceUserCRN)
     )
     verify(snsPublisher).publish(
       referralAssignedEvent.referral.id,
