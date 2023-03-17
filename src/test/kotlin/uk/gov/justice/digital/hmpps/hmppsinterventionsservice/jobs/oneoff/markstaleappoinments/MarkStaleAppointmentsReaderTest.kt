@@ -20,9 +20,7 @@ class MarkStaleAppointmentsReaderTest @Autowired constructor(
     val activeReferral = setupAssistant.createAssignedReferral()
     val deliverySession = setupAssistant.createDeliverySession(1, duration = 1, OffsetDateTime.now().plusWeeks(1), referral = activeReferral)
     var targetAppointment = deliverySession.appointments.first()
-    targetAppointment.id = UUID.fromString("82e2fbbe-1bb4-4967-8ee6-81aa072fd44b")
-    appointmentRepository.save(targetAppointment)
-    deliverySessionRepository.save(deliverySession)
+    setupAssistant.changeAppointmentId(targetAppointment, deliverySession)
 
     reader.open(ExecutionContext())
     assertThat(reader.read()?.id).isEqualTo(targetAppointment.id)
