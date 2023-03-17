@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.markstaleappointments
+package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.linksupersededappointments
 
 import org.hibernate.SessionFactory
 import org.springframework.batch.core.configuration.annotation.JobScope

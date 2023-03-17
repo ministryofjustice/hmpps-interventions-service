@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.markstaleappointments
+package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.linksupersededappointments
 
 import org.springframework.batch.item.ItemWriter
 import org.springframework.stereotype.Component
