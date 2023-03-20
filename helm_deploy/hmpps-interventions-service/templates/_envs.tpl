@@ -120,6 +120,8 @@ env:
         name: reporting-s3-bucket
         key: bucket_name
 
+  {{- with (index .Values.ingress.hosts 0) }}
   - name: INTERVENTIONSAPI_BASEURL
-    value: "https://{{ index .Values.ingress.hosts 0 }}"
+    value: "https://{{ .host}}"
+  {{- end -}}
 {{- end -}}
