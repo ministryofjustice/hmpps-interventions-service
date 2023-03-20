@@ -5,6 +5,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.SNSPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.EndOfServiceReportEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.EndOfServiceReportEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
@@ -48,6 +49,7 @@ internal class SNSEndOfServiceReportServiceTest {
         "endOfServiceReportId" to endOfServiceReportEvent.endOfServiceReport.id,
         "submittedBy" to endOfServiceReportEvent.endOfServiceReport.submittedBy!!.userName,
       ),
+      PersonReference.crn(endOfServiceReportEvent.endOfServiceReport.referral.serviceUserCRN)
     )
 
     verify(publisher).publish(referralId, user, eventDTO)

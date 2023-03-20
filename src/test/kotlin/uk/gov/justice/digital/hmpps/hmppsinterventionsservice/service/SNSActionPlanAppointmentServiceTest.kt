@@ -10,6 +10,7 @@ import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.SNSPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AuthUserDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanAppointmentEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanAppointmentEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
@@ -79,6 +80,7 @@ internal class SNSActionPlanAppointmentServiceTest {
         "serviceUserCRN" to "X123456",
         "referralId" to referralId
       ),
+      PersonReference.crn("X123456")
     )
 
     verify(publisher).publish(referralId, AuthUserDTO.from(actionPlan.createdBy), eventDTO)
@@ -99,6 +101,7 @@ internal class SNSActionPlanAppointmentServiceTest {
         "referralId" to referralId,
         "deliusAppointmentId" to "123"
       ),
+      PersonReference.crn("X123456")
     )
 
     verify(publisher).publish(referralId, AuthUserDTO.from(actionPlan.createdBy), eventDTO)

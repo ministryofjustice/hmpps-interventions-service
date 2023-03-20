@@ -4,6 +4,7 @@ import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.SNSPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanAppointmentEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanAppointmentEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanEvent
@@ -33,7 +34,8 @@ class SNSActionPlanService(
           "A draft action plan has been submitted",
           event.detailUrl,
           event.actionPlan.submittedAt!!,
-          mapOf("actionPlanId" to event.actionPlan.id, "submittedBy" to (event.actionPlan.submittedBy?.userName!!))
+          mapOf("actionPlanId" to event.actionPlan.id, "submittedBy" to (event.actionPlan.submittedBy?.userName!!)),
+          PersonReference.crn(event.actionPlan.referral.serviceUserCRN)
         )
         snsPublisher.publish(event.actionPlan.referral.id, event.actionPlan.submittedBy!!, snsEvent)
       }
@@ -43,7 +45,8 @@ class SNSActionPlanService(
           "An action plan has been approved",
           event.detailUrl,
           event.actionPlan.approvedAt!!,
-          mapOf("actionPlanId" to event.actionPlan.id, "approvedBy" to (event.actionPlan.approvedBy?.userName!!))
+          mapOf("actionPlanId" to event.actionPlan.id, "approvedBy" to (event.actionPlan.approvedBy?.userName!!)),
+          PersonReference.crn(event.actionPlan.referral.serviceUserCRN)
         )
         snsPublisher.publish(event.actionPlan.referral.id, event.actionPlan.approvedBy!!, snsEvent)
       }
@@ -65,7 +68,8 @@ class SNSReferralService(
           "A referral has been sent to a Service Provider",
           event.detailUrl,
           event.referral.sentAt!!,
-          mapOf("referralId" to event.referral.id)
+          mapOf("referralId" to event.referral.id),
+          PersonReference.crn(event.referral.serviceUserCRN)
         )
         snsPublisher.publish(event.referral.id, event.referral.sentBy!!, snsEvent)
       }
@@ -76,7 +80,8 @@ class SNSReferralService(
           "A referral has been assigned to a caseworker / service provider",
           event.detailUrl,
           assignment.assignedAt,
-          mapOf("referralId" to event.referral.id, "assignedTo" to (assignment.assignedTo.userName))
+          mapOf("referralId" to event.referral.id, "assignedTo" to (assignment.assignedTo.userName)),
+          PersonReference.crn(event.referral.serviceUserCRN)
         )
         snsPublisher.publish(event.referral.id, assignment.assignedBy, snsEvent)
       }
@@ -108,7 +113,8 @@ class SNSActionPlanAppointmentService(
           "Attendance was recorded for a session appointment",
           event.detailUrl,
           event.deliverySession.sessionFeedback.attendance.submittedAt!!,
-          mapOf("serviceUserCRN" to referral.serviceUserCRN, "referralId" to referral.id)
+          mapOf("serviceUserCRN" to referral.serviceUserCRN, "referralId" to referral.id),
+          PersonReference.crn(event.referral.serviceUserCRN)
         )
 
         snsPublisher.publish(referral.id, event.deliverySession.sessionFeedback.attendance.submittedBy!!, snsEvent)
@@ -128,7 +134,8 @@ class SNSActionPlanAppointmentService(
             "serviceUserCRN" to referral.serviceUserCRN,
             "referralId" to referral.id,
             "deliusAppointmentId" to event.deliverySession.deliusAppointmentId.toString()
-          )
+          ),
+          PersonReference.crn(referral.serviceUserCRN)
         )
 
         snsPublisher.publish(referral.id, event.deliverySession.sessionFeedback.submittedBy!!, snsEvent)
@@ -161,7 +168,8 @@ class SNSAppointmentService(
           "Attendance was recorded for an initial assessment appointment",
           event.detailUrl,
           appointment.attendanceSubmittedAt!!,
-          mapOf("serviceUserCRN" to referral.serviceUserCRN, "referralId" to referral.id)
+          mapOf("serviceUserCRN" to referral.serviceUserCRN, "referralId" to referral.id),
+          PersonReference.crn(referral.serviceUserCRN)
         )
 
         snsPublisher.publish(referral.id, appointment.appointmentFeedbackSubmittedBy!!, snsEvent)
@@ -181,7 +189,8 @@ class SNSAppointmentService(
             "serviceUserCRN" to referral.serviceUserCRN,
             "referralId" to referral.id,
             "deliusAppointmentId" to appointment.deliusAppointmentId.toString()
-          )
+          ),
+          PersonReference.crn(referral.serviceUserCRN)
         )
 
         snsPublisher.publish(referral.id, appointment.appointmentFeedbackSubmittedBy!!, snsEvent)
@@ -205,7 +214,8 @@ class SNSEndOfServiceReportService(
           "An end of service report has been submitted",
           event.detailUrl,
           event.endOfServiceReport.submittedAt!!,
-          mapOf("endOfServiceReportId" to event.endOfServiceReport.id, "submittedBy" to (event.endOfServiceReport.submittedBy?.userName!!))
+          mapOf("endOfServiceReportId" to event.endOfServiceReport.id, "submittedBy" to (event.endOfServiceReport.submittedBy?.userName!!)),
+          PersonReference.crn(event.endOfServiceReport.referral.serviceUserCRN)
         )
         snsPublisher.publish(event.endOfServiceReport.referral.id, event.endOfServiceReport.submittedBy!!, snsEvent)
       }

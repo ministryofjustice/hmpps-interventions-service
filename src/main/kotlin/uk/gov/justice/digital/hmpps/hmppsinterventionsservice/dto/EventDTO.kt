@@ -21,7 +21,7 @@ data class EventDTO(
   val detailUrl: String,
   val occurredAt: OffsetDateTime,
   val additionalInformation: Map<String, Any>,
-  val personReference: PersonReference? = null,
+  val personReference: PersonReference,
 ) {
   val version: Int = 1
 }
