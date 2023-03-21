@@ -72,7 +72,6 @@ class ReferralServiceUnitTest {
 
   private val referralService = ReferralService(
     referralRepository,
-    draftReferralRepository,
     sentReferralSummariesRepository,
     authUserRepository,
     interventionRepository,
@@ -89,8 +88,7 @@ class ReferralServiceUnitTest {
     amendReferralService,
     hmppsAuthService,
     telemetryService,
-    referralDetailsRepository,
-    changeLogRepository
+    referralDetailsRepository
   )
 
   @Test

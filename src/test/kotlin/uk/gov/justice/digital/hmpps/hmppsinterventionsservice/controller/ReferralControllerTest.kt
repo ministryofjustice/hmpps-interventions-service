@@ -7,24 +7,18 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.http.HttpStatus
-import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.security.access.AccessDeniedException
-import org.springframework.web.context.request.RequestContextHolder
-import org.springframework.web.context.request.ServletRequestAttributes
 import org.springframework.web.server.ResponseStatusException
-import org.springframework.web.server.ServerWebInputException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ClientApiAccessChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller.mappers.CancellationReasonMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AuthUserDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.CreateReferralRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EndReferralRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAssignmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
@@ -43,7 +37,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFacto
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAssessmentFactory
 import java.util.UUID
-import javax.persistence.EntityNotFoundException
 
 internal class ReferralControllerTest {
   private val draftReferralService = mock<DraftReferralService>()
@@ -58,7 +51,6 @@ internal class ReferralControllerTest {
   private val draftOasysRiskInformationService = mock<DraftOasysRiskInformationService>()
   private val telemetryClient = mock<TelemetryClient>()
   private val referralController = ReferralController(
-    draftReferralService,
     referralService,
     referralConcluder,
     serviceCategoryService,
@@ -66,7 +58,6 @@ internal class ReferralControllerTest {
     clientApiAccessChecker,
     cancellationReasonMapper,
     actionPlanService,
-    draftOasysRiskInformationService,
     telemetryClient,
   )
   private val tokenFactory = JwtTokenFactory()
@@ -75,16 +66,6 @@ internal class ReferralControllerTest {
   private val supplierAssessmentFactory = SupplierAssessmentFactory()
   private val appointmentsFactory = AppointmentFactory()
   private val actionPlanFactory = ActionPlanFactory()
-
-  @Test
-  fun `createDraftReferral handles EntityNotFound exceptions from InterventionsService`() {
-    val token = tokenFactory.create()
-    whenever(draftReferralService.createDraftReferral(any(), any(), any(), anyOrNull(), anyOrNull())).thenThrow(EntityNotFoundException::class.java)
-    whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
-    assertThrows<ServerWebInputException> {
-      referralController.createDraftReferral(CreateReferralRequestDTO("CRN20", UUID.randomUUID()), token)
-    }
-  }
 
   @Nested
   inner class GetSentReferralForUser {
@@ -423,25 +404,6 @@ internal class ReferralControllerTest {
     private val token = tokenFactory.create(userID = user.id, userName = user.userName, authSource = user.authSource)
 
     @Test
-    fun `is set after sending a referral`() {
-      val request = MockHttpServletRequest()
-      RequestContextHolder.setRequestAttributes(ServletRequestAttributes(request))
-
-      val draftReferral = referralFactory.createDraft()
-      val sentReferral = referralFactory.createSent()
-      whenever(draftReferralService.getDraftReferralForUser(draftReferral.id, user)).thenReturn(draftReferral)
-      whenever(draftReferralService.sendDraftReferral(draftReferral, user)).thenReturn(sentReferral)
-      whenever(referralConcluder.requiresEndOfServiceReportCreation(sentReferral)).thenReturn(false)
-      whenever(authUserRepository.save(any())).thenReturn(user)
-      val sentReferralResponse = referralController.sendDraftReferral(
-        draftReferral.id,
-        token,
-      )
-      assertThat(sentReferralResponse.body.id).isEqualTo(sentReferral.id)
-      assertThat(sentReferralResponse.body.endOfServiceReportCreationRequired).isFalse
-    }
-
-    @Test
     fun `is set when getting a set referral`() {
       val referral = referralFactory.createSent()
       whenever(referralService.getSentReferralForUser(eq(referral.id), any())).thenReturn(referral)
@@ -505,43 +467,5 @@ internal class ReferralControllerTest {
     val response = referralController.getReferralApprovedActionPlans(referralId)
 
     assertThat(response.size).isEqualTo(2)
-  }
-
-  @Nested
-  inner class GetDraftReferralByID {
-    private val referral = referralFactory.createDraft()
-    private val user = authUserFactory.create()
-    private val token = tokenFactory.create(userID = user.id, userName = user.userName, authSource = user.authSource)
-    private val clientApiToken = tokenFactory.create("interventions-event-client", "ROLE_INTERVENTIONS_API_READ_ALL")
-
-    @Test
-    fun `getDraftReferralByID returns a sent referral if it exists`() {
-      whenever(draftReferralService.getDraftReferralForUser(eq(referral.id), any())).thenReturn(referral)
-      whenever(authUserRepository.save(any())).thenReturn(user)
-
-      val draftReferral = referralController.getDraftReferralByID(
-        referral.id,
-        token,
-      )
-      assertThat(draftReferral.id).isEqualTo(referral.id)
-    }
-  }
-
-  @Nested
-  inner class GetDraftReferrals {
-    private val referral = referralFactory.createDraft()
-    private val user = authUserFactory.create()
-    private val token = tokenFactory.create(userID = user.id, userName = user.userName, authSource = user.authSource)
-    private val clientApiToken = tokenFactory.create("interventions-event-client", "ROLE_INTERVENTIONS_API_READ_ALL")
-
-    @Test
-    fun `getDraftReferrals returns a list of draft referrals if they exist`() {
-      whenever(draftReferralService.getDraftReferralsForUser(any())).thenReturn(listOf(referral))
-      whenever(authUserRepository.save(any())).thenReturn(user)
-
-      val draftReferrals = referralController.getDraftReferrals(token)
-      assertThat(draftReferrals).isNotNull
-      assertThat(draftReferrals.count()).isEqualTo(1)
-    }
   }
 }

@@ -28,9 +28,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SentRef
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceProviderSentReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
@@ -52,7 +50,6 @@ data class ResponsibleProbationPractitioner(
 @Transactional
 class ReferralService(
   val referralRepository: ReferralRepository,
-  val draftReferralRepository: DraftReferralRepository,
   val sentReferralSummariesRepository: SentReferralSummariesRepository,
   val authUserRepository: AuthUserRepository,
   val interventionRepository: InterventionRepository,
@@ -69,8 +66,7 @@ class ReferralService(
   @Lazy val amendReferralService: AmendReferralService,
   val hmppsAuthService: HMPPSAuthService,
   val telemetryService: TelemetryService,
-  val referralDetailsRepository: ReferralDetailsRepository,
-  val changelogRepository: ChangelogRepository,
+  val referralDetailsRepository: ReferralDetailsRepository
 ) {
   companion object {
     private val logger = KotlinLogging.logger {}
@@ -161,7 +157,7 @@ class ReferralService(
   ): Specification<T> {
     var findSentReferralsSpec = ReferralSpecifications.sent<T>()
 
-    findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, concluded, ReferralSpecifications.concluded())
+    findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, concluded, ReferralSpecifications.concluded(concluded))
     findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, cancelled, ReferralSpecifications.cancelled())
     findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, unassigned, ReferralSpecifications.unassigned())
     assignedToUserId?.let {
