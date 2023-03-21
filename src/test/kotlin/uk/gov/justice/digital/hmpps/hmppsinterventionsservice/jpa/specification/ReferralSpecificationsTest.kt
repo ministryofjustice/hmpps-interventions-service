@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Int
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSummariesRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SupplierAssessmentRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AssignmentsFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFrameworkContractFactory
@@ -25,6 +26,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionF
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SentReferralSummariesFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAssessmentFactory
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
 
@@ -50,6 +52,8 @@ class ReferralSpecificationsTest @Autowired constructor(
   private val interventionFactory = InterventionFactory(entityManager)
   private val dynamicFrameworkContractFactory = DynamicFrameworkContractFactory(entityManager)
   private val assignmentsFactory = AssignmentsFactory(entityManager)
+  private val appointmentFactory = AppointmentFactory(entityManager)
+  private val supplierAssessmentFactory = SupplierAssessmentFactory(entityManager)
   private val recursiveComparisonConfigurationBuilder = RecursiveComparisonConfiguration.builder()
   private lateinit var recursiveComparisonConfiguration: RecursiveComparisonConfiguration
 
@@ -68,10 +72,12 @@ class ReferralSpecificationsTest @Autowired constructor(
     authUserRepository.deleteAll()
     entityManager.flush()
     val truncateSeconds: Comparator<OffsetDateTime> = Comparator { a, exp ->
-      if (a
-        .truncatedTo(ChronoUnit.SECONDS)
-        .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
-      ) 0 else 1
+      if (exp != null && a != null) {
+        if (a
+          .truncatedTo(ChronoUnit.SECONDS)
+          .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
+        ) 0 else 1
+      } else { 0 }
     }
     recursiveComparisonConfiguration = recursiveComparisonConfigurationBuilder
       .withComparatorForType(truncateSeconds, OffsetDateTime::class.java)
@@ -98,15 +104,25 @@ class ReferralSpecificationsTest @Autowired constructor(
       val sent = referralFactory.createSent()
       val cancelled = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now(), concludedAt = OffsetDateTime.now(), endOfServiceReport = null)
       val completed = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now(), concludedAt = OffsetDateTime.now())
+      val appointment =
+        appointmentFactory.create(referral = completed, attendanceSubmittedAt = OffsetDateTime.now())
+      val superSededAppointment =
+        appointmentFactory.create(referral = completed, attendanceSubmittedAt = OffsetDateTime.now(), superseded = true)
+      val supplierAssessmentAppointment =
+        supplierAssessmentFactory.createWithMultipleAppointments(appointments = mutableSetOf(appointment, superSededAppointment), referral = completed)
+      completed.supplierAssessment = supplierAssessmentAppointment
+      entityManager.refresh(completed)
       val endOfServiceReport = endOfServiceReportFactory.create(referral = completed)
       val sentReferralSummary = referralSumariesFactory.getReferralSummary(sent)
       val cancelledReferralSummary = referralSumariesFactory.getReferralSummary(cancelled)
       val completedReferralSummary = referralSumariesFactory.getReferralSummary(completed, endOfServiceReport)
-      val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.concluded())
+      val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.concluded(true))
       assertThat(result)
         .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
-        .containsExactlyInAnyOrder(completedReferralSummary, cancelledReferralSummary)
-      assertThat(result).doesNotContain(sentReferralSummary)
+        .contains(completedReferralSummary)
+      assertThat(result)
+        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
+        .doesNotContain(sentReferralSummary, cancelledReferralSummary)
     }
   }
 

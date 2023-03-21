@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository
 
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
@@ -14,5 +12,5 @@ interface SentReferralSummariesRepository : JpaRepository<SentReferralSummary, U
   /** TODO- Projection with specification is not been implemented by Spring JPA yet.So have to come up with this approach of creating a repository for projecting the fields we wanted.
    * Will have to move to projection when that is ready. **/
   @EntityGraph(value = "entity-referral-graph")
-  override fun findAll(@Nullable spec: Specification<SentReferralSummary>?, pageable: Pageable): Page<SentReferralSummary>
+  override fun findAll(@Nullable spec: Specification<SentReferralSummary>?): MutableList<SentReferralSummary>
 }

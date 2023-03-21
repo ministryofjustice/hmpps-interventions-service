@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 import mu.KotlinLogging
 import net.logstash.logback.argument.StructuredArguments.kv
 import org.springframework.context.annotation.Lazy
-import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.domain.Specification.not
@@ -29,13 +28,10 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SentRef
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceProviderSentReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSpecificationExecutor
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSummariesRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.specification.ReferralSpecifications
@@ -54,7 +50,6 @@ data class ResponsibleProbationPractitioner(
 @Transactional
 class ReferralService(
   val referralRepository: ReferralRepository,
-  val draftReferralRepository: DraftReferralRepository,
   val sentReferralSummariesRepository: SentReferralSummariesRepository,
   val authUserRepository: AuthUserRepository,
   val interventionRepository: InterventionRepository,
@@ -71,9 +66,7 @@ class ReferralService(
   @Lazy val amendReferralService: AmendReferralService,
   val hmppsAuthService: HMPPSAuthService,
   val telemetryService: TelemetryService,
-  val referralDetailsRepository: ReferralDetailsRepository,
-  val sentReferralSummariesRepositoryImpl: SentReferralSpecificationExecutor,
-  val changelogRepository: ChangelogRepository,
+  val referralDetailsRepository: ReferralDetailsRepository
 ) {
   companion object {
     private val logger = KotlinLogging.logger {}
@@ -141,18 +134,8 @@ class ReferralService(
   private fun getSentReferralSummaryForServiceProviderUser(user: AuthUser, sentReferralFilterSpecification: Specification<SentReferralSummary>, page: Pageable): Iterable<SentReferralSummary> {
     // todo: query for referrals where the service provider has been granted nominated access only
     val filteredSpec = referralAccessFilter.serviceProviderReferrals(sentReferralFilterSpecification, user)
-    val matchedReferralIds = sentReferralSummariesRepositoryImpl.findReferralIds(filteredSpec, page)
-    val sentReferralSummariesPage = sentReferralSummariesRepository.findAll(ReferralSpecifications.idIn(HashSet(matchedReferralIds.content)), page.sort)
-    val sentReferralSummaries = sentReferralSummariesPage.filterNot { cancelledUnattendedReferrals(it) }
-    val totalElements = if (sentReferralSummariesPage.size > sentReferralSummaries.size) matchedReferralIds.totalElements - (sentReferralSummariesPage.size - sentReferralSummaries.size)
-    else matchedReferralIds.totalElements
-    return PageImpl(sentReferralSummaries, page, totalElements)
+    return sentReferralSummariesRepository.findAll(filteredSpec, page)
   }
-
-  private fun cancelledUnattendedReferrals(it: SentReferralSummary) =
-    (it.concludedAt != null && it.endRequestedAt != null && it.endOfServiceReport == null) &&
-      it.supplierAssessment?.currentAppointment?.attendanceSubmittedAt == null &&
-      (it.actionPlans!!.all { actionPlan -> actionPlan.submittedAt == null })
 
   private fun getSentReferralSummariesForServiceProviderUser(user: AuthUser, dashboardType: DashboardType?): List<ServiceProviderSentReferralSummary> {
     val serviceProviders = serviceProviderUserAccessScopeMapper.fromUser(user).serviceProviders
@@ -162,9 +145,7 @@ class ReferralService(
 
   private fun getSentReferralSummaryForProbationPractitionerUser(user: AuthUser, sentReferralFilterSpecification: Specification<SentReferralSummary>, page: Pageable): Iterable<SentReferralSummary> {
     val filteredSpec = createSpecificationForProbationPractitionerUser(user, sentReferralFilterSpecification)
-    val matchedReferralIds = sentReferralSummariesRepositoryImpl.findReferralIds(filteredSpec, page)
-    val sentReferralSummaries = sentReferralSummariesRepository.findAll(ReferralSpecifications.idIn(HashSet(matchedReferralIds.content)), page.sort)
-    return PageImpl(sentReferralSummaries, page, matchedReferralIds.totalElements)
+    return sentReferralSummariesRepository.findAll(filteredSpec, page)
   }
 
   private inline fun <reified T> createSpecification(
@@ -176,7 +157,7 @@ class ReferralService(
   ): Specification<T> {
     var findSentReferralsSpec = ReferralSpecifications.sent<T>()
 
-    findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, concluded, ReferralSpecifications.concluded())
+    findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, concluded, ReferralSpecifications.concluded(concluded))
     findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, cancelled, ReferralSpecifications.cancelled())
     findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, unassigned, ReferralSpecifications.unassigned())
     assignedToUserId?.let {

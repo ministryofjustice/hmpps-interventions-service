@@ -47,7 +47,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.End
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSpecificationExecutor
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSummariesRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
@@ -83,8 +82,7 @@ class ReferralServiceTest @Autowired constructor(
   val endOfServiceReportRepository: EndOfServiceReportRepository,
   val serviceCategoryRepository: ServiceCategoryRepository,
   val referralDetailsRepository: ReferralDetailsRepository,
-  val changelogRepository: ChangelogRepository,
-  val sentReferralSummariesRepositoryImpl: SentReferralSpecificationExecutor
+  val changelogRepository: ChangelogRepository
 ) {
   private val userFactory = AuthUserFactory(entityManager)
   private val interventionFactory = InterventionFactory(entityManager)
@@ -113,11 +111,11 @@ class ReferralServiceTest @Autowired constructor(
 
   private val recursiveComparisonConfigurationBuilder = RecursiveComparisonConfiguration.builder()
   private val userMapper: UserMapper = mock()
-  private val jwtAuthentionToken: JwtAuthenticationToken = mock()
+  private val jwtAuthenticationToken: JwtAuthenticationToken = mock()
+  private val withDrawnReferrals = true
 
   private val referralService = ReferralService(
     referralRepository,
-    draftReferralRepository,
     sentReferralSummariesRepository,
     authUserRepository,
     interventionRepository,
@@ -134,9 +132,7 @@ class ReferralServiceTest @Autowired constructor(
     amendReferralService,
     hmppsAuthService,
     telemetryService,
-    referralDetailsRepository,
-    sentReferralSummariesRepositoryImpl,
-    changelogRepository
+    referralDetailsRepository
   )
 
   companion object {
@@ -852,10 +848,19 @@ class ReferralServiceTest @Autowired constructor(
     }
     @Test
     fun `setting concluded returns only concluded referrals`() {
+      val appointment =
+        appointmentFactory.create(referral = completedReferral, attendanceSubmittedAt = OffsetDateTime.now())
+      val superSededAppointment =
+        appointmentFactory.create(referral = completedReferral, attendanceSubmittedAt = OffsetDateTime.now(), superseded = true)
+      val supplierAssessmentAppointment =
+        supplierAssessmentFactory.createWithMultipleAppointments(appointments = mutableSetOf(appointment, superSededAppointment), referral = completedReferral)
+      completedReferral.supplierAssessment = supplierAssessmentAppointment
+      entityManager.refresh(completedReferral)
+      completedSentReferralSummary = sentReferralSummariesFactory.getReferralSummary(completedReferral)
       val result = referralService.getSentReferralSummaryForUser(user, true, null, null, null, pageRequest)
       assertThat(result)
         .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
-        .containsExactlyInAnyOrder(completedSentReferralSummary, cancelledSentReferralSummary)
+        .containsExactlyInAnyOrder(completedSentReferralSummary)
       assertThat(result).doesNotContain(liveSentReferralSummary, selfAssignedSentReferralSummary, otherAssignedSentReferralSummary)
     }
 
@@ -944,17 +949,18 @@ class ReferralServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `setting all filter options to true will return cancelled and unassigned referral`() {
+    fun `setting all filter options to true will not return any results`() {
+      val appointment =
+        appointmentFactory.create(referral = completedReferral, attendanceSubmittedAt = OffsetDateTime.now())
+      val superSededAppointment =
+        appointmentFactory.create(referral = completedReferral, attendanceSubmittedAt = OffsetDateTime.now(), superseded = true)
+      val supplierAssessmentAppointment =
+        supplierAssessmentFactory.createWithMultipleAppointments(appointments = mutableSetOf(appointment, superSededAppointment), referral = completedReferral)
+      completedReferral.supplierAssessment = supplierAssessmentAppointment
+      entityManager.refresh(completedReferral)
+      completedSentReferralSummary = sentReferralSummariesFactory.getReferralSummary(completedReferral)
       val result = referralService.getSentReferralSummaryForUser(user, true, true, true, null, pageRequest)
-      assertThat(result)
-        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
-        .containsExactlyInAnyOrder(cancelledSentReferralSummary)
-      assertThat(result).doesNotContain(
-        completedSentReferralSummary,
-        liveSentReferralSummary,
-        selfAssignedSentReferralSummary,
-        otherAssignedSentReferralSummary
-      )
+      assertThat(result).isEmpty()
     }
 
     @Test
@@ -1040,7 +1046,7 @@ class ReferralServiceTest @Autowired constructor(
       completionDeadline = existingCompletionDate,
       saved = true
     )
-    whenever(userMapper.fromToken(jwtAuthentionToken)).thenReturn(authUser)
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
 
     val referralToUpdate = UpdateReferralDetailsDTO(20, completionDateToChange, "new information", expectedreleaseDate, null, "we decided 10 days wasn't enough")
     val referralDetailsReturned = referralService.updateReferralDetails(referral, referralToUpdate, user)
@@ -1075,7 +1081,7 @@ class ReferralServiceTest @Autowired constructor(
       saved = true
     )
 
-    whenever(userMapper.fromToken(jwtAuthentionToken)).thenReturn(authUser)
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
 
     val referralToUpdate = UpdateReferralDetailsDTO(20, null, "new information", null, null, "we decided 10 days wasn't enough")
     val referralDetailsReturned = referralService.updateReferralDetails(referral, referralToUpdate, user)
