@@ -7,6 +7,9 @@ interventions-ui:
 interventions-api:
   baseurl: http://localhost:8080
 
+refer-and-monitor-and-delius:
+  baseurl: http://localhost:9090
+
 community-api:
   baseurl: http://localhost:8091
   referrals:
