@@ -45,6 +45,21 @@ class RestClient(
       .withAuth(customAuthentication)
   }
 
+  fun <T> put(
+    uri: String,
+    body: T,
+    customAuthentication: JwtAuthenticationToken? = null,
+  ): WebClient.RequestHeadersSpec<*> {
+    val spec = webClient
+      .put()
+      .uri(uri)
+      .bodyValue(body)
+
+    return spec
+      .withDefaultHeaders()
+      .withAuth(customAuthentication)
+  }
+
   fun <T> patch(
     uri: String,
     body: T,

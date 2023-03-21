@@ -81,7 +81,7 @@ class DraftReferralServiceTest @Autowired constructor(
   private val userTypeChecker = UserTypeChecker()
   private val serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper = mock()
   private val referralAccessFilter = ReferralAccessFilter(serviceProviderAccessScopeMapper)
-  private val communityAPIReferralService: CommunityAPIReferralService = mock()
+  private val ramDeliusReferralService: RamDeliusReferralService = mock()
   private val serviceUserAccessChecker: ServiceUserAccessChecker = mock()
   private val assessRisksAndNeedsService: RisksAndNeedsService = mock()
   private val supplierAssessmentService: SupplierAssessmentService = mock()
@@ -102,7 +102,7 @@ class DraftReferralServiceTest @Autowired constructor(
     deliverySessionRepository,
     serviceCategoryRepository,
     userTypeChecker,
-    communityAPIReferralService,
+    ramDeliusReferralService,
     assessRisksAndNeedsService,
     supplierAssessmentService,
     hmppsAuthService,
@@ -531,7 +531,7 @@ class DraftReferralServiceTest @Autowired constructor(
 
       val referral = draftReferralService.sendDraftReferral(draftReferral, user)
       val eventCaptor = argumentCaptor<Referral>()
-      verify(communityAPIReferralService).send(eventCaptor.capture())
+      verify(ramDeliusReferralService).send(eventCaptor.capture())
       val capturedReferral = eventCaptor.firstValue
       assertThat(capturedReferral.id).isEqualTo(referral.id)
       verify(referralEventPublisher).referralSentEvent(referral)

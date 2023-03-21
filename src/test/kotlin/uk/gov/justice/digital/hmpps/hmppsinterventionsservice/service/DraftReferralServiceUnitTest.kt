@@ -66,7 +66,7 @@ class DraftReferralServiceUnitTest {
   private val serviceCategoryRepository: ServiceCategoryRepository = mock()
   private val referralAccessFilter: ReferralAccessFilter = mock()
   private val referralAccessChecker: ReferralAccessChecker = mock()
-  private val communityAPIReferralService: CommunityAPIReferralService = mock()
+  private val ramDeliusReferralService: RamDeliusReferralService = mock()
   private val userTypeChecker: UserTypeChecker = mock()
   private val serviceUserAccessChecker: ServiceUserAccessChecker = mock()
   private val assessRisksAndNeedsService: RisksAndNeedsService = mock()
@@ -98,7 +98,7 @@ class DraftReferralServiceUnitTest {
     deliverySessionRepository,
     serviceCategoryRepository,
     userTypeChecker,
-    communityAPIReferralService,
+    ramDeliusReferralService,
     assessRisksAndNeedsService,
     supplierAssessmentService,
     hmppsAuthService,
@@ -751,12 +751,12 @@ class DraftReferralServiceUnitTest {
 
     val sendReferral = draftReferralService.sendDraftReferral(draftReferral, authUser)
 
-    val inOrder = inOrder(assessRisksAndNeedsService, communityAPIReferralService)
+    val inOrder = inOrder(assessRisksAndNeedsService, ramDeliusReferralService)
     inOrder.verify(assessRisksAndNeedsService, times(1))
       .createSupplementaryRisk(draftReferral.id, draftReferral.serviceUserCRN, authUser, timestamp, "something")
     val eventCaptor = argumentCaptor<Referral>()
 
-    inOrder.verify(communityAPIReferralService, times(1)).send(eventCaptor.capture())
+    inOrder.verify(ramDeliusReferralService, times(1)).send(eventCaptor.capture())
     val capturedReferral = eventCaptor.firstValue
     assertThat(capturedReferral.id).isEqualTo(sendReferral.id)
   }

@@ -19,8 +19,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AuthUserDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.CommunityAPIOffenderService
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.CommunityAPIReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.RamDeliusReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.RisksAndNeedsService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ServiceUserAccessResult
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.UserDetail
@@ -33,7 +33,7 @@ import java.util.UUID
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class PactTest : IntegrationTestBase() {
   @MockBean private lateinit var communityAPIOffenderService: CommunityAPIOffenderService
-  @MockBean private lateinit var communityAPIReferralService: CommunityAPIReferralService
+  @MockBean private lateinit var ramDeliusReferralService: RamDeliusReferralService
   @MockBean private lateinit var risksAndNeedsService: RisksAndNeedsService
   @MockBean private lateinit var hmppsAuthService: HMPPSAuthService
   @MockBean private lateinit var serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper
