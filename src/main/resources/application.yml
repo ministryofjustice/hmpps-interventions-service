@@ -136,9 +136,12 @@ interventions-ui:
       end-of-service-report: "/probation-practitioner/end-of-service-report/{id}"
       case-note-details: "/probation-practitioner/case-note/{id}"
 
+refer-and-monitor-and-delius:
+  locations:
+    referral-start: "/probation-case/{crn}/referrals"
+
 community-api:
   locations:
-    sent-referral: "/secure/offenders/crn/{crn}/referral/start/context/{contextName}"
     ended-referral: "/secure/offenders/crn/{crn}/referral/end/context/{contextName}"
     book-appointment: "/secure/offenders/crn/{crn}/sentence/{sentenceId}/appointments/context/{contextName}"
     reschedule-appointment: "/secure/offenders/crn/{crn}/appointments/{appointmentId}/reschedule/context/{contextName}"

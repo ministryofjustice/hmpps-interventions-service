@@ -15,8 +15,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUse
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DynamicFrameworkContract
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.CommunityAPIOffenderService
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.CommunityAPIReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.RamDeliusReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.RisksAndNeedsService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ServiceUserAccessResult
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFactory
@@ -26,7 +26,7 @@ import java.util.UUID
 class SingleReferralEndpoints : IntegrationTestBase() {
   @MockBean lateinit var mockHmppsAuthService: HMPPSAuthService
   @MockBean lateinit var mockCommunityAPIOffenderService: CommunityAPIOffenderService
-  @MockBean @Suppress("UNUSED") lateinit var mockCommunityApiReferralService: CommunityAPIReferralService
+  @MockBean @Suppress("UNUSED") lateinit var ramDeliusReferralService: RamDeliusReferralService
   @MockBean lateinit var mockRisksAndNeedsService: RisksAndNeedsService
 
   private lateinit var requestFactory: RequestFactory

@@ -53,7 +53,7 @@ class DraftReferralService(
   val deliverySessionRepository: DeliverySessionRepository,
   val serviceCategoryRepository: ServiceCategoryRepository,
   val userTypeChecker: UserTypeChecker,
-  val communityAPIReferralService: CommunityAPIReferralService,
+  val ramDeliusReferralService: RamDeliusReferralService,
   val assessRisksAndNeedsService: RisksAndNeedsService,
   val supplierAssessmentService: SupplierAssessmentService,
   val hmppsAuthService: HMPPSAuthService,
@@ -435,7 +435,7 @@ class DraftReferralService(
      * duplicate NSIs in nDelius on user retry.
      */
     submitAdditionalRiskInformation(referral, user)
-    communityAPIReferralService.send(referral)
+    ramDeliusReferralService.send(referral)
 
     val sentReferral = referralRepository.save(referral)
     createReferralLocation(draftReferral, sentReferral)
