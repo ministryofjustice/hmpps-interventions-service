@@ -31,33 +31,12 @@ class CommunityAPIClient(
       .subscribe()
   }
 
-  fun makeAsyncPatchRequest(uri: String, requestBody: Any) {
-    communityApiClient.patch(uri, requestBody)
-      .retrieve()
-      .bodyToMono(Unit::class.java)
-      .onErrorResume { e ->
-        handleResponse(e, requestBody)
-        Mono.empty()
-      }
-      .subscribe()
-  }
-
   fun <T : Any> makeSyncPostRequest(uri: String, requestBody: Any, responseBodyClass: Class<T>): T {
     return communityApiClient.post(uri, requestBody)
       .retrieve()
       .bodyToMono(responseBodyClass)
       .onErrorMap { e ->
         handleResponse(e, requestBody)
-      }
-      .block()
-  }
-
-  fun <T : Any> makeSyncGetRequest(uri: String, responseBodyClass: Class<T>): T {
-    return communityApiClient.get(uri)
-      .retrieve()
-      .bodyToMono(responseBodyClass)
-      .onErrorMap { e ->
-        handleResponse(e, "")
       }
       .block()
   }

@@ -4,7 +4,6 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.CommunityAPIClient
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.SNSPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.PersonIdentifier
@@ -13,7 +12,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEnd
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralEndRequest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import java.time.OffsetDateTime
@@ -51,14 +49,10 @@ private fun referralEndingEvent(state: ReferralConcludedState): ReferralEndingEv
 
 internal class ReferralEndingListenerTest {
   private val snsPublisher = mock<SNSPublisher>()
-  private val communityAPIClient = mock<CommunityAPIClient>()
   private val listener = ReferralEndingListener(
     "http://testUrl",
     "/pp/referral/{id}",
-    "secure/offenders/crn/{crn}/referral/end/context/{contextName}",
-    "commissioned-rehabilitation-services",
-    snsPublisher,
-    communityAPIClient,
+    snsPublisher
   )
 
   @ParameterizedTest
@@ -85,26 +79,5 @@ internal class ReferralEndingListenerTest {
       ),
     )
     verify(snsPublisher).publish(event.referral.id, AuthUser.interventionsServiceUser, eventPayload)
-  }
-
-  @ParameterizedTest
-  @EnumSource(ReferralConcludedState::class)
-  fun `terminates the NSI`(state: ReferralConcludedState) {
-    val event = referralEndingEvent(state)
-    listener.onApplicationEvent(event)
-
-    verify(communityAPIClient).makeAsyncPostRequest(
-      "secure/offenders/crn/T123000/referral/end/context/commissioned-rehabilitation-services",
-      ReferralEndRequest(
-        contractType = "ACC",
-        startedAt = sentAtDefault,
-        endedAt = cancelledAtDefault,
-        sentenceId = 123456789,
-        referralId = event.referral.id,
-        endType = state.name,
-        notes = "Referral Ended for Accommodation Referral HAS71263 with Prime Provider Harmony Living\n" +
-          "http://testUrl/pp/referral/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
-      )
-    )
   }
 }

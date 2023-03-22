@@ -84,25 +84,6 @@ class CommunityAPIClientTest {
   }
 
   @Test
-  fun `makes async patch request successfully`() {
-
-    communityAPIClient = CommunityAPIClient(
-      RestClient(WebClient.builder().exchangeFunction(exchangeFunction).build(), "client-registration-id"),
-      objectMapper
-    )
-    whenever(exchangeFunction.exchange(any())).thenReturn(Mono.empty())
-
-    communityAPIClient.makeAsyncPatchRequest("/uriValue", referralSentEvent)
-
-    verify(exchangeFunction, times(1)).exchange(any())
-    val requestCaptor = argumentCaptor<ClientRequest>()
-    verify(exchangeFunction).exchange(requestCaptor.capture())
-    val requestDetails = requestCaptor.firstValue
-
-    assertThat("/uriValue").isEqualTo(requestDetails.url().toString())
-  }
-
-  @Test
   fun `error was logged on exception during async post request`() {
 
     communityAPIClient = CommunityAPIClient(
