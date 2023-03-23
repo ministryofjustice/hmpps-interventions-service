@@ -33,3 +33,9 @@ env:
   AWS_S3_NDMIS_ENABLED: "true"
   OVERRIDES_SHOWFUTUREINTERVENTIONS: "false"
   FEATUREFLAGS_CURRENTLOCATION_ENABLED: "true"
+
+spring:
+  batch:
+    jobs:
+      mark-stale-appointments:
+        appointments: 75834134-3fdf-4b29-ae6f-af8eff441cd0
