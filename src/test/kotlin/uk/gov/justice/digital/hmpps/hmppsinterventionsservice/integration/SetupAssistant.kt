@@ -797,8 +797,8 @@ class SetupAssistant(
     deliverySessionRepository.save(deliverySession)
     return appointment
   }
-  fun changeAppointmentId(targetAppointment: Appointment, deliverySession: DeliverySession) {
-    targetAppointment.id = UUID.fromString("82e2fbbe-1bb4-4967-8ee6-81aa072fd44b")
+  fun changeAppointmentId(targetAppointment: Appointment, newId: UUID, deliverySession: DeliverySession) {
+    targetAppointment.id = newId
     appointmentRepository.save(targetAppointment)
     deliverySessionRepository.save(deliverySession)
   }

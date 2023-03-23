@@ -5,6 +5,8 @@ import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
+import org.springframework.batch.core.job.DefaultJobParametersValidator
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -18,8 +20,9 @@ class MarkStaleAppointmentsJobConfiguration(
   private val jobBuilderFactory: JobBuilderFactory,
   private val stepBuilderFactory: StepBuilderFactory,
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
+  @Value("\${spring.batch.jobs.mark-stale-appointments.appointments}")
+  private val appointmentsStr: String,
 ) {
-
   @Bean
   fun markStaleAppointmentsJobLauncher(markStaleAppointmentsJob: Job): ApplicationRunner {
     return onStartupJobLauncherFactory.makeBatchLauncher(markStaleAppointmentsJob)
@@ -27,7 +30,14 @@ class MarkStaleAppointmentsJobConfiguration(
 
   @Bean
   fun markStaleAppointmentsJob(markStaleAppointmentsStep: Step): Job {
+    val validator = DefaultJobParametersValidator()
+    validator.setRequiredKeys(
+      arrayOf(
+        "appointmentStr",
+      ),
+    )
     return jobBuilderFactory["markStaleAppointmentsJob"]
+      .validator(validator)
       .incrementer(TimestampIncrementer())
       .start(markStaleAppointmentsStep)
       .build()
