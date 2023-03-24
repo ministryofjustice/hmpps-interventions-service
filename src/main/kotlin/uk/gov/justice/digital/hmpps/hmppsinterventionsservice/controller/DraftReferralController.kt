@@ -34,7 +34,7 @@ class DraftReferralController(
   private val draftReferralService: DraftReferralService,
   private val referralConcluder: ReferralConcluder,
   private val userMapper: UserMapper,
-  private val draftOasysRiskInformationService: DraftOasysRiskInformationService
+  private val draftOasysRiskInformationService: DraftOasysRiskInformationService,
 ) {
   companion object : KLogging()
 
@@ -107,7 +107,7 @@ class DraftReferralController(
   fun setDraftReferralDesiredOutcomes(
     authentication: JwtAuthenticationToken,
     @PathVariable id: UUID,
-    @RequestBody request: SelectedDesiredOutcomesDTO
+    @RequestBody request: SelectedDesiredOutcomesDTO,
   ): DraftReferralDTO {
     val referral = getDraftReferralForAuthenticatedUser(authentication, id)
     val updatedReferral = draftReferralService.updateDraftReferralDesiredOutcomes(referral, request.serviceCategoryId, request.desiredOutcomesIds)
@@ -118,7 +118,7 @@ class DraftReferralController(
   fun setDraftReferralOasysRiskInformation(
     authentication: JwtAuthenticationToken,
     @PathVariable id: UUID,
-    @RequestBody request: DraftOasysRiskInformationDTO
+    @RequestBody request: DraftOasysRiskInformationDTO,
   ): DraftOasysRiskInformationDTO {
     val referral = getDraftReferralForAuthenticatedUser(authentication, id)
     val user = userMapper.fromToken(authentication)
@@ -129,7 +129,7 @@ class DraftReferralController(
   @GetMapping("/draft-referral/{id}/oasys-risk-information")
   fun getDraftReferralOasysRiskInformation(
     authentication: JwtAuthenticationToken,
-    @PathVariable id: UUID
+    @PathVariable id: UUID,
   ): DraftOasysRiskInformationDTO {
     // check that user has access to referral
     val referral = getDraftReferralForAuthenticatedUser(authentication, id)

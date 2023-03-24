@@ -33,9 +33,13 @@ import java.util.UUID
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class PactTest : IntegrationTestBase() {
   @MockBean private lateinit var communityAPIOffenderService: CommunityAPIOffenderService
+
   @MockBean private lateinit var ramDeliusReferralService: RamDeliusReferralService
+
   @MockBean private lateinit var risksAndNeedsService: RisksAndNeedsService
+
   @MockBean private lateinit var hmppsAuthService: HMPPSAuthService
+
   @MockBean private lateinit var serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper
 
   private val serviceProviderFactory = ServiceProviderFactory()

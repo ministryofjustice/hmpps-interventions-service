@@ -66,7 +66,7 @@ class ReferralService(
   @Lazy val amendReferralService: AmendReferralService,
   val hmppsAuthService: HMPPSAuthService,
   val telemetryService: TelemetryService,
-  val referralDetailsRepository: ReferralDetailsRepository
+  val referralDetailsRepository: ReferralDetailsRepository,
 ) {
   companion object {
     private val logger = KotlinLogging.logger {}

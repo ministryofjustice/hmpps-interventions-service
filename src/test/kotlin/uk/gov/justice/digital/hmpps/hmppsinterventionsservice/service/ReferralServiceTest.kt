@@ -132,7 +132,7 @@ class ReferralServiceTest @Autowired constructor(
     amendReferralService,
     hmppsAuthService,
     telemetryService,
-    referralDetailsRepository
+    referralDetailsRepository,
   )
 
   companion object {
@@ -338,7 +338,7 @@ class ReferralServiceTest @Autowired constructor(
         null,
         null,
         null,
-        pageable
+        pageable,
       ) as Page<SentReferralSummary>
       assertThat(page.content.size).isEqualTo(pageSize)
       assertThat(page.totalElements).isEqualTo(8)
@@ -349,7 +349,7 @@ class ReferralServiceTest @Autowired constructor(
         null,
         null,
         null,
-        pageable.next()
+        pageable.next(),
       ) as Page<SentReferralSummary>
 
       assertThat(secondPage.content.size).isEqualTo(3)
@@ -836,7 +836,7 @@ class ReferralServiceTest @Autowired constructor(
         concludedAt = OffsetDateTime.now(),
         endOfServiceReport = null,
         createdBy = ppUser,
-        actionPlans = mutableListOf(actionPlanFactory.create(submittedAt = null))
+        actionPlans = mutableListOf(actionPlanFactory.create(submittedAt = null)),
       )
       val appointment =
         appointmentFactory.create(referral = cancelledReferral, attendanceSubmittedAt = null)

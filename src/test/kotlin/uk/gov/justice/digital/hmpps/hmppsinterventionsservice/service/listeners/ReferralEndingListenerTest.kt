@@ -52,7 +52,7 @@ internal class ReferralEndingListenerTest {
   private val listener = ReferralEndingListener(
     "http://testUrl",
     "/pp/referral/{id}",
-    snsPublisher
+    snsPublisher,
   )
 
   @ParameterizedTest

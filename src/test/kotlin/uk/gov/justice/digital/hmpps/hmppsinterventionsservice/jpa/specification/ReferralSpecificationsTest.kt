@@ -76,7 +76,11 @@ class ReferralSpecificationsTest @Autowired constructor(
         if (a
           .truncatedTo(ChronoUnit.SECONDS)
           .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
-        ) 0 else 1
+        ) {
+          0
+        } else {
+          1
+        }
       } else { 0 }
     }
     recursiveComparisonConfiguration = recursiveComparisonConfigurationBuilder

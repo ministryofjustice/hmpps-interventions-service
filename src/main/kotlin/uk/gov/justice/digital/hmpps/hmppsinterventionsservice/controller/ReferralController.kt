@@ -51,7 +51,7 @@ class ReferralController(
   private val clientApiAccessChecker: ClientApiAccessChecker,
   private val cancellationReasonMapper: CancellationReasonMapper,
   private val actionPlanService: ActionPlanService,
-  private val telemetryClient: TelemetryClient
+  private val telemetryClient: TelemetryClient,
 ) {
   companion object : KLogging()
 
@@ -147,6 +147,7 @@ class ReferralController(
       referralConcluder.requiresEndOfServiceReportCreation(sentReferral),
     )
   }
+
   @GetMapping("/service-category/{id}")
   fun getServiceCategoryByID(@PathVariable id: UUID): ServiceCategoryFullDTO {
     return serviceCategoryService.getServiceCategoryByID(id)

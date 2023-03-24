@@ -88,7 +88,7 @@ class ReferralServiceUnitTest {
     amendReferralService,
     hmppsAuthService,
     telemetryService,
-    referralDetailsRepository
+    referralDetailsRepository,
   )
 
   @Test

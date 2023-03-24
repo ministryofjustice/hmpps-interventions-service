@@ -63,7 +63,7 @@ class WebClientConfiguration(
   fun ramDeliusApiClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient {
     return RestClient(
       createAuthorizedWebClient(authorizedClientManager, ramDelius),
-      interventionsClientRegistrationId
+      interventionsClientRegistrationId,
     )
   }
 

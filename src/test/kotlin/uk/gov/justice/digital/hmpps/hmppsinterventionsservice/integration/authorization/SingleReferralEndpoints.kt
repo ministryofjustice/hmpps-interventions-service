@@ -27,7 +27,11 @@ class SingleReferralEndpoints : IntegrationTestBase() {
   @MockBean lateinit var mockHmppsAuthService: HMPPSAuthService
 
   @MockBean lateinit var mockCommunityAPIOffenderService: CommunityAPIOffenderService
-  @MockBean @Suppress("UNUSED") lateinit var ramDeliusReferralService: RamDeliusReferralService
+
+  @MockBean
+  @Suppress("UNUSED")
+  lateinit var ramDeliusReferralService: RamDeliusReferralService
+
   @MockBean lateinit var mockRisksAndNeedsService: RisksAndNeedsService
 
   private lateinit var requestFactory: RequestFactory
