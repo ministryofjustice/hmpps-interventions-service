@@ -37,8 +37,8 @@ internal class CommunityAPIBookingServiceTest {
     relevantSentenceId = 123L,
     referenceNumber = "XX123456",
     intervention = interventionFactory.create(
-      contract = dynamicFrameworkContractFactory.create(primeProvider = ServiceProvider("SPN", "SPN"))
-    )
+      contract = dynamicFrameworkContractFactory.create(primeProvider = ServiceProvider("SPN", "SPN")),
+    ),
   )
 
   private val httpBaseUrl = "http://url"
@@ -64,7 +64,7 @@ internal class CommunityAPIBookingServiceTest {
     mapOf(AppointmentType.SERVICE_DELIVERY to "Service Delivery"),
     mapOf(AppointmentType.SERVICE_DELIVERY to true),
     crsBookingsContext,
-    communityAPIClient
+    communityAPIClient,
   )
 
   @Nested
@@ -87,7 +87,7 @@ internal class CommunityAPIBookingServiceTest {
         notes = notes,
         true,
         null,
-        null
+        null,
       )
       val response = AppointmentResponseDTO(1234L)
 
@@ -117,7 +117,7 @@ internal class CommunityAPIBookingServiceTest {
         notes = notes,
         true,
         null,
-        null
+        null,
       )
       val response = AppointmentResponseDTO(1234L)
 
@@ -147,7 +147,7 @@ internal class CommunityAPIBookingServiceTest {
         notes = notes,
         true,
         "YES",
-        true
+        true,
       )
       val response = AppointmentResponseDTO(1234L)
 
@@ -177,7 +177,7 @@ internal class CommunityAPIBookingServiceTest {
         notes = notes,
         true,
         "NO",
-        true
+        true,
       )
       val response = AppointmentResponseDTO(1234L)
 
@@ -372,7 +372,7 @@ internal class CommunityAPIBookingServiceTest {
       mapOf(),
       mapOf(),
       crsBookingsContext,
-      communityAPIClient
+      communityAPIClient,
     )
 
     val deliusAppointmentId = communityAPIBookingServiceNotEnabled.book(referral, appointment, now(), 60, SERVICE_DELIVERY, null, null, null)
@@ -397,7 +397,7 @@ internal class CommunityAPIBookingServiceTest {
       mapOf(),
       mapOf(),
       crsBookingsContext,
-      communityAPIClient
+      communityAPIClient,
     )
 
     val deliusAppointmentId = communityAPIBookingServiceNotEnabled.book(referral, appointment, now(), 60, SERVICE_DELIVERY, null, null, null)

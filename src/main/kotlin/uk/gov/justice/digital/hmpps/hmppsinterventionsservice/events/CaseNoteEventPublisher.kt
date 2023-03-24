@@ -32,7 +32,7 @@ class CaseNoteEventPublisher(
         caseNote.sentBy,
         caseNoteUrl(caseNote),
         caseNote.referral.id,
-      )
+      ),
     )
   }
 

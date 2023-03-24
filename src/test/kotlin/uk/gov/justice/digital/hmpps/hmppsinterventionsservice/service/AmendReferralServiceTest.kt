@@ -54,7 +54,7 @@ class AmendReferralServiceTest @Autowired constructor(
   val endOfServiceReportRepository: EndOfServiceReportRepository,
   val serviceCategoryRepository: ServiceCategoryRepository,
   val desiredOutcomeRepository: DesiredOutcomeRepository,
-  val changelogRepository: ChangelogRepository
+  val changelogRepository: ChangelogRepository,
 ) {
 
   private val referralEventPublisher: ReferralEventPublisher = mock()
@@ -77,7 +77,7 @@ class AmendReferralServiceTest @Autowired constructor(
     complexityLevelRepository,
     desiredOutcomeRepository,
     userMapper,
-    referralService
+    referralService,
   )
 
   @AfterEach
@@ -98,12 +98,12 @@ class AmendReferralServiceTest @Autowired constructor(
 
     val serviceCategory = serviceCategoryFactory.create(
       id = serviceCategoryId,
-      desiredOutcomes = listOf(desiredOutcome1, desiredOutcome2)
+      desiredOutcomes = listOf(desiredOutcome1, desiredOutcome2),
     )
     val referral = referralFactory.createSent(
       selectedServiceCategories = mutableSetOf(serviceCategory),
       desiredOutcomes = mutableListOf(desiredOutcome1),
-      createdBy = someoneElse
+      createdBy = someoneElse,
     )
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
     whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
@@ -112,7 +112,7 @@ class AmendReferralServiceTest @Autowired constructor(
       referral.id,
       AmendDesiredOutcomesDTO(listOf(desiredOutcome2.id), "needs changing"),
       jwtAuthenticationToken,
-      serviceCategory.id
+      serviceCategory.id,
     )
     val changelog = entityManager.entityManager.createQuery("FROM Changelog u WHERE u.referralId = :referralId")
       .setParameter("referralId", referral.id)
@@ -136,7 +136,7 @@ class AmendReferralServiceTest @Autowired constructor(
 
     val referral = referralFactory.createSent(
       hasAdditionalResponsibilities = false,
-      createdBy = someoneElse
+      createdBy = someoneElse,
     )
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
     whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
@@ -144,7 +144,7 @@ class AmendReferralServiceTest @Autowired constructor(
     amendReferralService.amendCaringOrEmploymentResponsibilities(
       referral.id,
       AmendNeedsAndRequirementsDTO(hasAdditionalResponsibilities = true, whenUnavailable = "9-12AM", reasonForChange = "needs changing"),
-      jwtAuthenticationToken
+      jwtAuthenticationToken,
     )
     val changelog = entityManager.entityManager.createQuery("FROM Changelog u WHERE u.referralId = :referralId")
       .setParameter("referralId", referral.id)
@@ -161,6 +161,7 @@ class AmendReferralServiceTest @Autowired constructor(
     assertThat(newReferral.hasAdditionalResponsibilities).isTrue
     assertThat(newReferral.whenUnavailable).isEqualTo("9-12AM")
   }
+
   @Test
   fun `amend needs and requirements for accessibility needs `() {
     val someoneElse = userFactory.create("helper_pp_user", "delius")
@@ -168,7 +169,7 @@ class AmendReferralServiceTest @Autowired constructor(
 
     val referral = referralFactory.createSent(
       accessibilityNeeds = "school",
-      createdBy = someoneElse
+      createdBy = someoneElse,
     )
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
     whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
@@ -176,7 +177,7 @@ class AmendReferralServiceTest @Autowired constructor(
     amendReferralService.amendAccessibilityNeeds(
       referral.id,
       AmendNeedsAndRequirementsDTO(accessibilityNeeds = "Home", reasonForChange = "needs changing"),
-      jwtAuthenticationToken
+      jwtAuthenticationToken,
     )
     val changelog = entityManager.entityManager.createQuery("FROM Changelog u WHERE u.referralId = :referralId")
       .setParameter("referralId", referral.id)
@@ -196,7 +197,7 @@ class AmendReferralServiceTest @Autowired constructor(
 
     val referral = referralFactory.createSent(
       additionalNeedsInformation = "school",
-      createdBy = someoneElse
+      createdBy = someoneElse,
     )
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
     whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
@@ -204,7 +205,7 @@ class AmendReferralServiceTest @Autowired constructor(
     amendReferralService.amendIdentifyNeeds(
       referral.id,
       AmendNeedsAndRequirementsDTO(additionalNeedsInformation = "Home", reasonForChange = "needs changing"),
-      jwtAuthenticationToken
+      jwtAuthenticationToken,
     )
     val changelog = entityManager.entityManager.createQuery("FROM Changelog u WHERE u.referralId = :referralId")
       .setParameter("referralId", referral.id)
@@ -224,7 +225,7 @@ class AmendReferralServiceTest @Autowired constructor(
 
     val referral = referralFactory.createSent(
       needsInterpreter = false,
-      createdBy = someoneElse
+      createdBy = someoneElse,
     )
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
     whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
@@ -232,7 +233,7 @@ class AmendReferralServiceTest @Autowired constructor(
     amendReferralService.amendInterpreterRequired(
       referral.id,
       AmendNeedsAndRequirementsDTO(needsInterpreter = true, interpreterLanguage = "Yoruba", reasonForChange = "needs changing"),
-      jwtAuthenticationToken
+      jwtAuthenticationToken,
     )
     val changelog = entityManager.entityManager.createQuery("FROM Changelog u WHERE u.referralId = :referralId")
       .setParameter("referralId", referral.id)
@@ -252,7 +253,6 @@ class AmendReferralServiceTest @Autowired constructor(
 
   @Test
   fun `find changelog by changelogId`() {
-
     val someoneElse = userFactory.create("helper_pp_user", "delius")
     val user = userFactory.create("pp_user_1", "delius")
 
@@ -261,7 +261,7 @@ class AmendReferralServiceTest @Autowired constructor(
 
     val referral = referralFactory.createSent(
       needsInterpreter = false,
-      createdBy = someoneElse
+      createdBy = someoneElse,
     )
 
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
@@ -278,7 +278,7 @@ class AmendReferralServiceTest @Autowired constructor(
       topic = AmendTopic.NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS,
       oldVal = ReferralAmendmentDetails(listOf("wheelchair")),
       newVal = ReferralAmendmentDetails(listOf("hearing aid")),
-      changedBy = someoneElse
+      changedBy = someoneElse,
     )
     val changelog2 = changeLogFactory.create(
       id = uuid2,
@@ -286,7 +286,7 @@ class AmendReferralServiceTest @Autowired constructor(
       topic = AmendTopic.COMPLEXITY_LEVEL,
       oldVal = ReferralAmendmentDetails(listOf(complexityLevel1.id.toString())),
       newVal = ReferralAmendmentDetails(listOf(complexityLevel2.id.toString())),
-      changedBy = user
+      changedBy = user,
     )
     changeLogFactory.create(
       id = uuid3,
@@ -294,7 +294,7 @@ class AmendReferralServiceTest @Autowired constructor(
       topic = AmendTopic.DESIRED_OUTCOMES,
       oldVal = ReferralAmendmentDetails(listOf("301ead30-30a4-4c7c-8296-2768abfb59b5")),
       newVal = ReferralAmendmentDetails(listOf("65924ac6-9724-455b-ad30-906936291421")),
-      changedBy = user
+      changedBy = user,
     )
 
     val changelog = amendReferralService.getChangeLogById(changelog2.id, jwtAuthenticationToken)
@@ -306,7 +306,6 @@ class AmendReferralServiceTest @Autowired constructor(
 
   @Test
   fun `find changelog by changelogId for desired outcomes`() {
-
     val someoneElse = userFactory.create("helper_pp_user", "delius")
     val user = userFactory.create("pp_user_1", "delius")
     val serviceCategoryId = UUID.randomUUID()
@@ -315,12 +314,12 @@ class AmendReferralServiceTest @Autowired constructor(
 
     val serviceCategory = serviceCategoryFactory.create(
       id = serviceCategoryId,
-      desiredOutcomes = listOf(desiredOutcome1, desiredOutcome2)
+      desiredOutcomes = listOf(desiredOutcome1, desiredOutcome2),
     )
     val referral = referralFactory.createSent(
       selectedServiceCategories = mutableSetOf(serviceCategory),
       desiredOutcomes = mutableListOf(desiredOutcome1, desiredOutcome2),
-      createdBy = someoneElse
+      createdBy = someoneElse,
     )
 
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
@@ -334,7 +333,7 @@ class AmendReferralServiceTest @Autowired constructor(
       topic = AmendTopic.NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS,
       oldVal = ReferralAmendmentDetails(listOf("018e8ef3-9645-4712-898e-c913e2bb5bd9")),
       newVal = ReferralAmendmentDetails(listOf("hearing aid")),
-      changedBy = someoneElse
+      changedBy = someoneElse,
     )
     val changelog2 = changeLogFactory.create(
       id = uuid3,
@@ -342,7 +341,7 @@ class AmendReferralServiceTest @Autowired constructor(
       topic = AmendTopic.DESIRED_OUTCOMES,
       oldVal = ReferralAmendmentDetails(listOf(desiredOutcome1.id.toString())),
       newVal = ReferralAmendmentDetails(listOf(desiredOutcome2.id.toString())),
-      changedBy = user
+      changedBy = user,
     )
 
     val changelog = amendReferralService.getChangeLogById(changelog2.id, jwtAuthenticationToken)
@@ -354,14 +353,13 @@ class AmendReferralServiceTest @Autowired constructor(
 
   @Test
   fun `find changelog by changelogId for interpreter required`() {
-
     val someoneElse = userFactory.create("helper_pp_user", "delius")
     val user = userFactory.create("pp_user_1", "delius")
 
     val referral = referralFactory.createSent(
       needsInterpreter = true,
       interpreterLanguage = "french",
-      createdBy = someoneElse
+      createdBy = someoneElse,
     )
 
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
@@ -374,7 +372,7 @@ class AmendReferralServiceTest @Autowired constructor(
       topic = AmendTopic.NEEDS_AND_REQUIREMENTS_INTERPRETER_REQUIRED,
       oldVal = ReferralAmendmentDetails(listOf("false")),
       newVal = ReferralAmendmentDetails(listOf("true", "French")),
-      changedBy = someoneElse
+      changedBy = someoneElse,
     )
 
     val changelog = amendReferralService.getChangeLogById(changelog1.id, jwtAuthenticationToken)
@@ -386,14 +384,13 @@ class AmendReferralServiceTest @Autowired constructor(
 
   @Test
   fun `find changelog by changelogId for employment responsibilities`() {
-
     val someoneElse = userFactory.create("helper_pp_user", "delius")
     val user = userFactory.create("pp_user_1", "delius")
 
     val referral = referralFactory.createSent(
       needsInterpreter = true,
       interpreterLanguage = "french",
-      createdBy = someoneElse
+      createdBy = someoneElse,
     )
 
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
@@ -406,7 +403,7 @@ class AmendReferralServiceTest @Autowired constructor(
       topic = AmendTopic.NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES,
       oldVal = ReferralAmendmentDetails(listOf("false")),
       newVal = ReferralAmendmentDetails(listOf("true", "will not available wednesday mornings")),
-      changedBy = someoneElse
+      changedBy = someoneElse,
     )
 
     val changelog = amendReferralService.getChangeLogById(changelog1.id, jwtAuthenticationToken)
@@ -418,14 +415,13 @@ class AmendReferralServiceTest @Autowired constructor(
 
   @Test
   fun `find changelog by changelogId for completion date`() {
-
     val someoneElse = userFactory.create("helper_pp_user", "delius")
     val user = userFactory.create("pp_user_1", "delius")
 
     val referral = referralFactory.createSent(
       needsInterpreter = true,
       interpreterLanguage = "french",
-      createdBy = someoneElse
+      createdBy = someoneElse,
     )
 
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
@@ -438,7 +434,7 @@ class AmendReferralServiceTest @Autowired constructor(
       topic = AmendTopic.COMPLETION_DATETIME,
       oldVal = ReferralAmendmentDetails(listOf("2023-02-14")),
       newVal = ReferralAmendmentDetails(listOf("2023-03-14")),
-      changedBy = someoneElse
+      changedBy = someoneElse,
     )
 
     val changelog = amendReferralService.getChangeLogById(changelog1.id, jwtAuthenticationToken)
@@ -450,13 +446,12 @@ class AmendReferralServiceTest @Autowired constructor(
 
   @Test
   fun `find changelog throws 404 when changelog is not found`() {
-
     val someoneElse = userFactory.create("helper_pp_user", "delius")
     val user = userFactory.create("pp_user_1", "delius")
 
     val referral = referralFactory.createSent(
       needsInterpreter = false,
-      createdBy = someoneElse
+      createdBy = someoneElse,
     )
 
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
@@ -468,6 +463,7 @@ class AmendReferralServiceTest @Autowired constructor(
     }
     assertThat(exception.message).contains("Change log not found for [id=$uuid1]")
   }
+
   @Test
   fun `log change writes changelog data`() {
     val user = userFactory.create("pp_user_1", "delius")
@@ -481,7 +477,7 @@ class AmendReferralServiceTest @Autowired constructor(
       id = id,
       sentAt = OffsetDateTime.now(),
       serviceUserCRN = "crn",
-      intervention = intervention
+      intervention = intervention,
     )
     val referralDetails = referralDetailsFactory.create(
       referralId = id,
@@ -489,7 +485,7 @@ class AmendReferralServiceTest @Autowired constructor(
       createdBy = user,
       id = UUID.randomUUID(),
       maximumNumberOfEnforceableDays = 15,
-      saved = true
+      saved = true,
     )
 
     val referralToUpdate = UpdateReferralDetailsDTO(20, null, "new information", null, null, "we decided 10 days wasn't enough")

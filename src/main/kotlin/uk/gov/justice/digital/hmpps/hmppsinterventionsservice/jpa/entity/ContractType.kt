@@ -17,7 +17,7 @@ data class ContractType(
   @JoinTable(
     name = "contract_type_service_category",
     joinColumns = [JoinColumn(name = "contract_type_id")],
-    inverseJoinColumns = [JoinColumn(name = "service_category_id")]
+    inverseJoinColumns = [JoinColumn(name = "service_category_id")],
   )
   val serviceCategories: Set<ServiceCategory> = setOf(),
 )

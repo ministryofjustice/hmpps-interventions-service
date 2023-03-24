@@ -11,7 +11,7 @@ data class ChangelogDetailsDTO(
   val oldValue: List<String>,
   val newValue: List<String>,
   val name: String,
-  val reasonForChange: String
+  val reasonForChange: String,
 ) {
   companion object {
     fun from(changelogUpdateDTO: ChangelogUpdateDTO, userDetail: UserDetail): ChangelogDetailsDTO {
@@ -44,7 +44,7 @@ data class ChangelogDetailsDTO(
         oldValue = oldValue.ifEmpty { changelog.oldVal.values },
         newValue = newValue.ifEmpty { changelog.newVal.values },
         name = userDetail.firstName + ' ' + userDetail.lastName,
-        reasonForChange = changelog.reasonForChange
+        reasonForChange = changelog.reasonForChange,
       )
     }
   }

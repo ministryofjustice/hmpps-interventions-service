@@ -36,9 +36,8 @@ class ActionPlanService(
     referralId: UUID,
     numberOfSessions: Int?,
     activities: List<ActionPlanActivity>,
-    createdByUser: AuthUser
+    createdByUser: AuthUser,
   ): ActionPlan {
-
     val draftActionPlan = ActionPlan(
       id = randomUUID(),
       numberOfSessions = numberOfSessions,
@@ -142,7 +141,7 @@ class ActionPlanService(
   private fun updateDraftActivityPlan(
     draftActionPlan: ActionPlan,
     numberOfSessions: Int?,
-    newActivity: ActionPlanActivity?
+    newActivity: ActionPlanActivity?,
   ) {
     numberOfSessions?.let {
       draftActionPlan.numberOfSessions = it

@@ -49,7 +49,7 @@ class SentReferralDTO(
         concludedAt = referral.concludedAt,
         supplementaryRiskId = referral.supplementaryRiskId!!,
         endOfServiceReportCreationRequired = endOfServiceReportRequired,
-        createdBy = AuthUserDTO.from(referral.createdBy)
+        createdBy = AuthUserDTO.from(referral.createdBy),
       )
     }
   }

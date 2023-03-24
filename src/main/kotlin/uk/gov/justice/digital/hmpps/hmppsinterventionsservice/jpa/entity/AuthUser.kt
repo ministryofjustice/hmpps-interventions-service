@@ -7,7 +7,8 @@ import javax.validation.constraints.NotNull
 
 @Entity
 data class AuthUser(
-  @Id @NotNull val id: String,
+  @Id @NotNull
+  val id: String,
   @NotNull val authSource: String,
   @NotNull val userName: String,
   var deleted: Boolean? = null,

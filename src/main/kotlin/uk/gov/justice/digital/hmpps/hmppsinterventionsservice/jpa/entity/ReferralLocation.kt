@@ -16,7 +16,11 @@ import javax.persistence.OneToOne
 data class ReferralLocation(
   @Id val id: UUID,
   @OneToOne(fetch = FetchType.LAZY) val referral: Referral,
-  @Type(type = "person_current_location_type") @Enumerated(EnumType.STRING) @NotNull @Column(name = "type") val type: PersonCurrentLocationType,
+  @Type(type = "person_current_location_type")
+  @Enumerated(EnumType.STRING)
+  @NotNull
+  @Column(name = "type")
+  val type: PersonCurrentLocationType,
   @Column(name = "prison_id") val prisonId: String?,
   @Column(name = "expected_release_date") val expectedReleaseDate: LocalDate?,
   @Column(name = "expected_release_date_missing_reason") val expectedReleaseDateMissingReason: String?,

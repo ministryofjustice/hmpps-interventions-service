@@ -21,7 +21,7 @@ class ReferralEvent(
   val type: ReferralEventType,
   val referral: Referral,
   val detailUrl: String,
-  val data: Map<String, Any?> = emptyMap()
+  val data: Map<String, Any?> = emptyMap(),
 ) : ApplicationEvent(source) {
   override fun toString(): String {
     return "ReferralEvent(type=$type, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
@@ -53,7 +53,7 @@ class ReferralConcludedEvent(
 @Component
 class ReferralEventPublisher(
   private val applicationEventPublisher: ApplicationEventPublisher,
-  private val locationMapper: LocationMapper
+  private val locationMapper: LocationMapper,
 ) {
   companion object : KLogging()
 
@@ -88,16 +88,19 @@ class ReferralEventPublisher(
   fun referralDetailsChangedEvent(referral: Referral, newDetails: ReferralDetails, previousDetails: ReferralDetails) {
     applicationEventPublisher.publishEvent(
       ReferralEvent(
-        this, ReferralEventType.DETAILS_AMENDED, referral, getSentReferralURL(referral),
+        this,
+        ReferralEventType.DETAILS_AMENDED,
+        referral,
+        getSentReferralURL(referral),
         mapOf(
           "newDetails" to ReferralDetailsDTO.from(newDetails),
           "previousDetails" to ReferralDetailsDTO.from(previousDetails),
           "currentAssignee" to referral.currentAssignee?.let { AuthUserDTO.from(it) },
           "crn" to referral.serviceUserCRN,
           "sentBy" to referral.sentBy,
-          "createdBy" to referral.createdBy
-        )
-      )
+          "createdBy" to referral.createdBy,
+        ),
+      ),
     )
   }
 

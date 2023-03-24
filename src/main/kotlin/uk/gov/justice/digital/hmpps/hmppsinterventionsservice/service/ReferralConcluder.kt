@@ -14,7 +14,7 @@ import java.time.OffsetDateTime
 enum class DeliveryState(
   val requiresEndOfServiceReport: Boolean,
   val inProgress: Boolean,
-  val concludedState: ReferralConcludedState
+  val concludedState: ReferralConcludedState,
 ) {
   NOT_DELIVERING_YET(false, true, ReferralConcludedState.CANCELLED),
   MISSING_FIRST_SUBSTANTIVE_APPOINTMENT(false, true, ReferralConcludedState.CANCELLED),
@@ -65,10 +65,11 @@ class ReferralConcluder(
 
     val numberOfSessionsWithAttendanceRecord = countSessionsWithAttendanceRecord(referral)
     val allSessionsHaveAttendance = approvedActionPlan.numberOfSessions == numberOfSessionsWithAttendanceRecord
-    return if (allSessionsHaveAttendance)
+    return if (allSessionsHaveAttendance) {
       DeliveryState.COMPLETED
-    else
+    } else {
       DeliveryState.IN_PROGRESS
+    }
   }
 
   fun requiresEndOfServiceReportCreation(referral: Referral): Boolean {
@@ -83,10 +84,11 @@ class ReferralConcluder(
   }
 
   private fun endState(deliveryState: DeliveryState, endOfServiceReport: EndOfServiceReport?): ReferralEndState {
-    return if (deliveryState.requiresEndOfServiceReport && endOfServiceReport?.submittedAt == null)
+    return if (deliveryState.requiresEndOfServiceReport && endOfServiceReport?.submittedAt == null) {
       ReferralEndState.AWAITING_END_OF_SERVICE_REPORT
-    else
+    } else {
       ReferralEndState.CAN_CONCLUDE
+    }
   }
 
   private fun countSessionsWithAttendanceRecord(referral: Referral): Int {

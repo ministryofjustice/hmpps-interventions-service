@@ -13,7 +13,7 @@ data class SentReferralSummariesDTO(
   val serviceUser: ServiceUserDTO,
   val serviceProvider: ServiceProviderDTO,
   val interventionTitle: String,
-  val concludedAt: OffsetDateTime?
+  val concludedAt: OffsetDateTime?,
 ) {
   companion object {
     fun from(referral: SentReferralSummary): SentReferralSummariesDTO {
@@ -26,7 +26,7 @@ data class SentReferralSummariesDTO(
         serviceUser = ServiceUserDTO.from(referral.serviceUserCRN, referral.serviceUserData),
         serviceProvider = ServiceProviderDTO.from(referral.intervention.dynamicFrameworkContract.primeProvider),
         interventionTitle = referral.intervention.title,
-        concludedAt = referral.concludedAt
+        concludedAt = referral.concludedAt,
       )
     }
   }

@@ -16,9 +16,12 @@ class ActionPlanContracts(private val setupAssistant: SetupAssistant) {
     val referral = setupAssistant.createSentReferral()
     setupAssistant.createActionPlan(id = UUID.fromString("81987e8b-aeb9-4fbf-8ecb-1a054ad74b2d"), numberOfSessions = 1, referral = referral)
     setupAssistant.createDeliverySession(
-      1, 120, OffsetDateTime.parse("2021-05-13T13:30:00+01:00"),
-      Attended.LATE, "Alex missed the bus",
-      referral = referral
+      1,
+      120,
+      OffsetDateTime.parse("2021-05-13T13:30:00+01:00"),
+      Attended.LATE,
+      "Alex missed the bus",
+      referral = referral,
     )
   }
 
@@ -36,14 +39,14 @@ class ActionPlanContracts(private val setupAssistant: SetupAssistant) {
 
   @State(
     "an action plan with ID 345059d4-1697-467b-8914-fedec9957279 exists and has 2 2-hour appointments already",
-    "an action plan with ID 345059d4-1697-467b-8914-fedec9957279 exists and has an appointment for which no session feedback has been recorded"
+    "an action plan with ID 345059d4-1697-467b-8914-fedec9957279 exists and has an appointment for which no session feedback has been recorded",
   )
   fun `create an empty draft plan with 2 2 hours appointments`() {
     val referral = setupAssistant.createSentReferral(sentAt = OffsetDateTime.now().minusDays(1))
     setupAssistant.createActionPlan(
       id = UUID.fromString("345059d4-1697-467b-8914-fedec9957279"),
       numberOfSessions = 2,
-      referral = referral
+      referral = referral,
     )
     val appointmentDeliveryAddress = AddressDTO(
       firstAddressLine = "Harmony Living Office, Room 4",
@@ -59,7 +62,7 @@ class ActionPlanContracts(private val setupAssistant: SetupAssistant) {
       appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_OTHER,
       appointmentDeliveryAddress = appointmentDeliveryAddress,
       appointmentSessionType = AppointmentSessionType.GROUP,
-      referral = referral
+      referral = referral,
     )
     setupAssistant.createDeliverySession(
       2,
@@ -68,7 +71,7 @@ class ActionPlanContracts(private val setupAssistant: SetupAssistant) {
       appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_OTHER,
       appointmentDeliveryAddress = appointmentDeliveryAddress,
       appointmentSessionType = AppointmentSessionType.GROUP,
-      referral = referral
+      referral = referral,
     )
   }
 
@@ -82,8 +85,8 @@ class ActionPlanContracts(private val setupAssistant: SetupAssistant) {
       activities = mutableListOf(
         ActionPlanActivity(
           description = "Attend training course",
-        )
-      )
+        ),
+      ),
     )
   }
 
@@ -98,8 +101,8 @@ class ActionPlanContracts(private val setupAssistant: SetupAssistant) {
       activities = mutableListOf(
         ActionPlanActivity(
           description = "Attend training course",
-        )
-      )
+        ),
+      ),
     )
   }
 
@@ -136,8 +139,8 @@ class ActionPlanContracts(private val setupAssistant: SetupAssistant) {
         ActionPlanActivity(
           id = UUID.fromString("fd1b6653-ea7b-4e12-9d45-72ff9b1a3ea0"),
           description = "Attend training course",
-        )
-      )
+        ),
+      ),
     )
   }
 
@@ -147,15 +150,18 @@ class ActionPlanContracts(private val setupAssistant: SetupAssistant) {
     setupAssistant.createActionPlan(
       id = UUID.fromString("0f5afe04-e323-4699-9423-fb6122580638"),
       numberOfSessions = 1,
-      referral = referral
+      referral = referral,
     )
 
     setupAssistant.createDeliverySession(
-      1, 120, OffsetDateTime.parse("2021-05-13T13:30:00+01:00"),
-      Attended.LATE, "Alex missed the bus",
+      1,
+      120,
+      OffsetDateTime.parse("2021-05-13T13:30:00+01:00"),
+      Attended.LATE,
+      "Alex missed the bus",
       behaviour = "Alex was well behaved",
       notifyPPOfBehaviour = false,
-      referral = referral
+      referral = referral,
     )
   }
 

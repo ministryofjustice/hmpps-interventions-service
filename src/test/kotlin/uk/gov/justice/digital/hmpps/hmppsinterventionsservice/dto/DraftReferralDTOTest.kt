@@ -21,6 +21,7 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
   private val referralDetailsFactory = ReferralDetailsFactory()
   private val authUserFactory = AuthUserFactory()
   private val serviceCategoryFactory = ServiceCategoryFactory()
+
   @Test
   fun `test serialization of newly created referral`() {
     val referral = referralFactory.createDraft(
@@ -45,7 +46,7 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
         "complexityLevels": null,
         "contractTypeName": "Accommodation"
       }
-    """
+    """,
     )
   }
 
@@ -65,7 +66,7 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
         "desiredOutcomes": null,
         "complexityLevels": null
       }
-    """
+    """,
     )
   }
 
@@ -94,7 +95,7 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
            "complexityLevelId": "11c6d1f1-a22e-402a-b343-e57595876857"
         }]
       }
-    """
+    """,
     )
   }
 
@@ -108,7 +109,7 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
       id = referralID,
       createdAt = createdAt,
       createdBy = createdBy,
-      referralDetail = referralDetailsFactory.create(completionDeadline = LocalDate.of(2021, 2, 12), createdBy = createdBy, createdAt = createdAt, referralId = referralID)
+      referralDetail = referralDetailsFactory.create(completionDeadline = LocalDate.of(2021, 2, 12), createdBy = createdBy, createdAt = createdAt, referralId = referralID),
     )
 
     val out = json.write(DraftReferralDTO.from(referral))
@@ -122,7 +123,7 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
           "crn": "X123456"
         },
       }
-    """
+    """,
     )
   }
 
@@ -131,7 +132,7 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
     val draftReferral = json.parseObject(
       """
       {"completionDeadline": "2021-02-10"}
-    """
+    """,
     )
     assertThat(draftReferral.completionDeadline).isEqualTo(LocalDate.of(2021, 2, 10))
   }
@@ -141,7 +142,7 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
     val draftReferral = json.parseObject(
       """
       {"relevantSentenceId": 123456789}
-    """
+    """,
     )
     assertThat(draftReferral.relevantSentenceId).isEqualTo(123456789)
   }
@@ -162,7 +163,7 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
           "completionDeadline": null,
           "additionalRiskInformation": null
         }
-        """
+        """,
       )
     }
 
@@ -179,7 +180,7 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
           "id": "3b9ed289-8412-41a9-8291-45e33e60276c",
           "completionDeadline": null
         }
-        """
+        """,
       )
       assertThat(out).doesNotHaveJsonPath("$.additionalRiskInformation")
     }
@@ -193,6 +194,7 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
     val uuid4 = UUID.fromString("40000000-0106-4bcf-9da4-2a3c8c062114")
     val uuid5 = UUID.fromString("50000000-0106-4bcf-9da4-2a3c8c062114")
     val uuid6 = UUID.fromString("60000000-0106-4bcf-9da4-2a3c8c062114")
+
     @Test
     fun `service category ids are always the same order`() {
       val serviceCat1 = serviceCategoryFactory.create(id = uuid1)

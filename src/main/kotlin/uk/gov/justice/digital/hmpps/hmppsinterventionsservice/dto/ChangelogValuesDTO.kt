@@ -14,7 +14,7 @@ data class ChangelogValuesDTO(
   val description: String,
   val changedAt: String,
   val name: String,
-  val reasonForChange: String
+  val reasonForChange: String,
 ) {
 
   companion object {
@@ -26,7 +26,7 @@ data class ChangelogValuesDTO(
       AmendTopic.NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS, "Accessibility needs was changed",
       AmendTopic.NEEDS_AND_REQUIREMENTS_ADDITIONAL_INFORMATION, "Additional information was changed",
       AmendTopic.NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES, "Additional responsibilities was changed",
-      AmendTopic.NEEDS_AND_REQUIREMENTS_INTERPRETER_REQUIRED, "Interpreter required was changed"
+      AmendTopic.NEEDS_AND_REQUIREMENTS_INTERPRETER_REQUIRED, "Interpreter required was changed",
     )
     fun from(changelog: Changelog, userDetail: UserDetail): ChangelogValuesDTO {
       val dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy 'at' h.mma")
@@ -37,7 +37,7 @@ data class ChangelogValuesDTO(
         description = amendTopicDescription[changelog.topic]!!,
         changedAt = changelog.changedAt.format(dateTimeFormatter).replace("AM", "am").replace("PM", "pm"),
         name = userDetail.firstName + ' ' + userDetail.lastName,
-        reasonForChange = changelog.reasonForChange
+        reasonForChange = changelog.reasonForChange,
       )
     }
   }

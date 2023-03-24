@@ -34,7 +34,7 @@ class SupplierAssessmentService(
       SupplierAssessment(
         id = UUID.randomUUID(),
         referral = referral,
-      )
+      ),
     )
     return referralRepository.save(referral)
   }
@@ -68,7 +68,7 @@ class SupplierAssessmentService(
       attended,
       additionalAttendanceInformation,
       notifyProbationPractitioner,
-      behaviourDescription
+      behaviourDescription,
     )
     supplierAssessment.appointments.add(appointment)
     supplierAssessmentRepository.save(supplierAssessment)
@@ -84,7 +84,6 @@ class SupplierAssessmentService(
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
   ): Appointment {
-
     val sentReferral = referralRepository.findByIdAndSentAtIsNotNull(referralId) ?: throw EntityNotFoundException("Sent Referral not found [referralId=$referralId]")
     val supplierAssessment = sentReferral.supplierAssessment ?: run {
       SupplierAssessment(
@@ -93,7 +92,7 @@ class SupplierAssessmentService(
       )
     }
     supplierAssessment.currentAppointment?.let {
-      latestAppointment ->
+        latestAppointment ->
       if (latestAppointment.appointmentTime.isAfter(appointmentTime)) {
         throw EntityExistsException("can't schedule new supplier assessment appointment; new appointment occurs before previously scheduled appointment [referralId=$referralId]")
       }
@@ -133,7 +132,7 @@ class SupplierAssessmentService(
     val referral = referralRepository.findByIdAndSentAtIsNotNull(referralId) ?: throw EntityNotFoundException("Sent Referral not found [referralId=$referralId]")
     val supplierAssessment = referral.supplierAssessment ?: throw EntityNotFoundException("Supplier Assessment not found for referral [referralId=$referralId]")
     supplierAssessment.currentAppointment?.let {
-      latestAppointment ->
+        latestAppointment ->
       if (latestAppointment.id != appointmentId) throw ValidationError("Supplier Assessment Appointment is not the latest [appointmentId=$appointmentId]", listOf())
       latestAppointment
     } ?: throw EntityNotFoundException("Supplier Assessment Appointment not found [appointmentId=$appointmentId]")

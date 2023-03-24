@@ -27,7 +27,7 @@ class CaseNoteFactory(em: TestEntityManager? = null) : EntityFactory(em) {
         body = body,
         sentAt = sentAt,
         sentBy = sentBy,
-      )
+      ),
     )
   }
 }

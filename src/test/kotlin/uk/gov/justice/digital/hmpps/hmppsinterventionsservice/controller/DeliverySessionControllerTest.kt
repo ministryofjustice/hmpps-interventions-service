@@ -70,8 +70,8 @@ internal class DeliverySessionControllerTest {
       whenever(
         sessionsService.getDeliverySessionByActionPlanIdOrThrowException(
           actionPlanId,
-          sessionNumber
-        )
+          sessionNumber,
+        ),
       ).thenReturn(deliverySession)
 
       whenever(
@@ -88,8 +88,8 @@ internal class DeliverySessionControllerTest {
           null,
           null,
           null,
-          null
-        )
+          null,
+        ),
       ).thenReturn(deliverySession)
 
       val sessionResponse = sessionsController.updateSessionAppointment(actionPlanId, sessionNumber, updateAppointmentDTO, userToken)
@@ -113,8 +113,8 @@ internal class DeliverySessionControllerTest {
       whenever(
         sessionsService.getDeliverySessionByActionPlanIdOrThrowException(
           actionPlanId,
-          sessionNumber
-        )
+          sessionNumber,
+        ),
       ).thenReturn(deliverySession)
 
       whenever(
@@ -131,8 +131,8 @@ internal class DeliverySessionControllerTest {
           YES,
           "attended",
           false,
-          "behaviour"
-        )
+          "behaviour",
+        ),
       ).thenReturn(deliverySession)
 
       val sessionResponse = sessionsController.updateSessionAppointment(actionPlanId, sessionNumber, updateAppointmentDTO, userToken)
@@ -177,8 +177,8 @@ internal class DeliverySessionControllerTest {
           NO,
           "attended",
           false,
-          "behaviour"
-        )
+          "behaviour",
+        ),
       ).thenReturn(deliverySession)
 
       val sessionResponse = sessionsController.updateSessionAppointment(actionPlanId, sessionNumber, updateAppointmentDTO, userToken)
@@ -258,6 +258,7 @@ internal class DeliverySessionControllerTest {
   inner class GetSessionsForReferral {
     val user = authUserFactory.create()
     val userToken = jwtTokenFactory.create(user)
+
     @Test
     fun `can get sessions by referralId`() {
       val deliverySession = deliverySessionFactory.createScheduled()
@@ -311,14 +312,17 @@ internal class DeliverySessionControllerTest {
     val updatedSession = deliverySessionFactory.createAttended(
       sessionNumber = sessionNumber,
       attended = Attended.YES,
-      additionalAttendanceInformation = "more info"
+      additionalAttendanceInformation = "more info",
     )
 
     whenever(
       sessionsService.recordAppointmentAttendance(
-        user, actionPlan.id, sessionNumber, update.attended,
-        update.additionalAttendanceInformation
-      )
+        user,
+        actionPlan.id,
+        sessionNumber,
+        update.attended,
+        update.additionalAttendanceInformation,
+      ),
     ).thenReturn(updatedSession)
 
     whenever(authUserRepository.save(any())).thenReturn(user)

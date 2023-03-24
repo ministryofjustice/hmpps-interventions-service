@@ -35,7 +35,7 @@ internal class CustodyLocationLookupListenerTest {
     communityAPIOffenderService,
     prisonerOffenderSearchService,
     referralLocationRepository,
-    telemetryClient
+    telemetryClient,
   )
 
   @Test
@@ -59,9 +59,9 @@ internal class CustodyLocationLookupListenerTest {
       "CustodyLocationLookup",
       mapOf(
         "result" to "match",
-        "crn" to serviceUserCRN
+        "crn" to serviceUserCRN,
       ),
-      null
+      null,
     )
   }
 
@@ -87,9 +87,9 @@ internal class CustodyLocationLookupListenerTest {
       "CustodyLocationLookup",
       mapOf(
         "result" to "no match",
-        "crn" to serviceUserCRN
+        "crn" to serviceUserCRN,
       ),
-      null
+      null,
     )
   }
 
@@ -112,18 +112,18 @@ internal class CustodyLocationLookupListenerTest {
       mapOf(
         "result" to "prisoner search failed",
         "exception" to e.toString(),
-        "crn" to serviceUserCRN
+        "crn" to serviceUserCRN,
       ),
-      null
+      null,
     )
     verify(telemetryClient, never()).trackEvent(
       "CustodyLocationLookup",
       mapOf(
         "result" to "prisoner not found",
         "noms" to nomsNumber,
-        "crn" to serviceUserCRN
+        "crn" to serviceUserCRN,
       ),
-      null
+      null,
     )
   }
 
@@ -139,9 +139,9 @@ internal class CustodyLocationLookupListenerTest {
       "CustodyLocationLookup",
       mapOf(
         "result" to "noms not found",
-        "crn" to serviceUserCRN
+        "crn" to serviceUserCRN,
       ),
-      null
+      null,
     )
   }
 
@@ -155,7 +155,7 @@ internal class CustodyLocationLookupListenerTest {
       expectedReleaseDate,
       expectedReleaseDate,
       expectedReleaseDate,
-      expectedReleaseDate
+      expectedReleaseDate,
     )
 
   private fun mockReferralLocation(prisonId: String, expectedReleaseDate: LocalDate) =
@@ -165,7 +165,7 @@ internal class CustodyLocationLookupListenerTest {
       type = PersonCurrentLocationType.CUSTODY,
       prisonId = prisonId,
       expectedReleaseDate = expectedReleaseDate,
-      expectedReleaseDateMissingReason = null
+      expectedReleaseDateMissingReason = null,
     )
 
   private fun referralSentEvent(referralId: UUID, serviceUserCRN: String): ReferralEvent {
@@ -175,13 +175,13 @@ internal class CustodyLocationLookupListenerTest {
       serviceUserCRN = serviceUserCRN,
       createdBy = mock(),
       createdAt = OffsetDateTime.now(),
-      intervention = mock()
+      intervention = mock(),
     )
     return ReferralEvent(
       this,
       ReferralEventType.SENT,
       referral,
-      "irrelevant-for-this-test"
+      "irrelevant-for-this-test",
     )
   }
 }

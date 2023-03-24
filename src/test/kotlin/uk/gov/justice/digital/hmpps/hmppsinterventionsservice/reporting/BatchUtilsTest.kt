@@ -61,8 +61,8 @@ internal class BatchUtilsTest {
       writer.write(
         listOf(
           Data("tom", UUID.fromString("5863b32b-bb60-4bad-aeee-a15ff61abf3a")),
-          Data("andrew", UUID.fromString("cec6b55f-b32f-43af-828b-c72a4c1aade7"))
-        )
+          Data("andrew", UUID.fromString("cec6b55f-b32f-43af-828b-c72a4c1aade7")),
+        ),
       )
 
       assertThat(tmpFile.readText()).isEqualTo(
@@ -71,7 +71,7 @@ internal class BatchUtilsTest {
       tom,5863b32b-bb60-4bad-aeee-a15ff61abf3a
       andrew,cec6b55f-b32f-43af-828b-c72a4c1aade7
 
-        """.trimIndent()
+        """.trimIndent(),
       )
     } finally {
       tmpFile.delete()

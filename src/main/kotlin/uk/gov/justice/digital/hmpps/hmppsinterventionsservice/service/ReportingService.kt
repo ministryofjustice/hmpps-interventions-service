@@ -33,7 +33,7 @@ class ReportingService(
         .addDate("from", batchUtils.parseLocalDateToDate(from))
         .addDate("to", batchUtils.parseLocalDateToDate(to.plusDays(1))) // 'to' is inclusive
         .addString("timestamp", Instant.now().toEpochMilli().toString())
-        .toJobParameters()
+        .toJobParameters(),
     )
   }
 
@@ -42,7 +42,7 @@ class ReportingService(
       ndmisPerformanceReportJob,
       JobParametersBuilder()
         .addString("timestamp", Instant.now().toEpochMilli().toString())
-        .toJobParameters()
+        .toJobParameters(),
     )
   }
 }

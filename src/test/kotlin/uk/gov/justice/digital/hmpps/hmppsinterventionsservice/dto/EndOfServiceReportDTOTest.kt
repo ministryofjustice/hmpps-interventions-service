@@ -20,7 +20,8 @@ class EndOfServiceReportDTOTest(@Autowired private val json: JacksonTester<EndOf
     val createdAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
     val referral = referralFactory.createSent()
     val endOfServiceReport = SampleData.sampleEndOfServiceReport(
-      createdAt = createdAt, id = id,
+      createdAt = createdAt,
+      id = id,
       outcomes = setOf(SampleData.sampleEndOfServiceReportOutcome(desiredOutcome = SampleData.sampleDesiredOutcome(id = id))),
       referral = referral,
     )
@@ -51,7 +52,7 @@ class EndOfServiceReportDTOTest(@Autowired private val json: JacksonTester<EndOf
           }
         ]
       }
-    """
+    """,
     )
   }
 }

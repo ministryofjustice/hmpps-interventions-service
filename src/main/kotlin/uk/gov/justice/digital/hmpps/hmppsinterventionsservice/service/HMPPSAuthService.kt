@@ -106,7 +106,7 @@ class HMPPSAuthService(
           .onStatus({ it.equals(HttpStatus.NO_CONTENT) }, { Mono.error(UnverifiedEmailException()) })
           .bodyToMono(UserEmailResponse::class.java)
           .withRetryPolicy()
-          .map { it.email }
+          .map { it.email },
       )
         .map { UserDetail(it.t1.first, it.t2, it.t1.second) }
         .block()
@@ -118,7 +118,7 @@ class HMPPSAuthService(
       .retryWhen(
         Retry.max(maxRetryAttempts)
           .filter { isTimeoutException(it) }
-          .doBeforeRetry { logRetrySignal(it) }
+          .doBeforeRetry { logRetrySignal(it) },
       )
   }
 
@@ -127,7 +127,7 @@ class HMPPSAuthService(
       .retryWhen(
         Retry.max(maxRetryAttempts)
           .filter { isTimeoutException(it) }
-          .doBeforeRetry { logRetrySignal(it) }
+          .doBeforeRetry { logRetrySignal(it) },
       )
   }
 
@@ -144,7 +144,7 @@ class HMPPSAuthService(
       "Retrying due to [$message]",
       exception,
       StructuredArguments.kv("res.causeMessage", message),
-      StructuredArguments.kv("totalRetries", retrySignal.totalRetries())
+      StructuredArguments.kv("totalRetries", retrySignal.totalRetries()),
     )
   }
 }

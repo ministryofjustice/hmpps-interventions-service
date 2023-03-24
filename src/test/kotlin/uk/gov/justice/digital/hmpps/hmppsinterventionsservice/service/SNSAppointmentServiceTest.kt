@@ -41,7 +41,7 @@ internal class SNSAppointmentServiceTest {
     ),
     "http://localhost/sent-referral/123/supplier-assessment",
     false,
-    appointmentType = AppointmentType.SUPPLIER_ASSESSMENT
+    appointmentType = AppointmentType.SUPPLIER_ASSESSMENT,
   )
 
   private fun feedbackSubmittedEvent(attendance: Attended) = AppointmentEvent(
@@ -57,7 +57,7 @@ internal class SNSAppointmentServiceTest {
     ),
     "http://localhost/sent-referral/123/supplier-assessment",
     false,
-    appointmentType = AppointmentType.SUPPLIER_ASSESSMENT
+    appointmentType = AppointmentType.SUPPLIER_ASSESSMENT,
   )
 
   @Test
@@ -72,9 +72,9 @@ internal class SNSAppointmentServiceTest {
       occurredAt = now,
       additionalInformation = mapOf(
         "serviceUserCRN" to "X123456",
-        "referralId" to referralId
+        "referralId" to referralId,
       ),
-      PersonReference.crn("X123456")
+      PersonReference.crn("X123456"),
     )
 
     verify(publisher).publish(referralId, user, eventDTO)
@@ -93,9 +93,9 @@ internal class SNSAppointmentServiceTest {
       additionalInformation = mapOf(
         "serviceUserCRN" to "X123456",
         "referralId" to referralId,
-        "deliusAppointmentId" to "123"
+        "deliusAppointmentId" to "123",
       ),
-      PersonReference.crn("X123456")
+      PersonReference.crn("X123456"),
     )
 
     verify(publisher).publish(referralId, user, eventDTO)

@@ -39,11 +39,11 @@ private fun referralEndingEvent(state: ReferralConcludedState): ReferralEndingEv
         ReferralAssignment(
           OffsetDateTime.parse("2020-12-04T10:42:43+00:00"),
           authUserFactory.createSP("irrelevant"),
-          authUserFactory.createSP("abc123")
-        )
-      )
+          authUserFactory.createSP("abc123"),
+        ),
+      ),
     ),
-    "http://localhost:8080/sent-referral/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"
+    "http://localhost:8080/sent-referral/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
   )
 }
 
@@ -74,8 +74,8 @@ internal class ReferralEndingListenerTest {
       ),
       personReference = PersonReference(
         identifiers = listOf(
-          PersonIdentifier(type = "CRN", value = "T123000")
-        )
+          PersonIdentifier(type = "CRN", value = "T123000"),
+        ),
       ),
     )
     verify(snsPublisher).publish(event.referral.id, AuthUser.interventionsServiceUser, eventPayload)

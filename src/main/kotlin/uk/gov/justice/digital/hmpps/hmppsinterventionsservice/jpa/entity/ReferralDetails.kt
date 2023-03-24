@@ -19,5 +19,5 @@ data class ReferralDetails(
   // actual referral details fields:
   var completionDeadline: LocalDate? = null,
   var furtherInformation: String? = null,
-  var maximumEnforceableDays: Int? = null
+  var maximumEnforceableDays: Int? = null,
 )

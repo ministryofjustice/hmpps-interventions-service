@@ -105,7 +105,7 @@ class DraftReferralServiceUnitTest {
     referralDetailsRepository,
     draftOasysRiskInformationService,
     referralLocationRepository,
-    currentLocationEnabled
+    currentLocationEnabled,
   )
 
   @BeforeEach
@@ -122,7 +122,7 @@ class DraftReferralServiceUnitTest {
         draftReferralService.updateDraftReferralComplexityLevel(
           referral,
           referral.intervention.dynamicFrameworkContract.contractType.serviceCategories.first().id,
-          UUID.randomUUID()
+          UUID.randomUUID(),
         )
       }
 
@@ -138,7 +138,7 @@ class DraftReferralServiceUnitTest {
         draftReferralService.updateDraftReferralComplexityLevel(
           referral,
           serviceCategory2.id,
-          UUID.randomUUID()
+          UUID.randomUUID(),
         )
       }
 
@@ -154,7 +154,7 @@ class DraftReferralServiceUnitTest {
         draftReferralService.updateDraftReferralComplexityLevel(
           referral,
           serviceCategory.id,
-          UUID.randomUUID()
+          UUID.randomUUID(),
         )
       }
 
@@ -173,7 +173,7 @@ class DraftReferralServiceUnitTest {
         draftReferralService.updateDraftReferralComplexityLevel(
           referral,
           serviceCategory.id,
-          UUID.randomUUID()
+          UUID.randomUUID(),
         )
       }
 
@@ -207,7 +207,7 @@ class DraftReferralServiceUnitTest {
       val serviceCategory = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel1, complexityLevel2))
       val referral = referralFactory.createDraft(
         selectedServiceCategories = mutableSetOf(serviceCategory),
-        complexityLevelIds = mutableMapOf(serviceCategory.id to complexityLevel1.id)
+        complexityLevelIds = mutableMapOf(serviceCategory.id to complexityLevel1.id),
       )
 
       whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.of(serviceCategory))
@@ -230,7 +230,7 @@ class DraftReferralServiceUnitTest {
       UUID.fromString("8221a81c-08b2-4262-9c1a-0ab3c82cec8c"),
       UUID.fromString("9556a399-3529-4993-8030-41db2090555e"),
       UUID.fromString("b84f4eb7-4db0-477e-8c59-21027b3262c5"),
-      UUID.fromString("c036826e-f077-49a5-8b33-601dca7ad479")
+      UUID.fromString("c036826e-f077-49a5-8b33-601dca7ad479"),
     )
 
     @Test
@@ -239,16 +239,16 @@ class DraftReferralServiceUnitTest {
         serviceCategoryFactory.create(id = UUID.fromString("8221a81c-08b2-4262-9c1a-0ab3c82cec8c"), name = "aaa"),
         serviceCategoryFactory.create(id = UUID.fromString("9556a399-3529-4993-8030-41db2090555e"), name = "bbb"),
         serviceCategoryFactory.create(id = UUID.fromString("b84f4eb7-4db0-477e-8c59-21027b3262c5"), name = "ccc"),
-        serviceCategoryFactory.create(id = UUID.fromString("c036826e-f077-49a5-8b33-601dca7ad479"), name = "ddd")
+        serviceCategoryFactory.create(id = UUID.fromString("c036826e-f077-49a5-8b33-601dca7ad479"), name = "ddd"),
       )
 
       val contractType = contractTypeFactory.create(serviceCategories = serviceCategories.toSet())
       val referral = referralFactory.createDraft(
         intervention = interventionFactory.create(
           contract = dynamicFrameworkContractFactory.create(
-            contractType = contractType
-          )
-        )
+            contractType = contractType,
+          ),
+        ),
       )
 
       val update = DraftReferralDTO(serviceCategoryIds = serviceCategoryIds)
@@ -265,7 +265,6 @@ class DraftReferralServiceUnitTest {
 
     @Test
     fun `updating selected service category with new set removes desired outcome for existing service categories`() {
-
       val serviceCategoryId1 = UUID.randomUUID()
       val serviceCategoryId2 = UUID.randomUUID()
       val desiredOutcome1 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId1)
@@ -277,11 +276,11 @@ class DraftReferralServiceUnitTest {
       val referral = referralFactory.createDraft(
         intervention = interventionFactory.create(
           contract = dynamicFrameworkContractFactory.create(
-            contractType = contractType
-          )
+            contractType = contractType,
+          ),
         ),
         selectedServiceCategories = mutableSetOf(serviceCategory1),
-        desiredOutcomes = listOf(desiredOutcome1)
+        desiredOutcomes = listOf(desiredOutcome1),
       )
 
       whenever(serviceCategoryRepository.findByIdIn(any())).thenReturn(setOf(serviceCategory2))
@@ -296,7 +295,6 @@ class DraftReferralServiceUnitTest {
 
     @Test
     fun `updating selected service category with same set doesn't remove desired outcome for same service categories`() {
-
       val serviceCategoryId1 = UUID.randomUUID()
       val desiredOutcome1 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId1)
       val serviceCategory1 = serviceCategoryFactory.create(id = serviceCategoryId1, desiredOutcomes = listOf(desiredOutcome1))
@@ -305,11 +303,11 @@ class DraftReferralServiceUnitTest {
       val referral = referralFactory.createDraft(
         intervention = interventionFactory.create(
           contract = dynamicFrameworkContractFactory.create(
-            contractType = contractType
-          )
+            contractType = contractType,
+          ),
         ),
         selectedServiceCategories = mutableSetOf(serviceCategory1),
-        desiredOutcomes = listOf(desiredOutcome1)
+        desiredOutcomes = listOf(desiredOutcome1),
       )
 
       whenever(serviceCategoryRepository.findByIdIn(any())).thenReturn(setOf(serviceCategory1))
@@ -328,7 +326,6 @@ class DraftReferralServiceUnitTest {
 
     @Test
     fun `updating selected service category with new set removes complexity level for existing service categories`() {
-
       val complexityLevel1 = ComplexityLevel(UUID.randomUUID(), "title", "description", Complexity.LOW)
       val complexityLevel2 = ComplexityLevel(UUID.randomUUID(), "title", "description", Complexity.MEDIUM)
       val serviceCategory1 = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel1))
@@ -338,11 +335,11 @@ class DraftReferralServiceUnitTest {
       val referral = referralFactory.createDraft(
         intervention = interventionFactory.create(
           contract = dynamicFrameworkContractFactory.create(
-            contractType = contractType
-          )
+            contractType = contractType,
+          ),
         ),
         selectedServiceCategories = mutableSetOf(serviceCategory1),
-        complexityLevelIds = mapOf(serviceCategory1.id to complexityLevel1.id).toMutableMap()
+        complexityLevelIds = mapOf(serviceCategory1.id to complexityLevel1.id).toMutableMap(),
       )
 
       whenever(serviceCategoryRepository.findByIdIn(any())).thenReturn(setOf(serviceCategory2))
@@ -357,7 +354,6 @@ class DraftReferralServiceUnitTest {
 
     @Test
     fun `updating selected service category with same set doesn't remove complexity level for same service categories`() {
-
       val complexityLevel1 = ComplexityLevel(UUID.randomUUID(), "title", "description", Complexity.LOW)
       val serviceCategory1 = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel1))
 
@@ -365,11 +361,11 @@ class DraftReferralServiceUnitTest {
       val referral = referralFactory.createDraft(
         intervention = interventionFactory.create(
           contract = dynamicFrameworkContractFactory.create(
-            contractType = contractType
-          )
+            contractType = contractType,
+          ),
         ),
         selectedServiceCategories = mutableSetOf(serviceCategory1),
-        complexityLevelIds = mapOf(serviceCategory1.id to complexityLevel1.id).toMutableMap()
+        complexityLevelIds = mapOf(serviceCategory1.id to complexityLevel1.id).toMutableMap(),
       )
 
       whenever(serviceCategoryRepository.findByIdIn(any())).thenReturn(setOf(serviceCategory1))
@@ -388,16 +384,16 @@ class DraftReferralServiceUnitTest {
       val serviceCategories = setOf(
         serviceCategoryFactory.create(id = UUID.fromString("8221a81c-08b2-4262-9c1a-0ab3c82cec8c"), name = "aaa"),
         serviceCategoryFactory.create(id = UUID.fromString("9556a399-3529-4993-8030-41db2090555e"), name = "bbb"),
-        serviceCategoryFactory.create(id = UUID.fromString("b84f4eb7-4db0-477e-8c59-21027b3262c5"), name = "ccc")
+        serviceCategoryFactory.create(id = UUID.fromString("b84f4eb7-4db0-477e-8c59-21027b3262c5"), name = "ccc"),
       )
 
       val contractType = contractTypeFactory.create(serviceCategories = serviceCategories)
       val referral = referralFactory.createDraft(
         intervention = interventionFactory.create(
           contract = dynamicFrameworkContractFactory.create(
-            contractType = contractType
-          )
-        )
+            contractType = contractType,
+          ),
+        ),
       )
 
       val update = DraftReferralDTO(serviceCategoryIds = serviceCategoryIds)
@@ -421,7 +417,7 @@ class DraftReferralServiceUnitTest {
         draftReferralService.updateDraftReferralDesiredOutcomes(
           referral,
           referral.intervention.dynamicFrameworkContract.contractType.serviceCategories.first().id,
-          listOf()
+          listOf(),
         )
       }
 
@@ -435,7 +431,7 @@ class DraftReferralServiceUnitTest {
         draftReferralService.updateDraftReferralDesiredOutcomes(
           referral,
           referral.intervention.dynamicFrameworkContract.contractType.serviceCategories.first().id,
-          listOf(UUID.randomUUID())
+          listOf(UUID.randomUUID()),
         )
       }
 
@@ -451,7 +447,7 @@ class DraftReferralServiceUnitTest {
         draftReferralService.updateDraftReferralDesiredOutcomes(
           referral,
           serviceCategory2.id,
-          listOf(UUID.randomUUID())
+          listOf(UUID.randomUUID()),
         )
       }
 
@@ -467,7 +463,7 @@ class DraftReferralServiceUnitTest {
         draftReferralService.updateDraftReferralDesiredOutcomes(
           referral,
           serviceCategory.id,
-          listOf(UUID.randomUUID())
+          listOf(UUID.randomUUID()),
         )
       }
 
@@ -488,7 +484,7 @@ class DraftReferralServiceUnitTest {
         draftReferralService.updateDraftReferralDesiredOutcomes(
           referral,
           serviceCategory.id,
-          listOf(UUID.randomUUID())
+          listOf(UUID.randomUUID()),
         )
       }
 
@@ -526,11 +522,11 @@ class DraftReferralServiceUnitTest {
       val desiredOutcome2 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId)
       val serviceCategory = serviceCategoryFactory.create(
         id = serviceCategoryId,
-        desiredOutcomes = listOf(desiredOutcome1, desiredOutcome2)
+        desiredOutcomes = listOf(desiredOutcome1, desiredOutcome2),
       )
       val referral = referralFactory.createDraft(
         selectedServiceCategories = mutableSetOf(serviceCategory),
-        desiredOutcomes = mutableListOf(desiredOutcome1)
+        desiredOutcomes = mutableListOf(desiredOutcome1),
       )
 
       whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.of(serviceCategory))
@@ -557,11 +553,11 @@ class DraftReferralServiceUnitTest {
         serviceCategoryFactory.create(id = serviceCategoryId1, desiredOutcomes = listOf(desiredOutcome2))
       val serviceCategory2 = serviceCategoryFactory.create(
         id = serviceCategoryId2,
-        desiredOutcomes = listOf(desiredOutcome1, desiredOutcome2)
+        desiredOutcomes = listOf(desiredOutcome1, desiredOutcome2),
       )
       val referral = referralFactory.createDraft(
         selectedServiceCategories = mutableSetOf(serviceCategory1, serviceCategory2),
-        desiredOutcomes = mutableListOf(desiredOutcome1)
+        desiredOutcomes = mutableListOf(desiredOutcome1),
       )
 
       whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.of(serviceCategory2))
@@ -592,6 +588,7 @@ class DraftReferralServiceUnitTest {
 
     assertThat(e.message).contains("can't submit a referral without risk information")
   }
+
   @Test
   fun `cannot send draft referral for person in custody without expected release date or reason`() {
     val referral = referralFactory.createDraft()
@@ -628,7 +625,7 @@ class DraftReferralServiceUnitTest {
       additionalRiskInformation = "something",
       additionalRiskInformationUpdatedAt = OffsetDateTime.now(),
       personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
-      personCustodyPrisonId = "ABC"
+      personCustodyPrisonId = "ABC",
     )
     draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
     val authUser = authUserFactory.create()
@@ -643,7 +640,7 @@ class DraftReferralServiceUnitTest {
       additionalRiskInformation = "something",
       additionalRiskInformationUpdatedAt = OffsetDateTime.now(),
       personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
-      personCustodyPrisonId = "ABC"
+      personCustodyPrisonId = "ABC",
     )
     draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
     val authUser = authUserFactory.create()
@@ -674,7 +671,7 @@ class DraftReferralServiceUnitTest {
       val draftReferral = referralFactory.createDraft(
         additionalRiskInformation = "something",
         personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
-        personCustodyPrisonId = "ABC"
+        personCustodyPrisonId = "ABC",
       )
       draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
       val authUser = authUserFactory.create()
@@ -694,7 +691,7 @@ class DraftReferralServiceUnitTest {
       val draftReferral = referralFactory.createDraft(
         additionalRiskInformation = null,
         personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
-        personCustodyPrisonId = "ABC"
+        personCustodyPrisonId = "ABC",
       )
       draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
 
@@ -713,7 +710,7 @@ class DraftReferralServiceUnitTest {
         additionalRiskInformation = "something",
         additionalRiskInformationUpdatedAt = riskUpdatedAt,
         personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
-        personCustodyPrisonId = "ABC"
+        personCustodyPrisonId = "ABC",
       )
       draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
 
@@ -744,7 +741,7 @@ class DraftReferralServiceUnitTest {
       additionalRiskInformation = "something",
       additionalRiskInformationUpdatedAt = timestamp,
       personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
-      personCustodyPrisonId = "ABC"
+      personCustodyPrisonId = "ABC",
     )
     draftReferral.expectedReleaseDate = LocalDate.of(2050, 11, 1)
     val authUser = authUserFactory.create()
@@ -802,8 +799,8 @@ class DraftReferralServiceUnitTest {
       draftReferralService.updateDraftReferral(
         draftReferral,
         DraftReferralDTO(
-          completionDeadline = LocalDate.of(3022, 3, 28)
-        )
+          completionDeadline = LocalDate.of(3022, 3, 28),
+        ),
       )
 
       val captor = ArgumentCaptor.forClass(ReferralDetails::class.java)
@@ -883,7 +880,7 @@ class DraftReferralServiceUnitTest {
           completionDeadline = LocalDate.of(3022, 3, 28),
           furtherInformation = "nothing to see here",
           maximumEnforceableDays = 25,
-        )
+        ),
       )
 
       val captor = ArgumentCaptor.forClass(ReferralDetails::class.java)

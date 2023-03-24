@@ -80,8 +80,8 @@ internal class ActionPlanServiceTest {
             it.submittedAt == null &&
             it.submittedBy == null &&
             it.referral == referral
-        }
-      )
+        },
+      ),
     ).thenReturn(SampleData.sampleActionPlan())
 
     val draftActionPlan = actionPlanService.createDraftActionPlan(referralId, numberOfSessions, activities, authUser)
@@ -132,13 +132,13 @@ internal class ActionPlanServiceTest {
     whenever(
       actionPlanRepository.save(
         ArgumentMatchers.argThat { (
-          numberOfSessionsArg, activitiesArg, _, _, _, _, _, _
-        ) ->
+          numberOfSessionsArg, activitiesArg, _, _, _, _, _, _,
+        ), ->
           (
             numberOfSessionsArg == 5 && activitiesArg.size == draftActionPlan.activities.size
             )
-        }
-      )
+        },
+      ),
     ).thenReturn(updatedDraftActionPlan)
 
     val updatedDraftActionPlanResponse = actionPlanService.updateActionPlan(draftActionPlanId, 5, null)
@@ -159,13 +159,13 @@ internal class ActionPlanServiceTest {
     whenever(
       actionPlanRepository.save(
         ArgumentMatchers.argThat { (
-          numberOfSessionsArg, activitiesArg, _, _, _, _, _, _
-        ) ->
+          numberOfSessionsArg, activitiesArg, _, _, _, _, _, _,
+        ), ->
           (
             numberOfSessionsArg == 9 && activitiesArg.size == 1
             )
-        }
-      )
+        },
+      ),
     ).thenReturn(updatedDraftActionPlan)
 
     val newActivity = ActionPlanActivity("Description", OffsetDateTime.now())
@@ -217,8 +217,8 @@ internal class ActionPlanServiceTest {
             it.approvedAt == null &&
             it.approvedBy == null &&
             it.referral == actionPlan.referral
-        }
-      )
+        },
+      ),
     ).thenReturn(SampleData.sampleActionPlan())
     whenever(authUserRepository.save(any())).thenReturn(SampleData.sampleAuthUser())
 
@@ -332,7 +332,7 @@ internal class ActionPlanServiceTest {
     val savedActionPlan = argument.value
     assertThat(savedActionPlan.activities[0].description == updatedDescription)
     assertThat(
-      savedActionPlan.activities[1].description == SampleData.sampleActionPlanActivity().description
+      savedActionPlan.activities[1].description == SampleData.sampleActionPlanActivity().description,
     )
   }
 
@@ -359,9 +359,11 @@ internal class ActionPlanServiceTest {
       appointments = mutableSetOf(
         unattendedAppointments[0],
         unattendedAppointments[1],
-        lateAppointments[0]
+        lateAppointments[0],
       ),
-      1, referral, UUID.randomUUID()
+      1,
+      referral,
+      UUID.randomUUID(),
     )
 
     val session2 = DeliverySession(
@@ -375,9 +377,11 @@ internal class ActionPlanServiceTest {
       appointments = mutableSetOf(
         unattendedAppointments[3],
         unattendedAppointments[4],
-        lateAppointments[1]
+        lateAppointments[1],
       ),
-      3, referral, UUID.randomUUID(),
+      3,
+      referral,
+      UUID.randomUUID(),
     )
 
     whenever(deliverySessionRepository.findAllByReferralId(referral.id)).thenReturn(listOf(session1, session2, session3))

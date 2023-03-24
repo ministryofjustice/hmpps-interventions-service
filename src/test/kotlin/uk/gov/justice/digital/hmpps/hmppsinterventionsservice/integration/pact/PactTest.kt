@@ -63,10 +63,10 @@ class PactTest : IntegrationTestBase() {
         setOf(
           setupAssistant.createDynamicFrameworkContract(
             contractType = setupAssistant.contractTypes["WOS"]!!,
-            primeProviderId = "HARMONY_LIVING"
-          )
+            primeProviderId = "HARMONY_LIVING",
+          ),
         ),
-      )
+      ),
     )
 
     context.addStateChangeHandlers(
@@ -77,7 +77,7 @@ class PactTest : IntegrationTestBase() {
       EndOfServiceReportContracts(setupAssistant),
       SupplierAssessmentContracts(setupAssistant),
       ReportingContracts(setupAssistant),
-      CaseNoteContracts(setupAssistant)
+      CaseNoteContracts(setupAssistant),
     )
   }
 

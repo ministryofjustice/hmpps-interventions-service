@@ -12,7 +12,7 @@ import kotlin.reflect.full.findAnnotation
 
 @Component
 class LocationMapper(
-  @Value("\${interventions-api.baseurl}") private val interventionsApiBaseUrl: String
+  @Value("\${interventions-api.baseurl}") private val interventionsApiBaseUrl: String,
 ) {
   // This method appends the path onto the end of the current requests URL
   // e.g. current request URL http://interventions.go.uk/draft-referral + path referral/{id}

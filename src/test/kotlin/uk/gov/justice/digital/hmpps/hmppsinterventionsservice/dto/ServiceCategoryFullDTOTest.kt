@@ -22,9 +22,9 @@ class ServiceCategoryFullDTOTest(@Autowired private val json: JacksonTester<Serv
       complexityLevels = listOf(
         ComplexityLevel(UUID.fromString("11c6d1f1-a22e-402a-b343-e57595876857"), "Low complexity", "Low complexity", Complexity.LOW),
         ComplexityLevel(UUID.fromString("11c6d1f1-a22e-402a-b343-e57595876858"), "Medium complexity", "Medium complexity", Complexity.MEDIUM),
-        ComplexityLevel(UUID.fromString("11c6d1f1-a22e-402a-b343-e57595876859"), "High complexity", "High complexity", Complexity.HIGH)
+        ComplexityLevel(UUID.fromString("11c6d1f1-a22e-402a-b343-e57595876859"), "High complexity", "High complexity", Complexity.HIGH),
       ),
-      desiredOutcomes = listOf(DesiredOutcome(UUID.fromString("5a9d6e60-c314-4bf9-bf1e-b42b366b9398"), "good accommodation", UUID.fromString("e30c24e5-3aa7-4820-82ee-b028909876e6")))
+      desiredOutcomes = listOf(DesiredOutcome(UUID.fromString("5a9d6e60-c314-4bf9-bf1e-b42b366b9398"), "good accommodation", UUID.fromString("e30c24e5-3aa7-4820-82ee-b028909876e6"))),
     )
 
     val out = json.write(ServiceCategoryFullDTO.from(serviceCategory))
@@ -52,7 +52,7 @@ class ServiceCategoryFullDTOTest(@Autowired private val json: JacksonTester<Serv
            "description": "good accommodation"
         }]
       }
-    """
+    """,
     )
   }
 
@@ -62,9 +62,9 @@ class ServiceCategoryFullDTOTest(@Autowired private val json: JacksonTester<Serv
       id = UUID.fromString("e30c24e5-3aa7-4820-82ee-b028909876e6"),
       complexityLevels = listOf(
         ComplexityLevel(UUID.fromString("11c6d1f1-a22e-402a-b343-e57595876857"), "Low complexity", "Low complexity", Complexity.LOW),
-        ComplexityLevel(UUID.fromString("11c6d1f1-a22e-402a-b343-e57595876859"), "High complexity", "High complexity", Complexity.HIGH)
+        ComplexityLevel(UUID.fromString("11c6d1f1-a22e-402a-b343-e57595876859"), "High complexity", "High complexity", Complexity.HIGH),
       ),
-      desiredOutcomes = listOf(DesiredOutcome(UUID.fromString("5a9d6e60-c314-4bf9-bf1e-b42b366b9398"), "good accommodation", UUID.fromString("e30c24e5-3aa7-4820-82ee-b028909876e6")))
+      desiredOutcomes = listOf(DesiredOutcome(UUID.fromString("5a9d6e60-c314-4bf9-bf1e-b42b366b9398"), "good accommodation", UUID.fromString("e30c24e5-3aa7-4820-82ee-b028909876e6"))),
     )
 
     val out = json.write(ServiceCategoryFullDTO.from(serviceCategory))
@@ -87,7 +87,7 @@ class ServiceCategoryFullDTOTest(@Autowired private val json: JacksonTester<Serv
            "description": "good accommodation"
         }]
       }
-    """
+    """,
     )
   }
 }

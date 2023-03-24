@@ -14,7 +14,7 @@ data class AppointmentData(
   val attendanceSubmittedAt: NdmisDateTime?,
   val notifyPPOfAttendanceBehaviour: Boolean?,
   val deliusAppointmentId: String,
-  val reasonForAppointment: AppointmentReason
+  val reasonForAppointment: AppointmentReason,
 ) {
   companion object {
     val fields = listOf(
@@ -50,7 +50,8 @@ enum class AppointmentReason(
   val value: String,
 ) {
   SAA("saa"),
-  DELIVERY("delivery");
+  DELIVERY("delivery"),
+  ;
 
   override fun toString(): String {
     return value

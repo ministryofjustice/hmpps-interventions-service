@@ -58,7 +58,7 @@ class AppointmentValidator {
       updateAppointmentDTO.appointmentAttendance?.attended,
       updateAppointmentDTO.appointmentBehaviour?.notifyProbationPractitioner,
       updateAppointmentDTO.appointmentBehaviour?.behaviourDescription,
-      errors
+      errors,
     )
     if (errors.isNotEmpty()) {
       throw ValidationError("invalid update session appointment request", errors)
@@ -82,7 +82,7 @@ class AppointmentValidator {
     attended: Attended?,
     notifyProbationPractitioner: Boolean?,
     behaviourDescription: String?,
-    errors: MutableList<FieldError>
+    errors: MutableList<FieldError>,
   ) {
     // if the appointment occurred today or on a date in the future, no attendance validation is required
     if (appointmentTime.isAfter(OffsetDateTime.now().with(LocalTime.MIN))) {

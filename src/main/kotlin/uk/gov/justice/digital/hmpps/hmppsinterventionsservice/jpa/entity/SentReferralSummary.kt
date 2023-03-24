@@ -30,38 +30,38 @@ import javax.validation.constraints.NotNull
     NamedAttributeNode(value = "serviceUserData", subgraph = "serviceUserData"),
     NamedAttributeNode(value = "intervention", subgraph = "interventions"),
     NamedAttributeNode(value = "endOfServiceReport", subgraph = "endOfServiceReport"),
-    NamedAttributeNode(value = "supplierAssessment", subgraph = "supplierAssessmentData")
+    NamedAttributeNode(value = "supplierAssessment", subgraph = "supplierAssessmentData"),
   ],
   subgraphs = [
     NamedSubgraph(
       name = "interventions",
       attributeNodes = [
         NamedAttributeNode("dynamicFrameworkContract"),
-      ]
+      ],
     ),
     NamedSubgraph(
       name = "endOfServiceReport",
       attributeNodes = [
         NamedAttributeNode("referral"),
         NamedAttributeNode("createdBy"),
-        NamedAttributeNode("submittedBy")
-      ]
+        NamedAttributeNode("submittedBy"),
+      ],
     ),
     NamedSubgraph(
       name = "serviceUserData",
       attributeNodes = [
         NamedAttributeNode("disabilities"),
-        NamedAttributeNode("draftReferral")
-      ]
+        NamedAttributeNode("draftReferral"),
+      ],
     ),
     NamedSubgraph(
       name = "supplierAssessmentData",
       attributeNodes = [
         NamedAttributeNode("referral"),
-        NamedAttributeNode("appointments")
-      ]
-    )
-  ]
+        NamedAttributeNode("appointments"),
+      ],
+    ),
+  ],
 )
 @Entity(name = "referral")
 @Table(name = "referral", indexes = arrayOf(Index(columnList = "created_by_id")))
@@ -71,18 +71,31 @@ class SentReferralSummary(
   @CollectionTable(name = "referral_assignments")
   @Where(clause = "superseded = false")
   val assignments: MutableList<ReferralAssignment> = mutableListOf(),
-  @ManyToOne @Fetch(FetchMode.JOIN) var sentBy: AuthUser,
+  @ManyToOne
+  @Fetch(FetchMode.JOIN)
+  var sentBy: AuthUser,
   var sentAt: OffsetDateTime,
   var concludedAt: OffsetDateTime? = null,
   var referenceNumber: String,
   @OneToOne(mappedBy = "draftReferral", cascade = [CascadeType.ALL]) @PrimaryKeyJoinColumn var serviceUserData: ServiceUserData?,
-  @NotNull @ManyToOne @Fetch(FetchMode.JOIN) val createdBy: AuthUser,
+  @NotNull
+  @ManyToOne
+  @Fetch(FetchMode.JOIN)
+  val createdBy: AuthUser,
   var endRequestedAt: OffsetDateTime? = null,
-  @NotNull @ManyToOne(fetch = FetchType.LAZY) val intervention: Intervention,
+  @NotNull
+  @ManyToOne(fetch = FetchType.LAZY)
+  val intervention: Intervention,
   @NotNull val serviceUserCRN: String,
-  @OneToOne(mappedBy = "referral") @Fetch(FetchMode.JOIN) var endOfServiceReport: EndOfServiceReport? = null,
-  @OneToOne(mappedBy = "referral") @Fetch(FetchMode.JOIN) var supplierAssessment: SupplierAssessment? = null,
-  @OneToMany(fetch = FetchType.LAZY) @JoinColumn(name = "referral_id") var actionPlans: MutableList<ActionPlan>? = null,
+  @OneToOne(mappedBy = "referral")
+  @Fetch(FetchMode.JOIN)
+  var endOfServiceReport: EndOfServiceReport? = null,
+  @OneToOne(mappedBy = "referral")
+  @Fetch(FetchMode.JOIN)
+  var supplierAssessment: SupplierAssessment? = null,
+  @OneToMany(fetch = FetchType.LAZY)
+  @JoinColumn(name = "referral_id")
+  var actionPlans: MutableList<ActionPlan>? = null,
 ) {
   private val currentAssignment: ReferralAssignment?
     get() = assignments.maxByOrNull { it.assignedAt }

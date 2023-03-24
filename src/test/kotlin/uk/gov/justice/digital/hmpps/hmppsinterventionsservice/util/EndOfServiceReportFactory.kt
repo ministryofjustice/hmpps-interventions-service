@@ -32,7 +32,7 @@ class EndOfServiceReportFactory(em: TestEntityManager? = null) : EntityFactory(e
         submittedBy = submittedBy,
         furtherInformation = furtherInformation,
         outcomes = outcomes,
-      )
+      ),
     )
   }
 }

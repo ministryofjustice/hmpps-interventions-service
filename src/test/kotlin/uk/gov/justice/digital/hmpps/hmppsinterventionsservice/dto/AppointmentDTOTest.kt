@@ -11,6 +11,7 @@ internal class AppointmentDTOTest {
   private val appointmentFactory = AppointmentFactory()
   private val appointmentDeliveryFactory = AppointmentDeliveryFactory()
   private val appointmentDeliveryAddressFactory = AppointmentDeliveryAddressFactory()
+
   @Test
   fun `Maps from an appointment booked with Other Location`() {
     val appointment = appointmentFactory.create()

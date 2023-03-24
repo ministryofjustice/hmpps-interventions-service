@@ -27,7 +27,7 @@ class EndOfServiceReportOutcomeDTOTest(@Autowired private val json: JacksonTeste
             "progressionComments": null,
             "additionalTaskComments": null
           }
-    """
+    """,
     )
   }
 }

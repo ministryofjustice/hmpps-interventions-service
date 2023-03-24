@@ -112,7 +112,7 @@ internal class ReferralControllerTest {
         tokenFactory.create(
           clientId = "interventions-event-client",
           subject = "interventions-event-client",
-          authorities = arrayOf("ROLE_INTERVENTIONS_API_READ_ALL")
+          authorities = arrayOf("ROLE_INTERVENTIONS_API_READ_ALL"),
         ),
       )
       assertThat(sentReferral.id).isEqualTo(referral.id)
@@ -127,7 +127,7 @@ internal class ReferralControllerTest {
           tokenFactory.create(
             clientId = "interventions-event-client",
             subject = "BERNARD.BERKS",
-            authorities = arrayOf("ROLE_INTERVENTIONS_API_READ_ALL")
+            authorities = arrayOf("ROLE_INTERVENTIONS_API_READ_ALL"),
           ),
         )
       }
@@ -143,7 +143,7 @@ internal class ReferralControllerTest {
           tokenFactory.create(
             clientId = "interventions-event-client",
             subject = "interventions-event-client",
-            authorities = arrayOf("ROLE_INTEXXXXTIONS_API_READ_ALL")
+            authorities = arrayOf("ROLE_INTEXXXXTIONS_API_READ_ALL"),
           ),
         )
       }
@@ -169,7 +169,7 @@ internal class ReferralControllerTest {
         tokenFactory.create(
           clientId = "interventions-event-client",
           subject = "interventions-event-client",
-          authorities = arrayOf("ROLE_INTERVENTIONS_API_READ_ALL")
+          authorities = arrayOf("ROLE_INTERVENTIONS_API_READ_ALL"),
         ),
       )
       assertThat(supplierAssessmentDto.id).isEqualTo(supplierAssessment.id)
@@ -189,7 +189,7 @@ internal class ReferralControllerTest {
         tokenFactory.create(
           clientId = "interventions-event-client",
           subject = "interventions-event-client",
-          authorities = arrayOf("ROLE_INTERVENTIONS_API_READ_ALL")
+          authorities = arrayOf("ROLE_INTERVENTIONS_API_READ_ALL"),
         ),
       )
       assertThat(supplierAssessmentDto.id).isEqualTo(supplierAssessment.id)
@@ -208,7 +208,7 @@ internal class ReferralControllerTest {
           tokenFactory.create(
             clientId = "interventions-event-client",
             subject = "BERNARD.BERKS",
-            authorities = arrayOf("ROLE_INTERVENTIONS_API_READ_ALL")
+            authorities = arrayOf("ROLE_INTERVENTIONS_API_READ_ALL"),
           ),
         )
       }
@@ -224,7 +224,7 @@ internal class ReferralControllerTest {
           tokenFactory.create(
             clientId = "interventions-event-client",
             subject = "interventions-event-client",
-            authorities = arrayOf("ROLE_INTEXXXXTIONS_API_READ_ALL")
+            authorities = arrayOf("ROLE_INTEXXXXTIONS_API_READ_ALL"),
           ),
         )
       }
@@ -242,26 +242,30 @@ internal class ReferralControllerTest {
       whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
       assertThat(
         referralController.getServiceProviderSentReferralsSummary(
-          token, "myCases"
-        )
+          token,
+          "MyCases",
+        ),
       ).isNotNull
 
       assertThat(
         referralController.getServiceProviderSentReferralsSummary(
-          token, "openCases"
-        )
+          token,
+          "OpenCases",
+        ),
       ).isNotNull
 
       assertThat(
         referralController.getServiceProviderSentReferralsSummary(
-          token, "unassignedCases"
-        )
+          token,
+          "UnassignedCases",
+        ),
       ).isNotNull
 
       assertThat(
         referralController.getServiceProviderSentReferralsSummary(
-          token, "completedCases"
-        )
+          token,
+          "CompletedCases",
+        ),
       ).isNotNull
     }
 
@@ -270,7 +274,8 @@ internal class ReferralControllerTest {
       whenever(referralService.getServiceProviderSummaries(any(), any())).thenReturn(emptyList())
       whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
       val result = referralController.getServiceProviderSentReferralsSummary(
-        token, null
+        token,
+        null,
       )
       assertThat(result).isNotNull
     }
@@ -282,7 +287,7 @@ internal class ReferralControllerTest {
       assertThrows<IllegalArgumentException> {
         referralController.getServiceProviderSentReferralsSummary(
           token,
-          "invalidDashBoardType"
+          "invalidDashBoardType",
         )
       }
     }
@@ -296,7 +301,7 @@ internal class ReferralControllerTest {
       referralController.assignSentReferral(
         UUID.randomUUID(),
         ReferralAssignmentDTO(AuthUserDTO("username", "authSource", "userId")),
-        tokenFactory.create()
+        tokenFactory.create(),
       )
     }
     assertThat(e.status).isEqualTo(HttpStatus.NOT_FOUND)
@@ -312,7 +317,7 @@ internal class ReferralControllerTest {
     referralController.assignSentReferral(
       UUID.randomUUID(),
       ReferralAssignmentDTO(AuthUserDTO.from(assignedToUser)),
-      tokenFactory.create(userID = "by")
+      tokenFactory.create(userID = "by"),
     )
 
     val toCaptor = argumentCaptor<AuthUser>()
@@ -362,7 +367,7 @@ internal class ReferralControllerTest {
   fun `get all cancellation reasons`() {
     val cancellationReasons = listOf(
       CancellationReason(code = "aaa", description = "reason 1"),
-      CancellationReason(code = "bbb", description = "reason 2")
+      CancellationReason(code = "bbb", description = "reason 2"),
     )
     whenever(referralService.getCancellationReasons()).thenReturn(cancellationReasons)
     val response = referralController.getCancellationReasons()
@@ -430,7 +435,7 @@ internal class ReferralControllerTest {
       val assignedReferral = referralController.assignSentReferral(
         UUID.randomUUID(),
         ReferralAssignmentDTO(AuthUserDTO.from(assignedToUser)),
-        tokenFactory.create(userID = "by")
+        tokenFactory.create(userID = "by"),
       )
       assertThat(assignedReferral.id).isEqualTo(referral.id)
       assertThat(assignedReferral.endOfServiceReportCreationRequired).isFalse

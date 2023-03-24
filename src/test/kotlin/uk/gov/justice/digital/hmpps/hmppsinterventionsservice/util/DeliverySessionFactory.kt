@@ -17,7 +17,7 @@ class DeliverySessionFactory(em: TestEntityManager? = null) : EntityFactory(em) 
     id: UUID = UUID.randomUUID(),
     referral: Referral = referralFactory.createSent(),
     sessionNumber: Int = 1,
-    appointments: MutableSet<Appointment> = mutableSetOf()
+    appointments: MutableSet<Appointment> = mutableSetOf(),
   ): DeliverySession {
     return save(
       DeliverySession(
@@ -25,7 +25,7 @@ class DeliverySessionFactory(em: TestEntityManager? = null) : EntityFactory(em) 
         referral = referral,
         sessionNumber = sessionNumber,
         appointments = appointments,
-      )
+      ),
     )
   }
 
@@ -38,7 +38,7 @@ class DeliverySessionFactory(em: TestEntityManager? = null) : EntityFactory(em) 
     appointmentTime: OffsetDateTime = OffsetDateTime.now().plusMonths(1),
     durationInMinutes: Int = 120,
     deliusAppointmentId: Long? = null,
-    attended: Attended? = null
+    attended: Attended? = null,
   ): DeliverySession {
     val appointment = appointmentFactory.create(
       createdBy = createdBy,
@@ -47,7 +47,7 @@ class DeliverySessionFactory(em: TestEntityManager? = null) : EntityFactory(em) 
       durationInMinutes = durationInMinutes,
       appointmentFeedbackSubmittedBy = createdBy,
       deliusAppointmentId = deliusAppointmentId,
-      attended = attended
+      attended = attended,
     )
 
     return save(
@@ -56,7 +56,7 @@ class DeliverySessionFactory(em: TestEntityManager? = null) : EntityFactory(em) 
         referral = referral,
         sessionNumber = sessionNumber,
         appointments = mutableSetOf(appointment),
-      )
+      ),
     )
   }
 
@@ -98,7 +98,7 @@ class DeliverySessionFactory(em: TestEntityManager? = null) : EntityFactory(em) 
         referral = referral,
         sessionNumber = sessionNumber,
         appointments = mutableSetOf(appointment),
-      )
+      ),
     )
   }
 
@@ -106,7 +106,7 @@ class DeliverySessionFactory(em: TestEntityManager? = null) : EntityFactory(em) 
     id: UUID = UUID.randomUUID(),
     referral: Referral,
     sessionNumber: Int = 1,
-    appointment: MutableSet<Appointment> = mutableSetOf()
+    appointment: MutableSet<Appointment> = mutableSetOf(),
   ): DeliverySession {
     return save(
       DeliverySession(
@@ -114,7 +114,7 @@ class DeliverySessionFactory(em: TestEntityManager? = null) : EntityFactory(em) 
         referral = referral,
         sessionNumber = sessionNumber,
         appointments = appointment,
-      )
+      ),
     )
   }
 }

@@ -54,9 +54,14 @@ internal class DeliverySessionsServiceTest {
   private val referralFactory = ReferralFactory()
 
   private val deliverySessionsService = DeliverySessionService(
-    deliverySessionRepository, actionPlanRepository,
-    authUserRepository, actionPlanAppointmentEventPublisher,
-    communityAPIBookingService, appointmentService, appointmentRepository, referralRepository
+    deliverySessionRepository,
+    actionPlanRepository,
+    authUserRepository,
+    actionPlanAppointmentEventPublisher,
+    communityAPIBookingService,
+    appointmentService,
+    appointmentRepository,
+    referralRepository,
   )
 
   private fun createActor(userName: String = "action_plan_session_test"): AuthUser =
@@ -123,7 +128,7 @@ internal class DeliverySessionsServiceTest {
       user,
       AppointmentDeliveryType.PHONE_CALL,
       AppointmentSessionType.ONE_TO_ONE,
-      null
+      null,
     )
 
     verify(appointmentService, times(1)).createOrUpdateAppointmentDeliveryDetails(any(), eq(AppointmentDeliveryType.PHONE_CALL), eq(AppointmentSessionType.ONE_TO_ONE), isNull(), isNull())
@@ -167,7 +172,7 @@ internal class DeliverySessionsServiceTest {
       Attended.YES,
       "additional information",
       false,
-      "description"
+      "description",
     )
 
     verify(appointmentService, times(1)).createOrUpdateAppointmentDeliveryDetails(any(), eq(AppointmentDeliveryType.PHONE_CALL), eq(AppointmentSessionType.ONE_TO_ONE), isNull(), isNull())
@@ -212,7 +217,7 @@ internal class DeliverySessionsServiceTest {
       null,
       null,
       Attended.NO,
-      "additional information"
+      "additional information",
     )
 
     verify(appointmentService, times(1)).createOrUpdateAppointmentDeliveryDetails(any(), eq(AppointmentDeliveryType.PHONE_CALL), eq(AppointmentSessionType.ONE_TO_ONE), isNull(), isNull())
@@ -253,7 +258,7 @@ internal class DeliverySessionsServiceTest {
       user,
       AppointmentDeliveryType.PHONE_CALL,
       AppointmentSessionType.ONE_TO_ONE,
-      null
+      null,
     )
 
     verify(appointmentService, times(1)).createOrUpdateAppointmentDeliveryDetails(any(), eq(AppointmentDeliveryType.PHONE_CALL), eq(AppointmentSessionType.ONE_TO_ONE), isNull(), isNull())
@@ -289,8 +294,8 @@ internal class DeliverySessionsServiceTest {
         appointmentTime,
         durationInMinutes,
         SERVICE_DELIVERY,
-        null
-      )
+        null,
+      ),
     ).thenReturn(999L)
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber))
       .thenReturn(session)
@@ -304,7 +309,7 @@ internal class DeliverySessionsServiceTest {
       createdByUser,
       AppointmentDeliveryType.PHONE_CALL,
       AppointmentSessionType.ONE_TO_ONE,
-      null
+      null,
     )
 
     assertThat(updatedSession).isEqualTo(session)
@@ -315,12 +320,12 @@ internal class DeliverySessionsServiceTest {
       appointmentTime,
       durationInMinutes,
       SERVICE_DELIVERY,
-      null
+      null,
     )
     verify(appointmentRepository, times(1)).saveAndFlush(
       ArgumentMatchers.argThat {
         it.deliusAppointmentId == 999L
-      }
+      },
     )
   }
 
@@ -341,8 +346,8 @@ internal class DeliverySessionsServiceTest {
         appointmentTime,
         durationInMinutes,
         SERVICE_DELIVERY,
-        null
-      )
+        null,
+      ),
     ).thenReturn(null)
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(session)
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
@@ -355,14 +360,14 @@ internal class DeliverySessionsServiceTest {
       createdByUser,
       AppointmentDeliveryType.PHONE_CALL,
       AppointmentSessionType.ONE_TO_ONE,
-      null
+      null,
     )
 
     verify(appointmentService, times(1)).createOrUpdateAppointmentDeliveryDetails(any(), eq(AppointmentDeliveryType.PHONE_CALL), eq(AppointmentSessionType.ONE_TO_ONE), isNull(), isNull())
     verify(appointmentRepository, times(1)).saveAndFlush(
       ArgumentMatchers.argThat {
         it.deliusAppointmentId == null
-      }
+      },
     )
   }
 
@@ -384,7 +389,7 @@ internal class DeliverySessionsServiceTest {
         authUserFactory.create(),
         AppointmentDeliveryType.PHONE_CALL,
         AppointmentSessionType.ONE_TO_ONE,
-        null
+        null,
       )
     }
     assertThat(exception.message).isEqualTo("Action plan session not found [actionPlanId=$actionPlanId, sessionNumber=$sessionNumber]")
@@ -546,7 +551,7 @@ internal class DeliverySessionsServiceTest {
     val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
     val actionPlanId = UUID.randomUUID()
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(
-      session
+      session,
     )
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
 
@@ -576,7 +581,7 @@ internal class DeliverySessionsServiceTest {
     val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
     val actionPlanId = UUID.randomUUID()
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(
-      session
+      session,
     )
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
     deliverySessionsService.recordAppointmentAttendance(user, actionPlanId, 1, Attended.YES, "")
@@ -617,7 +622,7 @@ internal class DeliverySessionsServiceTest {
     val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
     val actionPlanId = UUID.randomUUID()
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(
-      session
+      session,
     )
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
 
@@ -635,7 +640,7 @@ internal class DeliverySessionsServiceTest {
     val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
     val actionPlanId = UUID.randomUUID()
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(
-      session
+      session,
     )
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
 
@@ -667,11 +672,11 @@ internal class DeliverySessionsServiceTest {
         appointmentTime,
         durationInMinutes,
         SERVICE_DELIVERY,
-        npsOfficeCode
-      )
+        npsOfficeCode,
+      ),
     ).thenReturn(999L)
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(
-      session
+      session,
     )
     whenever(authUserRepository.save(createdByUser)).thenReturn(createdByUser)
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
@@ -685,7 +690,7 @@ internal class DeliverySessionsServiceTest {
       AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE,
       AppointmentSessionType.ONE_TO_ONE,
       null,
-      npsOfficeCode
+      npsOfficeCode,
     )
 
     assertThat(updatedSession).isEqualTo(session)
@@ -696,12 +701,12 @@ internal class DeliverySessionsServiceTest {
       appointmentTime,
       durationInMinutes,
       SERVICE_DELIVERY,
-      npsOfficeCode
+      npsOfficeCode,
     )
     verify(appointmentRepository, times(1)).saveAndFlush(
       ArgumentMatchers.argThat {
         it.deliusAppointmentId == 999L
-      }
+      },
     )
   }
 }

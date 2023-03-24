@@ -9,15 +9,15 @@ class ServiceUserFactory(em: TestEntityManager? = null) : EntityFactory(em) {
   fun create(
     firstName: String? = null,
     lastName: String? = null,
-    referral: DraftReferral = referralFactory.createDraft()
+    referral: DraftReferral = referralFactory.createDraft(),
   ): ServiceUserData {
     return save(
       ServiceUserData(
         firstName = firstName,
         lastName = lastName,
         draftReferral = referral,
-        referralID = referral.id
-      )
+        referralID = referral.id,
+      ),
     )
   }
 }

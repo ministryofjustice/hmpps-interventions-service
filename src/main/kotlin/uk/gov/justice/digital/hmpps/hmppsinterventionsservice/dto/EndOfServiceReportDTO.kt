@@ -35,7 +35,7 @@ data class EndOfServiceReportOutcomeDTO(
   val desiredOutcome: DesiredOutcomeDTO,
   val achievementLevel: AchievementLevel,
   val progressionComments: String? = null,
-  val additionalTaskComments: String? = null
+  val additionalTaskComments: String? = null,
 ) {
   companion object {
     fun from(endOfServiceReportOutcome: EndOfServiceReportOutcome): EndOfServiceReportOutcomeDTO {
@@ -43,7 +43,7 @@ data class EndOfServiceReportOutcomeDTO(
         desiredOutcome = DesiredOutcomeDTO.from(endOfServiceReportOutcome.desiredOutcome),
         achievementLevel = endOfServiceReportOutcome.achievementLevel,
         progressionComments = endOfServiceReportOutcome.progressionComments,
-        additionalTaskComments = endOfServiceReportOutcome.additionalTaskComments
+        additionalTaskComments = endOfServiceReportOutcome.additionalTaskComments,
       )
     }
   }

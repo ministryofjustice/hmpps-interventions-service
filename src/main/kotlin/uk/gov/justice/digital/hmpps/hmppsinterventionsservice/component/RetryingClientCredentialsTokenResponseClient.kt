@@ -54,7 +54,7 @@ class RetryingClientCredentialsTokenResponseClient(
     setBackOffPolicy(
       FixedBackOffPolicy().apply {
         backOffPeriod = config.retryDelayMs
-      }
+      },
     )
     setRetryPolicy(SimpleRetryPolicy(config.retries))
     setListeners(arrayOf(retryLogger))
@@ -71,7 +71,7 @@ class RetryingClientCredentialsTokenResponseClient(
               errorHandler.handleError(response)
             }
           }
-        }
+        },
       )
     }
   }
@@ -89,7 +89,7 @@ class RetryingClientCredentialsTokenResponseClient(
           OAuth2AccessTokenResponseHttpMessageConverter(),
         )
         .errorHandler(errorHandler)
-        .build()
+        .build(),
     )
   }
 }

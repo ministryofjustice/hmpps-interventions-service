@@ -82,40 +82,55 @@ class CaseNoteServiceTest @Autowired constructor(
     fun `can return the correct page of case notes with provided pageable`() {
       val referral = referralFactory.createSent()
       val caseNote5 = caseNoteFactory.create(
-        referral = referral, subject = "subject", body = "body",
-        sentAt = OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 5, 0), ZoneOffset.MAX)
+        referral = referral,
+        subject = "subject",
+        body = "body",
+        sentAt = OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 5, 0), ZoneOffset.MAX),
       )
       val caseNote1 = caseNoteFactory.create(
-        referral = referral, subject = "subject", body = "body",
-        sentAt = OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 1, 0), ZoneOffset.MAX)
+        referral = referral,
+        subject = "subject",
+        body = "body",
+        sentAt = OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 1, 0), ZoneOffset.MAX),
       )
       val caseNote2 = caseNoteFactory.create(
-        referral = referral, subject = "subject", body = "body",
-        sentAt = OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 2, 0), ZoneOffset.MAX)
+        referral = referral,
+        subject = "subject",
+        body = "body",
+        sentAt = OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 2, 0), ZoneOffset.MAX),
       )
       val caseNote4 = caseNoteFactory.create(
-        referral = referral, subject = "subject", body = "body",
-        sentAt = OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 4, 0), ZoneOffset.MAX)
+        referral = referral,
+        subject = "subject",
+        body = "body",
+        sentAt = OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 4, 0), ZoneOffset.MAX),
       )
       val caseNote7 = caseNoteFactory.create(
-        referral = referral, subject = "subject", body = "body",
-        sentAt = OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 7, 0), ZoneOffset.MAX)
+        referral = referral,
+        subject = "subject",
+        body = "body",
+        sentAt = OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 7, 0), ZoneOffset.MAX),
       )
       val caseNote6 = caseNoteFactory.create(
-        referral = referral, subject = "subject", body = "body",
-        sentAt = OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 6, 0), ZoneOffset.MAX)
+        referral = referral,
+        subject = "subject",
+        body = "body",
+        sentAt = OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 6, 0), ZoneOffset.MAX),
       )
       val caseNote3 = caseNoteFactory.create(
-        referral = referral, subject = "subject", body = "body",
-        sentAt = OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 3, 0), ZoneOffset.MAX)
+        referral = referral,
+        subject = "subject",
+        body = "body",
+        sentAt = OffsetDateTime.of(LocalDateTime.of(2021, 1, 1, 3, 0), ZoneOffset.MAX),
       )
 
       val caseNotes = caseNoteService.findByReferral(
         referralId = referral.id,
         PageRequest.of(
-          1, 3,
-          Sort.by("sentAt")
-        )
+          1,
+          3,
+          Sort.by("sentAt"),
+        ),
       )
 
       assertThat(caseNotes.totalPages).isEqualTo(3)
@@ -158,8 +173,8 @@ class CaseNoteServiceTest @Autowired constructor(
       whenever(
         referralService.getSentReferralForUser(
           caseNote.id,
-          caseNote.sentBy
-        )
+          caseNote.sentBy,
+        ),
       ).thenThrow(AccessError(caseNote.sentBy, "denied", emptyList()))
 
       assertThrows<AccessError> { caseNoteService.getCaseNoteForUser(caseNote.id, referral.sentBy!!) }

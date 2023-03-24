@@ -73,7 +73,8 @@ internal class TransferReferralsProcessorTest {
     assertThat(caseNoteCaptor.firstValue.body).isEqualTo("Automated transfer from Source Intervention to Target Intervention")
     assertThat(caseNoteCaptor.firstValue.sentBy).isEqualTo(AuthUser.interventionsServiceUser)
     assertThat(caseNoteCaptor.firstValue.sentAt).isCloseTo(
-      OffsetDateTime.now(), TemporalUnitWithinOffset(1, ChronoUnit.MINUTES)
+      OffsetDateTime.now(),
+      TemporalUnitWithinOffset(1, ChronoUnit.MINUTES),
     )
   }
 }

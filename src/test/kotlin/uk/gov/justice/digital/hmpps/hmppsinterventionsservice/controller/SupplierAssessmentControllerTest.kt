@@ -64,7 +64,7 @@ class SupplierAssessmentControllerTest {
         secondAddressLine = "44 Bouverie Road",
         townOrCity = "Blackpool",
         county = "Lancashire",
-        postCode = "SY40RE"
+        postCode = "SY40RE",
       )
       val update = UpdateAppointmentDTO(appointmentTime, durationInMinutes, appointmentDeliveryType, appointmentSessionType, addressDTO, npsOfficeCode)
       val user = authUserFactory.create()
@@ -128,6 +128,7 @@ class SupplierAssessmentControllerTest {
       val result = supplierAssessmentController.recordAppointmentBehaviour(referralId, userRequest, token)
       assertThat(result).isNotNull
     }
+
     @Test
     fun `expect not found if referral does not exist`() {
       val referralId = UUID.randomUUID()
@@ -290,6 +291,7 @@ class SupplierAssessmentControllerTest {
       val result = supplierAssessmentController.submitFeedback(referralId, token)
       assertThat(result).isNotNull
     }
+
     @Test
     fun `expect not found if referral does not exist`() {
       val referralId = UUID.randomUUID()

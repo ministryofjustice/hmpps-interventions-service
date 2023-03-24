@@ -21,7 +21,7 @@ class ActionPlanEvent(source: Any, val type: ActionPlanEventType, val actionPlan
 @Component
 class ActionPlanEventPublisher(
   private val applicationEventPublisher: ApplicationEventPublisher,
-  private val locationMapper: LocationMapper
+  private val locationMapper: LocationMapper,
 ) {
 
   fun actionPlanSubmitEvent(actionPlan: ActionPlan) {

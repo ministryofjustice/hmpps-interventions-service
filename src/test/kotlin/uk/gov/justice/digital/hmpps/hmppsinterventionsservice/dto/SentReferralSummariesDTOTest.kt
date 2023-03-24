@@ -29,7 +29,7 @@ class SentReferralSummariesDTOTest(@Autowired private val json: JacksonTester<Se
       "Smith",
       dateOfBirth = LocalDate.of(1981, 7, 20),
       gender = "male",
-      ethnicity = "Indian"
+      ethnicity = "Indian",
     )
 
     val sentReferralSummary = sentReferralSummariesFactory.createSent(
@@ -37,7 +37,7 @@ class SentReferralSummariesDTOTest(@Autowired private val json: JacksonTester<Se
       serviceUserData = serviceUserData,
       referenceNumber = "something",
       sentAt = sentAt,
-      sentBy = sentBy
+      sentBy = sentBy,
     )
 
     val out = json.write(SentReferralSummariesDTO.from(sentReferralSummary))
@@ -53,7 +53,7 @@ class SentReferralSummariesDTOTest(@Autowired private val json: JacksonTester<Se
         "serviceUser": {"crn": "X123456"},
         "serviceProvider": {id:"HARMONY_LIVING","name": "Harmony Living"}
       }
-    """
+    """,
     )
   }
 
@@ -68,7 +68,7 @@ class SentReferralSummariesDTOTest(@Autowired private val json: JacksonTester<Se
       "Smith",
       dateOfBirth = LocalDate.of(1981, 7, 20),
       gender = "male",
-      ethnicity = "Indian"
+      ethnicity = "Indian",
     )
 
     val sentReferralSummary = sentReferralSummariesFactory.createSent(
@@ -77,7 +77,7 @@ class SentReferralSummariesDTOTest(@Autowired private val json: JacksonTester<Se
       referenceNumber = "something",
       intervention = interventionFactory.create(title = "Accommodation Services for Yorkshire"),
       sentAt = sentAt,
-      sentBy = sentBy
+      sentBy = sentBy,
     )
     val out = json.write(SentReferralSummariesDTO.from(sentReferralSummary))
     Assertions.assertThat(out).isEqualToJson(
@@ -85,7 +85,7 @@ class SentReferralSummariesDTOTest(@Autowired private val json: JacksonTester<Se
       {
         "interventionTitle": "Accommodation Services for Yorkshire"
       }
-    """
+    """,
     )
   }
 }

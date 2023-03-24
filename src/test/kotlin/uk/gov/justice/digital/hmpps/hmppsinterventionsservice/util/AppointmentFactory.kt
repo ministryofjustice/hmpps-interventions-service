@@ -29,7 +29,7 @@ class AppointmentFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     appointmentFeedbackSubmittedBy: AuthUser? = null,
     deliusAppointmentId: Long? = null,
     superseded: Boolean = false,
-    referral: Referral = referralFactory.createSent()
+    referral: Referral = referralFactory.createSent(),
   ): Appointment {
     return save(
       Appointment(
@@ -50,7 +50,7 @@ class AppointmentFactory(em: TestEntityManager? = null) : EntityFactory(em) {
         deliusAppointmentId = deliusAppointmentId,
         superseded = superseded,
         referral = referral,
-      )
+      ),
     )
   }
 
@@ -71,7 +71,7 @@ class AppointmentFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     appointmentFeedbackSubmittedBy: AuthUser? = null,
     deliusAppointmentId: Long? = null,
     superseded: Boolean = false,
-    referral: Referral
+    referral: Referral,
   ): Appointment {
     return save(
       Appointment(
@@ -92,7 +92,7 @@ class AppointmentFactory(em: TestEntityManager? = null) : EntityFactory(em) {
         deliusAppointmentId = deliusAppointmentId,
         superseded = superseded,
         referral = referral,
-      )
+      ),
     )
   }
 }

@@ -39,7 +39,7 @@ class ServiceProviderAccessScopeMapperTest {
       serviceProviderRepository = serviceProviderRepository,
       dynamicFrameworkContractRepository = contractRepository,
       userTypeChecker = userTypeChecker,
-      telemetryClient = telemetryClient
+      telemetryClient = telemetryClient,
     )
   }
 
@@ -79,8 +79,8 @@ class ServiceProviderAccessScopeMapperTest {
           "INT_SP_UNKNOWN",
           "INT_CR_TEST_C0001",
           "INT_CR_TEST_A0002",
-          "INT_CR_UNDEFINED"
-        )
+          "INT_CR_UNDEFINED",
+        ),
       )
 
       val p1 = ServiceProvider(id = "TEST_P1", name = "Test 1 Ltd")
@@ -120,7 +120,7 @@ class ServiceProviderAccessScopeMapperTest {
           "contracts" to "TEST_A0002,TEST_C0001",
           "providers" to "TEST_A2,TEST_P1",
         ),
-        null
+        null,
       )
     }
 
@@ -135,7 +135,7 @@ class ServiceProviderAccessScopeMapperTest {
           "userAuthSource" to "auth",
           "issues" to "[unidentified provider 'UNKNOWN': group does not exist in the reference data, unidentified contract 'UNDEFINED': group does not exist in the reference data]",
         ),
-        null
+        null,
       )
     }
   }

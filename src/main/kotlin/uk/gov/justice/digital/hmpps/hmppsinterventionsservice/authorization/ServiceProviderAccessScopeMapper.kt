@@ -80,7 +80,7 @@ class ServiceProviderAccessScopeMapper(
         "contracts" to scope.contracts.joinToString(",") { c -> c.contractReference },
         "providers" to scope.serviceProviders.joinToString(",") { p -> p.id },
       ),
-      null
+      null,
     )
   }
 
@@ -91,9 +91,9 @@ class ServiceProviderAccessScopeMapper(
         "userId" to user.id,
         "userName" to user.userName,
         "userAuthSource" to user.authSource,
-        "issues" to scope.toString()
+        "issues" to scope.toString(),
       ),
-      null
+      null,
     )
   }
 

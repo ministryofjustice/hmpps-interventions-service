@@ -52,7 +52,7 @@ data class DraftReferralDTO(
   val personCustodyPrisonId: String? = null,
   val hasExpectedReleaseDate: Boolean? = null,
   val expectedReleaseDate: LocalDate? = null,
-  val expectedReleaseDateMissingReason: String? = null
+  val expectedReleaseDateMissingReason: String? = null,
 ) {
   companion object {
     fun from(referral: DraftReferral): DraftReferralDTO {
@@ -79,7 +79,7 @@ data class DraftReferralDTO(
           ?.map { (serviceCategoryId, desiredOutcomes) ->
             SelectedDesiredOutcomesDTO(
               serviceCategoryId,
-              desiredOutcomes.map { it.desiredOutcomeId }.sorted()
+              desiredOutcomes.map { it.desiredOutcomeId }.sorted(),
             )
           },
         serviceUser = ServiceUserDTO.from(referral.serviceUserCRN, referral.serviceUserData),
@@ -93,9 +93,10 @@ data class DraftReferralDTO(
         personCurrentLocationType = referral.personCurrentLocationType,
         personCustodyPrisonId = referral.personCustodyPrisonId,
         expectedReleaseDate = referral.expectedReleaseDate,
-        expectedReleaseDateMissingReason = referral.expectedReleaseDateMissingReason
+        expectedReleaseDateMissingReason = referral.expectedReleaseDateMissingReason,
       )
     }
+
     @Deprecated("deprecated as we will be using from(referral: DraftReferral) in the future")
     fun from(referral: Referral): DraftReferralDTO {
       val contract = referral.intervention.dynamicFrameworkContract
@@ -121,7 +122,7 @@ data class DraftReferralDTO(
           ?.map { (serviceCategoryId, desiredOutcomes) ->
             SelectedDesiredOutcomesDTO(
               serviceCategoryId,
-              desiredOutcomes.map { it.desiredOutcomeId }.sorted()
+              desiredOutcomes.map { it.desiredOutcomeId }.sorted(),
             )
           },
         serviceUser = ServiceUserDTO.from(referral.serviceUserCRN, referral.serviceUserData),
@@ -135,7 +136,7 @@ data class DraftReferralDTO(
         personCurrentLocationType = referral.referralLocation?.type,
         personCustodyPrisonId = referral.referralLocation?.prisonId,
         expectedReleaseDate = referral.referralLocation?.expectedReleaseDate,
-        expectedReleaseDateMissingReason = referral.referralLocation?.expectedReleaseDateMissingReason
+        expectedReleaseDateMissingReason = referral.referralLocation?.expectedReleaseDateMissingReason,
       )
     }
   }

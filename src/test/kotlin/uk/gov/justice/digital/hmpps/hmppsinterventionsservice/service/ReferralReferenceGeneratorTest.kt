@@ -32,7 +32,7 @@ class ReferralReferenceGeneratorTest {
       val g = ReferralReferenceGenerator(prefixChars = ex.prefixChars.toList(), numbers = ex.numbers.toList())
       assertThat(g.generate("name")).doesNotContain(
         ex.doesNotContain,
-        "Characters in ${ex.prefixChars} and ${ex.numbers} are similar, avoid '${ex.doesNotContain}' to remain unambiguous"
+        "Characters in ${ex.prefixChars} and ${ex.numbers} are similar, avoid '${ex.doesNotContain}' to remain unambiguous",
       )
     }
   }

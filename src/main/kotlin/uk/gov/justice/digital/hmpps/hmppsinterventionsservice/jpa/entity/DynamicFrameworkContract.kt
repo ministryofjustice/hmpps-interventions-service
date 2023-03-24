@@ -22,28 +22,30 @@ import javax.validation.constraints.NotNull
     NamedAttributeNode("npsRegion"),
     NamedAttributeNode(value = "pccRegion", subgraph = "pcc-region"),
     NamedAttributeNode("subcontractorProviders"),
-    NamedAttributeNode(value = "contractType", subgraph = "contractType")
+    NamedAttributeNode(value = "contractType", subgraph = "contractType"),
   ],
   subgraphs = [
     NamedSubgraph(
       name = "pcc-region",
       attributeNodes = [
         NamedAttributeNode("npsRegion"),
-      ]
+      ],
     ),
     NamedSubgraph(
       name = "contractType",
       attributeNodes = [
         NamedAttributeNode("serviceCategories"),
-      ]
-    )
-  ]
+      ],
+    ),
+  ],
 )
 @Entity
 data class DynamicFrameworkContract(
   @Id val id: UUID,
 
-  @NotNull @ManyToOne @JoinColumn(name = "prime_provider_id")
+  @NotNull
+  @ManyToOne
+  @JoinColumn(name = "prime_provider_id")
   val primeProvider: ServiceProvider,
 
   @NotNull val startDate: LocalDate,
@@ -52,10 +54,12 @@ data class DynamicFrameworkContract(
   @NotNull val referralStartDate: LocalDate,
   var referralEndAt: OffsetDateTime? = null,
 
-  @ManyToOne @JoinColumn(name = "nps_region_id")
+  @ManyToOne
+  @JoinColumn(name = "nps_region_id")
   val npsRegion: NPSRegion? = null,
 
-  @ManyToOne @JoinColumn(name = "pcc_region_id")
+  @ManyToOne
+  @JoinColumn(name = "pcc_region_id")
   val pccRegion: PCCRegion? = null,
 
   @NotNull val minimumAge: Int,
@@ -69,11 +73,13 @@ data class DynamicFrameworkContract(
   @JoinTable(
     name = "dynamic_framework_contract_sub_contractor",
     joinColumns = [JoinColumn(name = "dynamic_framework_contract_id")],
-    inverseJoinColumns = [JoinColumn(name = "subcontractor_provider_id")]
+    inverseJoinColumns = [JoinColumn(name = "subcontractor_provider_id")],
   )
   val subcontractorProviders: Set<ServiceProvider> = setOf(),
 
-  @NotNull @ManyToOne @JoinColumn(name = "contract_type_id")
+  @NotNull
+  @ManyToOne
+  @JoinColumn(name = "contract_type_id")
   val contractType: ContractType,
 
 ) {

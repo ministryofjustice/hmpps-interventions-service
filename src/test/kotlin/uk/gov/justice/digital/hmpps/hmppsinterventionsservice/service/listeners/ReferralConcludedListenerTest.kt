@@ -29,7 +29,7 @@ private val submittedAtDefault = OffsetDateTime.of(2020, 3, 3, 3, 3, 3, 3, ZoneO
 
 private fun referralConcludedEvent(
   eventType: ReferralConcludedState,
-  endOfServiceReport: EndOfServiceReport? = null
+  endOfServiceReport: EndOfServiceReport? = null,
 ): ReferralConcludedEvent {
   val referralFactory = ReferralFactory()
   val authUserFactory = AuthUserFactory()
@@ -47,11 +47,11 @@ private fun referralConcludedEvent(
         ReferralAssignment(
           OffsetDateTime.parse("2020-12-04T10:42:43+00:00"),
           authUserFactory.createSP("irrelevant"),
-          authUserFactory.createSP("abc123")
-        )
-      )
+          authUserFactory.createSP("abc123"),
+        ),
+      ),
     ),
-    "http://localhost:8080/sent-referral/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"
+    "http://localhost:8080/sent-referral/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
   )
 }
 
@@ -73,7 +73,7 @@ internal class ReferralConcludedListenerTest {
         "deliveryState" to state.name,
         "referralId" to UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
       ),
-      PersonReference.crn(referralConcludedEvent.referral.serviceUserCRN)
+      PersonReference.crn(referralConcludedEvent.referral.serviceUserCRN),
     )
     verify(snsPublisher).publish(referralConcludedEvent.referral.id, AuthUser.interventionsServiceUser, snsEvent)
   }
@@ -86,7 +86,7 @@ internal class ReferralConcludedIntegrationListenerTest {
     "/pp/referral/{id}/end-of-service-report",
     "secure/offenders/crn/{crn}/sentence/{sentenceId}/notifications/context/{contextName}",
     "commissioned-rehabilitation-services",
-    communityAPIClient
+    communityAPIClient,
   )
 
   @Test
@@ -104,7 +104,7 @@ internal class ReferralConcludedIntegrationListenerTest {
         "End of Service Report Submitted for Accommodation Referral HAS71263 with Prime Provider Harmony Living\n" +
           "http://testUrl/pp/referral/120b1a45-8ac7-4920-b05b-acecccf4734b/end-of-service-report",
       ),
-      Unit::class.java
+      Unit::class.java,
     )
   }
 
@@ -129,7 +129,7 @@ internal class ReferralConcludedIntegrationListenerTest {
         "End of Service Report Submitted for Accommodation Referral HAS71263 with Prime Provider Harmony Living\n" +
           "http://testUrl/pp/referral/120b1a45-8ac7-4920-b05b-acecccf4734b/end-of-service-report",
       ),
-      Unit::class.java
+      Unit::class.java,
     )
   }
 
@@ -149,8 +149,8 @@ internal class ReferralConcludedIntegrationListenerTest {
         relevantSentenceId = 123456789,
         serviceProviderName = "Harmony Living",
         sentAt = sentAtDefault,
-        concludedAt = concludedAtDefault
+        concludedAt = concludedAtDefault,
       ),
-      submittedAt = submittedAtDefault
+      submittedAt = submittedAtDefault,
     )
 }

@@ -13,7 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralCo
 @JobScope
 class ConcludeReferralsProcessor(
   private val referralConcluder: ReferralConcluder,
-  private val deliverySessionRepository: DeliverySessionRepository
+  private val deliverySessionRepository: DeliverySessionRepository,
 ) : ItemProcessor<Referral, Referral> {
   companion object : KLogging()
 

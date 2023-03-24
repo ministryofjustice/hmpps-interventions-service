@@ -77,7 +77,7 @@ class NdmisPerformanceReportJobConfiguration(
       "ndmisReferralsPerformanceReportWriter",
       FileSystemResource(Path.of(outputPath).resolve(referralReportFilename)),
       ReferralsData.headers,
-      ReferralsData.fields
+      ReferralsData.fields,
     )
   }
 
@@ -88,7 +88,7 @@ class NdmisPerformanceReportJobConfiguration(
       "ndmisComplexityPerformanceReportWriter",
       FileSystemResource(Path.of(outputPath).resolve(complexityReportFilename)),
       ComplexityData.headers,
-      ComplexityData.fields
+      ComplexityData.fields,
     )
   }
 
@@ -99,7 +99,7 @@ class NdmisPerformanceReportJobConfiguration(
       "ndmisAppointmentPerformanceReportWriter",
       FileSystemResource(Path.of(outputPath).resolve(appointmentReportFilename)),
       AppointmentData.headers,
-      AppointmentData.fields
+      AppointmentData.fields,
     )
   }
 

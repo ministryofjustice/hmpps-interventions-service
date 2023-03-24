@@ -121,7 +121,6 @@ class AppointmentServiceRepositoryTest @Autowired constructor(
 
     @Test
     fun `expect failure when appointment does not exist`() {
-
       val error = assertThrows<EntityNotFoundException> {
         appointmentService.rescheduleExistingAppointment(
           UUID.randomUUID(),

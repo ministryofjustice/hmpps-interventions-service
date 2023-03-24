@@ -28,7 +28,7 @@ class ServiceUserDTOTest(@Autowired private val json: JacksonTester<ServiceUserD
               "blindness"
             ]
           }
-      """
+      """,
     )
     Assertions.assertThat(serviceUser.dateOfBirth).isEqualTo(LocalDate.of(2059, 8, 9))
     Assertions.assertThat(serviceUser.disabilities).isEqualTo(listOf("prosthetic left leg", "blindness"))

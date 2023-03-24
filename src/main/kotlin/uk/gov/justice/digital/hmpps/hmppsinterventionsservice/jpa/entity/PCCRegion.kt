@@ -11,10 +11,13 @@ import javax.validation.constraints.NotNull
 @Entity
 @Table(name = "pcc_region")
 data class PCCRegion(
-  @NotNull @Id val id: PCCRegionID,
+  @NotNull @Id
+  val id: PCCRegionID,
   @NotNull val name: String,
-  @NotNull @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "nps_region_id")
-  val npsRegion: NPSRegion
+  @NotNull
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "nps_region_id")
+  val npsRegion: NPSRegion,
 )
 
 typealias PCCRegionID = String

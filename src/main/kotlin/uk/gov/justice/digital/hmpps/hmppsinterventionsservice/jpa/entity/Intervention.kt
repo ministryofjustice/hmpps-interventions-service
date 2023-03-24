@@ -10,13 +10,16 @@ import javax.validation.constraints.NotNull
 
 @Entity
 data class Intervention(
-  @NotNull @Id val id: UUID,
+  @NotNull @Id
+  val id: UUID,
   @NotNull val createdAt: OffsetDateTime,
 
   @NotNull val title: String,
   @NotNull val description: String,
   @NotNull val incomingReferralDistributionEmail: String,
 
-  @NotNull @OneToOne @JoinColumn(name = "dynamic_framework_contract_id")
+  @NotNull
+  @OneToOne
+  @JoinColumn(name = "dynamic_framework_contract_id")
   val dynamicFrameworkContract: DynamicFrameworkContract,
 )

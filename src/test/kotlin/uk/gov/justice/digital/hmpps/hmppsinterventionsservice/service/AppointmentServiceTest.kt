@@ -337,7 +337,6 @@ class AppointmentServiceTest {
   }
 
   private fun verifyResponse(appointment: Appointment, originalId: UUID?, expectNewId: Boolean, deliusAppointmentId: Long, appointmentTime: OffsetDateTime?, durationInMinutes: Int, appointmentDeliveryType: AppointmentDeliveryType, appointmentSessionType: AppointmentSessionType, npsOfficeCode: String? = null) {
-
     // Verifying create or update route
     assertThat(appointment).isNotEqualTo(originalId)
 

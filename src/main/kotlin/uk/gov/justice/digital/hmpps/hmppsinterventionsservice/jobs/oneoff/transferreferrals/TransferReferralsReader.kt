@@ -21,13 +21,13 @@ class TransferReferralsReader(
     this.setQueryString(
       "SELECT r FROM Referral r JOIN CaseNote n ON n.referral = r " +
         "WHERE r.intervention.dynamicFrameworkContract.contractReference = :fromContract " +
-        "  AND n.body like :transferSignalText"
+        "  AND n.body like :transferSignalText",
     )
     this.setParameterValues(
       mapOf(
         "fromContract" to fromContract,
-        "transferSignalText" to transferSignalText
-      )
+        "transferSignalText" to transferSignalText,
+      ),
     )
   }
 }

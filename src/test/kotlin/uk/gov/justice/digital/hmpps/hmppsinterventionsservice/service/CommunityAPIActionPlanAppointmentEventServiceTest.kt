@@ -34,12 +34,11 @@ class CommunityAPIActionPlanAppointmentEventServiceTest {
     true,
     "/secure/offenders/crn/{crn}/appointments/{appointmentId}/outcome/context/{contextName}",
     "commissioned-rehabilitation-services",
-    communityAPIClient
+    communityAPIClient,
   )
 
   @Test
   fun `notifies community-api of late attended appointment outcome`() {
-
     val appointmentEvent = generateAppointmentEvent(LATE, false)
     communityAPIService.onApplicationEvent(appointmentEvent)
 
@@ -48,7 +47,6 @@ class CommunityAPIActionPlanAppointmentEventServiceTest {
 
   @Test
   fun `notifies community-api of attended appointment outcome`() {
-
     val appointmentEvent = generateAppointmentEvent(YES, false)
     communityAPIService.onApplicationEvent(appointmentEvent)
 
@@ -57,7 +55,6 @@ class CommunityAPIActionPlanAppointmentEventServiceTest {
 
   @Test
   fun `notifies community-api of non attended appointment outcome and notify PP set is always set`() {
-
     val appointmentEvent = generateAppointmentEvent(NO, false)
     communityAPIService.onApplicationEvent(appointmentEvent)
 
@@ -66,7 +63,6 @@ class CommunityAPIActionPlanAppointmentEventServiceTest {
 
   @Test
   fun `notifies community-api of appointment outcome with notify PP set`() {
-
     val appointmentEvent = generateAppointmentEvent(YES, true)
     communityAPIService.onApplicationEvent(appointmentEvent)
 
@@ -75,14 +71,13 @@ class CommunityAPIActionPlanAppointmentEventServiceTest {
 
   @Test
   fun `does not notify when not enabled`() {
-
     val communityAPIService = CommunityAPIActionPlanAppointmentEventService(
       "http://baseUrl",
       "/probation-practitioner/referrals/{id}/appointment/{sessionNumber}/post-session-feedback",
       false,
       "/secure/offenders/crn/{crn}/appointments/{appointmentId}/outcome/context/{contextName}",
       "commissioned-rehabilitation-services",
-      communityAPIClient
+      communityAPIClient,
     )
 
     communityAPIService.onApplicationEvent(generateAppointmentEvent(YES, true))
@@ -100,8 +95,8 @@ class CommunityAPIActionPlanAppointmentEventServiceTest {
         "Session Feedback Recorded for Accommodation Referral X123456 with Prime Provider Harmony Living\n" +
           "http://baseUrl/probation-practitioner/referrals/$referralId/appointment/1/post-session-feedback",
         attended,
-        notifyPP
-      ).toString()
+        notifyPP,
+      ).toString(),
     )
   }
 
@@ -122,7 +117,7 @@ class CommunityAPIActionPlanAppointmentEventServiceTest {
         attended = attended,
         notifyPPOfAttendanceBehaviour = notifyPP,
       ),
-      "http://localhost:8080/url/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"
+      "http://localhost:8080/url/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
     )
   }
 }

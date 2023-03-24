@@ -15,7 +15,7 @@ class EndOfServiceReportEvent(
   source: Any,
   val type: EndOfServiceReportEventType,
   val endOfServiceReport: EndOfServiceReport,
-  val detailUrl: String
+  val detailUrl: String,
 ) :
   ApplicationEvent(source) {
   override fun toString(): String {
@@ -26,14 +26,16 @@ class EndOfServiceReportEvent(
 @Component
 class EndOfServiceReportEventPublisher(
   private val applicationEventPublisher: ApplicationEventPublisher,
-  private val locationMapper: LocationMapper
+  private val locationMapper: LocationMapper,
 ) {
   fun endOfServiceReportSubmittedEvent(endOfServiceReport: EndOfServiceReport) {
     applicationEventPublisher.publishEvent(
       EndOfServiceReportEvent(
-        this, EndOfServiceReportEventType.SUBMITTED,
-        endOfServiceReport, getEndOfServiceReportUrl(endOfServiceReport)
-      )
+        this,
+        EndOfServiceReportEventType.SUBMITTED,
+        endOfServiceReport,
+        getEndOfServiceReportUrl(endOfServiceReport),
+      ),
     )
   }
 

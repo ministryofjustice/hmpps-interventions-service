@@ -17,6 +17,6 @@ data class ActionPlanActivity(
 
   // as an embedded collection entry each instance have no unique identifier
   // this uuid can be though of as a unique handle to each entry for future use
-  @NotNull val id: UUID = randomUUID()
+  @NotNull val id: UUID = randomUUID(),
 
 )

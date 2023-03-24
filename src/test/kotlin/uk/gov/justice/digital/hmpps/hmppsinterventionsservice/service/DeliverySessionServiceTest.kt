@@ -58,14 +58,23 @@ class DeliverySessionServiceTest @Autowired constructor(
   private val communityAPIBookingService = mock<CommunityAPIBookingService>()
   private val appointmentEventPublisher = mock<AppointmentEventPublisher>()
   private val appointmentService = AppointmentService(
-    appointmentRepository, communityAPIBookingService, appointmentDeliveryRepository, authUserRepository, appointmentEventPublisher, referralRepository
+    appointmentRepository,
+    communityAPIBookingService,
+    appointmentDeliveryRepository,
+    authUserRepository,
+    appointmentEventPublisher,
+    referralRepository,
   )
 
   private val deliverySessionService = DeliverySessionService(
-    deliverySessionRepository, actionPlanRepository, authUserRepository,
+    deliverySessionRepository,
+    actionPlanRepository,
+    authUserRepository,
     actionPlanAppointmentEventPublisher,
     communityAPIBookingService,
-    appointmentService, appointmentRepository, referralRepository
+    appointmentService,
+    appointmentRepository,
+    referralRepository,
   )
 
   private val referralFactory = ReferralFactory(entityManager)
@@ -145,7 +154,7 @@ class DeliverySessionServiceTest @Autowired constructor(
 
       val updatedSession = deliverySessionService.scheduleNewDeliverySessionAppointment(
         session.referral.id, session.sessionNumber, pastDate, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE,
-        attended = Attended.YES, additionalAttendanceInformation = "additionalAttendanceInformation", notifyProbationPractitioner = false, behaviourDescription = "behaviourDescription"
+        attended = Attended.YES, additionalAttendanceInformation = "additionalAttendanceInformation", notifyProbationPractitioner = false, behaviourDescription = "behaviourDescription",
       )
 
       verify(communityAPIBookingService).book(eq(session.referral), isNull(), eq(pastDate), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull())
@@ -214,10 +223,14 @@ class DeliverySessionServiceTest @Autowired constructor(
 
     val deliverySession = session.currentAppointment?.attended?.let {
       deliverySessionService.recordAppointmentAttendance(
-        defaultUser, actionPlan.id, session.sessionNumber,
-        it, ""
+        defaultUser,
+        actionPlan.id,
+        session.sessionNumber,
+        it,
+        "",
       )
     }
+
     @Test
     fun `superseded flag set to true when pop did not attended appointment`() {
       val actionPlan = actionPlanFactory.createApproved(numberOfSessions = 1)
@@ -225,8 +238,11 @@ class DeliverySessionServiceTest @Autowired constructor(
 
       val deliverySession = session.currentAppointment?.attended?.let {
         deliverySessionService.recordAppointmentAttendance(
-          defaultUser, actionPlan.id, session.sessionNumber,
-          it, ""
+          defaultUser,
+          actionPlan.id,
+          session.sessionNumber,
+          it,
+          "",
         )
       }
 
@@ -239,6 +255,7 @@ class DeliverySessionServiceTest @Autowired constructor(
 
     assertThat(appointment?.superseded).isFalse
   }
+
   @Nested
   inner class ReschedulingDeliverySessionAppointment {
     @Test
@@ -277,7 +294,7 @@ class DeliverySessionServiceTest @Autowired constructor(
 
       val updatedSession = deliverySessionService.rescheduleDeliverySessionAppointment(
         session.referral.id, session.sessionNumber, existingAppointment.id, pastDate, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE,
-        attended = Attended.YES, additionalAttendanceInformation = "additionalAttendanceInformation", notifyProbationPractitioner = false, behaviourDescription = "behaviourDescription"
+        attended = Attended.YES, additionalAttendanceInformation = "additionalAttendanceInformation", notifyProbationPractitioner = false, behaviourDescription = "behaviourDescription",
       )
 
       verify(communityAPIBookingService).book(any(), isNotNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
@@ -540,7 +557,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         Attended.YES,
         "additionalAttendanceInformation",
         true,
-        "behaviourDescription"
+        "behaviourDescription",
       )
 
       verify(communityAPIBookingService).book(eq(session.referral), isNull(), eq(appointmentTime), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull())
@@ -583,7 +600,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         Attended.YES,
         "additionalAttendanceInformation",
         true,
-        "behaviourDescription"
+        "behaviourDescription",
       )
 
       verify(communityAPIBookingService).book(eq(session.referral), isNotNull(), eq(defaultPastAppointmentTime), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull())
@@ -626,7 +643,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         Attended.NO,
         null,
         true,
-        null
+        null,
       )
 
       verify(communityAPIBookingService).book(eq(session.referral), isNull(), eq(defaultPastAppointmentTime), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull())
@@ -670,7 +687,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         Attended.YES,
         null,
         true,
-        "some description"
+        "some description",
 
       )
 
@@ -691,6 +708,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       assertThat(appointment.appointmentDelivery?.appointmentSessionType).isNotNull
       assertThat(updatedSession.appointments.first { it.attended == Attended.YES }.superseded).isFalse
     }
+
     @Test
     fun `when session current appointment rescheduled set superseded should be true`() {
       val actionPlan = actionPlanFactory.createApproved(numberOfSessions = 1)
@@ -715,7 +733,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         null,
         null,
         true,
-        "some description"
+        "some description",
 
       )
 

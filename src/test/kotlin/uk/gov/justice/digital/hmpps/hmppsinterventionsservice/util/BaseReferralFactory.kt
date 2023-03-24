@@ -58,7 +58,6 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     completionDeadline: LocalDate? = null,
     maximumEnforceableDays: Int? = null,
   ): Referral {
-
     val referral = save(
       Referral(
         id = id,
@@ -91,23 +90,27 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
         additionalNeedsInformation = additionalNeedsInformation,
         needsInterpreter = needsInterpreter,
         interpreterLanguage = interpreterLanguage,
-        referralDetailsHistory = if (referralDetails != null) setOf(
-          referralDetails.let {
-            ReferralDetails(
-              UUID.randomUUID(),
-              null,
-              it!!.referralId,
-              createdAt,
-              createdBy.id,
-              "initial referral details",
-              it.completionDeadline,
-              it.furtherInformation,
-              it.maximumEnforceableDays,
-            )
-          }
-        ) else emptySet()
+        referralDetailsHistory = if (referralDetails != null) {
+          setOf(
+            referralDetails.let {
+              ReferralDetails(
+                UUID.randomUUID(),
+                null,
+                it!!.referralId,
+                createdAt,
+                createdBy.id,
+                "initial referral details",
+                it.completionDeadline,
+                it.furtherInformation,
+                it.maximumEnforceableDays,
+              )
+            },
+          )
+        } else {
+          emptySet()
+        },
 
-      )
+      ),
     )
     referral.selectedDesiredOutcomes = desiredOutcomes.map { SelectedDesiredOutcomesMapping(it.serviceCategoryId, it.id) }.toMutableList()
     save(referral)
@@ -130,7 +133,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     additionalRiskInformationUpdatedAt: OffsetDateTime? = null,
     personCurrentLocationType: PersonCurrentLocationType? = null,
     personCustodyPrisonId: String? = null,
-    expectedReleaseDate: LocalDate? = null
+    expectedReleaseDate: LocalDate? = null,
   ): DraftReferral {
     val draftReferral = DraftReferral(
       id = id,
@@ -147,21 +150,25 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
       complexityLevelIds = complexityLevelIds,
       additionalRiskInformation = additionalRiskInformation,
       additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt,
-      referralDetailsHistory = if (referralDetails != null) setOf(
-        referralDetails.let {
-          ReferralDetails(
-            UUID.randomUUID(),
-            null,
-            it!!.referralId,
-            createdAt,
-            createdBy.id,
-            "initial referral details",
-            it.completionDeadline,
-            it.furtherInformation,
-            it.maximumEnforceableDays,
-          )
-        }
-      ) else emptySet()
+      referralDetailsHistory = if (referralDetails != null) {
+        setOf(
+          referralDetails.let {
+            ReferralDetails(
+              UUID.randomUUID(),
+              null,
+              it!!.referralId,
+              createdAt,
+              createdBy.id,
+              "initial referral details",
+              it.completionDeadline,
+              it.furtherInformation,
+              it.maximumEnforceableDays,
+            )
+          },
+        )
+      } else {
+        emptySet()
+      },
     )
 
     save(draftReferral)

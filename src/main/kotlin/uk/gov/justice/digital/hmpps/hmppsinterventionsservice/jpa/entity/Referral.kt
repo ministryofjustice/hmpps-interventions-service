@@ -30,7 +30,7 @@ class SelectedDesiredOutcomesMapping(
   @Column(name = "service_category_id")
   var serviceCategoryId: UUID,
   @Column(name = "desired_outcome_id")
-  var desiredOutcomeId: UUID
+  var desiredOutcomeId: UUID,
 )
 
 @Entity
@@ -40,13 +40,19 @@ class Referral(
   val assignments: MutableList<ReferralAssignment> = mutableListOf(),
   // sent referral fields
   var sentAt: OffsetDateTime? = null,
-  @ManyToOne @Fetch(JOIN) var sentBy: AuthUser? = null,
+  @ManyToOne
+  @Fetch(JOIN)
+  var sentBy: AuthUser? = null,
   var referenceNumber: String? = null,
   var supplementaryRiskId: UUID? = null,
 
   var endRequestedAt: OffsetDateTime? = null,
-  @ManyToOne @Fetch(JOIN) var endRequestedBy: AuthUser? = null,
-  @ManyToOne @JoinColumn(name = "end_requested_reason_code") var endRequestedReason: CancellationReason? = null,
+  @ManyToOne
+  @Fetch(JOIN)
+  var endRequestedBy: AuthUser? = null,
+  @ManyToOne
+  @JoinColumn(name = "end_requested_reason_code")
+  var endRequestedReason: CancellationReason? = null,
   var endRequestedComments: String? = null,
   var concludedAt: OffsetDateTime? = null,
 
@@ -66,14 +72,16 @@ class Referral(
 
   var relevantSentenceId: Long? = null,
 
-  @OneToMany(fetch = FetchType.LAZY) @OrderBy("createdAt")
-  @JoinColumn(name = "referral_id") var actionPlans: MutableList<ActionPlan>? = null,
+  @OneToMany(fetch = FetchType.LAZY)
+  @OrderBy("createdAt")
+  @JoinColumn(name = "referral_id")
+  var actionPlans: MutableList<ActionPlan>? = null,
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
     name = "referral_selected_service_category",
     joinColumns = [JoinColumn(name = "referral_id")],
-    inverseJoinColumns = [JoinColumn(name = "service_category_id")]
+    inverseJoinColumns = [JoinColumn(name = "service_category_id")],
   )
   var selectedServiceCategories: MutableSet<ServiceCategory>? = mutableSetOf(),
 
@@ -82,17 +90,29 @@ class Referral(
   var complexityLevelIds: MutableMap<UUID, UUID>? = mutableMapOf(),
 
   // required fields
-  @NotNull @ManyToOne(fetch = FetchType.LAZY) var intervention: Intervention,
+  @NotNull
+  @ManyToOne(fetch = FetchType.LAZY)
+  var intervention: Intervention,
   @NotNull val serviceUserCRN: String,
-  @NotNull @ManyToOne @Fetch(JOIN) val createdBy: AuthUser,
+  @NotNull
+  @ManyToOne
+  @Fetch(JOIN)
+  val createdBy: AuthUser,
   @NotNull val createdAt: OffsetDateTime,
   @Id val id: UUID,
 
-  @OneToOne(mappedBy = "referral") @Fetch(JOIN) var endOfServiceReport: EndOfServiceReport? = null,
-  @OneToOne(mappedBy = "referral") @Fetch(JOIN) var supplierAssessment: SupplierAssessment? = null,
-  @OneToOne(mappedBy = "referral") @Fetch(JOIN) var referralLocation: ReferralLocation? = null,
+  @OneToOne(mappedBy = "referral")
+  @Fetch(JOIN)
+  var endOfServiceReport: EndOfServiceReport? = null,
+  @OneToOne(mappedBy = "referral")
+  @Fetch(JOIN)
+  var supplierAssessment: SupplierAssessment? = null,
+  @OneToOne(mappedBy = "referral")
+  @Fetch(JOIN)
+  var referralLocation: ReferralLocation? = null,
 
-  @OneToMany(fetch = FetchType.LAZY) @JoinColumn(name = "referral_id")
+  @OneToMany(fetch = FetchType.LAZY)
+  @JoinColumn(name = "referral_id")
   private val referralDetailsHistory: Set<ReferralDetails>? = null,
 ) {
   val urn: String

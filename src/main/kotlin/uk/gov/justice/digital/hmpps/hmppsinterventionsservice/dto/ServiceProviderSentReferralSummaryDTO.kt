@@ -25,7 +25,7 @@ class ServiceProviderSentReferralSummaryDTO(
         serviceUserFirstName = sentReferralSummary.serviceUserFirstName,
         serviceUserLastName = sentReferralSummary.serviceUserLastName,
         hasEndOfServiceReport = sentReferralSummary.endOfServiceReportId != null,
-        endOfServiceReportSubmitted = sentReferralSummary.endOfServiceReportSubmittedAt != null
+        endOfServiceReportSubmitted = sentReferralSummary.endOfServiceReportSubmittedAt != null,
       )
     }
   }

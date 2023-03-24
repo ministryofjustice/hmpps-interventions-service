@@ -50,13 +50,13 @@ internal class LogReferralIdsListenerTest {
       serviceUserCRN = crn,
       createdBy = mock(),
       createdAt = OffsetDateTime.now(),
-      intervention = mock()
+      intervention = mock(),
     )
     val sentEvent = ReferralEvent(
       this,
       ReferralEventType.SENT,
       referral,
-      "irrelevant-for-this-test"
+      "irrelevant-for-this-test",
     )
 
     LogReferralIdsListener().onApplicationEvent(sentEvent)
@@ -66,8 +66,8 @@ internal class LogReferralIdsListenerTest {
       listOf(
         StructuredArguments.kv("id", UUID.fromString("abcdef00-1234-5678-90ab-ea4890c92ef6")),
         StructuredArguments.kv("reference", "TE1234ST"),
-        StructuredArguments.kv("crn", "T123456")
-      )
+        StructuredArguments.kv("crn", "T123456"),
+      ),
     )
   }
 }

@@ -9,7 +9,8 @@ typealias AuthGroupID = String
 @Entity
 data class ServiceProvider(
   // Service Provider id maps to the hmpps-auth field Group#groupCode
-  @NotNull @Id val id: AuthGroupID,
+  @NotNull @Id
+  val id: AuthGroupID,
   @NotNull val name: String,
 ) {
   override fun hashCode(): Int {

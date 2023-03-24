@@ -59,7 +59,7 @@ class CommunityAPIClient(
       e,
       StructuredArguments.kv("req.body", requestBody),
       StructuredArguments.kv("res.body", responseBodyAsString),
-      StructuredArguments.kv("res.causeMessage", causeMessage)
+      StructuredArguments.kv("res.causeMessage", causeMessage),
     )
 
     return error

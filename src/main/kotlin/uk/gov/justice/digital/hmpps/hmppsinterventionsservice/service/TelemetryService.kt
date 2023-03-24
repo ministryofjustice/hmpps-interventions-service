@@ -12,7 +12,7 @@ class TelemetryService(
     telemetryClient.trackEvent(
       "InterventionsInvalidAssumption",
       mapOf("assumption" to assumption).plus(information),
-      null
+      null,
     )
 
     if (!recoverable) {

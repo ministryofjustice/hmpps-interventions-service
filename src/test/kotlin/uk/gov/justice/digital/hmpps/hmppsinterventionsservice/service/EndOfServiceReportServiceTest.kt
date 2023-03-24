@@ -34,8 +34,11 @@ class EndOfServiceReportServiceTest {
   private val endOfServiceReportFactory = EndOfServiceReportFactory()
 
   private val endOfServiceReportService = EndOfServiceReportService(
-    authUserRepository, referralRepository,
-    endOfServiceReportRepository, endOfServiceReportEventPublisher, referralConcluder,
+    authUserRepository,
+    referralRepository,
+    endOfServiceReportRepository,
+    endOfServiceReportEventPublisher,
+    referralConcluder,
   )
 
   @Test
@@ -150,7 +153,8 @@ class EndOfServiceReportServiceTest {
     val endOfServiceReportId = UUID.randomUUID()
     val furtherInformation = "info"
     val outcome = SampleData.sampleEndOfServiceReportOutcome(
-      desiredOutcome = desiredOutcome, achievementLevel = AchievementLevel.PARTIALLY_ACHIEVED
+      desiredOutcome = desiredOutcome,
+      achievementLevel = AchievementLevel.PARTIALLY_ACHIEVED,
     )
 
     whenever(endOfServiceReportRepository.findById(any())).thenReturn(of(endOfServiceReport))

@@ -20,7 +20,7 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
       endRequestedComments = "Alex was arrested for driving without insurance and immediately recalled",
       personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
       personCustodyPrisonId = "aaa",
-      expectedReleaseDate = LocalDate.now().plusDays(1)
+      expectedReleaseDate = LocalDate.now().plusDays(1),
     )
     setupAssistant.fillReferralFields(referral)
   }
@@ -98,13 +98,13 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
 
   @State(
     "a draft referral with ID dfb64747-f658-40e0-a827-87b4b0bdcfed exists",
-    "a single referral for user with ID 8751622134 exists"
+    "a single referral for user with ID 8751622134 exists",
   )
   fun `create a new draft referral for 'deliusUser' with a specific createdAt timestamp and CRN`() {
     setupAssistant.createDraftReferral(
       id = UUID.fromString("dfb64747-f658-40e0-a827-87b4b0bdcfed"),
       createdAt = OffsetDateTime.parse("2020-12-07T20:45:21.986389+00:00"),
-      serviceUserCRN = "X862134"
+      serviceUserCRN = "X862134",
     )
   }
 
@@ -118,8 +118,9 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
     val contract = setupAssistant.createDynamicFrameworkContract(contractType = setupAssistant.contractTypes["WOS"]!!, primeProviderId = "HARMONY_LIVING")
     val intervention = setupAssistant.createIntervention(dynamicFrameworkContract = contract)
     setupAssistant.createDraftReferral(
-      id = UUID.fromString("d496e4a7-7cc1-44ea-ba67-c295084f1962"), intervention = intervention,
-      selectedServiceCategories = mutableSetOf(setupAssistant.serviceCategory(UUID.fromString("428ee70f-3001-4399-95a6-ad25eaaede16")))
+      id = UUID.fromString("d496e4a7-7cc1-44ea-ba67-c295084f1962"),
+      intervention = intervention,
+      selectedServiceCategories = mutableSetOf(setupAssistant.serviceCategory(UUID.fromString("428ee70f-3001-4399-95a6-ad25eaaede16"))),
     )
   }
 
@@ -148,7 +149,7 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
       ppUser = setupAssistant.createPPUserSecond(),
       personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
       personCustodyPrisonId = "aaa",
-      expectedReleaseDate = LocalDate.now().plusDays(1)
+      expectedReleaseDate = LocalDate.now().plusDays(1),
     )
     setupAssistant.fillReferralFields(referral)
   }
@@ -159,10 +160,11 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
       id = UUID.fromString("2a67075a-9c77-4103-9de0-63c4cfe3e8d6"),
       personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
       personCustodyPrisonId = "test",
-      expectedReleaseDate = LocalDate.now().plusDays(1)
+      expectedReleaseDate = LocalDate.now().plusDays(1),
     )
     setupAssistant.fillDraftReferralFields(referral)
   }
+
   @State("got change log entires successfully")
   fun `got change log entires successfully`() {
     setupAssistant.createChangeLogEntry(referralId = UUID.fromString("ac386c25-52c8-41fa-9213-fcf42e24b0b5"), changedAt = OffsetDateTime.parse("2020-12-07T18:02:01.599803Z"))

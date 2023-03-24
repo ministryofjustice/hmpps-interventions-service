@@ -52,8 +52,8 @@ class PerformanceReportJobListener(
             "reportUrl" to UriComponentsBuilder.fromHttpUrl(interventionsUiBaseUrl)
               .path(downloadLocation)
               .buildAndExpand(path.fileName)
-              .toString()
-          )
+              .toString(),
+          ),
         )
       }
       BatchStatus.FAILED -> {
@@ -62,15 +62,15 @@ class PerformanceReportJobListener(
           jobExecution.jobParameters.getString("user.email"),
           mapOf(
             "serviceProviderFirstName" to jobExecution.jobParameters.getString("user.firstName"),
-            "jobInstanceId" to jobExecution.jobInstance.id.toString()
-          )
+            "jobInstanceId" to jobExecution.jobInstance.id.toString(),
+          ),
         )
       }
       else -> {
         logger.warn(
           "unexpected status encountered for performance report {} {}",
           kv("status", jobExecution.status),
-          kv("exitDescription", jobExecution.exitStatus.exitDescription)
+          kv("exitDescription", jobExecution.exitStatus.exitDescription),
         )
       }
     }

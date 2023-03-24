@@ -44,7 +44,7 @@ internal class ReferralMetricsListenerTest @Autowired constructor(
       this,
       ReferralEventType.SENT,
       referral,
-      "irrelevant-for-this-test"
+      "irrelevant-for-this-test",
     )
   }
 
@@ -63,7 +63,7 @@ internal class ReferralMetricsListenerTest @Autowired constructor(
       assertThat(it?.totalTime(TimeUnit.HOURS)).isEqualTo(2.0)
     }
     assertThat(
-      registry.find("intervention.referral.repeated_time").tag("intervention", "different").timers()
+      registry.find("intervention.referral.repeated_time").tag("intervention", "different").timers(),
     ).isEmpty()
   }
 
@@ -81,7 +81,7 @@ internal class ReferralMetricsListenerTest @Autowired constructor(
       assertThat(it?.totalTime(TimeUnit.HOURS)).isEqualTo(2.0)
     }
     assertThat(
-      registry.find("intervention.referral.repeated_time").tag("intervention", "same").timers()
+      registry.find("intervention.referral.repeated_time").tag("intervention", "same").timers(),
     ).isEmpty()
   }
 

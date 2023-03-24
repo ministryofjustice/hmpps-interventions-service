@@ -11,6 +11,7 @@ internal class DeliverySessionsDTOTest {
   private val deliverySessionFactory = DeliverySessionFactory()
   private val appointmentDeliveryFactory = AppointmentDeliveryFactory()
   private val appointmentDeliveryAddressFactory = AppointmentDeliveryAddressFactory()
+
   @Test
   fun `Maps from a session`() {
     val session = deliverySessionFactory.createScheduled()

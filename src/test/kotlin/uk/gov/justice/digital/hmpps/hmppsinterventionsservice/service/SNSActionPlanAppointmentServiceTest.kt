@@ -27,7 +27,7 @@ internal class SNSActionPlanAppointmentServiceTest {
   private val referralFactory = ReferralFactory()
   private val deliverySessionFactory = DeliverySessionFactory()
   private val actionPlan = ActionPlanFactory().create(
-    referral = referralFactory.createSent(id = UUID.fromString("56b40f96-0657-4e01-925c-da208a6fbcfd"))
+    referral = referralFactory.createSent(id = UUID.fromString("56b40f96-0657-4e01-925c-da208a6fbcfd")),
   )
   private val now = OffsetDateTime.now()
   private fun attendanceRecordedEvent(attendance: Attended) = ActionPlanAppointmentEvent.from(
@@ -36,7 +36,7 @@ internal class SNSActionPlanAppointmentServiceTest {
     deliverySessionFactory.createAttended(
       referral = referralFactory.createSent(
         id = UUID.fromString("56b40f96-0657-4e01-925c-da208a6fbcfd"),
-        actionPlans = mutableListOf(actionPlan)
+        actionPlans = mutableListOf(actionPlan),
       ),
       createdBy = actionPlan.createdBy,
       attended = attendance,
@@ -45,7 +45,7 @@ internal class SNSActionPlanAppointmentServiceTest {
       appointmentFeedbackSubmittedBy = actionPlan.createdBy,
       appointmentFeedbackSubmittedAt = now,
     ),
-    "http://localhost:8080/action-plan/77df9f6c-3fcb-4ec6-8fcf-96551cd9b080/session/1"
+    "http://localhost:8080/action-plan/77df9f6c-3fcb-4ec6-8fcf-96551cd9b080/session/1",
   )
 
   private fun sessionFeedbackEvent(attendance: Attended) = ActionPlanAppointmentEvent.from(
@@ -54,14 +54,14 @@ internal class SNSActionPlanAppointmentServiceTest {
     deliverySessionFactory.createAttended(
       referral = referralFactory.createSent(
         id = UUID.fromString("56b40f96-0657-4e01-925c-da208a6fbcfd"),
-        actionPlans = mutableListOf(actionPlan)
+        actionPlans = mutableListOf(actionPlan),
       ),
       createdBy = actionPlan.createdBy,
       attended = attendance,
       attendanceSubmittedAt = now,
       appointmentFeedbackSubmittedBy = actionPlan.createdBy,
       appointmentFeedbackSubmittedAt = now,
-      deliusAppointmentId = 123L
+      deliusAppointmentId = 123L,
     ),
     "http://localhost:8080/action-plan/77df9f6c-3fcb-4ec6-8fcf-96551cd9b080/session/1",
   )
@@ -78,9 +78,9 @@ internal class SNSActionPlanAppointmentServiceTest {
       occurredAt = now,
       additionalInformation = mapOf(
         "serviceUserCRN" to "X123456",
-        "referralId" to referralId
+        "referralId" to referralId,
       ),
-      PersonReference.crn("X123456")
+      PersonReference.crn("X123456"),
     )
 
     verify(publisher).publish(referralId, AuthUserDTO.from(actionPlan.createdBy), eventDTO)
@@ -99,9 +99,9 @@ internal class SNSActionPlanAppointmentServiceTest {
       additionalInformation = mapOf(
         "serviceUserCRN" to "X123456",
         "referralId" to referralId,
-        "deliusAppointmentId" to "123"
+        "deliusAppointmentId" to "123",
       ),
-      PersonReference.crn("X123456")
+      PersonReference.crn("X123456"),
     )
 
     verify(publisher).publish(referralId, AuthUserDTO.from(actionPlan.createdBy), eventDTO)

@@ -26,9 +26,15 @@ data class ServiceUserData(
   var preferredLanguage: String? = null,
   var religionOrBelief: String? = null,
 
-  @Type(type = "list-array") @Column(name = "disabilities", columnDefinition = "text[]")
+  @Type(type = "list-array")
+  @Column(name = "disabilities", columnDefinition = "text[]")
   var disabilities: List<String>? = null,
 
-  @OneToOne @MapsId @JoinColumn(name = "referral_id") var draftReferral: DraftReferral? = null,
-  @Id @Column(name = "referral_id") var referralID: UUID? = null,
+  @OneToOne
+  @MapsId
+  @JoinColumn(name = "referral_id")
+  var draftReferral: DraftReferral? = null,
+  @Id
+  @Column(name = "referral_id")
+  var referralID: UUID? = null,
 )

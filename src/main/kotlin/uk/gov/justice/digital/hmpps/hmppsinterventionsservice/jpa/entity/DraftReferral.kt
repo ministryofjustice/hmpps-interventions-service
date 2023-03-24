@@ -49,14 +49,16 @@ class DraftReferral(
 
   var relevantSentenceId: Long? = null,
 
-  @Type(type = "person_current_location_type") @Enumerated(EnumType.STRING) var personCurrentLocationType: PersonCurrentLocationType? = null,
+  @Type(type = "person_current_location_type")
+  @Enumerated(EnumType.STRING)
+  var personCurrentLocationType: PersonCurrentLocationType? = null,
   var personCustodyPrisonId: String? = null,
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
     name = "referral_selected_service_category",
     joinColumns = [JoinColumn(name = "referral_id")],
-    inverseJoinColumns = [JoinColumn(name = "service_category_id")]
+    inverseJoinColumns = [JoinColumn(name = "service_category_id")],
   )
   var selectedServiceCategories: MutableSet<ServiceCategory>? = null,
 
@@ -72,13 +74,19 @@ class DraftReferral(
   @Column(name = "person_expected_release_date_missing_reason") var expectedReleaseDateMissingReason: String? = null,
 
   // required fields
-  @NotNull @ManyToOne(fetch = FetchType.LAZY) val intervention: Intervention,
+  @NotNull
+  @ManyToOne(fetch = FetchType.LAZY)
+  val intervention: Intervention,
   @NotNull val serviceUserCRN: String,
-  @NotNull @ManyToOne @Fetch(JOIN) val createdBy: AuthUser,
+  @NotNull
+  @ManyToOne
+  @Fetch(JOIN)
+  val createdBy: AuthUser,
   @NotNull val createdAt: OffsetDateTime,
   @Id val id: UUID,
 
-  @OneToMany(fetch = FetchType.LAZY) @JoinColumn(name = "referral_id")
+  @OneToMany(fetch = FetchType.LAZY)
+  @JoinColumn(name = "referral_id")
   val referralDetailsHistory: Set<ReferralDetails>? = null,
 ) {
   val referralDetails: ReferralDetails? get() {

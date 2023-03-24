@@ -71,7 +71,7 @@ class ReferralSpecifications {
         cb.and(
           cb.isNotNull(root.get<OffsetDateTime>("endRequestedAt")),
           cb.isNotNull(root.get<OffsetDateTime>("concludedAt")),
-          root.join<T, EndOfServiceReport>("endOfServiceReport", JoinType.LEFT).isNull
+          root.join<T, EndOfServiceReport>("endOfServiceReport", JoinType.LEFT).isNull,
         )
       }
     }

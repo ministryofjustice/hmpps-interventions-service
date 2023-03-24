@@ -20,7 +20,7 @@ res.body=409 Conflict from POST https://community-api-secure.probation.service.j
 */
 class CommunityApiCallError(val httpStatus: HttpStatus, causeMessage: String, val responseBody: String, val exception: Throwable) :
   RuntimeException(
-    exception
+    exception,
   ) {
   private val uuidRegex = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".toRegex()
   private val identifiersRegex = "[A-Z]*[0-9]+".toRegex()

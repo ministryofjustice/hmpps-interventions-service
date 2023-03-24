@@ -39,14 +39,14 @@ internal class CommunityAPIOffenderServiceTest {
                 ClientResponse.create(it.status)
                   .header("content-type", "application/json")
                   .body(it.responseBody)
-                  .build()
+                  .build(),
               )
             }
           }
           Mono.empty()
         }
         .build(),
-      "client-registration-id"
+      "client-registration-id",
     )
   }
 

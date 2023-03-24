@@ -31,9 +31,8 @@ class ActionPlanController(
   @PostMapping("/draft-action-plan")
   fun createDraftActionPlan(
     @RequestBody createActionPlanDTO: CreateActionPlanDTO,
-    authentication: JwtAuthenticationToken
+    authentication: JwtAuthenticationToken,
   ): ResponseEntity<ActionPlanDTO> {
-
     val draftActionPlan = actionPlanService.createDraftActionPlan(
       createActionPlanDTO.referralId,
       createActionPlanDTO.numberOfSessions,

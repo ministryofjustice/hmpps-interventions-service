@@ -10,7 +10,7 @@ class PCCRegionFactory(em: TestEntityManager? = null) : EntityFactory(em) {
   fun create(
     id: String = "avon-and-somerset",
     name: String = "Avon & Somerset",
-    npsRegion: NPSRegion? = null
+    npsRegion: NPSRegion? = null,
   ):
     PCCRegion {
     return save(PCCRegion(id = id, name = name, npsRegion = npsRegion ?: npsRegionFactory.create()))

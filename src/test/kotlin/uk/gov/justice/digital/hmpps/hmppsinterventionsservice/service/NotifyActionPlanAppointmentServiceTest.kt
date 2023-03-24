@@ -48,9 +48,9 @@ class NotifyActionPlanAppointmentServiceTest {
         ),
         createdBy = SampleData.sampleAuthUser(),
         attended = attended,
-        notifyPPOfAttendanceBehaviour = notifyPP
+        notifyPPOfAttendanceBehaviour = notifyPP,
       ),
-      "http://localhost:8080/appointment/42c7d267-0776-4272-a8e8-a673bfe30d0d"
+      "http://localhost:8080/appointment/42c7d267-0776-4272-a8e8-a673bfe30d0d",
     )
   }
   private fun notifyService(): NotifyActionPlanAppointmentService {

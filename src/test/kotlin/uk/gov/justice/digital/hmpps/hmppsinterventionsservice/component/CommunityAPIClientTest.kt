@@ -66,10 +66,9 @@ class CommunityAPIClientTest {
 
   @Test
   fun `makes async post request successfully`() {
-
     communityAPIClient = CommunityAPIClient(
       RestClient(WebClient.builder().exchangeFunction(exchangeFunction).build(), "client-registration-id"),
-      objectMapper
+      objectMapper,
     )
     whenever(exchangeFunction.exchange(any())).thenReturn(Mono.empty())
 
@@ -85,10 +84,9 @@ class CommunityAPIClientTest {
 
   @Test
   fun `error was logged on exception during async post request`() {
-
     communityAPIClient = CommunityAPIClient(
       RestClient(WebClient.builder().exchangeFunction(exchangeFunction).build(), "client-registration-id"),
-      objectMapper
+      objectMapper,
     )
     whenever(exchangeFunction.exchange(any())).thenThrow(RuntimeException("An error"))
 
@@ -101,10 +99,9 @@ class CommunityAPIClientTest {
 
   @Test
   fun `makes sync post request successfully`() {
-
     communityAPIClient = CommunityAPIClient(
       RestClient(WebClient.builder().exchangeFunction(exchangeFunction).build(), "client-registration-id"),
-      objectMapper
+      objectMapper,
     )
     val clientResponse: ClientResponse = ClientResponse
       .create(OK)
@@ -127,10 +124,9 @@ class CommunityAPIClientTest {
 
   @Test
   fun `error was logged on exception during sync post request`() {
-
     communityAPIClient = CommunityAPIClient(
       RestClient(WebClient.builder().exchangeFunction(exchangeFunction).build(), "client-registration-id"),
-      objectMapper
+      objectMapper,
     )
     whenever(exchangeFunction.exchange(any())).thenThrow(RuntimeException("A problem"))
 
@@ -146,10 +142,9 @@ class CommunityAPIClientTest {
 
   @Test
   fun `propagates error response body on exception during sync post request`() {
-
     communityAPIClient = CommunityAPIClient(
       RestClient(WebClient.builder().exchangeFunction(exchangeFunction).build(), "client-registration-id"),
-      objectMapper
+      objectMapper,
     )
     val clientResponse: ClientResponse = ClientResponse
       .create(BAD_REQUEST)
@@ -174,10 +169,9 @@ class CommunityAPIClientTest {
 
   @Test
   fun `propagates user message on exception during sync post request`() {
-
     communityAPIClient = CommunityAPIClient(
       RestClient(WebClient.builder().exchangeFunction(exchangeFunction).build(), "client-registration-id"),
-      objectMapper
+      objectMapper,
     )
     val clientResponse: ClientResponse = ClientResponse
       .create(BAD_REQUEST)
@@ -202,10 +196,9 @@ class CommunityAPIClientTest {
 
   @Test
   fun `propagates developer message on exception during sync post request`() {
-
     communityAPIClient = CommunityAPIClient(
       RestClient(WebClient.builder().exchangeFunction(exchangeFunction).build(), "client-registration-id"),
-      objectMapper
+      objectMapper,
     )
     val clientResponse: ClientResponse = ClientResponse
       .create(BAD_REQUEST)
@@ -237,9 +230,9 @@ class CommunityAPIClientTest {
       crn = "X123456",
       relevantSentenceId = 123456,
       serviceProviderName = "Harmony Living",
-      sentAt = OffsetDateTime.of(2020, 1, 1, 1, 1, 1, 0, ZoneOffset.of("+00:00"))
+      sentAt = OffsetDateTime.of(2020, 1, 1, 1, 1, 1, 0, ZoneOffset.of("+00:00")),
     ),
-    "http://url"
+    "http://url",
   )
 
   private val appointmentCreateRequest = AppointmentCreateRequestDTO(

@@ -47,7 +47,7 @@ data class ReferralsData(
       "eosrSubmittedAt",
       "endReasonCode",
       "endReasonDescription",
-      "concludedAt"
+      "concludedAt",
     )
     val headers = listOf(
       "referral_ref",

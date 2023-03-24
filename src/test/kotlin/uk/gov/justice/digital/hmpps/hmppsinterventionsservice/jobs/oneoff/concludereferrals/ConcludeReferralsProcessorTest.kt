@@ -22,7 +22,7 @@ class ConcludeReferralsProcessorTest : IntegrationTestBase() {
       referralRepository,
       deliverySessionRepository,
       actionPlanRepository,
-      referralEventPublisher
+      referralEventPublisher,
     )
     processor = ConcludeReferralsProcessor(referralConcluder, deliverySessionRepository)
   }

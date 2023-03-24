@@ -30,10 +30,13 @@ class ActionPlanAppointmentEvent(
       val contractTypeName = referral.intervention.dynamicFrameworkContract.contractType.name
       val primeProviderName = referral.intervention.dynamicFrameworkContract.primeProvider.name
       return ActionPlanAppointmentEvent(
-        source, type, detailUrl,
+        source,
+        type,
+        detailUrl,
         SentReferralDTO.from(referral, true),
         DeliverySessionDTO.from(deliverySession),
-        contractTypeName, primeProviderName
+        contractTypeName,
+        primeProviderName,
       )
     }
   }
@@ -46,23 +49,23 @@ class ActionPlanAppointmentEvent(
 @Component
 class ActionPlanAppointmentEventPublisher(
   private val applicationEventPublisher: ApplicationEventPublisher,
-  private val locationMapper: LocationMapper
+  private val locationMapper: LocationMapper,
 ) {
   fun attendanceRecordedEvent(session: DeliverySession) {
     applicationEventPublisher.publishEvent(
-      ActionPlanAppointmentEvent.from(this, ActionPlanAppointmentEventType.ATTENDANCE_RECORDED, session, getAppointmentURL(session))
+      ActionPlanAppointmentEvent.from(this, ActionPlanAppointmentEventType.ATTENDANCE_RECORDED, session, getAppointmentURL(session)),
     )
   }
 
   fun behaviourRecordedEvent(session: DeliverySession) {
     applicationEventPublisher.publishEvent(
-      ActionPlanAppointmentEvent.from(this, ActionPlanAppointmentEventType.BEHAVIOUR_RECORDED, session, getAppointmentURL(session))
+      ActionPlanAppointmentEvent.from(this, ActionPlanAppointmentEventType.BEHAVIOUR_RECORDED, session, getAppointmentURL(session)),
     )
   }
 
   fun sessionFeedbackRecordedEvent(session: DeliverySession) {
     applicationEventPublisher.publishEvent(
-      ActionPlanAppointmentEvent.from(this, ActionPlanAppointmentEventType.SESSION_FEEDBACK_RECORDED, session, getAppointmentURL(session))
+      ActionPlanAppointmentEvent.from(this, ActionPlanAppointmentEventType.SESSION_FEEDBACK_RECORDED, session, getAppointmentURL(session)),
     )
   }
 
