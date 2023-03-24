@@ -33,7 +33,7 @@ class MarkStaleAppointmentsJobConfiguration(
     val validator = DefaultJobParametersValidator()
     validator.setRequiredKeys(
       arrayOf(
-        "appointmentStr",
+        "appointmentsStr",
       ),
     )
     return jobBuilderFactory["markStaleAppointmentsJob"]
