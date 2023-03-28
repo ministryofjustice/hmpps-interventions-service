@@ -50,6 +50,7 @@ class NdmisPerformanceReportJobConfiguration(
   private val referralReportFilename = "crs_performance_report-v2-referrals.csv"
   private val complexityReportFilename = "crs_performance_report-v2-complexity.csv"
   private val appointmentReportFilename = "crs_performance_report-v2-appointments.csv"
+  private val outcomeReportFilename = "crs_performance_report-v2-outcomes.csv"
   private val skipPolicy = NPESkipPolicy()
 
   @Bean
@@ -104,10 +105,22 @@ class NdmisPerformanceReportJobConfiguration(
   }
 
   @Bean
+  @StepScope
+  fun ndmisOutcomeWriter(@Value("#{jobParameters['outputPath']}") outputPath: String): FlatFileItemWriter<Collection<OutcomeData>> {
+    return batchUtils.recursiveCollectionCsvFileWriter(
+      "ndmisOutcomePerformanceReportWriter",
+      FileSystemResource(Path.of(outputPath).resolve(outcomeReportFilename)),
+      OutcomeData.headers,
+      OutcomeData.fields
+    )
+  }
+
+  @Bean
   fun ndmisPerformanceReportJob(
     ndmisWriteReferralToCsvStep: Step,
     ndmisWriteComplexityToCsvStep: Step,
     ndmisWriteAppointmentToCsvStep: Step,
+    ndmisWriteOutcomeToCsvStep: Step,
     pushToS3Step: Step,
   ): Job {
     val validator = DefaultJobParametersValidator()
@@ -119,6 +132,7 @@ class NdmisPerformanceReportJobConfiguration(
       .start(ndmisWriteReferralToCsvStep)
       .next(ndmisWriteComplexityToCsvStep)
       .next(ndmisWriteAppointmentToCsvStep)
+      .next(ndmisWriteOutcomeToCsvStep)
       .next(pushToS3Step)
       .build()
   }
@@ -163,6 +177,22 @@ class NdmisPerformanceReportJobConfiguration(
   ): Step {
     return stepBuilderFactory.get("ndmisWriteAppointmentToCsvStep")
       .chunk<Referral, List<AppointmentData>>(chunkSize)
+      .reader(ndmisReader)
+      .processor(processor)
+      .writer(writer)
+      .faultTolerant()
+      .skipPolicy(skipPolicy)
+      .build()
+  }
+
+  @Bean
+  fun ndmisWriteOutcomeToCsvStep(
+    ndmisReader: HibernateCursorItemReader<Referral>,
+    processor: OutcomeProcessor,
+    writer: FlatFileItemWriter<Collection<OutcomeData>>,
+  ): Step {
+    return stepBuilderFactory.get("ndmisWriteOutcomeToCsvStep")
+      .chunk<Referral, List<OutcomeData>>(chunkSize)
       .reader(ndmisReader)
       .processor(processor)
       .writer(writer)

@@ -39,7 +39,9 @@ class NdmisPerformanceReportJobConfigurationTest : IntegrationTestBase() {
 
   @Test
   fun `job writes non-empty CSV export files`() {
-    val referral = setupAssistant.createSentReferral().also { setupAssistant.fillReferralFields(it) }
+    val referral = setupAssistant.createSentReferral()
+      .also { setupAssistant.fillReferralFields(it) }
+      .also { setupAssistant.addEndOfServiceReportWithOutcome(referral = it) }
     setupAssistant.createDeliverySession(
       sessionNumber = 1,
       duration = 60,
@@ -56,6 +58,8 @@ class NdmisPerformanceReportJobConfigurationTest : IntegrationTestBase() {
     assertThat(outputDir.resolve("crs_performance_report-v2-complexity.csv"))
       .content().contains(referral.referenceNumber)
     assertThat(outputDir.resolve("crs_performance_report-v2-appointments.csv"))
+      .content().contains(referral.referenceNumber)
+    assertThat(outputDir.resolve("crs_performance_report-v2-outcomes.csv"))
       .content().contains(referral.referenceNumber)
   }
 }

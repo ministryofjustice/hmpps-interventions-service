@@ -201,6 +201,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     supplementaryRiskId: UUID = UUID.randomUUID(),
     actionPlans: MutableList<ActionPlan>? = mutableListOf(),
     supplierAssessment: SupplierAssessment? = null,
+    desiredOutcomes: List<DesiredOutcome> = emptyList(),
 
     assignments: List<ReferralAssignment> = emptyList(),
 
@@ -236,6 +237,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       referenceNumber = referenceNumber,
       supplementaryRiskId = supplementaryRiskId,
       relevantSentenceId = relevantSentenceId,
+      desiredOutcomes = desiredOutcomes,
 
       assignments = assignments,
 
