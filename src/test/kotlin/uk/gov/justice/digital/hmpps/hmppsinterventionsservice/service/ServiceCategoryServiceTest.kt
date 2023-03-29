@@ -12,7 +12,7 @@ import java.util.UUID
 @RepositoryTest
 class ServiceCategoryServiceTest @Autowired constructor(
   val entityManager: TestEntityManager,
-  val serviceCategoryRepository: ServiceCategoryRepository
+  val serviceCategoryRepository: ServiceCategoryRepository,
 ) {
   private val serviceCategoryService = ServiceCategoryService(serviceCategoryRepository)
   private val serviceCategoryFactory = ServiceCategoryFactory(entityManager)

@@ -32,8 +32,8 @@ internal class ReferralTest {
       val referral = referralFactory.createSent(
         assignments = listOf(
           ReferralAssignment(OffsetDateTime.now(), currentAssignee, currentAssignee),
-          ReferralAssignment(OffsetDateTime.now().minusHours(2), oldAssignee, oldAssignee)
-        )
+          ReferralAssignment(OffsetDateTime.now().minusHours(2), oldAssignee, oldAssignee),
+        ),
       )
 
       assertThat(referral.currentAssignment!!.assignedTo).isEqualTo(currentAssignee)
@@ -46,8 +46,8 @@ internal class ReferralTest {
       val referral = referralFactory.createSent(
         assignments = listOf(
           ReferralAssignment(OffsetDateTime.now(), currentAssignee, currentAssignee),
-          ReferralAssignment(OffsetDateTime.now().minusHours(2), oldAssignee, oldAssignee)
-        )
+          ReferralAssignment(OffsetDateTime.now().minusHours(2), oldAssignee, oldAssignee),
+        ),
       )
 
       assertThat(referral.currentAssignee).isEqualTo(currentAssignee)
@@ -86,8 +86,8 @@ internal class ReferralTest {
     fun `approvedActionPlan returns null if there are no approved action plan`() {
       val referral = referralFactory.createSent(
         actionPlans = mutableListOf(
-          actionPlanFactory.createSubmitted()
-        )
+          actionPlanFactory.createSubmitted(),
+        ),
       )
 
       assertThat(referral.approvedActionPlan).isNull()
@@ -100,8 +100,8 @@ internal class ReferralTest {
         actionPlans = mutableListOf(
           actionPlanFactory.createSubmitted(),
           actionPlanFactory.createApproved(createdAt = OffsetDateTime.now().minusHours(1)),
-          actionPlanFactory.createApproved(createdAt = OffsetDateTime.now(), id = correctId)
-        )
+          actionPlanFactory.createApproved(createdAt = OffsetDateTime.now(), id = correctId),
+        ),
       )
       assertThat(referral.approvedActionPlan?.id).isEqualTo(correctId)
     }

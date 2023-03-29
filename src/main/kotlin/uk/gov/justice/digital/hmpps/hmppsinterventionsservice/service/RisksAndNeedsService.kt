@@ -61,7 +61,6 @@ class RisksAndNeedsService(
   companion object : KLogging()
 
   fun createSupplementaryRisk(referralId: UUID, crn: String, user: AuthUser, riskCreatedAt: OffsetDateTime, riskInformation: String, redactedRisk: RedactedRisk? = null): UUID {
-
     val request = if (redactedRisk != null) {
       logger.debug("Sending full supplementary risk information to ARN")
       CreateFullSupplementaryRiskRequest(
@@ -72,7 +71,7 @@ class RisksAndNeedsService(
         user.authSource,
         riskCreatedAt.toLocalDateTime(),
         riskInformation,
-        redactedRisk
+        redactedRisk,
       )
     } else {
       CreateSupplementaryRiskRequest(
@@ -102,7 +101,7 @@ class RisksAndNeedsService(
           kv("referralId", referralId),
           kv("riskId", response.body.supplementaryRiskId),
           kv("riskCreatedAt", riskCreatedAt),
-          kv("remoteRiskCreatedAt", response.body.createdDate)
+          kv("remoteRiskCreatedAt", response.body.createdDate),
         )
 
         throw WebClientResponseException(409, "Conflict from ARN 'createSupplementaryRisk'", null, null, null)

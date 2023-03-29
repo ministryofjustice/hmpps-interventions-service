@@ -18,7 +18,7 @@ class ChangeLogFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     newVal: ReferralAmendmentDetails,
     reasonForChange: String = "the value needs changing",
     changedAt: OffsetDateTime = OffsetDateTime.now(),
-    changedBy: AuthUser = AuthUserFactory().create()
+    changedBy: AuthUser = AuthUserFactory().create(),
   ): Changelog {
     return save(
       Changelog(
@@ -29,8 +29,8 @@ class ChangeLogFactory(em: TestEntityManager? = null) : EntityFactory(em) {
         newVal = newVal,
         reasonForChange = reasonForChange,
         changedAt = changedAt,
-        changedBy = changedBy
-      )
+        changedBy = changedBy,
+      ),
     )
   }
 }

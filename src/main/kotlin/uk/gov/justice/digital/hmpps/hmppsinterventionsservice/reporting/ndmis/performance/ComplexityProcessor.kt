@@ -19,7 +19,7 @@ class ComplexityProcessor() : SentReferralProcessor<List<ComplexityData>> {
         serviceCategoryName = it.name,
         complexityLevelTitle = it.complexityLevels.find { complexityLevel ->
           complexityLevel.id == referral.complexityLevelIds!![it.id]
-        }!!.title
+        }!!.title,
       )
     }
   }

@@ -16,13 +16,13 @@ data class Prisoner(
   val postRecallReleaseDate: LocalDate?,
   val conditionalReleaseDate: LocalDate?,
   val actualParoleDate: LocalDate?,
-  val dischargeDate: LocalDate?
+  val dischargeDate: LocalDate?,
 )
 
 @Service
 class PrisonerOffenderSearchService(
   @Value("\${prisoner-offender-search.locations.prisoner}") private val prisonerSearchPrisonerLocation: String,
-  private val prisonerOffenderSearchClient: RestClient
+  private val prisonerOffenderSearchClient: RestClient,
 ) {
   fun getPrisonerById(nomsId: String): Mono<Prisoner> {
     val prisonSearchPrisonerPath = UriComponentsBuilder.fromPath(prisonerSearchPrisonerLocation)

@@ -7,7 +7,7 @@ data class SupplierAssessmentDTO(
   val id: UUID,
   val appointments: List<AppointmentDTO>,
   val currentAppointmentId: UUID?,
-  val referralId: UUID
+  val referralId: UUID,
 ) {
   companion object {
     fun from(supplierAssessment: SupplierAssessment): SupplierAssessmentDTO {
@@ -15,7 +15,7 @@ data class SupplierAssessmentDTO(
         id = supplierAssessment.id,
         appointments = AppointmentDTO.from(supplierAssessment.appointments.filterNot { it.superseded }.toMutableSet()),
         currentAppointmentId = supplierAssessment.currentAppointment?.id,
-        referralId = supplierAssessment.referral.id
+        referralId = supplierAssessment.referral.id,
       )
     }
   }

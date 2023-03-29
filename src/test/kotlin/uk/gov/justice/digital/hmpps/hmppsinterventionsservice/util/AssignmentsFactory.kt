@@ -26,7 +26,7 @@ class AssignmentsFactory(em: TestEntityManager? = null) : EntityFactory(em) {
         OffsetDateTime.now().minusHours(latest.toLong()).plusHours(i.toLong()),
         assignedBy = u,
         assignedTo = u,
-        superseded = i != latest
+        superseded = i != latest,
       )
     }
   }

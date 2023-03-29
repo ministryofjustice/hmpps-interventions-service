@@ -32,6 +32,7 @@ internal class AppointmentValidatorTest {
           deliverySessionValidator.validateUpdateAppointment(updateAppointmentDTO, OffsetDateTime.now())
         }
       }
+
       @Test
       fun `an empty delius office location throws validation error`() {
         var updateAppointmentDTO = UpdateAppointmentDTO(appointmentTime = OffsetDateTime.now().plusDays(1), durationInMinutes = 1, appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE, sessionType = AppointmentSessionType.ONE_TO_ONE)
@@ -68,6 +69,7 @@ internal class AppointmentValidatorTest {
         private fun createUpdateAppointmentDTO(postCode: String): UpdateAppointmentDTO {
           return UpdateAppointmentDTO(appointmentTime = OffsetDateTime.now().plusHours(1), durationInMinutes = 1, appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_OTHER, sessionType = AppointmentSessionType.ONE_TO_ONE, appointmentDeliveryAddress = AddressDTO("firstline", "secondLine", "town", "county", postCode))
         }
+
         @Test
         fun `can request valid non nps office appointment for various postcodes`() {
           val today = OffsetDateTime.now()
@@ -125,7 +127,7 @@ internal class AppointmentValidatorTest {
           sessionType = AppointmentSessionType.ONE_TO_ONE,
           npsOfficeCode = "CRSEXT",
           appointmentAttendance = null,
-          appointmentBehaviour = null
+          appointmentBehaviour = null,
         )
         assertDoesNotThrow {
           deliverySessionValidator.validateUpdateAppointment(updateAppointmentDTO, OffsetDateTime.now().minusMonths(1))
@@ -163,7 +165,7 @@ internal class AppointmentValidatorTest {
           sessionType = AppointmentSessionType.ONE_TO_ONE,
           npsOfficeCode = "CRSEXT",
           appointmentAttendance = null,
-          appointmentBehaviour = null
+          appointmentBehaviour = null,
         )
 
         var exception = assertThrows<ValidationError> {
@@ -184,7 +186,7 @@ internal class AppointmentValidatorTest {
           sessionType = AppointmentSessionType.ONE_TO_ONE,
           npsOfficeCode = "CRSEXT",
           appointmentAttendance = null,
-          appointmentBehaviour = null
+          appointmentBehaviour = null,
         )
         val exception = assertThrows<ValidationError> {
           deliverySessionValidator.validateUpdateAppointment(updateAppointmentDTO, OffsetDateTime.now().minusMonths(1))
@@ -203,7 +205,7 @@ internal class AppointmentValidatorTest {
           sessionType = AppointmentSessionType.ONE_TO_ONE,
           npsOfficeCode = "CRSEXT",
           appointmentAttendance = UpdateAppointmentAttendanceDTO(Attended.YES, null),
-          appointmentBehaviour = null
+          appointmentBehaviour = null,
         )
         val exception = assertThrows<ValidationError> {
           deliverySessionValidator.validateUpdateAppointment(updateAppointmentDTO, OffsetDateTime.now().minusMonths(1))
@@ -223,7 +225,7 @@ internal class AppointmentValidatorTest {
           sessionType = AppointmentSessionType.ONE_TO_ONE,
           npsOfficeCode = "CRSEXT",
           appointmentAttendance = UpdateAppointmentAttendanceDTO(Attended.LATE, null),
-          appointmentBehaviour = null
+          appointmentBehaviour = null,
         )
         val exception = assertThrows<ValidationError> {
           deliverySessionValidator.validateUpdateAppointment(updateAppointmentDTO, OffsetDateTime.now().minusMonths(1))

@@ -41,26 +41,47 @@ abstract class IntegrationTestBase {
   lateinit var webTestClient: WebTestClient
 
   @Autowired protected lateinit var referralRepository: ReferralRepository
+
   @Autowired protected lateinit var draftReferralRepository: DraftReferralRepository
+
   @Autowired protected lateinit var actionPlanRepository: ActionPlanRepository
+
   @Autowired protected lateinit var deliverySessionRepository: DeliverySessionRepository
+
   @Autowired protected lateinit var authUserRepository: AuthUserRepository
+
   @Autowired protected lateinit var interventionRepository: InterventionRepository
+
   @Autowired protected lateinit var serviceCategoryRepository: ServiceCategoryRepository
+
   @Autowired protected lateinit var serviceProviderRepository: ServiceProviderRepository
+
   @Autowired protected lateinit var npsRegionRepository: NPSRegionRepository
+
   @Autowired protected lateinit var dynamicFrameworkContractRepository: DynamicFrameworkContractRepository
+
   @Autowired protected lateinit var desiredOutcomeRepository: DesiredOutcomeRepository
+
   @Autowired protected lateinit var endOfServiceReportRepository: EndOfServiceReportRepository
+
   @Autowired protected lateinit var cancellationReasonRepository: CancellationReasonRepository
+
   @Autowired protected lateinit var contractTypeRepository: ContractTypeRepository
+
   @Autowired protected lateinit var appointmentRepository: AppointmentRepository
+
   @Autowired protected lateinit var supplierAssessmentRepository: SupplierAssessmentRepository
+
   @Autowired protected lateinit var appointmentDeliveryRepository: AppointmentDeliveryRepository
+
   @Autowired protected lateinit var appointmentDeliveryAddressRepository: AppointmentDeliveryAddressRepository
+
   @Autowired protected lateinit var caseNoteRepository: CaseNoteRepository
+
   @Autowired protected lateinit var referralDetailsRepository: ReferralDetailsRepository
+
   @Autowired protected lateinit var changeLogRepository: ChangelogRepository
+
   @Autowired protected lateinit var referralLocationRepository: ReferralLocationRepository
   protected lateinit var setupAssistant: SetupAssistant
 
@@ -88,7 +109,7 @@ abstract class IntegrationTestBase {
       caseNoteRepository,
       referralDetailsRepository,
       changeLogRepository,
-      referralLocationRepository
+      referralLocationRepository,
     )
     setupAssistant.cleanAll()
   }

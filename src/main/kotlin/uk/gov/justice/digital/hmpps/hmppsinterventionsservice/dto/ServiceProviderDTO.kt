@@ -4,7 +4,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Service
 
 class ServiceProviderDTO(
   val name: String,
-  val id: String
+  val id: String,
 ) {
   companion object {
     fun from(serviceProvider: ServiceProvider): ServiceProviderDTO {

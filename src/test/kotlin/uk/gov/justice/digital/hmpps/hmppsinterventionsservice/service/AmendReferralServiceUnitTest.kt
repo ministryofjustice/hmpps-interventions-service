@@ -68,7 +68,7 @@ class AmendReferralServiceUnitTest {
     complexityLevelRepository,
     desiredOutcomeRepository,
     userMapper,
-    referralService
+    referralService,
   )
 
   @Nested
@@ -120,7 +120,7 @@ class AmendReferralServiceUnitTest {
           referral.id,
           AmendDesiredOutcomesDTO(listOf(UUID.randomUUID()), "wrong input"),
           jwtAuthenticationToken,
-          serviceCategory2.id
+          serviceCategory2.id,
         )
       }
       assertThat(e.message.equals("desired outcomes cannot be updated: specified service category not selected for this referral"))
@@ -138,7 +138,7 @@ class AmendReferralServiceUnitTest {
           referral.id,
           AmendDesiredOutcomesDTO(listOf(UUID.randomUUID()), "wrong input"),
           jwtAuthenticationToken,
-          serviceCategory.id
+          serviceCategory.id,
         )
       }
 
@@ -151,12 +151,12 @@ class AmendReferralServiceUnitTest {
       val desiredOutcome = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId)
       val serviceCategory = serviceCategoryFactory.create(
         id = serviceCategoryId,
-        desiredOutcomes = listOf(desiredOutcome)
+        desiredOutcomes = listOf(desiredOutcome),
       )
       val referral = referralFactory.createSent(
         selectedServiceCategories = mutableSetOf(serviceCategory),
         desiredOutcomes = mutableListOf(desiredOutcome),
-        actionPlans = mutableListOf(actionPlanFactory.create(approvedAt = OffsetDateTime.now()))
+        actionPlans = mutableListOf(actionPlanFactory.create(approvedAt = OffsetDateTime.now())),
       )
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
       whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
@@ -166,7 +166,7 @@ class AmendReferralServiceUnitTest {
           referral.id,
           AmendDesiredOutcomesDTO(listOf(desiredOutcome.id), "there is a reason"),
           jwtAuthenticationToken,
-          serviceCategory.id
+          serviceCategory.id,
         )
       }
       assertThat(e.reason).isEqualTo("desired outcomes cannot be updated: the action plan is already approved")
@@ -189,7 +189,7 @@ class AmendReferralServiceUnitTest {
           referral.id,
           AmendDesiredOutcomesDTO(listOf(UUID.randomUUID()), "wrong input"),
           jwtAuthenticationToken,
-          serviceCategory.id
+          serviceCategory.id,
         )
       }
       assertThat(e.message.equals("desired outcomes cannot be updated: at least one desired outcome is not valid for this service category"))
@@ -202,19 +202,19 @@ class AmendReferralServiceUnitTest {
       val desiredOutcome2 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId)
       val serviceCategory = serviceCategoryFactory.create(
         id = serviceCategoryId,
-        desiredOutcomes = listOf(desiredOutcome1, desiredOutcome2)
+        desiredOutcomes = listOf(desiredOutcome1, desiredOutcome2),
       )
       val oldReferral = referralFactory.createSent(
         selectedServiceCategories = mutableSetOf(serviceCategory),
-        desiredOutcomes = mutableListOf(desiredOutcome1)
+        desiredOutcomes = mutableListOf(desiredOutcome1),
       )
       val referral = referralFactory.createSent(
         selectedServiceCategories = mutableSetOf(serviceCategory),
-        desiredOutcomes = mutableListOf(desiredOutcome2)
+        desiredOutcomes = mutableListOf(desiredOutcome2),
       )
       val expectedChangeLog = changeLogFactory.create(
         oldVal = ReferralAmendmentDetails(listOf(desiredOutcome1.id.toString())),
-        newVal = ReferralAmendmentDetails(listOf(desiredOutcome2.id.toString()))
+        newVal = ReferralAmendmentDetails(listOf(desiredOutcome2.id.toString())),
       )
 
       whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
@@ -227,7 +227,7 @@ class AmendReferralServiceUnitTest {
         oldReferral.id,
         AmendDesiredOutcomesDTO(listOf(desiredOutcome2.id), "needs changing"),
         jwtAuthenticationToken,
-        serviceCategory.id
+        serviceCategory.id,
       )
 
       val changelogArgument: ArgumentCaptor<Changelog> = ArgumentCaptor.forClass(Changelog::class.java)
@@ -259,16 +259,16 @@ class AmendReferralServiceUnitTest {
 
       val oldReferral = referralFactory.createSent(
         selectedServiceCategories = mutableSetOf(serviceCategory),
-        desiredOutcomes = mutableListOf(desiredOutcome1)
+        desiredOutcomes = mutableListOf(desiredOutcome1),
       )
       val referral = referralFactory.createSent(
         selectedServiceCategories = mutableSetOf(serviceCategory),
-        desiredOutcomes = mutableListOf(desiredOutcome1, desiredOutcome2)
+        desiredOutcomes = mutableListOf(desiredOutcome1, desiredOutcome2),
       )
 
       val expectedChangeLog = changeLogFactory.create(
         oldVal = ReferralAmendmentDetails(listOf(desiredOutcome1.id.toString(), desiredOutcome2.id.toString())),
-        newVal = ReferralAmendmentDetails(listOf(desiredOutcome3.id.toString(), desiredOutcome4.id.toString()))
+        newVal = ReferralAmendmentDetails(listOf(desiredOutcome3.id.toString(), desiredOutcome4.id.toString())),
       )
 
       whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
@@ -283,7 +283,7 @@ class AmendReferralServiceUnitTest {
         oldReferral.id,
         AmendDesiredOutcomesDTO(listOf(desiredOutcome3.id, desiredOutcome4.id), "needs changing"),
         jwtAuthenticationToken,
-        serviceCategory.id
+        serviceCategory.id,
       )
 
       val changelogArgument: ArgumentCaptor<Changelog> = ArgumentCaptor.forClass(Changelog::class.java)
@@ -313,7 +313,6 @@ class AmendReferralServiceUnitTest {
 
     @Test
     fun `updateComplexityLevel results in changes being saved`() {
-
       val complexityLevelId1 = UUID.randomUUID()
       val complexityLevelId2 = UUID.randomUUID()
 
@@ -327,7 +326,7 @@ class AmendReferralServiceUnitTest {
 
       val referral = referralFactory.createSent(
         selectedServiceCategories = mutableSetOf(serviceCategory),
-        complexityLevelIds = mutableMapOf(serviceCategory.id to complexityLevel1.id)
+        complexityLevelIds = mutableMapOf(serviceCategory.id to complexityLevel1.id),
       )
       whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
 
@@ -366,7 +365,6 @@ class AmendReferralServiceUnitTest {
 
     @Test
     fun `cant amend complexity level when the action plan is approved`() {
-
       val complexityLevelId1 = UUID.randomUUID()
 
       val complexityLevel1 = ComplexityLevel(complexityLevelId1, "1", "description", Complexity.LOW)
@@ -376,7 +374,7 @@ class AmendReferralServiceUnitTest {
       val referral = referralFactory.createSent(
         selectedServiceCategories = mutableSetOf(serviceCategory),
         complexityLevelIds = mutableMapOf(serviceCategory.id to complexityLevel1.id),
-        actionPlans = mutableListOf(actionPlanFactory.create(approvedAt = OffsetDateTime.now()))
+        actionPlans = mutableListOf(actionPlanFactory.create(approvedAt = OffsetDateTime.now())),
       )
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
       whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
@@ -386,7 +384,7 @@ class AmendReferralServiceUnitTest {
           referral.id,
           AmendComplexityLevelDTO(complexityLevelId1, "testing change"),
           serviceCategory.id,
-          jwtAuthenticationToken
+          jwtAuthenticationToken,
         )
       }
       assertThat(e.reason).isEqualTo("complexity level cannot be updated: the action plan is already approved")
@@ -400,11 +398,10 @@ class AmendReferralServiceUnitTest {
 
     @Test
     fun `has additional responsibilities is being amended to true and unavailability time is updated`() {
-
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
 
       val referral = referralFactory.createSent(
-        hasAdditionalResponsibilities = false
+        hasAdditionalResponsibilities = false,
       )
       whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
       whenever(referralRepository.save(any())).thenReturn(referral)
@@ -431,12 +428,11 @@ class AmendReferralServiceUnitTest {
 
     @Test
     fun `has additional responsibilities is being amended to false and unavailability time is set to null`() {
-
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
 
       val referral = referralFactory.createSent(
         hasAdditionalResponsibilities = true,
-        whenUnavailable = "9-12AM"
+        whenUnavailable = "9-12AM",
       )
       whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
       whenever(referralRepository.save(any())).thenReturn(referral)
@@ -468,7 +464,7 @@ class AmendReferralServiceUnitTest {
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
 
     val referral = referralFactory.createSent(
-      accessibilityNeeds = "schools"
+      accessibilityNeeds = "schools",
     )
     whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
     whenever(referralRepository.save(any())).thenReturn(referral)
@@ -497,7 +493,7 @@ class AmendReferralServiceUnitTest {
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
 
     val referral = referralFactory.createSent(
-      additionalNeedsInformation = "schools"
+      additionalNeedsInformation = "schools",
     )
     whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
     whenever(referralRepository.save(any())).thenReturn(referral)
@@ -527,11 +523,10 @@ class AmendReferralServiceUnitTest {
 
     @Test
     fun `has interpreter required is being amended to true and interpreter Language is updated`() {
-
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
 
       val referral = referralFactory.createSent(
-        needsInterpreter = false
+        needsInterpreter = false,
       )
       whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
       whenever(referralRepository.save(any())).thenReturn(referral)
@@ -558,12 +553,11 @@ class AmendReferralServiceUnitTest {
 
     @Test
     fun `has interpreter required is being amended to false and interpreter Language is set to null`() {
-
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
 
       val referral = referralFactory.createSent(
         needsInterpreter = true,
-        interpreterLanguage = "Yoruba"
+        interpreterLanguage = "Yoruba",
       )
       whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
       whenever(referralRepository.save(any())).thenReturn(referral)

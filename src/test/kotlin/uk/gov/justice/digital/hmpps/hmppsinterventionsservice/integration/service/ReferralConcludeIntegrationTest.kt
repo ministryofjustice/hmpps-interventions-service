@@ -62,8 +62,8 @@ class ReferralConcludeIntegrationTest @Autowired constructor(
       appointment = mutableSetOf(
         unattendedAppointments[0],
         attendedAppointments[1],
-        lateAppointments[0]
-      )
+        lateAppointments[0],
+      ),
     )
     // now we'll make a bunch of sessions with various unattended and attended appointments on them
     val referralConclude = referralConcludeCheck.requiresEndOfServiceReportCreation(actionPlan.referral)

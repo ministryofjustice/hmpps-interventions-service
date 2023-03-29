@@ -60,7 +60,7 @@ class DraftReferralService(
   val referralDetailsRepository: ReferralDetailsRepository,
   val draftOasysRiskInformationService: DraftOasysRiskInformationService,
   val referralLocationRepository: ReferralLocationRepository,
-  @Value("\${feature-flags.current-location.enabled}") private val currentLocationEnabled: Boolean
+  @Value("\${feature-flags.current-location.enabled}") private val currentLocationEnabled: Boolean,
 ) {
   companion object {
     private val logger = KotlinLogging.logger {}
@@ -93,7 +93,7 @@ class DraftReferralService(
         serviceUserCRN = crn,
         intervention = interventionRepository.getById(interventionId),
         selectedServiceCategories = selectedServiceCategories,
-      )
+      ),
     )
   }
 
@@ -320,7 +320,7 @@ class DraftReferralService(
     referral.selectedDesiredOutcomes!!.removeIf { desiredOutcome -> desiredOutcome.serviceCategoryId == serviceCategoryId }
     desiredOutcomeIds.forEach { desiredOutcomeId ->
       referral.selectedDesiredOutcomes!!.add(
-        SelectedDesiredOutcomesMapping(serviceCategoryId, desiredOutcomeId)
+        SelectedDesiredOutcomesMapping(serviceCategoryId, desiredOutcomeId),
       )
     }
     return draftReferralRepository.save(referral)
@@ -348,7 +348,6 @@ class DraftReferralService(
   }
 
   private fun validateSendReferralCandidate(draftReferral: DraftReferral) {
-
     if (currentLocationEnabled) {
       draftReferral.personCurrentLocationType?.let {
         if (it == PersonCurrentLocationType.CUSTODY &&
@@ -400,7 +399,7 @@ class DraftReferralService(
 
     update.serviceCategoryIds?.let {
       if (!draftReferral.intervention.dynamicFrameworkContract.contractType.serviceCategories.map {
-        serviceCategory ->
+          serviceCategory ->
         serviceCategory.id
       }.containsAll(it)
       ) {
@@ -420,7 +419,6 @@ class DraftReferralService(
   }
 
   fun sendDraftReferral(draftReferral: DraftReferral, user: AuthUser): Referral {
-
     validateSendReferralCandidate(draftReferral)
 
     val referral = createSentReferral(draftReferral, user)
@@ -479,8 +477,8 @@ class DraftReferralService(
             ?: throw ServerWebInputException("can't submit a referral without current location"),
           prisonId = draftReferral.personCustodyPrisonId,
           expectedReleaseDate = draftReferral.expectedReleaseDate,
-          expectedReleaseDateMissingReason = draftReferral.expectedReleaseDateMissingReason
-        )
+          expectedReleaseDateMissingReason = draftReferral.expectedReleaseDateMissingReason,
+        ),
       )
       referralRepository.save(referral)
     }
@@ -506,7 +504,7 @@ class DraftReferralService(
           concernsSuicide = oasysRiskInformation.riskToSelfSuicide ?: "",
           concernsHostel = oasysRiskInformation.riskToSelfHostelSetting ?: "",
           concernsVulnerability = oasysRiskInformation.riskToSelfVulnerability ?: "",
-        )
+        ),
       )
     } else {
       val additionalRiskInformation = referral.additionalRiskInformation
@@ -520,7 +518,7 @@ class DraftReferralService(
         user,
         riskSubmittedAt,
         additionalRiskInformation,
-        null
+        null,
       )
     }
 
@@ -535,19 +533,20 @@ class DraftReferralService(
 
     for (i in 1..maxReferenceNumberTries) {
       val candidate = referenceGenerator.generate(type)
-      if (!referralRepository.existsByReferenceNumber(candidate))
+      if (!referralRepository.existsByReferenceNumber(candidate)) {
         return candidate
-      else
+      } else {
         logger.warn(
           "Clash found for referral number {}",
-          StructuredArguments.kv("candidate", candidate)
+          StructuredArguments.kv("candidate", candidate),
         )
+      }
     }
 
     logger.error(
       "Unable to generate a referral number {} {}",
       StructuredArguments.kv("tries", maxReferenceNumberTries),
-      StructuredArguments.kv("referral_id", draftReferral.id)
+      StructuredArguments.kv("referral_id", draftReferral.id),
     )
     return null
   }

@@ -34,7 +34,7 @@ internal class AmendReferralControllerTest {
   private val hmppsAuthService = mock<HMPPSAuthService>()
   private val amendReferralController = AmendReferralController(
     amendReferralService,
-    hmppsAuthService
+    hmppsAuthService,
   )
   private val tokenFactory = JwtTokenFactory()
   private val referralFactory = ReferralFactory()
@@ -133,6 +133,7 @@ internal class AmendReferralControllerTest {
         amendReferralController.amendNeedsAndRequirements(token, referral.id, "non-existing-type", amendNeedsAndRequirementsDTO)
       assertThat(returnedValue.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
     }
+
     @Test
     fun `amendNeedsAndRequirements updates details in referral for the correct type  for amendReferralService updateAmendAccessibilityNeeds`() {
       val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(accessibilityNeeds = "school", reasonForChange = "A reason for change")
@@ -162,6 +163,7 @@ internal class AmendReferralControllerTest {
         amendReferralController.amendNeedsAndRequirements(token, referral.id, "identify-needs", amendNeedsAndRequirementsDTO)
       assertThat(returnedValue.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
     }
+
     @Test
     fun `amendNeedsAndRequirements updates details in referral for the correct type for amendReferralService updateAmendInterpreterRequired`() {
       val amendNeedsAndRequirementsDTO = AmendNeedsAndRequirementsDTO(needsInterpreter = true, interpreterLanguage = "Yoruba", reasonForChange = "A reason for change")
@@ -185,8 +187,8 @@ internal class AmendReferralControllerTest {
       whenever(
         amendReferralService.getSentReferralForAuthenticatedUser(
           eq(referral.id),
-          eq(token)
-        )
+          eq(token),
+        ),
       ).thenReturn(referral)
 
       val changeLogValuesList = mutableListOf(
@@ -198,7 +200,7 @@ internal class AmendReferralControllerTest {
           ReferralAmendmentDetails(mutableListOf("another value")),
           "A reason",
           OffsetDateTime.now(),
-          user
+          user,
         ),
         changeLogFactory.create(
           UUID.randomUUID(),
@@ -208,8 +210,8 @@ internal class AmendReferralControllerTest {
           ReferralAmendmentDetails(mutableListOf("another value 2")),
           "Another reason",
           OffsetDateTime.now(),
-          user
-        )
+          user,
+        ),
       )
 
       whenever(amendReferralService.getListOfChangeLogEntries(eq(referral))).thenReturn(changeLogValuesList)
@@ -231,8 +233,8 @@ internal class AmendReferralControllerTest {
       whenever(
         amendReferralService.getSentReferralForAuthenticatedUser(
           eq(referral.id),
-          eq(token)
-        )
+          eq(token),
+        ),
       ).thenReturn(referral)
 
       val changeLogValuesList = listOf<uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog>()
@@ -253,7 +255,6 @@ internal class AmendReferralControllerTest {
 
     @Test
     fun `getChangelogDetails returns the matched changelog entry`() {
-
       val changelog = changeLogFactory.create(
         UUID.randomUUID(),
         AmendTopic.NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS,
@@ -262,7 +263,7 @@ internal class AmendReferralControllerTest {
         ReferralAmendmentDetails(mutableListOf("another value")),
         "A reason",
         OffsetDateTime.now(),
-        user
+        user,
       )
 
       val changelogUpdateDTO = ChangelogUpdateDTO(changelog)
@@ -280,7 +281,6 @@ internal class AmendReferralControllerTest {
 
     @Test
     fun `getChangelogDetails returns the complexity title for complexity level changelog entry`() {
-
       val changelog = changeLogFactory.create(
         UUID.randomUUID(),
         AmendTopic.COMPLEXITY_LEVEL,
@@ -289,7 +289,7 @@ internal class AmendReferralControllerTest {
         ReferralAmendmentDetails(mutableListOf("UUID2")),
         "A reason",
         OffsetDateTime.now(),
-        user
+        user,
       )
 
       val changelogUpdateDTO = ChangelogUpdateDTO(changelog, "oldtitle", "newTitle")
@@ -309,7 +309,6 @@ internal class AmendReferralControllerTest {
 
     @Test
     fun `getChangelogDetails returns the desired outcomes description for desired outcomes changelog entry`() {
-
       val changelog = changeLogFactory.create(
         UUID.randomUUID(),
         AmendTopic.DESIRED_OUTCOMES,
@@ -318,13 +317,13 @@ internal class AmendReferralControllerTest {
         ReferralAmendmentDetails(mutableListOf("UUID2")),
         "A reason",
         OffsetDateTime.now(),
-        user
+        user,
       )
 
       val changelogUpdateDTO = ChangelogUpdateDTO(
         changelog,
         oldValues = mutableListOf("desc1", "desc2"),
-        newValues = mutableListOf("desc3")
+        newValues = mutableListOf("desc3"),
       )
       whenever(amendReferralService.getChangeLogById(changelog.id, token)).thenReturn(changelogUpdateDTO)
       whenever(userMapper.fromToken(any())).thenReturn(user)
@@ -342,7 +341,6 @@ internal class AmendReferralControllerTest {
 
     @Test
     fun `getChangelogDetails returns the amended description for interpreter required changelog entry`() {
-
       val changelog = changeLogFactory.create(
         UUID.randomUUID(),
         AmendTopic.NEEDS_AND_REQUIREMENTS_INTERPRETER_REQUIRED,
@@ -351,13 +349,13 @@ internal class AmendReferralControllerTest {
         ReferralAmendmentDetails(mutableListOf("no")),
         "A reason",
         OffsetDateTime.now(),
-        user
+        user,
       )
 
       val changelogUpdateDTO = ChangelogUpdateDTO(
         changelog,
         oldValue = "Yes-spanish",
-        newValue = "No"
+        newValue = "No",
       )
       whenever(amendReferralService.getChangeLogById(changelog.id, token)).thenReturn(changelogUpdateDTO)
       whenever(userMapper.fromToken(any())).thenReturn(user)
@@ -375,7 +373,6 @@ internal class AmendReferralControllerTest {
 
     @Test
     fun `getChangelogDetails throws 404 when changelog is not present`() {
-
       val changelog = changeLogFactory.create(
         UUID.randomUUID(),
         AmendTopic.COMPLEXITY_LEVEL,
@@ -384,7 +381,7 @@ internal class AmendReferralControllerTest {
         ReferralAmendmentDetails(mutableListOf("another value")),
         "A reason",
         OffsetDateTime.now(),
-        user
+        user,
       )
 
       val responseStatusException = ResponseStatusException(HttpStatus.NOT_FOUND, "Change log not found for [id=$changelog.id]")

@@ -28,7 +28,7 @@ class AppointmentProcessor(
         attendanceSubmittedAt = it.attendanceSubmittedAt?.let { t -> NdmisDateTime(t) },
         notifyPPOfAttendanceBehaviour = it.notifyPPOfAttendanceBehaviour,
         deliusAppointmentId = it.deliusAppointmentId.toString(),
-        reasonForAppointment = if (saaAppointments.contains(it)) AppointmentReason.SAA else AppointmentReason.DELIVERY
+        reasonForAppointment = if (saaAppointments.contains(it)) AppointmentReason.SAA else AppointmentReason.DELIVERY,
       )
     }.ifEmpty { null }
   }

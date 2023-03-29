@@ -27,7 +27,6 @@ internal class ErrorConfigurationTest {
 
   @Test
   fun `augments web client request exception`() {
-
     val exception = WebClientRequestException(IllegalStateException("An Error"), POST, URI.create("uri"), HttpHeaders.EMPTY)
 
     val response = errorConfiguration.handleWebClientRequestException(exception)
@@ -41,7 +40,6 @@ internal class ErrorConfigurationTest {
 
   @Test
   fun `augments web client response exception`() {
-
     val exception = WebClientResponseException(BAD_REQUEST.value(), "Reason Phrase", HttpHeaders.EMPTY, "An Error".toByteArray(), Charset.defaultCharset())
 
     val response = errorConfiguration.handleWebClientResponseException(exception)
@@ -55,7 +53,6 @@ internal class ErrorConfigurationTest {
 
   @Test
   fun `user message is mapped correctly`() {
-
     assertThat(errorConfiguration.userMessageForWebClientException(null)).isNull()
     assertThat(errorConfiguration.userMessageForWebClientException(CONFLICT)).isNull()
     assertThat(errorConfiguration.userMessageForWebClientException(BAD_REQUEST))
@@ -88,13 +85,12 @@ internal class ErrorConfigurationTest {
         "message" to "explaining why",
         "issues" to "[reason1, reason2]",
       ),
-      null
+      null,
     )
   }
 
   @Test
   fun `handles downstream api call error`() {
-
     val error = CommunityApiCallError(BAD_REQUEST, "category of error", "{\"name\",\"value\"}", RuntimeException("An exception"))
 
     val response = errorConfiguration.handleCommunityApiCallError(error).body!!
@@ -108,9 +104,9 @@ internal class ErrorConfigurationTest {
       "InterventionsCommunityAPICallError",
       mapOf(
         "category" to "category of error",
-        "userMessage" to "Delius reported \"category of error\". Please correct, if possible, otherwise contact support"
+        "userMessage" to "Delius reported \"category of error\". Please correct, if possible, otherwise contact support",
       ),
-      null
+      null,
     )
   }
 }

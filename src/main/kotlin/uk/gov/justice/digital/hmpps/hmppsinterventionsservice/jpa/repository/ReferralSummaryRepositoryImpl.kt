@@ -66,7 +66,7 @@ class ReferralSummaryRepositoryImpl : ReferralSummaryRepository {
   override fun getSentReferralSummaries(authUser: AuthUser, serviceProviders: List<String>, dashboardType: DashboardType?): List<ServiceProviderSentReferralSummary> {
     val query = entityManager.createNativeQuery(summariesQuery(constructCustomCriteria(dashboardType)))
     query.setParameter("serviceProviders", serviceProviders)
-    if (dashboardType == DashboardType.myCases) {
+    if (dashboardType == DashboardType.MyCases) {
       query.setParameter("username", authUser.userName)
     }
     val result = query.resultList as List<Array<Any>>
@@ -89,10 +89,10 @@ class ReferralSummaryRepositoryImpl : ReferralSummaryRepository {
 
   private fun constructCustomCriteria(dashboardType: DashboardType?): String? {
     return when (dashboardType) {
-      DashboardType.myCases -> "and assignedToUserName = :username and concludedAt is null "
-      DashboardType.openCases -> "and concludedAt is null "
-      DashboardType.unassignedCases -> "and assignedToUserName is null and concludedAt is null "
-      DashboardType.completedCases -> "and concludedAt is not null "
+      DashboardType.MyCases -> "and assignedToUserName = :username and concludedAt is null "
+      DashboardType.OpenCases -> "and concludedAt is null "
+      DashboardType.UnassignedCases -> "and assignedToUserName is null and concludedAt is null "
+      DashboardType.CompletedCases -> "and concludedAt is not null "
       null -> null
     }
   }

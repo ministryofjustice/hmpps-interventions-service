@@ -34,7 +34,7 @@ internal class PerformanceReportJobListenerTest {
       JobParametersBuilder()
         .addString("user.firstName", "tom")
         .addString("user.email", "tom@tom.tom")
-        .toJobParameters()
+        .toJobParameters(),
     )
     jobExecution.executionContext = ExecutionContext(mapOf("output.file.path" to "/tmp/foo/tom.csv"))
     jobExecution.status = BatchStatus.COMPLETED
@@ -44,7 +44,7 @@ internal class PerformanceReportJobListenerTest {
     verify(emailSender).sendEmail(
       "success-email-template",
       "tom@tom.tom",
-      mapOf("serviceProviderFirstName" to "tom", "reportUrl" to "https://interventions.com/sp-report-download?file=tom.csv")
+      mapOf("serviceProviderFirstName" to "tom", "reportUrl" to "https://interventions.com/sp-report-download?file=tom.csv"),
     )
   }
 
@@ -55,7 +55,7 @@ internal class PerformanceReportJobListenerTest {
       JobParametersBuilder()
         .addString("user.firstName", "tom")
         .addString("user.email", "tom@tom.tom")
-        .toJobParameters()
+        .toJobParameters(),
     )
     jobExecution.executionContext = ExecutionContext(mapOf("output.file.path" to "/tmp/foo/tom.csv"))
     jobExecution.status = BatchStatus.FAILED
@@ -66,7 +66,7 @@ internal class PerformanceReportJobListenerTest {
     verify(emailSender).sendEmail(
       "failure-email-template",
       "tom@tom.tom",
-      mapOf("serviceProviderFirstName" to "tom", "jobInstanceId" to "123")
+      mapOf("serviceProviderFirstName" to "tom", "jobInstanceId" to "123"),
     )
   }
 }

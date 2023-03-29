@@ -13,7 +13,7 @@ class RamDeliusReferralService(
   @Value("\${interventions-ui.baseurl}") private val interventionsUiBaseUrl: String,
   @Value("\${interventions-ui.locations.probation-practitioner.referral-details}") private val referralDetailsLocation: String,
   @Value("\${refer-and-monitor-and-delius.locations.referral-start}") private val referralStartLocation: String,
-  private val ramDeliusClient: RamDeliusClient
+  private val ramDeliusClient: RamDeliusClient,
 ) : CommunityAPIService {
   fun send(referral: Referral) {
     val url = UriComponentsBuilder.fromHttpUrl(interventionsUiBaseUrl)
@@ -39,7 +39,7 @@ class RamDeliusReferralService(
 
     ramDeliusClient.makeSyncPutRequest(
       pathToSend,
-      referRequest
+      referRequest,
     )
   }
 }

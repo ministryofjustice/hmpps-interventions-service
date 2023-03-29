@@ -51,7 +51,7 @@ class ReferralController(
   private val clientApiAccessChecker: ClientApiAccessChecker,
   private val cancellationReasonMapper: CancellationReasonMapper,
   private val actionPlanService: ActionPlanService,
-  private val telemetryClient: TelemetryClient
+  private val telemetryClient: TelemetryClient,
 ) {
   companion object : KLogging()
 
@@ -72,7 +72,7 @@ class ReferralController(
     )
     return SentReferralDTO.from(
       referralService.assignSentReferral(sentReferral, assignedBy, assignedTo),
-      referralConcluder.requiresEndOfServiceReportCreation(sentReferral)
+      referralConcluder.requiresEndOfServiceReportCreation(sentReferral),
     )
   }
 
@@ -86,11 +86,21 @@ class ReferralController(
   @GetMapping("/sent-referrals/summaries")
   fun getSentReferralsSummaries(
     authentication: JwtAuthenticationToken,
-    @Nullable @RequestParam(name = "concluded", required = false) concluded: Boolean?,
-    @Nullable @RequestParam(name = "cancelled", required = false) cancelled: Boolean?,
-    @Nullable @RequestParam(name = "unassigned", required = false) unassigned: Boolean?,
-    @Nullable @RequestParam(name = "assignedTo", required = false) assignedToUserId: String?,
-    @Nullable @RequestParam(name = "search", required = false) searchText: String?,
+    @Nullable
+    @RequestParam(name = "concluded", required = false)
+    concluded: Boolean?,
+    @Nullable
+    @RequestParam(name = "cancelled", required = false)
+    cancelled: Boolean?,
+    @Nullable
+    @RequestParam(name = "unassigned", required = false)
+    unassigned: Boolean?,
+    @Nullable
+    @RequestParam(name = "assignedTo", required = false)
+    assignedToUserId: String?,
+    @Nullable
+    @RequestParam(name = "search", required = false)
+    searchText: String?,
     @PageableDefault(page = 0, size = 50, sort = ["sentAt"]) page: Pageable,
   ): Page<SentReferralSummariesDTO> {
     val user = userMapper.fromToken(authentication)
@@ -98,7 +108,7 @@ class ReferralController(
       telemetryClient.trackEvent(
         "PagedDashboardRequest",
         null,
-        mutableMapOf("totalNumberOfReferrals" to it.totalElements.toDouble(), "pageSize" to page.pageSize.toDouble())
+        mutableMapOf("totalNumberOfReferrals" to it.totalElements.toDouble(), "pageSize" to page.pageSize.toDouble()),
       )
     }
   }
@@ -108,7 +118,9 @@ class ReferralController(
   @GetMapping("/sent-referrals/summary/service-provider")
   fun getServiceProviderSentReferralsSummary(
     authentication: JwtAuthenticationToken,
-    @Nullable @RequestParam(name = "dashboardType", required = false) dashboardTypeSelection: String?,
+    @Nullable
+    @RequestParam(name = "dashboardType", required = false)
+    dashboardTypeSelection: String?,
   ): List<ServiceProviderSentReferralSummaryDTO> {
     val user = userMapper.fromToken(authentication)
     val dashboardType = dashboardTypeSelection?.let { DashboardType.valueOf(it) }
@@ -117,7 +129,7 @@ class ReferralController(
         telemetryClient.trackEvent(
           "ServiceProviderReferralSummaryRequest",
           null,
-          mutableMapOf("totalNumberOfReferrals" to it.size.toDouble())
+          mutableMapOf("totalNumberOfReferrals" to it.size.toDouble()),
         )
       }
   }
@@ -135,6 +147,7 @@ class ReferralController(
       referralConcluder.requiresEndOfServiceReportCreation(sentReferral),
     )
   }
+
   @GetMapping("/service-category/{id}")
   fun getServiceCategoryByID(@PathVariable id: UUID): ServiceCategoryFullDTO {
     return serviceCategoryService.getServiceCategoryByID(id)
@@ -182,7 +195,7 @@ class ReferralController(
   private fun getSupplierAssessment(sentReferral: Referral): SupplierAssessment {
     return sentReferral.supplierAssessment ?: throw ResponseStatusException(
       HttpStatus.NOT_FOUND,
-      "Supplier assessment does not exist for referral[id=${sentReferral.id}]"
+      "Supplier assessment does not exist for referral[id=${sentReferral.id}]",
     )
   }
 

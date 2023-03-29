@@ -31,7 +31,7 @@ internal class SNSActionPlanServiceTest {
       submittedBy = AuthUser("abc123", "auth", "abc123"),
       submittedAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00"),
     ),
-    "http://localhost:8080/action-plan/77df9f6c-3fcb-4ec6-8fcf-96551cd9b080"
+    "http://localhost:8080/action-plan/77df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
   )
 
   @Test
@@ -44,14 +44,14 @@ internal class SNSActionPlanServiceTest {
       actionPlanSubmittedEvent.actionPlan.submittedAt!!,
       mapOf(
         "actionPlanId" to UUID.fromString("77df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
-        "submittedBy" to actionPlanSubmittedEvent.actionPlan.submittedBy!!.userName
+        "submittedBy" to actionPlanSubmittedEvent.actionPlan.submittedBy!!.userName,
       ),
-      PersonReference.crn(actionPlanSubmittedEvent.actionPlan.referral.serviceUserCRN)
+      PersonReference.crn(actionPlanSubmittedEvent.actionPlan.referral.serviceUserCRN),
     )
     verify(snsPublisher).publish(
       actionPlanSubmittedEvent.actionPlan.referral.id,
       actionPlanSubmittedEvent.actionPlan.submittedBy!!,
-      snsEvent
+      snsEvent,
     )
   }
 

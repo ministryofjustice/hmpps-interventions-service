@@ -88,7 +88,7 @@ class ReferralServiceUnitTest {
     amendReferralService,
     hmppsAuthService,
     telemetryService,
-    referralDetailsRepository
+    referralDetailsRepository,
   )
 
   @Test
@@ -127,7 +127,7 @@ class ReferralServiceUnitTest {
   fun `get all cancellation reasons`() {
     val cancellationReasons = listOf(
       CancellationReason(code = "aaa", description = "reason 1"),
-      CancellationReason(code = "bbb", description = "reason 2")
+      CancellationReason(code = "bbb", description = "reason 2"),
     )
     whenever(cancellationReasonRepository.findAll()).thenReturn(cancellationReasons)
     val result = referralService.getCancellationReasons()
@@ -230,7 +230,8 @@ class ReferralServiceUnitTest {
         referral.id,
         oldReferralValue,
         newValue,
-        "completion deadline change", OffsetDateTime.of(2022, 8, 3, 0, 0, 0, 0, ZoneOffset.UTC)
+        "completion deadline change",
+        OffsetDateTime.of(2022, 8, 3, 0, 0, 0, 0, ZoneOffset.UTC),
       )
 
       whenever(changeLogRepository.save(changlogReturned)).thenReturn(changlogReturned)

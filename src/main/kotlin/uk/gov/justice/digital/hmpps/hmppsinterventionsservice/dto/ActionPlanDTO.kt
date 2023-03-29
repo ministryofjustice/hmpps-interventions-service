@@ -15,7 +15,7 @@ data class ActionPlanDTO(
   val submittedBy: AuthUserDTO?,
   val submittedAt: OffsetDateTime?,
   val approvedBy: AuthUserDTO?,
-  val approvedAt: OffsetDateTime?
+  val approvedAt: OffsetDateTime?,
 ) {
   companion object {
     fun from(actionPlan: ActionPlan): ActionPlanDTO {
@@ -38,14 +38,14 @@ data class ActionPlanDTO(
 data class ActionPlanActivityDTO(
   val id: UUID,
   val description: String,
-  val createdAt: OffsetDateTime
+  val createdAt: OffsetDateTime,
 ) {
   companion object {
     fun from(actionPlanActivity: ActionPlanActivity): ActionPlanActivityDTO {
       return ActionPlanActivityDTO(
         id = actionPlanActivity.id,
         description = actionPlanActivity.description,
-        createdAt = actionPlanActivity.createdAt
+        createdAt = actionPlanActivity.createdAt,
       )
     }
   }
@@ -54,12 +54,12 @@ data class ActionPlanActivityDTO(
 data class CreateActionPlanDTO(
   val referralId: UUID,
   val numberOfSessions: Int?,
-  val activities: List<UpdateActionPlanActivityDTO> = emptyList()
+  val activities: List<UpdateActionPlanActivityDTO> = emptyList(),
 )
 
 data class UpdateActionPlanDTO(
   val numberOfSessions: Int?,
-  val newActivity: UpdateActionPlanActivityDTO?
+  val newActivity: UpdateActionPlanActivityDTO?,
 )
 
 data class UpdateActionPlanActivityDTO(

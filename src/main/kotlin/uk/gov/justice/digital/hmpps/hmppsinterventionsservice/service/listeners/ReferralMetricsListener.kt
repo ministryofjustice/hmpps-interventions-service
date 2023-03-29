@@ -35,8 +35,11 @@ class ReferralMetricsListener(
 
   private fun timer(previous: Referral, current: Referral): Timer {
     val interventionKind =
-      if (current.intervention.id == previous.intervention.id) "same"
-      else "different"
+      if (current.intervention.id == previous.intervention.id) {
+        "same"
+      } else {
+        "different"
+      }
 
     return Timer.builder("intervention.referral.repeated_time")
       .tag("crn", current.serviceUserCRN)
@@ -47,7 +50,7 @@ class ReferralMetricsListener(
   private fun findPreviousReferral(current: Referral): Referral? {
     return repository.findAll(
       otherReferralsForSamePerson(current.id, current.serviceUserCRN),
-      limitToLatestSent()
+      limitToLatestSent(),
     ).firstOrNull()
   }
 
@@ -56,7 +59,7 @@ class ReferralMetricsListener(
       cb.and(
         cb.notEqual(r.get<String>("id"), id),
         cb.equal(r.get<String>("serviceUserCRN"), crn),
-        cb.isNotNull(r.get<OffsetDateTime?>("sentAt"))
+        cb.isNotNull(r.get<OffsetDateTime?>("sentAt")),
       )
     }
 

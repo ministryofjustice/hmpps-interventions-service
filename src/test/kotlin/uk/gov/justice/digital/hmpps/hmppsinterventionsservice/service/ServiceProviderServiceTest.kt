@@ -13,16 +13,18 @@ import java.util.UUID
 @RepositoryTest
 class ServiceProviderServiceTest @Autowired constructor(
   val entityManager: TestEntityManager,
-  val referralRepository: ReferralRepository
+  val referralRepository: ReferralRepository,
 ) {
   private val serviceProviderService = ServiceProviderService(referralRepository)
   private val referralFactory = ReferralFactory(entityManager)
+
   @Nested
   inner class GetServiceProviderByReferralId {
     @Test
     fun `get service provider with unknown id returns null`() {
       Assertions.assertThat(serviceProviderService.getServiceProviderByReferralId(UUID.randomUUID())).isNull()
     }
+
     @Test
     fun `get service provider with known referral id returns service provider`() {
       val referral = referralFactory.createSent()

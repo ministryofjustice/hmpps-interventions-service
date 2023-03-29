@@ -34,7 +34,7 @@ class DraftOasysRiskInformationFactory(em: TestEntityManager? = null) : EntityFa
         riskToSelfHostelSetting,
         riskToSelfVulnerability,
         additionalInformation,
-      )
+      ),
     )
   }
 }

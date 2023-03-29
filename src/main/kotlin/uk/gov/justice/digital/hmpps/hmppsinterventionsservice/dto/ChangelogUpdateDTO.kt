@@ -7,5 +7,5 @@ data class ChangelogUpdateDTO(
   val oldValue: String? = null,
   val newValue: String? = null,
   val oldValues: List<String> = emptyList(),
-  val newValues: List<String> = emptyList()
+  val newValues: List<String> = emptyList(),
 )

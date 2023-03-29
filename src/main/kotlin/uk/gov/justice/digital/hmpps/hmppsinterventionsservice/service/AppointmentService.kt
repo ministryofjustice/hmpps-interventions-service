@@ -71,7 +71,7 @@ class AppointmentService(
           additionalAttendanceInformation,
           notifyProbationPractitioner,
           behaviourDescription,
-          appointmentType
+          appointmentType,
         )
       }
       // the current appointment needs to be updated
@@ -93,7 +93,7 @@ class AppointmentService(
           additionalAttendanceInformation,
           notifyProbationPractitioner,
           behaviourDescription,
-          appointmentType
+          appointmentType,
         )
       }
       // an additional appointment is required
@@ -114,7 +114,7 @@ class AppointmentService(
           additionalAttendanceInformation,
           notifyProbationPractitioner,
           behaviourDescription,
-          appointmentType
+          appointmentType,
         )
       }
       // the appointment has already been attended
@@ -131,7 +131,7 @@ class AppointmentService(
     appointmentDeliveryType: AppointmentDeliveryType,
     appointmentSessionType: AppointmentSessionType?,
     appointmentDeliveryAddressDTO: AddressDTO?,
-    npsOfficeCode: String? = null
+    npsOfficeCode: String? = null,
   ) {
     var appointmentDelivery = appointment.appointmentDelivery
     if (appointmentDelivery == null) {
@@ -154,12 +154,12 @@ class AppointmentService(
     appointment: Appointment,
     behaviourDescription: String,
     notifyProbationPractitioner: Boolean,
-    submittedBy: AuthUser
+    submittedBy: AuthUser,
   ): Appointment {
     if (appointment.appointmentFeedbackSubmittedAt != null) {
       throw ResponseStatusException(
         HttpStatus.CONFLICT,
-        "Feedback has already been submitted for this appointment [id=${appointment.id}]"
+        "Feedback has already been submitted for this appointment [id=${appointment.id}]",
       )
     }
     setBehaviourFields(appointment, behaviourDescription, notifyProbationPractitioner, submittedBy)
@@ -170,18 +170,18 @@ class AppointmentService(
     appointment: Appointment,
     attended: Attended,
     additionalAttendanceInformation: String?,
-    submittedBy: AuthUser
+    submittedBy: AuthUser,
   ): Appointment {
     if (appointment.appointmentFeedbackSubmittedAt != null) {
       throw ResponseStatusException(
         HttpStatus.CONFLICT,
-        "Feedback has already been submitted for this appointment [id=${appointment.id}]"
+        "Feedback has already been submitted for this appointment [id=${appointment.id}]",
       )
     }
     if (appointment.appointmentTime.isAfter(OffsetDateTime.now())) {
       throw ResponseStatusException(
         HttpStatus.BAD_REQUEST,
-        "Cannot submit feedback for a future appointment [id=${appointment.id}]"
+        "Cannot submit feedback for a future appointment [id=${appointment.id}]",
       )
     }
     setAttendanceFields(appointment, attended, additionalAttendanceInformation, submittedBy)
@@ -191,7 +191,7 @@ class AppointmentService(
   fun submitSessionFeedback(
     appointment: Appointment,
     submitter: AuthUser,
-    appointmentType: AppointmentType
+    appointmentType: AppointmentType,
   ): Appointment {
     if (appointment.appointmentFeedbackSubmittedAt != null) {
       throw ResponseStatusException(HttpStatus.CONFLICT, "appointment feedback has already been submitted")
@@ -200,7 +200,7 @@ class AppointmentService(
     if (appointment.attendanceSubmittedAt == null) {
       throw ResponseStatusException(
         HttpStatus.UNPROCESSABLE_ENTITY,
-        "can't submit feedback unless attendance has been recorded"
+        "can't submit feedback unless attendance has been recorded",
       )
     }
 
@@ -211,21 +211,21 @@ class AppointmentService(
     appointmentEventPublisher.attendanceRecordedEvent(
       appointment,
       appointment.attended!! == Attended.NO,
-      appointmentType
+      appointmentType,
     )
 
     if (appointment.attendanceBehaviourSubmittedAt != null) { // excluding the case of non attendance
       appointmentEventPublisher.behaviourRecordedEvent(
         appointment,
         appointment.notifyPPOfAttendanceBehaviour!!,
-        appointmentType
+        appointmentType,
       )
     }
 
     appointmentEventPublisher.sessionFeedbackRecordedEvent(
       appointment,
       appointment.notifyPPOfAttendanceBehaviour ?: false,
-      appointmentType
+      appointmentType,
     )
 
     return appointment
@@ -269,7 +269,7 @@ class AppointmentService(
     additionalAttendanceInformation: String?,
     notifyProbationPractitioner: Boolean?,
     behaviourDescription: String?,
-    appointmentType: AppointmentType
+    appointmentType: AppointmentType,
   ): Appointment {
     val appointment = Appointment(
       id = UUID.randomUUID(),
@@ -317,7 +317,7 @@ class AppointmentService(
       additionalAttendanceInformation,
       notifyProbationPractitioner,
       behaviourDescription,
-      appointmentType
+      appointmentType,
     )
     oldAppointment.superseded = true
     appointmentRepository.save(oldAppointment)
@@ -326,7 +326,7 @@ class AppointmentService(
 
   private fun createOrUpdateAppointmentDeliveryAddress(
     appointmentDelivery: AppointmentDelivery,
-    appointmentDeliveryAddressDTO: AddressDTO
+    appointmentDeliveryAddressDTO: AddressDTO,
   ): AppointmentDeliveryAddress {
     var appointmentDeliveryAddress = appointmentDelivery.appointmentDeliveryAddress
     if (appointmentDeliveryAddress == null) {
@@ -336,7 +336,7 @@ class AppointmentService(
         secondAddressLine = appointmentDeliveryAddressDTO.secondAddressLine,
         townCity = appointmentDeliveryAddressDTO.townOrCity,
         county = appointmentDeliveryAddressDTO.county,
-        postCode = appointmentDeliveryAddressDTO.postCode
+        postCode = appointmentDeliveryAddressDTO.postCode,
       )
     } else {
       appointmentDeliveryAddress.firstAddressLine = appointmentDeliveryAddressDTO.firstAddressLine
@@ -360,7 +360,7 @@ class AppointmentService(
     npsOfficeCode: String? = null,
   ): Appointment {
     val sentReferral = referralRepository.findByIdAndSentAtIsNotNull(sentReferralId) ?: throw EntityNotFoundException(
-      "Sent Referral not found [referralId=$sentReferralId]"
+      "Sent Referral not found [referralId=$sentReferralId]",
     )
     val deliusAppointmentId =
       communityAPIBookingService.book(sentReferral, null, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode)

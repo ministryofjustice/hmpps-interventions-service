@@ -29,7 +29,7 @@ class InterventionFactory(em: TestEntityManager? = null) : EntityFactory(em) {
         description = description,
         incomingReferralDistributionEmail = incomingReferralDistributionEmail,
         dynamicFrameworkContract = contract ?: dynamicFrameworkContractFactory.create(),
-      )
+      ),
     )
   }
 

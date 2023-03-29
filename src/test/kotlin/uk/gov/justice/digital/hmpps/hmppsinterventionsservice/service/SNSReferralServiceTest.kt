@@ -29,7 +29,7 @@ internal class SNSReferralServiceTest {
       sentAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00"),
       sentBy = AuthUser("ecd7b8d690", "irrelevant", "irrelevant"),
     ),
-    "http://localhost:8080/sent-referral/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"
+    "http://localhost:8080/sent-referral/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
   )
 
   private val referralAssignedEvent = ReferralEvent(
@@ -42,11 +42,11 @@ internal class SNSReferralServiceTest {
         ReferralAssignment(
           OffsetDateTime.parse("2020-12-04T10:42:43+00:00"),
           authUserFactory.createSP("irrelevant"),
-          authUserFactory.createSP("abc123")
-        )
-      )
+          authUserFactory.createSP("abc123"),
+        ),
+      ),
     ),
-    "http://localhost:8080/sent-referral/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"
+    "http://localhost:8080/sent-referral/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
   )
 
   @Test
@@ -58,7 +58,7 @@ internal class SNSReferralServiceTest {
       "http://localhost:8080" + "/sent-referral/${referralSentEvent.referral.id}",
       referralSentEvent.referral.sentAt!!,
       mapOf("referralId" to UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080")),
-      PersonReference.crn(referralSentEvent.referral.serviceUserCRN)
+      PersonReference.crn(referralSentEvent.referral.serviceUserCRN),
     )
     verify(snsPublisher).publish(referralSentEvent.referral.id, referralSentEvent.referral.sentBy!!, snsEvent)
   }
@@ -72,12 +72,12 @@ internal class SNSReferralServiceTest {
       "http://localhost:8080" + "/sent-referral/${referralSentEvent.referral.id}",
       referralSentEvent.referral.sentAt!!,
       mapOf("referralId" to UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"), "assignedTo" to "abc123"),
-      PersonReference.crn(referralSentEvent.referral.serviceUserCRN)
+      PersonReference.crn(referralSentEvent.referral.serviceUserCRN),
     )
     verify(snsPublisher).publish(
       referralAssignedEvent.referral.id,
       referralAssignedEvent.referral.currentAssignment!!.assignedBy,
-      snsEvent
+      snsEvent,
     )
   }
 

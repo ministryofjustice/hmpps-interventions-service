@@ -14,7 +14,9 @@ class DraftOasysRiskInformation(
   @Id
   val referralId: UUID,
   @NotNull val updatedAt: OffsetDateTime,
-  @NotNull @ManyToOne @Fetch(FetchMode.JOIN)
+  @NotNull
+  @ManyToOne
+  @Fetch(FetchMode.JOIN)
   val updatedBy: AuthUser,
   var riskSummaryWhoIsAtRisk: String?,
   var riskSummaryNatureOfRisk: String?,

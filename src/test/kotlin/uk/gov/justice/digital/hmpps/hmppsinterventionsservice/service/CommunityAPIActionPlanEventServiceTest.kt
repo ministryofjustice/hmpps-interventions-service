@@ -30,12 +30,11 @@ class CommunityAPIActionPlanEventServiceTest {
     "/probation-practitioner/referral/{id}/action-plan",
     "/secure/offenders/crn/{crn}/sentence/{sentenceId}/notifications/context/{contextName}",
     "commissioned-rehabilitation-services",
-    communityAPIClient
+    communityAPIClient,
   )
 
   @Test
   fun `notify submitted action plan`() {
-
     val event = getEvent(SUBMITTED)
     communityAPIService.onApplicationEvent(event)
 
@@ -48,13 +47,12 @@ class CommunityAPIActionPlanEventServiceTest {
         submittedAtDefault,
         "Action Plan Submitted for Accommodation Referral XX1234 with Prime Provider Harmony Living\n" +
           "http://testUrl/probation-practitioner/referral/${event.actionPlan.referral.id}/action-plan",
-      )
+      ),
     )
   }
 
   @Test
   fun `notify approved action plan`() {
-
     val event = getEvent(APPROVED)
     communityAPIService.onApplicationEvent(event)
 
@@ -67,12 +65,12 @@ class CommunityAPIActionPlanEventServiceTest {
         approvedAtDefault,
         "Action Plan Approved for Accommodation Referral XX1234 with Prime Provider Harmony Living\n" +
           "http://testUrl/probation-practitioner/referral/${event.actionPlan.referral.id}/action-plan",
-      )
+      ),
     )
   }
 
   private fun getEvent(
-    ActionPlanEventType: ActionPlanEventType
+    ActionPlanEventType: ActionPlanEventType,
   ): ActionPlanEvent =
     ActionPlanEvent(
       "source",
@@ -85,9 +83,9 @@ class CommunityAPIActionPlanEventServiceTest {
           serviceUserCRN = "X123456",
           relevantSentenceId = 1234L,
           sentAt = sentAtDefault,
-          referenceNumber = "XX1234"
+          referenceNumber = "XX1234",
         ),
       ),
-      "http://localhost:8080/submit-action-plan/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"
+      "http://localhost:8080/submit-action-plan/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
     )
 }

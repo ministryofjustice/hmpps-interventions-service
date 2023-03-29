@@ -52,7 +52,7 @@ data class DeliverySessionAppointmentScheduleDetailsDTO(
 
 data class UpdateAppointmentAttendanceDTO(
   val attended: Attended,
-  val additionalAttendanceInformation: String?
+  val additionalAttendanceInformation: String?,
 )
 
 data class RecordAppointmentBehaviourDTO(
@@ -71,7 +71,7 @@ data class DeliverySessionDTO(
   val npsOfficeCode: String?,
   val appointmentDeliveryAddress: AddressDTO?,
   val sessionFeedback: SessionFeedbackDTO,
-  val deliusAppointmentId: Long?
+  val deliusAppointmentId: Long?,
 ) {
   companion object {
     fun from(session: DeliverySession): DeliverySessionDTO {
@@ -82,8 +82,12 @@ data class DeliverySessionDTO(
             val address = appointmentDelivery.appointmentDeliveryAddress
             if (address != null) {
               AddressDTO(address.firstAddressLine, address.secondAddressLine ?: "", address.townCity, address.county, address.postCode)
-            } else null
-          } else null
+            } else {
+              null
+            }
+          } else {
+            null
+          }
         }
         else -> null
       }
@@ -101,7 +105,7 @@ data class DeliverySessionDTO(
           .mapTo(HashSet()) { AppointmentDTO.from(it) },
         npsOfficeCode = session.currentAppointment?.appointmentDelivery?.npsOfficeCode,
         sessionFeedback = SessionFeedbackDTO.from(session.currentAppointment),
-        deliusAppointmentId = session.currentAppointment?.deliusAppointmentId
+        deliusAppointmentId = session.currentAppointment?.deliusAppointmentId,
       )
     }
     fun from(sessions: List<DeliverySession>): List<DeliverySessionDTO> {
@@ -120,7 +124,6 @@ data class SessionFeedbackDTO(
     fun from(
       appointment: Appointment?,
     ): SessionFeedbackDTO {
-
       return appointment?.let {
         SessionFeedbackDTO(
           AttendanceDTO.from(appointment),

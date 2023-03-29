@@ -24,7 +24,7 @@ class ReportingController(
   @PostMapping("/reports/service-provider/performance")
   fun creatServiceProviderPerformanceReport(
     @RequestBody dateInterval: DateInterval,
-    authentication: JwtAuthenticationToken
+    authentication: JwtAuthenticationToken,
   ): ResponseEntity<Any> {
     reportingService.generateServiceProviderPerformanceReport(dateInterval.fromDate, dateInterval.toDate, userMapper.fromToken(authentication))
     return ResponseEntity.accepted().build()

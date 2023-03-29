@@ -22,10 +22,10 @@ class HMPPSAuthServiceTest {
     0L,
     RestClient(
       WebClient.create(
-        mockWebServer.url("/").toString()
+        mockWebServer.url("/").toString(),
       ),
-      "client-registration-id"
-    )
+      "client-registration-id",
+    ),
   )
 
   @Test
@@ -41,8 +41,8 @@ class HMPPSAuthServiceTest {
             "firstName": "tom",
             "lastName": "tom"
           }
-          """.trimIndent()
-        )
+          """.trimIndent(),
+        ),
     )
     val detail = hmppsAuthService.getUserDetail(AuthUser("id", "auth", "username"))
 
@@ -64,8 +64,8 @@ class HMPPSAuthServiceTest {
             "firstName": "tom",
             "lastName": "tom"
           }
-          """.trimIndent()
-        )
+          """.trimIndent(),
+        ),
     )
     assertThrows<UnverifiedEmailException> {
       hmppsAuthService.getUserDetail(AuthUser("id", "auth", "username"))
@@ -85,7 +85,7 @@ class HMPPSAuthServiceTest {
               {
                 "email": "tom@tom.tom"
               }
-                """.trimIndent()
+                """.trimIndent(),
               )
           "/user/detail" ->
             MockResponse()
@@ -95,7 +95,7 @@ class HMPPSAuthServiceTest {
               {
                 "name": "tom timothy"
               }
-                """.trimIndent()
+                """.trimIndent(),
               )
           else -> MockResponse().setResponseCode(404)
         }
@@ -121,7 +121,7 @@ class HMPPSAuthServiceTest {
               {
                 "name": "tom timothy"
               }
-                """.trimIndent()
+                """.trimIndent(),
               )
           else -> MockResponse().setResponseCode(404)
         }

@@ -26,8 +26,8 @@ class AppointmentDeliveryAddressFactory(em: TestEntityManager? = null) : EntityF
         secondAddressLine = secondAddressLine,
         townCity = townCity,
         county = county,
-        postCode = postCode
-      )
+        postCode = postCode,
+      ),
     )
   }
 }

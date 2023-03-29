@@ -87,7 +87,6 @@ class ReferralRepositoryTest @Autowired constructor(
 
     @Test
     fun `can obtain a multiple referral summaries as subcontractor and as prime provider`() {
-
       val referralWithPrimeSp = createReferral(true)
       val referralWithAnotherPrimeSp = createReferral(true)
       val referralWithSubConSp = createReferral(false)
@@ -95,7 +94,7 @@ class ReferralRepositoryTest @Autowired constructor(
 
       val serviceProviderSearchIds = listOf(
         referralWithPrimeSp.intervention.dynamicFrameworkContract.primeProvider.id,
-        referralWithSubConSp.intervention.dynamicFrameworkContract.subcontractorProviders.firstOrNull()!!.id
+        referralWithSubConSp.intervention.dynamicFrameworkContract.subcontractorProviders.firstOrNull()!!.id,
       )
       val summaries = referralRepository.getSentReferralSummaries(authUser, serviceProviderSearchIds)
 
@@ -106,7 +105,6 @@ class ReferralRepositoryTest @Autowired constructor(
 
     @Test
     fun `cannot obtain a single referral summary when provider doesn't match`() {
-
       val referralWithPrimeSp = createReferral(true)
       val referralWithSubConSp = createReferral(false)
 
@@ -147,7 +145,7 @@ class ReferralRepositoryTest @Autowired constructor(
 
       val serviceProviderSearchIds = listOf(
         referralWithChangedAssignee.intervention.dynamicFrameworkContract.primeProvider.id,
-        referralWithMultipleChangedAssignee.intervention.dynamicFrameworkContract.primeProvider.id
+        referralWithMultipleChangedAssignee.intervention.dynamicFrameworkContract.primeProvider.id,
       )
       val summaries = referralRepository.getSentReferralSummaries(authUser, serviceProviderSearchIds)
 
@@ -313,54 +311,53 @@ class ReferralRepositoryTest @Autowired constructor(
 
     @Test
     fun `does not show referrals where the user has been historically assigned but no longer the active assignee`() {
-
       val assignedReferral = createReferral(true, 2)
       val oldAssignee = assignedReferral.assignments[0].assignedTo
       val serviceProviderSearchId = assignedReferral.intervention.dynamicFrameworkContract.primeProvider.id
-      val summaries = referralRepository.getSentReferralSummaries(oldAssignee, listOf(serviceProviderSearchId), DashboardType.myCases)
+      val summaries = referralRepository.getSentReferralSummaries(oldAssignee, listOf(serviceProviderSearchId), DashboardType.MyCases)
 
       assertThat(summaries.size).isEqualTo(0)
     }
 
     @Test
-    fun `myCases dashboard type should only return logged in user referrals`() {
+    fun `MyCases dashboard type should only return logged in user referrals`() {
       val assignedReferral = createReferral(true, 1)
       val assignedToSomeoneElse = createReferral(true, 1, assignedReferral.intervention)
       val serviceProviderSearchId = assignedReferral.intervention.dynamicFrameworkContract.primeProvider.id
-      val summaries = referralRepository.getSentReferralSummaries(assignedReferral.currentAssignee!!, listOf(serviceProviderSearchId), DashboardType.myCases)
+      val summaries = referralRepository.getSentReferralSummaries(assignedReferral.currentAssignee!!, listOf(serviceProviderSearchId), DashboardType.MyCases)
 
       assertThat(summaries.size).isEqualTo(1)
       assertThat(contains(summaries, expectedSummary(assignedReferral)))
     }
 
     @Test
-    fun `openCases dashboard type should only return referrals that don't have an EOSR submitted`() {
+    fun `OpenCases dashboard type should only return referrals that don't have an EOSR submitted`() {
       val openReferral = createReferral(true, 1)
       val endedReferral = createEndedReferral(true, OffsetDateTime.now(), OffsetDateTime.now(), true, openReferral.intervention)
       val serviceProviderSearchId = openReferral.intervention.dynamicFrameworkContract.primeProvider.id
-      val summaries = referralRepository.getSentReferralSummaries(authUser, listOf(serviceProviderSearchId), DashboardType.openCases)
+      val summaries = referralRepository.getSentReferralSummaries(authUser, listOf(serviceProviderSearchId), DashboardType.OpenCases)
 
       assertThat(summaries.size).isEqualTo(1)
       assertThat(contains(summaries, expectedSummary(openReferral)))
     }
 
     @Test
-    fun `unassigned dashboard type should only return referrals that aren't assigned`() {
+    fun `UnassignedCases dashboard type should only return referrals that aren't assigned`() {
       val openReferral = createReferral(true, 1)
       val unassignedReferral = createReferral(true, 0, openReferral.intervention)
       val serviceProviderSearchId = openReferral.intervention.dynamicFrameworkContract.primeProvider.id
-      val summaries = referralRepository.getSentReferralSummaries(authUser, listOf(serviceProviderSearchId), DashboardType.unassignedCases)
+      val summaries = referralRepository.getSentReferralSummaries(authUser, listOf(serviceProviderSearchId), DashboardType.UnassignedCases)
 
       assertThat(summaries.size).isEqualTo(1)
       assertThat(contains(summaries, expectedSummary(unassignedReferral)))
     }
 
     @Test
-    fun `completed dashboard type should only return referrals that have been concluded`() {
+    fun `CompletedCases dashboard type should only return referrals that have been concluded`() {
       val openReferral = createReferral(true, 1)
       val concludedReferral = createEndedReferral(true, OffsetDateTime.now(), OffsetDateTime.now(), true, openReferral.intervention)
       val serviceProviderSearchId = openReferral.intervention.dynamicFrameworkContract.primeProvider.id
-      val summaries = referralRepository.getSentReferralSummaries(authUser, listOf(serviceProviderSearchId), DashboardType.completedCases)
+      val summaries = referralRepository.getSentReferralSummaries(authUser, listOf(serviceProviderSearchId), DashboardType.CompletedCases)
 
       assertThat(summaries.size).isEqualTo(1)
       assertThat(contains(summaries, expectedSummary(concludedReferral)))
@@ -373,7 +370,7 @@ class ReferralRepositoryTest @Autowired constructor(
       val cancelledReferralWithSubmittedActionPlan = createEndedReferral(true, OffsetDateTime.now(), OffsetDateTime.now(), false, openReferral.intervention)
       actionPlanFactory.createSubmitted(referral = cancelledReferralWithSubmittedActionPlan)
       val serviceProviderSearchId = openReferral.intervention.dynamicFrameworkContract.primeProvider.id
-      val summaries = referralRepository.getSentReferralSummaries(authUser, listOf(serviceProviderSearchId), DashboardType.completedCases)
+      val summaries = referralRepository.getSentReferralSummaries(authUser, listOf(serviceProviderSearchId), DashboardType.CompletedCases)
 
       assertThat(summaries.size).isEqualTo(1)
       assertThat(contains(summaries, expectedSummary(cancelledReferralWithSubmittedActionPlan)))
@@ -387,7 +384,7 @@ class ReferralRepositoryTest @Autowired constructor(
       val appointment = appointmentFactory.create(referral = cancelledReferralWithSaaAttended, attended = Attended.YES, attendanceSubmittedAt = OffsetDateTime.now())
       supplierAssessmentFactory.create(referral = cancelledReferralWithSaaAttended, appointment = appointment)
       val serviceProviderSearchId = openReferral.intervention.dynamicFrameworkContract.primeProvider.id
-      val summaries = referralRepository.getSentReferralSummaries(authUser, listOf(serviceProviderSearchId), DashboardType.completedCases)
+      val summaries = referralRepository.getSentReferralSummaries(authUser, listOf(serviceProviderSearchId), DashboardType.CompletedCases)
 
       assertThat(summaries.size).isEqualTo(1)
       assertThat(contains(summaries, expectedSummary(cancelledReferralWithSaaAttended)))
@@ -399,11 +396,11 @@ class ReferralRepositoryTest @Autowired constructor(
     val contract = when {
       asPrime -> dynamicFrameworkContractFactory.create(
         primeProvider = serviceProvider,
-        contractReference = random(10)
+        contractReference = random(10),
       )
       else -> dynamicFrameworkContractFactory.create(
         subcontractorProviders = setOf(serviceProvider),
-        contractReference = random(10)
+        contractReference = random(10),
       )
     }
     return interventionFactory.create(contract = contract)
@@ -412,12 +409,11 @@ class ReferralRepositoryTest @Autowired constructor(
   private fun createReferral(
     asPrime: Boolean,
     numberOfAssignedUsers: Int = 1,
-    intervention: Intervention? = null
+    intervention: Intervention? = null,
   ): Referral {
-
     val referral: Referral = referralFactory.createSent(
       intervention = intervention ?: createIntervention(asPrime),
-      assignments = assignmentsFactory.create(numberOfAssignedUsers)
+      assignments = assignmentsFactory.create(numberOfAssignedUsers),
     )
 
     val draftReferral = entityManager.find(DraftReferral::class.java, referral.id)
@@ -432,7 +428,7 @@ class ReferralRepositoryTest @Autowired constructor(
     endRequestedAt: OffsetDateTime? = null,
     concludedAt: OffsetDateTime? = null,
     hasEosr: Boolean = false,
-    intervention: Intervention? = null
+    intervention: Intervention? = null,
   ): Referral {
     val referral: Referral = intervention?.let { intervention ->
       referralFactory.createEnded(
@@ -460,9 +456,8 @@ class ReferralRepositoryTest @Autowired constructor(
   }
 
   private fun createDraftReferral(
-    asPrime: Boolean
+    asPrime: Boolean,
   ): DraftReferral {
-
     val serviceProvider = serviceProviderFactory.create(random(13), random(14))
     val contract = when {
       asPrime -> dynamicFrameworkContractFactory.create(primeProvider = serviceProvider, contractReference = random(10))
@@ -505,7 +500,7 @@ class ReferralRepositoryTest @Autowired constructor(
       referral.serviceUserData!!.firstName,
       referral.serviceUserData!!.lastName,
       referral.endOfServiceReport?.id,
-      referral.endOfServiceReport?.submittedAt?.toInstant()
+      referral.endOfServiceReport?.submittedAt?.toInstant(),
     )
 
   @Test

@@ -23,7 +23,7 @@ AppointmentEvent(
   val appointment: Appointment,
   val detailUrl: String,
   val notifyPP: Boolean,
-  val appointmentType: AppointmentType
+  val appointmentType: AppointmentType,
 ) : ApplicationEvent(source) {
   override fun toString(): String {
     return "AppointmentEvent(type=$type, appointmentId=${appointment.id}, detailUrl='$detailUrl', source=$source)"
@@ -33,7 +33,7 @@ AppointmentEvent(
 @Component
 class AppointmentEventPublisher(
   private val applicationEventPublisher: ApplicationEventPublisher,
-  private val locationMapper: LocationMapper
+  private val locationMapper: LocationMapper,
 ) {
   fun appointmentScheduledEvent(appointment: Appointment, appointmentType: AppointmentType) {
     applicationEventPublisher.publishEvent(
@@ -43,8 +43,8 @@ class AppointmentEventPublisher(
         appointment,
         getAppointmentURL(appointment, appointmentType),
         appointmentType == AppointmentType.SUPPLIER_ASSESSMENT,
-        appointmentType
-      )
+        appointmentType,
+      ),
     )
   }
 
@@ -56,8 +56,8 @@ class AppointmentEventPublisher(
         appointment,
         getAppointmentURL(appointment, appointmentType),
         notifyPP,
-        appointmentType
-      )
+        appointmentType,
+      ),
     )
   }
 
@@ -69,8 +69,8 @@ class AppointmentEventPublisher(
         appointment,
         getAppointmentURL(appointment, appointmentType),
         notifyPP,
-        appointmentType
-      )
+        appointmentType,
+      ),
     )
   }
 
@@ -82,8 +82,8 @@ class AppointmentEventPublisher(
         appointment,
         getAppointmentURL(appointment, appointmentType),
         notifyPP,
-        appointmentType
-      )
+        appointmentType,
+      ),
     )
   }
 

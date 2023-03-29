@@ -57,7 +57,7 @@ class NotifyActionPlanService(
             "submitterFirstName" to recipient.firstName,
             "referenceNumber" to event.actionPlan.referral.referenceNumber!!,
             "actionPlanUrl" to location.toString(),
-          )
+          ),
         )
       }
       ActionPlanEventType.APPROVED -> {
@@ -70,7 +70,7 @@ class NotifyActionPlanService(
             "submitterFirstName" to recipient.firstName,
             "referenceNumber" to event.actionPlan.referral.referenceNumber!!,
             "actionPlanUrl" to location.toString(),
-          )
+          ),
         )
       }
     }
@@ -99,7 +99,7 @@ class NotifyEndOfServiceReportService(
             "ppFirstName" to recipient.firstName,
             "referralReference" to event.endOfServiceReport.referral.referenceNumber!!,
             "endOfServiceReportLink" to location.toString(),
-          )
+          ),
         )
       }
     }
@@ -147,7 +147,7 @@ class NotifyActionPlanAppointmentService(
               "ppFirstName" to recipient.firstName,
               "referenceNumber" to referral.referenceNumber!!,
               "attendanceUrl" to location.toString(),
-            )
+            ),
           )
         }
         ActionPlanAppointmentEventType.BEHAVIOUR_RECORDED -> {
@@ -158,7 +158,7 @@ class NotifyActionPlanAppointmentService(
               "ppFirstName" to recipient.firstName,
               "referenceNumber" to referral.referenceNumber!!,
               "sessionUrl" to location.toString(),
-            )
+            ),
           )
         }
         else -> {}
@@ -179,6 +179,7 @@ class NotifyAppointmentService(
   private val referralService: ReferralService,
 ) : ApplicationListener<AppointmentEvent>, NotifyService {
   companion object : KLogging()
+
   @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: AppointmentEvent) {
     if (event.notifyPP) {
@@ -189,7 +190,7 @@ class NotifyAppointmentService(
         AppointmentType.SUPPLIER_ASSESSMENT -> generateResourceUrl(
           interventionsUIBaseURL,
           ppSAASessionFeedbackLocation,
-          event.appointment.referral.id
+          event.appointment.referral.id,
         )
         AppointmentType.SERVICE_DELIVERY -> run {
           logger.error("action plan session should not be using the shared appointment service.")
@@ -206,7 +207,7 @@ class NotifyAppointmentService(
               "ppFirstName" to recipient.firstName,
               "referenceNumber" to referral.referenceNumber!!,
               "attendanceUrl" to sessionFeedbackLocation.toString(),
-            )
+            ),
           )
         }
         AppointmentEventType.BEHAVIOUR_RECORDED -> {
@@ -217,17 +218,18 @@ class NotifyAppointmentService(
               "ppFirstName" to recipient.firstName,
               "referenceNumber" to referral.referenceNumber!!,
               "sessionUrl" to sessionFeedbackLocation.toString(),
-            )
+            ),
           )
         }
         AppointmentEventType.SCHEDULED -> {
           emailSender.sendEmail(
-            initialAssessmentScheduledTemplateID, recipient.email,
+            initialAssessmentScheduledTemplateID,
+            recipient.email,
             mapOf(
               "ppFirstName" to recipient.firstName,
               "referenceNumber" to referral.referenceNumber!!,
               "referralUrl" to generateResourceUrl(interventionsUIBaseURL, ppInterventionProgressUrl, referral.id).toString(),
-            )
+            ),
           )
         }
         else -> {}

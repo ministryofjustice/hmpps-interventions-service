@@ -9,7 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Can
 
 @Component
 class CancellationReasonMapper(
-  private val cancellationReasonRepository: CancellationReasonRepository
+  private val cancellationReasonRepository: CancellationReasonRepository,
 ) {
   fun mapCancellationReasonIdToCancellationReason(cancellationReasonId: String): CancellationReason {
     return cancellationReasonRepository.findByIdOrNull(cancellationReasonId)

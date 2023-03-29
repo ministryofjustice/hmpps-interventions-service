@@ -67,7 +67,7 @@ class SNSPublisherTest {
       "personReference":{"identifiers":[{"type":"CRN","value":"X123456"}]},
       "version":1
       }
-      """.trimIndent().replace("\n", "")
+      """.trimIndent().replace("\n", ""),
     )
   }
 
@@ -82,7 +82,7 @@ class SNSPublisherTest {
         "actorUserId" to "d7c4c3a7a7",
         "actorUserName" to "d7c4c3a7a7@example.org",
       ),
-      null
+      null,
     )
   }
 
@@ -109,7 +109,7 @@ class SNSPublisherTest {
         "actorUserId" to "d7c4c3a7a7",
         "actorUserName" to "d7c4c3a7a7@example.org",
       ),
-      null
+      null,
     )
   }
 }

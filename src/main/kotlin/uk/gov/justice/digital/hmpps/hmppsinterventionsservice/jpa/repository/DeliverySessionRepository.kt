@@ -11,14 +11,14 @@ interface DeliverySessionRepository : JpaRepository<DeliverySession, UUID> {
 
   @Deprecated(
     "looking up by action plan ID is no longer necessary",
-    ReplaceWith("findByReferralIdAndSessionNumber(referralId, sessionNumber")
+    ReplaceWith("findByReferralIdAndSessionNumber(referralId, sessionNumber"),
   )
   @Query("select aps from DeliverySession aps left join ActionPlan ap on ap.referral = aps.referral where ap.id = :actionPlanId and aps.sessionNumber = :sessionNumber")
   fun findAllByActionPlanIdAndSessionNumber(actionPlanId: UUID, sessionNumber: Int): DeliverySession?
 
   @Deprecated(
     "looking up by action plan ID is no longer necessary",
-    ReplaceWith("findAllByReferralId(referralId")
+    ReplaceWith("findAllByReferralId(referralId"),
   )
   @Query("select ds from DeliverySession ds left join ActionPlan ap on ap.referral = ds.referral where ap.id = :actionPlanId")
   fun findAllByActionPlanId(actionPlanId: UUID): List<DeliverySession>
@@ -26,21 +26,21 @@ interface DeliverySessionRepository : JpaRepository<DeliverySession, UUID> {
   @Query(
     "select count(sesh) from DeliverySession sesh join sesh.appointments appt " +
       "where sesh.referral.id = :referralId and appt.attended is not null " +
-      "and appt.appointmentFeedbackSubmittedAt is not null and appt.superseded is false"
+      "and appt.appointmentFeedbackSubmittedAt is not null and appt.superseded is false",
   )
   fun countNumberOfSessionsWithAttendanceRecord(referralId: UUID): Int
 
   @Query(
     "select count(sesh) from DeliverySession sesh join sesh.appointments appt " +
       "where sesh.referral.id = :referralId and appt.attended in ('YES', 'LATE') " +
-      "and appt.appointmentFeedbackSubmittedAt is not null"
+      "and appt.appointmentFeedbackSubmittedAt is not null",
   )
   fun countNumberOfAttendedSessions(referralId: UUID): Int
 
   @Query(
     "select count(sesh) from DeliverySession sesh join sesh.appointments appt " +
       "where sesh.referral.id = :referralId and appt.attended in ('NO') " +
-      "and appt.appointmentFeedbackSubmittedAt is not null"
+      "and appt.appointmentFeedbackSubmittedAt is not null",
   )
   fun countNumberOfNotAttendedSessions(referralId: UUID): Int
 }

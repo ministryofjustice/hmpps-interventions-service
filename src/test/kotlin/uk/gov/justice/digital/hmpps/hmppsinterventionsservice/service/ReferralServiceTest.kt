@@ -82,7 +82,7 @@ class ReferralServiceTest @Autowired constructor(
   val endOfServiceReportRepository: EndOfServiceReportRepository,
   val serviceCategoryRepository: ServiceCategoryRepository,
   val referralDetailsRepository: ReferralDetailsRepository,
-  val changelogRepository: ChangelogRepository
+  val changelogRepository: ChangelogRepository,
 ) {
   private val userFactory = AuthUserFactory(entityManager)
   private val interventionFactory = InterventionFactory(entityManager)
@@ -132,7 +132,7 @@ class ReferralServiceTest @Autowired constructor(
     amendReferralService,
     hmppsAuthService,
     telemetryService,
-    referralDetailsRepository
+    referralDetailsRepository,
   )
 
   companion object {
@@ -140,10 +140,11 @@ class ReferralServiceTest @Autowired constructor(
     fun names1234(): List<Arguments> {
       return listOf(
         Arguments.of("bob-smith", "smith", "bob-smith smith"),
-        Arguments.of("john", "blue-red", "john blue-red")
+        Arguments.of("john", "blue-red", "john blue-red"),
       )
     }
   }
+
   @AfterEach
   fun `clear referrals`() {
     entityManager.flush()
@@ -163,7 +164,11 @@ class ReferralServiceTest @Autowired constructor(
         if (a
           .truncatedTo(ChronoUnit.SECONDS)
           .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
-        ) 0 else 1
+        ) {
+          0
+        } else {
+          1
+        }
       } else { 0 }
     }
 
@@ -172,6 +177,7 @@ class ReferralServiceTest @Autowired constructor(
       .build()
 
     var pageRequest: PageRequest = PageRequest.of(0, 20)
+
     @Test
     fun `returns referrals started by the user`() {
       val user = userFactory.create("pp_user_1", "delius")
@@ -219,7 +225,7 @@ class ReferralServiceTest @Autowired constructor(
         endRequestedAt = OffsetDateTime.now(),
         concludedAt = OffsetDateTime.now(),
         endOfServiceReport = null,
-        actionPlans = mutableListOf(actionPlanFactory.create(submittedAt = null))
+        actionPlans = mutableListOf(actionPlanFactory.create(submittedAt = null)),
       )
       val appointment =
         appointmentFactory.create(referral = cancelledReferral, attendanceSubmittedAt = null)
@@ -304,7 +310,7 @@ class ReferralServiceTest @Autowired constructor(
         null,
         null,
         null,
-        Pageable.ofSize(pageSize)
+        Pageable.ofSize(pageSize),
       ) as Page<SentReferralSummary>
       assertThat(page.content.size).isEqualTo(pageSize)
       assertThat(page.totalElements).isEqualTo(8)
@@ -332,7 +338,7 @@ class ReferralServiceTest @Autowired constructor(
         null,
         null,
         null,
-        pageable
+        pageable,
       ) as Page<SentReferralSummary>
       assertThat(page.content.size).isEqualTo(pageSize)
       assertThat(page.totalElements).isEqualTo(8)
@@ -343,7 +349,7 @@ class ReferralServiceTest @Autowired constructor(
         null,
         null,
         null,
-        pageable.next()
+        pageable.next(),
       ) as Page<SentReferralSummary>
 
       assertThat(secondPage.content.size).isEqualTo(3)
@@ -398,8 +404,8 @@ class ReferralServiceTest @Autowired constructor(
           primeRef.id,
           primeAndSubRef.id,
           refWithAllProvidersBeingSubs.id,
-          subRef.id
-        )
+          subRef.id,
+        ),
       )
     }
 
@@ -422,7 +428,7 @@ class ReferralServiceTest @Autowired constructor(
         intervention = intervention,
         endRequestedReason = cancellationReasonFactory.create("ANY"),
         endRequestedAt = OffsetDateTime.now(),
-        concludedAt = null
+        concludedAt = null,
       )
 
       val user = userFactory.create("test_user", "auth")
@@ -538,7 +544,7 @@ class ReferralServiceTest @Autowired constructor(
 
       val refLive = referralFactory.createSent(intervention = intervention)
       val endOfServiceReportCreated = referralFactory.createSent(
-        intervention = intervention
+        intervention = intervention,
       ).also { referral ->
         referral.endOfServiceReport = endOfServiceReportFactory.create(referral = referral)
       }
@@ -731,7 +737,11 @@ class ReferralServiceTest @Autowired constructor(
         if (a
           .truncatedTo(ChronoUnit.SECONDS)
           .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
-        ) 0 else 1
+        ) {
+          0
+        } else {
+          1
+        }
       } else { 0 }
     }
 
@@ -759,7 +769,7 @@ class ReferralServiceTest @Autowired constructor(
       completedSentReferralSummary = sentReferralSummariesFactory.getReferralSummary(completedReferral)
 
       liveReferral = referralFactory.createSent(
-        intervention = intervention
+        intervention = intervention,
       )
 
       liveSentReferralSummary = sentReferralSummariesFactory.getReferralSummary(liveReferral)
@@ -770,7 +780,7 @@ class ReferralServiceTest @Autowired constructor(
         endRequestedAt = OffsetDateTime.now(),
         concludedAt = OffsetDateTime.now(),
         endOfServiceReport = null,
-        actionPlans = mutableListOf(actionPlanFactory.createSubmitted())
+        actionPlans = mutableListOf(actionPlanFactory.createSubmitted()),
       )
 
       cancelledSentReferralSummary = sentReferralSummariesFactory.getReferralSummary(cancelledReferral)
@@ -780,8 +790,8 @@ class ReferralServiceTest @Autowired constructor(
       selfAssignedReferral = referralFactory.createAssigned(
         intervention = intervention,
         assignments = listOf(
-          ReferralAssignment(OffsetDateTime.now(), user, user)
-        )
+          ReferralAssignment(OffsetDateTime.now(), user, user),
+        ),
       )
 
       selfAssignedSentReferralSummary = sentReferralSummariesFactory.getReferralSummary(selfAssignedReferral)
@@ -789,8 +799,8 @@ class ReferralServiceTest @Autowired constructor(
       otherAssignedReferral = referralFactory.createAssigned(
         intervention = intervention,
         assignments = listOf(
-          ReferralAssignment(OffsetDateTime.now(), otherUser, otherUser)
-        )
+          ReferralAssignment(OffsetDateTime.now(), otherUser, otherUser),
+        ),
       )
 
       otherAssignedSentReferralSummary = sentReferralSummariesFactory.getReferralSummary(otherAssignedReferral)
@@ -811,10 +821,11 @@ class ReferralServiceTest @Autowired constructor(
           liveSentReferralSummary,
           cancelledSentReferralSummary,
           selfAssignedSentReferralSummary,
-          otherAssignedSentReferralSummary
+          otherAssignedSentReferralSummary,
         )
     }
 
+    // TODO- come back once we solve the production issue
     @Test
     fun `to check for cancelled referral were pop did not attend appointment should not return for SP User`() {
       val intervention = interventionFactory.create(contract = contractFactory.create(primeProvider = provider))
@@ -825,7 +836,7 @@ class ReferralServiceTest @Autowired constructor(
         concludedAt = OffsetDateTime.now(),
         endOfServiceReport = null,
         createdBy = ppUser,
-        actionPlans = mutableListOf(actionPlanFactory.create(submittedAt = null))
+        actionPlans = mutableListOf(actionPlanFactory.create(submittedAt = null)),
       )
       val appointment =
         appointmentFactory.create(referral = cancelledReferral, attendanceSubmittedAt = null)
@@ -843,9 +854,10 @@ class ReferralServiceTest @Autowired constructor(
           liveSentReferralSummary,
           cancelledSentReferralSummary,
           selfAssignedSentReferralSummary,
-          otherAssignedSentReferralSummary
+          otherAssignedSentReferralSummary,
         )
     }
+
     @Test
     fun `setting concluded returns only concluded referrals`() {
       val appointment =
@@ -883,7 +895,7 @@ class ReferralServiceTest @Autowired constructor(
         completedSentReferralSummary,
         liveSentReferralSummary,
         selfAssignedSentReferralSummary,
-        otherAssignedSentReferralSummary
+        otherAssignedSentReferralSummary,
       )
     }
 
@@ -897,7 +909,7 @@ class ReferralServiceTest @Autowired constructor(
           completedSentReferralSummary,
           liveSentReferralSummary,
           selfAssignedSentReferralSummary,
-          otherAssignedSentReferralSummary
+          otherAssignedSentReferralSummary,
         )
 
       assertThat(result).doesNotContain(cancelledSentReferralSummary)
@@ -931,7 +943,7 @@ class ReferralServiceTest @Autowired constructor(
         completedSentReferralSummary,
         liveSentReferralSummary,
         cancelledSentReferralSummary,
-        selfAssignedSentReferralSummary
+        selfAssignedSentReferralSummary,
       )
     }
 
@@ -944,7 +956,7 @@ class ReferralServiceTest @Autowired constructor(
         liveSentReferralSummary,
         cancelledSentReferralSummary,
         otherAssignedSentReferralSummary,
-        selfAssignedSentReferralSummary
+        selfAssignedSentReferralSummary,
       )
     }
 
@@ -973,7 +985,7 @@ class ReferralServiceTest @Autowired constructor(
         completedSentReferralSummary,
         liveSentReferralSummary,
         cancelledSentReferralSummary,
-        otherAssignedSentReferralSummary
+        otherAssignedSentReferralSummary,
       )
     }
   }
@@ -1044,7 +1056,7 @@ class ReferralServiceTest @Autowired constructor(
       createdBy = authUser,
       id = UUID.randomUUID(),
       completionDeadline = existingCompletionDate,
-      saved = true
+      saved = true,
     )
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
 
@@ -1070,7 +1082,7 @@ class ReferralServiceTest @Autowired constructor(
       id = id,
       sentAt = OffsetDateTime.now(),
       serviceUserCRN = "crn",
-      intervention = intervention
+      intervention = intervention,
     )
     referralDetailsFactory.create(
       referralId = id,
@@ -1078,7 +1090,7 @@ class ReferralServiceTest @Autowired constructor(
       createdBy = authUser,
       id = UUID.randomUUID(),
       maximumNumberOfEnforceableDays = 15,
-      saved = true
+      saved = true,
     )
 
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)

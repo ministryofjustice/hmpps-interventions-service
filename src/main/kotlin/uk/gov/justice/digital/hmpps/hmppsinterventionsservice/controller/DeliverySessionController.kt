@@ -71,9 +71,8 @@ class DeliverySessionController(
   @Deprecated("superseded by getDeliverySessionAppointments")
   @GetMapping("/action-plan/{id}/appointments")
   fun getSessionsForActionPlan(
-    @PathVariable(name = "id") actionPlanId: UUID
+    @PathVariable(name = "id") actionPlanId: UUID,
   ): List<DeliverySessionDTO> {
-
     val actionPlan = actionPlanService.getActionPlan(actionPlanId)
     val deliverySessions = deliverySessionService.getSessions(actionPlan.referral.id)
     return DeliverySessionDTO.from(deliverySessions)
@@ -85,7 +84,6 @@ class DeliverySessionController(
     @PathVariable(name = "id") actionPlanId: UUID,
     @PathVariable sessionNumber: Int,
   ): DeliverySessionDTO {
-
     val actionPlan = actionPlanService.getActionPlan(actionPlanId)
     val deliverySession = deliverySessionService.getSession(actionPlan.referral.id, sessionNumber)
     return DeliverySessionDTO.from(deliverySession)
@@ -97,7 +95,6 @@ class DeliverySessionController(
     @PathVariable(name = "id") referralId: UUID,
     @PathVariable sessionNumber: Int,
   ): DeliverySessionDTO {
-
     val deliverySession = deliverySessionService.getSession(referralId, sessionNumber)
     return DeliverySessionDTO.from(deliverySession)
   }
@@ -112,7 +109,11 @@ class DeliverySessionController(
   ): DeliverySessionDTO {
     val user = userMapper.fromToken(authentication)
     val updatedSession = deliverySessionService.recordAppointmentAttendance(
-      user, actionPlanId, sessionNumber, update.attended, update.additionalAttendanceInformation
+      user,
+      actionPlanId,
+      sessionNumber,
+      update.attended,
+      update.additionalAttendanceInformation,
     )
 
     return DeliverySessionDTO.from(updatedSession)
@@ -124,11 +125,15 @@ class DeliverySessionController(
     @PathVariable actionPlanId: UUID,
     @PathVariable sessionNumber: Int,
     @RequestBody recordBehaviourDTO: RecordAppointmentBehaviourDTO,
-    authentication: JwtAuthenticationToken
+    authentication: JwtAuthenticationToken,
   ): DeliverySessionDTO {
     val user = userMapper.fromToken(authentication)
     val updatedSession = deliverySessionService.recordBehaviour(
-      user, actionPlanId, sessionNumber, recordBehaviourDTO.behaviourDescription, recordBehaviourDTO.notifyProbationPractitioner
+      user,
+      actionPlanId,
+      sessionNumber,
+      recordBehaviourDTO.behaviourDescription,
+      recordBehaviourDTO.notifyProbationPractitioner,
     )
     return DeliverySessionDTO.from(updatedSession)
   }
@@ -152,7 +157,8 @@ class DeliverySessionController(
   ): DeliverySessionAppointmentDTO {
     val user = userMapper.fromToken(authentication)
     val referral = referralService.getSentReferral(referralId) ?: throw ResponseStatusException(
-      HttpStatus.BAD_REQUEST, "sent referral not found [referralId=$referralId]"
+      HttpStatus.BAD_REQUEST,
+      "sent referral not found [referralId=$referralId]",
     )
     referralAccessChecker.forUser(referral, user)
     val matchingAppointment = deliverySessionService.getSessions(referralId)
@@ -169,7 +175,8 @@ class DeliverySessionController(
   ): List<DeliverySessionAppointmentDTO> {
     val user = userMapper.fromToken(authentication)
     val referral = referralService.getSentReferral(referralId) ?: throw ResponseStatusException(
-      HttpStatus.BAD_REQUEST, "sent referral not found [referralId=$referralId]"
+      HttpStatus.BAD_REQUEST,
+      "sent referral not found [referralId=$referralId]",
     )
     referralAccessChecker.forUser(referral, user)
     return deliverySessionService.getSessions(referralId)
@@ -184,7 +191,8 @@ class DeliverySessionController(
   ): DeliverySessionAppointmentDTO {
     val user = userMapper.fromToken(authentication)
     val referral = referralService.getSentReferral(referralId) ?: throw ResponseStatusException(
-      HttpStatus.BAD_REQUEST, "sent referral not found [referralId=$referralId]"
+      HttpStatus.BAD_REQUEST,
+      "sent referral not found [referralId=$referralId]",
     )
     referralAccessChecker.forUser(referral, user)
     val deliverySession = deliverySessionService.scheduleNewDeliverySessionAppointment(
@@ -214,7 +222,8 @@ class DeliverySessionController(
   ): DeliverySessionAppointmentDTO {
     val user = userMapper.fromToken(authentication)
     val referral = referralService.getSentReferral(referralId) ?: throw ResponseStatusException(
-      HttpStatus.BAD_REQUEST, "sent referral not found [referralId=$referralId]"
+      HttpStatus.BAD_REQUEST,
+      "sent referral not found [referralId=$referralId]",
     )
     referralAccessChecker.forUser(referral, user)
     val deliverySession = deliverySessionService.rescheduleDeliverySessionAppointment(
@@ -245,11 +254,16 @@ class DeliverySessionController(
   ): DeliverySessionAppointmentDTO {
     val user = userMapper.fromToken(authentication)
     val referral = referralService.getSentReferral(referralId) ?: throw ResponseStatusException(
-      HttpStatus.BAD_REQUEST, "sent referral not found [referralId=$referralId]"
+      HttpStatus.BAD_REQUEST,
+      "sent referral not found [referralId=$referralId]",
     )
     referralAccessChecker.forUser(referral, user)
     val updatedSessionAppointment = deliverySessionService.recordAppointmentAttendance(
-      referralId, appointmentId, user, update.attended, update.additionalAttendanceInformation
+      referralId,
+      appointmentId,
+      user,
+      update.attended,
+      update.additionalAttendanceInformation,
     )
     return DeliverySessionAppointmentDTO.from(updatedSessionAppointment.first.sessionNumber, updatedSessionAppointment.second)
   }
@@ -263,11 +277,16 @@ class DeliverySessionController(
   ): DeliverySessionAppointmentDTO {
     val user = userMapper.fromToken(authentication)
     val referral = referralService.getSentReferral(referralId) ?: throw ResponseStatusException(
-      HttpStatus.BAD_REQUEST, "sent referral not found [referralId=$referralId]"
+      HttpStatus.BAD_REQUEST,
+      "sent referral not found [referralId=$referralId]",
     )
     referralAccessChecker.forUser(referral, user)
     val updatedSessionAppointment = deliverySessionService.recordAppointmentBehaviour(
-      referralId, appointmentId, user, recordBehaviourDTO.behaviourDescription, recordBehaviourDTO.notifyProbationPractitioner
+      referralId,
+      appointmentId,
+      user,
+      recordBehaviourDTO.behaviourDescription,
+      recordBehaviourDTO.notifyProbationPractitioner,
     )
     return DeliverySessionAppointmentDTO.from(updatedSessionAppointment.first.sessionNumber, updatedSessionAppointment.second)
   }
@@ -280,7 +299,8 @@ class DeliverySessionController(
   ): DeliverySessionAppointmentDTO {
     val user = userMapper.fromToken(authentication)
     val referral = referralService.getSentReferral(referralId) ?: throw ResponseStatusException(
-      HttpStatus.BAD_REQUEST, "sent referral not found [referralId=$referralId]"
+      HttpStatus.BAD_REQUEST,
+      "sent referral not found [referralId=$referralId]",
     )
     referralAccessChecker.forUser(referral, user)
     val sessionAndAppointment = deliverySessionService.submitSessionFeedback(referralId, appointmentId, user)

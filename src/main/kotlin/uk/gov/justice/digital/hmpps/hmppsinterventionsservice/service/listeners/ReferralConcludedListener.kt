@@ -32,7 +32,7 @@ class ReferralConcludedListener(
         "deliveryState" to event.type.name,
         "referralId" to event.referral.id,
       ),
-      PersonReference.crn(event.referral.serviceUserCRN)
+      PersonReference.crn(event.referral.serviceUserCRN),
     )
     snsPublisher.publish(event.referral.id, AuthUser.interventionsServiceUser, snsEvent)
   }

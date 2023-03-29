@@ -77,8 +77,8 @@ class ActionPlanFactory(em: TestEntityManager? = null) : EntityFactory(em) {
         submittedBy = submittedBy,
         approvedAt = approvedAt,
         approvedBy = approvedBy,
-        activities = mutableListOf()
-      )
+        activities = mutableListOf(),
+      ),
     )
   }
 }

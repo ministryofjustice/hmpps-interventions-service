@@ -6,7 +6,7 @@ import java.util.UUID
 
 data class DesiredOutcomeDTO(
   val id: UUID,
-  val description: String
+  val description: String,
 ) {
   companion object {
     fun from(desiredOutcome: DesiredOutcome): DesiredOutcomeDTO {
@@ -25,7 +25,7 @@ data class ServiceCategoryFullDTO(
   val id: UUID,
   val name: String,
   val complexityLevels: List<ComplexityLevelDTO>,
-  val desiredOutcomes: List<DesiredOutcomeDTO>
+  val desiredOutcomes: List<DesiredOutcomeDTO>,
 ) {
   companion object {
     fun from(serviceCategory: ServiceCategory): ServiceCategoryFullDTO {

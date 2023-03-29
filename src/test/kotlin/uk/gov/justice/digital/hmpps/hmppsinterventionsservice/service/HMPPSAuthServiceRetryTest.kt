@@ -68,7 +68,7 @@ class HMPPSAuthServiceRetryTest : LoggingSpyTest(HMPPSAuthService::class, Level.
       "/user/email",
       "/user/detail",
       2L,
-      RestClient(webClient, "client-registration-id")
+      RestClient(webClient, "client-registration-id"),
     )
   }
 
@@ -147,7 +147,7 @@ class HMPPSAuthServiceRetryTest : LoggingSpyTest(HMPPSAuthService::class, Level.
             MockResponse()
               .setHeader("content-type", "application/json")
               .setBody(
-                emailBody
+                emailBody,
               )
           }
           "/user/detail" ->
@@ -229,7 +229,7 @@ class TestRetrySignal constructor(
   private val failureTotalIndex: Long,
   private val failureSubsequentIndex: Long,
   private val failure: Throwable,
-  private val retryContext: ContextView = Context.empty()
+  private val retryContext: ContextView = Context.empty(),
 ) : RetrySignal {
 
   override fun totalRetries(): Long {

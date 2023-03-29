@@ -16,7 +16,7 @@ import java.util.UUID
 @Transactional
 class InterventionService(
   val pccRegionRepository: PCCRegionRepository,
-  val interventionRepository: InterventionRepository
+  val interventionRepository: InterventionRepository,
 ) {
 
   fun getInterventionsForServiceProviderScope(scope: ServiceProviderAccessScope): List<Intervention> {
@@ -40,7 +40,7 @@ class InterventionService(
     allowsFemale: Boolean?,
     allowsMale: Boolean?,
     minimumAge: Int?,
-    maximumAge: Int?
+    maximumAge: Int?,
   ): List<Intervention> {
     return interventionRepository.findByCriteria(pccRegionIds, allowsFemale, allowsMale, minimumAge, maximumAge)
   }

@@ -15,7 +15,7 @@ class AuthUserFactory(em: TestEntityManager? = null) : EntityFactory(em) {
   fun create(
     id: String = "123456",
     authSource: String = "delius",
-    userName: String = "bernard.beaks"
+    userName: String = "bernard.beaks",
   ): AuthUser {
     return save(AuthUser(id, authSource, userName))
   }

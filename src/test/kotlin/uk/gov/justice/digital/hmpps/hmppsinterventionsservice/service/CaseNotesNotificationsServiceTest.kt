@@ -43,10 +43,9 @@ internal class CaseNotesNotificationsServiceTest {
 
   @Test
   fun `both PPs (responsible officer) and SPs (assignee) get notifications for a sent case note as long as they didn't send it`() {
-
     whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("sp", "sp@provider.co.uk", "last"))
     whenever(referralService.getResponsibleProbationPractitioner(any())).thenReturn(
-      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", null, null, "last")
+      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", null, null, "last"),
     )
     whenever(referralService.isUserTheResponsibleOfficer(any(), any())).thenReturn(false)
 
@@ -59,7 +58,7 @@ internal class CaseNotesNotificationsServiceTest {
       caseNote.id,
       caseNote.sentBy,
       "detailUrl",
-      referral.id
+      referral.id,
     )
 
     caseNotesNotificationsService.onApplicationEvent(eventRequiringSPNotification)
@@ -71,8 +70,8 @@ internal class CaseNotesNotificationsServiceTest {
       mapOf(
         "recipientFirstName" to "sp",
         "referralReference" to caseNote.referral.referenceNumber!!,
-        "caseNoteUrl" to "https://interventions.gov.uk/service-provider/case-note/${caseNote.id}"
-      )
+        "caseNoteUrl" to "https://interventions.gov.uk/service-provider/case-note/${caseNote.id}",
+      ),
     )
     verify(emailSender, times(1)).sendEmail(
       "sent-template",
@@ -80,8 +79,8 @@ internal class CaseNotesNotificationsServiceTest {
       mapOf(
         "recipientFirstName" to "pp",
         "referralReference" to caseNote.referral.referenceNumber!!,
-        "caseNoteUrl" to "https://interventions.gov.uk/probation-practitioner/case-note/${caseNote.id}"
-      )
+        "caseNoteUrl" to "https://interventions.gov.uk/probation-practitioner/case-note/${caseNote.id}",
+      ),
     )
   }
 
@@ -89,7 +88,7 @@ internal class CaseNotesNotificationsServiceTest {
   fun `PP (responsible officer) does not get notified if they sent the case note`() {
     whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("sp", "sp@provider.co.uk", "last"))
     whenever(referralService.getResponsibleProbationPractitioner(any())).thenReturn(
-      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", 123L, null, "last")
+      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", 123L, null, "last"),
     )
     whenever(referralService.isUserTheResponsibleOfficer(any(), any())).thenReturn(true)
     whenever(communityAPIOffenderService.getStaffIdentifier(any())).thenReturn(123L)
@@ -103,7 +102,7 @@ internal class CaseNotesNotificationsServiceTest {
       caseNote.id,
       caseNote.sentBy,
       "detailUrl",
-      referral.id
+      referral.id,
     )
 
     caseNotesNotificationsService.onApplicationEvent(eventRequiringSPNotification)
@@ -117,8 +116,8 @@ internal class CaseNotesNotificationsServiceTest {
       mapOf(
         "recipientFirstName" to "sp",
         "referralReference" to caseNote.referral.referenceNumber!!,
-        "caseNoteUrl" to "https://interventions.gov.uk/service-provider/case-note/${caseNote.id}"
-      )
+        "caseNoteUrl" to "https://interventions.gov.uk/service-provider/case-note/${caseNote.id}",
+      ),
     )
   }
 
@@ -128,7 +127,7 @@ internal class CaseNotesNotificationsServiceTest {
 
     whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("sp", "sp@provider.co.uk", "last"))
     whenever(referralService.getResponsibleProbationPractitioner(any())).thenReturn(
-      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", null, sender, "last")
+      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", null, sender, "last"),
     )
     whenever(referralService.isUserTheResponsibleOfficer(any(), any())).thenReturn(true)
 
@@ -140,7 +139,7 @@ internal class CaseNotesNotificationsServiceTest {
       caseNote.id,
       caseNote.sentBy,
       "detailUrl",
-      referral.id
+      referral.id,
     )
 
     caseNotesNotificationsService.onApplicationEvent(eventRequiringSPNotification)
@@ -154,8 +153,8 @@ internal class CaseNotesNotificationsServiceTest {
       mapOf(
         "recipientFirstName" to "sp",
         "referralReference" to caseNote.referral.referenceNumber!!,
-        "caseNoteUrl" to "https://interventions.gov.uk/service-provider/case-note/${caseNote.id}"
-      )
+        "caseNoteUrl" to "https://interventions.gov.uk/service-provider/case-note/${caseNote.id}",
+      ),
     )
   }
 
@@ -163,7 +162,7 @@ internal class CaseNotesNotificationsServiceTest {
   fun `SP (assignee) does not get notified if they sent the case note`() {
     whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("sp", "sp@provider.co.uk", "last"))
     whenever(referralService.getResponsibleProbationPractitioner(any())).thenReturn(
-      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", null, null, "last")
+      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", null, null, "last"),
     )
     whenever(referralService.isUserTheResponsibleOfficer(any(), any())).thenReturn(false)
 
@@ -176,7 +175,7 @@ internal class CaseNotesNotificationsServiceTest {
       caseNote.id,
       caseNote.sentBy,
       "detailUrl",
-      referral.id
+      referral.id,
     )
 
     caseNotesNotificationsService.onApplicationEvent(eventRequiringSPNotification)
@@ -190,8 +189,8 @@ internal class CaseNotesNotificationsServiceTest {
       mapOf(
         "recipientFirstName" to "pp",
         "referralReference" to caseNote.referral.referenceNumber!!,
-        "caseNoteUrl" to "https://interventions.gov.uk/probation-practitioner/case-note/${caseNote.id}"
-      )
+        "caseNoteUrl" to "https://interventions.gov.uk/probation-practitioner/case-note/${caseNote.id}",
+      ),
     )
   }
 
@@ -203,7 +202,7 @@ internal class CaseNotesNotificationsServiceTest {
     whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("sp", "sp@provider.co.uk", "last"))
     val responsiblePp = authUserFactory.createSP(id = "responsiblePp", userName = "sameUserName")
     whenever(referralService.getResponsibleProbationPractitioner(any())).thenReturn(
-      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", null, responsiblePp, "last")
+      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", null, responsiblePp, "last"),
     )
     whenever(referralService.isUserTheResponsibleOfficer(any(), any())).thenReturn(false)
 
@@ -218,7 +217,7 @@ internal class CaseNotesNotificationsServiceTest {
       caseNote.id,
       caseNote.sentBy,
       "detailUrl",
-      referral.id
+      referral.id,
     )
 
     caseNotesNotificationsService.onApplicationEvent(eventRequiringSPNotification)
@@ -232,8 +231,8 @@ internal class CaseNotesNotificationsServiceTest {
       mapOf(
         "recipientFirstName" to "pp",
         "referralReference" to caseNote.referral.referenceNumber!!,
-        "caseNoteUrl" to "https://interventions.gov.uk/probation-practitioner/case-note/${caseNote.id}"
-      )
+        "caseNoteUrl" to "https://interventions.gov.uk/probation-practitioner/case-note/${caseNote.id}",
+      ),
     )
   }
 
@@ -241,7 +240,7 @@ internal class CaseNotesNotificationsServiceTest {
   fun `SP (assignee) does not get notified if the referral is unassigned`() {
     whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("sp", "sp@provider.co.uk", "last"))
     whenever(referralService.getResponsibleProbationPractitioner(any())).thenReturn(
-      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", null, null, "last")
+      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", null, null, "last"),
     )
     whenever(referralService.isUserTheResponsibleOfficer(any(), any())).thenReturn(false)
 
@@ -253,7 +252,7 @@ internal class CaseNotesNotificationsServiceTest {
       caseNote.id,
       caseNote.sentBy,
       "detailUrl",
-      caseNote.referral.id
+      caseNote.referral.id,
     )
 
     caseNotesNotificationsService.onApplicationEvent(event)
@@ -267,8 +266,8 @@ internal class CaseNotesNotificationsServiceTest {
       mapOf(
         "recipientFirstName" to "pp",
         "referralReference" to caseNote.referral.referenceNumber!!,
-        "caseNoteUrl" to "https://interventions.gov.uk/probation-practitioner/case-note/${caseNote.id}"
-      )
+        "caseNoteUrl" to "https://interventions.gov.uk/probation-practitioner/case-note/${caseNote.id}",
+      ),
     )
   }
 
@@ -282,7 +281,7 @@ internal class CaseNotesNotificationsServiceTest {
       caseNote.id,
       caseNote.sentBy,
       "detailUrl",
-      UUID.fromString("e5274827-fcbc-4891-a68b-d9b4d3b59dab")
+      UUID.fromString("e5274827-fcbc-4891-a68b-d9b4d3b59dab"),
     )
     var e = assertThrows<RuntimeException> { caseNotesNotificationsService.onApplicationEvent(event) }
     Assertions.assertThat(e.message).contains("Unable to retrieve referral for id e5274827-fcbc-4891-a68b-d9b4d3b59dab")

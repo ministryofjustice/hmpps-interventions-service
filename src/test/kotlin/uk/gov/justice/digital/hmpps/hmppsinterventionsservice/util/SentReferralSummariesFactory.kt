@@ -39,7 +39,7 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
     assignments: List<ReferralAssignment> = emptyList(),
 
     supplierAssessment: SupplierAssessment? = null,
-    serviceUserData: ServiceUserData? = null
+    serviceUserData: ServiceUserData? = null,
   ): SentReferralSummary {
     createReferral(
       id = id,
@@ -58,7 +58,7 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
       supplementaryRiskId = supplementaryRiskId,
       assignments = assignments,
       concludedAt = concludedAt,
-      supplierAssessment = supplierAssessment
+      supplierAssessment = supplierAssessment,
     )
 
     return SentReferralSummary(
@@ -73,13 +73,13 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
       assignments = assignments.toMutableList(),
       serviceUserData = serviceUserData,
       actionPlans = actionPlans,
-      supplierAssessment = supplierAssessment
+      supplierAssessment = supplierAssessment,
     )
   }
 
   fun getReferralSummary(
     referral: Referral,
-    endOfServiceReport: EndOfServiceReport? = null
+    endOfServiceReport: EndOfServiceReport? = null,
   ): SentReferralSummary {
     return SentReferralSummary(
       id = referral.id,
@@ -95,7 +95,7 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
       endOfServiceReport = referral.endOfServiceReport ?: endOfServiceReport,
       serviceUserData = referral.serviceUserData,
       actionPlans = referral.actionPlans,
-      supplierAssessment = referral.supplierAssessment
+      supplierAssessment = referral.supplierAssessment,
     )
   }
 }

@@ -17,6 +17,7 @@ class CaseNoteRepositoryTest @Autowired constructor(
 ) {
   private val authUserFactory = AuthUserFactory(entityManager)
   private val referralFactory = ReferralFactory(entityManager)
+
   @Test
   fun `can retrieve a case note`() {
     val caseNote = buildAndPersistCaseNote()

@@ -24,18 +24,29 @@ data class ActionPlan(
   // Activities
   @ElementCollection
   @CollectionTable(name = "action_plan_activity", joinColumns = [JoinColumn(name = "action_plan_id")])
-  @NotNull val activities: MutableList<ActionPlanActivity> = mutableListOf(),
+  @NotNull
+  val activities: MutableList<ActionPlanActivity> = mutableListOf(),
 
   // Status
-  @NotNull @ManyToOne @Fetch(FetchMode.JOIN) val createdBy: AuthUser,
+  @NotNull
+  @ManyToOne
+  @Fetch(FetchMode.JOIN)
+  val createdBy: AuthUser,
   @NotNull val createdAt: OffsetDateTime,
-  @ManyToOne @Fetch(FetchMode.JOIN) var submittedBy: AuthUser? = null,
+  @ManyToOne
+  @Fetch(FetchMode.JOIN)
+  var submittedBy: AuthUser? = null,
   var submittedAt: OffsetDateTime? = null,
-  @ManyToOne @Fetch(FetchMode.JOIN) var approvedBy: AuthUser? = null,
+  @ManyToOne
+  @Fetch(FetchMode.JOIN)
+  var approvedBy: AuthUser? = null,
   var approvedAt: OffsetDateTime? = null,
 
   // Required
-  @NotNull @OneToOne @Fetch(FetchMode.JOIN) val referral: Referral,
+  @NotNull
+  @OneToOne
+  @Fetch(FetchMode.JOIN)
+  val referral: Referral,
   @Id val id: UUID,
 ) {
   // This is to avoid stack overflow issues with the bi-directional association with referral

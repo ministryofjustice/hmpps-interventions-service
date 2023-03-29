@@ -14,7 +14,6 @@ import java.util.UUID
 class ActionPlanDTOTest(@Autowired private val json: JacksonTester<ActionPlanDTO>) {
   @Test
   fun `test serialization of an action plan`() {
-
     val planCreatedAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
     val activityCreatedAt = OffsetDateTime.parse("2020-12-04T10:42:44+00:00")
     val planSubmittedAt = OffsetDateTime.parse("2020-12-04T10:42:45+00:00")
@@ -26,7 +25,7 @@ class ActionPlanDTOTest(@Autowired private val json: JacksonTester<ActionPlanDTO
       submittedBy = AuthUser("submitter", "auth", "submitterName"),
       submittedAt = planSubmittedAt,
       activityId = UUID.fromString("444ED289-8412-41A9-8291-45E33E60276C"),
-      activityCreatedAt = activityCreatedAt
+      activityCreatedAt = activityCreatedAt,
     )
 
     val out = json.write(ActionPlanDTO.from(actionPlan))
@@ -54,7 +53,7 @@ class ActionPlanDTOTest(@Autowired private val json: JacksonTester<ActionPlanDTO
         },
         "submittedAt": "2020-12-04T10:42:45Z"
       }
-    """
+    """,
     )
   }
 }

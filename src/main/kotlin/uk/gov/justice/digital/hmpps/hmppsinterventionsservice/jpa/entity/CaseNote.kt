@@ -14,10 +14,14 @@ import javax.validation.constraints.NotNull
 class CaseNote(
   @Id
   val id: UUID,
-  @NotNull @ManyToOne(fetch = FetchType.LAZY)
+  @NotNull
+  @ManyToOne(fetch = FetchType.LAZY)
   var referral: Referral,
   @NotNull var subject: String,
   @NotNull var body: String,
   @NotNull val sentAt: OffsetDateTime,
-  @NotNull @ManyToOne @Fetch(FetchMode.JOIN) val sentBy: AuthUser,
+  @NotNull
+  @ManyToOne
+  @Fetch(FetchMode.JOIN)
+  val sentBy: AuthUser,
 )

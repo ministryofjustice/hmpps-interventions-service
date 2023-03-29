@@ -51,7 +51,7 @@ class AmendReferralService(
   private val complexityLevelRepository: ComplexityLevelRepository,
   private val desiredOutcomeRepository: DesiredOutcomeRepository,
   private val userMapper: UserMapper,
-  @Lazy private val referralService: ReferralService
+  @Lazy private val referralService: ReferralService,
 ) {
 
   fun updateComplexityLevel(referralId: UUID, update: AmendComplexityLevelDTO, serviceCategoryId: UUID, authentication: JwtAuthenticationToken) {
@@ -76,7 +76,7 @@ class AmendReferralService(
       newValue,
       update.reasonForChange,
       OffsetDateTime.now(),
-      actor
+      actor,
     )
     changelogRepository.save(changelog)
     referralRepository.save(referral)
@@ -87,7 +87,7 @@ class AmendReferralService(
     referralId: UUID,
     amendDesiredOutcomesDTO: AmendDesiredOutcomesDTO,
     authentication: JwtAuthenticationToken,
-    serviceCategoryId: UUID
+    serviceCategoryId: UUID,
   ) {
     val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
 
@@ -127,7 +127,7 @@ class AmendReferralService(
     referral.selectedDesiredOutcomes!!.removeIf { desiredOutcome -> desiredOutcome.serviceCategoryId == serviceCategoryId }
     desiredOutcomeIds.forEach { desiredOutcomeId ->
       referral.selectedDesiredOutcomes!!.add(
-        SelectedDesiredOutcomesMapping(serviceCategoryId, desiredOutcomeId)
+        SelectedDesiredOutcomesMapping(serviceCategoryId, desiredOutcomeId),
       )
     }
 
@@ -139,7 +139,7 @@ class AmendReferralService(
       newValue,
       amendDesiredOutcomesDTO.reasonForChange,
       OffsetDateTime.now(),
-      actor
+      actor,
     )
     changelogRepository.save(changelog)
     val savedReferral = referralRepository.save(referral)
@@ -149,7 +149,7 @@ class AmendReferralService(
   fun amendCaringOrEmploymentResponsibilities(
     referralId: UUID,
     amendNeedsAndRequirementsDTO: AmendNeedsAndRequirementsDTO,
-    authentication: JwtAuthenticationToken
+    authentication: JwtAuthenticationToken,
   ) {
     val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
 
@@ -172,7 +172,7 @@ class AmendReferralService(
       ReferralAmendmentDetails(values = newValues),
       amendNeedsAndRequirementsDTO.reasonForChange,
       OffsetDateTime.now(),
-      userMapper.fromToken(authentication)
+      userMapper.fromToken(authentication),
     )
     changelogRepository.save(changelog)
     val savedReferral = referralRepository.save(referral)
@@ -214,14 +214,14 @@ class AmendReferralService(
         return ChangelogUpdateDTO(
           changelog = changelog,
           oldValue = generateDescription(changelog.oldVal.values),
-          newValue = generateDescription(changelog.newVal.values)
+          newValue = generateDescription(changelog.newVal.values),
         )
       }
       AmendTopic.NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES -> {
         return ChangelogUpdateDTO(
           changelog = changelog,
           oldValue = generateDescription(changelog.oldVal.values),
-          newValue = generateDescription(changelog.newVal.values)
+          newValue = generateDescription(changelog.newVal.values),
         )
       }
       AmendTopic.COMPLETION_DATETIME -> {
@@ -234,7 +234,7 @@ class AmendReferralService(
         return ChangelogUpdateDTO(
           changelog = changelog,
           oldValue = formattedOldCompletionDate,
-          newValue = formattedNewCompletionDate
+          newValue = formattedNewCompletionDate,
         )
       }
       else -> {}
@@ -248,7 +248,7 @@ class AmendReferralService(
     newValue: ReferralAmendmentDetails,
     referralId: UUID,
     actor: AuthUser,
-    update: UpdateReferralDetailsDTO
+    update: UpdateReferralDetailsDTO,
   ) {
     val changelog = Changelog(
       referralId,
@@ -258,7 +258,7 @@ class AmendReferralService(
       newValue,
       update.reasonForChange,
       OffsetDateTime.now(),
-      actor
+      actor,
     )
 
     changelogRepository.save(changelog)
@@ -283,9 +283,8 @@ class AmendReferralService(
   fun amendAccessibilityNeeds(
     referralId: UUID,
     amendNeedsAndRequirementsDTO: AmendNeedsAndRequirementsDTO,
-    authentication: JwtAuthenticationToken
+    authentication: JwtAuthenticationToken,
   ) {
-
     val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
     val oldValues = mutableListOf<String>()
 
@@ -303,7 +302,7 @@ class AmendReferralService(
       ReferralAmendmentDetails(values = newValues),
       amendNeedsAndRequirementsDTO.reasonForChange,
       OffsetDateTime.now(),
-      userMapper.fromToken(authentication)
+      userMapper.fromToken(authentication),
     )
     changelogRepository.save(changelog)
     val savedReferral = referralRepository.save(referral)
@@ -327,7 +326,7 @@ class AmendReferralService(
       ReferralAmendmentDetails(values = newValues),
       amendNeedsAndRequirementsDTO.reasonForChange,
       OffsetDateTime.now(),
-      userMapper.fromToken(authentication)
+      userMapper.fromToken(authentication),
     )
     changelogRepository.save(changelog)
     val savedReferral = referralRepository.save(referral)
@@ -335,7 +334,6 @@ class AmendReferralService(
   }
 
   fun amendInterpreterRequired(referralId: UUID, amendNeedsAndRequirementsDTO: AmendNeedsAndRequirementsDTO, authentication: JwtAuthenticationToken) {
-
     val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
     val oldValues = mutableListOf<String>()
     referral.needsInterpreter?.let { oldValues.add(referral.needsInterpreter.toString()) }
@@ -356,7 +354,7 @@ class AmendReferralService(
       ReferralAmendmentDetails(values = newValues),
       amendNeedsAndRequirementsDTO.reasonForChange,
       OffsetDateTime.now(),
-      userMapper.fromToken(authentication)
+      userMapper.fromToken(authentication),
     )
     changelogRepository.save(changelog)
     val savedReferral = referralRepository.save(referral)

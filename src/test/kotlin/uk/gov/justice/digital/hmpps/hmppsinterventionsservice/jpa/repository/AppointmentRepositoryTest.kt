@@ -14,7 +14,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTes
 @RepositoryTest
 class AppointmentRepositoryTest @Autowired constructor(
   val entityManager: TestEntityManager,
-  val appointmentRepository: AppointmentRepository
+  val appointmentRepository: AppointmentRepository,
 ) {
   private val appointmentDeliveryFactory = AppointmentDeliveryFactory(entityManager)
   private val appointmentDeliveryAddressFactory = AppointmentDeliveryAddressFactory(entityManager)
@@ -23,6 +23,7 @@ class AppointmentRepositoryTest @Autowired constructor(
   fun setup() {
     appointmentRepository.deleteAll()
   }
+
   @Nested
   inner class AppointmentDelivery {
     @Test

@@ -25,8 +25,13 @@ import java.util.UUID
 // @Suppress("UNUSED") is used for things that are only used through parameterised tests, so appear unused
 class SingleReferralEndpoints : IntegrationTestBase() {
   @MockBean lateinit var mockHmppsAuthService: HMPPSAuthService
+
   @MockBean lateinit var mockCommunityAPIOffenderService: CommunityAPIOffenderService
-  @MockBean @Suppress("UNUSED") lateinit var ramDeliusReferralService: RamDeliusReferralService
+
+  @MockBean
+  @Suppress("UNUSED")
+  lateinit var ramDeliusReferralService: RamDeliusReferralService
+
   @MockBean lateinit var mockRisksAndNeedsService: RisksAndNeedsService
 
   private lateinit var requestFactory: RequestFactory
@@ -46,17 +51,20 @@ class SingleReferralEndpoints : IntegrationTestBase() {
 
   companion object {
     @Suppress("UNUSED")
-    @JvmStatic fun draftReferralRequests(): List<Request> {
+    @JvmStatic
+    fun draftReferralRequests(): List<Request> {
       return listOf(Request.GetDraftReferral, Request.UpdateDraftReferral, Request.SendDraftReferral)
     }
 
     @Suppress("UNUSED")
-    @JvmStatic fun sentReferralRequests(): List<Request> {
+    @JvmStatic
+    fun sentReferralRequests(): List<Request> {
       return listOf(Request.GetSentReferral, Request.AssignSentReferral, Request.EndSentReferral)
     }
 
     @Suppress("UNUSED")
-    @JvmStatic fun allReferralRequests(): List<Request> {
+    @JvmStatic
+    fun allReferralRequests(): List<Request> {
       return draftReferralRequests() + sentReferralRequests()
     }
   }
@@ -110,7 +118,7 @@ class SingleReferralEndpoints : IntegrationTestBase() {
         "exclusion message",
         "restriction message"
         ]}
-        """.trimIndent()
+        """.trimIndent(),
       )
   }
 
@@ -136,7 +144,7 @@ class SingleReferralEndpoints : IntegrationTestBase() {
         "exclusion message",
         "restriction message"
         ]}
-        """.trimIndent()
+        """.trimIndent(),
       )
   }
 
@@ -150,13 +158,13 @@ class SingleReferralEndpoints : IntegrationTestBase() {
       listOf(
         "INT_SP_HARMONY_LIVING",
         "INT_CR_0001",
-      )
+      ),
     )
 
     val contract = setupAssistant.createDynamicFrameworkContract(
       contractReference = "0001",
       primeProviderId = "HARMONY_LIVING",
-      subContractorServiceProviderIds = emptySet()
+      subContractorServiceProviderIds = emptySet(),
     )
     val referral = createSentReferral(contract)
     val token = createEncodedTokenForUser(user)
@@ -177,13 +185,13 @@ class SingleReferralEndpoints : IntegrationTestBase() {
       listOf(
         "INT_SP_BETTER_LTD",
         "INT_CR_0001",
-      )
+      ),
     )
 
     val contract = setupAssistant.createDynamicFrameworkContract(
       contractReference = "0001",
       primeProviderId = "HARMONY_LIVING",
-      subContractorServiceProviderIds = setOf("BETTER_LTD")
+      subContractorServiceProviderIds = setOf("BETTER_LTD"),
     )
     val referral = createSentReferral(contract)
     val token = createEncodedTokenForUser(user)
@@ -204,13 +212,13 @@ class SingleReferralEndpoints : IntegrationTestBase() {
       listOf(
         "INT_SP_BETTER_LTD",
         "INT_CR_0002",
-      )
+      ),
     )
 
     val contract = setupAssistant.createDynamicFrameworkContract(
       contractReference = "0001",
       primeProviderId = "HARMONY_LIVING",
-      subContractorServiceProviderIds = setOf()
+      subContractorServiceProviderIds = setOf(),
     )
     val referral = createSentReferral(contract)
     val token = createEncodedTokenForUser(user)
@@ -223,7 +231,7 @@ class SingleReferralEndpoints : IntegrationTestBase() {
       "no valid service provider groups associated with user",
       "no valid contract groups associated with user"
       ]}
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -237,19 +245,19 @@ class SingleReferralEndpoints : IntegrationTestBase() {
       listOf(
         "INT_SP_BETTER_LTD",
         "INT_CR_0002",
-      )
+      ),
     )
 
     setupAssistant.createDynamicFrameworkContract(
       contractReference = "0002",
       primeProviderId = "BETTER_LTD",
-      subContractorServiceProviderIds = setOf()
+      subContractorServiceProviderIds = setOf(),
     )
 
     val contract = setupAssistant.createDynamicFrameworkContract(
       contractReference = "0001",
       primeProviderId = "HARMONY_LIVING",
-      subContractorServiceProviderIds = setOf()
+      subContractorServiceProviderIds = setOf(),
     )
 
     val referral = createSentReferral(contract)
@@ -263,7 +271,7 @@ class SingleReferralEndpoints : IntegrationTestBase() {
       "user does not have the required provider group to access this referral",
       "user does not have the required contract group to access this referral"
       ]}
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -278,19 +286,19 @@ class SingleReferralEndpoints : IntegrationTestBase() {
         "INT_SP_BETTER_LTD",
         "INT_SP_HARMONY_LIVING",
         "INT_CR_0002",
-      )
+      ),
     )
 
     setupAssistant.createDynamicFrameworkContract(
       contractReference = "0002",
       primeProviderId = "BETTER_LTD",
-      subContractorServiceProviderIds = setOf()
+      subContractorServiceProviderIds = setOf(),
     )
 
     val contract = setupAssistant.createDynamicFrameworkContract(
       contractReference = "0001",
       primeProviderId = "HARMONY_LIVING",
-      subContractorServiceProviderIds = setOf()
+      subContractorServiceProviderIds = setOf(),
     )
 
     val referral = createSentReferral(contract)
@@ -303,9 +311,10 @@ class SingleReferralEndpoints : IntegrationTestBase() {
       {"accessErrors": [
       "user does not have the required contract group to access this referral"
       ]}
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
+
   @ParameterizedTest(name = "{displayName} ({argumentsWithNames})")
   @MethodSource("sentReferralRequests")
   fun `sp user works for subcontractor provider but is missing required contract group`(request: Request) {
@@ -316,13 +325,13 @@ class SingleReferralEndpoints : IntegrationTestBase() {
       listOf(
         "INT_SP_BETTER_LTD",
         "INT_CR_0002",
-      )
+      ),
     )
 
     val contract = setupAssistant.createDynamicFrameworkContract(
       contractReference = "0001",
       primeProviderId = "HARMONY_LIVING",
-      subContractorServiceProviderIds = setOf("BETTER_LTD")
+      subContractorServiceProviderIds = setOf("BETTER_LTD"),
     )
     val referral = createSentReferral(contract)
     val token = createEncodedTokenForUser(user)
@@ -334,7 +343,7 @@ class SingleReferralEndpoints : IntegrationTestBase() {
       {"accessErrors": [
       "no valid contract groups associated with user"
       ]}
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -347,7 +356,7 @@ class SingleReferralEndpoints : IntegrationTestBase() {
     val contract = setupAssistant.createDynamicFrameworkContract(
       contractReference = "0001",
       primeProviderId = "HARMONY_LIVING",
-      subContractorServiceProviderIds = setOf("BETTER_LTD")
+      subContractorServiceProviderIds = setOf("BETTER_LTD"),
     )
     val referral = createSentReferral(contract)
     val token = createEncodedTokenForUser(user)
@@ -360,7 +369,7 @@ class SingleReferralEndpoints : IntegrationTestBase() {
       "no valid service provider groups associated with user",
       "no valid contract groups associated with user"
       ]}
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -376,13 +385,13 @@ class SingleReferralEndpoints : IntegrationTestBase() {
         "INT_CR_0001",
         "INT_CR_0002",
         "INT_CR_0003",
-      )
+      ),
     )
 
     val contract1 = setupAssistant.createDynamicFrameworkContract(
       contractReference = "0001",
       primeProviderId = "HARMONY_LIVING",
-      subContractorServiceProviderIds = setOf("BETTER_LTD")
+      subContractorServiceProviderIds = setOf("BETTER_LTD"),
     )
     val contract2 = setupAssistant.createDynamicFrameworkContract(
       contractReference = "0002",
@@ -391,7 +400,7 @@ class SingleReferralEndpoints : IntegrationTestBase() {
     val contract3 = setupAssistant.createDynamicFrameworkContract(
       contractReference = "0003",
       primeProviderId = "DONT_HAVE_THIS_GROUP",
-      subContractorServiceProviderIds = setOf("BETTER_LTD")
+      subContractorServiceProviderIds = setOf("BETTER_LTD"),
     )
     val referral1 = createSentReferral(contract1)
     val referral2 = createSentReferral(contract2)
@@ -423,7 +432,7 @@ class SingleReferralEndpoints : IntegrationTestBase() {
       {"accessErrors": [
       "only probation practitioners can access draft referrals"
       ]}
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -438,7 +447,7 @@ class SingleReferralEndpoints : IntegrationTestBase() {
     response.expectBody().json(
       """
       {"accessErrors": ["logins from nomis are not supported"]}
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -458,7 +467,7 @@ class SingleReferralEndpoints : IntegrationTestBase() {
       {"accessErrors": [
       "cannot find user in hmpps auth"
       ]}
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -472,7 +481,7 @@ class SingleReferralEndpoints : IntegrationTestBase() {
       """
       {"status":403,"error":"access denied",
        "message":"could not map auth token to user: [no 'user_name' claim in token, no 'auth_source' claim in token]"}
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 

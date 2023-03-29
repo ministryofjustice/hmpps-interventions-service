@@ -11,7 +11,7 @@ interface DraftReferralRepository : JpaRepository<DraftReferral, UUID> {
     value =
     """select dr from DraftReferral dr where dr.createdBy.id = :userId 
       and NOT EXISTS 
-      (select r from Referral r where r.id = dr.id)"""
+      (select r from Referral r where r.id = dr.id)""",
   )
   fun findByCreatedById(userId: String): List<DraftReferral>
 }

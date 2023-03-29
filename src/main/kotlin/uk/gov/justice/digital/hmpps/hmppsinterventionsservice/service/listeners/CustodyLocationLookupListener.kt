@@ -15,7 +15,7 @@ class CustodyLocationLookupListener(
   val communityAPIOffenderService: CommunityAPIOffenderService,
   val prisonerOffenderSearchService: PrisonerOffenderSearchService,
   val referralLocationRepository: ReferralLocationRepository,
-  val telemetryClient: TelemetryClient
+  val telemetryClient: TelemetryClient,
 ) : ApplicationListener<ReferralEvent> {
   override fun onApplicationEvent(event: ReferralEvent) {
     if (event.type != ReferralEventType.SENT) {
@@ -75,9 +75,9 @@ class CustodyLocationLookupListener(
           eventName,
           mapOf(
             "result" to if (it.nomisPrisonId == it.prisonId) "match" else "no match",
-            "crn" to serviceUserCRN
+            "crn" to serviceUserCRN,
           ),
-          null
+          null,
         )
       }
       referralLocationRepository.save(referralLocation)

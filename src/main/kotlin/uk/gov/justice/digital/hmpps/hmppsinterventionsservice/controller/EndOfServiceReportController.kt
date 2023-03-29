@@ -29,9 +29,8 @@ class EndOfServiceReportController(
   @PostMapping("/draft-end-of-service-report")
   fun createEndOfServiceReport(
     @RequestBody createEndOfServiceReportDTO: CreateEndOfServiceReportDTO,
-    authentication: JwtAuthenticationToken
+    authentication: JwtAuthenticationToken,
   ): ResponseEntity<EndOfServiceReportDTO> {
-
     val createdByUser = userMapper.fromToken(authentication)
     val endOfServiceReport = endOfServiceReportService.createEndOfServiceReport(createEndOfServiceReportDTO.referralId, createdByUser)
 
@@ -42,7 +41,7 @@ class EndOfServiceReportController(
 
   @GetMapping("/end-of-service-report/{id}")
   fun getEndOfServiceReportById(
-    @PathVariable id: UUID
+    @PathVariable id: UUID,
   ): EndOfServiceReportDTO {
     val endOfServiceReport = endOfServiceReportService.getEndOfServiceReport(id)
     return EndOfServiceReportDTO.from(endOfServiceReport)
@@ -50,7 +49,7 @@ class EndOfServiceReportController(
 
   @GetMapping("/end-of-service-report")
   fun getEndOfServiceReportByReferralId(
-    @RequestParam(name = "referralId", required = true) referralId: UUID
+    @RequestParam(name = "referralId", required = true) referralId: UUID,
   ): EndOfServiceReportDTO {
     val endOfServiceReport = endOfServiceReportService.getEndOfServiceReportByReferralId(referralId)
     return EndOfServiceReportDTO.from(endOfServiceReport)
@@ -70,7 +69,7 @@ class EndOfServiceReportController(
   @PostMapping("/draft-end-of-service-report/{id}/submit")
   fun submitEndOfServiceReport(
     @PathVariable id: UUID,
-    authentication: JwtAuthenticationToken
+    authentication: JwtAuthenticationToken,
   ): EndOfServiceReportDTO {
     val submittedByUser = userMapper.fromToken(authentication)
     val submittedEndOfServiceReport = endOfServiceReportService.submitEndOfServiceReport(id, submittedByUser)

@@ -64,7 +64,7 @@ class ActionPlanAppointmentEventPublisherTest {
     val appointment = DeliverySessionFactory().createAttended(
       attended = LATE,
       additionalAttendanceInformation = "Behaviour was fine",
-      attendanceSubmittedAt = OffsetDateTime.now()
+      attendanceSubmittedAt = OffsetDateTime.now(),
     )
 
     publisher.sessionFeedbackRecordedEvent(appointment)

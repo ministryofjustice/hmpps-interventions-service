@@ -34,7 +34,7 @@ class TransferReferralsJobConfiguration(
         "fromContract",
         "toContract",
         "timestamp",
-      )
+      ),
     )
 
     return jobBuilderFactory["transferReferralsJob"]

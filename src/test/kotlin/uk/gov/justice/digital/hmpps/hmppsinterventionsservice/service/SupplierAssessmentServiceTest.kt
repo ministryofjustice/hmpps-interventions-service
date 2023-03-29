@@ -43,7 +43,7 @@ class SupplierAssessmentServiceTest {
   private val supplierAssessmentService = SupplierAssessmentService(
     supplierAssessmentRepository,
     referralRepository,
-    appointmentService
+    appointmentService,
   )
 
   @Test
@@ -73,6 +73,7 @@ class SupplierAssessmentServiceTest {
     val appointmentTime = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
     var appointmentDeliveryType = AppointmentDeliveryType.PHONE_CALL
     var appointmentSessionType = AppointmentSessionType.ONE_TO_ONE
+
     @Test
     fun `can create supplier assessment appointment`() {
       whenever(
@@ -91,7 +92,7 @@ class SupplierAssessmentServiceTest {
           isNull(),
           isNull(),
           isNull(),
-        )
+        ),
       ).thenReturn(appointment)
       whenever(supplierAssessmentRepository.save(any())).thenReturn(supplierAssessment)
 
@@ -126,7 +127,7 @@ class SupplierAssessmentServiceTest {
           isNull(),
           isNull(),
           isNull(),
-        )
+        ),
       ).thenReturn(appointment)
       whenever(supplierAssessmentRepository.save(any())).thenReturn(supplierAssessment)
 
@@ -142,7 +143,6 @@ class SupplierAssessmentServiceTest {
 
     @Test
     fun `can replace the existing appointment with the new appointment`() {
-
       val appointment = appointmentFactory.create()
       val supplierAssessment = supplierAssessmentFactory.create(appointment = appointment)
       val newAppointment = appointmentFactory.create()
@@ -163,7 +163,7 @@ class SupplierAssessmentServiceTest {
           isNull(),
           isNull(),
           isNull(),
-        )
+        ),
       ).thenReturn(newAppointment)
       whenever(supplierAssessmentRepository.save(any())).thenReturn(supplierAssessment)
 
@@ -179,7 +179,6 @@ class SupplierAssessmentServiceTest {
 
     @Test
     fun `can create a new appointment when the previous appointment was not attended`() {
-
       val appointment = appointmentFactory.create(attended = Attended.NO)
       val supplierAssessment = supplierAssessmentFactory.create(appointment = appointment)
       val newAppointment = appointmentFactory.create()
@@ -201,7 +200,7 @@ class SupplierAssessmentServiceTest {
           isNull(),
           isNull(),
           isNull(),
-        )
+        ),
       ).thenReturn(newAppointment)
       whenever(supplierAssessmentRepository.save(any())).thenReturn(supplierAssessment)
 

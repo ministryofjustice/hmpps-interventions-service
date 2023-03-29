@@ -31,7 +31,7 @@ class NotifyAppointmentServiceTest {
       appointmentFactory.create(referral = referralFactory.createSent(id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"))),
       "http://localhost:8080/appointment/42c7d267-0776-4272-a8e8-a673bfe30d0d",
       notifyPP,
-      appointmentType
+      appointmentType,
     )
   }
 

@@ -7,5 +7,5 @@ data class CreateEndOfServiceReportOutcomeDTO(
   val desiredOutcomeId: UUID,
   val achievementLevel: AchievementLevel,
   val progressionComments: String? = null,
-  val additionalTaskComments: String? = null
+  val additionalTaskComments: String? = null,
 )

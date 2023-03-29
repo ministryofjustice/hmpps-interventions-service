@@ -34,7 +34,7 @@ data class ReferralDetailsDTO(
         furtherInformation = referralDetails.furtherInformation,
         reasonForChange = referralDetails.reasonForChange,
         createdById = referralDetails.createdByUserId,
-        createdAt = referralDetails.createdAt
+        createdAt = referralDetails.createdAt,
       )
     }
   }

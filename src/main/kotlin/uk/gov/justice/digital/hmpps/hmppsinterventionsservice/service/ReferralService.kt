@@ -66,7 +66,7 @@ class ReferralService(
   @Lazy val amendReferralService: AmendReferralService,
   val hmppsAuthService: HMPPSAuthService,
   val telemetryService: TelemetryService,
-  val referralDetailsRepository: ReferralDetailsRepository
+  val referralDetailsRepository: ReferralDetailsRepository,
 ) {
   companion object {
     private val logger = KotlinLogging.logger {}
@@ -95,7 +95,7 @@ class ReferralService(
     val assignment = ReferralAssignment(
       OffsetDateTime.now(),
       authUserRepository.save(assignedBy),
-      authUserRepository.save(assignedTo)
+      authUserRepository.save(assignedTo),
     )
     referral.assignments.forEach { it.superseded = true }
     referral.assignments.add(assignment)
@@ -170,13 +170,16 @@ class ReferralService(
   }
 
   private fun <T> searchSpec(searchText: String): Specification<T> {
-    return if (searchText.matches(Regex("[A-Z]{2}[0-9]{4}[A-Z]{2}"))) ReferralSpecifications.searchByReferenceNumber(searchText)
-    else ReferralSpecifications.searchByPoPName(searchText)
+    return if (searchText.matches(Regex("[A-Z]{2}[0-9]{4}[A-Z]{2}"))) {
+      ReferralSpecifications.searchByReferenceNumber(searchText)
+    } else {
+      ReferralSpecifications.searchByPoPName(searchText)
+    }
   }
 
   private fun <T> createSpecificationForProbationPractitionerUser(
     user: AuthUser,
-    sentReferralFilterSpecification: Specification<T>
+    sentReferralFilterSpecification: Specification<T>,
   ): Specification<T> {
     var referralsForPPUser = ReferralSpecifications.createdBy<T>(user)
     try {
@@ -229,7 +232,7 @@ class ReferralService(
     amendReferralService.logChanges(
       existingDetails!!,
       update,
-      actor
+      actor,
     )
 
     update.completionDeadline?.let {
@@ -280,14 +283,14 @@ class ReferralService(
 
       telemetryService.reportInvalidAssumption(
         "all responsible officers have email addresses",
-        mapOf("staffId" to responsibleOfficer.staffId.toString())
+        mapOf("staffId" to responsibleOfficer.staffId.toString()),
       )
 
       logger.warn("no email address for responsible officer; falling back to referring probation practitioner")
     } catch (e: Exception) {
       logger.error(
         "could not get responsible officer due to unexpected error; falling back to referring probation practitioner",
-        e
+        e,
       )
     }
 
@@ -298,7 +301,7 @@ class ReferralService(
       userDetail.email,
       null,
       referringProbationPractitioner,
-      userDetail.lastName
+      userDetail.lastName,
     )
   }
 

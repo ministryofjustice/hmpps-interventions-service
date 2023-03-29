@@ -37,7 +37,7 @@ class DeliverySessionService(
   val communityAPIBookingService: CommunityAPIBookingService,
   val appointmentService: AppointmentService,
   val appointmentRepository: AppointmentRepository,
-  val referralRepository: ReferralRepository
+  val referralRepository: ReferralRepository,
 ) {
   fun createUnscheduledSessionsForActionPlan(approvedActionPlan: ActionPlan) {
     val previouslyApprovedSessions = approvedActionPlan.referral.approvedActionPlan?. let {
@@ -107,10 +107,10 @@ class DeliverySessionService(
       createdAt = OffsetDateTime.now(),
       appointmentTime = appointmentTime,
       durationInMinutes = durationInMinutes,
-      referral = session.referral
+      referral = session.referral,
     )
     return scheduleDeliverySessionAppointment(
-      session, appointment, existingAppointment, appointmentTime, durationInMinutes, appointmentDeliveryType, createdBy, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode, attended, additionalAttendanceInformation, notifyProbationPractitioner, behaviourDescription
+      session, appointment, existingAppointment, appointmentTime, durationInMinutes, appointmentDeliveryType, createdBy, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode, attended, additionalAttendanceInformation, notifyProbationPractitioner, behaviourDescription,
     )
   }
 
@@ -137,7 +137,7 @@ class DeliverySessionService(
     }
     existingAppointment.appointmentFeedbackSubmittedAt?.let { throw ValidationError("can't reschedule appointment for session; appointment feedback already supplied [referralId=$referralId, sessionNumber=$sessionNumber, appointmentId=$appointmentId]", listOf()) }
     return scheduleDeliverySessionAppointment(
-      session, existingAppointment, existingAppointment, appointmentTime, durationInMinutes, appointmentDeliveryType, updatedBy, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode, attended, additionalAttendanceInformation, notifyProbationPractitioner, behaviourDescription
+      session, existingAppointment, existingAppointment, appointmentTime, durationInMinutes, appointmentDeliveryType, updatedBy, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode, attended, additionalAttendanceInformation, notifyProbationPractitioner, behaviourDescription,
     )
   }
 
@@ -163,7 +163,7 @@ class DeliverySessionService(
       appointmentTime,
       durationInMinutes,
       SERVICE_DELIVERY,
-      npsOfficeCode
+      npsOfficeCode,
     )
     if (appointmentTime.isBefore(OffsetDateTime.now()) && attended == null) {
       throw IllegalArgumentException("Appointment feedback must be provided for appointments in the past.")
@@ -219,7 +219,7 @@ class DeliverySessionService(
       deliusAppointmentId = deliusAppointmentId,
       createdAt = OffsetDateTime.now(),
       createdBy = existingAppointment?.createdBy ?: authUserRepository.save(updatedBy),
-      referral = existingAppointment?.referral ?: session.referral
+      referral = existingAppointment?.referral ?: session.referral,
     )
     session.appointments.map { appt -> appt.superseded = true }
     appointmentRepository.saveAndFlush(appointment)
@@ -238,7 +238,7 @@ class DeliverySessionService(
     actionPlanId: UUID,
     sessionNumber: Int,
     attended: Attended,
-    additionalInformation: String?
+    additionalInformation: String?,
   ): DeliverySession {
     val session = getDeliverySessionByActionPlanIdOrThrowException(actionPlanId, sessionNumber)
     val appointment = session.currentAppointment
@@ -258,7 +258,7 @@ class DeliverySessionService(
     appointmentId: UUID,
     actor: AuthUser,
     attended: Attended,
-    additionalInformation: String?
+    additionalInformation: String?,
   ): Pair<DeliverySession, Appointment> {
     val sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
     if (sessionAndAppointment.second.appointmentTime.isAfter(OffsetDateTime.now())) {
@@ -361,7 +361,7 @@ class DeliverySessionService(
     additionalAttendanceInformation: String?,
     behaviourDescription: String?,
     notifyProbationPractitioner: Boolean?,
-    updatedBy: AuthUser
+    updatedBy: AuthUser,
   ) {
     attended?.let {
       setAttendanceFields(appointment, attended, additionalAttendanceInformation, updatedBy)
@@ -416,7 +416,7 @@ class DeliverySessionService(
 
   @Deprecated(
     "looking up by action plan ID is no longer necessary",
-    ReplaceWith("getDeliverySessionOrThrowException(referralId, sessionNumber)")
+    ReplaceWith("getDeliverySessionOrThrowException(referralId, sessionNumber)"),
   )
   fun getDeliverySessionByActionPlanIdOrThrowException(actionPlanId: UUID, sessionNumber: Int): DeliverySession =
     getDeliverySessionByActionPlanId(actionPlanId, sessionNumber)
@@ -431,7 +431,7 @@ class DeliverySessionService(
 
   @Deprecated(
     "looking up by action plan ID is no longer necessary",
-    ReplaceWith("getDeliverySession(referralId, sessionNumber)")
+    ReplaceWith("getDeliverySession(referralId, sessionNumber)"),
   )
   private fun getDeliverySessionByActionPlanId(actionPlanId: UUID, sessionNumber: Int) =
     deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)

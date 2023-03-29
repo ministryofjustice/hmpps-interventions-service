@@ -93,7 +93,7 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
         "actionPlanId": null,
         "endOfServiceReportCreationRequired": false
       }
-    """
+    """,
     )
   }
 
@@ -110,7 +110,7 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
       "Provider",
       id = id,
       createdAt = createdAt,
-      actionPlans = mutableListOf(actionPlan)
+      actionPlans = mutableListOf(actionPlan),
     )
 
     referral.referenceNumber = "something"
@@ -144,7 +144,7 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
         "actionPlanId": "${actionPlan.id}",
         "endOfServiceReportCreationRequired": false
       }
-    """
+    """,
     )
   }
 
@@ -163,8 +163,9 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
 
     referral.endOfServiceReport = SampleData.sampleEndOfServiceReport(
       referral = referral,
-      createdAt = createdAt, id = id,
-      outcomes = setOf(SampleData.sampleEndOfServiceReportOutcome(desiredOutcome = SampleData.sampleDesiredOutcome(id = id)))
+      createdAt = createdAt,
+      id = id,
+      outcomes = setOf(SampleData.sampleEndOfServiceReportOutcome(desiredOutcome = SampleData.sampleDesiredOutcome(id = id))),
     )
 
     referral.referenceNumber = "something"
@@ -216,7 +217,7 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
         }]
       }
     }
-    """
+    """,
     )
   }
 
@@ -239,7 +240,7 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
         "concludedAt": "2021-01-13T21:57:13Z"
       }
     }
-    """
+    """,
     )
   }
 }

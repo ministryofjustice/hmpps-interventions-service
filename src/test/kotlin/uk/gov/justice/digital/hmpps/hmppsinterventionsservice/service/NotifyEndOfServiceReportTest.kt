@@ -27,7 +27,7 @@ class NotifyEndOfServiceReportTest {
     endOfServiceReportFactory.create(
       id = UUID.fromString("42c7d267-0776-4272-a8e8-a673bfe30d0d"),
     ),
-    "http://localhost:8080/end-of-service-report/42c7d267-0776-4272-a8e8-a673bfe30d0d"
+    "http://localhost:8080/end-of-service-report/42c7d267-0776-4272-a8e8-a673bfe30d0d",
   )
 
   private fun notifyService(): NotifyEndOfServiceReportService {

@@ -23,8 +23,8 @@ import javax.validation.constraints.NotNull
 @TypeDefs(
   value = [
     TypeDef(name = "jsonb", typeClass = JsonBinaryType::class),
-    TypeDef(name = "topic", typeClass = PostgreSQLEnumType::class)
-  ]
+    TypeDef(name = "topic", typeClass = PostgreSQLEnumType::class),
+  ],
 )
 data class Changelog(
   @Column(name = "referral_id") val referralId: UUID,
@@ -33,7 +33,8 @@ data class Changelog(
   @Column(name = "changelog_id")
   val id: UUID,
 
-  @Type(type = "topic") @Enumerated(EnumType.STRING)
+  @Type(type = "topic")
+  @Enumerated(EnumType.STRING)
   var topic: AmendTopic,
 
   @Type(type = "jsonb")
@@ -50,6 +51,8 @@ data class Changelog(
   @Column(name = "changed_at")
   val changedAt: OffsetDateTime,
 
-  @NotNull @ManyToOne @Fetch(FetchMode.JOIN)
-  val changedBy: AuthUser
+  @NotNull
+  @ManyToOne
+  @Fetch(FetchMode.JOIN)
+  val changedBy: AuthUser,
 )

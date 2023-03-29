@@ -39,7 +39,7 @@ internal class ReferralsProcessorTest {
       concludedAt = concludedAt,
       endRequestedAt = endRequestedAt,
       endOfServiceReport = eosrFactory.create(submittedAt = eosrSubmittedAt),
-      actionPlans = mutableListOf(actionPlanFirst, actionPlanSecond)
+      actionPlans = mutableListOf(actionPlanFirst, actionPlanSecond),
     )
 
     whenever(actionPlanService.getAllAttendedAppointments(anyOrNull())).thenReturn(listOf(appointmentFactory.create()))

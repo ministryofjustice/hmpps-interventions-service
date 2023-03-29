@@ -19,7 +19,7 @@ class RetryingClientCredentialsTokenResponseClientTest : LoggingSpyTest(Retrying
       .clientId("test-client")
       .tokenUri(mockWebServer.url("/oauth/token").toString())
       .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-      .build()
+      .build(),
   )
 
   @Test
@@ -41,8 +41,8 @@ class RetryingClientCredentialsTokenResponseClientTest : LoggingSpyTest(Retrying
           "token_type": "Bearer",
           "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
         }
-       """
-        )
+       """,
+        ),
     )
 
     val tokenConfig = TokenRequestConfig(

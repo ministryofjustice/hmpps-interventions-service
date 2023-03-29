@@ -39,7 +39,7 @@ class WebClientConfiguration(
   fun assessRisksAndNeedsClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient {
     return RestClient(
       createAuthorizedWebClient(authorizedClientManager, assessRisksAndNeedsBaseUrl),
-      interventionsClientRegistrationId
+      interventionsClientRegistrationId,
     )
   }
 
@@ -47,7 +47,7 @@ class WebClientConfiguration(
   fun hmppsAuthApiClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient {
     return RestClient(
       createAuthorizedWebClient(authorizedClientManager, hmppsAuthBaseUrl, hmppsReadTimeoutSeconds, hmppsAuthConnectTimeoutSeconds),
-      interventionsClientRegistrationId
+      interventionsClientRegistrationId,
     )
   }
 
@@ -55,7 +55,7 @@ class WebClientConfiguration(
   fun communityApiClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient {
     return RestClient(
       createAuthorizedWebClient(authorizedClientManager, communityApiBaseUrl),
-      interventionsClientRegistrationId
+      interventionsClientRegistrationId,
     )
   }
 
@@ -63,7 +63,7 @@ class WebClientConfiguration(
   fun ramDeliusApiClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient {
     return RestClient(
       createAuthorizedWebClient(authorizedClientManager, ramDelius),
-      interventionsClientRegistrationId
+      interventionsClientRegistrationId,
     )
   }
 
@@ -71,14 +71,14 @@ class WebClientConfiguration(
   fun prisonerOffenderSearchClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient {
     return RestClient(
       createAuthorizedWebClient(authorizedClientManager, prisonerOffenderSearchApiUrl),
-      interventionsClientRegistrationId
+      interventionsClientRegistrationId,
     )
   }
 
   @Bean
   fun authorizedClientManager(
     clientRegistrationRepository: ClientRegistrationRepository?,
-    clientService: OAuth2AuthorizedClientService?
+    clientService: OAuth2AuthorizedClientService?,
   ): OAuth2AuthorizedClientManager? {
     val authorizedClientProvider = OAuth2AuthorizedClientProviderBuilder.builder()
       .clientCredentials {
@@ -88,7 +88,7 @@ class WebClientConfiguration(
 
     val authorizedClientManager = AuthorizedClientServiceOAuth2AuthorizedClientManager(
       clientRegistrationRepository,
-      clientService
+      clientService,
     )
     authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider)
 

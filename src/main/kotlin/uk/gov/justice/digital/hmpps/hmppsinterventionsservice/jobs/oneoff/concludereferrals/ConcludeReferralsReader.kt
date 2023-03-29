@@ -20,7 +20,7 @@ class ConcludeReferralsReader(
         "LEFT JOIN EndOfServiceReport e ON r.id = e.referral.id " +
         "WHERE e.id IS null " +
         "AND end_requested_at IS NOT null " +
-        "AND concluded_at is null"
+        "AND concluded_at is null",
     )
   }
 }

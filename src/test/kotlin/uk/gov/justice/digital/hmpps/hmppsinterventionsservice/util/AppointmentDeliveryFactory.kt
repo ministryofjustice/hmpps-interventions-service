@@ -25,7 +25,7 @@ class AppointmentDeliveryFactory(em: TestEntityManager? = null) : EntityFactory(
         appointmentDeliveryType = appointmentDeliveryType,
         appointmentSessionType = appointmentSessionType,
         npsOfficeCode = npsOfficeCode,
-      )
+      ),
     )
   }
 }

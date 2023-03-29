@@ -30,12 +30,11 @@ class CommunityAPIAppointmentEventServiceTest {
     true,
     "/secure/offenders/crn/{crn}/appointments/{appointmentId}/outcome/context/{contextName}",
     "commissioned-rehabilitation-services",
-    communityAPIClient
+    communityAPIClient,
   )
 
   @Test
   fun `notifies community-api of late attended appointment outcome`() {
-
     appointmentEvent.appointment.attended = LATE
     appointmentEvent.appointment.notifyPPOfAttendanceBehaviour = false
 
@@ -46,7 +45,6 @@ class CommunityAPIAppointmentEventServiceTest {
 
   @Test
   fun `notifies community-api of attended appointment outcome`() {
-
     appointmentEvent.appointment.attended = YES
     appointmentEvent.appointment.notifyPPOfAttendanceBehaviour = false
 
@@ -57,7 +55,6 @@ class CommunityAPIAppointmentEventServiceTest {
 
   @Test
   fun `notifies community-api of non attended appointment outcome and notify PP set is always set`() {
-
     appointmentEvent.appointment.attended = NO
     appointmentEvent.appointment.notifyPPOfAttendanceBehaviour = false
 
@@ -68,7 +65,6 @@ class CommunityAPIAppointmentEventServiceTest {
 
   @Test
   fun `notifies community-api of appointment outcome with notify PP set`() {
-
     appointmentEvent.appointment.attended = YES
     appointmentEvent.appointment.notifyPPOfAttendanceBehaviour = true
 
@@ -79,14 +75,13 @@ class CommunityAPIAppointmentEventServiceTest {
 
   @Test
   fun `does not notify when not enabled`() {
-
     val communityAPIService = CommunityAPIAppointmentEventService(
       "http://baseUrl",
       "/probation-practitioner/referrals/{id}/supplier-assessment/post-session-feedback",
       false,
       "/secure/offenders/crn/{crn}/appointments/{appointmentId}/outcome/context/{contextName}",
       "commissioned-rehabilitation-services",
-      communityAPIClient
+      communityAPIClient,
     )
 
     appointmentEvent.appointment.attended = YES
@@ -107,8 +102,8 @@ class CommunityAPIAppointmentEventServiceTest {
         "Session Feedback Recorded for Accommodation Referral X123456 with Prime Provider TOP Service Provider\n" +
           "http://baseUrl/probation-practitioner/referrals/356d0712-5266-4d18-9070-058244873f2c/supplier-assessment/post-session-feedback",
         attended,
-        notifyPP
-      ).toString()
+        notifyPP,
+      ).toString(),
     )
   }
 
@@ -123,10 +118,10 @@ class CommunityAPIAppointmentEventServiceTest {
       createdBy = SampleData.sampleAuthUser("userId", "auth", "me"),
       additionalAttendanceInformation = "dded notes",
       attendanceSubmittedAt = OffsetDateTime.now(),
-      deliusAppointmentId = 123456L
+      deliusAppointmentId = 123456L,
     ),
     "http://localhost:8080/url/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
     true,
-    SUPPLIER_ASSESSMENT
+    SUPPLIER_ASSESSMENT,
   )
 }

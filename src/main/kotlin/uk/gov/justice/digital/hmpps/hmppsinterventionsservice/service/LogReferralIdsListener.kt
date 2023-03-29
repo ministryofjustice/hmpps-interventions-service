@@ -21,7 +21,7 @@ class LogReferralIdsListener : ApplicationListener<ReferralEvent> {
       "new referral sent, reference numbers:",
       StructuredArguments.kv("id", event.referral.id),
       StructuredArguments.kv("reference", event.referral.referenceNumber),
-      StructuredArguments.kv("crn", event.referral.serviceUserCRN)
+      StructuredArguments.kv("crn", event.referral.serviceUserCRN),
     )
   }
 }

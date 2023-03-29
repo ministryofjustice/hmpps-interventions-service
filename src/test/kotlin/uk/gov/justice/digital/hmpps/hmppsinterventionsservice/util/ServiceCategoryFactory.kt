@@ -13,9 +13,8 @@ class ServiceCategoryFactory(em: TestEntityManager? = null) : EntityFactory(em) 
     name: String = "accommodation",
     complexityLevels: List<ComplexityLevel> = emptyList(),
     desiredOutcomes: List<DesiredOutcome> = emptyList(),
-    created: OffsetDateTime? = null
+    created: OffsetDateTime? = null,
   ): ServiceCategory {
-
     // this is really annoying - when we save the service category, JPgit stA runs
     // statements like "update desired_outcome set service_category_id=? where id=?".
     // this fails if the desired outcome doesn't exist. BUT we can't create the
@@ -30,7 +29,7 @@ class ServiceCategoryFactory(em: TestEntityManager? = null) : EntityFactory(em) 
         created = created ?: OffsetDateTime.now(),
         desiredOutcomes = mutableListOf(),
         complexityLevels = mutableListOf(),
-      )
+      ),
     )
 
     complexityLevels.forEach { save(it) }
@@ -43,7 +42,7 @@ class ServiceCategoryFactory(em: TestEntityManager? = null) : EntityFactory(em) 
         created = created ?: OffsetDateTime.now(),
         desiredOutcomes = desiredOutcomes,
         complexityLevels = complexityLevels,
-      )
+      ),
     )
   }
 }

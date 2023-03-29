@@ -18,9 +18,8 @@ class ReferralDetailsFactory(em: TestEntityManager? = null) : EntityFactory(em) 
     completionDeadline: LocalDate? = LocalDate.now(),
     maximumNumberOfEnforceableDays: Int? = 10,
     furtherInformation: String? = "further information",
-    saved: Boolean = false
+    saved: Boolean = false,
   ): ReferralDetails {
-
     val referralDetails = ReferralDetails(
       id = id,
       supersededById = supersededById,

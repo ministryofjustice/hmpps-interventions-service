@@ -13,7 +13,7 @@ internal class CommunityApiCallErrorTest {
     val response: HttpStatus,
     val causeMessage: String,
     val expectedCategory: String,
-    val expectedUserMessage: String
+    val expectedUserMessage: String,
   )
 
   @Test

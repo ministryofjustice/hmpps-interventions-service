@@ -12,7 +12,7 @@ class CancellationReasonFactory(em: TestEntityManager? = null) : EntityFactory(e
       CancellationReason(
         code = id,
         description = description,
-      )
+      ),
     )
   }
 }

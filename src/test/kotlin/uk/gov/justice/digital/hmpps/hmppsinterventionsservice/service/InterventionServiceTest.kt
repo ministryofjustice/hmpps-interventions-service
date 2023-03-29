@@ -72,8 +72,8 @@ class InterventionServiceTest @Autowired constructor(
           npsRegion = npsRegion,
           contractType = contractTypeFactory.create(),
           primeProvider = serviceProviderFactory.create(),
-        )
-      )
+        ),
+      ),
     )
 
     val interventionDTO = interventionService.getIntervention(intervention.id)
@@ -93,8 +93,8 @@ class InterventionServiceTest @Autowired constructor(
           pccRegion = pccRegionFactory.create(),
           contractType = contractTypeFactory.create(),
           primeProvider = serviceProviderFactory.create(),
-        )
-      )
+        ),
+      ),
     )
 
     val interventionDTO = interventionService.getIntervention(intervention.id)
@@ -168,8 +168,8 @@ class InterventionServiceTest @Autowired constructor(
     val interventions = interventionService.getInterventionsForServiceProviderScope(
       ServiceProviderAccessScope(
         emptySet(),
-        contracts.toSet()
-      )
+        contracts.toSet(),
+      ),
     )
 
     assertThat(interventions.size).isEqualTo(2)
@@ -185,7 +185,7 @@ class InterventionServiceTest @Autowired constructor(
     val serviceProviders = mapOf(
       "harmonyLiving" to serviceProviderFactory.create("HARMONY_LIVING", "Harmony Living"),
       "homeTrust" to serviceProviderFactory.create("HOME_TRUST", "Home Trust"),
-      "liveWell" to serviceProviderFactory.create("LIVE_WELL", "Live Well")
+      "liveWell" to serviceProviderFactory.create("LIVE_WELL", "Live Well"),
     )
 
     val npsRegion = npsRegionFactory.create()
@@ -211,7 +211,7 @@ class InterventionServiceTest @Autowired constructor(
         startDate = LocalDate.of(2019, 5, 12),
         endDate = LocalDate.of(2022, 5, 12),
         pccRegion = pccRegionAvon,
-      )
+      ),
     )
     contracts.values.forEach {
       entityManager.persist(it.contractType)
@@ -223,7 +223,7 @@ class InterventionServiceTest @Autowired constructor(
     val interventions = mapOf(
       "intervention1" to sampleIntervention(dynamicFrameworkContract = contracts["harmonyLiving1"]!!),
       "intervention2" to sampleIntervention(dynamicFrameworkContract = contracts["harmonyLiving2"]!!),
-      "intervention3" to sampleIntervention(dynamicFrameworkContract = contracts["homeTrust"]!!)
+      "intervention3" to sampleIntervention(dynamicFrameworkContract = contracts["homeTrust"]!!),
     )
     interventions.values.forEach {
       entityManager.persistAndFlush(it)

@@ -13,7 +13,7 @@ class EndOfServiceReportOutcomeFactory(em: TestEntityManager? = null) : EntityFa
     desiredOutcome: DesiredOutcome? = null,
     achievementLevel: AchievementLevel = AchievementLevel.ACHIEVED,
     progressionComments: String? = null,
-    additionalTaskComments: String? = null
+    additionalTaskComments: String? = null,
   ): EndOfServiceReportOutcome {
     return save(
       EndOfServiceReportOutcome(
@@ -21,7 +21,7 @@ class EndOfServiceReportOutcomeFactory(em: TestEntityManager? = null) : EntityFa
         achievementLevel = achievementLevel,
         progressionComments = progressionComments,
         additionalTaskComments = additionalTaskComments,
-      )
+      ),
     )
   }
 }

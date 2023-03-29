@@ -96,7 +96,7 @@ class CommunityAPIBookingService(
     appointmentType: AppointmentType,
     npsOfficeCode: String,
     attended: Attended?,
-    notifyPPOfAttendanceBehaviour: Boolean?
+    notifyPPOfAttendanceBehaviour: Boolean?,
   ): AppointmentCreateRequestDTO {
     val resourceUrl = buildReferralResourceUrl(referral, appointmentType)
 
@@ -119,7 +119,7 @@ class CommunityAPIBookingService(
 
   private fun buildAppointmentRelocateRequestDTO(npsOfficeCode: String): AppointmentRelocateRequestDTO {
     return AppointmentRelocateRequestDTO(
-      officeLocationCode = npsOfficeCode
+      officeLocationCode = npsOfficeCode,
     )
   }
 
@@ -128,7 +128,7 @@ class CommunityAPIBookingService(
       updatedAppointmentStart = appointmentTime,
       updatedAppointmentEnd = appointmentTime.plusMinutes(durationInMinutes.toLong()),
       initiatedByServiceProvider = true, // fixme - needs to come from the user - defaulted to SP Initiated Reschedule
-      officeLocationCode = npsOfficeCode
+      officeLocationCode = npsOfficeCode,
     )
   }
 
@@ -185,5 +185,5 @@ data class AppointmentRelocateRequestDTO(
 ) : AppointmentRequestDTO()
 
 data class AppointmentResponseDTO(
-  @NotNull val appointmentId: Long
+  @NotNull val appointmentId: Long,
 )

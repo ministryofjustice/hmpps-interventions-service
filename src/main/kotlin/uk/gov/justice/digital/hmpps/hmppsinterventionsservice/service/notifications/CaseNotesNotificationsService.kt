@@ -51,7 +51,7 @@ class CaseNotesNotificationsService(
           "recipientFirstName" to responsibleOfficer.firstName,
           "referralReference" to referral.referenceNumber!!,
           "caseNoteUrl" to generateResourceUrl(interventionsUIBaseURL, ppCaseNoteLocation, caseNoteId).toString(),
-        )
+        ),
       )
     }
   }
@@ -71,7 +71,7 @@ class CaseNotesNotificationsService(
             "recipientFirstName" to assigneeDetails.firstName,
             "referralReference" to referral.referenceNumber!!,
             "caseNoteUrl" to generateResourceUrl(interventionsUIBaseURL, spCaseNoteLocation, caseNoteId).toString(),
-          )
+          ),
         )
       }
     } ?: logger.warn("referral is unassigned; cannot notify case worker about case note creation")

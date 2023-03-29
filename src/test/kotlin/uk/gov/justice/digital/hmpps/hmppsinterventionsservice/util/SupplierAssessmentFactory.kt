@@ -13,14 +13,14 @@ class SupplierAssessmentFactory(em: TestEntityManager? = null) : EntityFactory(e
   fun create(
     id: UUID = UUID.randomUUID(),
     referral: Referral = referralFactory.createSent(),
-    appointment: Appointment = appointmentFactory.create()
+    appointment: Appointment = appointmentFactory.create(),
   ): SupplierAssessment {
     return save(
       SupplierAssessment(
         id = id,
         referral = referral,
         appointments = mutableSetOf(appointment),
-      )
+      ),
     )
   }
 
@@ -30,15 +30,15 @@ class SupplierAssessmentFactory(em: TestEntityManager? = null) : EntityFactory(e
     appointments: MutableSet<Appointment> =
       mutableSetOf(
         appointmentFactory.create(referral = referral),
-        appointmentFactory.create(referral = referral)
-      )
+        appointmentFactory.create(referral = referral),
+      ),
   ): SupplierAssessment {
     return save(
       SupplierAssessment(
         id = id,
         referral = referral,
         appointments = appointments,
-      )
+      ),
     )
   }
 
@@ -51,7 +51,7 @@ class SupplierAssessmentFactory(em: TestEntityManager? = null) : EntityFactory(e
         id = id,
         referral = referral,
         appointments = mutableSetOf(),
-      )
+      ),
     )
   }
 }

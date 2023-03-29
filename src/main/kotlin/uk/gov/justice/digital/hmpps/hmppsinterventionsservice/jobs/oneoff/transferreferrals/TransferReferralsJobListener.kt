@@ -15,7 +15,6 @@ class TransferReferralsJobListener : JobExecutionListener {
   }
 
   override fun afterJob(jobExecution: JobExecution) {
-
     when (jobExecution.status) {
       BatchStatus.COMPLETED -> {
       }
@@ -27,7 +26,7 @@ class TransferReferralsJobListener : JobExecutionListener {
         logger.warn(
           "aaaunexpected status encountered for performance report {} {}",
           kv("status", jobExecution.status),
-          kv("exitDescription", jobExecution.exitStatus.exitDescription)
+          kv("exitDescription", jobExecution.exitStatus.exitDescription),
         )
       }
     }

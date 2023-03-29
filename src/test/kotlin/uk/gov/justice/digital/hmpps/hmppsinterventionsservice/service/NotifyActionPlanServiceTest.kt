@@ -38,9 +38,9 @@ class NotifyActionPlanServiceTest {
         id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
         referenceNumber = "HAS71263",
         sentAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00"),
-        sentBy = AuthUser("abc999", "auth", "abc999")
+        sentBy = AuthUser("abc999", "auth", "abc999"),
       ),
-      submittedBy = AuthUser("abc123", "auth", "abc123")
+      submittedBy = AuthUser("abc123", "auth", "abc123"),
     ),
     "http://localhost:8080/action-plan/42c7d267-0776-4272-a8e8-a673bfe30d0d",
   )

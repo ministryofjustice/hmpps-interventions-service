@@ -33,7 +33,7 @@ class OnStartupJobLauncherFactory(
   fun makeBatchLauncher(job: Job): ApplicationRunner {
     val entryPoint = fun(args: ApplicationArguments): Int {
       val rawParams = jobParametersConverter.getJobParameters(
-        StringUtils.splitArrayElementsIntoProperties(args.nonOptionArgs.toTypedArray(), "=")
+        StringUtils.splitArrayElementsIntoProperties(args.nonOptionArgs.toTypedArray(), "="),
       )
 
       val nextParams = job.jobParametersIncrementer?.let {

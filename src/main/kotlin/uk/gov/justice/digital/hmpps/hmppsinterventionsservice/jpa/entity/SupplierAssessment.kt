@@ -17,14 +17,19 @@ import javax.validation.constraints.NotNull
 @Table(name = "supplier_assessment")
 data class SupplierAssessment(
   @Id val id: UUID,
-  @NotNull @OneToOne(fetch = FetchType.LAZY) val referral: Referral,
+  @NotNull
+  @OneToOne(fetch = FetchType.LAZY)
+  val referral: Referral,
 
   @JoinTable(
     name = "supplier_assessment_appointment",
     joinColumns = [JoinColumn(name = "supplier_assessment_id")],
-    inverseJoinColumns = [JoinColumn(name = "appointment_id")]
+    inverseJoinColumns = [JoinColumn(name = "appointment_id")],
   )
-  @NotNull @OneToMany @Fetch(FetchMode.JOIN) val appointments: MutableSet<Appointment> = mutableSetOf(),
+  @NotNull
+  @OneToMany
+  @Fetch(FetchMode.JOIN)
+  val appointments: MutableSet<Appointment> = mutableSetOf(),
 ) {
   val currentAppointment: Appointment?
     get() = appointments.maxByOrNull { it.createdAt }

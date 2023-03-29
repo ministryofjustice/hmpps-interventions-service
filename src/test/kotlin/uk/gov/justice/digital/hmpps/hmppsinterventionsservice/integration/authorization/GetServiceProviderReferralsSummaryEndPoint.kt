@@ -49,7 +49,7 @@ class GetServiceProviderReferralsSummaryEndPoint : IntegrationTestBase() {
         "INT_SP_HARMONY_LIVING",
         "INT_CR_0001",
         "INT_CR_0002",
-      )
+      ),
     )
 
     listOf(
@@ -62,7 +62,7 @@ class GetServiceProviderReferralsSummaryEndPoint : IntegrationTestBase() {
         contractReference = "0002",
         primeProviderId = "HARMONY_LIVING",
         subContractorServiceProviderIds = emptySet(),
-      )
+      ),
     ).forEach {
       createSentReferral(it)
     }
@@ -83,7 +83,7 @@ class GetServiceProviderReferralsSummaryEndPoint : IntegrationTestBase() {
         "INT_SP_HOME_TRUST",
         "INT_CR_0001",
         "INT_CR_0002",
-      )
+      ),
     )
 
     listOf(
@@ -96,7 +96,7 @@ class GetServiceProviderReferralsSummaryEndPoint : IntegrationTestBase() {
         contractReference = "0002",
         primeProviderId = "HOME_TRUST",
         subContractorServiceProviderIds = emptySet(),
-      )
+      ),
     ).forEach {
       createSentReferral(it)
     }
@@ -116,7 +116,7 @@ class GetServiceProviderReferralsSummaryEndPoint : IntegrationTestBase() {
       listOf(
         "INT_SP_HOME_TRUST",
         "INT_CR_0003",
-      )
+      ),
     )
 
     listOf(
@@ -129,7 +129,7 @@ class GetServiceProviderReferralsSummaryEndPoint : IntegrationTestBase() {
         contractReference = "0002",
         primeProviderId = "HOME_TRUST",
         subContractorServiceProviderIds = emptySet(),
-      )
+      ),
     ).forEach {
       createSentReferral(it)
     }
@@ -156,7 +156,7 @@ class GetServiceProviderReferralsSummaryEndPoint : IntegrationTestBase() {
       listOf(
         "INT_SP_HOME_TRUST",
         "INT_CR_0999",
-      )
+      ),
     )
 
     val token = createEncodedTokenForUser(user)
@@ -168,7 +168,7 @@ class GetServiceProviderReferralsSummaryEndPoint : IntegrationTestBase() {
       "no valid service provider groups associated with user",
       "no valid contract groups associated with user"
       ]}
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -182,7 +182,7 @@ class GetServiceProviderReferralsSummaryEndPoint : IntegrationTestBase() {
     response.expectBody().json(
       """
       {"accessErrors": ["logins from nomis are not supported"]}
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -201,7 +201,7 @@ class GetServiceProviderReferralsSummaryEndPoint : IntegrationTestBase() {
       {"accessErrors": [
       "cannot find user in hmpps auth"
       ]}
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 }

@@ -26,7 +26,7 @@ class EndOfServiceReportService(
 
   fun createEndOfServiceReport(
     referralId: UUID,
-    createdByUser: AuthUser
+    createdByUser: AuthUser,
   ): EndOfServiceReport {
     val endOfServiceReport = EndOfServiceReport(
       id = UUID.randomUUID(),

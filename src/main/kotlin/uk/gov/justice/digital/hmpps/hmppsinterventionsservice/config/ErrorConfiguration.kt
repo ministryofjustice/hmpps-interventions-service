@@ -31,7 +31,7 @@ enum class Code {
   INVALID_VALUE,
   NOT_YET_IMPLEMENTED,
   APPOINTMENT_TIME_BEFORE_REFERRAL_START_DATE,
-  APPOINTMENT_TIME_TOO_FAR_IN_FUTURE
+  APPOINTMENT_TIME_TOO_FAR_IN_FUTURE,
 }
 
 data class FieldError(
@@ -68,9 +68,9 @@ class ErrorConfiguration(private val telemetryClient: TelemetryClient) {
         "userName" to e.user.userName,
         "userAuthSource" to e.user.authSource,
         "message" to e.message,
-        "issues" to e.errors.toString()
+        "issues" to e.errors.toString(),
       ),
-      null
+      null,
     )
     return errorResponse(HttpStatus.FORBIDDEN, "access error", e.message, accessErrors = e.errors)
   }
@@ -142,9 +142,9 @@ class ErrorConfiguration(private val telemetryClient: TelemetryClient) {
       "InterventionsCommunityAPICallError",
       mapOf(
         "category" to e.category,
-        "userMessage" to e.userMessage
+        "userMessage" to e.userMessage,
       ),
-      null
+      null,
     )
 
     logger.info("Call to downstream response exception", e)
@@ -152,7 +152,7 @@ class ErrorConfiguration(private val telemetryClient: TelemetryClient) {
       e.httpStatus,
       e.category,
       e.responseBody,
-      e.userMessage
+      e.userMessage,
     )
   }
 
@@ -184,7 +184,7 @@ class ErrorConfiguration(private val telemetryClient: TelemetryClient) {
           userMessage = userMessage,
           validationErrors = validationErrors,
           accessErrors = accessErrors,
-        )
+        ),
       )
   }
 }

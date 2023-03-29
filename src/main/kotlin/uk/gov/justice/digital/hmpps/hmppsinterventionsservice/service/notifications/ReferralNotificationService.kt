@@ -39,7 +39,7 @@ class ReferralNotificationService(
   private val emailSender: EmailSender,
   private val hmppsAuthService: HMPPSAuthService,
   private val authUserRepository: AuthUserRepository,
-  private val referralService: ReferralService
+  private val referralService: ReferralService,
 ) : ApplicationListener<ReferralEvent>, NotifyService {
 
   companion object : KLogging()
@@ -57,8 +57,8 @@ class ReferralNotificationService(
           mapOf(
             "organisationName" to serviceProvider.name,
             "referenceNumber" to event.referral.referenceNumber!!,
-            "referralUrl" to location.toString()
-          )
+            "referralUrl" to location.toString(),
+          ),
         )
       }
 
@@ -73,7 +73,7 @@ class ReferralNotificationService(
             "spFirstName" to userDetails.firstName,
             "referenceNumber" to event.referral.referenceNumber!!,
             "referralUrl" to location.toString(),
-          )
+          ),
         )
       }
 
@@ -109,8 +109,8 @@ class ReferralNotificationService(
       mapOf(
         "sp_first_name" to userDetails.firstName,
         "referral_number" to referral.referenceNumber!!,
-        "referral" to location.toString()
-      )
+        "referral" to location.toString(),
+      ),
     )
   }
 
@@ -136,7 +136,7 @@ class ReferralNotificationService(
         newDetails,
         previousDetails,
         updater,
-        frontendUrl
+        frontendUrl,
       )
       if (!isUserTheResponsibleOfficer) {
         sendEmail(
@@ -145,21 +145,22 @@ class ReferralNotificationService(
           newDetails,
           previousDetails,
           updater,
-          frontendUrl
+          frontendUrl,
         )
       }
     }
 
     if (newDetails.maximumEnforceableDays != previousDetails.maximumEnforceableDays) {
       emailSender.sendEmail(
-        enforceableDaysUpdatedTemplateID, recipient.email,
+        enforceableDaysUpdatedTemplateID,
+        recipient.email,
         mapOf(
           "recipientFirstName" to recipient.firstName,
           "newMaximumEnforceableDays" to newDetails.maximumEnforceableDays!!.toString(),
           "previousMaximumEnforceableDays" to previousDetails.maximumEnforceableDays!!.toString(),
           "changedByName" to "${updater.firstName} ${updater.lastName}",
-          "referralDetailsUrl" to frontendUrl.toString()
-        )
+          "referralDetailsUrl" to frontendUrl.toString(),
+        ),
       )
     }
   }
@@ -170,17 +171,18 @@ class ReferralNotificationService(
     newDetails: ReferralDetailsDTO,
     previousDetails: ReferralDetailsDTO,
     updater: UserDetail,
-    frontendUrl: URI
+    frontendUrl: URI,
   ) {
     emailSender.sendEmail(
-      completionDeadlineUpdatedTemplateID, email,
+      completionDeadlineUpdatedTemplateID,
+      email,
       mapOf(
         "caseworkerFirstName" to firstName,
         "newCompletionDeadline" to formatDate(newDetails.completionDeadline!!),
         "previousCompletionDeadline" to formatDate(previousDetails.completionDeadline!!),
         "changedByName" to "${updater.firstName} ${updater.lastName}",
-        "referralDetailsUrl" to frontendUrl.toString()
-      )
+        "referralDetailsUrl" to frontendUrl.toString(),
+      ),
     )
   }
 

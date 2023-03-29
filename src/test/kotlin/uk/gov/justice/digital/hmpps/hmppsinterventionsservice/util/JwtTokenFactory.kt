@@ -21,7 +21,7 @@ class JwtTokenFactory {
     userID: String = "user",
     authSource: String = "authSource",
     userName: String = "username",
-    authorities: Array<String> = arrayOf("ROLES_PROBATION")
+    authorities: Array<String> = arrayOf("ROLES_PROBATION"),
   ): JwtAuthenticationToken {
     val jwt: Jwt = Jwt.withTokenValue("token")
       .header("alg", "none")
@@ -55,7 +55,7 @@ class JwtTokenFactory {
   fun createEncodedToken(
     userID: String? = "user",
     authSource: String? = "authSource",
-    userName: String? = "username"
+    userName: String? = "username",
   ): String {
     val jwk = RSAKeyGenerator(2048).keyID("123").generate()
     val claimsBuilder = JWTClaimsSet.Builder()

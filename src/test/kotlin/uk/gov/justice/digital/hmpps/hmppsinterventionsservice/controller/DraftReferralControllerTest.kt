@@ -45,7 +45,7 @@ internal class DraftReferralControllerTest {
   fun `createDraftReferral handles EntityNotFound exceptions from InterventionsService`() {
     val token = tokenFactory.create()
     whenever(draftReferralService.createDraftReferral(any(), any(), any(), anyOrNull(), anyOrNull())).thenThrow(
-      EntityNotFoundException::class.java
+      EntityNotFoundException::class.java,
     )
     whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
     assertThrows<ServerWebInputException> {

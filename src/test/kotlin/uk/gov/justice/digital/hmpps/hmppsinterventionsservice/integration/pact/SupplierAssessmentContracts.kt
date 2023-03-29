@@ -40,7 +40,7 @@ class SupplierAssessmentContracts(private val setupAssistant: SetupAssistant) {
       secondAddressLine = "44 Bouverie Road",
       townOrCity = "Blackpool",
       county = "Lancashire",
-      postCode = "SY40RE"
+      postCode = "SY40RE",
     )
     setupAssistant.addSupplierAssessmentAppointment(supplierAssessment!!, appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_OTHER, appointmentDeliveryAddress = addressDTO)
   }

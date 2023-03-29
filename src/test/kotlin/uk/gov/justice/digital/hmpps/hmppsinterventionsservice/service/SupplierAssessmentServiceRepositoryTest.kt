@@ -38,7 +38,9 @@ class SupplierAssessmentServiceRepositoryTest @Autowired constructor(
   private val appointmentService = mock<AppointmentService>()
 
   private val supplierAssessmentService = SupplierAssessmentService(
-    supplierAssessmentRepository, referralRepository, appointmentService
+    supplierAssessmentRepository,
+    referralRepository,
+    appointmentService,
 
   )
 
@@ -74,13 +76,16 @@ class SupplierAssessmentServiceRepositoryTest @Autowired constructor(
           eq(AppointmentDeliveryType.PHONE_CALL),
           eq(AppointmentSessionType.ONE_TO_ONE),
           anyOrNull(),
-          anyOrNull()
-        )
+          anyOrNull(),
+        ),
       ).thenReturn(appointment)
 
       val actualAppointment = supplierAssessmentService.scheduleNewSupplierAssessmentAppointment(
         referral.id,
-        defaultDuration, defaultAppointmentTime, defaultUser, AppointmentDeliveryType.PHONE_CALL
+        defaultDuration,
+        defaultAppointmentTime,
+        defaultUser,
+        AppointmentDeliveryType.PHONE_CALL,
       )
 
       assertThat(actualAppointment).isEqualTo(appointment)
@@ -102,13 +107,16 @@ class SupplierAssessmentServiceRepositoryTest @Autowired constructor(
           eq(AppointmentDeliveryType.PHONE_CALL),
           eq(AppointmentSessionType.ONE_TO_ONE),
           anyOrNull(),
-          anyOrNull()
-        )
+          anyOrNull(),
+        ),
       ).thenReturn(newAppointment)
 
       val actualAppointment = supplierAssessmentService.scheduleNewSupplierAssessmentAppointment(
         referral.id,
-        defaultDuration, defaultAppointmentTime, defaultUser, AppointmentDeliveryType.PHONE_CALL
+        defaultDuration,
+        defaultAppointmentTime,
+        defaultUser,
+        AppointmentDeliveryType.PHONE_CALL,
       )
 
       assertThat(actualAppointment).isEqualTo(newAppointment)
@@ -121,7 +129,10 @@ class SupplierAssessmentServiceRepositoryTest @Autowired constructor(
       val error = assertThrows<EntityNotFoundException> {
         supplierAssessmentService.scheduleNewSupplierAssessmentAppointment(
           referralId,
-          defaultDuration, defaultAppointmentTime, defaultUser, AppointmentDeliveryType.PHONE_CALL
+          defaultDuration,
+          defaultAppointmentTime,
+          defaultUser,
+          AppointmentDeliveryType.PHONE_CALL,
         )
       }
       assertThat(error.message).contains("Sent Referral not found")
@@ -138,7 +149,10 @@ class SupplierAssessmentServiceRepositoryTest @Autowired constructor(
       val error = assertThrows<EntityExistsException> {
         supplierAssessmentService.scheduleNewSupplierAssessmentAppointment(
           referral.id,
-          defaultDuration, defaultAppointmentTime, defaultUser, AppointmentDeliveryType.PHONE_CALL
+          defaultDuration,
+          defaultAppointmentTime,
+          defaultUser,
+          AppointmentDeliveryType.PHONE_CALL,
         )
       }
       assertThat(error.message).contains("can't schedule new supplier assessment appointment; new appointment occurs before previously scheduled appointment")
@@ -155,7 +169,10 @@ class SupplierAssessmentServiceRepositoryTest @Autowired constructor(
       val error = assertThrows<ValidationError> {
         supplierAssessmentService.scheduleNewSupplierAssessmentAppointment(
           referral.id,
-          defaultDuration, defaultAppointmentTime, defaultUser, AppointmentDeliveryType.PHONE_CALL
+          defaultDuration,
+          defaultAppointmentTime,
+          defaultUser,
+          AppointmentDeliveryType.PHONE_CALL,
         )
       }
       assertThat(error.message).contains("can't schedule new supplier assessment appointment; latest appointment has no feedback delivered")
@@ -182,14 +199,18 @@ class SupplierAssessmentServiceRepositoryTest @Autowired constructor(
           eq(AppointmentDeliveryType.PHONE_CALL),
           eq(AppointmentSessionType.ONE_TO_ONE),
           anyOrNull(),
-          anyOrNull()
-        )
+          anyOrNull(),
+        ),
       ).thenReturn(appointment)
 
       val actualAppointment = supplierAssessmentService.rescheduleSupplierAssessmentAppointment(
         referral.id,
         appointment.id,
-        defaultDuration, defaultAppointmentTime, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE
+        defaultDuration,
+        defaultAppointmentTime,
+        defaultUser,
+        AppointmentDeliveryType.PHONE_CALL,
+        AppointmentSessionType.ONE_TO_ONE,
       )
 
       assertThat(actualAppointment).isEqualTo(appointment)
@@ -199,8 +220,13 @@ class SupplierAssessmentServiceRepositoryTest @Autowired constructor(
     fun `expect failure if GROUP Session Type provided`() {
       val error = assertThrows<ValidationError> {
         supplierAssessmentService.rescheduleSupplierAssessmentAppointment(
-          UUID.randomUUID(), UUID.randomUUID(),
-          defaultDuration, defaultAppointmentTime, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.GROUP
+          UUID.randomUUID(),
+          UUID.randomUUID(),
+          defaultDuration,
+          defaultAppointmentTime,
+          defaultUser,
+          AppointmentDeliveryType.PHONE_CALL,
+          AppointmentSessionType.GROUP,
         )
       }
       assertThat(error.message).contains("Supplier Assessment Appointment must always be ONE_TO_ONE session")
@@ -212,8 +238,13 @@ class SupplierAssessmentServiceRepositoryTest @Autowired constructor(
 
       val error = assertThrows<EntityNotFoundException> {
         supplierAssessmentService.rescheduleSupplierAssessmentAppointment(
-          referralId, UUID.randomUUID(),
-          defaultDuration, defaultAppointmentTime, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE
+          referralId,
+          UUID.randomUUID(),
+          defaultDuration,
+          defaultAppointmentTime,
+          defaultUser,
+          AppointmentDeliveryType.PHONE_CALL,
+          AppointmentSessionType.ONE_TO_ONE,
         )
       }
       assertThat(error.message).contains("Sent Referral not found")
@@ -225,8 +256,13 @@ class SupplierAssessmentServiceRepositoryTest @Autowired constructor(
 
       val error = assertThrows<EntityNotFoundException> {
         supplierAssessmentService.rescheduleSupplierAssessmentAppointment(
-          referral.id, UUID.randomUUID(),
-          defaultDuration, defaultAppointmentTime, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE
+          referral.id,
+          UUID.randomUUID(),
+          defaultDuration,
+          defaultAppointmentTime,
+          defaultUser,
+          AppointmentDeliveryType.PHONE_CALL,
+          AppointmentSessionType.ONE_TO_ONE,
         )
       }
       assertThat(error.message).contains("Supplier Assessment not found for referral")
@@ -241,8 +277,13 @@ class SupplierAssessmentServiceRepositoryTest @Autowired constructor(
 
       val error = assertThrows<EntityNotFoundException> {
         supplierAssessmentService.rescheduleSupplierAssessmentAppointment(
-          referral.id, UUID.randomUUID(),
-          defaultDuration, defaultAppointmentTime, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE
+          referral.id,
+          UUID.randomUUID(),
+          defaultDuration,
+          defaultAppointmentTime,
+          defaultUser,
+          AppointmentDeliveryType.PHONE_CALL,
+          AppointmentSessionType.ONE_TO_ONE,
         )
       }
       assertThat(error.message).contains("Supplier Assessment Appointment not found")
@@ -258,8 +299,13 @@ class SupplierAssessmentServiceRepositoryTest @Autowired constructor(
 
       val error = assertThrows<ValidationError> {
         supplierAssessmentService.rescheduleSupplierAssessmentAppointment(
-          referral.id, UUID.randomUUID(),
-          defaultDuration, defaultAppointmentTime, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE
+          referral.id,
+          UUID.randomUUID(),
+          defaultDuration,
+          defaultAppointmentTime,
+          defaultUser,
+          AppointmentDeliveryType.PHONE_CALL,
+          AppointmentSessionType.ONE_TO_ONE,
         )
       }
       assertThat(error.message).contains("Supplier Assessment Appointment is not the latest")

@@ -54,7 +54,7 @@ class SupplierAssessmentController(
         updateAppointmentDTO.appointmentAttendance?.additionalAttendanceInformation,
         updateAppointmentDTO.appointmentBehaviour?.notifyProbationPractitioner,
         updateAppointmentDTO.appointmentBehaviour?.behaviourDescription,
-      )
+      ),
     )
   }
 
@@ -73,7 +73,7 @@ class SupplierAssessmentController(
       user,
       updateAppointmentDTO.appointmentDeliveryType,
       updateAppointmentDTO.appointmentDeliveryAddress,
-      updateAppointmentDTO.npsOfficeCode
+      updateAppointmentDTO.npsOfficeCode,
     )
     return AppointmentDTO.from(appointment)
   }
@@ -96,7 +96,7 @@ class SupplierAssessmentController(
       updateAppointmentDTO.appointmentDeliveryType,
       updateAppointmentDTO.sessionType,
       updateAppointmentDTO.appointmentDeliveryAddress,
-      updateAppointmentDTO.npsOfficeCode
+      updateAppointmentDTO.npsOfficeCode,
     )
     return AppointmentDTO.from(appointment)
   }
@@ -112,8 +112,11 @@ class SupplierAssessmentController(
 
     return AppointmentDTO.from(
       appointmentService.recordBehaviour(
-        supplierAssessmentAppointment, recordBehaviourDTO.behaviourDescription, recordBehaviourDTO.notifyProbationPractitioner, user
-      )
+        supplierAssessmentAppointment,
+        recordBehaviourDTO.behaviourDescription,
+        recordBehaviourDTO.notifyProbationPractitioner,
+        user,
+      ),
     )
   }
 
@@ -126,7 +129,10 @@ class SupplierAssessmentController(
     val submittedBy = userMapper.fromToken(authentication)
     val supplierAssessmentAppointment = getSupplierAssessmentAppointment(referralId, submittedBy)
     val updatedAppointment = appointmentService.recordAppointmentAttendance(
-      supplierAssessmentAppointment, update.attended, update.additionalAttendanceInformation, submittedBy
+      supplierAssessmentAppointment,
+      update.attended,
+      update.additionalAttendanceInformation,
+      submittedBy,
     )
     return AppointmentDTO.from(updatedAppointment)
   }
@@ -134,7 +140,7 @@ class SupplierAssessmentController(
   @PostMapping("/referral/{referralId}/supplier-assessment/submit-feedback")
   fun submitFeedback(
     @PathVariable referralId: UUID,
-    authentication: JwtAuthenticationToken
+    authentication: JwtAuthenticationToken,
   ): AppointmentDTO {
     val user = userMapper.fromToken(authentication)
     val supplierAssessmentAppointment = getSupplierAssessmentAppointment(referralId, user)

@@ -47,7 +47,7 @@ class SampleData {
       AuthUserFactory(em).create(
         referral.createdBy.id,
         referral.createdBy.authSource,
-        referral.createdBy.userName
+        referral.createdBy.userName,
       )
       return em.persistAndFlush(referral)
     }
@@ -68,11 +68,10 @@ class SampleData {
       intervention: Intervention = sampleIntervention(
         dynamicFrameworkContract = sampleContract(
           primeProvider = sampleServiceProvider(id = serviceProviderName, name = serviceProviderName),
-        )
+        ),
       ),
-      supplementaryRiskId: UUID? = null
+      supplementaryRiskId: UUID? = null,
     ): Referral {
-
       return Referral(
         serviceUserCRN = crn,
         id = id,
@@ -101,10 +100,9 @@ class SampleData {
       intervention: Intervention = sampleIntervention(
         dynamicFrameworkContract = sampleContract(
           primeProvider = sampleServiceProvider(id = serviceProviderName, name = serviceProviderName),
-        )
+        ),
       ),
     ): DraftReferral {
-
       return DraftReferral(
         serviceUserCRN = crn,
         id = id,
@@ -162,7 +160,7 @@ class SampleData {
         npsRegion = npsRegion,
         pccRegion = pccRegion,
         contractReference = contractReference,
-        referralStartDate = referralStartDate
+        referralStartDate = referralStartDate,
       )
     }
 
@@ -170,13 +168,13 @@ class SampleData {
       id: UUID? = null,
       name: String? = null,
       code: String? = null,
-      serviceCategories: Set<ServiceCategory>? = null
+      serviceCategories: Set<ServiceCategory>? = null,
     ): ContractType {
       return ContractType(
         id = id ?: UUID.randomUUID(),
         name = name ?: "Accommodation",
         code = code ?: "ACC",
-        serviceCategories = serviceCategories ?: setOf(sampleServiceCategory())
+        serviceCategories = serviceCategories ?: setOf(sampleServiceCategory()),
       )
     }
 
@@ -188,7 +186,7 @@ class SampleData {
       submittedAt: OffsetDateTime? = null,
       submittedBy: AuthUser? = null,
       furtherInformation: String? = null,
-      outcomes: Set<EndOfServiceReportOutcome> = setOf(sampleEndOfServiceReportOutcome())
+      outcomes: Set<EndOfServiceReportOutcome> = setOf(sampleEndOfServiceReportOutcome()),
     ): EndOfServiceReport {
       return EndOfServiceReport(
         id = id ?: UUID.randomUUID(),
@@ -198,7 +196,7 @@ class SampleData {
         submittedAt = submittedAt,
         submittedBy = submittedBy,
         furtherInformation = furtherInformation,
-        outcomes = outcomes.toMutableSet()
+        outcomes = outcomes.toMutableSet(),
       )
     }
 
@@ -206,7 +204,7 @@ class SampleData {
       desiredOutcome: DesiredOutcome? = null,
       achievementLevel: AchievementLevel = AchievementLevel.ACHIEVED,
       progressionComments: String? = null,
-      additionalTaskComments: String? = null
+      additionalTaskComments: String? = null,
     ): EndOfServiceReportOutcome {
       return EndOfServiceReportOutcome(
         desiredOutcome = desiredOutcome ?: sampleDesiredOutcome(),
@@ -230,7 +228,7 @@ class SampleData {
         body = body,
         referral = referral,
         sentAt = sentAt,
-        sentBy = sentBy
+        sentBy = sentBy,
       )
     }
 
@@ -256,13 +254,13 @@ class SampleData {
         submittedBy = submittedBy,
         submittedAt = submittedAt,
         approvedAt = approvedAt,
-        activities = activities.toMutableList()
+        activities = activities.toMutableList(),
       )
     }
 
     fun sampleActionPlanActivity(
       id: UUID = UUID.randomUUID(),
-      createdAt: OffsetDateTime = OffsetDateTime.now()
+      createdAt: OffsetDateTime = OffsetDateTime.now(),
     ): ActionPlanActivity {
       return ActionPlanActivity(
         id = id,
@@ -285,23 +283,22 @@ class SampleData {
       created: OffsetDateTime = OffsetDateTime.now(),
       complexityLevels: List<ComplexityLevel> = emptyList(),
     ): ServiceCategory {
-
       return ServiceCategory(
         name = name,
         id = id,
         created = created,
         complexityLevels = complexityLevels,
-        desiredOutcomes = desiredOutcomes
+        desiredOutcomes = desiredOutcomes,
       )
     }
 
     fun sampleNPSRegion(
       id: Char = 'G',
-      name: String = "South West"
+      name: String = "South West",
     ): NPSRegion {
       return NPSRegion(
         id = id,
-        name = name
+        name = name,
       )
     }
 
@@ -313,14 +310,14 @@ class SampleData {
       return PCCRegion(
         id = id,
         name = name,
-        npsRegion = npsRegion
+        npsRegion = npsRegion,
       )
     }
 
     fun sampleDesiredOutcome(
       id: UUID = UUID.randomUUID(),
       description: String = "Outcome 1",
-      serviceCategoryId: UUID = UUID.randomUUID()
+      serviceCategoryId: UUID = UUID.randomUUID(),
     ): DesiredOutcome {
       return DesiredOutcome(id, description, serviceCategoryId)
     }
@@ -328,7 +325,7 @@ class SampleData {
     fun sampleAuthUser(
       id: String = "CRN123",
       authSource: String = "auth",
-      userName: String = "user"
+      userName: String = "user",
     ): AuthUser {
       return AuthUser(id, authSource, userName)
     }

@@ -22,7 +22,7 @@ internal class EndOfServiceReportTest {
           EndOfServiceReportOutcome(desiredOutcomes[1], AchievementLevel.ACHIEVED),
           EndOfServiceReportOutcome(desiredOutcomes[2], AchievementLevel.PARTIALLY_ACHIEVED),
           EndOfServiceReportOutcome(desiredOutcomes[3], AchievementLevel.NOT_ACHIEVED),
-        )
+        ),
       )
       assertThat(eosr.achievementScore).isEqualTo(0f)
     }
@@ -37,7 +37,7 @@ internal class EndOfServiceReportTest {
           EndOfServiceReportOutcome(desiredOutcomes[1], AchievementLevel.ACHIEVED),
           EndOfServiceReportOutcome(desiredOutcomes[2], AchievementLevel.PARTIALLY_ACHIEVED),
           EndOfServiceReportOutcome(desiredOutcomes[3], AchievementLevel.NOT_ACHIEVED),
-        )
+        ),
       )
 
       assertThat(eosr.achievementScore).isEqualTo(2.5f)

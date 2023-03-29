@@ -22,7 +22,7 @@ import java.util.UUID
 @RestController
 class AmendReferralController(
   private val amendReferralService: AmendReferralService,
-  private val hmppsAuthService: HMPPSAuthService
+  private val hmppsAuthService: HMPPSAuthService,
 ) {
   companion object : KLogging()
 
@@ -31,7 +31,7 @@ class AmendReferralController(
     @PathVariable referralId: UUID,
     @PathVariable serviceCategoryId: UUID,
     @RequestBody complexityLevel: AmendComplexityLevelDTO,
-    authentication: JwtAuthenticationToken
+    authentication: JwtAuthenticationToken,
   ): ResponseEntity<Any> {
     amendReferralService.updateComplexityLevel(referralId, complexityLevel, serviceCategoryId, authentication)
     return ResponseEntity(NO_CONTENT)
@@ -42,7 +42,7 @@ class AmendReferralController(
     authentication: JwtAuthenticationToken,
     @PathVariable referralId: UUID,
     @PathVariable serviceCategoryId: UUID,
-    @RequestBody request: AmendDesiredOutcomesDTO
+    @RequestBody request: AmendDesiredOutcomesDTO,
   ): ResponseEntity<Any> {
     amendReferralService.updateReferralDesiredOutcomes(referralId, request, authentication, serviceCategoryId)
     return ResponseEntity(NO_CONTENT)
@@ -53,7 +53,7 @@ class AmendReferralController(
     authentication: JwtAuthenticationToken,
     @PathVariable referralId: UUID,
     @PathVariable needsAndRequirementsType: String,
-    @RequestBody request: AmendNeedsAndRequirementsDTO
+    @RequestBody request: AmendNeedsAndRequirementsDTO,
   ): ResponseEntity<Any> {
     when (needsAndRequirementsType) {
       "additional-responsibilities" -> amendReferralService.amendCaringOrEmploymentResponsibilities(referralId, request, authentication)
@@ -68,7 +68,7 @@ class AmendReferralController(
   @GetMapping("/sent-referral/{referralId}/change-log")
   fun getChangelog(
     @PathVariable referralId: UUID,
-    authentication: JwtAuthenticationToken
+    authentication: JwtAuthenticationToken,
   ): List<ChangelogValuesDTO>? {
     val referral = amendReferralService.getSentReferralForAuthenticatedUser(referralId, authentication)
     return amendReferralService.getListOfChangeLogEntries(referral).map {
@@ -79,7 +79,7 @@ class AmendReferralController(
   @GetMapping("/sent-referral/change-log/{changeLogId}")
   fun getChangelogDetails(
     @PathVariable changeLogId: UUID,
-    authentication: JwtAuthenticationToken
+    authentication: JwtAuthenticationToken,
   ): ChangelogDetailsDTO {
     val changeLog = amendReferralService.getChangeLogById(changeLogId, authentication)
     return ChangelogDetailsDTO.from(changeLog, hmppsAuthService.getUserDetail(changeLog.changelog.changedBy))

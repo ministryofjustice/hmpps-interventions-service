@@ -23,22 +23,23 @@ import javax.persistence.EntityNotFoundException
 class CaseNoteController(
   val userMapper: UserMapper,
   val caseNoteService: CaseNoteService,
-  val referralService: ReferralService
+  val referralService: ReferralService,
 ) {
   @PostMapping("/case-note")
   fun createCaseNote(
     @RequestBody createCaseNote: CreateCaseNoteDTO,
-    authentication: JwtAuthenticationToken
+    authentication: JwtAuthenticationToken,
   ): CaseNoteDTO {
     val user = userMapper.fromToken(authentication)
     val sentReferral = referralService.getSentReferralForUser(createCaseNote.referralId, user) ?: throw ResponseStatusException(
-      HttpStatus.BAD_REQUEST, "sent referral not found [id=${createCaseNote.referralId}]"
+      HttpStatus.BAD_REQUEST,
+      "sent referral not found [id=${createCaseNote.referralId}]",
     )
     val caseNote = caseNoteService.createCaseNote(
       referralId = sentReferral.id,
       subject = createCaseNote.subject,
       body = createCaseNote.body,
-      sentByUser = user
+      sentByUser = user,
     )
     return CaseNoteDTO.from(caseNote)
   }
@@ -47,11 +48,12 @@ class CaseNoteController(
   fun getCaseNotes(
     @PageableDefault(page = 0, size = 10, sort = ["sentAt"]) pageable: Pageable,
     @PathVariable referralId: UUID,
-    authentication: JwtAuthenticationToken
+    authentication: JwtAuthenticationToken,
   ): Page<CaseNoteDTO> {
     val user = userMapper.fromToken(authentication)
     val sentReferral = referralService.getSentReferralForUser(referralId, user) ?: throw ResponseStatusException(
-      HttpStatus.NOT_FOUND, "sent referral not found [id=$referralId]"
+      HttpStatus.NOT_FOUND,
+      "sent referral not found [id=$referralId]",
     )
     return caseNoteService.findByReferral(sentReferral.id, pageable).map { caseNote -> CaseNoteDTO.from(caseNote) }
   }

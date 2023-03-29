@@ -66,7 +66,7 @@ class DraftReferralServiceTest @Autowired constructor(
   val endOfServiceReportRepository: EndOfServiceReportRepository,
   val serviceCategoryRepository: ServiceCategoryRepository,
   val referralDetailsRepository: ReferralDetailsRepository,
-  val referralLocationRepository: ReferralLocationRepository
+  val referralLocationRepository: ReferralLocationRepository,
 ) {
   private val userFactory = AuthUserFactory(entityManager)
   private val interventionFactory = InterventionFactory(entityManager)
@@ -109,7 +109,7 @@ class DraftReferralServiceTest @Autowired constructor(
     referralDetailsRepository,
     draftOasysRiskInformationService,
     referralLocationRepository,
-    currentLocationEnabled
+    currentLocationEnabled,
   )
 
   @AfterEach
@@ -134,7 +134,7 @@ class DraftReferralServiceTest @Autowired constructor(
     fun beforeEach() {
       sampleDraftReferral = SampleData.persistReferral(
         entityManager,
-        SampleData.sampleDraftReferral("X123456", "Harmony Living")
+        SampleData.sampleDraftReferral("X123456", "Harmony Living"),
       )
       sampleIntervention = sampleDraftReferral.intervention
 
@@ -148,11 +148,11 @@ class DraftReferralServiceTest @Autowired constructor(
               code = "PWB",
               serviceCategories = mutableSetOf(
                 SampleData.sampleServiceCategory(),
-                SampleData.sampleServiceCategory(name = "Social inclusion")
-              )
-            )
-          )
-        )
+                SampleData.sampleServiceCategory(name = "Social inclusion"),
+              ),
+            ),
+          ),
+        ),
       )
     }
 
@@ -160,7 +160,7 @@ class DraftReferralServiceTest @Autowired constructor(
     fun `update cannot overwrite identifier fields`() {
       val draftReferral = DraftReferralDTO(
         id = UUID.fromString("ce364949-7301-497b-894d-130f34a98bff"),
-        createdAt = OffsetDateTime.of(LocalDate.of(2020, 12, 1), LocalTime.MIN, ZoneOffset.UTC)
+        createdAt = OffsetDateTime.of(LocalDate.of(2020, 12, 1), LocalTime.MIN, ZoneOffset.UTC),
       )
 
       val updated = draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
@@ -329,8 +329,8 @@ class DraftReferralServiceTest @Autowired constructor(
       assertThat(savedDraftReferral?.selectedServiceCategories).hasSize(1)
       assertThat(savedDraftReferral?.selectedServiceCategories!!.elementAt(0).id).isEqualTo(
         sampleIntervention.dynamicFrameworkContract.contractType.serviceCategories.elementAt(
-          0
-        ).id
+          0,
+        ).id,
       )
     }
 
@@ -406,7 +406,7 @@ class DraftReferralServiceTest @Autowired constructor(
       // this is also fine
       draftReferralService.updateDraftReferral(
         sampleDraftReferral,
-        DraftReferralDTO(needsInterpreter = true, interpreterLanguage = "German")
+        DraftReferralDTO(needsInterpreter = true, interpreterLanguage = "German"),
       )
     }
 
@@ -425,7 +425,7 @@ class DraftReferralServiceTest @Autowired constructor(
       // this is also fine
       draftReferralService.updateDraftReferral(
         sampleDraftReferral,
-        DraftReferralDTO(hasAdditionalResponsibilities = true, whenUnavailable = "wednesdays")
+        DraftReferralDTO(hasAdditionalResponsibilities = true, whenUnavailable = "wednesdays"),
       )
     }
 
@@ -454,7 +454,7 @@ class DraftReferralServiceTest @Autowired constructor(
       entityManager.flush()
       val draftReferral = draftReferralService.getDraftReferralForUser(
         sampleDraftReferral.id,
-        userFactory.create()
+        userFactory.create(),
       )
       assertThat(draftReferral?.additionalNeedsInformation).isNull()
     }
@@ -563,11 +563,11 @@ class DraftReferralServiceTest @Autowired constructor(
     val referral = referralFactory.createDraft(
       intervention = interventionFactory.create(
         contract = dynamicFrameworkContractFactory.create(
-          contractType = contractType
-        )
+          contractType = contractType,
+        ),
       ),
       selectedServiceCategories = setOf(serviceCategory1).toMutableSet(),
-      desiredOutcomes = listOf(desiredOutcome1).toMutableList()
+      desiredOutcomes = listOf(desiredOutcome1).toMutableList(),
     )
     draftReferralService.updateDraftReferral(referral, DraftReferralDTO(serviceCategoryIds = listOf(serviceCategoryId2)))
 
@@ -589,8 +589,8 @@ class DraftReferralServiceTest @Autowired constructor(
     val referral = referralFactory.createDraft(
       intervention = interventionFactory.create(
         contract = dynamicFrameworkContractFactory.create(
-          contractType = contractType
-        )
+          contractType = contractType,
+        ),
       ),
       selectedServiceCategories = setOf(serviceCategory).toMutableSet(),
       desiredOutcomes = listOf(desiredOutcome).toMutableList(),
@@ -610,7 +610,7 @@ class DraftReferralServiceTest @Autowired constructor(
     additionalRiskInformationUpdatedAt: OffsetDateTime ? = OffsetDateTime.now(),
     personCurrentLocationType: PersonCurrentLocationType ? = PersonCurrentLocationType.CUSTODY,
     personCustodyPrisonId: String ? = "ABC",
-    expectedReleaseDate: LocalDate ? = LocalDate.of(2050, 11, 1)
+    expectedReleaseDate: LocalDate ? = LocalDate.of(2050, 11, 1),
   ) {
     draftReferral.additionalRiskInformation = additionalRiskInformation
     draftReferral.additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt

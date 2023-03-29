@@ -16,7 +16,7 @@ import javax.persistence.criteria.Root
 
 class InterventionFilterRepositoryImpl(
   @Value("\${overrides.show-future-interventions}") private val showFutureInterventions: Boolean,
-  private val pccRegionRepository: PCCRegionRepository
+  private val pccRegionRepository: PCCRegionRepository,
 ) : InterventionFilterRepository {
 
   @PersistenceContext
@@ -43,7 +43,6 @@ class InterventionFilterRepositoryImpl(
   }
 
   private fun getRegionPredicate(criteriaBuilder: CriteriaBuilder, root: Root<Intervention>, pccRegionIds: List<PCCRegionID>): Predicate? {
-
     if (pccRegionIds.isNullOrEmpty()) {
       return null
     }
@@ -54,13 +53,11 @@ class InterventionFilterRepositoryImpl(
   }
 
   private fun getPccRegionPredicate(root: Root<Intervention>, pccRegionIds: List<PCCRegionID>): Predicate {
-
     val expression = root.get<DynamicFrameworkContract>("dynamicFrameworkContract").get<PCCRegion>("pccRegion").get<String>("id")
     return expression.`in`(pccRegionIds)
   }
 
   private fun getNpsRegionPredicate(root: Root<Intervention>, pccRegionIds: List<PCCRegionID>): Predicate {
-
     val expression = root.get<DynamicFrameworkContract>("dynamicFrameworkContract").get<NPSRegion>("npsRegion").get<Char>("id")
     val npsRegions = pccRegionRepository.findAllByIdIn(pccRegionIds).map { it.npsRegion.id }.distinct()
     return expression.`in`(npsRegions)
@@ -81,7 +78,6 @@ class InterventionFilterRepositoryImpl(
   }
 
   private fun getMinimumAgePredicate(criteriaBuilder: CriteriaBuilder, root: Root<Intervention>, minimumAge: Int?): Predicate? {
-
     return minimumAge?.let {
       val expression = root.get<DynamicFrameworkContract>("dynamicFrameworkContract").get<Int>("minimumAge")
       criteriaBuilder.equal(expression, minimumAge)
@@ -89,7 +85,6 @@ class InterventionFilterRepositoryImpl(
   }
 
   private fun getMaximumAgePredicate(criteriaBuilder: CriteriaBuilder, root: Root<Intervention>, maximumAge: Int?): Predicate? {
-
     return maximumAge?.let {
       val expression = root.get<DynamicFrameworkContract>("dynamicFrameworkContract").get<Int>("maximumAge")
       criteriaBuilder.equal(expression, maximumAge)

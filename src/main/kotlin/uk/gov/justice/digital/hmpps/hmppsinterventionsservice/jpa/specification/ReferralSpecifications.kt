@@ -28,13 +28,13 @@ class ReferralSpecifications {
           val supplierAssessmentJoin = root.join<T, SupplierAssessment>("supplierAssessment", JoinType.LEFT)
           cb.and(
             cb.isNotNull(root.get<OffsetDateTime>("concludedAt")),
-            cb.isNotEmpty(supplierAssessmentJoin.get<MutableSet<Appointment>>("appointments"))
+            cb.isNotEmpty(supplierAssessmentJoin.get<MutableSet<Appointment>>("appointments")),
           )
         }
       } else {
         Specification<T> { root, _, cb ->
           cb.and(
-            cb.isNotNull(root.get<OffsetDateTime>("concludedAt"))
+            cb.isNotNull(root.get<OffsetDateTime>("concludedAt")),
           )
         }
       }
@@ -71,7 +71,7 @@ class ReferralSpecifications {
         cb.and(
           cb.isNotNull(root.get<OffsetDateTime>("endRequestedAt")),
           cb.isNotNull(root.get<OffsetDateTime>("concludedAt")),
-          root.join<T, EndOfServiceReport>("endOfServiceReport", JoinType.LEFT).isNull
+          root.join<T, EndOfServiceReport>("endOfServiceReport", JoinType.LEFT).isNull,
         )
       }
     }

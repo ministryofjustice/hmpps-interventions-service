@@ -41,9 +41,9 @@ class NotifyReferralServiceTest {
     ReferralEventType.SENT,
     referralFactory.createSent(
       id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
-      referenceNumber = "JS8762AC"
+      referenceNumber = "JS8762AC",
     ),
-    "http://localhost:8080/sent-referral/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"
+    "http://localhost:8080/sent-referral/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
   )
 
   private val referralAssignedEvent = ReferralEvent(
@@ -52,9 +52,9 @@ class NotifyReferralServiceTest {
     referralFactory.createSent(
       id = UUID.fromString("42C7D267-0776-4272-A8E8-A673BFE30D0D"),
       referenceNumber = "AJ9871AC",
-      assignments = assignmentsFactory.createInOrder(authUserFactory.createSP())
+      assignments = assignmentsFactory.createInOrder(authUserFactory.createSP()),
     ),
-    "http://localhost:8080/sent-referral/42c7d267-0776-4272-a8e8-a673bfe30d0d"
+    "http://localhost:8080/sent-referral/42c7d267-0776-4272-a8e8-a673bfe30d0d",
   )
 
   private fun notifyService(): ReferralNotificationService {
@@ -71,7 +71,7 @@ class NotifyReferralServiceTest {
       emailSender,
       hmppsAuthService,
       authUserRepository,
-      referralService
+      referralService,
     )
   }
 
@@ -82,7 +82,7 @@ class NotifyReferralServiceTest {
     verify(emailSender).sendEmail(
       eq("referralSentTemplateID"),
       eq("shs-incoming@provider.example.com"),
-      personalisationCaptor.capture()
+      personalisationCaptor.capture(),
     )
     assertThat(personalisationCaptor.firstValue["organisationName"]).isEqualTo("Harmony Living")
     assertThat(personalisationCaptor.firstValue["referenceNumber"]).isEqualTo("JS8762AC")
@@ -133,22 +133,22 @@ class NotifyReferralServiceTest {
               referral.id,
               referral.createdAt,
               referral.createdBy,
-              completionDeadline = LocalDate.of(2022, 6, 6)
-            )
+              completionDeadline = LocalDate.of(2022, 6, 6),
+            ),
           ),
           "previousDetails" to ReferralDetailsDTO.from(
             referralDetailsFactory.create(
               referral.id,
               referral.createdAt,
               referral.createdBy,
-              completionDeadline = LocalDate.of(2022, 4, 13)
-            )
+              completionDeadline = LocalDate.of(2022, 4, 13),
+            ),
           ),
           "currentAssignee" to if (assigned) AuthUserDTO.from(referral.currentAssignee!!) else null,
           "crn" to referral.serviceUserCRN,
           "sentBy" to referral.sentBy,
-          "createdBy" to referral.createdBy
-        )
+          "createdBy" to referral.createdBy,
+        ),
       )
     }
     private val makeReferralDetailsEnforceableDaysChangedEvent = { assigned: Boolean ->
@@ -163,22 +163,22 @@ class NotifyReferralServiceTest {
               referral.id,
               referral.createdAt,
               referral.createdBy,
-              maximumNumberOfEnforceableDays = 2
-            )
+              maximumNumberOfEnforceableDays = 2,
+            ),
           ),
           "previousDetails" to ReferralDetailsDTO.from(
             referralDetailsFactory.create(
               referral.id,
               referral.createdAt,
               referral.createdBy,
-              maximumNumberOfEnforceableDays = 3
-            )
+              maximumNumberOfEnforceableDays = 3,
+            ),
           ),
           "currentAssignee" to if (assigned) AuthUserDTO.from(referral.currentAssignee!!) else null,
           "crn" to referral.serviceUserCRN,
           "sentBy" to referral.sentBy,
-          "createdBy" to referral.createdBy
-        )
+          "createdBy" to referral.createdBy,
+        ),
       )
     }
 
@@ -189,18 +189,18 @@ class NotifyReferralServiceTest {
         UserDetail(
           "sally",
           "sally@tom.com",
-          "smith"
-        )
+          "smith",
+        ),
       )
       whenever(hmppsAuthService.getUserDetail(AuthUserDTO.from(referral.currentAssignee!!))).thenReturn(
         UserDetail(
           "tom",
           "tom@tom.tom",
-          "jones"
-        )
+          "jones",
+        ),
       )
       whenever(referralService.getResponsibleProbationPractitioner(any(), any(), any())).thenReturn(
-        ResponsibleProbationPractitioner("abc", "abc@abc.com", null, null, "def")
+        ResponsibleProbationPractitioner("abc", "abc@abc.com", null, null, "def"),
       )
       whenever(referralService.isUserTheResponsibleOfficer(any(), any())).thenReturn(true)
 
@@ -209,7 +209,7 @@ class NotifyReferralServiceTest {
       verify(emailSender).sendEmail(
         eq("completionDeadlineUpdatedTemplateID"),
         eq("tom@tom.tom"),
-        personalisationCaptor.capture()
+        personalisationCaptor.capture(),
       )
       assertThat(personalisationCaptor.firstValue["caseworkerFirstName"]).isEqualTo("tom")
       assertThat(personalisationCaptor.firstValue["newCompletionDeadline"]).isEqualTo("6 June 2022")
@@ -228,18 +228,18 @@ class NotifyReferralServiceTest {
         UserDetail(
           "sally",
           "sally@tom.com",
-          "smith"
-        )
+          "smith",
+        ),
       )
       whenever(hmppsAuthService.getUserDetail(AuthUserDTO.from(referral.currentAssignee!!))).thenReturn(
         UserDetail(
           "tom",
           "tom@tom.tom",
-          "jones"
-        )
+          "jones",
+        ),
       )
       whenever(referralService.getResponsibleProbationPractitioner(any(), any(), any())).thenReturn(
-        ResponsibleProbationPractitioner("abc", "abc@abc.com", null, null, "def")
+        ResponsibleProbationPractitioner("abc", "abc@abc.com", null, null, "def"),
       )
       whenever(referralService.isUserTheResponsibleOfficer(any(), any())).thenReturn(false)
 
@@ -248,12 +248,12 @@ class NotifyReferralServiceTest {
       verify(emailSender).sendEmail(
         eq("completionDeadlineUpdatedTemplateID"),
         eq("tom@tom.tom"),
-        personalisationCaptor.capture()
+        personalisationCaptor.capture(),
       )
       verify(emailSender).sendEmail(
         eq("completionDeadlineUpdatedTemplateID"),
         eq("abc@abc.com"),
-        personalisationCaptor.capture()
+        personalisationCaptor.capture(),
       )
       assertThat(personalisationCaptor.firstValue["caseworkerFirstName"]).isEqualTo("tom")
       assertThat(personalisationCaptor.firstValue["newCompletionDeadline"]).isEqualTo("6 June 2022")
@@ -278,15 +278,15 @@ class NotifyReferralServiceTest {
         UserDetail(
           "sally",
           "sally@tom.com",
-          "smith"
-        )
+          "smith",
+        ),
       )
       whenever(hmppsAuthService.getUserDetail(AuthUserDTO.from(referral.currentAssignee!!))).thenReturn(
         UserDetail(
           "tom",
           "tom@tom.tom",
-          "jones"
-        )
+          "jones",
+        ),
       )
 
       notifyService().onApplicationEvent(makeReferralDetailsEnforceableDaysChangedEvent(true))
@@ -294,7 +294,7 @@ class NotifyReferralServiceTest {
       verify(emailSender).sendEmail(
         eq("enforceableDaysUpdatedTemplateID"),
         eq("tom@tom.tom"),
-        personalisationCaptor.capture()
+        personalisationCaptor.capture(),
       )
       assertThat(personalisationCaptor.firstValue["recipientFirstName"]).isEqualTo("tom")
       assertThat(personalisationCaptor.firstValue["newMaximumEnforceableDays"]).isEqualTo("2")
@@ -325,14 +325,14 @@ class NotifyReferralServiceTest {
         "source",
         eventType,
         referral,
-        "http://localhost:8080/sent-referral/${referral.id}"
+        "http://localhost:8080/sent-referral/${referral.id}",
       )
     }
 
     @Test
     fun `amending 'desired outcome' notifies the assigned caseworker via email`() {
       whenever(hmppsAuthService.getUserDetail(caseworker)).thenReturn(
-        UserDetail(firstName = "Outcome", email = "outcome.caseworker@provider.example.org", lastName = "unused")
+        UserDetail(firstName = "Outcome", email = "outcome.caseworker@provider.example.org", lastName = "unused"),
       )
 
       val event = makeReferralChangedEvent(ReferralEventType.DESIRED_OUTCOMES_AMENDED, assigned = true)
@@ -344,15 +344,15 @@ class NotifyReferralServiceTest {
         mapOf(
           "sp_first_name" to "Outcome",
           "referral_number" to event.referral.referenceNumber!!,
-          "referral" to "http://interventions-ui.example.com/referral/${event.referral.id}"
-        )
+          "referral" to "http://interventions-ui.example.com/referral/${event.referral.id}",
+        ),
       )
     }
 
     @Test
     fun `amending 'desired outcome' does not send email for unassigned referrals`() {
       notifyService().onApplicationEvent(
-        makeReferralChangedEvent(ReferralEventType.DESIRED_OUTCOMES_AMENDED, assigned = false)
+        makeReferralChangedEvent(ReferralEventType.DESIRED_OUTCOMES_AMENDED, assigned = false),
       )
       verifyNoInteractions(emailSender)
     }
@@ -360,7 +360,7 @@ class NotifyReferralServiceTest {
     @Test
     fun `amending 'complexity level' notifies the assigned caseworker via email`() {
       whenever(hmppsAuthService.getUserDetail(caseworker)).thenReturn(
-        UserDetail(firstName = "Complexity", email = "complexity.caseworker@provider.example.org", lastName = "unused")
+        UserDetail(firstName = "Complexity", email = "complexity.caseworker@provider.example.org", lastName = "unused"),
       )
 
       val event = makeReferralChangedEvent(ReferralEventType.COMPLEXITY_LEVEL_AMENDED, assigned = true)
@@ -372,15 +372,15 @@ class NotifyReferralServiceTest {
         mapOf(
           "sp_first_name" to "Complexity",
           "referral_number" to event.referral.referenceNumber!!,
-          "referral" to "http://interventions-ui.example.com/referral/${event.referral.id}"
-        )
+          "referral" to "http://interventions-ui.example.com/referral/${event.referral.id}",
+        ),
       )
     }
 
     @Test
     fun `amending 'complexity level' does not send email for unassigned referrals`() {
       notifyService().onApplicationEvent(
-        makeReferralChangedEvent(ReferralEventType.COMPLEXITY_LEVEL_AMENDED, assigned = false)
+        makeReferralChangedEvent(ReferralEventType.COMPLEXITY_LEVEL_AMENDED, assigned = false),
       )
       verifyNoInteractions(emailSender)
     }
@@ -388,7 +388,7 @@ class NotifyReferralServiceTest {
     @Test
     fun `amending 'needs and requirements' notifies the assigned caseworker via email`() {
       whenever(hmppsAuthService.getUserDetail(caseworker)).thenReturn(
-        UserDetail(firstName = "Needs", email = "needs.caseworker@provider.example.org", lastName = "unused")
+        UserDetail(firstName = "Needs", email = "needs.caseworker@provider.example.org", lastName = "unused"),
       )
 
       val event = makeReferralChangedEvent(ReferralEventType.NEEDS_AND_REQUIREMENTS_AMENDED, assigned = true)
@@ -400,15 +400,15 @@ class NotifyReferralServiceTest {
         mapOf(
           "sp_first_name" to "Needs",
           "referral_number" to event.referral.referenceNumber!!,
-          "referral" to "http://interventions-ui.example.com/referral/${event.referral.id}"
-        )
+          "referral" to "http://interventions-ui.example.com/referral/${event.referral.id}",
+        ),
       )
     }
 
     @Test
     fun `amending 'needs and requirements' does not send email for unassigned referrals`() {
       notifyService().onApplicationEvent(
-        makeReferralChangedEvent(ReferralEventType.NEEDS_AND_REQUIREMENTS_AMENDED, assigned = false)
+        makeReferralChangedEvent(ReferralEventType.NEEDS_AND_REQUIREMENTS_AMENDED, assigned = false),
       )
       verifyNoInteractions(emailSender)
     }

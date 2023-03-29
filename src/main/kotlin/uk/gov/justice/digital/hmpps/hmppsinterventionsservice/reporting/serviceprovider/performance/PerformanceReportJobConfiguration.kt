@@ -47,8 +47,8 @@ class PerformanceReportJobConfiguration(
         mapOf(
           "from" to batchUtils.parseDateToOffsetDateTime(from),
           "to" to batchUtils.parseDateToOffsetDateTime(to),
-          "contractReferences" to contractReferences.split(",")
-        )
+          "contractReferences" to contractReferences.split(","),
+        ),
       )
       .build()
   }
@@ -60,7 +60,7 @@ class PerformanceReportJobConfiguration(
       "performanceReportWriter",
       FileSystemResource(path),
       PerformanceReportData.headers,
-      PerformanceReportData.fields
+      PerformanceReportData.fields,
     )
   }
 
@@ -76,7 +76,7 @@ class PerformanceReportJobConfiguration(
         "from",
         "to",
         "timestamp",
-      )
+      ),
     )
 
     return jobBuilderFactory["performanceReportJob"]

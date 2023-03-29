@@ -10,7 +10,7 @@ class NPSRegionDTO(
     fun from(npsRegion: NPSRegion): NPSRegionDTO {
       return NPSRegionDTO(
         id = npsRegion.id,
-        name = npsRegion.name
+        name = npsRegion.name,
       )
     }
   }

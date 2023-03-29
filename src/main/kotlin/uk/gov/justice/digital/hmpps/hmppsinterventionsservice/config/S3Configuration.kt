@@ -21,11 +21,11 @@ data class S3BucketConfiguration(
   val bucket: Bucket,
 ) {
   data class Endpoint(
-    val uri: String
+    val uri: String,
   )
 
   data class Bucket(
-    val name: String
+    val name: String,
   )
 }
 

@@ -42,7 +42,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     referralDetail: ReferralDetails? = null,
     personCurrentLocationType: PersonCurrentLocationType? = null,
     personCustodyPrisonId: String? = null,
-    expectedReleaseDate: LocalDate? = null
+    expectedReleaseDate: LocalDate? = null,
   ): DraftReferral {
     return createDraftReferral(
       id = id,
@@ -59,7 +59,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       referralDetails = referralDetail,
       personCurrentLocationType = personCurrentLocationType,
       personCustodyPrisonId = personCustodyPrisonId,
-      expectedReleaseDate = expectedReleaseDate
+      expectedReleaseDate = expectedReleaseDate,
     )
   }
 
@@ -151,7 +151,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     supplementaryRiskId: UUID = UUID.randomUUID(),
 
     assignments: List<ReferralAssignment> = listOf(
-      ReferralAssignment(OffsetDateTime.now(), authUserFactory.createSP(), authUserFactory.createSP())
+      ReferralAssignment(OffsetDateTime.now(), authUserFactory.createSP(), authUserFactory.createSP()),
     ),
 
     supplierAssessment: SupplierAssessment? = null,
@@ -183,7 +183,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
 
       assignments = assignments,
       supplierAssessment = supplierAssessment,
-      serviceUserData = serviceUserData
+      serviceUserData = serviceUserData,
     )
   }
 

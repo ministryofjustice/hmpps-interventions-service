@@ -52,7 +52,7 @@ class SNSPublisher(
         "actorUserId" to actor.userId,
         "actorUserName" to actor.username,
       ),
-      null
+      null,
     )
   }
 
@@ -62,7 +62,7 @@ class SNSPublisher(
       "eventType" to MessageAttributeValue.builder()
         .dataType("String")
         .stringValue(event.eventType)
-        .build()
+        .build(),
     )
     val request = PublishRequest.builder()
       .messageAttributes(messageAttributes)

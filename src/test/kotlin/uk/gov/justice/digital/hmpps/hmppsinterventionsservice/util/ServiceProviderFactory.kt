@@ -13,7 +13,7 @@ class ServiceProviderFactory(em: TestEntityManager? = null) : EntityFactory(em) 
       ServiceProvider(
         id = id,
         name = name,
-      )
+      ),
     )
   }
 }

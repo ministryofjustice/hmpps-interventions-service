@@ -37,8 +37,9 @@ internal class AppointmentProcessorTest {
     val supplierAssessment = supplierAssessmentFactory.createWithMultipleAppointments(
       referral = referral,
       appointments = mutableSetOf(
-        appointment4, appointment5
-      )
+        appointment4,
+        appointment5,
+      ),
     )
 
     referral.supplierAssessment = supplierAssessment
@@ -79,7 +80,7 @@ internal class AppointmentProcessorTest {
     val appointment2 = appointmentFactory.create(referral = referral)
     val supplierAssessment = supplierAssessmentFactory.createWithMultipleAppointments(
       referral = referral,
-      appointments = mutableSetOf(appointment1, appointment2)
+      appointments = mutableSetOf(appointment1, appointment2),
     )
 
     referral.supplierAssessment = supplierAssessment

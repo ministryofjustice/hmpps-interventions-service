@@ -54,6 +54,7 @@ class CaseNoteControllerTest {
       val caseNoteDTO = caseNoteController.createCaseNote(createCaseNoteDTO, userToken)
       assertThat(caseNoteDTO).isEqualTo(CaseNoteDTO.from(caseNote))
     }
+
     @Test
     fun `returns bad request when sent referral does not exist`() {
       val user = authUserFactory.create()

@@ -70,7 +70,6 @@ class CommunityAPIActionPlanEventService(
   }
 
   private fun postNotificationRequest(event: ActionPlanEvent, url: String, status: String, eventTime: OffsetDateTime) {
-
     val referral = event.actionPlan.referral
 
     val request = NotificationCreateRequestDTO(
@@ -116,7 +115,7 @@ class CommunityAPIActionPlanAppointmentEventService(
         val request = AppointmentOutcomeRequest(
           getNotes(event.referral, url, "Session Feedback Recorded", event.contractTypeName, event.primeProviderName),
           event.deliverySession.sessionFeedback.attendance.attended!!.name,
-          notifyPP
+          notifyPP,
         )
 
         val communityApiSentReferralPath = UriComponentsBuilder.fromPath(communityAPIAppointmentOutcomeLocation)
@@ -159,7 +158,7 @@ class CommunityAPIAppointmentEventService(
         val request = AppointmentOutcomeRequest(
           getNotes(event.appointment.referral, url, "Session Feedback Recorded"),
           appointment.attended!!.name,
-          notifyPP
+          notifyPP,
         )
 
         val communityApiSentReferralPath = UriComponentsBuilder.fromPath(communityAPIAppointmentOutcomeLocation)
@@ -188,7 +187,7 @@ data class NotificationCreateRequestDTO(
   val referralStart: OffsetDateTime,
   val referralId: UUID,
   val contactDateTime: OffsetDateTime,
-  val notes: String
+  val notes: String,
 )
 
 data class AppointmentOutcomeRequest(

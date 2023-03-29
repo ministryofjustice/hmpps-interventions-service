@@ -19,9 +19,12 @@ data class DeliverySession(
   @JoinTable(
     name = "delivery_session_appointment",
     joinColumns = [JoinColumn(name = "delivery_session_id")],
-    inverseJoinColumns = [JoinColumn(name = "appointment_id")]
+    inverseJoinColumns = [JoinColumn(name = "appointment_id")],
   )
-  @NotNull @OneToMany @Fetch(FetchMode.JOIN) val appointments: MutableSet<Appointment> = mutableSetOf(),
+  @NotNull
+  @OneToMany
+  @Fetch(FetchMode.JOIN)
+  val appointments: MutableSet<Appointment> = mutableSetOf(),
   @NotNull val sessionNumber: Int,
 
   @ManyToOne val referral: Referral,

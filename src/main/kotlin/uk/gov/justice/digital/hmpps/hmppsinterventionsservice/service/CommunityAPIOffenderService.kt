@@ -35,11 +35,11 @@ private data class StaffDetailsResponse(
 )
 
 data class OffenderIdentifiersResponse(
-  val primaryIdentifiers: PrimaryIdentifiersResponse?
+  val primaryIdentifiers: PrimaryIdentifiersResponse?,
 )
 
 data class PrimaryIdentifiersResponse(
-  val nomsNumber: String?
+  val nomsNumber: String?,
 )
 
 private data class ContactableHumanResponse(
@@ -78,7 +78,7 @@ class CommunityAPIOffenderService(
 
     return ServiceUserAccessResult(
       !response.statusCode.equals(HttpStatus.FORBIDDEN),
-      listOfNotNull(response.body.restrictionMessage, response.body.exclusionMessage)
+      listOfNotNull(response.body.restrictionMessage, response.body.exclusionMessage),
     )
   }
 
@@ -149,7 +149,7 @@ class CommunityAPIOffenderService(
         it == 0 -> telemetryService.reportInvalidAssumption(
           "service users always have a responsible officer",
           mapOf("crn" to crn),
-          recoverable = false
+          recoverable = false,
         )
         it > 1 -> telemetryService.reportInvalidAssumption(
           "service users only have one responsible officer",

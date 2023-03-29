@@ -19,13 +19,14 @@ import java.util.UUID
 class DraftOasysRiskInformationServiceTest @Autowired constructor(
   val entityManager: TestEntityManager,
   val draftOasysRiskInformationRepository: DraftOasysRiskInformationRepository,
-  val authUserRepository: AuthUserRepository
+  val authUserRepository: AuthUserRepository,
 ) {
 
   private val referralFactory = ReferralFactory(entityManager)
   private val authUserFactory = AuthUserFactory(entityManager)
   private val draftOasysRiskInformationService = DraftOasysRiskInformationService(
-    draftOasysRiskInformationRepository, authUserRepository
+    draftOasysRiskInformationRepository,
+    authUserRepository,
   )
 
   @Nested
@@ -102,6 +103,7 @@ class DraftOasysRiskInformationServiceTest @Autowired constructor(
       Assertions.assertThat(entity.additionalInformation).isEqualTo(oasysRiskInformationDTO.additionalInformation)
     }
   }
+
   @Nested
   inner class GetDraftOasysRiskInformation {
     @Test

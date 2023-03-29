@@ -13,7 +13,7 @@ class PCCRegionDTO(
       return PCCRegionDTO(
         id = pccRegion.id,
         name = pccRegion.name,
-        npsRegion = NPSRegionDTO.from(pccRegion.npsRegion)
+        npsRegion = NPSRegionDTO.from(pccRegion.npsRegion),
       )
     }
   }

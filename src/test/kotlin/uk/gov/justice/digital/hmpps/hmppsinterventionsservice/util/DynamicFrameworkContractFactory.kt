@@ -48,8 +48,8 @@ class DynamicFrameworkContractFactory(em: TestEntityManager? = null) : EntityFac
         contractReference = contractReference,
         subcontractorProviders = subcontractorProviders,
         referralStartDate = referralStartDate,
-        referralEndAt = referralEndAt
-      )
+        referralEndAt = referralEndAt,
+      ),
     )
   }
 }

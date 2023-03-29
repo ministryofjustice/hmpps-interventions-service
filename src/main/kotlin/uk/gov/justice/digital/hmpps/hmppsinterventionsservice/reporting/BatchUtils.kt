@@ -74,7 +74,7 @@ class BatchUtils {
       .lineAggregator(
         RecursiveCollectionLineAggregator<T>().apply {
           setDelegate(CsvLineAggregator(fields))
-        }
+        },
       ).build()
   }
 }
@@ -142,7 +142,7 @@ class CsvLineAggregator<T>(fieldsToExtract: List<String>) : ExtractorLineAggrega
       BeanWrapperFieldExtractor<T>().apply {
         setNames(fieldsToExtract.toTypedArray())
         afterPropertiesSet()
-      }
+      },
     )
   }
 

@@ -32,7 +32,7 @@ internal class SNSEndOfServiceReportServiceTest {
       submittedAt = now,
       submittedBy = user,
     ),
-    "http://localhost/sent-referral/123/supplier-assessment"
+    "http://localhost/sent-referral/123/supplier-assessment",
   )
 
   @Test
@@ -49,7 +49,7 @@ internal class SNSEndOfServiceReportServiceTest {
         "endOfServiceReportId" to endOfServiceReportEvent.endOfServiceReport.id,
         "submittedBy" to endOfServiceReportEvent.endOfServiceReport.submittedBy!!.userName,
       ),
-      PersonReference.crn(endOfServiceReportEvent.endOfServiceReport.referral.serviceUserCRN)
+      PersonReference.crn(endOfServiceReportEvent.endOfServiceReport.referral.serviceUserCRN),
     )
 
     verify(publisher).publish(referralId, user, eventDTO)
