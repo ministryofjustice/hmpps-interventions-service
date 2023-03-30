@@ -381,7 +381,7 @@ internal class DeliverySessionsServiceTest {
     )
 
     verify(appointmentService, times(1)).createOrUpdateAppointmentDeliveryDetails(any(), eq(AppointmentDeliveryType.PHONE_CALL), eq(AppointmentSessionType.ONE_TO_ONE), isNull(), isNull())
-    verify(appointmentRepository, times(1)).saveAndFlush(
+    verify(appointmentRepository, times(2)).saveAndFlush(
       ArgumentMatchers.argThat {
         it.deliusAppointmentId == null
       },
