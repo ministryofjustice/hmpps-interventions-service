@@ -111,7 +111,7 @@ class ReferralSpecificationsTest @Autowired constructor(
       val appointment =
         appointmentFactory.create(referral = completed, attendanceSubmittedAt = OffsetDateTime.now())
       val superSededAppointment =
-        appointmentFactory.create(referral = completed, attendanceSubmittedAt = OffsetDateTime.now(), superseded = true)
+        appointmentFactory.create(referral = completed, attendanceSubmittedAt = OffsetDateTime.now(), superseded = true, supersededById = appointment.id)
       val supplierAssessmentAppointment =
         supplierAssessmentFactory.createWithMultipleAppointments(appointments = mutableSetOf(appointment, superSededAppointment), referral = completed)
       completed.supplierAssessment = supplierAssessmentAppointment
