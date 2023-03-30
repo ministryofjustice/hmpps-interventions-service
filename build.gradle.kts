@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.4"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.5-beta-3"
   kotlin("plugin.spring") version "1.8.10"
   id("org.jetbrains.kotlin.plugin.jpa") version "1.8.10"
   id("jacoco")
@@ -70,7 +70,7 @@ tasks {
 
 dependencyManagement {
   dependencies {
-    dependency("net.minidev:json-smart:2.4.9")
+    dependency("net.minidev:json-smart:2.4.10")
   }
 }
 
