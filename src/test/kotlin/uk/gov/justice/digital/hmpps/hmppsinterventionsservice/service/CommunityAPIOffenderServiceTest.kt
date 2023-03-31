@@ -4,6 +4,7 @@ import com.microsoft.applicationinsights.TelemetryClient
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.ClientResponse
@@ -11,7 +12,6 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.RestClient
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.InvalidAssumptionError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 
 private data class MockedResponse(
@@ -99,11 +99,9 @@ internal class CommunityAPIOffenderServiceTest {
   }
 
   @Test
-  fun `getResponsibleOfficer fails when there are no responsible officers`() {
+  fun `getResponsibleOfficer returns null when there are no responsible officers`() {
     val offenderService = offenderServiceFactory(createMockedRestClient(MockedResponse(offenderManagersLocation, HttpStatus.OK, "[]")))
-    assertThrows<InvalidAssumptionError> {
-      offenderService.getResponsibleOfficer("X123456")
-    }
+    assertThat(offenderService.getResponsibleOfficer("X123456")).isNull()
   }
 
   @Test

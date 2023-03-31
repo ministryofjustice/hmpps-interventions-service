@@ -128,7 +128,7 @@ class CommunityAPIOffenderService(
       .bodyToMono(OffenderIdentifiersResponse::class.java)
   }
 
-  fun getResponsibleOfficer(crn: String): ResponsibleOfficer {
+  fun getResponsibleOfficer(crn: String): ResponsibleOfficer? {
     val offenderManagersPath = UriComponentsBuilder.fromPath(offenderManagersLocation)
       .buildAndExpand(crn)
       .toString()
@@ -158,6 +158,9 @@ class CommunityAPIOffenderService(
       }
     }
 
+    if (responsibleOfficers.isNullOrEmpty()) {
+      return null
+    }
     return responsibleOfficers.first()
   }
 }

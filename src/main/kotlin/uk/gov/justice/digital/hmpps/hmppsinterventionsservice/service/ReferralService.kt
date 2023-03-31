@@ -271,7 +271,7 @@ class ReferralService(
   fun getResponsibleProbationPractitioner(crn: String, sentBy: AuthUser?, createdBy: AuthUser): ResponsibleProbationPractitioner {
     try {
       val responsibleOfficer = communityAPIOffenderService.getResponsibleOfficer(crn)
-      if (responsibleOfficer.email != null) {
+      if (responsibleOfficer?.email != null) {
         return ResponsibleProbationPractitioner(
           responsibleOfficer.firstName ?: "",
           responsibleOfficer.email,
@@ -283,7 +283,7 @@ class ReferralService(
 
       telemetryService.reportInvalidAssumption(
         "all responsible officers have email addresses",
-        mapOf("staffId" to responsibleOfficer.staffId.toString()),
+        mapOf("staffId" to responsibleOfficer?.staffId.toString()),
       )
 
       logger.warn("no email address for responsible officer; falling back to referring probation practitioner")

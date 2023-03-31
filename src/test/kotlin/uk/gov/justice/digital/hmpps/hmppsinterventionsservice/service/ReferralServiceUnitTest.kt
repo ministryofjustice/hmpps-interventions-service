@@ -153,6 +153,16 @@ class ReferralServiceUnitTest {
   }
 
   @Test
+  fun `getResponsibleProbationPractitioner uses sender if there is no responsible officer`() {
+    val sender = authUserFactory.create("sender")
+    whenever(communityAPIOffenderService.getResponsibleOfficer(any())).thenReturn(null)
+    whenever(hmppsAuthService.getUserDetail(sender)).thenReturn(UserDetail("andrew", "andrew@tom.tom", "marr"))
+    val pp = referralService.getResponsibleProbationPractitioner(referralFactory.createSent(sentBy = sender))
+    assertThat(pp.firstName).isEqualTo("andrew")
+    assertThat(pp.email).isEqualTo("andrew@tom.tom")
+  }
+
+  @Test
   fun `getResponsibleProbationPractitioner uses sender if there is no responsible officer email address`() {
     val sender = authUserFactory.create("sender")
     whenever(communityAPIOffenderService.getResponsibleOfficer(any())).thenReturn(ResponsibleOfficer("tom", null, 123, "jones"))
