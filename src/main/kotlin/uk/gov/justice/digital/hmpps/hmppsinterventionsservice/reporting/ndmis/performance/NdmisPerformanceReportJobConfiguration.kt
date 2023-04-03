@@ -111,7 +111,7 @@ class NdmisPerformanceReportJobConfiguration(
       "ndmisOutcomePerformanceReportWriter",
       FileSystemResource(Path.of(outputPath).resolve(outcomeReportFilename)),
       OutcomeData.headers,
-      OutcomeData.fields
+      OutcomeData.fields,
     )
   }
 
