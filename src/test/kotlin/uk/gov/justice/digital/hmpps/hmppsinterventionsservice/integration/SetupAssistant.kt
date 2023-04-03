@@ -21,6 +21,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Desired
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DynamicFrameworkContract
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReportOutcome
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NPSRegion
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
@@ -61,6 +62,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.CaseNoteFacto
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ChangeLogFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFrameworkContractFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportOutcomeFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceProviderFactory
@@ -112,6 +114,7 @@ class SetupAssistant(
   private val serviceUserFactory = ServiceUserFactory()
   private val caseNoteFactory = CaseNoteFactory()
   private val changelogFactory = ChangeLogFactory()
+  private val endOfServiceReportOutcomeFactory = EndOfServiceReportOutcomeFactory()
 
   val serviceCategories = serviceCategoryRepository.findAll().associateBy { it.name }
   val npsRegions = npsRegionRepository.findAll().associateBy { it.id }
@@ -179,6 +182,10 @@ class SetupAssistant(
 
   fun desiredOutcomesForServiceCategory(serviceCategoryId: UUID): List<DesiredOutcome> {
     return desiredOutcomeRepository.findByServiceCategoryId(serviceCategoryId)
+  }
+
+  fun getDesiredOutcome(desiredOutcomeId: UUID): DesiredOutcome {
+    return desiredOutcomeRepository.findByIdOrNull(desiredOutcomeId)!!
   }
 
   fun createDesiredOutcome(id: UUID, description: String, serviceCategoryId: UUID): DesiredOutcome {
@@ -283,7 +290,16 @@ class SetupAssistant(
     val ppUser = createPPUser()
     val spUser = createSPUser()
     draftReferralRepository.save(referralFactory.createDraft(id = id, intervention = intervention, createdBy = ppUser, personCustodyPrisonId = personCustodyPrisonId, personCurrentLocationType = personCurrentLocationType, expectedReleaseDate = expectedReleaseDate))
-    return referralRepository.save(referralFactory.createEnded(id = id, intervention = intervention, createdBy = ppUser, sentBy = ppUser, endRequestedBy = ppUser, assignments = listOf(ReferralAssignment(OffsetDateTime.now(), spUser, spUser)), endRequestedReason = endRequestedReason, endRequestedComments = endRequestedComments))
+    return referralRepository.save(
+      referralFactory.createEnded(
+        id = id, intervention = intervention, createdBy = ppUser, sentBy = ppUser, endRequestedBy = ppUser,
+        assignments = listOf(
+          ReferralAssignment(OffsetDateTime.now(), spUser, spUser)
+        ),
+        endRequestedReason = endRequestedReason,
+        endRequestedComments = endRequestedComments
+      )
+    )
   }
 
   fun createCancelledReferral(id: UUID = UUID.randomUUID(), intervention: Intervention = createIntervention(), endRequestedReason: CancellationReason? = randomCancellationReason(), endRequestedComments: String? = null): Referral {
@@ -759,6 +775,19 @@ class SetupAssistant(
     )
     referral.endOfServiceReport = eosr
     return eosr
+  }
+
+  fun addEndOfServiceReportWithOutcome(id: UUID = UUID.randomUUID(), referral: Referral) {
+    val desiredOutcomeId = referral.selectedDesiredOutcomes?.first()?.desiredOutcomeId
+    var outcomes = mutableSetOf<EndOfServiceReportOutcome>()
+    if (desiredOutcomeId != null) {
+      outcomes = mutableSetOf(endOfServiceReportOutcomeFactory.create(getDesiredOutcome(desiredOutcomeId)))
+    }
+
+    val endOfServiceReport = endOfServiceReportRepository.save(
+      endOfServiceReportFactory.create(id = id, referral = referral, createdBy = referral.createdBy, outcomes = outcomes)
+    )
+    referral.endOfServiceReport = endOfServiceReport
   }
 
   fun createCaseNote(
