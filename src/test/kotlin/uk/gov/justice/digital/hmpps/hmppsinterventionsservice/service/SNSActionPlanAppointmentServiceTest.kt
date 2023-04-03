@@ -107,7 +107,7 @@ internal class SNSActionPlanAppointmentServiceTest {
         "contractTypeName" to "Accommodation",
         "primeProviderName" to "Harmony Living",
         "deliusAppointmentId" to "123",
-        "referralProbationUserURL" to "http://baseUrl/probation-practitioner/referrals/56b40f96-0657-4e01-925c-da208a6fbcfd/appointment/1/post-session-feedback"
+        "referralProbationUserURL" to "http://baseUrl/probation-practitioner/referrals/56b40f96-0657-4e01-925c-da208a6fbcfd/appointment/1/post-session-feedback",
       ),
       PersonReference.crn("X123456"),
     )
