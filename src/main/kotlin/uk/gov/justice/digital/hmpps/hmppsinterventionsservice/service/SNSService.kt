@@ -1,7 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Service
+import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.SNSPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.PersonReference
@@ -93,6 +95,8 @@ class SNSReferralService(
 @Service
 class SNSActionPlanAppointmentService(
   private val snsPublisher: SNSPublisher,
+  @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
+  @Value("\${interventions-ui.locations.probation-practitioner.session-feedback}") private val ppSessionFeedbackLocation: String,
 ) : ApplicationListener<ActionPlanAppointmentEvent>, SNSService {
 
   @AsyncEventExceptionHandling
@@ -125,6 +129,11 @@ class SNSActionPlanAppointmentService(
 
         val eventType = "intervention.session-appointment.session-feedback-submitted"
 
+        val url = UriComponentsBuilder.fromHttpUrl(interventionsUIBaseURL)
+          .path(ppSessionFeedbackLocation)
+          .buildAndExpand(event.referral.id, event.deliverySession.sessionNumber, event.deliverySession.deliusAppointmentId!!)
+          .toString()
+
         val snsEvent = EventDTO(
           eventType,
           "Session feedback submitted for a session appointment",
@@ -133,7 +142,11 @@ class SNSActionPlanAppointmentService(
           mapOf(
             "serviceUserCRN" to referral.serviceUserCRN,
             "referralId" to referral.id,
+            "referralReference" to referral.referenceNumber,
+            "contractTypeName" to event.contractTypeName,
+            "primeProviderName" to event.primeProviderName,
             "deliusAppointmentId" to event.deliverySession.deliusAppointmentId.toString(),
+            "referralProbationUserURL" to url,
           ),
           PersonReference.crn(referral.serviceUserCRN),
         )
