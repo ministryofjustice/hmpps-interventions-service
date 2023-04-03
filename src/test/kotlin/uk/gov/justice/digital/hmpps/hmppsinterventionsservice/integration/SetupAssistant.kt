@@ -296,7 +296,8 @@ class SetupAssistant(
         assignments = listOf(
           ReferralAssignment(OffsetDateTime.now(), spUser, spUser)
         ),
-        endRequestedReason = endRequestedReason, endRequestedComments = endRequestedComments
+        endRequestedReason = endRequestedReason,
+        endRequestedComments = endRequestedComments
       )
     )
   }
