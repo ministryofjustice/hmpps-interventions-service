@@ -21,7 +21,7 @@ internal class OutcomeProcessorTest {
     val endOfServiceReport = endOfServiceReportFactory.create(
       outcomes = mutableSetOf(
         EndOfServiceReportOutcome(desiredOutcome, AchievementLevel.ACHIEVED),
-      )
+      ),
     )
 
     val referral = referralFactory.createEnded(
@@ -44,7 +44,7 @@ internal class OutcomeProcessorTest {
       outcomes = mutableSetOf(
         EndOfServiceReportOutcome(desiredOutcome1, AchievementLevel.ACHIEVED),
         EndOfServiceReportOutcome(desiredOutcome2, AchievementLevel.NOT_ACHIEVED),
-      )
+      ),
     )
 
     val referral = referralFactory.createEnded(

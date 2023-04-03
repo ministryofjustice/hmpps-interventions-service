@@ -292,13 +292,17 @@ class SetupAssistant(
     draftReferralRepository.save(referralFactory.createDraft(id = id, intervention = intervention, createdBy = ppUser, personCustodyPrisonId = personCustodyPrisonId, personCurrentLocationType = personCurrentLocationType, expectedReleaseDate = expectedReleaseDate))
     return referralRepository.save(
       referralFactory.createEnded(
-        id = id, intervention = intervention, createdBy = ppUser, sentBy = ppUser, endRequestedBy = ppUser,
+        id = id,
+        intervention = intervention,
+        createdBy = ppUser,
+        sentBy = ppUser,
+        endRequestedBy = ppUser,
         assignments = listOf(
-          ReferralAssignment(OffsetDateTime.now(), spUser, spUser)
+          ReferralAssignment(OffsetDateTime.now(), spUser, spUser),
         ),
         endRequestedReason = endRequestedReason,
-        endRequestedComments = endRequestedComments
-      )
+        endRequestedComments = endRequestedComments,
+      ),
     )
   }
 
@@ -785,7 +789,7 @@ class SetupAssistant(
     }
 
     val endOfServiceReport = endOfServiceReportRepository.save(
-      endOfServiceReportFactory.create(id = id, referral = referral, createdBy = referral.createdBy, outcomes = outcomes)
+      endOfServiceReportFactory.create(id = id, referral = referral, createdBy = referral.createdBy, outcomes = outcomes),
     )
     referral.endOfServiceReport = endOfServiceReport
   }

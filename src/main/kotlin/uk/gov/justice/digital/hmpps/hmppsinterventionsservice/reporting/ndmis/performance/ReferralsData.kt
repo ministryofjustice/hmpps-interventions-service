@@ -70,7 +70,7 @@ data class ReferralsData(
       "date_end_of_service_report_submitted",
       "intervention_end_reason_code",
       "intervention_end_reason_description",
-      "intervention_concluded_at"
+      "intervention_concluded_at",
     )
   }
 }
