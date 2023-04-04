@@ -207,7 +207,7 @@ class NdmisPerformanceReportJobConfiguration(
     stepBuilderFactory["pushToS3Step"].tasklet(pushFilesToS3(outputPath)).build()
 
   private fun pushFilesToS3(outputPath: String) = { _: StepContribution, _: ChunkContext ->
-    listOf(referralReportFilename, complexityReportFilename, appointmentReportFilename).forEach { file ->
+    listOf(referralReportFilename, complexityReportFilename, appointmentReportFilename, outcomeReportFilename).forEach { file ->
       val path = Path.of(outputPath).resolve(file)
       s3Service.publishFileToS3(ndmisS3Bucket, path, pathPrefix, acl = ObjectCannedACL.BUCKET_OWNER_FULL_CONTROL)
       path.toFile().deleteOnExit()
