@@ -8,6 +8,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.any
 import org.mockito.kotlin.firstValue
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.EndOfServiceReportEventPublisher
@@ -50,10 +51,28 @@ class EndOfServiceReportServiceTest {
     whenever(authUserRepository.save(authUser)).thenReturn(authUser)
     whenever(referralRepository.getReferenceById(referral.id)).thenReturn(referral)
     whenever(endOfServiceReportRepository.save(any())).thenReturn(endOfServiceReport)
+    whenever(endOfServiceReportRepository.findByReferralId(referralId = referral.id)).thenReturn(null)
     whenever(referralRepository.save(any())).thenReturn(referral)
 
     val savedEndOfServiceReport = endOfServiceReportService.createEndOfServiceReport(referral.id, authUser)
 
+    assertThat(savedEndOfServiceReport).isNotNull
+  }
+
+  @Test
+  fun `return existing end of service report`() {
+    val authUser = AuthUser("CRN123", "auth", "user")
+    val referral = SampleData.sampleReferral(crn = "CRN123", serviceProviderName = "Service Provider")
+    val endOfServiceReport = SampleData.sampleEndOfServiceReport(outcomes = mutableSetOf(), referral = referral)
+
+    whenever(authUserRepository.save(authUser)).thenReturn(authUser)
+    whenever(referralRepository.getReferenceById(referral.id)).thenReturn(referral)
+    whenever(endOfServiceReportRepository.findByReferralId(referralId = referral.id)).thenReturn(endOfServiceReport)
+    whenever(referralRepository.save(any())).thenReturn(referral)
+
+    val savedEndOfServiceReport = endOfServiceReportService.createEndOfServiceReport(referral.id, authUser)
+
+    verify(endOfServiceReportRepository, never()).save(any())
     assertThat(savedEndOfServiceReport).isNotNull
   }
 
