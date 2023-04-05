@@ -35,7 +35,7 @@ class EndOfServiceReportService(
       createdAt = OffsetDateTime.now(),
     )
     return endOfServiceReportRepository.findByReferralId(referralId)
-      ?: return endOfServiceReportRepository.save(endOfServiceReport)
+      ?: endOfServiceReportRepository.save(endOfServiceReport)
   }
 
   fun getEndOfServiceReport(endOfServiceReportId: UUID): EndOfServiceReport {
