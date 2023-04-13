@@ -41,7 +41,7 @@ import java.util.UUID
 data class ResponsibleProbationPractitioner(
   override val firstName: String,
   override val email: String,
-  val deliusStaffId: Long?,
+  val deliusStaffCode: String?,
   val authUser: AuthUser?,
   override val lastName: String,
 ) : ContactablePerson
@@ -264,26 +264,25 @@ class ReferralService(
   }
 
   fun getResponsibleProbationPractitioner(referral: Referral): ResponsibleProbationPractitioner {
-    val sentBy = referral.sentBy?.let { it } ?: null
-    return getResponsibleProbationPractitioner(referral.serviceUserCRN, sentBy, referral.createdBy)
+    return getResponsibleProbationPractitioner(referral.serviceUserCRN, referral.sentBy, referral.createdBy)
   }
 
   fun getResponsibleProbationPractitioner(crn: String, sentBy: AuthUser?, createdBy: AuthUser): ResponsibleProbationPractitioner {
     try {
-      val responsibleOfficer = communityAPIOffenderService.getResponsibleOfficer(crn)
-      if (responsibleOfficer.email != null) {
+      val responsibleOfficer = communityAPIOffenderService.getResponsibleOfficerDetails(crn)
+      if (responsibleOfficer?.communityOfficer?.email != null) {
         return ResponsibleProbationPractitioner(
-          responsibleOfficer.firstName ?: "",
-          responsibleOfficer.email,
-          responsibleOfficer.staffId,
-          null,
-          responsibleOfficer.lastName ?: "",
+          responsibleOfficer.communityOfficer.name.forename,
+          responsibleOfficer.communityOfficer.email,
+          responsibleOfficer.communityOfficer.code,
+          authUserRepository.findByUserName(responsibleOfficer.communityOfficer.username),
+          responsibleOfficer.communityOfficer.name.surname,
         )
       }
 
       telemetryService.reportInvalidAssumption(
         "all responsible officers have email addresses",
-        mapOf("staffId" to responsibleOfficer.staffId.toString()),
+        mapOf("staffId" to responsibleOfficer?.communityOfficer?.code!!),
       )
 
       logger.warn("no email address for responsible officer; falling back to referring probation practitioner")
@@ -306,13 +305,6 @@ class ReferralService(
   }
 
   fun isUserTheResponsibleOfficer(responsibleOfficer: ResponsibleProbationPractitioner, user: AuthUser): Boolean {
-    return userTypeChecker.isProbationPractitionerUser(user) &&
-      (
-        (responsibleOfficer.authUser?.let { it == user } ?: false) ||
-          (
-            responsibleOfficer.deliusStaffId?.let { it == communityAPIOffenderService.getStaffIdentifier(user) }
-              ?: false // if the RO doesn't have a staff ID we cannot determine if they are the sender, so assume not
-            )
-        )
+    return userTypeChecker.isProbationPractitionerUser(user) && (responsibleOfficer.authUser?.let { it.userName == user.userName } ?: false)
   }
 }

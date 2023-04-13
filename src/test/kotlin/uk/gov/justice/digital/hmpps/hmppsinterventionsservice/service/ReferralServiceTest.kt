@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.params.provider.Arguments
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
@@ -1012,9 +1011,8 @@ class ReferralServiceTest @Autowired constructor(
 
   @Test
   fun `check when user is not the same as the responsible officer and has a valid deliusStaffId `() {
-    val responsibleProbationPractitioner = ResponsibleProbationPractitioner("abc", "abc@abc.com", 768912, AuthUser("123456", "delius", "TEST_INTERVENTIONS_SP_1"), "def")
-    val authUser = AuthUser("123457", "delius", "bernard.beaks")
-    whenever(communityAPIOffenderService.getStaffIdentifier(any())).thenReturn(768912)
+    val responsibleProbationPractitioner = ResponsibleProbationPractitioner("abc", "abc@abc.com", "N01UTAA", AuthUser("123456", "delius", "TEST_INTERVENTIONS_SP_1"), "def")
+    val authUser = AuthUser("123457", "delius", "TEST_INTERVENTIONS_SP_1")
 
     val isUserTheResponsibleOfficer = referralService.isUserTheResponsibleOfficer(responsibleProbationPractitioner, authUser)
 
@@ -1023,9 +1021,8 @@ class ReferralServiceTest @Autowired constructor(
 
   @Test
   fun `check when user is not the same as the responsible officer and does not have a valid deliusStaffId `() {
-    val responsibleProbationPractitioner = ResponsibleProbationPractitioner("abc", "abc@abc.com", 768912, AuthUser("123456", "delius", "TEST_INTERVENTIONS_SP_1"), "def")
+    val responsibleProbationPractitioner = ResponsibleProbationPractitioner("abc", "abc@abc.com", "N01UTAA", AuthUser("123456", "delius", "TEST_INTERVENTIONS_SP_1"), "def")
     val authUser = AuthUser("123457", "delius", "bernard.beaks")
-    whenever(communityAPIOffenderService.getStaffIdentifier(any())).thenReturn(768913)
 
     val isUserTheResponsibleOfficer = referralService.isUserTheResponsibleOfficer(responsibleProbationPractitioner, authUser)
 

@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "ANY",
+    "urlPathPattern": "/probation-case/.*"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {}
+  }
+}

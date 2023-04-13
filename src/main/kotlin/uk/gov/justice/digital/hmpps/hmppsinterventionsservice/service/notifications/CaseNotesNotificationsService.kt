@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserTypeChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.EmailSender
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.CreateCaseNoteEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.AsyncEventExceptionHandling
@@ -23,8 +22,6 @@ class CaseNotesNotificationsService(
   private val emailSender: EmailSender,
   private val referralService: ReferralService,
   private val hmppsAuthService: HMPPSAuthService,
-  private val userTypeChecker: UserTypeChecker,
-  private val communityAPIOffenderService: CommunityAPIOffenderService,
 ) : ApplicationListener<CreateCaseNoteEvent>, NotifyService {
   companion object : KLogging()
 
