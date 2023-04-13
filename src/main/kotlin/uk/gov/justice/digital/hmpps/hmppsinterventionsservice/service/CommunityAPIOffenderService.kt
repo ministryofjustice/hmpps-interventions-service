@@ -149,7 +149,6 @@ class CommunityAPIOffenderService(
         it == 0 -> telemetryService.reportInvalidAssumption(
           "service users always have a responsible officer",
           mapOf("crn" to crn),
-          recoverable = false,
         )
         it > 1 -> telemetryService.reportInvalidAssumption(
           "service users only have one responsible officer",

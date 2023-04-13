@@ -12,15 +12,12 @@ class TelemetryService(
   companion object {
     private val logger = KotlinLogging.logger {}
   }
-  fun reportInvalidAssumption(assumption: String, information: Map<String, String> = emptyMap(), recoverable: Boolean = true) {
+  fun reportInvalidAssumption(assumption: String, information: Map<String, String> = emptyMap()) {
     telemetryClient.trackEvent(
       "InterventionsInvalidAssumption",
       mapOf("assumption" to assumption).plus(information),
       null,
     )
-
-    if (!recoverable) {
-      logger.error("assumption proved invalid: $assumption")
-    }
+    logger.error("assumption proved invalid: $assumption")
   }
 }
