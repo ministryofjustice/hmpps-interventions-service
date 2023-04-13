@@ -5,8 +5,7 @@
     {
       "matchManagers": ["gradle"],
       "matchUpdateTypes": ["patch", "minor"],
-      "groupName": "all gradle dependencies",
-      "schedule": ["before 7am on Monday"],
+      "groupName": "all gradle dependencies"
     },
     {
       // upgrading these is a team decision
