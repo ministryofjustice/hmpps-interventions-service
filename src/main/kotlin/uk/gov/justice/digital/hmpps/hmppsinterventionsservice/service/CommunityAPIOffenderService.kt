@@ -158,9 +158,6 @@ class CommunityAPIOffenderService(
       }
     }
 
-    if (responsibleOfficers.isNullOrEmpty()) {
-      return null
-    }
-    return responsibleOfficers.first()
+    return responsibleOfficers?.firstOrNull()
   }
 }
