@@ -145,7 +145,7 @@ class NotifyActionPlanAppointmentService(
             recipient.email,
             mapOf(
               "ppFirstName" to recipient.firstName,
-              "referenceNumber" to referral.referenceNumber!!,
+              "referenceNumber" to referral.referenceNumber,
               "attendanceUrl" to location.toString(),
             ),
           )
@@ -156,7 +156,7 @@ class NotifyActionPlanAppointmentService(
             recipient.email,
             mapOf(
               "ppFirstName" to recipient.firstName,
-              "referenceNumber" to referral.referenceNumber!!,
+              "referenceNumber" to referral.referenceNumber,
               "sessionUrl" to location.toString(),
             ),
           )

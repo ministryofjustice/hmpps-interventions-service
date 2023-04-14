@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
-import com.microsoft.applicationinsights.TelemetryClient
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -27,7 +26,8 @@ internal class CommunityAPIOffenderServiceTest {
   private val staffDetailsLocation = "staff-details"
   private val offenderManagersLocation = "offender-managers"
   private val offenderIdentifiersLocation = "offender-identifiers"
-  private val telemetryService = TelemetryService(mock<TelemetryClient>())
+  private val responsibleOfficerLocation = "responsible-officer"
+  private val telemetryService = TelemetryService(mock())
 
   private fun createMockedRestClient(vararg responses: MockedResponse): RestClient {
     return RestClient(
@@ -51,7 +51,7 @@ internal class CommunityAPIOffenderServiceTest {
   }
 
   private fun offenderServiceFactory(restClient: RestClient): CommunityAPIOffenderService {
-    return CommunityAPIOffenderService(offenderAccessLocation, managedOffendersLocation, staffDetailsLocation, offenderManagersLocation, offenderIdentifiersLocation, restClient, telemetryService)
+    return CommunityAPIOffenderService(offenderAccessLocation, managedOffendersLocation, staffDetailsLocation, offenderManagersLocation, offenderIdentifiersLocation, responsibleOfficerLocation, restClient, telemetryService)
   }
 
   @Test
@@ -99,24 +99,75 @@ internal class CommunityAPIOffenderServiceTest {
   }
 
   @Test
-  fun `getResponsibleOfficer fails when there are no responsible officers`() {
-    val offenderService = offenderServiceFactory(createMockedRestClient(MockedResponse(offenderManagersLocation, HttpStatus.OK, "[]")))
+  fun `getResponsibleOfficerDetails returns when there are is a responsible officer`() {
+    val offenderService = offenderServiceFactory(
+      createMockedRestClient(
+        MockedResponse(
+          responsibleOfficerLocation,
+          HttpStatus.OK,
+          "{\n" +
+            "  \"communityOfficer\": {\n" +
+            "    \"code\": \"123\",\n" +
+            "    \"name\": {\n" +
+            "      \"forename\": \"Dan\",\n" +
+            "      \"surname\": \"smith\"\n" +
+            "    },\n" +
+            "    \"username\": \"abcdef\",\n" +
+            "    \"email\": \"dan.smith@gmail.com\",\n" +
+            "    \"responsibleOfficer\": true\n" +
+            "  }\n" +
+            "}",
+        ),
+      ),
+    )
+
+    val responsibleOfficerDetails = offenderService.getResponsibleOfficerDetails("X123456")
+    assertThat(responsibleOfficerDetails?.communityOfficer?.name?.forename).isEqualTo("Dan")
+    assertThat(responsibleOfficerDetails?.communityOfficer?.code).isEqualTo("123")
+    assertThat(responsibleOfficerDetails?.communityOfficer?.responsibleOfficer).isTrue
+  }
+
+  @Test
+  fun `getResponsibleOfficerDetails fails when there are no responsible officers`() {
+    val offenderService = offenderServiceFactory(
+      createMockedRestClient(
+        MockedResponse(
+          responsibleOfficerLocation,
+          HttpStatus.OK,
+          "{\n" +
+            "  \"communityOfficer\": {\n" +
+            "    \"code\": \"123\",\n" +
+            "    \"name\": {\n" +
+            "      \"forename\": \"Dan\",\n" +
+            "      \"surname\": \"smith\"\n" +
+            "    },\n" +
+            "    \"username\": \"abcdef\",\n" +
+            "    \"email\": \"dan.smith@gmail.com\",\n" +
+            "    \"responsibleOfficer\": false\n" +
+            "  }\n" +
+            "}",
+        ),
+      ),
+    )
+
     assertThrows<InvalidAssumptionError> {
-      offenderService.getResponsibleOfficer("X123456")
+      offenderService.getResponsibleOfficerDetails("X123456")
     }
   }
 
   @Test
-  fun `getResponsibleOfficer returns first when there are multiple responsible officers`() {
-    val offenderService = offenderServiceFactory(createMockedRestClient(MockedResponse(offenderManagersLocation, HttpStatus.OK, "[{\"isResponsibleOfficer\": true, \"staff\": {\"forenames\": \"tom\", \"email\": \"tom@tom.tom\", \"surname\": \"jones\"}, \"staffId\": 123}, {\"isResponsibleOfficer\": true}]")))
-    val result = offenderService.getResponsibleOfficer("X123456")
-    assertThat(result).isEqualTo(ResponsibleOfficer("tom", "tom@tom.tom", 123, "jones"))
+  fun `getResponsibleOfficerDetails throws not found`() {
+    val offenderService = offenderServiceFactory(createMockedRestClient(MockedResponse(responsibleOfficerLocation, HttpStatus.NOT_FOUND, "")))
+    assertThrows<InvalidAssumptionError> {
+      offenderService.getResponsibleOfficerDetails("X123456")
+    }
   }
 
   @Test
-  fun `getResponsibleOfficer can handle null values in staff fields - we don't make any assumptions about the quality of data in delius`() {
-    val offenderService = offenderServiceFactory(createMockedRestClient(MockedResponse(offenderManagersLocation, HttpStatus.OK, "[{\"isResponsibleOfficer\": true, \"staffId\": 123}, {\"isResponsibleOfficer\": true}]")))
-    val result = offenderService.getResponsibleOfficer("X123456")
-    assertThat(result).isEqualTo(ResponsibleOfficer(null, null, 123, null))
+  fun `getResponsibleOfficerDetails throws unhandled error`() {
+    val offenderService = offenderServiceFactory(createMockedRestClient(MockedResponse(responsibleOfficerLocation, HttpStatus.INTERNAL_SERVER_ERROR, "")))
+    assertThrows<WebClientResponseException> {
+      offenderService.getResponsibleOfficerDetails("X123456")
+    }
   }
 }

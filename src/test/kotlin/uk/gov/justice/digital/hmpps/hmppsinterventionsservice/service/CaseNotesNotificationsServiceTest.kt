@@ -8,7 +8,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserTypeChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.EmailSender
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.CreateCaseNoteEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
@@ -33,8 +32,6 @@ internal class CaseNotesNotificationsServiceTest {
     emailSender,
     referralService,
     hmppsAuthService,
-    UserTypeChecker(),
-    communityAPIOffenderService,
   )
 
   private val authUserFactory = AuthUserFactory()
@@ -88,7 +85,7 @@ internal class CaseNotesNotificationsServiceTest {
   fun `PP (responsible officer) does not get notified if they sent the case note`() {
     whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("sp", "sp@provider.co.uk", "last"))
     whenever(referralService.getResponsibleProbationPractitioner(any())).thenReturn(
-      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", 123L, null, "last"),
+      ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", "N01UTAA", null, "last"),
     )
     whenever(referralService.isUserTheResponsibleOfficer(any(), any())).thenReturn(true)
     whenever(communityAPIOffenderService.getStaffIdentifier(any())).thenReturn(123L)
