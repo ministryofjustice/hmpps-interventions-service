@@ -93,8 +93,8 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:3.19.1-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.20.45")
-  implementation("software.amazon.awssdk:s3:2.20.45")
+  implementation("software.amazon.awssdk:sns:2.20.46")
+  implementation("software.amazon.awssdk:s3:2.20.46")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
