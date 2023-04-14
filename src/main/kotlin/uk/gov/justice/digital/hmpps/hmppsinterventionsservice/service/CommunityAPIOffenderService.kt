@@ -131,7 +131,7 @@ class CommunityAPIOffenderService(
       .buildAndExpand(crn)
       .toString()
 
-    val responsibleOfficer = communityApiClient.get(officerDetailsPath)
+    val officerDetails = communityApiClient.get(officerDetailsPath)
       .retrieve()
       .bodyToMono(OfficerDetails::class.java)
       .onErrorResume(WebClientResponseException::class.java) { e ->
@@ -143,13 +143,13 @@ class CommunityAPIOffenderService(
       }
       .block()
 
-    if (responsibleOfficer == null) {
+    if (officerDetails == null || !(officerDetails.communityOfficer.responsibleOfficer)) {
       telemetryService.reportInvalidAssumption(
         "service users always have a responsible officer",
         mapOf("crn" to crn),
         recoverable = false,
       )
     }
-    return responsibleOfficer
+    return officerDetails
   }
 }

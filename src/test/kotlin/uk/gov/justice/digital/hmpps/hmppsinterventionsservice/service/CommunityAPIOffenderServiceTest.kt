@@ -129,6 +129,34 @@ internal class CommunityAPIOffenderServiceTest {
 
   @Test
   fun `getResponsibleOfficerDetails fails when there are no responsible officers`() {
+    val offenderService = offenderServiceFactory(
+      createMockedRestClient(
+        MockedResponse(
+          responsibleOfficerLocation,
+          HttpStatus.OK,
+          "{\n" +
+            "  \"communityOfficer\": {\n" +
+            "    \"code\": \"123\",\n" +
+            "    \"name\": {\n" +
+            "      \"forename\": \"Dan\",\n" +
+            "      \"surname\": \"smith\"\n" +
+            "    },\n" +
+            "    \"username\": \"abcdef\",\n" +
+            "    \"email\": \"dan.smith@gmail.com\",\n" +
+            "    \"responsibleOfficer\": false\n" +
+            "  }\n" +
+            "}",
+        ),
+      ),
+    )
+
+    assertThrows<InvalidAssumptionError> {
+      offenderService.getResponsibleOfficerDetails("X123456")
+    }
+  }
+
+  @Test
+  fun `getResponsibleOfficerDetails throws not found`() {
     val offenderService = offenderServiceFactory(createMockedRestClient(MockedResponse(responsibleOfficerLocation, HttpStatus.NOT_FOUND, "")))
     assertThrows<InvalidAssumptionError> {
       offenderService.getResponsibleOfficerDetails("X123456")
