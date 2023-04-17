@@ -17,7 +17,7 @@ configurations {
 }
 
 jacoco {
-  toolVersion = "0.8.8"
+  toolVersion = "0.8.9"
 }
 
 tasks {
@@ -93,14 +93,14 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:3.19.1-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.20.46")
-  implementation("software.amazon.awssdk:s3:2.20.46")
+  implementation("software.amazon.awssdk:sns:2.20.47")
+  implementation("software.amazon.awssdk:s3:2.20.47")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-  implementation("com.nimbusds:oauth2-oidc-sdk:10.7.1")
+  implementation("com.nimbusds:oauth2-oidc-sdk:10.7.2")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
