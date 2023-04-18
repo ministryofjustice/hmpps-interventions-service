@@ -1,0 +1,1 @@
+update intervention set incoming_referral_distribution_email = 'bristol.info@nelsontrust.com' where incoming_referral_distribution_email = 'somerset.info@nelsontrust.com'
