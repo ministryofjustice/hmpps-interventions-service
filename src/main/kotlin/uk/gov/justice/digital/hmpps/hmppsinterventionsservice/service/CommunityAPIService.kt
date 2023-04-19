@@ -6,10 +6,6 @@ import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Service
 import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.CommunityAPIClient
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DeliverySessionDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SentReferralDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanAppointmentEvent
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanAppointmentEventType.SESSION_FEEDBACK_RECORDED
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEvent
@@ -27,15 +23,8 @@ interface CommunityAPIService {
     return "$description for $contractTypeName Referral ${referral.referenceNumber} with Prime Provider $primeProviderName\n$url"
   }
 
-  fun getNotes(referral: SentReferralDTO, url: String, description: String, contractTypeName: String, primeProviderName: String): String {
-    return "$description for $contractTypeName Referral ${referral.referenceNumber} with Prime Provider $primeProviderName\n$url"
-  }
-
   fun setNotifyPPIfRequired(appointment: Appointment) =
     NO == appointment.attended || appointment.notifyPPOfAttendanceBehaviour == true
-
-  fun setNotifyPPIfRequired(deliverySession: DeliverySessionDTO) =
-    NO == deliverySession.sessionFeedback.attendance.attended || deliverySession.sessionFeedback.behaviour.notifyProbationPractitioner == true
 }
 
 @Service
@@ -89,47 +78,6 @@ class CommunityAPIActionPlanEventService(
 }
 
 @Service
-class CommunityAPIActionPlanAppointmentEventService(
-  @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
-  @Value("\${interventions-ui.locations.probation-practitioner.session-feedback}") private val ppSessionFeedbackLocation: String,
-  @Value("\${community-api.appointments.outcome.enabled}") private val outcomeNotificationEnabled: Boolean,
-  @Value("\${community-api.locations.appointment-outcome-request}") private val communityAPIAppointmentOutcomeLocation: String,
-  @Value("\${community-api.integration-context}") private val integrationContext: String,
-  private val communityAPIClient: CommunityAPIClient,
-) : ApplicationListener<ActionPlanAppointmentEvent>, CommunityAPIService {
-  companion object : KLogging()
-
-  override fun onApplicationEvent(event: ActionPlanAppointmentEvent) {
-    when (event.type) {
-      SESSION_FEEDBACK_RECORDED -> {
-        if (!outcomeNotificationEnabled) {
-          return
-        }
-        val url = UriComponentsBuilder.fromHttpUrl(interventionsUIBaseURL)
-          .path(ppSessionFeedbackLocation)
-          .buildAndExpand(event.referral.id, event.deliverySession.sessionNumber, event.deliverySession.deliusAppointmentId!!)
-          .toString()
-
-        val notifyPP = setNotifyPPIfRequired(event.deliverySession)
-
-        val request = AppointmentOutcomeRequest(
-          getNotes(event.referral, url, "Session Feedback Recorded", event.contractTypeName, event.primeProviderName),
-          event.deliverySession.sessionFeedback.attendance.attended!!.name,
-          notifyPP,
-        )
-
-        val communityApiSentReferralPath = UriComponentsBuilder.fromPath(communityAPIAppointmentOutcomeLocation)
-          .buildAndExpand(event.referral.serviceUserCRN, event.deliverySession.deliusAppointmentId, integrationContext)
-          .toString()
-
-        communityAPIClient.makeAsyncPostRequest(communityApiSentReferralPath, request)
-      }
-      else -> {}
-    }
-  }
-}
-
-@Service
 class CommunityAPIAppointmentEventService(
   @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
   @Value("\${interventions-ui.locations.probation-practitioner.supplier-assessment-feedback}") private val ppSessionFeedbackLocation: String,
@@ -171,16 +119,6 @@ class CommunityAPIAppointmentEventService(
     }
   }
 }
-
-data class ReferralEndRequest(
-  val contractType: String,
-  val startedAt: OffsetDateTime,
-  val endedAt: OffsetDateTime,
-  val sentenceId: Long,
-  val referralId: UUID,
-  val endType: String,
-  val notes: String,
-)
 
 data class NotificationCreateRequestDTO(
   val contractType: String,
