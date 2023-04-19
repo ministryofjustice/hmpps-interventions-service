@@ -114,6 +114,10 @@ dependencies {
   implementation("com.github.java-json-tools:json-patch:1.13")
   implementation("org.apache.commons:commons-csv:1.10.0")
 
+  // https://mvnrepository.com/artifact/org.springframework/spring-expression
+  // fix for CVE-2023-20863
+  implementation("org.springframework:spring-expression:5.3.27")
+
   testImplementation("au.com.dius.pact.provider:junit5spring:4.5.6")
   testImplementation("com.squareup.okhttp3:okhttp:4.10.0")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
