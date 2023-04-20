@@ -35,23 +35,6 @@ data class PrimaryIdentifiersResponse(
   val nomsNumber: String?,
 )
 
-data class OfficerDetails(
-  val communityOfficer: CommunityOfficer,
-)
-
-data class CommunityOfficer(
-  val code: String,
-  val name: OfficerName,
-  val username: String,
-  val email: String?,
-  val responsibleOfficer: Boolean,
-)
-
-data class OfficerName(
-  val forename: String,
-  val surname: String,
-)
-
 @Service
 class CommunityAPIOffenderService(
   @Value("\${community-api.locations.offender-access}") private val offenderAccessLocation: String,
@@ -59,9 +42,7 @@ class CommunityAPIOffenderService(
   @Value("\${community-api.locations.staff-details}") private val staffDetailsLocation: String,
   @Value("\${community-api.locations.offender-managers}") private val offenderManagersLocation: String,
   @Value("\${community-api.locations.offender-identifiers}") private val offenderIdentifiersLocation: String,
-  @Value("\${refer-and-monitor-and-delius.locations.responsible-officer}") private val responsibleOfficerLocation: String,
   private val communityApiClient: RestClient,
-  private val telemetryService: TelemetryService,
 ) {
   fun checkIfAuthenticatedDeliusUserHasAccessToServiceUser(user: AuthUser, crn: String): ServiceUserAccessResult {
     val userAccessPath = UriComponentsBuilder.fromPath(offenderAccessLocation)
@@ -124,32 +105,5 @@ class CommunityAPIOffenderService(
     return communityApiClient.get(offenderIdentifiersPath)
       .retrieve()
       .bodyToMono(OffenderIdentifiersResponse::class.java)
-  }
-
-  fun getResponsibleOfficerDetails(crn: String): OfficerDetails? {
-    val officerDetailsPath = UriComponentsBuilder.fromPath(responsibleOfficerLocation)
-      .buildAndExpand(crn)
-      .toString()
-
-    val officerDetails = communityApiClient.get(officerDetailsPath)
-      .retrieve()
-      .bodyToMono(OfficerDetails::class.java)
-      .onErrorResume(WebClientResponseException::class.java) { e ->
-        when (e.statusCode) {
-          // not all delius users are staff
-          HttpStatus.NOT_FOUND -> Mono.empty()
-          else -> Mono.error(e)
-        }
-      }
-      .block()
-
-    if (officerDetails == null || !(officerDetails.communityOfficer.responsibleOfficer)) {
-      telemetryService.reportInvalidAssumption(
-        "service users always have a responsible officer",
-        mapOf("crn" to crn),
-        recoverable = false,
-      )
-    }
-    return officerDetails
   }
 }

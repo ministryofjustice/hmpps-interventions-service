@@ -63,6 +63,7 @@ class ReferralService(
   val serviceProviderUserAccessScopeMapper: ServiceProviderAccessScopeMapper,
   val referralAccessFilter: ReferralAccessFilter,
   val communityAPIOffenderService: CommunityAPIOffenderService,
+  val ramDeliusAPIOffenderService: RamDeliusAPIOffenderService,
   @Lazy val amendReferralService: AmendReferralService,
   val hmppsAuthService: HMPPSAuthService,
   val telemetryService: TelemetryService,
@@ -269,7 +270,7 @@ class ReferralService(
 
   fun getResponsibleProbationPractitioner(crn: String, sentBy: AuthUser?, createdBy: AuthUser): ResponsibleProbationPractitioner {
     try {
-      val responsibleOfficer = communityAPIOffenderService.getResponsibleOfficerDetails(crn)
+      val responsibleOfficer = ramDeliusAPIOffenderService.getResponsibleOfficerDetails(crn)
       if (responsibleOfficer?.communityOfficer?.email != null) {
         return ResponsibleProbationPractitioner(
           responsibleOfficer.communityOfficer.name.forename,
