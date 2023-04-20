@@ -49,7 +49,7 @@ internal class RamDeliusAPIOffenderServiceTest {
           responsibleOfficerLocation,
           HttpStatus.OK,
           "{\n" +
-            "  \"communityOfficer\": {\n" +
+            "  \"communityManager\": {\n" +
             "    \"code\": \"123\",\n" +
             "    \"name\": {\n" +
             "      \"forename\": \"Dan\",\n" +
@@ -78,7 +78,7 @@ internal class RamDeliusAPIOffenderServiceTest {
           responsibleOfficerLocation,
           HttpStatus.OK,
           "{\n" +
-            "  \"communityOfficer\": {\n" +
+            "  \"communityManager\": {\n" +
             "    \"code\": \"123\",\n" +
             "    \"name\": {\n" +
             "      \"forename\": \"Dan\",\n" +
