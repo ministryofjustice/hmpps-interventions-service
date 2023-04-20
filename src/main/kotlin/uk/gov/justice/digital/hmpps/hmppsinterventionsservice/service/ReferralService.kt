@@ -276,7 +276,7 @@ class ReferralService(
           responsibleOfficer.communityManager.name.forename,
           responsibleOfficer.communityManager.email,
           responsibleOfficer.communityManager.code,
-          authUserRepository.findByUserName(responsibleOfficer.communityManager.username),
+          if (responsibleOfficer.communityManager.username != null) authUserRepository.findByUserName(responsibleOfficer.communityManager.username) else null,
           responsibleOfficer.communityManager.name.surname,
         )
       }
