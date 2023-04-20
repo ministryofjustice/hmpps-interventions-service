@@ -9,18 +9,18 @@ import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.RestClient
 
 data class OfficerDetails(
-  val communityOfficer: CommunityOfficer,
+  val communityManager: CommunityManager,
 )
 
-data class CommunityOfficer(
+data class CommunityManager(
   val code: String,
-  val name: OfficerName,
+  val name: Name,
   val username: String,
   val email: String?,
   val responsibleOfficer: Boolean,
 )
 
-data class OfficerName(
+data class Name(
   val forename: String,
   val surname: String,
 )
@@ -48,7 +48,7 @@ class RamDeliusAPIOffenderService(
       }
       .block()
 
-    if (officerDetails == null || !(officerDetails.communityOfficer.responsibleOfficer)) {
+    if (officerDetails == null || !(officerDetails.communityManager.responsibleOfficer)) {
       telemetryService.reportInvalidAssumption(
         "service users always have a responsible officer",
         mapOf("crn" to crn),

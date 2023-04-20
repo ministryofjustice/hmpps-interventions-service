@@ -271,19 +271,19 @@ class ReferralService(
   fun getResponsibleProbationPractitioner(crn: String, sentBy: AuthUser?, createdBy: AuthUser): ResponsibleProbationPractitioner {
     try {
       val responsibleOfficer = ramDeliusAPIOffenderService.getResponsibleOfficerDetails(crn)
-      if (responsibleOfficer?.communityOfficer?.email != null) {
+      if (responsibleOfficer?.communityManager?.email != null) {
         return ResponsibleProbationPractitioner(
-          responsibleOfficer.communityOfficer.name.forename,
-          responsibleOfficer.communityOfficer.email,
-          responsibleOfficer.communityOfficer.code,
-          authUserRepository.findByUserName(responsibleOfficer.communityOfficer.username),
-          responsibleOfficer.communityOfficer.name.surname,
+          responsibleOfficer.communityManager.name.forename,
+          responsibleOfficer.communityManager.email,
+          responsibleOfficer.communityManager.code,
+          authUserRepository.findByUserName(responsibleOfficer.communityManager.username),
+          responsibleOfficer.communityManager.name.surname,
         )
       }
 
       telemetryService.reportInvalidAssumption(
         "all responsible officers have email addresses",
-        mapOf("staffId" to responsibleOfficer?.communityOfficer?.code!!),
+        mapOf("staffId" to responsibleOfficer?.communityManager?.code!!),
       )
 
       logger.warn("no email address for responsible officer; falling back to referring probation practitioner")
