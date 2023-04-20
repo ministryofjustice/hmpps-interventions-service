@@ -65,9 +65,9 @@ internal class RamDeliusAPIOffenderServiceTest {
     )
 
     val responsibleOfficerDetails = offenderService.getResponsibleOfficerDetails("X123456")
-    assertThat(responsibleOfficerDetails?.communityOfficer?.name?.forename).isEqualTo("Dan")
-    assertThat(responsibleOfficerDetails?.communityOfficer?.code).isEqualTo("123")
-    assertThat(responsibleOfficerDetails?.communityOfficer?.responsibleOfficer).isTrue
+    assertThat(responsibleOfficerDetails?.communityManager?.name?.forename).isEqualTo("Dan")
+    assertThat(responsibleOfficerDetails?.communityManager?.code).isEqualTo("123")
+    assertThat(responsibleOfficerDetails?.communityManager?.responsibleOfficer).isTrue
   }
 
   @Test
