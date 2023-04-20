@@ -104,6 +104,7 @@ class ReferralServiceTest @Autowired constructor(
   private val serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper = mock()
   private val referralAccessFilter = ReferralAccessFilter(serviceProviderAccessScopeMapper)
   private val communityAPIOffenderService: CommunityAPIOffenderService = mock()
+  private val ramDeliusAPIOffenderService: RamDeliusAPIOffenderService = mock()
   private val amendReferralService: AmendReferralService = mock()
   private val hmppsAuthService: HMPPSAuthService = mock()
   private val telemetryService: TelemetryService = mock()
@@ -128,6 +129,7 @@ class ReferralServiceTest @Autowired constructor(
     serviceProviderAccessScopeMapper,
     referralAccessFilter,
     communityAPIOffenderService,
+    ramDeliusAPIOffenderService,
     amendReferralService,
     hmppsAuthService,
     telemetryService,

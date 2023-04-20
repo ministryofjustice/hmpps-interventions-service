@@ -59,6 +59,7 @@ class ReferralServiceUnitTest {
   private val referralAccessFilter: ReferralAccessFilter = mock()
   private val userTypeChecker: UserTypeChecker = mock()
   private val communityAPIOffenderService: CommunityAPIOffenderService = mock()
+  private val ramDeliusAPIOffenderService: RamDeliusAPIOffenderService = mock()
   private val amendReferralService: AmendReferralService = mock()
   private val hmppsAuthService: HMPPSAuthService = mock()
   private val telemetryService: TelemetryService = mock()
@@ -85,6 +86,7 @@ class ReferralServiceUnitTest {
     serviceProviderAccessScopeMapper,
     referralAccessFilter,
     communityAPIOffenderService,
+    ramDeliusAPIOffenderService,
     amendReferralService,
     hmppsAuthService,
     telemetryService,
@@ -145,7 +147,7 @@ class ReferralServiceUnitTest {
         true,
       ),
     )
-    whenever(communityAPIOffenderService.getResponsibleOfficerDetails(any())).thenReturn(responsibleOfficerDetails)
+    whenever(ramDeliusAPIOffenderService.getResponsibleOfficerDetails(any())).thenReturn(responsibleOfficerDetails)
     val pp = referralService.getResponsibleProbationPractitioner(referralFactory.createSent())
     assertThat(pp.firstName).isEqualTo("tom")
     assertThat(pp.email).isEqualTo("tom@tom.tom")
@@ -154,7 +156,7 @@ class ReferralServiceUnitTest {
   @Test
   fun `getResponsibleProbationPractitioner uses sender if there is an unexpected error`() {
     val sender = authUserFactory.create("sender")
-    whenever(communityAPIOffenderService.getResponsibleOfficerDetails(any())).thenThrow(ReadTimeoutException.INSTANCE)
+    whenever(ramDeliusAPIOffenderService.getResponsibleOfficerDetails(any())).thenThrow(ReadTimeoutException.INSTANCE)
     whenever(hmppsAuthService.getUserDetail(sender)).thenReturn(UserDetail("andrew", "andrew@tom.tom", "marr"))
     val pp = referralService.getResponsibleProbationPractitioner(referralFactory.createSent(sentBy = sender))
     assertThat(pp.firstName).isEqualTo("andrew")
@@ -173,7 +175,7 @@ class ReferralServiceUnitTest {
       ),
     )
     val sender = authUserFactory.create("sender")
-    whenever(communityAPIOffenderService.getResponsibleOfficerDetails(any())).thenReturn(responsibleOfficerDetails)
+    whenever(ramDeliusAPIOffenderService.getResponsibleOfficerDetails(any())).thenReturn(responsibleOfficerDetails)
     whenever(hmppsAuthService.getUserDetail(sender)).thenReturn(UserDetail("andrew", "andrew@tom.tom", "marr"))
     val pp = referralService.getResponsibleProbationPractitioner(referralFactory.createSent(sentBy = sender))
     assertThat(pp.firstName).isEqualTo("andrew")
@@ -192,7 +194,7 @@ class ReferralServiceUnitTest {
       ),
     )
     val creator = authUserFactory.create("creator")
-    whenever(communityAPIOffenderService.getResponsibleOfficerDetails(any())).thenReturn(responsibleOfficerDetails)
+    whenever(ramDeliusAPIOffenderService.getResponsibleOfficerDetails(any())).thenReturn(responsibleOfficerDetails)
     whenever(hmppsAuthService.getUserDetail(creator)).thenReturn(UserDetail("dan", "dan@tom.tom", "walker"))
     val pp = referralService.getResponsibleProbationPractitioner(referralFactory.createSent(createdBy = creator))
     assertThat(pp.firstName).isEqualTo("dan")
