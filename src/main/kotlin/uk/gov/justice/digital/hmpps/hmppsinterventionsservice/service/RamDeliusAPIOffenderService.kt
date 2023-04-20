@@ -15,7 +15,7 @@ data class OfficerDetails(
 data class CommunityManager(
   val code: String,
   val name: Name,
-  val username: String,
+  val username: String?,
   val email: String?,
   val responsibleOfficer: Boolean,
 )
