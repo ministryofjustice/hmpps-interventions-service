@@ -46,7 +46,7 @@ class WebClientConfiguration(
   @Bean
   fun hmppsAuthApiClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient {
     return RestClient(
-      createAuthorizedWebClient(authorizedClientManager, hmppsAuthBaseUrl, hmppsAuthConnectTimeoutSeconds, hmppsAuthConnectTimeoutSeconds.toLong()),
+      createAuthorizedWebClient(authorizedClientManager, hmppsAuthBaseUrl, hmppsReadTimeoutSeconds, hmppsReadTimeoutSeconds.toLong()),
       interventionsClientRegistrationId,
     )
   }
