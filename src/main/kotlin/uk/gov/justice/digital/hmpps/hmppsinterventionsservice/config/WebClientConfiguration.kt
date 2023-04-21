@@ -23,7 +23,6 @@ class WebClientConfiguration(
   @Value("\${webclient.connect-timeout-seconds}") private val defaultConnectTimeoutSeconds: Long,
   @Value("\${webclient.read-timeout-seconds}") private val defaultReadTimeoutSeconds: Int,
   @Value("\${webclient.hmpps-auth.read-timeout-seconds}") private val hmppsReadTimeoutSeconds: Int,
-  @Value("\${webclient.hmpps-auth.connect-timeout-seconds}") private val hmppsAuthConnectTimeoutSeconds: Int,
   @Value("\${webclient.write-timeout-seconds}") private val writeTimeoutSeconds: Int,
   @Value("\${community-api.baseurl}") private val communityApiBaseUrl: String,
   @Value("\${hmppsauth.baseurl}") private val hmppsAuthBaseUrl: String,
