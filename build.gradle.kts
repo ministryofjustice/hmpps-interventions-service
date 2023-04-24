@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.6-beta-2"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.6-beta-3"
   kotlin("plugin.spring") version "1.8.20"
   id("org.jetbrains.kotlin.plugin.jpa") version "1.8.20"
   id("jacoco")
@@ -84,7 +84,7 @@ dependencies {
   implementation("io.sentry:sentry-logback:6.17.0")
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
   implementation("net.logstash.logback:logstash-logback-encoder:7.3")
-  runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2") // needed for OffsetDateTime for AppInsights
+  runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.0") // needed for OffsetDateTime for AppInsights
 
   // openapi
   implementation("org.springdoc:springdoc-openapi-ui:1.7.0")
@@ -93,14 +93,14 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:3.19.1-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.20.49")
-  implementation("software.amazon.awssdk:s3:2.20.49")
+  implementation("software.amazon.awssdk:sns:2.20.51")
+  implementation("software.amazon.awssdk:s3:2.20.51")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-  implementation("com.nimbusds:oauth2-oidc-sdk:10.7.2")
+  implementation("com.nimbusds:oauth2-oidc-sdk:10.8")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -115,8 +115,8 @@ dependencies {
   implementation("org.apache.commons:commons-csv:1.10.0")
 
   testImplementation("au.com.dius.pact.provider:junit5spring:4.5.6")
-  testImplementation("com.squareup.okhttp3:okhttp:4.10.0")
-  testImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
+  testImplementation("com.squareup.okhttp3:okhttp:4.11.0")
+  testImplementation("com.squareup.okhttp3:mockwebserver:4.11.0")
   testImplementation("org.mockito:mockito-inline:5.2.0")
   testImplementation("org.springframework.batch:spring-batch-test")
   testImplementation("com.github.tomakehurst:wiremock-jre8:2.35.0")
