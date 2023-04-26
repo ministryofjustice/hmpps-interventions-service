@@ -1,4 +1,4 @@
-FROM --platform=${BUILDPLATFORM:-linux/amd64} eclipse-temurin:17.0.6_10-jre-focal AS builder
+FROM --platform=${BUILDPLATFORM:-linux/amd64} eclipse-temurin:17.0.7_7-jre-focal AS builder
 
 WORKDIR /app
 
@@ -23,7 +23,7 @@ RUN ./gradlew assemble
 
 
 # ---
-FROM --platform=${BUILDPLATFORM:-linux/amd64} eclipse-temurin:17.0.6_10-jre-focal AS final
+FROM --platform=${BUILDPLATFORM:-linux/amd64} eclipse-temurin:17.0.7_7-jre-focal AS final
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
 # force a rebuild of `apk upgrade` below by invalidating the BUILD_NUMBER env variable on every commit
