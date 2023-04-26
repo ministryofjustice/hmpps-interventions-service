@@ -157,7 +157,7 @@ class DeliverySessionService(
     notifyProbationPractitioner: Boolean? = null,
     behaviourDescription: String? = null,
   ): DeliverySession {
-    val deliusAppointmentId = communityAPIBookingService.book(
+    val (deliusAppointmentId, _) = communityAPIBookingService.book(
       deliverySession.referral,
       latestAppointment,
       appointmentTime,
@@ -200,7 +200,7 @@ class DeliverySessionService(
     val existingAppointment = session.currentAppointment
 
     // TODO: Some code duplication here with AppointmentService.kt
-    val deliusAppointmentId = communityAPIBookingService.book(
+    val (deliusAppointmentId, appointmentId) = communityAPIBookingService.book(
       session.referral,
       if (existingAppointment?.attended != Attended.NO) existingAppointment else null,
       appointmentTime,
@@ -213,7 +213,7 @@ class DeliverySessionService(
 
     // creating a new appointment from the existing appointment or else create a new appointment
     val appointment = Appointment(
-      id = UUID.randomUUID(),
+      id = appointmentId ?: UUID.randomUUID(),
       durationInMinutes = durationInMinutes,
       appointmentTime = appointmentTime,
       deliusAppointmentId = deliusAppointmentId,

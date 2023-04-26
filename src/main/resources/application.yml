@@ -139,6 +139,7 @@ interventions-ui:
 refer-and-monitor-and-delius:
   locations:
     referral-start: "/probation-case/{crn}/referrals"
+    appointment-merge: "/probation-case/{crn}/referrals/{referralId}/appointments"
     responsible-officer: "/probation-case/{crn}/responsible-officer"
 
 community-api:
