@@ -9,10 +9,17 @@ import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.RestClient
 
 data class OfficerDetails(
-  val communityManager: CommunityManager,
-)
+  val communityManager: Manager,
+  val prisonManager: Manager? = null,
+) {
+  val responsibleManager = when {
+    communityManager.responsibleOfficer -> communityManager
+    prisonManager?.responsibleOfficer == true -> prisonManager
+    else -> null
+  }
+}
 
-data class CommunityManager(
+data class Manager(
   val code: String,
   val name: Name,
   val username: String?,
@@ -41,14 +48,14 @@ class RamDeliusAPIOffenderService(
       .bodyToMono(OfficerDetails::class.java)
       .onErrorResume(WebClientResponseException::class.java) { e ->
         when (e.statusCode) {
-          // not all delius users are staff
+          // crn not found - may have been merged
           HttpStatus.NOT_FOUND -> Mono.empty()
           else -> Mono.error(e)
         }
       }
       .block()
 
-    if (officerDetails == null || !(officerDetails.communityManager.responsibleOfficer)) {
+    if (officerDetails?.responsibleManager == null) {
       telemetryService.reportInvalidAssumption(
         "service users always have a responsible officer",
         mapOf("crn" to crn),
