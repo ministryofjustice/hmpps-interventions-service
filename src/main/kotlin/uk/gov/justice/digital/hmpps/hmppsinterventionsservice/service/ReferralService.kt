@@ -270,14 +270,14 @@ class ReferralService(
 
   fun getResponsibleProbationPractitioner(crn: String, sentBy: AuthUser?, createdBy: AuthUser): ResponsibleProbationPractitioner {
     try {
-      val officerDetails = ramDeliusAPIOffenderService.getResponsibleOfficerDetails(crn)
-      val responsibleOfficer = officerDetails!!.responsibleManager ?: officerDetails.communityManager
+      val officerDetails = ramDeliusAPIOffenderService.getResponsibleOfficerDetails(crn)!!
+      val responsibleOfficer = officerDetails.responsibleManager ?: officerDetails.communityManager
       if (responsibleOfficer.email != null) {
         return ResponsibleProbationPractitioner(
           responsibleOfficer.name.forename,
           responsibleOfficer.email,
           responsibleOfficer.code,
-          if (responsibleOfficer.username != null) authUserRepository.findByUserName(responsibleOfficer.username) else null,
+          responsibleOfficer.username?.let { authUserRepository.findByUserName(it) },
           responsibleOfficer.name.surname,
         )
       }
