@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.6-beta-3"
-  kotlin("plugin.spring") version "1.8.20"
-  id("org.jetbrains.kotlin.plugin.jpa") version "1.8.20"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.6-beta-4"
+  kotlin("plugin.spring") version "1.8.21"
+  id("org.jetbrains.kotlin.plugin.jpa") version "1.8.21"
   id("jacoco")
 }
 
@@ -17,7 +17,7 @@ configurations {
 }
 
 jacoco {
-  toolVersion = "0.8.9"
+  toolVersion = "0.8.10"
 }
 
 tasks {
@@ -93,8 +93,8 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:3.19.1-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.20.51")
-  implementation("software.amazon.awssdk:s3:2.20.51")
+  implementation("software.amazon.awssdk:sns:2.20.54")
+  implementation("software.amazon.awssdk:s3:2.20.54")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
