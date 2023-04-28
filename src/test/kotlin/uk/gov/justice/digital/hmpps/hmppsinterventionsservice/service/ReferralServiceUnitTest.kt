@@ -139,7 +139,7 @@ class ReferralServiceUnitTest {
   @Test
   fun `getResponsibleProbationPractitioner uses responsible officer`() {
     val responsibleOfficerDetails = OfficerDetails(
-      CommunityManager(
+      Manager(
         "234",
         Name("tom", "mayers"),
         "Test_User",
@@ -166,7 +166,7 @@ class ReferralServiceUnitTest {
   @Test
   fun `getResponsibleProbationPractitioner uses sender if there is no responsible officer email address`() {
     val responsibleOfficerDetails = OfficerDetails(
-      CommunityManager(
+      Manager(
         "234",
         Name("tom", "mayers"),
         "Test_User",
@@ -185,7 +185,7 @@ class ReferralServiceUnitTest {
   @Test
   fun `getResponsibleProbationPractitioner uses creator if there is no responsible officer email address`() {
     val responsibleOfficerDetails = OfficerDetails(
-      CommunityManager(
+      Manager(
         "234",
         Name("tom", "mayers"),
         "Test_User",
