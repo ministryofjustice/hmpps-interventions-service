@@ -77,7 +77,7 @@ class AppointmentService(
       }
       // the current appointment needs to be updated
       appointment.attended == null -> {
-        val (deliusAppointmentId, _) =
+        val (deliusAppointmentId, appointmentId) =
           communityAPIBookingService.book(referral, appointment, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode)
         updateAppointment(
           durationInMinutes,
@@ -95,6 +95,7 @@ class AppointmentService(
           notifyProbationPractitioner,
           behaviourDescription,
           appointmentType,
+          appointmentId,
         )
       }
       // the appointment has already been attended
@@ -283,6 +284,7 @@ class AppointmentService(
     notifyProbationPractitioner: Boolean?,
     behaviourDescription: String?,
     appointmentType: AppointmentType,
+    uuid: UUID?,
   ): Appointment {
     val appointment = createAppointment(
       durationInMinutes,
@@ -299,6 +301,7 @@ class AppointmentService(
       notifyProbationPractitioner,
       behaviourDescription,
       appointmentType,
+      uuid,
     )
     oldAppointment.superseded = true
     appointmentRepository.save(oldAppointment)

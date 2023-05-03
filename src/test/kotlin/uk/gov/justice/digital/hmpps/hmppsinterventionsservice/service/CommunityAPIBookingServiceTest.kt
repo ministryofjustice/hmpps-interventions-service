@@ -47,9 +47,7 @@ internal class CommunityAPIBookingServiceTest {
   private val httpBaseUrl = "http://url"
   private val progressUrl = "/pp/{referralId}/progress"
   private val supplierAssessmentUrl = "/pp/{referralId}/supplier-assessment"
-  private val rescheduleApiUrl = "/appt/{CRN}/{sentenceId}/{contextName}/reschedule"
   private val crsOfficeLocation = "CRSEXTL"
-  private val crsBookingsContext = "CRS"
   private val appointmentMergeUrl = "/probation-case/{crn}/referrals/{referralId}/appointments"
 
   private val communityAPIClient: CommunityAPIClient = mock()
@@ -60,12 +58,9 @@ internal class CommunityAPIBookingServiceTest {
     httpBaseUrl,
     progressUrl,
     supplierAssessmentUrl,
-    rescheduleApiUrl,
     crsOfficeLocation,
     mapOf(SERVICE_DELIVERY to "Service Delivery"),
     mapOf(SERVICE_DELIVERY to true),
-    crsBookingsContext,
-    communityAPIClient,
     appointmentMergeUrl,
     ramDeliusAPIClient,
   )
@@ -204,16 +199,14 @@ internal class CommunityAPIBookingServiceTest {
       val deliusAppointmentId = 999L
       val appointment = makeAppointment(now, now.plusDays(1), 60, deliusAppointmentId)
 
-      val uri = "/appt/X1/999/CRS/reschedule"
-      val request = AppointmentRescheduleRequestDTO(now, now.plusMinutes(45), true, crsOfficeLocation)
+      val uri = "/probation-case/${appointment.referral.serviceUserCRN}/referrals/${appointment.referral.id}/appointments"
       val response = AppointmentResponseDTO(1234L)
 
-      whenever(communityAPIClient.makeSyncPostRequest(uri, request, AppointmentResponseDTO::class.java))
-        .thenReturn(response)
+      whenever(ramDeliusAPIClient.makePutAppointmentRequest(eq(uri), any())).thenReturn(response)
 
       communityAPIBookingService.book(referral, appointment, now, 45, SERVICE_DELIVERY, null, null, null)
 
-      verify(communityAPIClient).makeSyncPostRequest(uri, request, AppointmentResponseDTO::class.java)
+      verify(ramDeliusAPIClient).makePutAppointmentRequest(eq(uri), any())
     }
 
     @Test
@@ -228,16 +221,14 @@ internal class CommunityAPIBookingServiceTest {
       )
       existingAppointment.appointmentDelivery = appointmentDelivery
 
-      val uri = "/appt/X1/999/CRS/reschedule"
-      val request = AppointmentRescheduleRequestDTO(now, now.plusMinutes(45), true, "NEW_CODE")
+      val uri = "/probation-case/${existingAppointment.referral.serviceUserCRN}/referrals/${existingAppointment.referral.id}/appointments"
       val response = AppointmentResponseDTO(1234L)
 
-      whenever(communityAPIClient.makeSyncPostRequest(uri, request, AppointmentResponseDTO::class.java))
-        .thenReturn(response)
+      whenever(ramDeliusAPIClient.makePutAppointmentRequest(eq(uri), any())).thenReturn(response)
 
       communityAPIBookingService.book(referral, existingAppointment, now, 45, SERVICE_DELIVERY, "NEW_CODE", null, null)
 
-      verify(communityAPIClient).makeSyncPostRequest(uri, request, AppointmentResponseDTO::class.java)
+      verify(ramDeliusAPIClient).makePutAppointmentRequest(eq(uri), any())
     }
 
     @Test
@@ -372,12 +363,9 @@ internal class CommunityAPIBookingServiceTest {
       httpBaseUrl,
       progressUrl,
       supplierAssessmentUrl,
-      rescheduleApiUrl,
       crsOfficeLocation,
       mapOf(),
       mapOf(),
-      crsBookingsContext,
-      communityAPIClient,
       appointmentMergeUrl,
       ramDeliusAPIClient,
     )
@@ -398,12 +386,9 @@ internal class CommunityAPIBookingServiceTest {
       httpBaseUrl,
       progressUrl,
       supplierAssessmentUrl,
-      rescheduleApiUrl,
       crsOfficeLocation,
       mapOf(),
       mapOf(),
-      crsBookingsContext,
-      communityAPIClient,
       appointmentMergeUrl,
       ramDeliusAPIClient,
     )

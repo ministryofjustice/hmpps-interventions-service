@@ -144,7 +144,6 @@ refer-and-monitor-and-delius:
 
 community-api:
   locations:
-    reschedule-appointment: "/secure/offenders/crn/{crn}/appointments/{appointmentId}/reschedule/context/{contextName}"
     appointment-outcome-request: "/secure/offenders/crn/{crn}/appointments/{appointmentId}/outcome/context/{contextName}"
     notification-request: "/secure/offenders/crn/{crn}/sentences/{sentenceId}/notifications/context/{contextName}"
     offender-access: "/secure/offenders/crn/{crn}/user/{username}/userAccess"

@@ -27,7 +27,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.CommunityApiCallError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AppointmentCreateRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AppointmentResponseDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.LoggingMemoryAppender
 import java.time.OffsetDateTime
@@ -246,5 +245,18 @@ class CommunityAPIClientTest {
     countsTowardsRarDays = true,
     attended = null,
     notifyPPOfAttendanceBehaviour = null,
+  )
+
+  data class AppointmentCreateRequestDTO(
+    val contractType: String,
+    val referralStart: OffsetDateTime,
+    val referralId: UUID,
+    val appointmentStart: OffsetDateTime,
+    val appointmentEnd: OffsetDateTime,
+    val officeLocationCode: String,
+    val notes: String,
+    val countsTowardsRarDays: Boolean,
+    val attended: String?,
+    val notifyPPOfAttendanceBehaviour: Boolean?,
   )
 }
