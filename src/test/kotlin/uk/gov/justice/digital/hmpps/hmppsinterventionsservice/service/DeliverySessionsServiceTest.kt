@@ -114,12 +114,16 @@ internal class DeliverySessionsServiceTest {
     val actionPlanId = UUID.randomUUID()
     val sessionNumber = session.sessionNumber
     val user = createActor("scheduler")
+    val appointmentTime = OffsetDateTime.now().plusHours(1)
+    val durationInMinutes = 200
+    val appointment = session.currentAppointment
 
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(session)
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
 
-    val appointmentTime = OffsetDateTime.now().plusHours(1)
-    val durationInMinutes = 200
+    whenever(communityAPIBookingService.book(session.referral, appointment, appointmentTime, durationInMinutes, SERVICE_DELIVERY, null, null, null))
+      .thenReturn(Pair(appointment?.deliusAppointmentId, appointment?.id))
+
     val updatedSession = deliverySessionsService.updateSessionAppointment(
       actionPlanId,
       sessionNumber,
@@ -159,6 +163,11 @@ internal class DeliverySessionsServiceTest {
 
     val appointmentTime = OffsetDateTime.now()
     val durationInMinutes = 200
+    val appointment = session.currentAppointment
+
+    whenever(communityAPIBookingService.book(session.referral, appointment, appointmentTime, durationInMinutes, SERVICE_DELIVERY, null, Attended.YES, false))
+      .thenReturn(Pair(76636819L, UUID.randomUUID()))
+
     val updatedSession = deliverySessionsService.updateSessionAppointment(
       actionPlanId,
       sessionNumber,
@@ -206,6 +215,10 @@ internal class DeliverySessionsServiceTest {
 
     val appointmentTime = OffsetDateTime.now()
     val durationInMinutes = 200
+
+    whenever(communityAPIBookingService.book(any(), isNull(), any(), any(), eq(SERVICE_DELIVERY), isNull(), eq(Attended.NO), isNull()))
+      .thenReturn(Pair(46298523523L, UUID.randomUUID()))
+
     val updatedSession = deliverySessionsService.updateSessionAppointment(
       actionPlanId,
       sessionNumber,
@@ -244,12 +257,16 @@ internal class DeliverySessionsServiceTest {
     val actionPlanId = UUID.randomUUID()
     val sessionNumber = session.sessionNumber
     val user = createActor("re-scheduler")
-
-    whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(session)
-    whenever(deliverySessionRepository.save(any())).thenReturn(session)
+    val appointment = session.currentAppointment
 
     val newTime = OffsetDateTime.now()
     val newDuration = 200
+
+    whenever(communityAPIBookingService.book(session.referral, appointment, newTime, newDuration, SERVICE_DELIVERY, null, null, null))
+      .thenReturn(Pair(4536183645L, UUID.randomUUID()))
+    whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(session)
+    whenever(deliverySessionRepository.save(any())).thenReturn(session)
+
     val updatedSession = deliverySessionsService.updateSessionAppointment(
       actionPlanId,
       sessionNumber,
@@ -296,7 +313,7 @@ internal class DeliverySessionsServiceTest {
         SERVICE_DELIVERY,
         null,
       ),
-    ).thenReturn(999L)
+    ).thenReturn(Pair(999L, appointment?.id))
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber))
       .thenReturn(session)
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
@@ -348,7 +365,7 @@ internal class DeliverySessionsServiceTest {
         SERVICE_DELIVERY,
         null,
       ),
-    ).thenReturn(null)
+    ).thenReturn(Pair(null, null))
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(session)
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
 
@@ -674,7 +691,7 @@ internal class DeliverySessionsServiceTest {
         SERVICE_DELIVERY,
         npsOfficeCode,
       ),
-    ).thenReturn(999L)
+    ).thenReturn(Pair(999L, appointment?.id))
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(
       session,
     )

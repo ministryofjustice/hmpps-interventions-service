@@ -72,7 +72,7 @@ class AppointmentService(
           notifyProbationPractitioner,
           behaviourDescription,
           appointmentType,
-          appointmentId
+          appointmentId,
         )
       }
       // the current appointment needs to be updated
@@ -250,7 +250,7 @@ class AppointmentService(
     notifyProbationPractitioner: Boolean?,
     behaviourDescription: String?,
     appointmentType: AppointmentType,
-    uuid: UUID? = null
+    uuid: UUID? = null,
   ): Appointment {
     val appointment = Appointment(
       id = uuid ?: UUID.randomUUID(),

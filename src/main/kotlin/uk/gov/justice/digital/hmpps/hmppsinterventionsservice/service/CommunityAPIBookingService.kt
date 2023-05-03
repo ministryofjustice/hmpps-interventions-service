@@ -60,11 +60,11 @@ class CommunityAPIBookingService(
     npsOfficeCode: String?,
     attended: Attended?,
     notifyPPOfAttendanceBehaviour: Boolean?,
-  ): Pair<Long?, UUID> {
+  ): Pair<Long?, UUID?> {
     return existingAppointment?.let {
       if (isDifferentTimings(existingAppointment, appointmentTime, durationInMinutes)) {
         val appointmentRequestDTO = buildAppointmentRescheduleRequestDTO(appointmentTime, durationInMinutes, npsOfficeCode ?: defaultOfficeLocation)
-        makeBooking(referral.serviceUserCRN, it.deliusAppointmentId!!, appointmentRequestDTO, communityApiRescheduleAppointmentLocation) to existingAppointment.id
+        makeBooking(referral.serviceUserCRN, it.deliusAppointmentId!!, appointmentRequestDTO, communityApiRescheduleAppointmentLocation) to null
       } else if (isDifferentLocation(existingAppointment, npsOfficeCode)) {
         val appointmentMerge = existingAppointment.forMerge(
           appointmentType,
@@ -91,7 +91,7 @@ class CommunityAPIBookingService(
         ),
         npsOfficeCode ?: defaultOfficeLocation,
         get(appointmentType, countsTowardsRarDays),
-        attended?.let { AppointmentMerge.Outcome(it, (attended == NO || notifyPPOfAttendanceBehaviour == true)) }
+        attended?.let { AppointmentMerge.Outcome(it, (attended == NO || notifyPPOfAttendanceBehaviour == true)) },
       )
       mergeAppointment(mergeAppointment) to mergeAppointment.id
     }
@@ -122,7 +122,7 @@ class CommunityAPIBookingService(
     val path = UriComponentsBuilder.fromPath(appointmentMergeLocation)
       .buildAndExpand(appointmentMerge.serviceUserCrn, appointmentMerge.referralId)
       .toString()
-    return ramDeliusClient.makeSyncPutRequest(path, appointmentMerge)?.appointmentId
+    return ramDeliusClient.makePutAppointmentRequest(path, appointmentMerge)?.appointmentId
   }
 
   private fun makeBooking(

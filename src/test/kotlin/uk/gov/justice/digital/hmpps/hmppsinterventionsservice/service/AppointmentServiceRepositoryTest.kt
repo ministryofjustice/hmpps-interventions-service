@@ -5,7 +5,12 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.isNotNull
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEventPublisher
@@ -67,6 +72,10 @@ class AppointmentServiceRepositoryTest @Autowired constructor(
     @Test
     fun `can schedule new appointment`() {
       val referral = referralFactory.createSent()
+
+      whenever(communityAPIBookingService.book(any(), isNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()))
+        .thenReturn(Pair(563729L, UUID.randomUUID()))
+
       val appointment = appointmentService.scheduleNewAppointment(
         referral.id,
         AppointmentType.SUPPLIER_ASSESSMENT,
@@ -103,7 +112,10 @@ class AppointmentServiceRepositoryTest @Autowired constructor(
 
     @Test
     fun `can reschedule existing appointment`() {
-      val appointment = appointmentFactory.create(appointmentTime = OffsetDateTime.now(), durationInMinutes = 60)
+      val appointment = appointmentFactory.create(appointmentTime = OffsetDateTime.now().plusMinutes(60), durationInMinutes = 60)
+
+      whenever(communityAPIBookingService.book(any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()))
+        .thenReturn(Pair(56478388921L, null))
 
       val rescheduledAppointment = appointmentService.rescheduleExistingAppointment(
         appointment.id,

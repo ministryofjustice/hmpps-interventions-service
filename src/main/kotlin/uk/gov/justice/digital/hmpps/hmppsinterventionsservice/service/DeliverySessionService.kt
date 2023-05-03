@@ -157,6 +157,9 @@ class DeliverySessionService(
     notifyProbationPractitioner: Boolean? = null,
     behaviourDescription: String? = null,
   ): DeliverySession {
+    if (appointmentTime.isBefore(OffsetDateTime.now()) && attended == null) {
+      throw IllegalArgumentException("Appointment feedback must be provided for appointments in the past.")
+    }
     val (deliusAppointmentId, _) = communityAPIBookingService.book(
       deliverySession.referral,
       latestAppointment,
@@ -165,9 +168,6 @@ class DeliverySessionService(
       SERVICE_DELIVERY,
       npsOfficeCode,
     )
-    if (appointmentTime.isBefore(OffsetDateTime.now()) && attended == null) {
-      throw IllegalArgumentException("Appointment feedback must be provided for appointments in the past.")
-    }
     appointmentToSchedule.appointmentTime = appointmentTime
     appointmentToSchedule.durationInMinutes = durationInMinutes
     appointmentToSchedule.deliusAppointmentId = deliusAppointmentId

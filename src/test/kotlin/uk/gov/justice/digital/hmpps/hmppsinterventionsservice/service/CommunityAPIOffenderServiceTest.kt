@@ -22,7 +22,6 @@ internal class CommunityAPIOffenderServiceTest {
   private val offenderAccessLocation = "offender-access"
   private val managedOffendersLocation = "managed-offenders"
   private val staffDetailsLocation = "staff-details"
-  private val offenderManagersLocation = "offender-managers"
   private val offenderIdentifiersLocation = "offender-identifiers"
 
   private fun createMockedRestClient(vararg responses: MockedResponse): RestClient {
@@ -47,7 +46,7 @@ internal class CommunityAPIOffenderServiceTest {
   }
 
   private fun offenderServiceFactory(restClient: RestClient): CommunityAPIOffenderService {
-    return CommunityAPIOffenderService(offenderAccessLocation, managedOffendersLocation, staffDetailsLocation, offenderManagersLocation, offenderIdentifiersLocation, restClient)
+    return CommunityAPIOffenderService(offenderAccessLocation, managedOffendersLocation, staffDetailsLocation, offenderIdentifiersLocation, restClient)
   }
 
   @Test
