@@ -376,15 +376,16 @@ class AppointmentService(
   ): Appointment {
     val appointment = this.appointmentRepository.findById(appointmentId).orElseThrow { EntityNotFoundException("Appointment not found [appointmentId=$appointmentId]") }
     appointment.appointmentFeedbackSubmittedAt ?.let { throw EntityExistsException("Appointment has already been delivered [appointmentId=$appointmentId]") }
-    val (deliusAppointmentId, _) =
+    val (deliusAppointmentId, apptId) =
       communityAPIBookingService.book(appointment.referral, appointment, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode)
-    appointment.durationInMinutes = durationInMinutes
-    appointment.appointmentTime = appointmentTime
-    appointment.deliusAppointmentId = deliusAppointmentId
-    appointmentRepository.save(appointment)
-    createOrUpdateAppointmentDeliveryDetails(appointment, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
-    appointmentEventPublisher.appointmentScheduledEvent(appointment, appointmentType)
-    return appointment
+    val rescheduled = apptId?.let { appointment.copy(id = apptId) } ?: appointment
+    rescheduled.durationInMinutes = durationInMinutes
+    rescheduled.appointmentTime = appointmentTime
+    rescheduled.deliusAppointmentId = deliusAppointmentId
+    appointmentRepository.saveAndFlush(rescheduled)
+    createOrUpdateAppointmentDeliveryDetails(rescheduled, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
+    appointmentEventPublisher.appointmentScheduledEvent(rescheduled, appointmentType)
+    return rescheduled
   }
 
   private fun setAttendanceAndBehaviourIfHistoricAppointment(

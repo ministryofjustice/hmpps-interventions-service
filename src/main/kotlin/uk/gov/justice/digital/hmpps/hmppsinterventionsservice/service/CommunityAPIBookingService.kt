@@ -87,6 +87,8 @@ class CommunityAPIBookingService(
         npsOfficeCode ?: defaultOfficeLocation,
         get(appointmentType, countsTowardsRarDays),
         attended?.let { AppointmentMerge.Outcome(it, (attended == NO || notifyPPOfAttendanceBehaviour == true)) },
+        null,
+        null,
       )
       mergeAppointment(mergeAppointment)
     }
@@ -111,6 +113,8 @@ class CommunityAPIBookingService(
     npsOfficeCode,
     get(appointmentType, countsTowardsRarDays),
     attended?.let { AppointmentMerge.Outcome(it, attended == NO || notifyOfAttendanceBehaviour) },
+    id,
+    deliusAppointmentId,
   )
 
   private fun mergeAppointment(appointmentMerge: AppointmentMerge): Pair<Long?, UUID> {
@@ -160,6 +164,8 @@ data class AppointmentMerge(
   val officeLocationCode: String?,
   val countsTowardsRar: Boolean,
   val outcome: Outcome?,
+  val previousId: UUID?,
+  val deliusId: Long?,
 ) {
   data class Outcome(
     val attended: Attended,

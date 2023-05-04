@@ -68,15 +68,10 @@ class AppointmentServiceTest {
     val referral = referralFactory.createSent()
     val deliusAppointmentId = 99L
     val npsOfficeCode = "CRSEXT"
-    val savedAppointment = appointmentFactory.create(
-      appointmentTime = appointmentTime,
-      durationInMinutes = durationInMinutes,
-      deliusAppointmentId = deliusAppointmentId,
-    )
 
     whenever(communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, npsOfficeCode))
-      .thenReturn(Pair(deliusAppointmentId, savedAppointment.id))
-    whenever(appointmentRepository.save(any())).thenReturn(savedAppointment)
+      .thenReturn(Pair(deliusAppointmentId, UUID.randomUUID()))
+    whenever(appointmentRepository.save(any())).thenAnswer { it.arguments[0] }
 
     // When
     val newAppointment = appointmentService.createOrUpdateAppointment(referral, null, durationInMinutes, appointmentTime, SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE, AppointmentSessionType.ONE_TO_ONE, npsOfficeCode = npsOfficeCode)
@@ -102,15 +97,10 @@ class AppointmentServiceTest {
     val appointmentTime = OffsetDateTime.parse("2022-12-04T10:42:43+00:00")
     val referral = referralFactory.createSent()
     val deliusAppointmentId = 99L
-    val savedAppointment = appointmentFactory.create(
-      appointmentTime = appointmentTime,
-      durationInMinutes = durationInMinutes,
-      deliusAppointmentId = deliusAppointmentId,
-    )
 
     whenever(communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null))
-      .thenReturn(Pair(deliusAppointmentId, savedAppointment.id))
-    whenever(appointmentRepository.save(any())).thenReturn(savedAppointment)
+      .thenReturn(Pair(deliusAppointmentId, UUID.randomUUID()))
+    whenever(appointmentRepository.save(any())).thenAnswer { it.arguments[0] }
 
     // When
     val newAppointment = appointmentService.createOrUpdateAppointment(referral, null, durationInMinutes, appointmentTime, SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
@@ -145,15 +135,10 @@ class AppointmentServiceTest {
     val appointmentTime = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
     val referral = referralFactory.createSent()
     val deliusAppointmentId = 99L
-    val savedAppointment = appointmentFactory.create(
-      appointmentTime = appointmentTime,
-      durationInMinutes = durationInMinutes,
-      deliusAppointmentId = deliusAppointmentId,
-    )
 
     whenever(communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null, YES, false))
-      .thenReturn(Pair(deliusAppointmentId, savedAppointment.id))
-    whenever(appointmentRepository.save(any())).thenReturn(savedAppointment)
+      .thenReturn(Pair(deliusAppointmentId, UUID.randomUUID()))
+    whenever(appointmentRepository.save(any())).thenAnswer { it.arguments[0] }
 
     // When
     val newAppointment = appointmentService.createOrUpdateAppointment(
@@ -209,13 +194,9 @@ class AppointmentServiceTest {
     val rescheduledDeliusAppointmentId = 99L
 
     whenever(communityAPIBookingService.book(referral, existingAppointment, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null))
-      .thenReturn(Pair(rescheduledDeliusAppointmentId, null))
-    val savedAppointment = appointmentFactory.create(
-      appointmentTime = appointmentTime,
-      durationInMinutes = durationInMinutes,
-      deliusAppointmentId = rescheduledDeliusAppointmentId,
-    )
-    whenever(appointmentRepository.saveAndFlush(any())).thenReturn(savedAppointment)
+      .thenReturn(Pair(rescheduledDeliusAppointmentId, UUID.randomUUID()))
+
+    whenever(appointmentRepository.saveAndFlush(any())).thenAnswer { it.arguments[0] }
 
     // When
     val updatedAppointment = appointmentService.createOrUpdateAppointment(referral, existingAppointment, durationInMinutes, appointmentTime, SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
@@ -255,15 +236,10 @@ class AppointmentServiceTest {
     val existingAppointment = appointmentFactory.create(deliusAppointmentId = 98L, attended = NO)
     val referral = referralFactory.createSent()
     val additionalDeliusAppointmentId = 99L
-    val savedAppointment = appointmentFactory.create(
-      appointmentTime = appointmentTime,
-      durationInMinutes = durationInMinutes,
-      deliusAppointmentId = additionalDeliusAppointmentId,
-    )
 
     whenever(communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null))
-      .thenReturn(Pair(additionalDeliusAppointmentId, savedAppointment.id))
-    whenever(appointmentRepository.save(any())).thenReturn(savedAppointment)
+      .thenReturn(Pair(additionalDeliusAppointmentId, UUID.randomUUID()))
+    whenever(appointmentRepository.save(any())).thenAnswer { it.arguments[0] }
 
     // When
     val newAppointment = appointmentService.createOrUpdateAppointment(referral, existingAppointment, durationInMinutes, appointmentTime, SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
@@ -299,19 +275,10 @@ class AppointmentServiceTest {
     val existingAppointment = appointmentFactory.create(deliusAppointmentId = 98L, attended = null)
     val referral = referralFactory.createSent()
     val rescheduledDeliusAppointmentId = 99L
-    val savedAppointment = appointmentFactory.create(
-      appointmentTime = OffsetDateTime.parse("2020-12-04T10:42:43+00:00"),
-      durationInMinutes = durationInMinutes,
-      deliusAppointmentId = rescheduledDeliusAppointmentId,
-      attended = NO,
-      additionalAttendanceInformation = "non attended",
-      attendanceBehaviour = null,
-      notifyPPOfAttendanceBehaviour = null,
-    )
 
     whenever(communityAPIBookingService.book(referral, existingAppointment, pastAppointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null))
-      .thenReturn(Pair(rescheduledDeliusAppointmentId, savedAppointment.id))
-    whenever(appointmentRepository.save(any())).thenReturn(savedAppointment)
+      .thenReturn(Pair(rescheduledDeliusAppointmentId, UUID.randomUUID()))
+    whenever(appointmentRepository.save(any())).thenAnswer { it.arguments[0] }
 
     // When
     val updatedAppointment = appointmentService.createOrUpdateAppointment(referral, existingAppointment, durationInMinutes, pastAppointmentTime, SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, NO, "non attended", null, null)
@@ -341,19 +308,10 @@ class AppointmentServiceTest {
     val existingAppointment = appointmentFactory.create(deliusAppointmentId = 98L, attended = NO)
     val referral = referralFactory.createSent()
     val additionalDeliusAppointmentId = 99L
-    val savedAppointment = appointmentFactory.create(
-      appointmentTime = appointmentTime,
-      durationInMinutes = durationInMinutes,
-      deliusAppointmentId = additionalDeliusAppointmentId,
-      attended = NO,
-      additionalAttendanceInformation = "non attended",
-      attendanceBehaviour = null,
-      notifyPPOfAttendanceBehaviour = null,
-    )
 
     whenever(communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null, NO, null))
-      .thenReturn(Pair(additionalDeliusAppointmentId, savedAppointment.id))
-    whenever(appointmentRepository.save(any())).thenReturn(savedAppointment)
+      .thenReturn(Pair(additionalDeliusAppointmentId, UUID.randomUUID()))
+    whenever(appointmentRepository.save(any())).thenAnswer { it.arguments[0] }
 
     // When
     val newAppointment = appointmentService.createOrUpdateAppointment(referral, existingAppointment, durationInMinutes, appointmentTime, SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, NO, "non attended", null, null)
@@ -443,13 +401,14 @@ class AppointmentServiceTest {
       val oldNpsCode = "CRS0001"
       val newNpsCode = "CRS0002"
       val savedAppointment = appointmentFactory.create(
+        existingAppointment.id,
         appointmentTime = appointmentTime,
         durationInMinutes = durationInMinutes,
         deliusAppointmentId = rescheduledDeliusAppointmentId,
       )
 
       whenever(communityAPIBookingService.book(referral, existingAppointment, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, newNpsCode))
-        .thenReturn(Pair(rescheduledDeliusAppointmentId, savedAppointment.id))
+        .thenReturn(Pair(rescheduledDeliusAppointmentId, existingAppointment.id))
       savedAppointment.appointmentDelivery = AppointmentDelivery(appointmentId = savedAppointment.id, appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE, AppointmentSessionType.ONE_TO_ONE, npsOfficeCode = oldNpsCode)
 
       whenever(appointmentRepository.save(any())).thenReturn(savedAppointment)

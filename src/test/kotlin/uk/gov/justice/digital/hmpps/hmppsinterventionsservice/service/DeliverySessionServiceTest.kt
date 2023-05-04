@@ -33,7 +33,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Aut
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DeliverySessionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
@@ -80,7 +79,6 @@ class DeliverySessionServiceTest @Autowired constructor(
   private val userFactory = AuthUserFactory(entityManager)
   private val deliverySessionFactory = DeliverySessionFactory(entityManager)
   private val actionPlanFactory = ActionPlanFactory(entityManager)
-  private val appointmentFactory = AppointmentFactory(entityManager)
 
   val defaultAppointmentTime = OffsetDateTime.now().plusDays(1)
   val defaultPastAppointmentTime = OffsetDateTime.now().minusHours(1)
@@ -108,9 +106,8 @@ class DeliverySessionServiceTest @Autowired constructor(
     fun `can schedule new appointment on empty session`() {
       val session = deliverySessionFactory.createUnscheduled()
 
-      val appt = session.currentAppointment
       whenever(communityAPIBookingService.book(any(), isNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()))
-        .thenReturn(Pair(appt?.deliusAppointmentId, appt?.id))
+        .thenReturn(Pair(384567262L, UUID.randomUUID()))
 
       val updatedSession = deliverySessionService.scheduleNewDeliverySessionAppointment(session.referral.id, session.sessionNumber, defaultAppointmentTime, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
 
@@ -128,7 +125,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       val newTime = existingAppointment.appointmentTime.plusHours(1)
 
       whenever(communityAPIBookingService.book(any(), isNotNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()))
-        .thenReturn(Pair(existingAppointment.deliusAppointmentId, existingAppointment.id))
+        .thenReturn(Pair(75638101746410L, UUID.randomUUID()))
 
       val updatedSession = deliverySessionService.scheduleNewDeliverySessionAppointment(session.referral.id, session.sessionNumber, newTime, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
 
@@ -156,9 +153,8 @@ class DeliverySessionServiceTest @Autowired constructor(
         null
       }
 
-      val appt = session.currentAppointment
       whenever(communityAPIBookingService.book(eq(session.referral), isNull(), eq(pastDate), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull()))
-        .thenReturn(Pair(appt?.deliusAppointmentId, appt?.id))
+        .thenReturn(Pair(462818752L, UUID.randomUUID()))
 
       val updatedSession = deliverySessionService.scheduleNewDeliverySessionAppointment(
         session.referral.id, session.sessionNumber, pastDate, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE,
@@ -270,13 +266,12 @@ class DeliverySessionServiceTest @Autowired constructor(
       val existingAppointment = session.currentAppointment!!
       val newTime = existingAppointment.appointmentTime.plusHours(1)
 
-      val appt = session.currentAppointment
       whenever(communityAPIBookingService.book(eq(session.referral), isNotNull(), eq(newTime), eq(2), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull()))
-        .thenReturn(Pair(appt?.deliusAppointmentId, appt?.id))
+        .thenReturn(Pair(32250921735125L, UUID.randomUUID()))
 
       val updatedSession = deliverySessionService.rescheduleDeliverySessionAppointment(session.referral.id, session.sessionNumber, existingAppointment.id, newTime, 2, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
 
-      assertThat(updatedSession.appointments.size).isEqualTo(1)
+      assertThat(updatedSession.appointments.size).isEqualTo(2)
 
       val appointment = updatedSession.currentAppointment!!
       assertThat(appointment.appointmentTime).isEqualTo(newTime)
@@ -301,17 +296,16 @@ class DeliverySessionServiceTest @Autowired constructor(
         null
       }
 
-      val appt = session.currentAppointment
       whenever(communityAPIBookingService.book(eq(session.referral), isNotNull(), eq(pastDate), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull()))
-        .thenReturn(Pair(appt?.deliusAppointmentId, appt?.id))
+        .thenReturn(Pair(2452352906724579L, UUID.randomUUID()))
 
       val updatedSession = deliverySessionService.rescheduleDeliverySessionAppointment(
         session.referral.id, session.sessionNumber, existingAppointment.id, pastDate, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE,
         attended = Attended.YES, additionalAttendanceInformation = "additionalAttendanceInformation", notifyProbationPractitioner = false, behaviourDescription = "behaviourDescription",
       )
 
-      assertThat(updatedSession.appointments.size).isEqualTo(1)
-      val appointment = updatedSession.appointments.first()
+      assertThat(updatedSession.appointments.size).isEqualTo(2)
+      val appointment = updatedSession.currentAppointment!!
       assertThat(appointment.appointmentTime).isEqualTo(pastDate)
       assertThat(appointment.durationInMinutes).isEqualTo(defaultDuration)
       assertThat(appointment.createdBy).isEqualTo(defaultUser)
@@ -605,9 +599,8 @@ class DeliverySessionServiceTest @Autowired constructor(
         null
       }
 
-      val appt = session.currentAppointment
       whenever(communityAPIBookingService.book(eq(session.referral), isNotNull(), eq(defaultPastAppointmentTime), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull()))
-        .thenReturn(Pair(appt?.deliusAppointmentId, appt?.id))
+        .thenReturn(Pair(6571124135135L, UUID.randomUUID()))
 
       val updatedSession = deliverySessionService.updateSessionAppointment(
         actionPlan.id, session.sessionNumber, defaultPastAppointmentTime, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE,
@@ -619,7 +612,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         "behaviourDescription",
       )
 
-      // assertThat(updatedSession.appointments.size).isEqualTo(2)
+      assertThat(updatedSession.appointments.size).isEqualTo(2)
       val appointment = updatedSession.currentAppointment!!
       assertThat(appointment.appointmentTime).isEqualTo(defaultPastAppointmentTime)
       assertThat(appointment.durationInMinutes).isEqualTo(defaultDuration)
@@ -696,7 +689,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         null
       }
 
-      whenever(communityAPIBookingService.book(any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()))
+      whenever(communityAPIBookingService.book(any(), isNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()))
         .thenReturn(Pair(564726L, UUID.randomUUID()))
 
       val updatedSession = deliverySessionService.updateSessionAppointment(
@@ -742,11 +735,10 @@ class DeliverySessionServiceTest @Autowired constructor(
         null
       }
 
-      val appt = session.currentAppointment!!
       whenever(
         communityAPIBookingService.book(
           eq(session.referral),
-          anyOrNull(),
+          isNull(),
           eq(defaultPastAppointmentTime),
           eq(defaultDuration),
           eq(AppointmentType.SERVICE_DELIVERY),
@@ -754,7 +746,7 @@ class DeliverySessionServiceTest @Autowired constructor(
           anyOrNull(),
           anyOrNull(),
         ),
-      ).thenReturn(Pair(56381916L, null))
+      ).thenReturn(Pair(56381916L, UUID.randomUUID()))
 
       val updatedSession = deliverySessionService.updateSessionAppointment(
         actionPlan.id, session.sessionNumber, defaultPastAppointmentTime, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE,
