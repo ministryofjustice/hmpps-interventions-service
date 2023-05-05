@@ -9,7 +9,9 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.RamDeliu
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.LATE
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.NO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.YES
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -89,7 +91,7 @@ class CommunityAPIBookingService(
         ),
         npsOfficeCode ?: defaultOfficeLocation,
         get(appointmentType, countsTowardsRarDays),
-        attended?.let { AppointmentMerge.Outcome(it, (attended == NO || notifyPPOfAttendanceBehaviour == true)) },
+        attended?.let { AppointmentMerge.Outcome(it.forMerge(), (attended == NO || notifyPPOfAttendanceBehaviour == true)) },
         null,
         null,
       )
@@ -118,10 +120,18 @@ class CommunityAPIBookingService(
     ),
     npsOfficeCode,
     get(appointmentType, countsTowardsRarDays),
-    attended?.let { AppointmentMerge.Outcome(it, attended == NO || notifyOfAttendanceBehaviour) },
+    attended?.let {
+      AppointmentMerge.Outcome(it.forMerge(), attended == NO || notifyOfAttendanceBehaviour)
+    },
     id,
     deliusAppointmentId,
   )
+
+  private fun Attended.forMerge() = when (this) {
+    YES -> AppointmentMerge.Outcome.Attended.YES
+    NO -> AppointmentMerge.Outcome.Attended.NO
+    LATE -> AppointmentMerge.Outcome.Attended.LATE
+  }
 
   private fun mergeAppointment(appointmentMerge: AppointmentMerge): Pair<Long?, UUID> {
     val path = UriComponentsBuilder.fromPath(appointmentMergeLocation)
@@ -176,7 +186,13 @@ data class AppointmentMerge(
   data class Outcome(
     val attended: Attended,
     val notify: Boolean = true,
-  )
+  ) {
+    enum class Attended {
+      YES,
+      LATE,
+      NO,
+    }
+  }
 }
 
 data class AppointmentResponseDTO(
