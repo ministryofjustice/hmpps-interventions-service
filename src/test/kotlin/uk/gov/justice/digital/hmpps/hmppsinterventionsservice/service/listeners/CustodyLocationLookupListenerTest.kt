@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -39,6 +40,38 @@ internal class CustodyLocationLookupListenerTest {
   )
 
   @Test
+  fun `Doesn't send tracking event if the person is not in custody`() {
+    val referralId = UUID.randomUUID()
+    val serviceUserCRN = "X123456"
+
+    custodyLocationLookupListener.onApplicationEvent(
+      referralEvent(
+        referralId,
+        serviceUserCRN,
+        mockReferralLocation(type = PersonCurrentLocationType.COMMUNITY),
+        ReferralEventType.SENT,
+      ),
+    )
+    verify(telemetryClient, times(0)).trackEvent(any(), any(), any())
+  }
+
+  @Test
+  fun `Doesn't send tracking event if it's not a sent referral and person is in custody`() {
+    val referralId = UUID.randomUUID()
+    val serviceUserCRN = "X123456"
+
+    custodyLocationLookupListener.onApplicationEvent(
+      referralEvent(
+        referralId,
+        serviceUserCRN,
+        mockReferralLocation(type = PersonCurrentLocationType.CUSTODY),
+        ReferralEventType.ASSIGNED,
+      ),
+    )
+    verify(telemetryClient, times(0)).trackEvent(any(), any(), any())
+  }
+
+  @Test
   fun `sends tracking event with matching comparison results`() {
     val referralId = UUID.randomUUID()
     val serviceUserCRN = "X123456"
@@ -51,9 +84,16 @@ internal class CustodyLocationLookupListenerTest {
     whenever(prisonerOffenderSearchService.getPrisonerById(nomsNumber))
       .thenReturn(Mono.just(mockPrisoner(personCustodyPrisonId, expectedReleaseDate)))
     whenever(referralLocationRepository.findByReferralId(referralId))
-      .thenReturn(mockReferralLocation(personCustodyPrisonId, expectedReleaseDate))
+      .thenReturn(mockReferralLocation(personCustodyPrisonId, expectedReleaseDate, PersonCurrentLocationType.CUSTODY))
 
-    custodyLocationLookupListener.onApplicationEvent(referralSentEvent(referralId, serviceUserCRN))
+    custodyLocationLookupListener.onApplicationEvent(
+      referralEvent(
+        referralId,
+        serviceUserCRN,
+        mockReferralLocation(type = PersonCurrentLocationType.CUSTODY),
+        ReferralEventType.SENT,
+      ),
+    )
 
     verify(telemetryClient).trackEvent(
       "CustodyLocationLookup",
@@ -79,9 +119,16 @@ internal class CustodyLocationLookupListenerTest {
     whenever(prisonerOffenderSearchService.getPrisonerById(nomsNumber))
       .thenReturn(Mono.just(mockPrisoner(personCustodyPrisonId, expectedReleaseDate)))
     whenever(referralLocationRepository.findByReferralId(referralId))
-      .thenReturn(mockReferralLocation(differentPrisonId, expectedReleaseDate))
+      .thenReturn(mockReferralLocation(differentPrisonId, expectedReleaseDate, PersonCurrentLocationType.CUSTODY))
 
-    custodyLocationLookupListener.onApplicationEvent(referralSentEvent(referralId, serviceUserCRN))
+    custodyLocationLookupListener.onApplicationEvent(
+      referralEvent(
+        referralId,
+        serviceUserCRN,
+        mockReferralLocation(type = PersonCurrentLocationType.CUSTODY),
+        ReferralEventType.SENT,
+      ),
+    )
 
     verify(telemetryClient).trackEvent(
       "CustodyLocationLookup",
@@ -105,7 +152,14 @@ internal class CustodyLocationLookupListenerTest {
     whenever(prisonerOffenderSearchService.getPrisonerById(nomsNumber))
       .thenReturn(Mono.error(e))
 
-    custodyLocationLookupListener.onApplicationEvent(referralSentEvent(referralId, serviceUserCRN))
+    custodyLocationLookupListener.onApplicationEvent(
+      referralEvent(
+        referralId,
+        serviceUserCRN,
+        mockReferralLocation(type = PersonCurrentLocationType.CUSTODY),
+        ReferralEventType.SENT,
+      ),
+    )
 
     verify(telemetryClient).trackEvent(
       "CustodyLocationLookup",
@@ -134,7 +188,14 @@ internal class CustodyLocationLookupListenerTest {
 
     whenever(communityAPIOffenderService.getOffenderIdentifiers(any())).thenReturn(Mono.empty())
 
-    custodyLocationLookupListener.onApplicationEvent(referralSentEvent(referralId, serviceUserCRN))
+    custodyLocationLookupListener.onApplicationEvent(
+      referralEvent(
+        referralId,
+        serviceUserCRN,
+        mockReferralLocation(type = PersonCurrentLocationType.CUSTODY),
+        ReferralEventType.SENT,
+      ),
+    )
     verify(telemetryClient).trackEvent(
       "CustodyLocationLookup",
       mapOf(
@@ -158,17 +219,26 @@ internal class CustodyLocationLookupListenerTest {
       expectedReleaseDate,
     )
 
-  private fun mockReferralLocation(prisonId: String, expectedReleaseDate: LocalDate) =
+  private fun mockReferralLocation(
+    prisonId: String? = null,
+    expectedReleaseDate: LocalDate? = null,
+    type: PersonCurrentLocationType,
+  ) =
     ReferralLocation(
       UUID.randomUUID(),
       referral = mock(),
-      type = PersonCurrentLocationType.CUSTODY,
+      type = type,
       prisonId = prisonId,
       expectedReleaseDate = expectedReleaseDate,
       expectedReleaseDateMissingReason = null,
     )
 
-  private fun referralSentEvent(referralId: UUID, serviceUserCRN: String): ReferralEvent {
+  private fun referralEvent(
+    referralId: UUID,
+    serviceUserCRN: String,
+    referralLocation: ReferralLocation? = null,
+    referralEventType: ReferralEventType,
+  ): ReferralEvent {
     val referral = Referral(
       id = referralId,
       referenceNumber = null,
@@ -176,10 +246,11 @@ internal class CustodyLocationLookupListenerTest {
       createdBy = mock(),
       createdAt = OffsetDateTime.now(),
       intervention = mock(),
+      referralLocation = referralLocation,
     )
     return ReferralEvent(
       this,
-      ReferralEventType.SENT,
+      referralEventType,
       referral,
       "irrelevant-for-this-test",
     )

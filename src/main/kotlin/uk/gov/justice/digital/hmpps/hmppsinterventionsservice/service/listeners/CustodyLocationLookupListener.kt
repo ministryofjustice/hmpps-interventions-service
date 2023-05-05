@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralLocationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.CommunityAPIOffenderService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.PrisonerOffenderSearchService
@@ -18,7 +19,8 @@ class CustodyLocationLookupListener(
   val telemetryClient: TelemetryClient,
 ) : ApplicationListener<ReferralEvent> {
   override fun onApplicationEvent(event: ReferralEvent) {
-    if (event.type != ReferralEventType.SENT) {
+    if (event.type != ReferralEventType.SENT || event.referral.referralLocation?.type != PersonCurrentLocationType.CUSTODY
+    ) {
       return
     }
     val eventName = "CustodyLocationLookup"
