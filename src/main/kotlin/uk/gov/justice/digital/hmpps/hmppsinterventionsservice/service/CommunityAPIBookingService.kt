@@ -65,6 +65,9 @@ class CommunityAPIBookingService(
           appointmentType,
           npsOfficeCode ?: defaultOfficeLocation,
           notifyPPOfAttendanceBehaviour ?: false,
+          appointmentTime,
+          durationInMinutes,
+          attended,
         )
         mergeAppointment(appointmentMerge)
       } else {
@@ -98,6 +101,9 @@ class CommunityAPIBookingService(
     appointmentType: AppointmentType,
     npsOfficeCode: String,
     notifyOfAttendanceBehaviour: Boolean,
+    appointmentTime: OffsetDateTime,
+    durationInMinutes: Int,
+    attended: Attended?,
   ) = AppointmentMerge(
     UUID.randomUUID(),
     referral.id,
