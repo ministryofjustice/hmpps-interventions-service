@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Service
 import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.CommunityAPIClient
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.EmailSender
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.SNSPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.PersonReference
@@ -12,9 +13,13 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralCon
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.AsyncEventExceptionHandling
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.CommunityAPIService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.NotificationCreateRequestDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.NotifyService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.SNSService
 
 @Service
@@ -49,7 +54,8 @@ class ReferralConcludedIntegrationListener(
   override fun onApplicationEvent(event: ReferralConcludedEvent) {
     // this really is just the "end of service report submitted" event now
     when (event.type) {
-      ReferralConcludedState.CANCELLED -> {}
+      ReferralConcludedState.CANCELLED -> {
+      }
       ReferralConcludedState.PREMATURELY_ENDED,
       ReferralConcludedState.COMPLETED,
       -> {
@@ -91,5 +97,32 @@ class ReferralConcludedIntegrationListener(
       .toString()
 
     communityAPIClient.makeSyncPostRequest(communityApiSentReferralPath, request, Unit::class.java)
+  }
+}
+
+@Service
+class ReferralConcludedNotificationListener(
+  @Value("\${notify.templates.referral-cancelled}") private val cancelledReferralTemplateID: String,
+  private val emailSender: EmailSender,
+  private val hmppsAuthService: HMPPSAuthService,
+) : ApplicationListener<ReferralConcludedEvent>, NotifyService {
+  @AsyncEventExceptionHandling
+  override fun onApplicationEvent(event: ReferralConcludedEvent) {
+    when (event.type) {
+      ReferralConcludedState.CANCELLED -> {
+        val userDetails = hmppsAuthService.getUserDetail(event.referral.currentAssignee!!)
+        emailSender.sendEmail(
+          cancelledReferralTemplateID,
+          userDetails.email,
+          mapOf(
+            "sp_first_name" to userDetails.firstName,
+            "referral_number" to event.referral.referenceNumber!!,
+          )
+        )
+      }
+      ReferralConcludedState.PREMATURELY_ENDED,
+      ReferralConcludedState.COMPLETED,
+      -> {}
+    }
   }
 }

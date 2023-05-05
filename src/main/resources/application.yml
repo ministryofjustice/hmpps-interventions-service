@@ -117,6 +117,7 @@ notify:
     complexity-level-changed: "824900b1-7c06-4594-984d-310b1b46098a"
     desired-outcome-changed: "817ce0e0-3efd-4bc9-a65d-e3e32e78c404"
     needs-and-requirements-outcome-changed: "41d31358-1e87-41e4-a84f-10006cf64423"
+    referral-cancelled: "b15ca66f-94a8-41ff-960f-5933cb8be841"
 
 interventions-ui:
   locations:
