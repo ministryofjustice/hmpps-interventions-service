@@ -146,6 +146,9 @@ class SupplierAssessmentService(
       appointmentDeliveryAddress,
       npsOfficeCode,
     )
+    if (appointment.id != appointmentId) {
+      supplierAssessment.currentAppointment?.superseded = true
+    }
     supplierAssessment.appointments.add(appointment)
     supplierAssessmentRepository.save(supplierAssessment)
     return appointment

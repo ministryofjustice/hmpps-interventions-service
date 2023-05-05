@@ -53,9 +53,9 @@ class AppointmentService(
     behaviourDescription: String? = null,
   ): Appointment {
     val appointment = when {
-      // an initial appointment is required
-      appointment == null -> {
-        val deliusAppointmentId =
+      // an initial appointment is required or an additional appointment is required
+      appointment == null || appointment.attended == Attended.NO -> {
+        val (deliusAppointmentId, appointmentId) =
           communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode, attended, notifyProbationPractitioner)
         createAppointment(
           durationInMinutes,
@@ -72,11 +72,12 @@ class AppointmentService(
           notifyProbationPractitioner,
           behaviourDescription,
           appointmentType,
+          appointmentId,
         )
       }
       // the current appointment needs to be updated
       appointment.attended == null -> {
-        val deliusAppointmentId =
+        val (deliusAppointmentId, appointmentId) =
           communityAPIBookingService.book(referral, appointment, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode)
         updateAppointment(
           durationInMinutes,
@@ -94,27 +95,7 @@ class AppointmentService(
           notifyProbationPractitioner,
           behaviourDescription,
           appointmentType,
-        )
-      }
-      // an additional appointment is required
-      appointment.attended == Attended.NO -> {
-        val deliusAppointmentId =
-          communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode, attended, notifyProbationPractitioner)
-        createAppointment(
-          durationInMinutes,
-          appointmentTime,
-          deliusAppointmentId,
-          createdByUser,
-          appointmentDeliveryType,
-          appointmentSessionType,
-          appointmentDeliveryAddress,
-          referral,
-          npsOfficeCode,
-          attended,
-          additionalAttendanceInformation,
-          notifyProbationPractitioner,
-          behaviourDescription,
-          appointmentType,
+          appointmentId,
         )
       }
       // the appointment has already been attended
@@ -270,9 +251,10 @@ class AppointmentService(
     notifyProbationPractitioner: Boolean?,
     behaviourDescription: String?,
     appointmentType: AppointmentType,
+    uuid: UUID? = null,
   ): Appointment {
     val appointment = Appointment(
-      id = UUID.randomUUID(),
+      id = uuid ?: UUID.randomUUID(),
       appointmentTime = appointmentTime,
       durationInMinutes = durationInMinutes,
       deliusAppointmentId = deliusAppointmentId,
@@ -302,6 +284,7 @@ class AppointmentService(
     notifyProbationPractitioner: Boolean?,
     behaviourDescription: String?,
     appointmentType: AppointmentType,
+    uuid: UUID?,
   ): Appointment {
     val appointment = createAppointment(
       durationInMinutes,
@@ -318,6 +301,7 @@ class AppointmentService(
       notifyProbationPractitioner,
       behaviourDescription,
       appointmentType,
+      uuid,
     )
     oldAppointment.superseded = true
     appointmentRepository.save(oldAppointment)
@@ -362,10 +346,10 @@ class AppointmentService(
     val sentReferral = referralRepository.findByIdAndSentAtIsNotNull(sentReferralId) ?: throw EntityNotFoundException(
       "Sent Referral not found [referralId=$sentReferralId]",
     )
-    val deliusAppointmentId =
+    val (deliusAppointmentId, appointmentId) =
       communityAPIBookingService.book(sentReferral, null, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode)
     val appointment = Appointment(
-      id = UUID.randomUUID(),
+      id = appointmentId ?: UUID.randomUUID(),
       appointmentTime = appointmentTime,
       durationInMinutes = durationInMinutes,
       deliusAppointmentId = deliusAppointmentId,
@@ -392,15 +376,16 @@ class AppointmentService(
   ): Appointment {
     val appointment = this.appointmentRepository.findById(appointmentId).orElseThrow { EntityNotFoundException("Appointment not found [appointmentId=$appointmentId]") }
     appointment.appointmentFeedbackSubmittedAt ?.let { throw EntityExistsException("Appointment has already been delivered [appointmentId=$appointmentId]") }
-    val deliusAppointmentId =
+    val (deliusAppointmentId, apptId) =
       communityAPIBookingService.book(appointment.referral, appointment, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode)
-    appointment.durationInMinutes = durationInMinutes
-    appointment.appointmentTime = appointmentTime
-    appointment.deliusAppointmentId = deliusAppointmentId
-    appointmentRepository.save(appointment)
-    createOrUpdateAppointmentDeliveryDetails(appointment, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
-    appointmentEventPublisher.appointmentScheduledEvent(appointment, appointmentType)
-    return appointment
+    val rescheduled = apptId?.let { appointment.copy(id = apptId) } ?: appointment
+    rescheduled.durationInMinutes = durationInMinutes
+    rescheduled.appointmentTime = appointmentTime
+    rescheduled.deliusAppointmentId = deliusAppointmentId
+    appointmentRepository.saveAndFlush(rescheduled)
+    createOrUpdateAppointmentDeliveryDetails(rescheduled, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
+    appointmentEventPublisher.appointmentScheduledEvent(rescheduled, appointmentType)
+    return rescheduled
   }
 
   private fun setAttendanceAndBehaviourIfHistoricAppointment(

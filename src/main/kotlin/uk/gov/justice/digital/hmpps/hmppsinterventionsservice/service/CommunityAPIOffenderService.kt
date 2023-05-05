@@ -40,7 +40,6 @@ class CommunityAPIOffenderService(
   @Value("\${community-api.locations.offender-access}") private val offenderAccessLocation: String,
   @Value("\${community-api.locations.managed-offenders}") private val managedOffendersLocation: String,
   @Value("\${community-api.locations.staff-details}") private val staffDetailsLocation: String,
-  @Value("\${community-api.locations.offender-managers}") private val offenderManagersLocation: String,
   @Value("\${community-api.locations.offender-identifiers}") private val offenderIdentifiersLocation: String,
   private val communityApiClient: RestClient,
 ) {

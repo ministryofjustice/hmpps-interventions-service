@@ -5,13 +5,12 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.util.UriComponentsBuilder
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.CommunityAPIClient
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.RamDeliusClient
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.NO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
-import java.lang.IllegalStateException
 import java.time.OffsetDateTime
 import java.util.UUID
 import javax.validation.constraints.NotNull
@@ -23,14 +22,11 @@ class CommunityAPIBookingService(
   @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
   @Value("\${interventions-ui.locations.probation-practitioner.intervention-progress}") private val ppInterventionProgressLocation: String,
   @Value("\${interventions-ui.locations.probation-practitioner.supplier-assessment}") private val ppSupplierAssessmentLocation: String,
-  @Value("\${community-api.locations.book-appointment}") private val communityApiBookAppointmentLocation: String,
-  @Value("\${community-api.locations.reschedule-appointment}") private val communityApiRescheduleAppointmentLocation: String,
-  @Value("\${community-api.locations.relocate-appointment}") private val communityApiRelocateAppointmentLocation: String,
   @Value("\${community-api.appointments.office-location}") private val defaultOfficeLocation: String,
   @Value("#{\${community-api.appointments.notes-field-qualifier}}") private val notesFieldQualifier: Map<AppointmentType, String>,
   @Value("#{\${community-api.appointments.counts-towards-rar-days}}") private val countsTowardsRarDays: Map<AppointmentType, Boolean>,
-  @Value("\${community-api.integration-context}") private val integrationContext: String,
-  val communityAPIClient: CommunityAPIClient,
+  @Value("\${refer-and-monitor-and-delius.locations.appointment-merge}") private val appointmentMergeLocation: String,
+  private val ramDeliusClient: RamDeliusClient,
 ) : CommunityAPIService {
   companion object : KLogging()
 
@@ -43,9 +39,9 @@ class CommunityAPIBookingService(
     npsOfficeCode: String?,
     attended: Attended? = null,
     notifyPPOfAttendanceBehaviour: Boolean? = null,
-  ): Long? {
+  ): Pair<Long?, UUID?> {
     if (!bookingsEnabled) {
-      return existingAppointment?.deliusAppointmentId
+      return existingAppointment?.deliusAppointmentId to null
     }
 
     return processingBooking(referral, existingAppointment, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode, attended, notifyPPOfAttendanceBehaviour)
@@ -60,77 +56,76 @@ class CommunityAPIBookingService(
     npsOfficeCode: String?,
     attended: Attended?,
     notifyPPOfAttendanceBehaviour: Boolean?,
-  ): Long? {
+  ): Pair<Long?, UUID> {
     return existingAppointment?.let {
-      if (isDifferentTimings(existingAppointment, appointmentTime, durationInMinutes)) {
-        val appointmentRequestDTO = buildAppointmentRescheduleRequestDTO(appointmentTime, durationInMinutes, npsOfficeCode ?: defaultOfficeLocation)
-        makeBooking(referral.serviceUserCRN, it.deliusAppointmentId!!, appointmentRequestDTO, communityApiRescheduleAppointmentLocation)
-      } else if (isDifferentLocation(existingAppointment, npsOfficeCode)) {
-        val appointmentRequestDTO = buildAppointmentRelocateRequestDTO(npsOfficeCode ?: defaultOfficeLocation)
-        makeBooking(referral.serviceUserCRN, it.deliusAppointmentId!!, appointmentRequestDTO, communityApiRelocateAppointmentLocation)
+      if (isDifferentTimings(existingAppointment, appointmentTime, durationInMinutes) ||
+        isDifferentLocation(existingAppointment, npsOfficeCode)
+      ) {
+        val appointmentMerge = existingAppointment.forMerge(
+          appointmentType,
+          npsOfficeCode ?: defaultOfficeLocation,
+          notifyPPOfAttendanceBehaviour ?: false,
+        )
+        mergeAppointment(appointmentMerge)
       } else {
         // nothing to do !
-        return existingAppointment.deliusAppointmentId
+        return existingAppointment.deliusAppointmentId to existingAppointment.id
       }
     } ?: run {
-      val appointmentRequestDTO = buildAppointmentCreateRequestDTO(referral, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode ?: defaultOfficeLocation, attended, notifyPPOfAttendanceBehaviour)
-      makeBooking(referral.serviceUserCRN, referral.relevantSentenceId!!, appointmentRequestDTO, communityApiBookAppointmentLocation)
+      val mergeAppointment = AppointmentMerge(
+        UUID.randomUUID(),
+        referral.id,
+        referral.referenceNumber!!,
+        referral.serviceUserCRN,
+        appointmentTime,
+        appointmentTime.plusMinutes(durationInMinutes.toLong()),
+        getNotes(
+          referral,
+          buildReferralResourceUrl(referral, appointmentType),
+          "${get(appointmentType, notesFieldQualifier)} Appointment",
+        ),
+        npsOfficeCode ?: defaultOfficeLocation,
+        get(appointmentType, countsTowardsRarDays),
+        attended?.let { AppointmentMerge.Outcome(it, (attended == NO || notifyPPOfAttendanceBehaviour == true)) },
+        null,
+        null,
+      )
+      mergeAppointment(mergeAppointment)
     }
   }
 
-  private fun makeBooking(serviceCrn: String, contextId: Long, appointmentRequestDTO: AppointmentRequestDTO, communityApiUrl: String): Long {
-    val communityApiBookAppointmentPath = UriComponentsBuilder.fromPath(communityApiUrl)
-      .buildAndExpand(serviceCrn, contextId, integrationContext)
-      .toString()
-
-    val response = communityAPIClient.makeSyncPostRequest(communityApiBookAppointmentPath, appointmentRequestDTO, AppointmentResponseDTO::class.java)
-    logger.debug("Requested booking for appointment. Returned appointment id: $response")
-
-    return response.appointmentId
-  }
-
-  private fun buildAppointmentCreateRequestDTO(
-    referral: Referral,
-    appointmentTime: OffsetDateTime,
-    durationInMinutes: Int,
+  private fun Appointment.forMerge(
     appointmentType: AppointmentType,
     npsOfficeCode: String,
-    attended: Attended?,
-    notifyPPOfAttendanceBehaviour: Boolean?,
-  ): AppointmentCreateRequestDTO {
-    val resourceUrl = buildReferralResourceUrl(referral, appointmentType)
+    notifyOfAttendanceBehaviour: Boolean,
+  ) = AppointmentMerge(
+    UUID.randomUUID(),
+    referral.id,
+    referral.referenceNumber!!,
+    referral.serviceUserCRN,
+    appointmentTime,
+    appointmentTime.plusMinutes(durationInMinutes.toLong()),
+    getNotes(
+      referral,
+      buildReferralResourceUrl(referral, appointmentType),
+      "${get(appointmentType, notesFieldQualifier)} Appointment",
+    ),
+    npsOfficeCode,
+    get(appointmentType, countsTowardsRarDays),
+    attended?.let { AppointmentMerge.Outcome(it, attended == NO || notifyOfAttendanceBehaviour) },
+    id,
+    deliusAppointmentId,
+  )
 
-    return AppointmentCreateRequestDTO(
-      contractType = referral.intervention.dynamicFrameworkContract.contractType.code,
-      referralStart = referral.sentAt!!,
-      referralId = referral.id,
-      appointmentStart = appointmentTime,
-      appointmentEnd = appointmentTime.plusMinutes(durationInMinutes.toLong()),
-      officeLocationCode = npsOfficeCode,
-      notes = getNotes(referral, resourceUrl, "${get(appointmentType, notesFieldQualifier)} Appointment"),
-      countsTowardsRarDays = get(appointmentType, countsTowardsRarDays),
-      attended = attended?.toString(),
-      notifyPPOfAttendanceBehaviour = setNotifyPPIfAttendedNo(attended, notifyPPOfAttendanceBehaviour),
-    )
+  private fun mergeAppointment(appointmentMerge: AppointmentMerge): Pair<Long?, UUID> {
+    val path = UriComponentsBuilder.fromPath(appointmentMergeLocation)
+      .buildAndExpand(appointmentMerge.serviceUserCrn, appointmentMerge.referralId)
+      .toString()
+    return ramDeliusClient.makePutAppointmentRequest(path, appointmentMerge)?.appointmentId to appointmentMerge.id
   }
 
   fun setNotifyPPIfAttendedNo(attended: Attended?, notifyPPOfAttendanceBehaviour: Boolean?) =
-    if (attended == NO) true else notifyPPOfAttendanceBehaviour
-
-  private fun buildAppointmentRelocateRequestDTO(npsOfficeCode: String): AppointmentRelocateRequestDTO {
-    return AppointmentRelocateRequestDTO(
-      officeLocationCode = npsOfficeCode,
-    )
-  }
-
-  private fun buildAppointmentRescheduleRequestDTO(appointmentTime: OffsetDateTime, durationInMinutes: Int, npsOfficeCode: String): AppointmentRescheduleRequestDTO {
-    return AppointmentRescheduleRequestDTO(
-      updatedAppointmentStart = appointmentTime,
-      updatedAppointmentEnd = appointmentTime.plusMinutes(durationInMinutes.toLong()),
-      initiatedByServiceProvider = true, // fixme - needs to come from the user - defaulted to SP Initiated Reschedule
-      officeLocationCode = npsOfficeCode,
-    )
-  }
+    attended == NO || notifyPPOfAttendanceBehaviour == true
 
   private fun buildReferralResourceUrl(referral: Referral, appointmentType: AppointmentType): String {
     val location = when (appointmentType) {
@@ -158,31 +153,25 @@ class CommunityAPIBookingService(
   }
 }
 
-abstract class AppointmentRequestDTO
-
-data class AppointmentCreateRequestDTO(
-  val contractType: String,
-  val referralStart: OffsetDateTime,
+data class AppointmentMerge(
+  val id: UUID,
   val referralId: UUID,
-  val appointmentStart: OffsetDateTime,
-  val appointmentEnd: OffsetDateTime,
-  val officeLocationCode: String,
-  val notes: String,
-  val countsTowardsRarDays: Boolean,
-  val attended: String?,
-  val notifyPPOfAttendanceBehaviour: Boolean?,
-) : AppointmentRequestDTO()
-
-data class AppointmentRescheduleRequestDTO(
-  val updatedAppointmentStart: OffsetDateTime?,
-  val updatedAppointmentEnd: OffsetDateTime?,
-  val initiatedByServiceProvider: Boolean,
-  val officeLocationCode: String,
-) : AppointmentRequestDTO()
-
-data class AppointmentRelocateRequestDTO(
-  val officeLocationCode: String,
-) : AppointmentRequestDTO()
+  val referralReference: String,
+  val serviceUserCrn: String,
+  val start: OffsetDateTime,
+  val end: OffsetDateTime,
+  val notes: String?,
+  val officeLocationCode: String?,
+  val countsTowardsRar: Boolean,
+  val outcome: Outcome?,
+  val previousId: UUID?,
+  val deliusId: Long?,
+) {
+  data class Outcome(
+    val attended: Attended,
+    val notify: Boolean = true,
+  )
+}
 
 data class AppointmentResponseDTO(
   @NotNull val appointmentId: Long,

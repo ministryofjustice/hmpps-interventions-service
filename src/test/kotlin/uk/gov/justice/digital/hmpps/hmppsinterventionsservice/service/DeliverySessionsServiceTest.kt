@@ -10,6 +10,7 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.firstValue
+import org.mockito.kotlin.isNotNull
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
@@ -114,12 +115,16 @@ internal class DeliverySessionsServiceTest {
     val actionPlanId = UUID.randomUUID()
     val sessionNumber = session.sessionNumber
     val user = createActor("scheduler")
-
-    whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(session)
-    whenever(deliverySessionRepository.save(any())).thenReturn(session)
-
     val appointmentTime = OffsetDateTime.now().plusHours(1)
     val durationInMinutes = 200
+    val appointment = session.currentAppointment
+
+    whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(session)
+    whenever(deliverySessionRepository.saveAndFlush(any())).thenReturn(session)
+
+    whenever(communityAPIBookingService.book(session.referral, appointment, appointmentTime, durationInMinutes, SERVICE_DELIVERY, null, null, null))
+      .thenReturn(Pair(73457252L, UUID.randomUUID()))
+
     val updatedSession = deliverySessionsService.updateSessionAppointment(
       actionPlanId,
       sessionNumber,
@@ -155,10 +160,15 @@ internal class DeliverySessionsServiceTest {
     val user = createActor("scheduler")
 
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(session)
-    whenever(deliverySessionRepository.save(any())).thenReturn(session)
+    whenever(deliverySessionRepository.saveAndFlush(any())).thenReturn(session)
 
     val appointmentTime = OffsetDateTime.now()
     val durationInMinutes = 200
+    val appointment = session.currentAppointment
+
+    whenever(communityAPIBookingService.book(session.referral, appointment, appointmentTime, durationInMinutes, SERVICE_DELIVERY, null, Attended.YES, false))
+      .thenReturn(Pair(929478456763L, UUID.randomUUID()))
+
     val updatedSession = deliverySessionsService.updateSessionAppointment(
       actionPlanId,
       sessionNumber,
@@ -202,10 +212,14 @@ internal class DeliverySessionsServiceTest {
     val user = createActor("scheduler")
 
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(session)
-    whenever(deliverySessionRepository.save(any())).thenReturn(session)
+    whenever(deliverySessionRepository.saveAndFlush(any())).thenReturn(session)
 
     val appointmentTime = OffsetDateTime.now()
     val durationInMinutes = 200
+
+    whenever(communityAPIBookingService.book(any(), isNull(), any(), any(), eq(SERVICE_DELIVERY), isNull(), eq(Attended.NO), isNull()))
+      .thenReturn(Pair(46298523523L, UUID.randomUUID()))
+
     val updatedSession = deliverySessionsService.updateSessionAppointment(
       actionPlanId,
       sessionNumber,
@@ -245,11 +259,14 @@ internal class DeliverySessionsServiceTest {
     val sessionNumber = session.sessionNumber
     val user = createActor("re-scheduler")
 
-    whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(session)
-    whenever(deliverySessionRepository.save(any())).thenReturn(session)
-
     val newTime = OffsetDateTime.now()
     val newDuration = 200
+
+    whenever(communityAPIBookingService.book(any(), isNotNull(), eq(newTime), eq(newDuration), eq(SERVICE_DELIVERY), isNull(), isNull(), isNull()))
+      .thenReturn(Pair(23523541087L, UUID.randomUUID()))
+    whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(session)
+    whenever(deliverySessionRepository.saveAndFlush(any())).thenAnswer { it.arguments[0] }
+
     val updatedSession = deliverySessionsService.updateSessionAppointment(
       actionPlanId,
       sessionNumber,
@@ -296,10 +313,10 @@ internal class DeliverySessionsServiceTest {
         SERVICE_DELIVERY,
         null,
       ),
-    ).thenReturn(999L)
+    ).thenReturn(Pair(999L, appointment?.id))
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber))
       .thenReturn(session)
-    whenever(deliverySessionRepository.save(any())).thenReturn(session)
+    whenever(deliverySessionRepository.saveAndFlush(any())).thenReturn(session)
 
     val updatedSession = deliverySessionsService.updateSessionAppointment(
       actionPlanId,
@@ -348,9 +365,9 @@ internal class DeliverySessionsServiceTest {
         SERVICE_DELIVERY,
         null,
       ),
-    ).thenReturn(null)
+    ).thenReturn(Pair(null, null))
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(session)
-    whenever(deliverySessionRepository.save(any())).thenReturn(session)
+    whenever(deliverySessionRepository.saveAndFlush(any())).thenReturn(session)
 
     deliverySessionsService.updateSessionAppointment(
       actionPlanId,
@@ -674,12 +691,12 @@ internal class DeliverySessionsServiceTest {
         SERVICE_DELIVERY,
         npsOfficeCode,
       ),
-    ).thenReturn(999L)
+    ).thenReturn(Pair(999L, appointment?.id))
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(
       session,
     )
     whenever(authUserRepository.save(createdByUser)).thenReturn(createdByUser)
-    whenever(deliverySessionRepository.save(any())).thenReturn(session)
+    whenever(deliverySessionRepository.saveAndFlush(any())).thenReturn(session)
 
     val updatedSession = deliverySessionsService.updateSessionAppointment(
       actionPlanId,

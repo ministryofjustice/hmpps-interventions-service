@@ -136,8 +136,16 @@ class DeliverySessionService(
       throw ValidationError("can't reschedule appointment for session; no appointment exists for session [referralId=$referralId, sessionNumber=$sessionNumber, appointmentId=$appointmentId]", listOf())
     }
     existingAppointment.appointmentFeedbackSubmittedAt?.let { throw ValidationError("can't reschedule appointment for session; appointment feedback already supplied [referralId=$referralId, sessionNumber=$sessionNumber, appointmentId=$appointmentId]", listOf()) }
+    val appointment = Appointment(
+      id = UUID.randomUUID(),
+      createdBy = existingAppointment.createdBy,
+      createdAt = OffsetDateTime.now(),
+      appointmentTime = appointmentTime,
+      durationInMinutes = durationInMinutes,
+      referral = session.referral,
+    )
     return scheduleDeliverySessionAppointment(
-      session, existingAppointment, existingAppointment, appointmentTime, durationInMinutes, appointmentDeliveryType, updatedBy, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode, attended, additionalAttendanceInformation, notifyProbationPractitioner, behaviourDescription,
+      session, appointment, existingAppointment, appointmentTime, durationInMinutes, appointmentDeliveryType, updatedBy, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode, attended, additionalAttendanceInformation, notifyProbationPractitioner, behaviourDescription,
     )
   }
 
@@ -157,7 +165,10 @@ class DeliverySessionService(
     notifyProbationPractitioner: Boolean? = null,
     behaviourDescription: String? = null,
   ): DeliverySession {
-    val deliusAppointmentId = communityAPIBookingService.book(
+    if (appointmentTime.isBefore(OffsetDateTime.now()) && attended == null) {
+      throw IllegalArgumentException("Appointment feedback must be provided for appointments in the past.")
+    }
+    val (deliusAppointmentId, appointmentId) = communityAPIBookingService.book(
       deliverySession.referral,
       latestAppointment,
       appointmentTime,
@@ -165,18 +176,17 @@ class DeliverySessionService(
       SERVICE_DELIVERY,
       npsOfficeCode,
     )
-    if (appointmentTime.isBefore(OffsetDateTime.now()) && attended == null) {
-      throw IllegalArgumentException("Appointment feedback must be provided for appointments in the past.")
-    }
     appointmentToSchedule.appointmentTime = appointmentTime
     appointmentToSchedule.durationInMinutes = durationInMinutes
     appointmentToSchedule.deliusAppointmentId = deliusAppointmentId
-    appointmentRepository.saveAndFlush(appointmentToSchedule)
-    appointmentService.createOrUpdateAppointmentDeliveryDetails(appointmentToSchedule, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
-    deliverySession.appointments.add(appointmentToSchedule)
+    val toSchedule = appointmentId?.let { appointmentToSchedule.copy(id = it) } ?: appointmentToSchedule
+    appointmentRepository.saveAndFlush(toSchedule)
+    appointmentService.createOrUpdateAppointmentDeliveryDetails(toSchedule, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
+    appointmentId?.also { deliverySession.appointments.forEach { it.superseded = true } }
+    deliverySession.appointments.add(toSchedule)
     return deliverySessionRepository.saveAndFlush(deliverySession).also {
       // Occurring after saving the session to ensure that session has the latest appointment attached when publishing the session feedback event.
-      setAttendanceAndBehaviourIfHistoricAppointment(deliverySession, appointmentToSchedule, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, scheduledBy)
+      setAttendanceAndBehaviourIfHistoricAppointment(deliverySession, toSchedule, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, scheduledBy)
     }
   }
 
@@ -200,7 +210,7 @@ class DeliverySessionService(
     val existingAppointment = session.currentAppointment
 
     // TODO: Some code duplication here with AppointmentService.kt
-    val deliusAppointmentId = communityAPIBookingService.book(
+    val (deliusAppointmentId, appointmentId) = communityAPIBookingService.book(
       session.referral,
       if (existingAppointment?.attended != Attended.NO) existingAppointment else null,
       appointmentTime,
@@ -213,7 +223,7 @@ class DeliverySessionService(
 
     // creating a new appointment from the existing appointment or else create a new appointment
     val appointment = Appointment(
-      id = UUID.randomUUID(),
+      id = appointmentId ?: UUID.randomUUID(),
       durationInMinutes = durationInMinutes,
       appointmentTime = appointmentTime,
       deliusAppointmentId = deliusAppointmentId,
@@ -225,9 +235,8 @@ class DeliverySessionService(
     appointmentRepository.saveAndFlush(appointment)
     appointmentService.createOrUpdateAppointmentDeliveryDetails(appointment, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
     session.appointments.add(appointment)
-    deliverySessionRepository.save(session)
-    return deliverySessionRepository.save(session).also {
-      // Occuring after saving the session to ensure that session has the latest appointment attached when publishing the session feedback event.
+    return deliverySessionRepository.saveAndFlush(session).also {
+      // Occurring after saving the session to ensure that session has the latest appointment attached when publishing the session feedback event.
       setAttendanceAndBehaviourIfHistoricAppointment(session, appointment, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, updatedBy)
     }
   }
