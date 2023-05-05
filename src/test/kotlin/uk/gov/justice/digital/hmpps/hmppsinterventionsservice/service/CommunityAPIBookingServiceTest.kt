@@ -144,7 +144,7 @@ internal class CommunityAPIBookingServiceTest {
       assertThat(appointmentMerge.officeLocationCode).isEqualTo(crsOfficeLocation)
       assertThat(appointmentMerge.notes).isEqualTo(notes)
       assertThat(appointmentMerge.outcome).isNotNull
-      assertThat(appointmentMerge.outcome!!.attended).isEqualTo(YES)
+      assertThat(appointmentMerge.outcome!!.attended).isEqualTo(AppointmentMerge.Outcome.Attended.YES)
       assertThat(appointmentMerge.outcome!!.notify).isTrue()
     }
 
@@ -171,7 +171,7 @@ internal class CommunityAPIBookingServiceTest {
       assertThat(appointmentMerge.officeLocationCode).isEqualTo(crsOfficeLocation)
       assertThat(appointmentMerge.notes).isEqualTo(notes)
       assertThat(appointmentMerge.outcome).isNotNull
-      assertThat(appointmentMerge.outcome!!.attended).isEqualTo(NO)
+      assertThat(appointmentMerge.outcome!!.attended).isEqualTo(AppointmentMerge.Outcome.Attended.NO)
       assertThat(appointmentMerge.outcome!!.notify).isTrue()
     }
 
