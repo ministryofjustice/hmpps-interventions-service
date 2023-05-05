@@ -14,12 +14,9 @@ import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.CommunityAPIClient
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.EmailSender
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.SNSPublisher
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AuthUserDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralConcludedEvent
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEvent
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
@@ -28,7 +25,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthS
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.NotificationCreateRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.UserDetail
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.notifications.ReferralNotificationService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AssignmentsFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
@@ -174,11 +170,10 @@ internal class ReferralConcludedNotificationListenerTest {
   private val referralFactory = ReferralFactory()
   private val assignmentsFactory = AssignmentsFactory()
 
-
-  private val sentReferral =referralFactory.createSent(
+  private val sentReferral = referralFactory.createSent(
     id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
     referenceNumber = "JS8762AC",
-    assignments = assignmentsFactory.create(1)
+    assignments = assignmentsFactory.create(1),
   )
 
   private val referralCancelledEvent = ReferralConcludedEvent(

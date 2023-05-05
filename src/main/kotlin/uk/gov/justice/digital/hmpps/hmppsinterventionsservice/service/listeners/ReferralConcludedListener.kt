@@ -13,13 +13,11 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralCon
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.AsyncEventExceptionHandling
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.CommunityAPIService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.NotificationCreateRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.NotifyService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.SNSService
 
 @Service
@@ -117,7 +115,7 @@ class ReferralConcludedNotificationListener(
           mapOf(
             "sp_first_name" to userDetails.firstName,
             "referral_number" to event.referral.referenceNumber!!,
-          )
+          ),
         )
       }
       ReferralConcludedState.PREMATURELY_ENDED,

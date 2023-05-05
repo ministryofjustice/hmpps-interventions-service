@@ -1,5 +1,5 @@
 notify:
-  enabled: true
+  enabled: false
 
 interventions-ui:
   baseurl: http://localhost:3000
