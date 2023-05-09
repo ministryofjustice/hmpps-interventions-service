@@ -82,6 +82,7 @@ class CommunityAPIBookingService(
         referral.id,
         referral.referenceNumber!!,
         referral.serviceUserCRN,
+        referral.relevantSentenceId,
         appointmentTime,
         appointmentTime.plusMinutes(durationInMinutes.toLong()),
         getNotes(
@@ -111,6 +112,7 @@ class CommunityAPIBookingService(
     referral.id,
     referral.referenceNumber!!,
     referral.serviceUserCRN,
+    referral.relevantSentenceId,
     appointmentTime,
     appointmentTime.plusMinutes(durationInMinutes.toLong()),
     getNotes(
@@ -174,6 +176,7 @@ data class AppointmentMerge(
   val referralId: UUID,
   val referralReference: String,
   val serviceUserCrn: String,
+  val sentenceId: Long?,
   val start: OffsetDateTime,
   val end: OffsetDateTime,
   val notes: String?,
