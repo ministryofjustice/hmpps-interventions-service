@@ -93,14 +93,14 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:3.19.1-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.20.59")
-  implementation("software.amazon.awssdk:s3:2.20.59")
+  implementation("software.amazon.awssdk:sns:2.20.62")
+  implementation("software.amazon.awssdk:s3:2.20.62")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-  implementation("com.nimbusds:oauth2-oidc-sdk:10.8")
+  implementation("com.nimbusds:oauth2-oidc-sdk:10.9")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -114,7 +114,7 @@ dependencies {
   implementation("com.github.java-json-tools:json-patch:1.13")
   implementation("org.apache.commons:commons-csv:1.10.0")
 
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.5.6")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.0")
   testImplementation("com.squareup.okhttp3:okhttp:4.11.0")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.11.0")
   testImplementation("org.mockito:mockito-inline:5.2.0")
