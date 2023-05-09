@@ -1,12 +1,18 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.listeners
 
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.CommunityAPIClient
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.EmailSender
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.SNSPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.PersonReference
@@ -15,8 +21,11 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUse
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.NotificationCreateRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.UserDetail
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AssignmentsFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import java.time.OffsetDateTime
@@ -153,4 +162,46 @@ internal class ReferralConcludedIntegrationListenerTest {
       ),
       submittedAt = submittedAtDefault,
     )
+}
+
+internal class ReferralConcludedNotificationListenerTest {
+  private val emailSender = mock<EmailSender>()
+  private val hmppsAuthService = mock<HMPPSAuthService>()
+  private val referralFactory = ReferralFactory()
+  private val assignmentsFactory = AssignmentsFactory()
+
+  private val sentReferral = referralFactory.createSent(
+    id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
+    referenceNumber = "JS8762AC",
+    assignments = assignmentsFactory.create(1),
+  )
+
+  private val referralCancelledEvent = ReferralConcludedEvent(
+    "source",
+    ReferralConcludedState.CANCELLED,
+    sentReferral,
+    "http://localhost:8080/sent-referral/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
+  )
+
+  private fun notifyService(): ReferralConcludedNotificationListener {
+    return ReferralConcludedNotificationListener(
+      "cancelledTemplateID",
+      emailSender,
+      hmppsAuthService,
+    )
+  }
+
+  @Test
+  fun `referral sent event generates valid url and sends an email`() {
+    whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("tom", "tom@tom.tom", "jones"))
+    notifyService().onApplicationEvent(referralCancelledEvent)
+    val personalisationCaptor = argumentCaptor<Map<String, String>>()
+    verify(emailSender).sendEmail(
+      eq("cancelledTemplateID"),
+      eq("tom@tom.tom"),
+      personalisationCaptor.capture(),
+    )
+    Assertions.assertThat(personalisationCaptor.firstValue["sp_first_name"]).isEqualTo("tom")
+    Assertions.assertThat(personalisationCaptor.firstValue["referral_number"]).isEqualTo("JS8762AC")
+  }
 }
