@@ -121,7 +121,7 @@ class CommunityAPIAppointmentEventService(
     false,
     attended?.let { AppointmentMerge.Outcome(it.forMerge(), (attended == NO || notifyPPOfAttendanceBehaviour == true)) },
     null,
-    deliusAppointmentId
+    deliusAppointmentId,
   )
 
   private fun Attended.forMerge() = when (this) {
