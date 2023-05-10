@@ -6,7 +6,7 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.CommunityAPIClient
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.RamDeliusClient
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEventType.SESSION_FEEDBACK_RECORDED
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentType.SUPPLIER_ASSESSMENT
@@ -20,7 +20,7 @@ import java.util.UUID
 
 class CommunityAPIAppointmentEventServiceTest {
 
-  private val communityAPIClient = mock<CommunityAPIClient>()
+  private val deliusRamClient = mock<RamDeliusClient>()
 
   private val appointmentFactory = AppointmentFactory()
 
@@ -28,9 +28,8 @@ class CommunityAPIAppointmentEventServiceTest {
     "http://baseUrl",
     "/probation-practitioner/referrals/{id}/supplier-assessment/post-session-feedback",
     true,
-    "/secure/offenders/crn/{crn}/appointments/{appointmentId}/outcome/context/{contextName}",
-    "commissioned-rehabilitation-services",
-    communityAPIClient,
+    "/probation-case/{crn}/referrals/{referralId}/appointments",
+    deliusRamClient,
   )
 
   @Test
@@ -79,9 +78,8 @@ class CommunityAPIAppointmentEventServiceTest {
       "http://baseUrl",
       "/probation-practitioner/referrals/{id}/supplier-assessment/post-session-feedback",
       false,
-      "/secure/offenders/crn/{crn}/appointments/{appointmentId}/outcome/context/{contextName}",
-      "commissioned-rehabilitation-services",
-      communityAPIClient,
+      "/probation-case/{crn}/referrals/{referralId}/appointments",
+      deliusRamClient,
     )
 
     appointmentEvent.appointment.attended = YES
@@ -89,22 +87,22 @@ class CommunityAPIAppointmentEventServiceTest {
 
     communityAPIService.onApplicationEvent(appointmentEvent)
 
-    verifyNoInteractions(communityAPIClient)
+    verifyNoInteractions(deliusRamClient)
   }
 
   private fun verifyNotification(attended: String, notifyPP: Boolean) {
     val urlCaptor = argumentCaptor<String>()
-    val payloadCaptor = argumentCaptor<Any>()
-    verify(communityAPIClient).makeAsyncPostRequest(urlCaptor.capture(), payloadCaptor.capture())
-    assertThat(urlCaptor.firstValue).isEqualTo("/secure/offenders/crn/CRN123/appointments/123456/outcome/context/commissioned-rehabilitation-services")
-    assertThat(payloadCaptor.firstValue.toString()).isEqualTo(
-      AppointmentOutcomeRequest(
-        "Session Feedback Recorded for Accommodation Referral X123456 with Prime Provider TOP Service Provider\n" +
-          "http://baseUrl/probation-practitioner/referrals/356d0712-5266-4d18-9070-058244873f2c/supplier-assessment/post-session-feedback",
-        attended,
-        notifyPP,
-      ).toString(),
+    val payloadCaptor = argumentCaptor<AppointmentMerge>()
+    verify(deliusRamClient).makePutAppointmentRequest(urlCaptor.capture(), payloadCaptor.capture())
+
+    val ma = payloadCaptor.firstValue
+    assertThat(urlCaptor.firstValue).isEqualTo("/probation-case/CRN123/referrals/356d0712-5266-4d18-9070-058244873f2c/appointments")
+    assertThat(ma.notes).isEqualTo(
+      "Session Feedback Recorded for Accommodation Referral X123456 with Prime Provider TOP Service Provider\n" +
+        "http://baseUrl/probation-practitioner/referrals/356d0712-5266-4d18-9070-058244873f2c/supplier-assessment/post-session-feedback",
     )
+    assertThat(ma.outcome?.attended?.name).isEqualTo(attended.uppercase())
+    assertThat(ma.outcome?.notify).isEqualTo(notifyPP)
   }
 
   private val appointmentEvent = AppointmentEvent(
