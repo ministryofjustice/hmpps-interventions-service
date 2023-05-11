@@ -94,13 +94,13 @@ dependencies {
 
   // aws
   implementation("software.amazon.awssdk:sns:2.20.63")
-  implementation("software.amazon.awssdk:s3:2.20.63")
+  implementation("software.amazon.awssdk:s3:2.20.64")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-  implementation("com.nimbusds:oauth2-oidc-sdk:10.9")
+  implementation("com.nimbusds:oauth2-oidc-sdk:10.9.1")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
