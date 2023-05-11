@@ -6,11 +6,13 @@ import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Service
 import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.CommunityAPIClient
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.RamDeliusClient
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.NO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import java.time.OffsetDateTime
@@ -82,9 +84,8 @@ class CommunityAPIAppointmentEventService(
   @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
   @Value("\${interventions-ui.locations.probation-practitioner.supplier-assessment-feedback}") private val ppSessionFeedbackLocation: String,
   @Value("\${community-api.appointments.outcome.enabled}") private val outcomeNotificationEnabled: Boolean,
-  @Value("\${community-api.locations.appointment-outcome-request}") private val communityAPIAppointmentOutcomeLocation: String,
-  @Value("\${community-api.integration-context}") private val integrationContext: String,
-  private val communityAPIClient: CommunityAPIClient,
+  @Value("\${refer-and-monitor-and-delius.locations.appointment-merge}") private val appointmentMergeLocation: String,
+  private val ramDeliusClient: RamDeliusClient,
 ) : ApplicationListener<AppointmentEvent>, CommunityAPIService {
   companion object : KLogging()
 
@@ -94,29 +95,46 @@ class CommunityAPIAppointmentEventService(
         if (!outcomeNotificationEnabled) {
           return
         }
-
-        val url = UriComponentsBuilder.fromHttpUrl(interventionsUIBaseURL)
-          .path(ppSessionFeedbackLocation)
-          .buildAndExpand(event.appointment.referral.id)
-          .toString()
-
-        val appointment = event.appointment
-        val notifyPP = setNotifyPPIfRequired(appointment)
-
-        val request = AppointmentOutcomeRequest(
-          getNotes(event.appointment.referral, url, "Session Feedback Recorded"),
-          appointment.attended!!.name,
-          notifyPP,
-        )
-
-        val communityApiSentReferralPath = UriComponentsBuilder.fromPath(communityAPIAppointmentOutcomeLocation)
-          .buildAndExpand(event.appointment.referral.serviceUserCRN, appointment.deliusAppointmentId, integrationContext)
-          .toString()
-
-        communityAPIClient.makeAsyncPostRequest(communityApiSentReferralPath, request)
+        mergeAppointment(event.appointment.forMerge())
       }
       else -> {}
     }
+  }
+
+  private fun Appointment.forMerge() = AppointmentMerge(
+    id,
+    referral.id,
+    referral.referenceNumber!!,
+    referral.serviceUserCRN,
+    referral.relevantSentenceId,
+    appointmentTime,
+    appointmentTime.plusMinutes(durationInMinutes.toLong()),
+    getNotes(
+      referral,
+      UriComponentsBuilder.fromHttpUrl(interventionsUIBaseURL)
+        .path(ppSessionFeedbackLocation)
+        .buildAndExpand(referral.id)
+        .toString(),
+      "Session Feedback Recorded",
+    ),
+    appointmentDelivery?.npsOfficeCode,
+    false,
+    attended?.let { AppointmentMerge.Outcome(it.forMerge(), (attended == NO || notifyPPOfAttendanceBehaviour == true)) },
+    null,
+    deliusAppointmentId,
+  )
+
+  private fun Attended.forMerge() = when (this) {
+    Attended.YES -> AppointmentMerge.Outcome.Attended.YES
+    NO -> AppointmentMerge.Outcome.Attended.NO
+    Attended.LATE -> AppointmentMerge.Outcome.Attended.LATE
+  }
+
+  private fun mergeAppointment(appointmentMerge: AppointmentMerge): Pair<Long?, UUID> {
+    val path = UriComponentsBuilder.fromPath(appointmentMergeLocation)
+      .buildAndExpand(appointmentMerge.serviceUserCrn, appointmentMerge.referralId)
+      .toString()
+    return ramDeliusClient.makePutAppointmentRequest(path, appointmentMerge)?.appointmentId to appointmentMerge.id
   }
 }
 
