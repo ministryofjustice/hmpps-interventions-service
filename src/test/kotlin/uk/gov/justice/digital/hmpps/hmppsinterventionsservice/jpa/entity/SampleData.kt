@@ -71,6 +71,7 @@ class SampleData {
         ),
       ),
       supplementaryRiskId: UUID? = null,
+      serviceUserData: ServiceUserData = ServiceUserData(),
     ): Referral {
       return Referral(
         serviceUserCRN = crn,
@@ -87,6 +88,7 @@ class SampleData {
         endOfServiceReport = endOfServiceReport,
         concludedAt = concludedAt,
         supplementaryRiskId = supplementaryRiskId,
+        serviceUserData = serviceUserData,
       )
     }
 

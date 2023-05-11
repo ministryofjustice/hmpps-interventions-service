@@ -140,12 +140,16 @@ class NotifyActionPlanAppointmentService(
 
       when (event.type) {
         ActionPlanAppointmentEventType.ATTENDANCE_RECORDED -> {
+          val popFirstName = referral.referral.serviceUser!!.firstName?.lowercase()?.replaceFirstChar { it.uppercase() }
+          val popLastName = referral.referral.serviceUser.lastName?.lowercase()?.replaceFirstChar { it.uppercase() }
+          val popFullName = "$popFirstName $popLastName"
+
           emailSender.sendEmail(
             appointmentNotAttendedTemplateID,
             recipient.email,
             mapOf(
               "ppFirstName" to recipient.firstName,
-              "referenceNumber" to referral.referenceNumber,
+              "popfullname" to popFullName,
               "attendanceUrl" to location.toString(),
             ),
           )
@@ -200,12 +204,16 @@ class NotifyAppointmentService(
 
       when (event.type) {
         AppointmentEventType.ATTENDANCE_RECORDED -> {
+          val popFirstName = referral.serviceUserData!!.firstName?.lowercase()?.replaceFirstChar { it.uppercase() }
+          val popLastName = referral.serviceUserData!!.lastName?.lowercase()?.replaceFirstChar { it.uppercase() }
+          val popFullName = "$popFirstName $popLastName"
+
           emailSender.sendEmail(
             appointmentNotAttendedTemplateID,
             recipient.email,
             mapOf(
               "ppFirstName" to recipient.firstName,
-              "referenceNumber" to referral.referenceNumber!!,
+              "popfullname" to popFullName,
               "attendanceUrl" to sessionFeedbackLocation.toString(),
             ),
           )
