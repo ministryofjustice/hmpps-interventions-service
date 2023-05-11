@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.linksupersededappointments
-=======
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.markstaleappointments
->>>>>>> 0faded70 (Rebase and apply merge conflict fixes for latest from main)
 
 import org.hibernate.SessionFactory
 import org.springframework.batch.core.configuration.annotation.JobScope
@@ -12,15 +8,17 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appoint
 
 @Component
 @JobScope
-class LinkSupersededAppointmentsReader(
+class MarkStaleAppointmentsReader(
   sessionFactory: SessionFactory,
 ) : HibernateCursorItemReader<Appointment>() {
 
   init {
-    this.setName("linkSupersededAppointmentsReader")
+    this.setName("markStaleAppointmentsReader")
     this.setSessionFactory(sessionFactory)
     this.setQueryString(
-      "SELECT a FROM Appointment a where a.superseded = true",
+      "SELECT a FROM Appointment a where a.id in ('82e2fbbe-1bb4-4967-8ee6-81aa072fd44b')",
     )
+    // 75834134-3fdf-4b29-ae6f-af8eff441cd0 PREPROD
+    // 82e2fbbe-1bb4-4967-8ee6-81aa072fd44b DEV
   }
 }
