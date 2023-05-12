@@ -85,12 +85,15 @@ class NotifyActionPlanAppointmentServiceTest {
   fun `appointment attendance recorded event calls email client when attended is NO`() {
     whenever(referralService.getResponsibleProbationPractitioner(any(), any(), any())).thenReturn(ResponsibleProbationPractitioner("abc", "abc@abc.com", null, null, "def"))
 
-    notifyService().onApplicationEvent(generateAppointmentEvent(ActionPlanAppointmentEventType.ATTENDANCE_RECORDED, false, Attended.NO))
+    val actionPlanAppointmentEvent = generateAppointmentEvent(ActionPlanAppointmentEventType.ATTENDANCE_RECORDED, false, Attended.NO)
+    val appointmentId = actionPlanAppointmentEvent.deliverySession.appointmentId
+
+    notifyService().onApplicationEvent(actionPlanAppointmentEvent)
     val personalisationCaptor = argumentCaptor<Map<String, String>>()
     verify(emailSender).sendEmail(eq("template"), eq("abc@abc.com"), personalisationCaptor.capture())
     Assertions.assertThat(personalisationCaptor.firstValue["ppFirstName"]).isEqualTo("abc")
     Assertions.assertThat(personalisationCaptor.firstValue["popfullname"]).isEqualTo("Bob Green")
-    Assertions.assertThat(personalisationCaptor.firstValue["attendanceUrl"]).isEqualTo("http://example.com/pp/referrals/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080/session/1/appointment/12345/feedback")
+    Assertions.assertThat(personalisationCaptor.firstValue["attendanceUrl"]).isEqualTo("http://example.com/pp/referrals/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080/session/1/appointment/$appointmentId/feedback")
   }
 
   @Test
@@ -112,11 +115,14 @@ class NotifyActionPlanAppointmentServiceTest {
   fun `appointment behaviour recorded event calls email client`() {
     whenever(referralService.getResponsibleProbationPractitioner(any(), any(), any())).thenReturn(ResponsibleProbationPractitioner("abc", "abc@abc.com", null, null, "def"))
 
-    notifyService().onApplicationEvent(generateAppointmentEvent(ActionPlanAppointmentEventType.BEHAVIOUR_RECORDED, true))
+    val actionPlanAppointmentEvent = generateAppointmentEvent(ActionPlanAppointmentEventType.BEHAVIOUR_RECORDED, true)
+    val appointmentId = actionPlanAppointmentEvent.deliverySession.appointmentId
+
+    notifyService().onApplicationEvent(actionPlanAppointmentEvent)
     val personalisationCaptor = argumentCaptor<Map<String, String>>()
     verify(emailSender).sendEmail(eq("template"), eq("abc@abc.com"), personalisationCaptor.capture())
     Assertions.assertThat(personalisationCaptor.firstValue["ppFirstName"]).isEqualTo("abc")
     Assertions.assertThat(personalisationCaptor.firstValue["referenceNumber"]).isEqualTo("HAS71263")
-    Assertions.assertThat(personalisationCaptor.firstValue["sessionUrl"]).isEqualTo("http://example.com/pp/referrals/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080/session/1/appointment/12345/feedback")
+    Assertions.assertThat(personalisationCaptor.firstValue["sessionUrl"]).isEqualTo("http://example.com/pp/referrals/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080/session/1/appointment/$appointmentId/feedback")
   }
 }
