@@ -16,7 +16,7 @@ class LinkSupersededAppointmentsReader(
     this.setName("linkSupersededAppointmentsReader")
     this.setSessionFactory(sessionFactory)
     this.setQueryString(
-      "SELECT a FROM Appointment a where superseded = true",
+      "SELECT a FROM Appointment a where a.superseded = true",
     )
   }
 }
