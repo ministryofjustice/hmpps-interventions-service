@@ -90,11 +90,11 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-ui:1.7.0")
 
   // notifications
-  implementation("uk.gov.service.notify:notifications-java-client:3.19.1-RELEASE")
+  implementation("uk.gov.service.notify:notifications-java-client:3.19.2-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.20.63")
-  implementation("software.amazon.awssdk:s3:2.20.64")
+  implementation("software.amazon.awssdk:sns:2.20.65")
+  implementation("software.amazon.awssdk:s3:2.20.65")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
