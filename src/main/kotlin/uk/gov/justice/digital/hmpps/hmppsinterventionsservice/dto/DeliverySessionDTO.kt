@@ -72,6 +72,7 @@ data class DeliverySessionDTO(
   val appointmentDeliveryAddress: AddressDTO?,
   val sessionFeedback: SessionFeedbackDTO,
   val deliusAppointmentId: Long?,
+  val appointmentId: UUID?,
 ) {
   companion object {
     fun from(session: DeliverySession): DeliverySessionDTO {
@@ -106,6 +107,7 @@ data class DeliverySessionDTO(
         npsOfficeCode = session.currentAppointment?.appointmentDelivery?.npsOfficeCode,
         sessionFeedback = SessionFeedbackDTO.from(session.currentAppointment),
         deliusAppointmentId = session.currentAppointment?.deliusAppointmentId,
+        appointmentId = session.currentAppointment?.id,
       )
     }
     fun from(sessions: List<DeliverySession>): List<DeliverySessionDTO> {
