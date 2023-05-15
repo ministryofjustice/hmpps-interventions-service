@@ -36,3 +36,9 @@ env:
   LOGGING_LEVEL_UK_GOV_JUSTICE_DIGITAL_HMPPS_HMPPSINTERVENTIONSSERVICE: "debug"
   OVERRIDES_SHOWFUTUREINTERVENTIONS: "true"
   FEATUREFLAGS_CURRENTLOCATION_ENABLED: "true"
+
+spring:
+  batch:
+    jobs:
+      mark-stale-appointments:
+        appointments: 82e2fbbe-1bb4-4967-8ee6-81aa072fd44b
