@@ -243,11 +243,9 @@ class DeliverySessionService(
       referral = existingAppointment?.referral ?: session.referral,
     )
 
-    if (existingAppointment != null) {
-      existingAppointment.let {
-        it.supersededByAppointmentId = appointment.id
-        it.superseded = true
-      }
+    existingAppointment?.let {
+      it.supersededByAppointmentId = appointment.id
+      it.superseded = true
     }
 
     session.appointments.map { appt ->
