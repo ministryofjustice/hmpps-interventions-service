@@ -772,7 +772,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       assertThat(appointment.appointmentFeedbackSubmittedBy).isNull()
       assertThat(appointment.appointmentDelivery?.appointmentDeliveryType).isNotNull
       assertThat(appointment.appointmentDelivery?.appointmentSessionType).isNotNull
-      assertThat(updatedSession.appointments.last { it.attended == Attended.NO }.superseded).isTrue
+      assertThat(updatedSession.appointments.first { it.attended == Attended.NO }.superseded).isTrue
     }
   }
 }

@@ -303,7 +303,6 @@ class AppointmentService(
       appointmentType,
       uuid,
     )
-    oldAppointment.supersededByAppointmentId = appointment.id
     oldAppointment.superseded = true
     appointmentRepository.save(oldAppointment)
     return appointment
