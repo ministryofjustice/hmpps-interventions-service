@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.Appointmen
 @JobScope
 class LinkSupersededAppointmentsProcessor(
   private val appointmentCleaner: AppointmentCleaner,
+
 ) : ItemProcessor<Appointment, Appointment> {
   companion object : KLogging()
 

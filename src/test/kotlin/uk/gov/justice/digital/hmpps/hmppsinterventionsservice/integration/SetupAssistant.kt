@@ -132,7 +132,7 @@ class SetupAssistant(
     endOfServiceReportRepository.deleteAll()
     appointmentDeliveryAddressRepository.deleteAll()
     appointmentDeliveryRepository.deleteAll()
-    appointmentRepository.deleteAll()
+    appointmentRepository.deleteAllInBatch()
     changeLogRepository.deleteAll()
     deleteAllReferralDetails()
     referralRepository.deleteAll()
@@ -832,6 +832,7 @@ class SetupAssistant(
   }
   fun changeAppointmentId(targetAppointment: Appointment, newId: UUID, deliverySession: DeliverySession) {
     targetAppointment.id = newId
+    // targetAppointment.id = UUID.fromString("82e2fbbe-1bb4-4967-8ee6-81aa072fd44b")
     appointmentRepository.save(targetAppointment)
     deliverySessionRepository.save(deliverySession)
   }
