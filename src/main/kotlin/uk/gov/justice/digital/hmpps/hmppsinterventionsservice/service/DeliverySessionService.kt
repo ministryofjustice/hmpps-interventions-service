@@ -109,11 +109,6 @@ class DeliverySessionService(
       durationInMinutes = durationInMinutes,
       referral = session.referral,
     )
-    if (existingAppointment != null) {
-      existingAppointment.supersededByAppointmentId = appointment.id
-      existingAppointment.superseded = true
-      appointmentRepository.save(existingAppointment)
-    }
     return scheduleDeliverySessionAppointment(
       session, appointment, existingAppointment, appointmentTime, durationInMinutes, appointmentDeliveryType, createdBy, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode, attended, additionalAttendanceInformation, notifyProbationPractitioner, behaviourDescription,
     )
@@ -185,15 +180,9 @@ class DeliverySessionService(
     appointmentToSchedule.durationInMinutes = durationInMinutes
     appointmentToSchedule.deliusAppointmentId = deliusAppointmentId
     val toSchedule = appointmentId?.let { appointmentToSchedule.copy(id = it) } ?: appointmentToSchedule
-    appointmentId?.also {
-      deliverySession.appointments.forEach {
-        it.superseded = true
-        it.supersededByAppointmentId = latestAppointment?.id
-        appointmentRepository.saveAndFlush(it)
-      }
-    }
     appointmentRepository.saveAndFlush(toSchedule)
     appointmentService.createOrUpdateAppointmentDeliveryDetails(toSchedule, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
+    appointmentId?.also { deliverySession.appointments.forEach { it.superseded = true } }
     deliverySession.appointments.add(toSchedule)
     return deliverySessionRepository.saveAndFlush(deliverySession).also {
       // Occurring after saving the session to ensure that session has the latest appointment attached when publishing the session feedback event.
@@ -242,20 +231,8 @@ class DeliverySessionService(
       createdBy = existingAppointment?.createdBy ?: authUserRepository.save(updatedBy),
       referral = existingAppointment?.referral ?: session.referral,
     )
-
-    existingAppointment?.let {
-      it.supersededByAppointmentId = appointment.id
-      it.superseded = true
-    }
-
-    session.appointments.map { appt ->
-      {
-        appt.superseded = true
-        appt.supersededByAppointmentId = appointment.id
-      }
-    }
+    session.appointments.map { appt -> appt.superseded = true }
     appointmentRepository.saveAndFlush(appointment)
-    if (existingAppointment != null) appointmentRepository.saveAndFlush(existingAppointment)
     appointmentService.createOrUpdateAppointmentDeliveryDetails(appointment, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
     session.appointments.add(appointment)
     return deliverySessionRepository.saveAndFlush(session).also {

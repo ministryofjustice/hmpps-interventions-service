@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.linksupersededappointments
+package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.markstaleappointments
 import mu.KLogging
 import net.logstash.logback.argument.StructuredArguments.kv
 import org.springframework.batch.core.configuration.annotation.JobScope
@@ -9,14 +9,14 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.Appointmen
 
 @Component
 @JobScope
-class LinkSupersededAppointmentsProcessor(
-  private val appointmentCleaner: AppointmentCleaner,
+class MarkStaleAppointmentsProcessor(
+  private val appointentCleaner: AppointmentCleaner,
 ) : ItemProcessor<Appointment, Appointment> {
   companion object : KLogging()
 
   override fun process(appointment: Appointment): Appointment {
-    logger.info("linking appointment {} for superseded tagging", kv("appointmentId", appointment.id))
+    logger.info("processing appointment {} for stale tagging", kv("appointmentId", appointment.id))
 
-    return appointmentCleaner.linkIfSuperseded(appointment)
+    return appointentCleaner.markAppoinmentAsStale(appointment)
   }
 }
