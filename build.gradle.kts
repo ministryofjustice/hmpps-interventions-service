@@ -80,11 +80,11 @@ dependencies {
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
-  implementation("io.sentry:sentry-spring-boot-starter:6.18.1")
-  implementation("io.sentry:sentry-logback:6.18.1")
+  implementation("io.sentry:sentry-spring-boot-starter:6.19.0")
+  implementation("io.sentry:sentry-logback:6.19.0")
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
   implementation("net.logstash.logback:logstash-logback-encoder:7.3")
-  runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.0") // needed for OffsetDateTime for AppInsights
+  runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.1") // needed for OffsetDateTime for AppInsights
 
   // openapi
   implementation("org.springdoc:springdoc-openapi-ui:1.7.0")
@@ -93,8 +93,8 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:3.19.2-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.20.65")
-  implementation("software.amazon.awssdk:s3:2.20.65")
+  implementation("software.amazon.awssdk:sns:2.20.67")
+  implementation("software.amazon.awssdk:s3:2.20.67")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
