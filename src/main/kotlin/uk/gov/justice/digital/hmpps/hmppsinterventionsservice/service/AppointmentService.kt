@@ -78,7 +78,7 @@ class AppointmentService(
       // the current appointment needs to be updated
       appointment.attended == null -> {
         val (deliusAppointmentId, appointmentId) =
-          communityAPIBookingService.book(referral, appointment, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode)
+          communityAPIBookingService.book(referral, appointment, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode, attended, notifyProbationPractitioner)
         updateAppointment(
           durationInMinutes,
           appointment,
