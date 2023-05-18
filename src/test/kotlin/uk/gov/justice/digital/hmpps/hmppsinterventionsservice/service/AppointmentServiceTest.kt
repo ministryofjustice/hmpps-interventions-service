@@ -276,7 +276,7 @@ class AppointmentServiceTest {
     val referral = referralFactory.createSent()
     val rescheduledDeliusAppointmentId = 99L
 
-    whenever(communityAPIBookingService.book(referral, existingAppointment, pastAppointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null))
+    whenever(communityAPIBookingService.book(referral, existingAppointment, pastAppointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null, NO, null))
       .thenReturn(Pair(rescheduledDeliusAppointmentId, UUID.randomUUID()))
     whenever(appointmentRepository.save(any())).thenAnswer { it.arguments[0] }
 
