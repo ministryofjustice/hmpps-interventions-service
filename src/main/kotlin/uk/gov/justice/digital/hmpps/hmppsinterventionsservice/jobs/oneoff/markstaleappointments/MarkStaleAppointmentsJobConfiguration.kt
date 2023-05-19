@@ -6,13 +6,16 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.job.DefaultJobParametersValidator
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.io.ResourceLoader
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.OnStartupJobLauncherFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
+import java.util.*
 
 @Configuration
 @EnableBatchProcessing
@@ -20,9 +23,15 @@ class MarkStaleAppointmentsJobConfiguration(
   private val jobBuilderFactory: JobBuilderFactory,
   private val stepBuilderFactory: StepBuilderFactory,
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
-  @Value("\${spring.batch.jobs.mark-stale-appointments.appointments}")
-  private val appointmentsStr: String,
+  @Value("#{environment.SENTRY_ENVIRONMENT}")
+  private var env: String?,
 ) {
+
+  @Autowired
+  private lateinit var resourceLoader: ResourceLoader
+
+  private val properties = Properties()
+
   @Bean
   fun markStaleAppointmentsJobLauncher(markStaleAppointmentsJob: Job): ApplicationRunner {
     return onStartupJobLauncherFactory.makeBatchLauncher(markStaleAppointmentsJob)
@@ -30,11 +39,15 @@ class MarkStaleAppointmentsJobConfiguration(
 
   @Bean
   fun markStaleAppointmentsJob(markStaleAppointmentsStep: Step): Job {
+    if (env.isNullOrBlank()) this.env = "LOCAL"
+
+    val propsPath = "classpath:jobs/oneoff/mark-stale-appointments-$env.txt"
+    val resourceUri = resourceLoader.getResource(propsPath)
+    val lines = resourceUri.file?.bufferedReader()?.readLines()
+
     val validator = DefaultJobParametersValidator()
     validator.setRequiredKeys(
-      arrayOf(
-        "appointmentsStr",
-      ),
+      lines!!.toTypedArray(),
     )
     return jobBuilderFactory["markStaleAppointmentsJob"]
       .validator(validator)
@@ -56,4 +69,6 @@ class MarkStaleAppointmentsJobConfiguration(
       .writer(writer)
       .build()
   }
+
+  fun getProperty(key: String): Any? = properties.get(key)
 }
