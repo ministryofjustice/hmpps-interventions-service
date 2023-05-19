@@ -47,14 +47,14 @@ class ReferralConcludeIntegrationTest @Autowired constructor(
     actionPlan.referral.actionPlans = mutableListOf(actionPlan)
 
     // then make a bunch of appointments
-    val unattendedAppointments = (1..5).map {
-      appointmentFactory.create(referral = actionPlan.referral, attended = Attended.YES, appointmentFeedbackSubmittedAt = OffsetDateTime.now(), superseded = true)
-    }
-    val attendedAppointments = (1..5).map {
+    val attendedAppointments = (1..10).map {
       appointmentFactory.create(referral = actionPlan.referral, attended = Attended.YES, appointmentFeedbackSubmittedAt = OffsetDateTime.now(), superseded = false)
     }
+    val unattendedAppointments = (1..5).map {
+      appointmentFactory.create(referral = actionPlan.referral, attended = Attended.YES, appointmentFeedbackSubmittedAt = OffsetDateTime.now(), superseded = true, supersededById = attendedAppointments.get(it - 1).id)
+    }
     val lateAppointments = (1..5).map {
-      appointmentFactory.create(referral = actionPlan.referral, attended = Attended.LATE, appointmentFeedbackSubmittedAt = OffsetDateTime.now(), superseded = true)
+      appointmentFactory.create(referral = actionPlan.referral, attended = Attended.LATE, appointmentFeedbackSubmittedAt = OffsetDateTime.now(), superseded = true, supersededById = attendedAppointments.get(it + 4).id)
     }
 
     val session = deliverySessionFactory.createAttendedDuplicateReferral(

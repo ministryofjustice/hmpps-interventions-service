@@ -92,5 +92,4 @@ enum class Attended {
 enum class AppointmentType {
   SERVICE_DELIVERY,
   SUPPLIER_ASSESSMENT,
-  ;
 }

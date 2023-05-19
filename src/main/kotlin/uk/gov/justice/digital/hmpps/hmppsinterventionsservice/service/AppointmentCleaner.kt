@@ -37,7 +37,6 @@ class AppointmentCleaner(
     return result
   }
 
-  @Transactional
   fun markAppoinmentAsStale(appointment: Appointment): Appointment {
     appointment.stale = true
     appointmentRepository.save(appointment)

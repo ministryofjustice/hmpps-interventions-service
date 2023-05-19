@@ -231,7 +231,7 @@ class ReferralServiceTest @Autowired constructor(
       val appointment =
         appointmentFactory.create(referral = cancelledReferral, attendanceSubmittedAt = null)
       val superSededAppointment =
-        appointmentFactory.create(referral = cancelledReferral, attendanceSubmittedAt = null, superseded = true)
+        appointmentFactory.create(referral = cancelledReferral, attendanceSubmittedAt = null, superseded = true, supersededById = appointment.id)
       val supplierAssessmentAppointment =
         supplierAssessmentFactory.createWithMultipleAppointments(appointments = mutableSetOf(appointment, superSededAppointment), referral = cancelledReferral)
       cancelledReferral.supplierAssessment = supplierAssessmentAppointment
@@ -864,7 +864,7 @@ class ReferralServiceTest @Autowired constructor(
       val appointment =
         appointmentFactory.create(referral = completedReferral, attendanceSubmittedAt = OffsetDateTime.now())
       val superSededAppointment =
-        appointmentFactory.create(referral = completedReferral, attendanceSubmittedAt = OffsetDateTime.now(), superseded = true)
+        appointmentFactory.create(referral = completedReferral, attendanceSubmittedAt = OffsetDateTime.now(), superseded = true, supersededById = appointment.id)
       val supplierAssessmentAppointment =
         supplierAssessmentFactory.createWithMultipleAppointments(appointments = mutableSetOf(appointment, superSededAppointment), referral = completedReferral)
       completedReferral.supplierAssessment = supplierAssessmentAppointment
@@ -966,7 +966,7 @@ class ReferralServiceTest @Autowired constructor(
       val appointment =
         appointmentFactory.create(referral = completedReferral, attendanceSubmittedAt = OffsetDateTime.now())
       val superSededAppointment =
-        appointmentFactory.create(referral = completedReferral, attendanceSubmittedAt = OffsetDateTime.now(), superseded = true)
+        appointmentFactory.create(referral = completedReferral, attendanceSubmittedAt = OffsetDateTime.now(), superseded = true, supersededById = appointment.id)
       val supplierAssessmentAppointment =
         supplierAssessmentFactory.createWithMultipleAppointments(appointments = mutableSetOf(appointment, superSededAppointment), referral = completedReferral)
       completedReferral.supplierAssessment = supplierAssessmentAppointment

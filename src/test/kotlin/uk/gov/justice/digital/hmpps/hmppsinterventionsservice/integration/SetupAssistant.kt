@@ -137,7 +137,7 @@ class SetupAssistant(
     endOfServiceReportRepository.deleteAll()
     appointmentDeliveryAddressRepository.deleteAll()
     appointmentDeliveryRepository.deleteAll()
-    appointmentRepository.deleteAll()
+    appointmentRepository.deleteAllInBatch()
     changeLogRepository.deleteAll()
     deleteAllReferralDetails()
     probationPractitionerDetailsRepository.deleteAll()
