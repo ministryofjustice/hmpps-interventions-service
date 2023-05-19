@@ -70,7 +70,7 @@ tasks {
 
 dependencyManagement {
   dependencies {
-    dependency("net.minidev:json-smart:2.4.10")
+    dependency("net.minidev:json-smart:2.4.11")
   }
 }
 
@@ -93,8 +93,8 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:4.1.0-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.20.67")
-  implementation("software.amazon.awssdk:s3:2.20.67")
+  implementation("software.amazon.awssdk:sns:2.20.68")
+  implementation("software.amazon.awssdk:s3:2.20.68")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
