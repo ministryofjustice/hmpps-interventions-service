@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: link-superseded-appointments
+spec:
+  schedule: "* 5 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: "Never"
+          containers:
+            - name: link-superseded-appointments
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              imagePullPolicy: Always
+              args: ["--jobName=linkSupersededAppointmentsJob"]
+{{- include "deployment.envs" . | nindent 14 }}

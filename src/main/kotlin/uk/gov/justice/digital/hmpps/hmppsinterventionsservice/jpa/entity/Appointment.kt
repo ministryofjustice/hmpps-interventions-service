@@ -60,7 +60,9 @@ data class Appointment(
 
   @ManyToOne(fetch = FetchType.LAZY) var referral: Referral,
   var superseded: Boolean = false,
-  @Id val id: UUID,
+  @Id var id: UUID,
+  var supersededByAppointmentId: UUID? = null,
+  var stale: Boolean = false,
 ) {
   override fun equals(other: Any?): Boolean {
     if (other == null || other !is Appointment) {
