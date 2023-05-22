@@ -39,7 +39,7 @@ class MarkStaleAppointmentsJobConfiguration(
 
   @Bean
   fun markStaleAppointmentsJob(markStaleAppointmentsStep: Step): Job {
-    if (env.isNullOrBlank()) this.env = "LOCAL"
+    if (env.isNullOrBlank()) this.env = "local"
 
     val propsPath = "classpath:jobs/oneoff/mark-stale-appointments-$env.txt"
     val resourceUri = resourceLoader.getResource(propsPath)
