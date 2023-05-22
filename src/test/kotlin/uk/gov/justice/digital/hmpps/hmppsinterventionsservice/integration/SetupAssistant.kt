@@ -804,4 +804,40 @@ class SetupAssistant(
     val caseNote = caseNoteFactory.create(id = id, referral = referral, subject = subject, body = body, sentBy = authUser)
     return caseNoteRepository.save(caseNote)
   }
+
+  fun createAppointment(
+    referral: Referral,
+    id: UUID = UUID.randomUUID(),
+    authUser: AuthUser = createSPUser(),
+    superseded: Boolean = false,
+  ): Appointment {
+    var deliverySession = deliverySessionRepository.findByReferralIdAndSessionNumber(referral.id, 1)
+
+    val appointment = appointmentFactory.create(
+      id,
+      createdAt = OffsetDateTime.now(),
+      authUser,
+      OffsetDateTime.now().plusMonths(2),
+      superseded = superseded,
+      referral = referral,
+    )
+
+    if (deliverySession != null) {
+      deliverySession.appointments.add(appointment)
+    }
+
+    appointmentRepository.save(appointment)
+    deliverySessionRepository.save(deliverySession)
+    return appointment
+  }
+  fun changeAppointmentId(targetAppointment: Appointment, newId: UUID, deliverySession: DeliverySession) {
+    targetAppointment.id = newId
+    appointmentRepository.save(targetAppointment)
+    deliverySessionRepository.save(deliverySession)
+  }
+  fun setSuperseded(supersededAppointment: Appointment, deliverySession: DeliverySession, superseded: Boolean = true) {
+    supersededAppointment.superseded = superseded
+    appointmentRepository.save(supersededAppointment)
+    deliverySessionRepository.save(deliverySession)
+  }
 }
