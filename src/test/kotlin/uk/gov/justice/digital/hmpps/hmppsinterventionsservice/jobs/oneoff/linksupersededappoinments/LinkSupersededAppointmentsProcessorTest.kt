@@ -22,7 +22,6 @@ class LinkSupersededAppointmentsProcessorTest : IntegrationTestBase() {
     processor = LinkSupersededAppointmentsProcessor(appointmentCleaner)
   }
 
-
   // This test disabled and is targetted for removal, as once the contraint on superseded appoitments is applied it won't pass.
   fun `adds superseded id to a superseded appointment`() {
     val activeReferral = setupAssistant.createAssignedReferral()
