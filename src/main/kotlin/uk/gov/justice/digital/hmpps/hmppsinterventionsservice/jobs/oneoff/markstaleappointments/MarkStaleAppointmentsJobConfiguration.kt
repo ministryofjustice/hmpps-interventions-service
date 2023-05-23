@@ -42,7 +42,7 @@ class MarkStaleAppointmentsJobConfiguration(
     if (env.isNullOrBlank()) this.env = "local"
 
     val propsPath = "jobs/oneoff/mark-stale-appointments-$env.txt"
-    val resourceReader = MarkStaleAppointmentsJobConfiguration::class.java.getResourceAsStream(propsPath)
+    val resourceReader = this::class.java.classLoader.getResourceAsStream(propsPath)
     val lines = resourceReader?.bufferedReader()?.readLines()
 
     val validator = DefaultJobParametersValidator()
