@@ -325,12 +325,12 @@ class DraftReferralServiceTest @Autowired constructor(
       entityManager.persistAndFlush(sampleDraftReferral)
 
       val draftReferral = DraftReferralDTO(
-        nDeliusPPName = "chris patt",
-        nDeliusPPEmailAddress = "pp@abc.com",
-        nDeliusPDU = "pdu1",
+        ndeliusPPName = "chris patt",
+        ndeliusPPEmailAddress = "pp@abc.com",
+        ndeliusPDU = "pdu1",
         ppName = "chris pratt",
         ppEmailAddress = "rr@abc.com",
-        pdu = "pdu2",
+        ppPdu = "pdu2",
       )
       draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
       val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
@@ -351,7 +351,7 @@ class DraftReferralServiceTest @Autowired constructor(
       val draftReferral = DraftReferralDTO(
         ppName = "chris pratt",
         ppEmailAddress = "rr@abc.com",
-        pdu = "pdu2",
+        ppPdu = "pdu2",
       )
       draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
       val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
@@ -370,9 +370,9 @@ class DraftReferralServiceTest @Autowired constructor(
       entityManager.persistAndFlush(sampleDraftReferral)
 
       val draftReferral = DraftReferralDTO(
-        nDeliusPPName = "chris patt",
-        nDeliusPPEmailAddress = "pp@abc.com",
-        nDeliusPDU = "pdu1",
+        ndeliusPPName = "chris patt",
+        ndeliusPPEmailAddress = "pp@abc.com",
+        ndeliusPDU = "pdu1",
       )
       draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
       val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
