@@ -23,8 +23,8 @@ class MarkStaleAppointmentsJobConfiguration(
   private val jobBuilderFactory: JobBuilderFactory,
   private val stepBuilderFactory: StepBuilderFactory,
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
-  @Value("#{environment.SENTRY_ENVIRONMENT}")
-  private var env: String?,
+  @Value("\${appointment.ids}")
+  private var appointmentIds: String,
 ) {
 
   @Autowired
@@ -39,11 +39,7 @@ class MarkStaleAppointmentsJobConfiguration(
 
   @Bean
   fun markStaleAppointmentsJob(markStaleAppointmentsStep: Step): Job {
-    if (env.isNullOrBlank()) this.env = "local"
-
-    val propsPath = "jobs/oneoff/mark-stale-appointments-$env.txt"
-    val resourceReader = this::class.java.classLoader.getResourceAsStream(propsPath)
-    val lines = resourceReader?.bufferedReader()?.readLines()
+    val lines = appointmentIds.split(",")
 
     val validator = DefaultJobParametersValidator()
     validator.setRequiredKeys(
