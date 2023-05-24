@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftRe
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ProbationPractitionerDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
@@ -24,6 +25,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
   private val interventionFactory = InterventionFactory(em)
   private val cancellationReasonFactory = CancellationReasonFactory(em)
   private val referalDetailsFactory = ReferralDetailsFactory(em)
+  private val probationPractitionerDetailsFactory = ProbationPractitionerDetailsFactory(em)
 
   fun createDraft(
     id: UUID = UUID.randomUUID(),
@@ -43,6 +45,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     personCurrentLocationType: PersonCurrentLocationType? = null,
     personCustodyPrisonId: String? = null,
     expectedReleaseDate: LocalDate? = null,
+    probationOffice: String? = "probation-office1",
   ): DraftReferral {
     return createDraftReferral(
       id = id,
@@ -60,6 +63,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       personCurrentLocationType = personCurrentLocationType,
       personCustodyPrisonId = personCustodyPrisonId,
       expectedReleaseDate = expectedReleaseDate,
+      probationOffice = probationOffice,
     )
   }
 
@@ -92,7 +96,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     referralDetail: ReferralDetails? = null,
     needsInterpreter: Boolean? = null,
     interpreterLanguage: String? = null,
-
+    probationPractitionerDetails: ProbationPractitionerDetails? = null,
   ): Referral {
     if (createDraft) {
       createDraft(
@@ -103,7 +107,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
         intervention = intervention,
       )
     }
-    return createReferral(
+    val referral = createReferral(
       id = id,
       createdAt = createdAt,
       createdBy = createdBy,
@@ -131,7 +135,13 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       additionalNeedsInformation = additionalNeedsInformation,
       needsInterpreter = needsInterpreter,
       interpreterLanguage = interpreterLanguage,
+      probationPractitionerDetails = probationPractitionerDetails,
     )
+    val probationPractitionerDetails = probationPractitionerDetailsFactory.create(referral = referral)
+
+    referral.probationPractitionerDetails = probationPractitionerDetails
+    save(referral)
+    return referral
   }
 
   fun createAssigned(
@@ -165,7 +175,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       intervention = intervention,
       selectedServiceCategories = selectedServiceCategories,
     )
-    return createReferral(
+    val referral = createReferral(
       id = id,
       createdAt = createdAt,
       createdBy = createdBy,
@@ -185,6 +195,10 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       supplierAssessment = supplierAssessment,
       serviceUserData = serviceUserData,
     )
+    val probationPractitionerDetails = probationPractitionerDetailsFactory.create(referral = referral)
+    referral.probationPractitionerDetails = probationPractitionerDetails
+    save(referral)
+    return referral
   }
 
   fun createEnded(
@@ -222,7 +236,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       intervention = intervention,
       selectedServiceCategories = selectedServiceCategories,
     )
-    return createReferral(
+    val referral = createReferral(
       id = id,
       createdAt = createdAt,
       createdBy = createdBy,
@@ -250,5 +264,9 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
 
       endOfServiceReport = endOfServiceReport,
     )
+    val probationPractitionerDetails = probationPractitionerDetailsFactory.create(referral = referral)
+    referral.probationPractitionerDetails = probationPractitionerDetails
+    save(referral)
+    return referral
   }
 }
