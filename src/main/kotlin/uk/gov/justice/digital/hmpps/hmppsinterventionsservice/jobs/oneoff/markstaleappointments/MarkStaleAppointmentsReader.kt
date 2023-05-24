@@ -13,10 +13,11 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appoint
 @Configuration
 class MarkStaleAppointmentsReader(
   sessionFactory: SessionFactory,
-  @Value("#{jobParameters['appointmentsStr']}") appointmentsStr: String,
+  @Value("\${appointment.ids}")
+  private var appointmentIds: String,
 ) : HibernateCursorItemReader<Appointment>() {
   init {
-    val targetIds = parseIds(appointmentsStr)
+    val targetIds = parseIds(appointmentIds)
     this.setName("markStaleAppointmentsReader")
     this.setSessionFactory(sessionFactory)
     this.setQueryString(
