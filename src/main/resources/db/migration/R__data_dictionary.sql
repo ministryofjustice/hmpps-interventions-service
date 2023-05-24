@@ -169,4 +169,8 @@ COMMENT ON TABLE referral_location IS 'details about the service user''s current
 
 COMMENT ON TABLE complexity_level IS 'details about the complexity levels of the service category';
 
+COMMENT ON TABLE draft_referral IS 'adding probation practitioner details';
+
+COMMENT ON TABLE probation_practitioner_details IS 'storing the probation practitioner details for a particular referral';
+
 -- some definitions are in V1_34__document_contract_table.sql; needs lifting
