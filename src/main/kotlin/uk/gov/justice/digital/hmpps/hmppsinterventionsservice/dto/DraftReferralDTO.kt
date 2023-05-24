@@ -53,6 +53,13 @@ data class DraftReferralDTO(
   val hasExpectedReleaseDate: Boolean? = null,
   val expectedReleaseDate: LocalDate? = null,
   val expectedReleaseDateMissingReason: String? = null,
+  val nDeliusPPName: String? = null,
+  val nDeliusPPEmailAddress: String? = null,
+  val nDeliusPDU: String? = null,
+  val ppName: String? = null,
+  val ppEmailAddress: String? = null,
+  val pdu: String? = null,
+  val probationOffice: String? = null,
 ) {
   companion object {
     fun from(referral: DraftReferral): DraftReferralDTO {
@@ -94,6 +101,13 @@ data class DraftReferralDTO(
         personCustodyPrisonId = referral.personCustodyPrisonId,
         expectedReleaseDate = referral.expectedReleaseDate,
         expectedReleaseDateMissingReason = referral.expectedReleaseDateMissingReason,
+        nDeliusPPName = referral.nDeliusPPName,
+        nDeliusPPEmailAddress = referral.nDeliusPPEmailAddress,
+        nDeliusPDU = referral.nDeliusPPPDU,
+        ppName = referral.name,
+        ppEmailAddress = referral.emailAddress,
+        pdu = referral.pdu,
+        probationOffice = referral.probationOffice,
       )
     }
 
@@ -137,6 +151,13 @@ data class DraftReferralDTO(
         personCustodyPrisonId = referral.referralLocation?.prisonId,
         expectedReleaseDate = referral.referralLocation?.expectedReleaseDate,
         expectedReleaseDateMissingReason = referral.referralLocation?.expectedReleaseDateMissingReason,
+        nDeliusPPName = referral.probationPractitionerDetails?.nDeliusName,
+        nDeliusPPEmailAddress = referral.probationPractitionerDetails?.nDeliusEmailAddress,
+        nDeliusPDU = referral.probationPractitionerDetails?.nDeliusPDU,
+        ppName = referral.probationPractitionerDetails?.name,
+        ppEmailAddress = referral.probationPractitionerDetails?.emailAddress,
+        pdu = referral.probationPractitionerDetails?.pdu,
+        probationOffice = referral.probationPractitionerDetails?.probationOffice!!,
       )
     }
   }

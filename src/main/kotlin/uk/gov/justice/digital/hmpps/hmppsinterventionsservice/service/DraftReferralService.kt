@@ -21,6 +21,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ProbationPractitionerDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralLocation
@@ -30,6 +31,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Aut
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ProbationPractitionerDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralLocationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
@@ -60,7 +62,9 @@ class DraftReferralService(
   val referralDetailsRepository: ReferralDetailsRepository,
   val draftOasysRiskInformationService: DraftOasysRiskInformationService,
   val referralLocationRepository: ReferralLocationRepository,
+  val probationPractitionerDetailsRepository: ProbationPractitionerDetailsRepository,
   @Value("\${feature-flags.current-location.enabled}") private val currentLocationEnabled: Boolean,
+  @Value("\${feature-flags.save-probation-practitioner-details.enabled}") private val saveProbationPractitionerDetails: Boolean,
 ) {
   companion object {
     private val logger = KotlinLogging.logger {}
@@ -121,6 +125,10 @@ class DraftReferralService(
       updatePersonExpectedReleaseDate(referral, update)
     }
 
+    if (saveProbationPractitionerDetails) {
+      updateProbationPractitionerDetails(referral, update)
+    }
+
     // this field doesn't fit into any other categories - is this a smell?
     update.relevantSentenceId?.let {
       referral.relevantSentenceId = it
@@ -159,6 +167,16 @@ class DraftReferralService(
         referral.selectedServiceCategories = updatedServiceCategories.toMutableSet()
       }
     }
+  }
+
+  private fun updateProbationPractitionerDetails(referral: DraftReferral, update: DraftReferralDTO) {
+    referral.nDeliusPPName = update.nDeliusPPName
+    referral.nDeliusPPEmailAddress = update.nDeliusPPEmailAddress
+    referral.nDeliusPPPDU = update.nDeliusPDU
+    referral.name = update.ppName
+    referral.emailAddress = update.ppEmailAddress
+    referral.pdu = update.pdu
+    referral.probationOffice = update.probationOffice
   }
 
   fun updateDraftReferralDetails(referral: DraftReferral, update: UpdateReferralDetailsDTO, actor: AuthUser): ReferralDetails? {
@@ -437,6 +455,7 @@ class DraftReferralService(
 
     val sentReferral = referralRepository.save(referral)
     createReferralLocation(draftReferral, sentReferral)
+    createProbationPractitionerDetails(draftReferral, sentReferral)
     eventPublisher.referralSentEvent(sentReferral)
     supplierAssessmentService.createSupplierAssessment(referral)
     return sentReferral
@@ -478,6 +497,25 @@ class DraftReferralService(
           prisonId = draftReferral.personCustodyPrisonId,
           expectedReleaseDate = draftReferral.expectedReleaseDate,
           expectedReleaseDateMissingReason = draftReferral.expectedReleaseDateMissingReason,
+        ),
+      )
+      referralRepository.save(referral)
+    }
+  }
+
+  private fun createProbationPractitionerDetails(draftReferral: DraftReferral, referral: Referral) {
+    if (saveProbationPractitionerDetails) {
+      referral.probationPractitionerDetails = probationPractitionerDetailsRepository.save(
+        ProbationPractitionerDetails(
+          id = UUID.randomUUID(),
+          referral = referral,
+          nDeliusName = draftReferral.nDeliusPPName,
+          nDeliusEmailAddress = draftReferral.nDeliusPPEmailAddress,
+          nDeliusPDU = draftReferral.nDeliusPPPDU,
+          name = draftReferral.name,
+          emailAddress = draftReferral.emailAddress,
+          pdu = draftReferral.pdu,
+          probationOffice = draftReferral.probationOffice!!,
         ),
       )
       referralRepository.save(referral)

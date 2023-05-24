@@ -73,7 +73,7 @@ class SampleData {
       supplementaryRiskId: UUID? = null,
       serviceUserData: ServiceUserData = ServiceUserData(),
     ): Referral {
-      return Referral(
+      val referral = Referral(
         serviceUserCRN = crn,
         id = id,
         createdAt = createdAt,
@@ -90,6 +90,21 @@ class SampleData {
         supplementaryRiskId = supplementaryRiskId,
         serviceUserData = serviceUserData,
       )
+
+      val probationPractitionerDetails = ProbationPractitionerDetails(
+        id = UUID.randomUUID(),
+        referral = referral,
+        nDeliusName = "ndelius name",
+        nDeliusEmailAddress = "a.b@xyz.com",
+        nDeliusPDU = "ndeliusPDU",
+        name = "name",
+        emailAddress = "emailAddress",
+        pdu = "pdu",
+        probationOffice = "probation-office",
+      )
+
+      referral.probationPractitionerDetails = probationPractitionerDetails
+      return referral
     }
 
     fun sampleDraftReferral(

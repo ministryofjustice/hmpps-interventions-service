@@ -39,6 +39,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Aut
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ProbationPractitionerDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralLocationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
@@ -75,6 +76,7 @@ class DraftReferralServiceUnitTest {
   private val draftOasysRiskInformationService: DraftOasysRiskInformationService = mock()
   private val referralDetailsRepository: ReferralDetailsRepository = mock()
   private val referralLocationRepository: ReferralLocationRepository = mock()
+  private val probationPractitionerDetailsRepository: ProbationPractitionerDetailsRepository = mock()
 
   private val referralFactory = ReferralFactory()
   private val authUserFactory = AuthUserFactory()
@@ -84,6 +86,7 @@ class DraftReferralServiceUnitTest {
   private val dynamicFrameworkContractFactory = DynamicFrameworkContractFactory()
   private val draftOasysRiskInformationFactory = DraftOasysRiskInformationFactory()
   private var currentLocationEnabled: Boolean = true
+  private var saveProbationPractitionerDetails: Boolean = true
 
   private val draftReferralService = DraftReferralService(
     referralRepository,
@@ -105,7 +108,9 @@ class DraftReferralServiceUnitTest {
     referralDetailsRepository,
     draftOasysRiskInformationService,
     referralLocationRepository,
+    probationPractitionerDetailsRepository,
     currentLocationEnabled,
+    saveProbationPractitionerDetails,
   )
 
   @BeforeEach

@@ -88,6 +88,14 @@ class DraftReferral(
   @OneToMany(fetch = FetchType.LAZY)
   @JoinColumn(name = "referral_id")
   val referralDetailsHistory: Set<ReferralDetails>? = null,
+
+  @Column(name = "ndelius_pp_name") var nDeliusPPName: String? = null,
+  @Column(name = "ndelius_pp_email_address") var nDeliusPPEmailAddress: String? = null,
+  @Column(name = "ndelius_pp_pdu") var nDeliusPPPDU: String? = null,
+  @Column(name = "pp_name") var name: String? = null,
+  @Column(name = "pp_email_address") var emailAddress: String? = null,
+  @Column(name = "pp_pdu") var pdu: String? = null,
+  @Column(name = "pp_probation_office") var probationOffice: String? = null,
 ) {
   val referralDetails: ReferralDetails? get() {
     return referralDetailsHistory?.firstOrNull { it.supersededById == null }

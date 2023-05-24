@@ -149,9 +149,7 @@ class SupplierAssessmentController(
 
   private fun getSupplierAssessmentAppointment(referralId: UUID, user: AuthUser): Appointment {
     val referral = referralService.getSentReferralForUser(referralId, user)
-    if (referral == null) {
-      throw ResponseStatusException(HttpStatus.NOT_FOUND, "referral not found [id=$referralId]")
-    }
+      ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "referral not found [id=$referralId]")
     if (referral.supplierAssessment == null) {
       throw ResponseStatusException(HttpStatus.NOT_FOUND, "supplier assessment not found for referral [id=$referralId]")
     }

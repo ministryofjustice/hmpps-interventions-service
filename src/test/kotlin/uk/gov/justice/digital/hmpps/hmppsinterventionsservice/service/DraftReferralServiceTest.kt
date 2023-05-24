@@ -36,6 +36,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Del
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ProbationPractitionerDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralLocationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
@@ -67,6 +68,7 @@ class DraftReferralServiceTest @Autowired constructor(
   val serviceCategoryRepository: ServiceCategoryRepository,
   val referralDetailsRepository: ReferralDetailsRepository,
   val referralLocationRepository: ReferralLocationRepository,
+  val probationPractitionerDetailsRepository: ProbationPractitionerDetailsRepository,
 ) {
   private val userFactory = AuthUserFactory(entityManager)
   private val interventionFactory = InterventionFactory(entityManager)
@@ -88,6 +90,7 @@ class DraftReferralServiceTest @Autowired constructor(
   private val hmppsAuthService: HMPPSAuthService = mock()
   private val draftOasysRiskInformationService: DraftOasysRiskInformationService = mock()
   private var currentLocationEnabled: Boolean = true
+  private var saveProbationPractitionerDetails: Boolean = true
 
   private val draftReferralService = DraftReferralService(
     referralRepository,
@@ -109,7 +112,9 @@ class DraftReferralServiceTest @Autowired constructor(
     referralDetailsRepository,
     draftOasysRiskInformationService,
     referralLocationRepository,
+    probationPractitionerDetailsRepository,
     currentLocationEnabled,
+    saveProbationPractitionerDetails,
   )
 
   @AfterEach
@@ -316,6 +321,72 @@ class DraftReferralServiceTest @Autowired constructor(
     }
 
     @Test
+    fun `updates probation practitioner details in the draft referral`() {
+      entityManager.persistAndFlush(sampleDraftReferral)
+
+      val draftReferral = DraftReferralDTO(
+        nDeliusPPName = "chris patt",
+        nDeliusPPEmailAddress = "pp@abc.com",
+        nDeliusPDU = "pdu1",
+        ppName = "chris pratt",
+        ppEmailAddress = "rr@abc.com",
+        pdu = "pdu2",
+      )
+      draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
+      val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
+      assertThat(savedDraftReferral).isNotNull
+      assertThat(savedDraftReferral?.id).isEqualTo(sampleDraftReferral.id)
+      assertThat(savedDraftReferral?.nDeliusPPName).isEqualTo("chris patt")
+      assertThat(savedDraftReferral?.nDeliusPPEmailAddress).isEqualTo("pp@abc.com")
+      assertThat(savedDraftReferral?.nDeliusPPPDU).isEqualTo("pdu1")
+      assertThat(savedDraftReferral?.name).isEqualTo("chris pratt")
+      assertThat(savedDraftReferral?.emailAddress).isEqualTo("rr@abc.com")
+      assertThat(savedDraftReferral?.pdu).isEqualTo("pdu2")
+    }
+
+    @Test
+    fun `updates probation practitioner details in the draft referral when details not present in delius`() {
+      entityManager.persistAndFlush(sampleDraftReferral)
+
+      val draftReferral = DraftReferralDTO(
+        ppName = "chris pratt",
+        ppEmailAddress = "rr@abc.com",
+        pdu = "pdu2",
+      )
+      draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
+      val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
+      assertThat(savedDraftReferral).isNotNull
+      assertThat(savedDraftReferral?.id).isEqualTo(sampleDraftReferral.id)
+      assertThat(savedDraftReferral?.nDeliusPPName).isNull()
+      assertThat(savedDraftReferral?.nDeliusPPEmailAddress).isNull()
+      assertThat(savedDraftReferral?.nDeliusPPPDU).isNull()
+      assertThat(savedDraftReferral?.name).isEqualTo("chris pratt")
+      assertThat(savedDraftReferral?.emailAddress).isEqualTo("rr@abc.com")
+      assertThat(savedDraftReferral?.pdu).isEqualTo("pdu2")
+    }
+
+    @Test
+    fun `updates only delius probation practitioner details in the draft referral when details are present in delius`() {
+      entityManager.persistAndFlush(sampleDraftReferral)
+
+      val draftReferral = DraftReferralDTO(
+        nDeliusPPName = "chris patt",
+        nDeliusPPEmailAddress = "pp@abc.com",
+        nDeliusPDU = "pdu1",
+      )
+      draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
+      val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
+      assertThat(savedDraftReferral).isNotNull
+      assertThat(savedDraftReferral?.id).isEqualTo(sampleDraftReferral.id)
+      assertThat(savedDraftReferral?.nDeliusPPName).isEqualTo("chris patt")
+      assertThat(savedDraftReferral?.nDeliusPPEmailAddress).isEqualTo("pp@abc.com")
+      assertThat(savedDraftReferral?.nDeliusPPPDU).isEqualTo("pdu1")
+      assertThat(savedDraftReferral?.name).isNull()
+      assertThat(savedDraftReferral?.emailAddress).isNull()
+      assertThat(savedDraftReferral?.pdu).isNull()
+    }
+
+    @Test
     fun `create and persist non-cohort draft referral`() {
       val authUser = AuthUser("user_id", "delius", "user_name")
       val draftReferral = draftReferralService.createDraftReferral(authUser, "X123456", sampleIntervention.id)
@@ -506,6 +577,51 @@ class DraftReferralServiceTest @Autowired constructor(
     }
 
     @Test
+    fun `sending a draft referral creates a probation practitioner details`() {
+      val user = AuthUser("user_id", "delius", "user_name")
+      val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
+      setDraftReferralRequiredFields(draftReferral)
+      setProbationPractitionerDetails(
+        draftReferral,
+        "chris patt",
+        "pp.name@abc.com",
+        "pdu1",
+        "chris pratt",
+        "pp.name@abc.com",
+        "pdu2",
+        "probation office 1",
+      )
+
+      val sentReferral = draftReferralService.sendDraftReferral(draftReferral, user)
+      assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.nDeliusName).isEqualTo(draftReferral.nDeliusPPName)
+      assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.emailAddress).isEqualTo(draftReferral.emailAddress)
+      assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.probationOffice).isEqualTo(draftReferral.probationOffice)
+    }
+
+    @Test
+    fun `sending a draft referral creates only delius probation practitioner details`() {
+      val user = AuthUser("user_id", "delius", "user_name")
+      val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
+      setDraftReferralRequiredFields(draftReferral)
+      setProbationPractitionerDetails(
+        draftReferral,
+        "chris patt",
+        "pp.name@abc.com",
+        "pdu1",
+        null,
+        null,
+        null,
+        "prob-office1",
+      )
+
+      val sentReferral = draftReferralService.sendDraftReferral(draftReferral, user)
+      assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.nDeliusName).isEqualTo(draftReferral.nDeliusPPName)
+      assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.name).isNull()
+      assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.emailAddress).isNull()
+      assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.probationOffice).isEqualTo(draftReferral.probationOffice)
+    }
+
+    @Test
     fun `sending a draft referral generates a unique reference, even if the previous reference already exists`() {
       val user = AuthUser("user_id", "delius", "user_name")
       val draft1 = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
@@ -611,11 +727,32 @@ class DraftReferralServiceTest @Autowired constructor(
     personCurrentLocationType: PersonCurrentLocationType ? = PersonCurrentLocationType.CUSTODY,
     personCustodyPrisonId: String ? = "ABC",
     expectedReleaseDate: LocalDate ? = LocalDate.of(2050, 11, 1),
+    probationOffice: String? = "probation-office1",
   ) {
     draftReferral.additionalRiskInformation = additionalRiskInformation
     draftReferral.additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt
     draftReferral.personCurrentLocationType = personCurrentLocationType
     draftReferral.personCustodyPrisonId = personCustodyPrisonId
     draftReferral.expectedReleaseDate = expectedReleaseDate
+    draftReferral.probationOffice = probationOffice
+  }
+
+  private fun setProbationPractitionerDetails(
+    draftReferral: DraftReferral,
+    nDeliusName: String? = null,
+    nDeliusEmailAddress: String? = null,
+    nDeliusPDU: String? = null,
+    ppName: String? = null,
+    ppEmailAddress: String? = null,
+    ppPdu: String? = null,
+    probationOffice: String? = null,
+  ) {
+    draftReferral.nDeliusPPName = nDeliusName
+    draftReferral.nDeliusPPEmailAddress = nDeliusEmailAddress
+    draftReferral.nDeliusPPPDU = nDeliusPDU
+    draftReferral.name = ppName
+    draftReferral.emailAddress = ppEmailAddress
+    draftReferral.pdu = ppPdu
+    draftReferral.probationOffice = probationOffice
   }
 }
