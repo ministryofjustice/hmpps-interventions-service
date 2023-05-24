@@ -5,9 +5,7 @@ import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
-import org.springframework.batch.core.job.DefaultJobParametersValidator
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -15,7 +13,6 @@ import org.springframework.core.io.ResourceLoader
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.OnStartupJobLauncherFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
-import java.util.*
 
 @Configuration
 @EnableBatchProcessing
@@ -23,14 +20,10 @@ class MarkStaleAppointmentsJobConfiguration(
   private val jobBuilderFactory: JobBuilderFactory,
   private val stepBuilderFactory: StepBuilderFactory,
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
-  @Value("\${appointment.ids}")
-  private var appointmentIds: String,
 ) {
 
   @Autowired
   private lateinit var resourceLoader: ResourceLoader
-
-  private val properties = Properties()
 
   @Bean
   fun markStaleAppointmentsJobLauncher(markStaleAppointmentsJob: Job): ApplicationRunner {
@@ -39,14 +32,7 @@ class MarkStaleAppointmentsJobConfiguration(
 
   @Bean
   fun markStaleAppointmentsJob(markStaleAppointmentsStep: Step): Job {
-    val lines = appointmentIds.split(",")
-
-    val validator = DefaultJobParametersValidator()
-    validator.setRequiredKeys(
-      lines!!.toTypedArray(),
-    )
     return jobBuilderFactory["markStaleAppointmentsJob"]
-      .validator(validator)
       .incrementer(TimestampIncrementer())
       .start(markStaleAppointmentsStep)
       .build()
@@ -65,6 +51,4 @@ class MarkStaleAppointmentsJobConfiguration(
       .writer(writer)
       .build()
   }
-
-  fun getProperty(key: String): Any? = properties.get(key)
 }
