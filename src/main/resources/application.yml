@@ -213,3 +213,6 @@ overrides:
 feature-flags:
   current-location:
     enabled: true
+
+appointment:
+  ids: 82e2fbbe-1bb4-4967-8ee6-81aa072fd44b
