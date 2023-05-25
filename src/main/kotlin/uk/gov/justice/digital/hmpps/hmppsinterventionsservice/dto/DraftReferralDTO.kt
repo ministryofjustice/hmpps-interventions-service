@@ -60,6 +60,7 @@ data class DraftReferralDTO(
   val ppEmailAddress: String? = null,
   val ppPdu: String? = null,
   val ppProbationOffice: String? = null,
+  val hasValidDeliusPPDetails: Boolean? = null,
 ) {
   companion object {
     fun from(referral: DraftReferral): DraftReferralDTO {

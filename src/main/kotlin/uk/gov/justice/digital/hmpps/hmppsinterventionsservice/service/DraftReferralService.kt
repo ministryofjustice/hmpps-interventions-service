@@ -170,7 +170,7 @@ class DraftReferralService(
   }
 
   private fun updateProbationPractitionerDetails(referral: DraftReferral, update: DraftReferralDTO) {
-    if (update.ndeliusPPName != null || update.ppName != null) {
+    if (update.hasValidDeliusPPDetails != null) {
       referral.nDeliusPPName = update.ndeliusPPName
       referral.nDeliusPPEmailAddress = update.ndeliusPPEmailAddress
       referral.nDeliusPPPDU = update.ndeliusPDU
