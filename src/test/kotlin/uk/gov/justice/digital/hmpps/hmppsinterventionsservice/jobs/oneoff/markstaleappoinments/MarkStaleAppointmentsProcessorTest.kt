@@ -17,6 +17,7 @@ class MarkStaleAppointmentsProcessorTest : IntegrationTestBase() {
     appointmentCleaner = AppointmentCleaner(
       appointmentRepository,
       deliverySessionRepository,
+      supplierAssessmentRepository,
     )
     processor = MarkStaleAppointmentsProcessor(appointmentCleaner)
   }
