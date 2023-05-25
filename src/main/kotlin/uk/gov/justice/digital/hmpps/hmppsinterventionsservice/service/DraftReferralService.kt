@@ -170,13 +170,15 @@ class DraftReferralService(
   }
 
   private fun updateProbationPractitionerDetails(referral: DraftReferral, update: DraftReferralDTO) {
-    referral.nDeliusPPName = update.ndeliusPPName
-    referral.nDeliusPPEmailAddress = update.ndeliusPPEmailAddress
-    referral.nDeliusPPPDU = update.ndeliusPDU
-    referral.name = update.ppName
-    referral.emailAddress = update.ppEmailAddress
-    referral.pdu = update.ppPdu
-    referral.probationOffice = update.ppProbationOffice
+    if (update.ndeliusPPName != null || update.ppName != null) {
+      referral.nDeliusPPName = update.ndeliusPPName
+      referral.nDeliusPPEmailAddress = update.ndeliusPPEmailAddress
+      referral.nDeliusPPPDU = update.ndeliusPDU
+      referral.name = update.ppName
+      referral.emailAddress = update.ppEmailAddress
+      referral.pdu = update.ppPdu
+      referral.probationOffice = update.ppProbationOffice
+    }
   }
 
   fun updateDraftReferralDetails(referral: DraftReferral, update: UpdateReferralDetailsDTO, actor: AuthUser): ReferralDetails? {
