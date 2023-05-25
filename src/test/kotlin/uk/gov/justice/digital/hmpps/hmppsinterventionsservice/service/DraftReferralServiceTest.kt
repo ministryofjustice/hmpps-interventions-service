@@ -331,6 +331,7 @@ class DraftReferralServiceTest @Autowired constructor(
         ppName = "chris pratt",
         ppEmailAddress = "rr@abc.com",
         ppPdu = "pdu2",
+        hasValidDeliusPPDetails = false,
       )
       draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
       val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
@@ -352,6 +353,7 @@ class DraftReferralServiceTest @Autowired constructor(
         ppName = "chris pratt",
         ppEmailAddress = "rr@abc.com",
         ppPdu = "pdu2",
+        hasValidDeliusPPDetails = true,
       )
       draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
       val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
@@ -373,6 +375,32 @@ class DraftReferralServiceTest @Autowired constructor(
         ndeliusPPName = "chris patt",
         ndeliusPPEmailAddress = "pp@abc.com",
         ndeliusPDU = "pdu1",
+        hasValidDeliusPPDetails = false,
+      )
+      draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
+      val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
+      assertThat(savedDraftReferral).isNotNull
+      assertThat(savedDraftReferral?.id).isEqualTo(sampleDraftReferral.id)
+      assertThat(savedDraftReferral?.nDeliusPPName).isEqualTo("chris patt")
+      assertThat(savedDraftReferral?.nDeliusPPEmailAddress).isEqualTo("pp@abc.com")
+      assertThat(savedDraftReferral?.nDeliusPPPDU).isEqualTo("pdu1")
+      assertThat(savedDraftReferral?.name).isNull()
+      assertThat(savedDraftReferral?.emailAddress).isNull()
+      assertThat(savedDraftReferral?.pdu).isNull()
+    }
+
+    @Test
+    fun `does not updates probation practitioner details in the draft referral when valid Delius PP Details is not set`() {
+      sampleDraftReferral.nDeliusPPName = "chris patt"
+      sampleDraftReferral.nDeliusPPEmailAddress = "pp@abc.com"
+      sampleDraftReferral.nDeliusPPPDU = "pdu1"
+      entityManager.persistAndFlush(sampleDraftReferral)
+
+      val draftReferral = DraftReferralDTO(
+        ndeliusPPName = null,
+        ndeliusPPEmailAddress = null,
+        ndeliusPDU = null,
+        hasValidDeliusPPDetails = null,
       )
       draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
       val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
