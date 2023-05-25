@@ -178,6 +178,7 @@ class DraftReferralService(
       referral.emailAddress = update.ppEmailAddress
       referral.pdu = update.ppPdu
       referral.probationOffice = update.ppProbationOffice
+      referral.hasValidDeliusPPDetails = update.hasValidDeliusPPDetails
     }
   }
 

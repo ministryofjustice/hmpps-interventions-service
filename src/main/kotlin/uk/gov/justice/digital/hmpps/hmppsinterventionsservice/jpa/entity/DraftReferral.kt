@@ -96,6 +96,7 @@ class DraftReferral(
   @Column(name = "pp_email_address") var emailAddress: String? = null,
   @Column(name = "pp_pdu") var pdu: String? = null,
   @Column(name = "pp_probation_office") var probationOffice: String? = null,
+  @Column(name = "valid_delius_pp_details") var hasValidDeliusPPDetails: Boolean? = null,
 ) {
   val referralDetails: ReferralDetails? get() {
     return referralDetailsHistory?.firstOrNull { it.supersededById == null }

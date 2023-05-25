@@ -343,6 +343,7 @@ class DraftReferralServiceTest @Autowired constructor(
       assertThat(savedDraftReferral?.name).isEqualTo("chris pratt")
       assertThat(savedDraftReferral?.emailAddress).isEqualTo("rr@abc.com")
       assertThat(savedDraftReferral?.pdu).isEqualTo("pdu2")
+      assertThat(savedDraftReferral?.hasValidDeliusPPDetails).isFalse
     }
 
     @Test
@@ -365,6 +366,7 @@ class DraftReferralServiceTest @Autowired constructor(
       assertThat(savedDraftReferral?.name).isEqualTo("chris pratt")
       assertThat(savedDraftReferral?.emailAddress).isEqualTo("rr@abc.com")
       assertThat(savedDraftReferral?.pdu).isEqualTo("pdu2")
+      assertThat(savedDraftReferral?.hasValidDeliusPPDetails).isTrue
     }
 
     @Test
@@ -387,6 +389,7 @@ class DraftReferralServiceTest @Autowired constructor(
       assertThat(savedDraftReferral?.name).isNull()
       assertThat(savedDraftReferral?.emailAddress).isNull()
       assertThat(savedDraftReferral?.pdu).isNull()
+      assertThat(savedDraftReferral?.hasValidDeliusPPDetails).isFalse
     }
 
     @Test
@@ -412,6 +415,7 @@ class DraftReferralServiceTest @Autowired constructor(
       assertThat(savedDraftReferral?.name).isNull()
       assertThat(savedDraftReferral?.emailAddress).isNull()
       assertThat(savedDraftReferral?.pdu).isNull()
+      assertThat(savedDraftReferral?.hasValidDeliusPPDetails).isNull()
     }
 
     @Test
