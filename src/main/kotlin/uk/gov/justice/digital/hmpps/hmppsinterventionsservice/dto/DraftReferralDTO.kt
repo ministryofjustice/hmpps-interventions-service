@@ -157,7 +157,7 @@ data class DraftReferralDTO(
         ppName = referral.probationPractitionerDetails?.name,
         ppEmailAddress = referral.probationPractitionerDetails?.emailAddress,
         ppPdu = referral.probationPractitionerDetails?.pdu,
-        ppProbationOffice = referral.probationPractitionerDetails?.probationOffice!!,
+        ppProbationOffice = referral.probationPractitionerDetails?.probationOffice,
       )
     }
   }
