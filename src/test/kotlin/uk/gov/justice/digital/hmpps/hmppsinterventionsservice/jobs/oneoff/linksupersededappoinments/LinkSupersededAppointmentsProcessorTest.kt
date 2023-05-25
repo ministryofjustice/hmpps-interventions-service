@@ -17,6 +17,7 @@ class LinkSupersededAppointmentsProcessorTest : IntegrationTestBase() {
     appointmentCleaner = AppointmentCleaner(
       appointmentRepository,
       deliverySessionRepository,
+      supplierAssessmentRepository,
     )
     processor = LinkSupersededAppointmentsProcessor(appointmentCleaner)
   }
