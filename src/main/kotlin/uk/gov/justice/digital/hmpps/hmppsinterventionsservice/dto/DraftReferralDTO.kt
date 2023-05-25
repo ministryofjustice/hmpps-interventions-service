@@ -109,6 +109,7 @@ data class DraftReferralDTO(
         ppEmailAddress = referral.emailAddress,
         ppPdu = referral.pdu,
         ppProbationOffice = referral.probationOffice,
+        hasValidDeliusPPDetails = referral.hasValidDeliusPPDetails,
       )
     }
 
