@@ -53,6 +53,12 @@ class AppointmentCleaner(
       val targetDeliverySession = targetDeliverySessionList.get(0)
       val sortedAppointmentFromDeliverySession = targetDeliverySession.appointments.sortedBy { it.createdAt }
       val nextAppointmentIndex = sortedAppointmentFromDeliverySession.indexOf(currentAppointment) + 1
+
+      if (nextAppointmentIndex > sortedAppointmentFromDeliverySession.lastIndex) {
+        logger.info("superseded delivery appointment ${currentAppointment.id} has no appointments created after it, skipping")
+        return null
+      }
+
       return sortedAppointmentFromDeliverySession.get(nextAppointmentIndex)
     } else {
       // supplier assessment appointments
@@ -62,6 +68,12 @@ class AppointmentCleaner(
       if (supplierAssessment != null) {
         val sortedAppointmentFromSupplierAssessment = supplierAssessment.appointments.sortedBy { it.createdAt }
         val nextAppointmentIndex = sortedAppointmentFromSupplierAssessment.indexOf(currentAppointment) + 1
+
+        if (nextAppointmentIndex > sortedAppointmentFromSupplierAssessment.lastIndex) {
+          logger.info("superseded supplier assessement appointment ${currentAppointment.id} has no appointments created after it, skipping")
+          return null
+        }
+
         return sortedAppointmentFromSupplierAssessment.get(nextAppointmentIndex)
       } else {
         logger.info("unable to find delivery session or supplier assessment for superseded appointment ${currentAppointment.id}")
