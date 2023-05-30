@@ -154,7 +154,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
       complexityLevelIds = complexityLevelIds,
       additionalRiskInformation = additionalRiskInformation,
       additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt,
-      probationOffice = probationOffice,
+      ppProbationOffice = probationOffice,
       referralDetailsHistory = if (referralDetails != null) {
         setOf(
           referralDetails.let {
