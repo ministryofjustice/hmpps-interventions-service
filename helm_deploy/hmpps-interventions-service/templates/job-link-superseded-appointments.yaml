@@ -7,6 +7,7 @@ spec:
   jobTemplate:
     spec:
       parallelism: 1
+      concurrencyPolicy: "Forbid"
       template:
         spec:
           restartPolicy: "Never"
