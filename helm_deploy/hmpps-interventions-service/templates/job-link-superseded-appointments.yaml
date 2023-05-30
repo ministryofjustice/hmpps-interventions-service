@@ -4,10 +4,10 @@ metadata:
   name: link-superseded-appointments
 spec:
   schedule: "* 5 * * *"
+  concurrencyPolicy: "Forbid"
   jobTemplate:
     spec:
       parallelism: 1
-      concurrencyPolicy: "Forbid"
       template:
         spec:
           restartPolicy: "Never"

@@ -4,10 +4,10 @@ metadata:
   name: mark-stale-appointments
 spec:
   schedule: "* 4 * * *"
+  concurrencyPolicy: "Forbid"
   jobTemplate:
     spec:
       parallelism: 1
-      concurrencyPolicy: "Forbid"
       template:
         spec:
           restartPolicy: "Never"
