@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
+import com.microsoft.applicationinsights.TelemetryClient
 import mu.KotlinLogging
 import net.logstash.logback.argument.StructuredArguments
 import org.springframework.beans.factory.annotation.Value
@@ -63,6 +64,7 @@ class DraftReferralService(
   val draftOasysRiskInformationService: DraftOasysRiskInformationService,
   val referralLocationRepository: ReferralLocationRepository,
   val probationPractitionerDetailsRepository: ProbationPractitionerDetailsRepository,
+  val telemetryClient: TelemetryClient,
   @Value("\${feature-flags.current-location.enabled}") private val currentLocationEnabled: Boolean,
   @Value("\${feature-flags.save-probation-practitioner-details.enabled}") private val saveProbationPractitionerDetails: Boolean,
 ) {
@@ -174,10 +176,10 @@ class DraftReferralService(
       referral.nDeliusPPName = update.ndeliusPPName
       referral.nDeliusPPEmailAddress = update.ndeliusPPEmailAddress
       referral.nDeliusPPPDU = update.ndeliusPDU
-      referral.name = update.ppName
-      referral.emailAddress = update.ppEmailAddress
-      referral.pdu = update.ppPdu
-      referral.probationOffice = update.ppProbationOffice
+      referral.ppName = update.ppName
+      referral.ppEmailAddress = update.ppEmailAddress
+      referral.ppPdu = update.ppPdu
+      referral.ppProbationOffice = update.ppProbationOffice
       referral.hasValidDeliusPPDetails = update.hasValidDeliusPPDetails
     }
   }
@@ -515,13 +517,96 @@ class DraftReferralService(
           nDeliusName = draftReferral.nDeliusPPName,
           nDeliusEmailAddress = draftReferral.nDeliusPPEmailAddress,
           nDeliusPDU = draftReferral.nDeliusPPPDU,
-          name = draftReferral.name,
-          emailAddress = draftReferral.emailAddress,
-          pdu = draftReferral.pdu,
-          probationOffice = draftReferral.probationOffice!!,
+          name = draftReferral.ppName,
+          emailAddress = draftReferral.ppEmailAddress,
+          pdu = draftReferral.ppPdu,
+          probationOffice = draftReferral.ppProbationOffice!!,
         ),
       )
       referralRepository.save(referral)
+      checkAndMeasureDeliusData(draftReferral)
+    }
+  }
+
+  private fun checkAndMeasureDeliusData(draftReferral: DraftReferral) {
+    val eventName = "probationPractitionerDetailsLookUp"
+    when (draftReferral.hasValidDeliusPPDetails) {
+      true -> telemetryClient.trackEvent(
+        eventName,
+        mapOf(
+          "result" to "valid delius details present",
+          "referralId" to draftReferral.id.toString(),
+        ),
+        null,
+      )
+      false -> {
+        telemetryClient.trackEvent(
+          eventName,
+          mapOf(
+            "result" to "valid delius details not present",
+            "referralId" to draftReferral.id.toString(),
+          ),
+          null,
+        )
+        if (draftReferral.ppName == draftReferral.nDeliusPPName) {
+          telemetryClient.trackEvent(
+            eventName,
+            mapOf(
+              "result" to "delius name and user name matches",
+              "referralId" to draftReferral.id.toString(),
+            ),
+            null,
+          )
+        } else {
+          telemetryClient.trackEvent(
+            eventName,
+            mapOf(
+              "result" to "delius name and user name does not match",
+              "referralId" to draftReferral.id.toString(),
+            ),
+            null,
+          )
+        }
+        if (draftReferral.ppEmailAddress == draftReferral.nDeliusPPEmailAddress) {
+          telemetryClient.trackEvent(
+            eventName,
+            mapOf(
+              "result" to "delius email address and user email address matches",
+              "referralId" to draftReferral.id.toString(),
+            ),
+            null,
+          )
+        } else {
+          telemetryClient.trackEvent(
+            eventName,
+            mapOf(
+              "result" to "delius email address and user email address does not match",
+              "referralId" to draftReferral.id.toString(),
+            ),
+            null,
+          )
+        }
+        if (draftReferral.ppPdu == draftReferral.nDeliusPPPDU) {
+          telemetryClient.trackEvent(
+            eventName,
+            mapOf(
+              "result" to "delius pdu and user pdu matches",
+              "referralId" to draftReferral.id.toString(),
+            ),
+            null,
+          )
+        } else {
+          telemetryClient.trackEvent(
+            eventName,
+            mapOf(
+              "result" to "delius pdu and user pdu does not match",
+              "referralId" to draftReferral.id.toString(),
+            ),
+            null,
+          )
+        }
+      }
+      else -> null
     }
   }
 

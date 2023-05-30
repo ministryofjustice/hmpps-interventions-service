@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
+import com.microsoft.applicationinsights.TelemetryClient
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -89,6 +90,7 @@ class DraftReferralServiceTest @Autowired constructor(
   private val supplierAssessmentService: SupplierAssessmentService = mock()
   private val hmppsAuthService: HMPPSAuthService = mock()
   private val draftOasysRiskInformationService: DraftOasysRiskInformationService = mock()
+  private val telemetryClient = mock<TelemetryClient>()
   private var currentLocationEnabled: Boolean = true
   private var saveProbationPractitionerDetails: Boolean = true
 
@@ -113,6 +115,7 @@ class DraftReferralServiceTest @Autowired constructor(
     draftOasysRiskInformationService,
     referralLocationRepository,
     probationPractitionerDetailsRepository,
+    telemetryClient,
     currentLocationEnabled,
     saveProbationPractitionerDetails,
   )
@@ -340,9 +343,9 @@ class DraftReferralServiceTest @Autowired constructor(
       assertThat(savedDraftReferral?.nDeliusPPName).isEqualTo("chris patt")
       assertThat(savedDraftReferral?.nDeliusPPEmailAddress).isEqualTo("pp@abc.com")
       assertThat(savedDraftReferral?.nDeliusPPPDU).isEqualTo("pdu1")
-      assertThat(savedDraftReferral?.name).isEqualTo("chris pratt")
-      assertThat(savedDraftReferral?.emailAddress).isEqualTo("rr@abc.com")
-      assertThat(savedDraftReferral?.pdu).isEqualTo("pdu2")
+      assertThat(savedDraftReferral?.ppName).isEqualTo("chris pratt")
+      assertThat(savedDraftReferral?.ppEmailAddress).isEqualTo("rr@abc.com")
+      assertThat(savedDraftReferral?.ppPdu).isEqualTo("pdu2")
       assertThat(savedDraftReferral?.hasValidDeliusPPDetails).isFalse
     }
 
@@ -363,9 +366,9 @@ class DraftReferralServiceTest @Autowired constructor(
       assertThat(savedDraftReferral?.nDeliusPPName).isNull()
       assertThat(savedDraftReferral?.nDeliusPPEmailAddress).isNull()
       assertThat(savedDraftReferral?.nDeliusPPPDU).isNull()
-      assertThat(savedDraftReferral?.name).isEqualTo("chris pratt")
-      assertThat(savedDraftReferral?.emailAddress).isEqualTo("rr@abc.com")
-      assertThat(savedDraftReferral?.pdu).isEqualTo("pdu2")
+      assertThat(savedDraftReferral?.ppName).isEqualTo("chris pratt")
+      assertThat(savedDraftReferral?.ppEmailAddress).isEqualTo("rr@abc.com")
+      assertThat(savedDraftReferral?.ppPdu).isEqualTo("pdu2")
       assertThat(savedDraftReferral?.hasValidDeliusPPDetails).isTrue
     }
 
@@ -386,9 +389,9 @@ class DraftReferralServiceTest @Autowired constructor(
       assertThat(savedDraftReferral?.nDeliusPPName).isEqualTo("chris patt")
       assertThat(savedDraftReferral?.nDeliusPPEmailAddress).isEqualTo("pp@abc.com")
       assertThat(savedDraftReferral?.nDeliusPPPDU).isEqualTo("pdu1")
-      assertThat(savedDraftReferral?.name).isNull()
-      assertThat(savedDraftReferral?.emailAddress).isNull()
-      assertThat(savedDraftReferral?.pdu).isNull()
+      assertThat(savedDraftReferral?.ppName).isNull()
+      assertThat(savedDraftReferral?.ppEmailAddress).isNull()
+      assertThat(savedDraftReferral?.ppPdu).isNull()
       assertThat(savedDraftReferral?.hasValidDeliusPPDetails).isFalse
     }
 
@@ -412,9 +415,9 @@ class DraftReferralServiceTest @Autowired constructor(
       assertThat(savedDraftReferral?.nDeliusPPName).isEqualTo("chris patt")
       assertThat(savedDraftReferral?.nDeliusPPEmailAddress).isEqualTo("pp@abc.com")
       assertThat(savedDraftReferral?.nDeliusPPPDU).isEqualTo("pdu1")
-      assertThat(savedDraftReferral?.name).isNull()
-      assertThat(savedDraftReferral?.emailAddress).isNull()
-      assertThat(savedDraftReferral?.pdu).isNull()
+      assertThat(savedDraftReferral?.ppName).isNull()
+      assertThat(savedDraftReferral?.ppEmailAddress).isNull()
+      assertThat(savedDraftReferral?.ppPdu).isNull()
       assertThat(savedDraftReferral?.hasValidDeliusPPDetails).isNull()
     }
 
@@ -610,6 +613,7 @@ class DraftReferralServiceTest @Autowired constructor(
 
     @Test
     fun `sending a draft referral creates a probation practitioner details`() {
+      val eventName = "probationPractitionerDetailsLookUp"
       val user = AuthUser("user_id", "delius", "user_name")
       val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
       setDraftReferralRequiredFields(draftReferral)
@@ -626,15 +630,20 @@ class DraftReferralServiceTest @Autowired constructor(
 
       val sentReferral = draftReferralService.sendDraftReferral(draftReferral, user)
       assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.nDeliusName).isEqualTo(draftReferral.nDeliusPPName)
-      assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.emailAddress).isEqualTo(draftReferral.emailAddress)
-      assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.probationOffice).isEqualTo(draftReferral.probationOffice)
+      assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.emailAddress).isEqualTo(draftReferral.ppEmailAddress)
+      assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.probationOffice).isEqualTo(draftReferral.ppProbationOffice)
+      verify(telemetryClient).trackEvent(eventName, mapOf("result" to "valid delius details not present", "referralId" to draftReferral.id.toString()), null)
+      verify(telemetryClient).trackEvent(eventName, mapOf("result" to "delius name and user name does not match", "referralId" to draftReferral.id.toString()), null)
+      verify(telemetryClient).trackEvent(eventName, mapOf("result" to "delius email address and user email address matches", "referralId" to draftReferral.id.toString()), null)
+      verify(telemetryClient).trackEvent(eventName, mapOf("result" to "delius pdu and user pdu does not match", "referralId" to draftReferral.id.toString()), null)
     }
 
     @Test
     fun `sending a draft referral creates only delius probation practitioner details`() {
+      val eventName = "probationPractitionerDetailsLookUp"
       val user = AuthUser("user_id", "delius", "user_name")
       val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
-      setDraftReferralRequiredFields(draftReferral)
+      setDraftReferralRequiredFields(draftReferral, hasValidDeliusPPDetails = true)
       setProbationPractitionerDetails(
         draftReferral,
         "chris patt",
@@ -650,7 +659,8 @@ class DraftReferralServiceTest @Autowired constructor(
       assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.nDeliusName).isEqualTo(draftReferral.nDeliusPPName)
       assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.name).isNull()
       assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.emailAddress).isNull()
-      assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.probationOffice).isEqualTo(draftReferral.probationOffice)
+      assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.probationOffice).isEqualTo(draftReferral.ppProbationOffice)
+      verify(telemetryClient).trackEvent(eventName, mapOf("result" to "valid delius details present", "referralId" to draftReferral.id.toString()), null)
     }
 
     @Test
@@ -760,13 +770,15 @@ class DraftReferralServiceTest @Autowired constructor(
     personCustodyPrisonId: String ? = "ABC",
     expectedReleaseDate: LocalDate ? = LocalDate.of(2050, 11, 1),
     probationOffice: String? = "probation-office1",
+    hasValidDeliusPPDetails: Boolean = false,
   ) {
     draftReferral.additionalRiskInformation = additionalRiskInformation
     draftReferral.additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt
     draftReferral.personCurrentLocationType = personCurrentLocationType
     draftReferral.personCustodyPrisonId = personCustodyPrisonId
     draftReferral.expectedReleaseDate = expectedReleaseDate
-    draftReferral.probationOffice = probationOffice
+    draftReferral.ppProbationOffice = probationOffice
+    draftReferral.hasValidDeliusPPDetails = hasValidDeliusPPDetails
   }
 
   private fun setProbationPractitionerDetails(
@@ -782,9 +794,9 @@ class DraftReferralServiceTest @Autowired constructor(
     draftReferral.nDeliusPPName = nDeliusName
     draftReferral.nDeliusPPEmailAddress = nDeliusEmailAddress
     draftReferral.nDeliusPPPDU = nDeliusPDU
-    draftReferral.name = ppName
-    draftReferral.emailAddress = ppEmailAddress
-    draftReferral.pdu = ppPdu
-    draftReferral.probationOffice = probationOffice
+    draftReferral.ppName = ppName
+    draftReferral.ppEmailAddress = ppEmailAddress
+    draftReferral.ppPdu = ppPdu
+    draftReferral.ppProbationOffice = probationOffice
   }
 }

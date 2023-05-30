@@ -681,7 +681,7 @@ class SetupAssistant(
     draftReferral.personCurrentLocationType = referralLocation.type
     draftReferral.personCustodyPrisonId = referralLocation.prisonId
     draftReferral.expectedReleaseDate = referralLocation.expectedReleaseDate
-    draftReferral.probationOffice = probationPractitionerDetails.probationOffice
+    draftReferral.ppProbationOffice = probationPractitionerDetails.probationOffice
     draftReferralRepository.save(draftReferral)
     referralRepository.saveAndFlush(referral)
 
@@ -774,7 +774,7 @@ class SetupAssistant(
     referral.personCurrentLocationType = personCurrentLocationType
     referral.personCustodyPrisonId = personCustodyPrisonId
     referral.expectedReleaseDate = expectedReleaseDate
-    referral.probationOffice = probationOffice
+    referral.ppProbationOffice = probationOffice
 
     return draftReferralRepository.save(referral).also {
       val details = referralDetailsRepository.save(
