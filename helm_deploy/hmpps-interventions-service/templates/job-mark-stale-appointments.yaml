@@ -9,6 +9,7 @@ spec:
       template:
         spec:
           restartPolicy: "Never"
+          parallelism: 1
           containers:
             - name: mark-stale-appointments
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
