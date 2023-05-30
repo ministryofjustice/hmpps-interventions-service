@@ -6,10 +6,10 @@ spec:
   schedule: "* 5 * * *"
   jobTemplate:
     spec:
+      parallelism: 1
       template:
         spec:
           restartPolicy: "Never"
-          parallelism: 1
           containers:
             - name: link-superseded-appointments
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
