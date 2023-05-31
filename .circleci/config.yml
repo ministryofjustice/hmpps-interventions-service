@@ -109,7 +109,11 @@ jobs:
             docker tag data-dictionary "quay.io/hmpps/${CIRCLE_PROJECT_REPONAME}:data-dictionary-${APP_VERSION}"
       - when:
           condition:
-            equal: [ main, << pipeline.git.branch >> ]
+            or:
+              - equal: [ main, << pipeline.git.branch >> ]
+              - matches:
+                  pattern: "^hotfix/.+$"
+                  value: << pipeline.git.branch >>
           steps:
             - run:
                 name: Publish docker image
@@ -208,14 +212,18 @@ workflows:
           name: build_and_publish_docker
           filters:
             branches:
-              only: [main]
+              only:
+                - main
+                - /hotfix\/.*/
       - hmpps/build_docker:
           name: build_docker
           publish: false
           persist_container_image: true
           filters:
             branches:
-              ignore: [main]
+              ignore:
+                - main
+                - /hotfix\/.*/
       - hmpps/trivy_latest_scan:
           name: vulnerability_scan
           slack_channel: << pipeline.parameters.alerts-slack-channel >>
@@ -233,6 +241,7 @@ workflows:
             branches:
               only:
                 - main
+                - /hotfix\/.*/
           requires:
             - validate
             - validate_db
