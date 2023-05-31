@@ -213,8 +213,8 @@ class AppointmentServiceTest {
     )
     verifySavedAppointment(appointmentTime, durationInMinutes, rescheduledDeliusAppointmentId, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
     val argumentCaptor = argumentCaptor<Appointment>()
-    verify(appointmentRepository, atLeast(1)).save(argumentCaptor.capture())
-    val oldAppointmentArguments = argumentCaptor.lastValue
+    verify(appointmentRepository, times(2)).save(argumentCaptor.capture())
+    val oldAppointmentArguments = argumentCaptor.firstValue
     assertThat(oldAppointmentArguments.superseded).isTrue
     assertThat(updatedAppointment.attended).isNull()
     assertThat(updatedAppointment.additionalAttendanceInformation).isNull()

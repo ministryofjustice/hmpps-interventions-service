@@ -305,6 +305,7 @@ class AppointmentService(
     )
     oldAppointment.superseded = true
     appointmentRepository.save(oldAppointment)
+    appointmentRepository.save(appointment)
     return appointment
   }
 
