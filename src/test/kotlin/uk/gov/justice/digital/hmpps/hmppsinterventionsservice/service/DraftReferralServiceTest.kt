@@ -632,7 +632,7 @@ class DraftReferralServiceTest @Autowired constructor(
       assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.nDeliusName).isEqualTo(draftReferral.nDeliusPPName)
       assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.emailAddress).isEqualTo(draftReferral.ppEmailAddress)
       assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.probationOffice).isEqualTo(draftReferral.ppProbationOffice)
-      verify(telemetryClient).trackEvent(eventName, mapOf("result" to "valid delius details not present", "referralId" to draftReferral.id.toString()), null)
+      verify(telemetryClient).trackEvent(eventName, mapOf("result" to "invalid delius details", "referralId" to draftReferral.id.toString()), null)
       verify(telemetryClient).trackEvent(eventName, mapOf("result" to "delius name and user name does not match", "referralId" to draftReferral.id.toString()), null)
       verify(telemetryClient).trackEvent(eventName, mapOf("result" to "delius email address and user email address matches", "referralId" to draftReferral.id.toString()), null)
       verify(telemetryClient).trackEvent(eventName, mapOf("result" to "delius pdu and user pdu does not match", "referralId" to draftReferral.id.toString()), null)
@@ -660,7 +660,7 @@ class DraftReferralServiceTest @Autowired constructor(
       assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.name).isNull()
       assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.emailAddress).isNull()
       assertThat(referralRepository.findById(sentReferral.id).get().probationPractitionerDetails?.probationOffice).isEqualTo(draftReferral.ppProbationOffice)
-      verify(telemetryClient).trackEvent(eventName, mapOf("result" to "valid delius details present", "referralId" to draftReferral.id.toString()), null)
+      verify(telemetryClient).trackEvent(eventName, mapOf("result" to "valid delius details", "referralId" to draftReferral.id.toString()), null)
     }
 
     @Test

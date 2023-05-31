@@ -534,7 +534,7 @@ class DraftReferralService(
       true -> telemetryClient.trackEvent(
         eventName,
         mapOf(
-          "result" to "valid delius details present",
+          "result" to "valid delius details",
           "referralId" to draftReferral.id.toString(),
         ),
         null,
@@ -543,68 +543,40 @@ class DraftReferralService(
         telemetryClient.trackEvent(
           eventName,
           mapOf(
-            "result" to "valid delius details not present",
+            "result" to "invalid delius details",
             "referralId" to draftReferral.id.toString(),
           ),
           null,
         )
-        if (draftReferral.ppName == draftReferral.nDeliusPPName) {
-          telemetryClient.trackEvent(
-            eventName,
-            mapOf(
-              "result" to "delius name and user name matches",
-              "referralId" to draftReferral.id.toString(),
-            ),
-            null,
-          )
-        } else {
-          telemetryClient.trackEvent(
-            eventName,
-            mapOf(
-              "result" to "delius name and user name does not match",
-              "referralId" to draftReferral.id.toString(),
-            ),
-            null,
-          )
-        }
-        if (draftReferral.ppEmailAddress == draftReferral.nDeliusPPEmailAddress) {
-          telemetryClient.trackEvent(
-            eventName,
-            mapOf(
-              "result" to "delius email address and user email address matches",
-              "referralId" to draftReferral.id.toString(),
-            ),
-            null,
-          )
-        } else {
-          telemetryClient.trackEvent(
-            eventName,
-            mapOf(
-              "result" to "delius email address and user email address does not match",
-              "referralId" to draftReferral.id.toString(),
-            ),
-            null,
-          )
-        }
-        if (draftReferral.ppPdu == draftReferral.nDeliusPPPDU) {
-          telemetryClient.trackEvent(
-            eventName,
-            mapOf(
-              "result" to "delius pdu and user pdu matches",
-              "referralId" to draftReferral.id.toString(),
-            ),
-            null,
-          )
-        } else {
-          telemetryClient.trackEvent(
-            eventName,
-            mapOf(
-              "result" to "delius pdu and user pdu does not match",
-              "referralId" to draftReferral.id.toString(),
-            ),
-            null,
-          )
-        }
+        telemetryClient.trackEvent(
+          eventName,
+          mapOf(
+            "result" to if (draftReferral.ppName == draftReferral.nDeliusPPName) "delius name and user name matches" else "delius name and user name does not match",
+            "referralId" to draftReferral.id.toString(),
+          ),
+          null,
+        )
+        telemetryClient.trackEvent(
+          eventName,
+          mapOf(
+            "result" to if (draftReferral.ppEmailAddress == draftReferral.nDeliusPPEmailAddress) {
+              "delius email address and user email address matches"
+            } else {
+              "delius email address and user email address does not match"
+            },
+            "referralId" to draftReferral.id.toString(),
+          ),
+          null,
+        )
+
+        telemetryClient.trackEvent(
+          eventName,
+          mapOf(
+            "result" to if (draftReferral.ppPdu == draftReferral.nDeliusPPPDU) "delius pdu and user pdu matches" else "delius pdu and user pdu does not match",
+            "referralId" to draftReferral.id.toString(),
+          ),
+          null,
+        )
       }
       else -> null
     }
