@@ -63,7 +63,7 @@ class AppointmentCleaner(
     } else {
       // supplier assessment appointments
       val referraL = currentAppointment.referral
-      val supplierAssessment = referraL.supplierAssessment
+      val supplierAssessment = supplierAssessmentRepository.findByReferral(referraL)
 
       if (supplierAssessment != null) {
         val sortedAppointmentFromSupplierAssessment = supplierAssessment.appointments.sortedBy { it.createdAt }
