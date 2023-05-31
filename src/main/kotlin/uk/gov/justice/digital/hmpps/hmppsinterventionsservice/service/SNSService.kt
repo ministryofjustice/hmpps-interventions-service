@@ -161,6 +161,8 @@ class SNSActionPlanAppointmentService(
 @Service
 class SNSAppointmentService(
   private val snsPublisher: SNSPublisher,
+  @Value("\${interventions-ui.baseurl}") private val interventionsUiBaseUrl: String,
+  @Value("\${interventions-ui.locations.probation-practitioner.supplier-assessment-feedback}") private val saFeedbackLocation: String,
 ) : ApplicationListener<AppointmentEvent>, SNSService {
 
   @AsyncEventExceptionHandling
@@ -192,6 +194,12 @@ class SNSAppointmentService(
         val appointment = event.appointment
 
         val eventType = "intervention.initial-assessment-appointment.session-feedback-submitted"
+        val url = UriComponentsBuilder.fromHttpUrl(interventionsUiBaseUrl)
+          .path(saFeedbackLocation)
+          .buildAndExpand(referral.id)
+          .toString()
+        val contractTypeName = referral.intervention.dynamicFrameworkContract.contractType.name
+        val primeProviderName = referral.intervention.dynamicFrameworkContract.primeProvider.name
 
         val snsEvent = EventDTO(
           eventType,
@@ -201,7 +209,11 @@ class SNSAppointmentService(
           mapOf(
             "serviceUserCRN" to referral.serviceUserCRN,
             "referralId" to referral.id,
+            "referralReference" to referral.referenceNumber!!,
+            "contractTypeName" to contractTypeName,
+            "primeProviderName" to primeProviderName,
             "deliusAppointmentId" to appointment.deliusAppointmentId.toString(),
+            "referralProbationUserURL" to url,
           ),
           PersonReference.crn(referral.serviceUserCRN),
         )
