@@ -99,7 +99,7 @@ internal class SNSAppointmentServiceTest {
         "contractTypeName" to "Accommodation",
         "primeProviderName" to "Harmony Living",
         "deliusAppointmentId" to "123",
-        "referralProbationUserURL" to "http://url/pp/$referralId/supplier-assessment"
+        "referralProbationUserURL" to "http://url/pp/$referralId/supplier-assessment",
       ),
       PersonReference.crn("X123456"),
     )
