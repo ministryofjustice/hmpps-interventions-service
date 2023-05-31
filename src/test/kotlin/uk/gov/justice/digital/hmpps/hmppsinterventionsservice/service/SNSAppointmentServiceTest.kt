@@ -22,7 +22,9 @@ import java.util.UUID
 
 internal class SNSAppointmentServiceTest {
   private val publisher = mock<SNSPublisher>()
-  private val snsAppointmentService = SNSAppointmentService(publisher)
+  private val uiBaseUrl = "http://url"
+  private val supplierAssessmentUrl = "/pp/{referralId}/supplier-assessment"
+  private val snsAppointmentService = SNSAppointmentService(publisher, uiBaseUrl, supplierAssessmentUrl)
 
   private val appointmentFactory = AppointmentFactory()
   private val authUserFactory = AuthUserFactory()
@@ -93,7 +95,11 @@ internal class SNSAppointmentServiceTest {
       additionalInformation = mapOf(
         "serviceUserCRN" to "X123456",
         "referralId" to referralId,
+        "referralReference" to "JS18726AC",
+        "contractTypeName" to "Accommodation",
+        "primeProviderName" to "Harmony Living",
         "deliusAppointmentId" to "123",
+        "referralProbationUserURL" to "http://url/pp/$referralId/supplier-assessment",
       ),
       PersonReference.crn("X123456"),
     )
