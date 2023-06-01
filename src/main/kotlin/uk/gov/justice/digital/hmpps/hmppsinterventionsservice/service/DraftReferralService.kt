@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
+import com.microsoft.applicationinsights.TelemetryClient
 import mu.KotlinLogging
 import net.logstash.logback.argument.StructuredArguments
 import org.springframework.beans.factory.annotation.Value
@@ -21,6 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ProbationPractitionerDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralLocation
@@ -30,6 +32,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Aut
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ProbationPractitionerDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralLocationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
@@ -60,7 +63,10 @@ class DraftReferralService(
   val referralDetailsRepository: ReferralDetailsRepository,
   val draftOasysRiskInformationService: DraftOasysRiskInformationService,
   val referralLocationRepository: ReferralLocationRepository,
+  val probationPractitionerDetailsRepository: ProbationPractitionerDetailsRepository,
+  val telemetryClient: TelemetryClient,
   @Value("\${feature-flags.current-location.enabled}") private val currentLocationEnabled: Boolean,
+  @Value("\${feature-flags.save-probation-practitioner-details.enabled}") private val saveProbationPractitionerDetails: Boolean,
 ) {
   companion object {
     private val logger = KotlinLogging.logger {}
@@ -121,6 +127,10 @@ class DraftReferralService(
       updatePersonExpectedReleaseDate(referral, update)
     }
 
+    if (saveProbationPractitionerDetails) {
+      updateProbationPractitionerDetails(referral, update)
+    }
+
     // this field doesn't fit into any other categories - is this a smell?
     update.relevantSentenceId?.let {
       referral.relevantSentenceId = it
@@ -158,6 +168,19 @@ class DraftReferralService(
       } ?: run {
         referral.selectedServiceCategories = updatedServiceCategories.toMutableSet()
       }
+    }
+  }
+
+  private fun updateProbationPractitionerDetails(referral: DraftReferral, update: DraftReferralDTO) {
+    if (update.hasValidDeliusPPDetails != null) {
+      referral.nDeliusPPName = update.ndeliusPPName
+      referral.nDeliusPPEmailAddress = update.ndeliusPPEmailAddress
+      referral.nDeliusPPPDU = update.ndeliusPDU
+      referral.ppName = update.ppName
+      referral.ppEmailAddress = update.ppEmailAddress
+      referral.ppPdu = update.ppPdu
+      referral.ppProbationOffice = update.ppProbationOffice
+      referral.hasValidDeliusPPDetails = update.hasValidDeliusPPDetails
     }
   }
 
@@ -437,6 +460,7 @@ class DraftReferralService(
 
     val sentReferral = referralRepository.save(referral)
     createReferralLocation(draftReferral, sentReferral)
+    createProbationPractitionerDetails(draftReferral, sentReferral)
     eventPublisher.referralSentEvent(sentReferral)
     supplierAssessmentService.createSupplierAssessment(referral)
     return sentReferral
@@ -481,6 +505,80 @@ class DraftReferralService(
         ),
       )
       referralRepository.save(referral)
+    }
+  }
+
+  private fun createProbationPractitionerDetails(draftReferral: DraftReferral, referral: Referral) {
+    if (saveProbationPractitionerDetails) {
+      referral.probationPractitionerDetails = probationPractitionerDetailsRepository.save(
+        ProbationPractitionerDetails(
+          id = UUID.randomUUID(),
+          referral = referral,
+          nDeliusName = draftReferral.nDeliusPPName,
+          nDeliusEmailAddress = draftReferral.nDeliusPPEmailAddress,
+          nDeliusPDU = draftReferral.nDeliusPPPDU,
+          name = draftReferral.ppName,
+          emailAddress = draftReferral.ppEmailAddress,
+          pdu = draftReferral.ppPdu,
+          probationOffice = draftReferral.ppProbationOffice!!,
+        ),
+      )
+      referralRepository.save(referral)
+      checkAndMeasureDeliusData(draftReferral)
+    }
+  }
+
+  private fun checkAndMeasureDeliusData(draftReferral: DraftReferral) {
+    val eventName = "probationPractitionerDetailsLookUp"
+    when (draftReferral.hasValidDeliusPPDetails) {
+      true -> telemetryClient.trackEvent(
+        eventName,
+        mapOf(
+          "result" to "valid delius details",
+          "referralId" to draftReferral.id.toString(),
+        ),
+        null,
+      )
+      false -> {
+        telemetryClient.trackEvent(
+          eventName,
+          mapOf(
+            "result" to "invalid delius details",
+            "referralId" to draftReferral.id.toString(),
+          ),
+          null,
+        )
+        telemetryClient.trackEvent(
+          eventName,
+          mapOf(
+            "result" to if (draftReferral.ppName == draftReferral.nDeliusPPName) "delius name and user name matches" else "delius name and user name does not match",
+            "referralId" to draftReferral.id.toString(),
+          ),
+          null,
+        )
+        telemetryClient.trackEvent(
+          eventName,
+          mapOf(
+            "result" to if (draftReferral.ppEmailAddress == draftReferral.nDeliusPPEmailAddress) {
+              "delius email address and user email address matches"
+            } else {
+              "delius email address and user email address does not match"
+            },
+            "referralId" to draftReferral.id.toString(),
+          ),
+          null,
+        )
+
+        telemetryClient.trackEvent(
+          eventName,
+          mapOf(
+            "result" to if (draftReferral.ppPdu == draftReferral.nDeliusPPPDU) "delius pdu and user pdu matches" else "delius pdu and user pdu does not match",
+            "referralId" to draftReferral.id.toString(),
+          ),
+          null,
+        )
+      }
+      else -> null
     }
   }
 

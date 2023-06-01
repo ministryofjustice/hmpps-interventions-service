@@ -25,6 +25,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfSe
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NPSRegion
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ProbationPractitionerDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
@@ -49,6 +50,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Dyn
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.NPSRegionRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ProbationPractitionerDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralLocationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
@@ -64,6 +66,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFramew
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportOutcomeFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ProbationPractitionerDetailsFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceProviderFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceUserFactory
@@ -101,6 +104,7 @@ class SetupAssistant(
   private val referralDetailsRepository: ReferralDetailsRepository,
   private val changeLogRepository: ChangelogRepository,
   private val referralLocationRepository: ReferralLocationRepository,
+  private val probationPractitionerDetailsRepository: ProbationPractitionerDetailsRepository,
 ) {
   private val dynamicFrameworkContractFactory = DynamicFrameworkContractFactory()
   private val interventionFactory = InterventionFactory()
@@ -115,6 +119,7 @@ class SetupAssistant(
   private val caseNoteFactory = CaseNoteFactory()
   private val changelogFactory = ChangeLogFactory()
   private val endOfServiceReportOutcomeFactory = EndOfServiceReportOutcomeFactory()
+  private val probationPractitionerDetailsFactory = ProbationPractitionerDetailsFactory()
 
   val serviceCategories = serviceCategoryRepository.findAll().associateBy { it.name }
   val npsRegions = npsRegionRepository.findAll().associateBy { it.id }
@@ -135,6 +140,7 @@ class SetupAssistant(
     appointmentRepository.deleteAll()
     changeLogRepository.deleteAll()
     deleteAllReferralDetails()
+    probationPractitionerDetailsRepository.deleteAll()
     referralRepository.deleteAll()
     draftReferralRepository.deleteAll()
     interventionRepository.deleteAll()
@@ -258,6 +264,7 @@ class SetupAssistant(
     personCurrentLocationType: PersonCurrentLocationType? = null,
     personCustodyPrisonId: String? = null,
     expectedReleaseDate: LocalDate? = null,
+    probationOffice: String? = "probation-office",
   ): DraftReferral {
     return draftReferralRepository.save(
       referralFactory.createDraft(
@@ -271,6 +278,7 @@ class SetupAssistant(
         personCurrentLocationType = personCurrentLocationType,
         personCustodyPrisonId = personCustodyPrisonId,
         expectedReleaseDate = expectedReleaseDate,
+        probationOffice = probationOffice,
       ),
     )
   }
@@ -333,6 +341,7 @@ class SetupAssistant(
     personCurrentLocationType: PersonCurrentLocationType = PersonCurrentLocationType.CUSTODY,
     personCustodyPrisonId: String? = null,
     expectedReleaseDate: LocalDate? = null,
+    probationPractitionerDetails: ProbationPractitionerDetails? = null,
   ): Referral {
     createDraftReferral(
       id = id,
@@ -352,23 +361,15 @@ class SetupAssistant(
         completionDeadline = completionDeadline,
         needsInterpreter = needsInterpreter,
         interpreterLanguage = interpreterLanguage,
+        probationPractitionerDetails = probationPractitionerDetails,
       ),
     )
+    val probationPractitionerDetails = probationPractitionerDetailsFactory.create(referral = referral)
+    probationPractitionerDetailsRepository.save(probationPractitionerDetails)
+    referral.probationPractitionerDetails = probationPractitionerDetails
     referral.supplierAssessment = createSupplierAssessment(referral = referral)
+    referralRepository.save(referral)
     return referral
-  }
-
-  private fun createReferralLocation(referral: Referral, type: PersonCurrentLocationType = PersonCurrentLocationType.CUSTODY, prisonId: String? = "aaa"): ReferralLocation {
-    return referralLocationRepository.save(
-      ReferralLocation(
-        UUID.randomUUID(),
-        referral = referral,
-        type = type,
-        prisonId = prisonId,
-        expectedReleaseDate = null,
-        expectedReleaseDateMissingReason = null,
-      ),
-    )
   }
 
   fun addSupplierAssessmentAppointment(
@@ -466,7 +467,7 @@ class SetupAssistant(
       intervention = intervention,
       createdBy = ppUser,
     )
-    return referralRepository.save(
+    val referral = referralRepository.save(
       referralFactory.createSent(
         id = id,
         intervention = intervention,
@@ -477,6 +478,11 @@ class SetupAssistant(
         completionDeadline = LocalDate.now(),
       ),
     )
+    val probationPractitionerDetails = probationPractitionerDetailsFactory.create(referral = referral)
+    probationPractitionerDetailsRepository.save(probationPractitionerDetails)
+    referral.probationPractitionerDetails = probationPractitionerDetails
+
+    return referralRepository.saveAndFlush(referral)
   }
 
   fun createAssignedReferral(
@@ -520,6 +526,9 @@ class SetupAssistant(
         referenceNumber = referenceNumber,
       ),
     )
+    val probationPractitionerDetails = probationPractitionerDetailsFactory.create(referral = referral)
+    probationPractitionerDetailsRepository.save(probationPractitionerDetails)
+    referral.probationPractitionerDetails = probationPractitionerDetails
     val serviceUser = serviceUserFactory.create(firstName = serviceUserFirstName, lastName = serviceUserLastName, referral = draftReferral)
     draftReferral.serviceUserData = serviceUser
     referral.serviceUserData = serviceUser
@@ -652,6 +661,17 @@ class SetupAssistant(
       expectedReleaseDate = LocalDate.now().plusDays(1),
       expectedReleaseDateMissingReason = null,
     ),
+    probationPractitionerDetails: ProbationPractitionerDetails = ProbationPractitionerDetails(
+      id = UUID.randomUUID(),
+      referral = referral,
+      nDeliusName = "ndelius name",
+      nDeliusEmailAddress = "a.b@xyz.com",
+      nDeliusPDU = "ndeliusPDU",
+      name = "name",
+      emailAddress = "emailAddress",
+      pdu = "pdu",
+      probationOffice = "probation-office",
+    ),
   ): Referral {
     referral.selectedServiceCategories = selectedServiceCategories.toMutableSet()
     // required to satisfy foreign key constrains on desired outcomes and complexity levels
@@ -661,6 +681,7 @@ class SetupAssistant(
     draftReferral.personCurrentLocationType = referralLocation.type
     draftReferral.personCustodyPrisonId = referralLocation.prisonId
     draftReferral.expectedReleaseDate = referralLocation.expectedReleaseDate
+    draftReferral.ppProbationOffice = probationPractitionerDetails.probationOffice
     draftReferralRepository.save(draftReferral)
     referralRepository.saveAndFlush(referral)
 
@@ -676,6 +697,7 @@ class SetupAssistant(
     referral.relevantSentenceId = relevantSentenceId
     referral.whenUnavailable = whenUnavailable
     referral.referralLocation = referralLocation
+    referral.probationPractitionerDetails = probationPractitionerDetails
     return referralRepository.save(referral).also {
       referralLocationRepository.save(referralLocation)
       val details = referralDetailsRepository.save(
@@ -731,6 +753,7 @@ class SetupAssistant(
     personCurrentLocationType: PersonCurrentLocationType? = PersonCurrentLocationType.CUSTODY,
     personCustodyPrisonId: String? = "test",
     expectedReleaseDate: LocalDate? = LocalDate.of(2050, 11, 1),
+    probationOffice: String? = "probation-office",
   ): DraftReferral {
     referral.selectedServiceCategories = selectedServiceCategories.toMutableSet()
     // required to satisfy foreign key constrains on desired outcomes and complexity levels
@@ -751,6 +774,7 @@ class SetupAssistant(
     referral.personCurrentLocationType = personCurrentLocationType
     referral.personCustodyPrisonId = personCustodyPrisonId
     referral.expectedReleaseDate = expectedReleaseDate
+    referral.ppProbationOffice = probationOffice
 
     return draftReferralRepository.save(referral).also {
       val details = referralDetailsRepository.save(

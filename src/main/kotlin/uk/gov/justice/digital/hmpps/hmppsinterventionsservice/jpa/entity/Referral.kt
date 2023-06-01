@@ -114,6 +114,10 @@ class Referral(
   @OneToMany(fetch = FetchType.LAZY)
   @JoinColumn(name = "referral_id")
   private val referralDetailsHistory: Set<ReferralDetails>? = null,
+
+  @OneToOne(mappedBy = "referral")
+  @Fetch(JOIN)
+  var probationPractitionerDetails: ProbationPractitionerDetails? = null,
 ) {
   val urn: String
     get() = "urn:hmpps:interventions-referral:$id"

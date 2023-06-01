@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftRe
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ProbationPractitionerDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
@@ -57,6 +58,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     interpreterLanguage: String? = null,
     completionDeadline: LocalDate? = null,
     maximumEnforceableDays: Int? = null,
+    probationPractitionerDetails: ProbationPractitionerDetails? = null,
   ): Referral {
     val referral = save(
       Referral(
@@ -90,6 +92,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
         additionalNeedsInformation = additionalNeedsInformation,
         needsInterpreter = needsInterpreter,
         interpreterLanguage = interpreterLanguage,
+        probationPractitionerDetails = probationPractitionerDetails,
         referralDetailsHistory = if (referralDetails != null) {
           setOf(
             referralDetails.let {
@@ -134,6 +137,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     personCurrentLocationType: PersonCurrentLocationType? = null,
     personCustodyPrisonId: String? = null,
     expectedReleaseDate: LocalDate? = null,
+    probationOffice: String? = null,
   ): DraftReferral {
     val draftReferral = DraftReferral(
       id = id,
@@ -150,6 +154,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
       complexityLevelIds = complexityLevelIds,
       additionalRiskInformation = additionalRiskInformation,
       additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt,
+      ppProbationOffice = probationOffice,
       referralDetailsHistory = if (referralDetails != null) {
         setOf(
           referralDetails.let {

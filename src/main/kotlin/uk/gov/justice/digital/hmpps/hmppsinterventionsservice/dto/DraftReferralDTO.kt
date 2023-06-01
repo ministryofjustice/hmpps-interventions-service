@@ -53,6 +53,14 @@ data class DraftReferralDTO(
   val hasExpectedReleaseDate: Boolean? = null,
   val expectedReleaseDate: LocalDate? = null,
   val expectedReleaseDateMissingReason: String? = null,
+  val ndeliusPPName: String? = null,
+  val ndeliusPPEmailAddress: String? = null,
+  val ndeliusPDU: String? = null,
+  val ppName: String? = null,
+  val ppEmailAddress: String? = null,
+  val ppPdu: String? = null,
+  val ppProbationOffice: String? = null,
+  val hasValidDeliusPPDetails: Boolean? = null,
 ) {
   companion object {
     fun from(referral: DraftReferral): DraftReferralDTO {
@@ -94,6 +102,14 @@ data class DraftReferralDTO(
         personCustodyPrisonId = referral.personCustodyPrisonId,
         expectedReleaseDate = referral.expectedReleaseDate,
         expectedReleaseDateMissingReason = referral.expectedReleaseDateMissingReason,
+        ndeliusPPName = referral.nDeliusPPName,
+        ndeliusPPEmailAddress = referral.nDeliusPPEmailAddress,
+        ndeliusPDU = referral.nDeliusPPPDU,
+        ppName = referral.ppName,
+        ppEmailAddress = referral.ppEmailAddress,
+        ppPdu = referral.ppPdu,
+        ppProbationOffice = referral.ppProbationOffice,
+        hasValidDeliusPPDetails = referral.hasValidDeliusPPDetails,
       )
     }
 
@@ -137,6 +153,13 @@ data class DraftReferralDTO(
         personCustodyPrisonId = referral.referralLocation?.prisonId,
         expectedReleaseDate = referral.referralLocation?.expectedReleaseDate,
         expectedReleaseDateMissingReason = referral.referralLocation?.expectedReleaseDateMissingReason,
+        ndeliusPPName = referral.probationPractitionerDetails?.nDeliusName,
+        ndeliusPPEmailAddress = referral.probationPractitionerDetails?.nDeliusEmailAddress,
+        ndeliusPDU = referral.probationPractitionerDetails?.nDeliusPDU,
+        ppName = referral.probationPractitionerDetails?.name,
+        ppEmailAddress = referral.probationPractitionerDetails?.emailAddress,
+        ppPdu = referral.probationPractitionerDetails?.pdu,
+        ppProbationOffice = referral.probationPractitionerDetails?.probationOffice,
       )
     }
   }
