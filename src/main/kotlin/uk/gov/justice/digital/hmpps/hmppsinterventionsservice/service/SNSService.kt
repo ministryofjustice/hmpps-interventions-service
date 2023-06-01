@@ -206,15 +206,15 @@ class SNSAppointmentService(
           "Session feedback submitted for an initial assessment appointment",
           event.detailUrl,
           appointment.appointmentFeedbackSubmittedAt!!,
-          mapOf(
+          listOfNotNull(
             "serviceUserCRN" to referral.serviceUserCRN,
             "referralId" to referral.id,
             "referralReference" to referral.referenceNumber!!,
             "contractTypeName" to contractTypeName,
             "primeProviderName" to primeProviderName,
-            "deliusAppointmentId" to appointment.deliusAppointmentId.toString(),
+            appointment.deliusAppointmentId?.let { "deliusAppointmentId" to it.toString() },
             "referralProbationUserURL" to url,
-          ),
+          ).toMap(),
           PersonReference.crn(referral.serviceUserCRN),
         )
 
