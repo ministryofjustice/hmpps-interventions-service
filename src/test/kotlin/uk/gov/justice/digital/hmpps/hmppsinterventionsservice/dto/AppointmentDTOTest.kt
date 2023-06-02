@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto
 
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentDeliveryType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentDeliveryAddressFactory
@@ -20,12 +20,13 @@ internal class AppointmentDTOTest {
     appointment.appointmentDelivery = appointmentDelivery
     appointmentDelivery.appointmentDeliveryAddress = appointmentDeliveryAddress
     val appointmentDTO = AppointmentDTO.from(appointment)
-    Assertions.assertThat(appointmentDTO.appointmentDeliveryType).isEqualTo(AppointmentDeliveryType.IN_PERSON_MEETING_OTHER)
-    Assertions.assertThat(appointmentDTO.appointmentDeliveryAddress?.firstAddressLine).isEqualTo("Harmony Living Office, Room 4")
-    Assertions.assertThat(appointmentDTO.appointmentDeliveryAddress?.secondAddressLine).isNull()
-    Assertions.assertThat(appointmentDTO.appointmentDeliveryAddress?.townOrCity).isNull()
-    Assertions.assertThat(appointmentDTO.appointmentDeliveryAddress?.county).isNull()
-    Assertions.assertThat(appointmentDTO.appointmentDeliveryAddress?.postCode).isEqualTo("SY40RE")
+    assertThat(appointmentDTO.appointmentDeliveryType).isEqualTo(AppointmentDeliveryType.IN_PERSON_MEETING_OTHER)
+    assertThat(appointmentDTO.appointmentDeliveryAddress?.firstAddressLine).isEqualTo("Harmony Living Office, Room 4")
+    assertThat(appointmentDTO.appointmentDeliveryAddress?.secondAddressLine).isNull()
+    assertThat(appointmentDTO.appointmentDeliveryAddress?.townOrCity).isNull()
+    assertThat(appointmentDTO.appointmentDeliveryAddress?.county).isNull()
+    assertThat(appointmentDTO.appointmentDeliveryAddress?.postCode).isEqualTo("SY40RE")
+    assertThat(appointmentDTO.createdAt).isEqualTo(appointment.createdAt)
   }
 
   @Test
@@ -34,7 +35,7 @@ internal class AppointmentDTOTest {
     val appointmentDelivery = appointmentDeliveryFactory.create(appointmentId = appointment.id, appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE, npsOfficeCode = "CRSEXT")
     appointment.appointmentDelivery = appointmentDelivery
     val appointmentDTO = AppointmentDTO.from(appointment)
-    Assertions.assertThat(appointmentDTO.appointmentDeliveryType).isEqualTo(AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE)
-    Assertions.assertThat(appointmentDTO.npsOfficeCode).isEqualTo("CRSEXT")
+    assertThat(appointmentDTO.appointmentDeliveryType).isEqualTo(AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE)
+    assertThat(appointmentDTO.npsOfficeCode).isEqualTo("CRSEXT")
   }
 }

@@ -15,6 +15,7 @@ data class AppointmentDTO(
   val sessionType: AppointmentSessionType?,
   val appointmentDeliveryAddress: AddressDTO?,
   val npsOfficeCode: String?,
+  val createdAt: OffsetDateTime?,
 ) {
   companion object {
     fun from(appointment: Appointment): AppointmentDTO {
@@ -34,6 +35,7 @@ data class AppointmentDTO(
         sessionType = appointment.appointmentDelivery?.appointmentSessionType,
         appointmentDeliveryAddress = addressDTO,
         npsOfficeCode = appointment.appointmentDelivery?.npsOfficeCode,
+        createdAt = appointment.createdAt,
       )
     }
     fun from(appointments: MutableSet<Appointment>): List<AppointmentDTO> {
