@@ -10,13 +10,13 @@ class ProbationPractitionerDetailsFactory(em: TestEntityManager? = null) : Entit
   fun create(
     id: UUID? = UUID.randomUUID(),
     referral: Referral,
-    nDeliusName: String = "delius name",
-    nDeliusEmailAddress: String = "a.b@xyz.com",
-    nDeliusPdu: String = "pdu1",
-    name: String = "user name",
-    emailAddress: String = "c.d@xyz.com",
-    pdu: String = "pdu2",
-    probationOffice: String = "probation-office",
+    nDeliusName: String? = "delius name",
+    nDeliusEmailAddress: String? = "a.b@xyz.com",
+    nDeliusPdu: String? = "pdu1",
+    name: String? = "user name",
+    emailAddress: String? = "c.d@xyz.com",
+    pdu: String? = "pdu2",
+    probationOffice: String? = "probation-office",
   ): ProbationPractitionerDetails {
     return save(
       ProbationPractitionerDetails(

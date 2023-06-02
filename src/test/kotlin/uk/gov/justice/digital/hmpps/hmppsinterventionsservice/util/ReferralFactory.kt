@@ -45,7 +45,14 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     personCurrentLocationType: PersonCurrentLocationType? = null,
     personCustodyPrisonId: String? = null,
     expectedReleaseDate: LocalDate? = null,
-    probationOffice: String? = "probation-office1",
+    ndeliusPPName: String? = "Bob",
+    ndeliusPPEmailAddress: String? = "bob@example.com",
+    ndeliusPDU: String? = "Hackney and City",
+    ppName: String? = "Alice",
+    ppEmailAddress: String? = "alice@example.com",
+    ppProbationOffice: String? = "London",
+    ppPdu: String? = "East Sussex",
+    hasValidDeliusPPDetails: Boolean = false,
   ): DraftReferral {
     return createDraftReferral(
       id = id,
@@ -63,7 +70,14 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       personCurrentLocationType = personCurrentLocationType,
       personCustodyPrisonId = personCustodyPrisonId,
       expectedReleaseDate = expectedReleaseDate,
-      probationOffice = probationOffice,
+      ndeliusPPName = ndeliusPPName,
+      ndeliusPPEmailAddress = ndeliusPPEmailAddress,
+      ndeliusPDU = ndeliusPDU,
+      ppName = ppName,
+      ppEmailAddress = ppEmailAddress,
+      ppProbationOffice = ppProbationOffice,
+      ppPdu = ppPdu,
+      hasValidDeliusPPDetails = hasValidDeliusPPDetails,
     )
   }
 
@@ -138,7 +152,6 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       probationPractitionerDetails = probationPractitionerDetails,
     )
     val probationPractitionerDetails = probationPractitionerDetailsFactory.create(referral = referral)
-
     referral.probationPractitionerDetails = probationPractitionerDetails
     save(referral)
     return referral
@@ -227,6 +240,13 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     concludedAt: OffsetDateTime? = null,
 
     endOfServiceReport: EndOfServiceReport? = null,
+    ndeliusPPName: String? = "Bob",
+    ndeliusPPEmailAddress: String? = "bob@example.com",
+    ndeliusPDU: String? = "Hackney and City",
+    ppName: String? = "Alice",
+    ppEmailAddress: String? = "alice@example.com",
+    ppProbationOffice: String? = "London",
+    ppPdu: String? = "East Sussex",
   ): Referral {
     createDraft(
       id = id,
@@ -264,7 +284,16 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
 
       endOfServiceReport = endOfServiceReport,
     )
-    val probationPractitionerDetails = probationPractitionerDetailsFactory.create(referral = referral)
+    val probationPractitionerDetails = probationPractitionerDetailsFactory.create(
+      referral = referral,
+      nDeliusName = ndeliusPPName,
+      nDeliusEmailAddress = ndeliusPPEmailAddress,
+      nDeliusPdu = ndeliusPDU,
+      name = ppName,
+      emailAddress = ppEmailAddress,
+      pdu = ppPdu,
+      probationOffice = ppProbationOffice,
+    )
     referral.probationPractitionerDetails = probationPractitionerDetails
     save(referral)
     return referral
