@@ -29,6 +29,7 @@ class AppointmentFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     appointmentFeedbackSubmittedBy: AuthUser? = null,
     deliusAppointmentId: Long? = null,
     superseded: Boolean = false,
+    supersededById: UUID? = null,
     referral: Referral = referralFactory.createSent(),
   ): Appointment {
     return save(
@@ -49,6 +50,7 @@ class AppointmentFactory(em: TestEntityManager? = null) : EntityFactory(em) {
         appointmentFeedbackSubmittedBy = appointmentFeedbackSubmittedBy,
         deliusAppointmentId = deliusAppointmentId,
         superseded = superseded,
+        supersededByAppointmentId = supersededById,
         referral = referral,
       ),
     )
