@@ -160,6 +160,9 @@ data class DraftReferralDTO(
         ppEmailAddress = referral.probationPractitionerDetails?.emailAddress,
         ppPdu = referral.probationPractitionerDetails?.pdu,
         ppProbationOffice = referral.probationPractitionerDetails?.probationOffice,
+        hasValidDeliusPPDetails = referral.probationPractitionerDetails?.let {
+          it.nDeliusName != null || it.nDeliusEmailAddress != null || it.nDeliusPDU != null
+        },
       )
     }
   }

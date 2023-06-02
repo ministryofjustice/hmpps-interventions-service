@@ -264,7 +264,14 @@ class SetupAssistant(
     personCurrentLocationType: PersonCurrentLocationType? = null,
     personCustodyPrisonId: String? = null,
     expectedReleaseDate: LocalDate? = null,
-    probationOffice: String? = "probation-office",
+    ndeliusPPName: String? = "Bob",
+    ndeliusPPEmailAddress: String? = "bob@example.com",
+    ndeliusPDU: String? = "Hackney and City",
+    ppName: String? = "Alice",
+    ppEmailAddress: String? = "alice@example.com",
+    ppProbationOffice: String? = "London",
+    ppPdu: String? = "East Sussex",
+    hasValidDeliusPPDetails: Boolean = false,
   ): DraftReferral {
     return draftReferralRepository.save(
       referralFactory.createDraft(
@@ -278,7 +285,14 @@ class SetupAssistant(
         personCurrentLocationType = personCurrentLocationType,
         personCustodyPrisonId = personCustodyPrisonId,
         expectedReleaseDate = expectedReleaseDate,
-        probationOffice = probationOffice,
+        ndeliusPPName = ndeliusPPName,
+        ndeliusPPEmailAddress = ndeliusPPEmailAddress,
+        ndeliusPDU = ndeliusPDU,
+        ppName = ppName,
+        ppEmailAddress = ppEmailAddress,
+        ppProbationOffice = ppProbationOffice,
+        ppPdu = ppPdu,
+        hasValidDeliusPPDetails = hasValidDeliusPPDetails,
       ),
     )
   }
@@ -294,11 +308,45 @@ class SetupAssistant(
     )
   }
 
-  fun createEndedReferral(id: UUID = UUID.randomUUID(), intervention: Intervention = createIntervention(), endRequestedReason: CancellationReason? = randomCancellationReason(), endRequestedComments: String? = null, personCurrentLocationType: PersonCurrentLocationType? = null, personCustodyPrisonId: String? = null, expectedReleaseDate: LocalDate? = null): Referral {
+  fun createEndedReferral(
+    id: UUID = UUID.randomUUID(),
+    intervention: Intervention = createIntervention(),
+    endRequestedReason: CancellationReason? = randomCancellationReason(),
+    endRequestedComments: String? = null,
+    personCurrentLocationType: PersonCurrentLocationType? = null,
+    personCustodyPrisonId: String? = null,
+    expectedReleaseDate: LocalDate? = null,
+    ndeliusPPName: String? = "Bob",
+    ndeliusPPEmailAddress: String? = "bob@example.com",
+    ndeliusPDU: String? = "Hackney and City",
+    ppName: String? = "Alice",
+    ppEmailAddress: String? = "alice@example.com",
+    ppProbationOffice: String? = "London",
+    ppPdu: String? = "East Sussex",
+    hasValidDeliusPPDetails: Boolean = false,
+  ): Referral {
     val ppUser = createPPUser()
     val spUser = createSPUser()
-    draftReferralRepository.save(referralFactory.createDraft(id = id, intervention = intervention, createdBy = ppUser, personCustodyPrisonId = personCustodyPrisonId, personCurrentLocationType = personCurrentLocationType, expectedReleaseDate = expectedReleaseDate))
-    return referralRepository.save(
+    draftReferralRepository.save(
+      referralFactory.createDraft(
+        id = id,
+        intervention = intervention,
+        createdBy = ppUser,
+        personCustodyPrisonId = personCustodyPrisonId,
+        personCurrentLocationType = personCurrentLocationType,
+        expectedReleaseDate = expectedReleaseDate,
+        ndeliusPPName = ndeliusPPName,
+        ndeliusPPEmailAddress = ndeliusPPEmailAddress,
+        ndeliusPDU = ndeliusPDU,
+        ppName = ppName,
+        ppEmailAddress = ppEmailAddress,
+        ppProbationOffice = ppProbationOffice,
+        ppPdu = ppPdu,
+        hasValidDeliusPPDetails = hasValidDeliusPPDetails,
+      ),
+    )
+
+    val endedReferral = referralRepository.save(
       referralFactory.createEnded(
         id = id,
         intervention = intervention,
@@ -310,8 +358,29 @@ class SetupAssistant(
         ),
         endRequestedReason = endRequestedReason,
         endRequestedComments = endRequestedComments,
+        ndeliusPPName = ndeliusPPName,
+        ndeliusPPEmailAddress = ndeliusPPEmailAddress,
+        ndeliusPDU = ndeliusPDU,
+        ppName = ppName,
+        ppEmailAddress = ppEmailAddress,
+        ppProbationOffice = ppProbationOffice,
+        ppPdu = ppPdu,
       ),
     )
+    val probationPractitionerDetails = probationPractitionerDetailsRepository.save(
+      probationPractitionerDetailsFactory.create(
+        referral = endedReferral,
+        nDeliusName = ndeliusPPName,
+        nDeliusEmailAddress = ndeliusPPEmailAddress,
+        nDeliusPdu = ndeliusPDU,
+        name = ppName,
+        emailAddress = ppEmailAddress,
+        pdu = ppPdu,
+        probationOffice = ppProbationOffice,
+      ),
+    )
+    endedReferral.probationPractitionerDetails = probationPractitionerDetails
+    return referralRepository.save(endedReferral)
   }
 
   fun createCancelledReferral(id: UUID = UUID.randomUUID(), intervention: Intervention = createIntervention(), endRequestedReason: CancellationReason? = randomCancellationReason(), endRequestedComments: String? = null): Referral {
@@ -653,6 +722,13 @@ class SetupAssistant(
     needsInterpreter: Boolean = true,
     relevantSentenceId: Long = 2600295124,
     whenUnavailable: String = "She works Mondays 9am - midday",
+    ndeliusPPName: String? = "Bob",
+    ndeliusPPEmailAddress: String? = "bob@example.com",
+    ndeliusPDU: String? = "Hackney and City",
+    ppName: String? = "Alice",
+    ppEmailAddress: String? = "alice@example.com",
+    ppProbationOffice: String? = "London",
+    ppPdu: String? = "East Sussex",
     referralLocation: ReferralLocation = ReferralLocation(
       UUID.randomUUID(),
       referral = referral,
@@ -661,16 +737,16 @@ class SetupAssistant(
       expectedReleaseDate = LocalDate.now().plusDays(1),
       expectedReleaseDateMissingReason = null,
     ),
-    probationPractitionerDetails: ProbationPractitionerDetails = ProbationPractitionerDetails(
+    probationPractitionerDetails: ProbationPractitionerDetails = referral.probationPractitionerDetails ?: ProbationPractitionerDetails(
       id = UUID.randomUUID(),
       referral = referral,
-      nDeliusName = "ndelius name",
-      nDeliusEmailAddress = "a.b@xyz.com",
-      nDeliusPDU = "ndeliusPDU",
-      name = "name",
-      emailAddress = "emailAddress",
-      pdu = "pdu",
-      probationOffice = "probation-office",
+      nDeliusName = ndeliusPPName,
+      nDeliusEmailAddress = ndeliusPPEmailAddress,
+      nDeliusPDU = ndeliusPDU,
+      name = ppName,
+      emailAddress = ppEmailAddress,
+      pdu = ppPdu,
+      probationOffice = ppProbationOffice,
     ),
   ): Referral {
     referral.selectedServiceCategories = selectedServiceCategories.toMutableSet()

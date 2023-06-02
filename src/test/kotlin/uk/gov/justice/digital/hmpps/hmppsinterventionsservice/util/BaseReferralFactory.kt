@@ -137,7 +137,14 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     personCurrentLocationType: PersonCurrentLocationType? = null,
     personCustodyPrisonId: String? = null,
     expectedReleaseDate: LocalDate? = null,
-    probationOffice: String? = null,
+    ndeliusPPName: String? = "Bob",
+    ndeliusPPEmailAddress: String? = "bob@example.com",
+    ndeliusPDU: String? = "Hackney and City",
+    ppName: String? = "Alice",
+    ppEmailAddress: String? = "alice@example.com",
+    ppProbationOffice: String? = "London",
+    ppPdu: String? = "East Sussex",
+    hasValidDeliusPPDetails: Boolean = false,
   ): DraftReferral {
     val draftReferral = DraftReferral(
       id = id,
@@ -154,7 +161,14 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
       complexityLevelIds = complexityLevelIds,
       additionalRiskInformation = additionalRiskInformation,
       additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt,
-      ppProbationOffice = probationOffice,
+      nDeliusPPName = ndeliusPPName,
+      nDeliusPPEmailAddress = ndeliusPPEmailAddress,
+      nDeliusPPPDU = ndeliusPDU,
+      ppName = ppName,
+      ppEmailAddress = ppEmailAddress,
+      ppProbationOffice = ppProbationOffice,
+      ppPdu = ppPdu,
+      hasValidDeliusPPDetails = hasValidDeliusPPDetails,
       referralDetailsHistory = if (referralDetails != null) {
         setOf(
           referralDetails.let {

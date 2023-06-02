@@ -21,6 +21,13 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
       personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
       personCustodyPrisonId = "aaa",
       expectedReleaseDate = LocalDate.now().plusDays(1),
+      ndeliusPPName = "John",
+      ndeliusPPEmailAddress = "john@example.com",
+      ndeliusPDU = "Sheffield",
+      ppName = "Bob",
+      ppEmailAddress = "null",
+      ppPdu = "London",
+      ppProbationOffice = "London",
     )
     setupAssistant.fillReferralFields(referral)
   }
