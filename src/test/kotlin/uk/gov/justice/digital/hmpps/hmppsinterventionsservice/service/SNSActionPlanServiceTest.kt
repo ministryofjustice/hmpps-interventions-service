@@ -45,6 +45,11 @@ internal class SNSActionPlanServiceTest {
       mapOf(
         "actionPlanId" to UUID.fromString("77df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
         "submittedBy" to actionPlanSubmittedEvent.actionPlan.submittedBy!!.userName,
+        "referralId" to UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
+        "referralReference" to "HAS71263",
+        "contractTypeName" to "Accommodation",
+        "primeProviderName" to "Harmony Living",
+        "actionPlanProbationUserUrl" to "https://base/url/action-plans/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
       ),
       PersonReference.crn(actionPlanSubmittedEvent.actionPlan.referral.serviceUserCRN),
     )
@@ -56,6 +61,6 @@ internal class SNSActionPlanServiceTest {
   }
 
   private fun snsActionPlanService(): SNSActionPlanService {
-    return SNSActionPlanService(snsPublisher)
+    return SNSActionPlanService(snsPublisher, "https://base/url", "/action-plans/{id}")
   }
 }
