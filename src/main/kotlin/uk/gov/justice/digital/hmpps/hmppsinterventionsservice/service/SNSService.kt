@@ -25,10 +25,17 @@ interface SNSService
 @Service
 class SNSActionPlanService(
   private val snsPublisher: SNSPublisher,
+  @Value("\${interventions-ui.baseurl}") private val interventionsUiBaseUrl: String,
+  @Value("\${interventions-ui.locations.probation-practitioner.action-plan}") private val actionPlanLocation: String,
 ) : ApplicationListener<ActionPlanEvent>, SNSService {
 
   @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: ActionPlanEvent) {
+    val uiUrl = UriComponentsBuilder.fromHttpUrl(interventionsUiBaseUrl)
+      .path(actionPlanLocation)
+      .buildAndExpand(event.actionPlan.referral.id)
+      .toString()
+    val referral = event.actionPlan.referral
     when (event.type) {
       ActionPlanEventType.SUBMITTED -> {
         val snsEvent = EventDTO(
@@ -36,7 +43,15 @@ class SNSActionPlanService(
           "A draft action plan has been submitted",
           event.detailUrl,
           event.actionPlan.submittedAt!!,
-          mapOf("actionPlanId" to event.actionPlan.id, "submittedBy" to (event.actionPlan.submittedBy?.userName!!)),
+          mapOf(
+            "actionPlanId" to event.actionPlan.id,
+            "submittedBy" to (event.actionPlan.submittedBy?.userName!!),
+            "referralId" to referral.id,
+            "referralReference" to referral.referenceNumber!!,
+            "contractTypeName" to referral.intervention.dynamicFrameworkContract.contractType.name,
+            "primeProviderName" to referral.intervention.dynamicFrameworkContract.primeProvider.name,
+            "actionPlanProbationUserUrl" to uiUrl,
+          ),
           PersonReference.crn(event.actionPlan.referral.serviceUserCRN),
         )
         snsPublisher.publish(event.actionPlan.referral.id, event.actionPlan.submittedBy!!, snsEvent)
@@ -47,7 +62,15 @@ class SNSActionPlanService(
           "An action plan has been approved",
           event.detailUrl,
           event.actionPlan.approvedAt!!,
-          mapOf("actionPlanId" to event.actionPlan.id, "approvedBy" to (event.actionPlan.approvedBy?.userName!!)),
+          mapOf(
+            "actionPlanId" to event.actionPlan.id,
+            "approvedBy" to (event.actionPlan.approvedBy?.userName!!),
+            "referralId" to referral.id,
+            "referralReference" to referral.referenceNumber!!,
+            "contractTypeName" to referral.intervention.dynamicFrameworkContract.contractType.name,
+            "primeProviderName" to referral.intervention.dynamicFrameworkContract.primeProvider.name,
+            "actionPlanProbationUserUrl" to uiUrl,
+          ),
           PersonReference.crn(event.actionPlan.referral.serviceUserCRN),
         )
         snsPublisher.publish(event.actionPlan.referral.id, event.actionPlan.approvedBy!!, snsEvent)

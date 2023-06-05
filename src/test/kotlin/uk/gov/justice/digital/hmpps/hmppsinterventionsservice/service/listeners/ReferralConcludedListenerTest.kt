@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.listeners
 
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.any
@@ -11,7 +10,6 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.CommunityAPIClient
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.EmailSender
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.SNSPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
@@ -20,9 +18,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralCon
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthService
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.NotificationCreateRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.UserDetail
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AssignmentsFactory
@@ -86,82 +82,6 @@ internal class ReferralConcludedListenerTest {
     )
     verify(snsPublisher).publish(referralConcludedEvent.referral.id, AuthUser.interventionsServiceUser, snsEvent)
   }
-}
-
-internal class ReferralConcludedIntegrationListenerTest {
-  private val communityAPIClient = mock<CommunityAPIClient>()
-  private val listener = ReferralConcludedIntegrationListener(
-    "http://testUrl",
-    "/pp/referral/{id}/end-of-service-report",
-    "secure/offenders/crn/{crn}/sentence/{sentenceId}/notifications/context/{contextName}",
-    "commissioned-rehabilitation-services",
-    communityAPIClient,
-  )
-
-  @Test
-  fun `notifies Delius that an end of service report has been submitted on a prematurely ended referral`() {
-    val event = referralConcludedEvent(ReferralConcludedState.PREMATURELY_ENDED, endOfServiceReport)
-    listener.onApplicationEvent(event)
-
-    verify(communityAPIClient).makeSyncPostRequest(
-      "secure/offenders/crn/X123456/sentence/123456789/notifications/context/commissioned-rehabilitation-services",
-      NotificationCreateRequestDTO(
-        "ACC",
-        sentAtDefault,
-        event.referral.id,
-        submittedAtDefault,
-        "End of Service Report Submitted for Accommodation Referral HAS71263 with Prime Provider Harmony Living\n" +
-          "http://testUrl/pp/referral/120b1a45-8ac7-4920-b05b-acecccf4734b/end-of-service-report",
-      ),
-      Unit::class.java,
-    )
-  }
-
-  @Test
-  fun `throws exception when called without end-of-service report on a prematurely ended referral`() {
-    val event = referralConcludedEvent(ReferralConcludedState.PREMATURELY_ENDED)
-    assertThrows<IllegalStateException> { listener.onApplicationEvent(event) }
-  }
-
-  @Test
-  fun `notifies Delius that an end of service report has been submitted on a completed referral`() {
-    val event = referralConcludedEvent(ReferralConcludedState.COMPLETED, endOfServiceReport)
-    listener.onApplicationEvent(event)
-
-    verify(communityAPIClient).makeSyncPostRequest(
-      "secure/offenders/crn/X123456/sentence/123456789/notifications/context/commissioned-rehabilitation-services",
-      NotificationCreateRequestDTO(
-        "ACC",
-        sentAtDefault,
-        event.referral.id,
-        submittedAtDefault,
-        "End of Service Report Submitted for Accommodation Referral HAS71263 with Prime Provider Harmony Living\n" +
-          "http://testUrl/pp/referral/120b1a45-8ac7-4920-b05b-acecccf4734b/end-of-service-report",
-      ),
-      Unit::class.java,
-    )
-  }
-
-  @Test
-  fun `throws exception when called without end-of-service report on a completed referral`() {
-    val event = referralConcludedEvent(ReferralConcludedState.COMPLETED)
-    assertThrows<IllegalStateException> { listener.onApplicationEvent(event) }
-  }
-
-  private val endOfServiceReport =
-    SampleData.sampleEndOfServiceReport(
-      id = UUID.fromString("120b1a45-8ac7-4920-b05b-acecccf4734b"),
-      referral = SampleData.sampleReferral(
-        id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
-        referenceNumber = "HAS71263",
-        crn = "X123456",
-        relevantSentenceId = 123456789,
-        serviceProviderName = "Harmony Living",
-        sentAt = sentAtDefault,
-        concludedAt = concludedAtDefault,
-      ),
-      submittedAt = submittedAtDefault,
-    )
 }
 
 internal class ReferralConcludedNotificationListenerTest {
