@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: mark-stale-appointments
 spec:
-  schedule: "* 4 * * *"
+  schedule: "0 4 * * *"
   concurrencyPolicy: "Forbid"
   jobTemplate:
     spec:
