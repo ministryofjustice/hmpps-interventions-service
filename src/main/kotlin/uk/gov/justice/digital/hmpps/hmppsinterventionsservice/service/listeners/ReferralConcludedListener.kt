@@ -42,63 +42,6 @@ class ReferralConcludedListener(
 }
 
 @Service
-class ReferralConcludedIntegrationListener(
-  @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
-  @Value("\${interventions-ui.locations.probation-practitioner.end-of-service-report}") private val ppEndOfServiceReportLocation: String,
-  @Value("\${community-api.locations.notification-request}") private val communityAPINotificationLocation: String,
-  @Value("\${community-api.integration-context}") private val integrationContext: String,
-  private val communityAPIClient: CommunityAPIClient,
-) : ApplicationListener<ReferralConcludedEvent>, CommunityAPIService {
-  override fun onApplicationEvent(event: ReferralConcludedEvent) {
-    // this really is just the "end of service report submitted" event now
-    when (event.type) {
-      ReferralConcludedState.CANCELLED -> {
-      }
-      ReferralConcludedState.PREMATURELY_ENDED,
-      ReferralConcludedState.COMPLETED,
-      -> {
-        // This should be an independent event based notification
-        // However a race condition arises with the referral end
-        // notification. To Avoid a NSI not found in community-api
-        // this must be sent and processed before referral end
-        postSyncNotificationRequest(event.referral.endOfServiceReport)
-      }
-    }
-  }
-
-  private fun postSyncNotificationRequest(endOfServiceReport: EndOfServiceReport?) {
-    endOfServiceReport?.submittedAt ?: run {
-      throw IllegalStateException("End of service report not submitted so should not get to this point")
-    }
-
-    val url = UriComponentsBuilder.fromHttpUrl(interventionsUIBaseURL)
-      .path(ppEndOfServiceReportLocation)
-      .buildAndExpand(endOfServiceReport.id)
-      .toString()
-
-    postSyncNotificationRequest(endOfServiceReport, url)
-  }
-
-  private fun postSyncNotificationRequest(endOfServiceReport: EndOfServiceReport, url: String) {
-    val referral = endOfServiceReport.referral
-
-    val request = NotificationCreateRequestDTO(
-      endOfServiceReport.referral.intervention.dynamicFrameworkContract.contractType.code,
-      referral.sentAt!!,
-      referral.id,
-      endOfServiceReport.submittedAt!!,
-      getNotes(referral, url, "End of Service Report Submitted"),
-    )
-
-    val communityApiSentReferralPath = UriComponentsBuilder.fromPath(communityAPINotificationLocation)
-      .buildAndExpand(referral.serviceUserCRN, referral.relevantSentenceId!!, integrationContext)
-      .toString()
-
-    communityAPIClient.makeSyncPostRequest(communityApiSentReferralPath, request, Unit::class.java)
-  }
-}
-
-@Service
 class ReferralConcludedNotificationListener(
   @Value("\${notify.templates.referral-cancelled}") private val cancelledReferralTemplateID: String,
   private val emailSender: EmailSender,
