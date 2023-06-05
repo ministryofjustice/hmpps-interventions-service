@@ -26,7 +26,7 @@ interface SNSService
 class SNSActionPlanService(
   private val snsPublisher: SNSPublisher,
   @Value("\${interventions-ui.baseurl}") private val interventionsUiBaseUrl: String,
-  @Value("\${interventions-ui.locations.probation-practitioner.action-plan}") private val actionPlanLocation: String
+  @Value("\${interventions-ui.locations.probation-practitioner.action-plan}") private val actionPlanLocation: String,
 ) : ApplicationListener<ActionPlanEvent>, SNSService {
 
   @AsyncEventExceptionHandling
@@ -50,7 +50,7 @@ class SNSActionPlanService(
             "referralReference" to referral.referenceNumber!!,
             "contractTypeName" to referral.intervention.dynamicFrameworkContract.contractType.name,
             "primeProviderName" to referral.intervention.dynamicFrameworkContract.primeProvider.name,
-            "actionPlanProbationUserUrl" to uiUrl
+            "actionPlanProbationUserUrl" to uiUrl,
           ),
           PersonReference.crn(event.actionPlan.referral.serviceUserCRN),
         )
@@ -69,7 +69,7 @@ class SNSActionPlanService(
             "referralReference" to referral.referenceNumber!!,
             "contractTypeName" to referral.intervention.dynamicFrameworkContract.contractType.name,
             "primeProviderName" to referral.intervention.dynamicFrameworkContract.primeProvider.name,
-            "actionPlanProbationUserUrl" to uiUrl
+            "actionPlanProbationUserUrl" to uiUrl,
           ),
           PersonReference.crn(event.actionPlan.referral.serviceUserCRN),
         )
