@@ -145,7 +145,6 @@ refer-and-monitor-and-delius:
 
 community-api:
   locations:
-    notification-request: "/secure/offenders/crn/{crn}/sentences/{sentenceId}/notifications/context/{contextName}"
     offender-access: "/secure/offenders/crn/{crn}/user/{username}/userAccess"
     managed-offenders: "/secure/staff/staffIdentifier/{staffIdentifier}/managedOffenders"
     staff-details: "/secure/staff/username/{username}"
