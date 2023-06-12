@@ -26,6 +26,7 @@ data class Appointment(
   @Enumerated(EnumType.STRING)
   var attended: Attended? = null,
   var additionalAttendanceInformation: String? = null,
+  var attendanceFailureInformation: String? = null,
   var attendanceSubmittedAt: OffsetDateTime? = null,
   @ManyToOne
   @Fetch(FetchMode.JOIN)

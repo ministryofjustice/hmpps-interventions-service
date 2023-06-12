@@ -180,7 +180,7 @@ internal class DeliverySessionsServiceTest {
       null,
       null,
       Attended.YES,
-      "additional information",
+      "attendance failure information",
       false,
       "description",
     )
@@ -193,7 +193,7 @@ internal class DeliverySessionsServiceTest {
     assertThat(updatedSession.currentAppointment?.durationInMinutes).isEqualTo(durationInMinutes)
     assertThat(updatedSession.currentAppointment?.createdBy?.userName).isEqualTo("scheduler")
     assertThat(updatedSession.currentAppointment?.attended).isEqualTo(Attended.YES)
-    assertThat(updatedSession.currentAppointment?.additionalAttendanceInformation).isEqualTo("additional information")
+    assertThat(updatedSession.currentAppointment?.attendanceFailureInformation).isEqualTo("attendance failure information")
     assertThat(updatedSession.currentAppointment?.notifyPPOfAttendanceBehaviour).isEqualTo(false)
     assertThat(updatedSession.currentAppointment?.attendanceBehaviour).isEqualTo("description")
     assertThat(updatedSession.currentAppointment?.attendanceSubmittedAt).isNotNull
@@ -231,7 +231,7 @@ internal class DeliverySessionsServiceTest {
       null,
       null,
       Attended.NO,
-      "additional information",
+      "attendance failure information",
     )
 
     verify(appointmentService, times(1)).createOrUpdateAppointmentDeliveryDetails(any(), eq(AppointmentDeliveryType.PHONE_CALL), eq(AppointmentSessionType.ONE_TO_ONE), isNull(), isNull())
@@ -239,7 +239,7 @@ internal class DeliverySessionsServiceTest {
     assertThat(updatedSession.currentAppointment?.durationInMinutes).isEqualTo(durationInMinutes)
     assertThat(updatedSession.currentAppointment?.createdBy?.userName).isEqualTo("scheduler")
     assertThat(updatedSession.currentAppointment?.attended).isEqualTo(Attended.NO)
-    assertThat(updatedSession.currentAppointment?.additionalAttendanceInformation).isEqualTo("additional information")
+    assertThat(updatedSession.currentAppointment?.attendanceFailureInformation).isEqualTo("attendance failure information")
     assertThat(updatedSession.currentAppointment?.notifyPPOfAttendanceBehaviour).isNull()
     assertThat(updatedSession.currentAppointment?.attendanceBehaviour).isNull()
     assertThat(updatedSession.currentAppointment?.attendanceSubmittedAt).isNotNull
@@ -459,7 +459,7 @@ internal class DeliverySessionsServiceTest {
   @Test
   fun `update session with attendance`() {
     val attended = Attended.YES
-    val additionalInformation = "extra info"
+    val attendanceFailureInformation = "extra info"
 
     val existingSession = deliverySessionFactory.createScheduled(sessionNumber = 1)
     val actionPlanId = UUID.randomUUID()
@@ -469,13 +469,13 @@ internal class DeliverySessionsServiceTest {
     whenever(deliverySessionRepository.save(any())).thenReturn(existingSession)
 
     val actor = createActor("attendance_submitter")
-    val savedSession = deliverySessionsService.recordAppointmentAttendance(actor, actionPlanId, 1, attended, additionalInformation)
+    val savedSession = deliverySessionsService.recordAppointmentAttendance(actor, actionPlanId, 1, attended, attendanceFailureInformation)
     val argumentCaptor: ArgumentCaptor<DeliverySession> = ArgumentCaptor.forClass(DeliverySession::class.java)
 
 //    verify(appointmentEventPublisher).appointmentNotAttendedEvent(existingSession)
     verify(deliverySessionRepository).save(argumentCaptor.capture())
     assertThat(argumentCaptor.firstValue.currentAppointment?.attended).isEqualTo(attended)
-    assertThat(argumentCaptor.firstValue.currentAppointment?.additionalAttendanceInformation).isEqualTo(additionalInformation)
+    assertThat(argumentCaptor.firstValue.currentAppointment?.attendanceFailureInformation).isEqualTo(attendanceFailureInformation)
     assertThat(argumentCaptor.firstValue.currentAppointment?.attendanceSubmittedAt).isNotNull
     assertThat(argumentCaptor.firstValue.currentAppointment?.attendanceSubmittedBy?.userName).isEqualTo("attendance_submitter")
     assertThat(savedSession).isNotNull
@@ -486,14 +486,14 @@ internal class DeliverySessionsServiceTest {
     val actionPlanId = UUID.randomUUID()
     val sessionNumber = 1
     val attended = Attended.YES
-    val additionalInformation = "extra info"
+    val attendanceFailureInformation = "extra info"
 
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber))
       .thenReturn(null)
 
     val actor = createActor()
     val exception = assertThrows(EntityNotFoundException::class.java) {
-      deliverySessionsService.recordAppointmentAttendance(actor, actionPlanId, 1, attended, additionalInformation)
+      deliverySessionsService.recordAppointmentAttendance(actor, actionPlanId, 1, attended, attendanceFailureInformation)
     }
 
     assertThat(exception.message).isEqualTo("Action plan session not found [actionPlanId=$actionPlanId, sessionNumber=$sessionNumber]")

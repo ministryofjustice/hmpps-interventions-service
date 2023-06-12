@@ -48,7 +48,7 @@ class AppointmentService(
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
     attended: Attended? = null,
-    additionalAttendanceInformation: String? = null,
+    attendanceFailureInformation: String? = null,
     notifyProbationPractitioner: Boolean? = null,
     behaviourDescription: String? = null,
   ): Appointment {
@@ -68,7 +68,7 @@ class AppointmentService(
           referral,
           npsOfficeCode,
           attended,
-          additionalAttendanceInformation,
+          attendanceFailureInformation,
           notifyProbationPractitioner,
           behaviourDescription,
           appointmentType,
@@ -91,7 +91,7 @@ class AppointmentService(
           npsOfficeCode,
           attended,
           referral,
-          additionalAttendanceInformation,
+          attendanceFailureInformation,
           notifyProbationPractitioner,
           behaviourDescription,
           appointmentType,
@@ -150,7 +150,7 @@ class AppointmentService(
   fun recordAppointmentAttendance(
     appointment: Appointment,
     attended: Attended,
-    additionalAttendanceInformation: String?,
+    attendanceFailureInformation: String?,
     submittedBy: AuthUser,
   ): Appointment {
     if (appointment.appointmentFeedbackSubmittedAt != null) {
@@ -165,7 +165,7 @@ class AppointmentService(
         "Cannot submit feedback for a future appointment [id=${appointment.id}]",
       )
     }
-    setAttendanceFields(appointment, attended, additionalAttendanceInformation, submittedBy)
+    setAttendanceFields(appointment, attended, attendanceFailureInformation, submittedBy)
     return appointmentRepository.save(appointment)
   }
 
@@ -215,11 +215,11 @@ class AppointmentService(
   private fun setAttendanceFields(
     appointment: Appointment,
     attended: Attended,
-    additionalInformation: String?,
+    attendanceFailureInformation: String?,
     submittedBy: AuthUser,
   ) {
     appointment.attended = attended
-    additionalInformation?.let { appointment.additionalAttendanceInformation = additionalInformation }
+    attendanceFailureInformation?.let { appointment.attendanceFailureInformation = attendanceFailureInformation }
     appointment.attendanceSubmittedAt = OffsetDateTime.now()
     appointment.attendanceSubmittedBy = authUserRepository.save(submittedBy)
   }
@@ -247,7 +247,7 @@ class AppointmentService(
     referral: Referral,
     npsOfficeCode: String?,
     attended: Attended?,
-    additionalAttendanceInformation: String?,
+    attendanceFailureInformation: String?,
     notifyProbationPractitioner: Boolean?,
     behaviourDescription: String?,
     appointmentType: AppointmentType,
@@ -262,7 +262,7 @@ class AppointmentService(
       createdAt = OffsetDateTime.now(),
       referral = referral,
     )
-    setAttendanceAndBehaviourIfHistoricAppointment(appointment, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, createdByUser, appointmentType)
+    setAttendanceAndBehaviourIfHistoricAppointment(appointment, attended, attendanceFailureInformation, behaviourDescription, notifyProbationPractitioner, createdByUser, appointmentType)
     appointmentRepository.saveAndFlush(appointment)
     createOrUpdateAppointmentDeliveryDetails(appointment, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
     return appointment
@@ -280,7 +280,7 @@ class AppointmentService(
     npsOfficeCode: String?,
     attended: Attended?,
     referral: Referral,
-    additionalAttendanceInformation: String?,
+    attendanceFailureInformation: String?,
     notifyProbationPractitioner: Boolean?,
     behaviourDescription: String?,
     appointmentType: AppointmentType,
@@ -297,7 +297,7 @@ class AppointmentService(
       referral,
       npsOfficeCode,
       attended,
-      additionalAttendanceInformation,
+      attendanceFailureInformation,
       notifyProbationPractitioner,
       behaviourDescription,
       appointmentType,
@@ -393,14 +393,14 @@ class AppointmentService(
   private fun setAttendanceAndBehaviourIfHistoricAppointment(
     appointment: Appointment,
     attended: Attended?,
-    additionalAttendanceInformation: String?,
+    attendanceFailureInformation: String?,
     behaviourDescription: String?,
     notifyProbationPractitioner: Boolean?,
     updatedBy: AuthUser,
     appointmentType: AppointmentType,
   ) {
     attended?.let {
-      setAttendanceFields(appointment, attended, additionalAttendanceInformation, updatedBy)
+      setAttendanceFields(appointment, attended, attendanceFailureInformation, updatedBy)
       if (Attended.NO != attended) {
         setBehaviourFields(appointment, behaviourDescription!!, notifyProbationPractitioner!!, updatedBy)
       }

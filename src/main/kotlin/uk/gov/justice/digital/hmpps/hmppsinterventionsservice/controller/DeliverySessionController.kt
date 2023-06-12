@@ -61,7 +61,7 @@ class DeliverySessionController(
       updateAppointmentDTO.appointmentDeliveryAddress,
       updateAppointmentDTO.npsOfficeCode,
       updateAppointmentDTO.appointmentAttendance?.attended,
-      updateAppointmentDTO.appointmentAttendance?.additionalAttendanceInformation,
+      updateAppointmentDTO.appointmentAttendance?.attendanceFailureInformation,
       updateAppointmentDTO.appointmentBehaviour?.notifyProbationPractitioner,
       updateAppointmentDTO.appointmentBehaviour?.behaviourDescription,
     )
@@ -113,7 +113,7 @@ class DeliverySessionController(
       actionPlanId,
       sessionNumber,
       update.attended,
-      update.additionalAttendanceInformation,
+      update.attendanceFailureInformation,
     )
 
     return DeliverySessionDTO.from(updatedSession)
@@ -206,7 +206,7 @@ class DeliverySessionController(
       newDeliverySessionAppointmentRequest.appointmentDeliveryAddress,
       newDeliverySessionAppointmentRequest.npsOfficeCode,
       newDeliverySessionAppointmentRequest.appointmentAttendance?.attended,
-      newDeliverySessionAppointmentRequest.appointmentAttendance?.additionalAttendanceInformation,
+      newDeliverySessionAppointmentRequest.appointmentAttendance?.attendanceFailureInformation,
       newDeliverySessionAppointmentRequest.appointmentBehaviour?.notifyProbationPractitioner,
       newDeliverySessionAppointmentRequest.appointmentBehaviour?.behaviourDescription,
     )
@@ -238,7 +238,7 @@ class DeliverySessionController(
       newDeliverySessionAppointmentRequest.appointmentDeliveryAddress,
       newDeliverySessionAppointmentRequest.npsOfficeCode,
       newDeliverySessionAppointmentRequest.appointmentAttendance?.attended,
-      newDeliverySessionAppointmentRequest.appointmentAttendance?.additionalAttendanceInformation,
+      newDeliverySessionAppointmentRequest.appointmentAttendance?.attendanceFailureInformation,
       newDeliverySessionAppointmentRequest.appointmentBehaviour?.notifyProbationPractitioner,
       newDeliverySessionAppointmentRequest.appointmentBehaviour?.behaviourDescription,
     )
@@ -263,7 +263,7 @@ class DeliverySessionController(
       appointmentId,
       user,
       update.attended,
-      update.additionalAttendanceInformation,
+      update.attendanceFailureInformation,
     )
     return DeliverySessionAppointmentDTO.from(updatedSessionAppointment.first.sessionNumber, updatedSessionAppointment.second)
   }

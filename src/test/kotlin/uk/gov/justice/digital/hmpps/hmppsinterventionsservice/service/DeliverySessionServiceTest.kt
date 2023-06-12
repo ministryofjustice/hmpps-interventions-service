@@ -147,7 +147,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         assertThat(session.currentAppointment?.appointmentFeedbackSubmittedAt).isNotNull()
         assertThat(session.currentAppointment?.appointmentFeedbackSubmittedBy).isNotNull()
         assertThat(session.currentAppointment?.attended).isEqualTo(Attended.YES)
-        assertThat(session.currentAppointment?.additionalAttendanceInformation).isEqualTo("additionalAttendanceInformation")
+        assertThat(session.currentAppointment?.attendanceFailureInformation).isEqualTo("attendanceFailureInformation")
         assertThat(session.currentAppointment?.notifyPPOfAttendanceBehaviour).isEqualTo(false)
         assertThat(session.currentAppointment?.attendanceBehaviour).isEqualTo("behaviourDescription")
         null
@@ -158,7 +158,7 @@ class DeliverySessionServiceTest @Autowired constructor(
 
       val updatedSession = deliverySessionService.scheduleNewDeliverySessionAppointment(
         session.referral.id, session.sessionNumber, pastDate, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE,
-        attended = Attended.YES, additionalAttendanceInformation = "additionalAttendanceInformation", notifyProbationPractitioner = false, behaviourDescription = "behaviourDescription",
+        attended = Attended.YES, attendanceFailureInformation = "attendanceFailureInformation", notifyProbationPractitioner = false, behaviourDescription = "behaviourDescription",
       )
 
       assertThat(updatedSession.appointments.size).isEqualTo(1)
@@ -167,7 +167,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       assertThat(appointment.durationInMinutes).isEqualTo(defaultDuration)
       assertThat(appointment.createdBy).isEqualTo(defaultUser)
       assertThat(appointment.attended).isEqualTo(Attended.YES)
-      assertThat(appointment.additionalAttendanceInformation).isEqualTo("additionalAttendanceInformation")
+      assertThat(appointment.attendanceFailureInformation).isEqualTo("attendanceFailureInformation")
       assertThat(appointment.notifyPPOfAttendanceBehaviour).isEqualTo(false)
       assertThat(appointment.attendanceBehaviour).isEqualTo("behaviourDescription")
       assertThat(appointment.attendanceSubmittedAt).isNotNull()
@@ -290,7 +290,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         assertThat(session.currentAppointment?.appointmentFeedbackSubmittedAt).isNotNull()
         assertThat(session.currentAppointment?.appointmentFeedbackSubmittedBy).isNotNull()
         assertThat(session.currentAppointment?.attended).isEqualTo(Attended.YES)
-        assertThat(session.currentAppointment?.additionalAttendanceInformation).isEqualTo("additionalAttendanceInformation")
+        assertThat(session.currentAppointment?.attendanceFailureInformation).isEqualTo("attendanceFailureInformation")
         assertThat(session.currentAppointment?.notifyPPOfAttendanceBehaviour).isEqualTo(false)
         assertThat(session.currentAppointment?.attendanceBehaviour).isEqualTo("behaviourDescription")
         null
@@ -301,7 +301,7 @@ class DeliverySessionServiceTest @Autowired constructor(
 
       val updatedSession = deliverySessionService.rescheduleDeliverySessionAppointment(
         session.referral.id, session.sessionNumber, existingAppointment.id, pastDate, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE,
-        attended = Attended.YES, additionalAttendanceInformation = "additionalAttendanceInformation", notifyProbationPractitioner = false, behaviourDescription = "behaviourDescription",
+        attended = Attended.YES, attendanceFailureInformation = "attendanceFailureInformation", notifyProbationPractitioner = false, behaviourDescription = "behaviourDescription",
       )
 
       assertThat(updatedSession.appointments.size).isEqualTo(2)
@@ -310,7 +310,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       assertThat(appointment.durationInMinutes).isEqualTo(defaultDuration)
       assertThat(appointment.createdBy).isEqualTo(defaultUser)
       assertThat(appointment.attended).isEqualTo(Attended.YES)
-      assertThat(appointment.additionalAttendanceInformation).isEqualTo("additionalAttendanceInformation")
+      assertThat(appointment.attendanceFailureInformation).isEqualTo("attendanceFailureInformation")
       assertThat(appointment.notifyPPOfAttendanceBehaviour).isEqualTo(false)
       assertThat(appointment.attendanceBehaviour).isEqualTo("behaviourDescription")
       assertThat(appointment.attendanceSubmittedAt).isNotNull()
@@ -549,7 +549,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         assertThat(session.currentAppointment?.appointmentFeedbackSubmittedAt).isNotNull
         assertThat(session.currentAppointment?.appointmentFeedbackSubmittedBy).isNotNull
         assertThat(session.currentAppointment?.attended).isEqualTo(Attended.YES)
-        assertThat(session.currentAppointment?.additionalAttendanceInformation).isEqualTo("additionalAttendanceInformation")
+        assertThat(session.currentAppointment?.attendanceFailureInformation).isEqualTo("attendanceFailureInformation")
         assertThat(session.currentAppointment?.notifyPPOfAttendanceBehaviour).isEqualTo(true)
         assertThat(session.currentAppointment?.attendanceBehaviour).isEqualTo("behaviourDescription")
         null
@@ -563,7 +563,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         null,
         null,
         Attended.YES,
-        "additionalAttendanceInformation",
+        "attendanceFailureInformation",
         true,
         "behaviourDescription",
       )
@@ -574,7 +574,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       assertThat(appointment.durationInMinutes).isEqualTo(defaultDuration)
       assertThat(appointment.createdBy).isEqualTo(defaultUser)
       assertThat(appointment.attended).isEqualTo(Attended.YES)
-      assertThat(appointment.additionalAttendanceInformation).isEqualTo("additionalAttendanceInformation")
+      assertThat(appointment.attendanceFailureInformation).isEqualTo("attendanceFailureInformation")
       assertThat(appointment.notifyPPOfAttendanceBehaviour).isEqualTo(true)
       assertThat(appointment.attendanceBehaviour).isEqualTo("behaviourDescription")
       assertThat(appointment.appointmentFeedbackSubmittedAt).isNotNull
@@ -593,7 +593,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         assertThat(session.currentAppointment?.appointmentFeedbackSubmittedAt).isNotNull()
         assertThat(session.currentAppointment?.appointmentFeedbackSubmittedBy).isNotNull()
         assertThat(session.currentAppointment?.attended).isEqualTo(Attended.YES)
-        assertThat(session.currentAppointment?.additionalAttendanceInformation).isEqualTo("additionalAttendanceInformation")
+        assertThat(session.currentAppointment?.attendanceFailureInformation).isEqualTo("attendanceFailureInformation")
         assertThat(session.currentAppointment?.notifyPPOfAttendanceBehaviour).isEqualTo(true)
         assertThat(session.currentAppointment?.attendanceBehaviour).isEqualTo("behaviourDescription")
         null
@@ -607,7 +607,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         null,
         null,
         Attended.YES,
-        "additionalAttendanceInformation",
+        "attendanceFailureInformation",
         true,
         "behaviourDescription",
       )
@@ -618,7 +618,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       assertThat(appointment.durationInMinutes).isEqualTo(defaultDuration)
       assertThat(appointment.createdBy).isEqualTo(defaultUser)
       assertThat(appointment.attended).isEqualTo(Attended.YES)
-      assertThat(appointment.additionalAttendanceInformation).isEqualTo("additionalAttendanceInformation")
+      assertThat(appointment.attendanceFailureInformation).isEqualTo("attendanceFailureInformation")
       assertThat(appointment.notifyPPOfAttendanceBehaviour).isEqualTo(true)
       assertThat(appointment.attendanceBehaviour).isEqualTo("behaviourDescription")
       assertThat(appointment.appointmentFeedbackSubmittedAt).isNotNull()

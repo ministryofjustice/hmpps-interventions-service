@@ -63,7 +63,6 @@ class ActionPlanAppointmentEventPublisherTest {
   fun `builds an appointment session feedback event and publishes it`() {
     val appointment = DeliverySessionFactory().createAttended(
       attended = LATE,
-      additionalAttendanceInformation = "Behaviour was fine",
       attendanceSubmittedAt = OffsetDateTime.now(),
     )
 

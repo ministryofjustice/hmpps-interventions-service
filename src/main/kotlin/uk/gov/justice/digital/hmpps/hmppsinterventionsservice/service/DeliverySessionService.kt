@@ -77,7 +77,7 @@ class DeliverySessionService(
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
     attended: Attended? = null,
-    additionalAttendanceInformation: String? = null,
+    attendanceFailureInformation: String? = null,
     notifyProbationPractitioner: Boolean? = null,
     behaviourDescription: String? = null,
   ): DeliverySession {
@@ -115,7 +115,7 @@ class DeliverySessionService(
       appointmentRepository.save(existingAppointment)
     }
     return scheduleDeliverySessionAppointment(
-      session, appointment, existingAppointment, appointmentTime, durationInMinutes, appointmentDeliveryType, createdBy, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode, attended, additionalAttendanceInformation, notifyProbationPractitioner, behaviourDescription,
+      session, appointment, existingAppointment, appointmentTime, durationInMinutes, appointmentDeliveryType, createdBy, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode, attended, attendanceFailureInformation, notifyProbationPractitioner, behaviourDescription,
     )
   }
 
@@ -131,7 +131,7 @@ class DeliverySessionService(
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
     attended: Attended? = null,
-    additionalAttendanceInformation: String? = null,
+    attendanceFailureInformation: String? = null,
     notifyProbationPractitioner: Boolean? = null,
     behaviourDescription: String? = null,
   ): DeliverySession {
@@ -150,7 +150,7 @@ class DeliverySessionService(
       referral = session.referral,
     )
     return scheduleDeliverySessionAppointment(
-      session, appointment, existingAppointment, appointmentTime, durationInMinutes, appointmentDeliveryType, updatedBy, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode, attended, additionalAttendanceInformation, notifyProbationPractitioner, behaviourDescription,
+      session, appointment, existingAppointment, appointmentTime, durationInMinutes, appointmentDeliveryType, updatedBy, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode, attended, attendanceFailureInformation, notifyProbationPractitioner, behaviourDescription,
     )
   }
 
@@ -166,7 +166,7 @@ class DeliverySessionService(
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
     attended: Attended? = null,
-    additionalAttendanceInformation: String? = null,
+    attendanceFailureInformation: String? = null,
     notifyProbationPractitioner: Boolean? = null,
     behaviourDescription: String? = null,
   ): DeliverySession {
@@ -197,7 +197,7 @@ class DeliverySessionService(
     deliverySession.appointments.add(toSchedule)
     return deliverySessionRepository.saveAndFlush(deliverySession).also {
       // Occurring after saving the session to ensure that session has the latest appointment attached when publishing the session feedback event.
-      setAttendanceAndBehaviourIfHistoricAppointment(deliverySession, toSchedule, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, scheduledBy)
+      setAttendanceAndBehaviourIfHistoricAppointment(deliverySession, toSchedule, attended, attendanceFailureInformation, behaviourDescription, notifyProbationPractitioner, scheduledBy)
     }
   }
 
@@ -213,7 +213,7 @@ class DeliverySessionService(
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
     attended: Attended? = null,
-    additionalAttendanceInformation: String? = null,
+    attendanceFailureInformation: String? = null,
     notifyProbationPractitioner: Boolean? = null,
     behaviourDescription: String? = null,
   ): DeliverySession {
@@ -260,7 +260,7 @@ class DeliverySessionService(
     session.appointments.add(appointment)
     return deliverySessionRepository.saveAndFlush(session).also {
       // Occurring after saving the session to ensure that session has the latest appointment attached when publishing the session feedback event.
-      setAttendanceAndBehaviourIfHistoricAppointment(session, appointment, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, updatedBy)
+      setAttendanceAndBehaviourIfHistoricAppointment(session, appointment, attended, attendanceFailureInformation, behaviourDescription, notifyProbationPractitioner, updatedBy)
     }
   }
 
@@ -270,7 +270,7 @@ class DeliverySessionService(
     actionPlanId: UUID,
     sessionNumber: Int,
     attended: Attended,
-    additionalInformation: String?,
+    attendanceFailureInformation: String?,
   ): DeliverySession {
     val session = getDeliverySessionByActionPlanIdOrThrowException(actionPlanId, sessionNumber)
     val appointment = session.currentAppointment
@@ -280,7 +280,7 @@ class DeliverySessionService(
       throw ResponseStatusException(HttpStatus.CONFLICT, "session feedback has already been submitted for this session")
     }
 
-    setAttendanceFields(appointment, attended, additionalInformation, actor)
+    setAttendanceFields(appointment, attended, attendanceFailureInformation, actor)
     return deliverySessionRepository.save(session)
   }
 
@@ -290,13 +290,13 @@ class DeliverySessionService(
     appointmentId: UUID,
     actor: AuthUser,
     attended: Attended,
-    additionalInformation: String?,
+    attendanceFailureInformation: String?,
   ): Pair<DeliverySession, Appointment> {
     val sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
     if (sessionAndAppointment.second.appointmentTime.isAfter(OffsetDateTime.now())) {
       throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot submit feedback for a future appointment [id=${sessionAndAppointment.second.id}]")
     }
-    val updatedAppointment = appointmentService.recordAppointmentAttendance(sessionAndAppointment.second, attended, additionalInformation, actor)
+    val updatedAppointment = appointmentService.recordAppointmentAttendance(sessionAndAppointment.second, attended, attendanceFailureInformation, actor)
     return Pair(sessionAndAppointment.first, updatedAppointment)
   }
 
@@ -390,13 +390,13 @@ class DeliverySessionService(
     session: DeliverySession,
     appointment: Appointment,
     attended: Attended?,
-    additionalAttendanceInformation: String?,
+    attendanceFailureInformation: String?,
     behaviourDescription: String?,
     notifyProbationPractitioner: Boolean?,
     updatedBy: AuthUser,
   ) {
     attended?.let {
-      setAttendanceFields(appointment, attended, additionalAttendanceInformation, updatedBy)
+      setAttendanceFields(appointment, attended, attendanceFailureInformation, updatedBy)
       if (attended != Attended.NO) {
         setBehaviourFields(appointment, behaviourDescription!!, notifyProbationPractitioner!!, updatedBy)
       }
@@ -412,12 +412,12 @@ class DeliverySessionService(
   private fun setAttendanceFields(
     appointment: Appointment,
     attended: Attended,
-    additionalInformation: String?,
+    attendanceFailureInformation: String?,
     actor: AuthUser,
   ) {
     setSuperseded(attended, appointment)
     appointment.attended = attended
-    additionalInformation?.let { appointment.additionalAttendanceInformation = additionalInformation }
+    attendanceFailureInformation?.let { appointment.attendanceFailureInformation = attendanceFailureInformation }
     appointment.attendanceSubmittedAt = OffsetDateTime.now()
     appointment.attendanceSubmittedBy = authUserRepository.save(actor)
   }

@@ -51,7 +51,7 @@ class SupplierAssessmentController(
         updateAppointmentDTO.appointmentDeliveryAddress,
         updateAppointmentDTO.npsOfficeCode,
         updateAppointmentDTO.appointmentAttendance?.attended,
-        updateAppointmentDTO.appointmentAttendance?.additionalAttendanceInformation,
+        updateAppointmentDTO.appointmentAttendance?.attendanceFailureInformation,
         updateAppointmentDTO.appointmentBehaviour?.notifyProbationPractitioner,
         updateAppointmentDTO.appointmentBehaviour?.behaviourDescription,
       ),
@@ -131,7 +131,7 @@ class SupplierAssessmentController(
     val updatedAppointment = appointmentService.recordAppointmentAttendance(
       supplierAssessmentAppointment,
       update.attended,
-      update.additionalAttendanceInformation,
+      update.attendanceFailureInformation,
       submittedBy,
     )
     return AppointmentDTO.from(updatedAppointment)

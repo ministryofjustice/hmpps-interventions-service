@@ -173,7 +173,7 @@ class AppointmentServiceTest {
     verify(appointmentEventPublisher).behaviourRecordedEvent(newAppointment, false, AppointmentType.SUPPLIER_ASSESSMENT)
     verify(appointmentEventPublisher).sessionFeedbackRecordedEvent(newAppointment, false, AppointmentType.SUPPLIER_ASSESSMENT)
     assertThat(newAppointment.attended).isEqualTo(YES)
-    assertThat(newAppointment.additionalAttendanceInformation).isEqualTo("additional information")
+    assertThat(newAppointment.attendanceFailureInformation).isEqualTo("additional information")
     assertThat(newAppointment.attendanceBehaviour).isEqualTo("description")
     assertThat(newAppointment.notifyPPOfAttendanceBehaviour).isEqualTo(false)
     assertThat(newAppointment.attendanceSubmittedAt).isNotNull
@@ -295,7 +295,7 @@ class AppointmentServiceTest {
     )
     verifySavedAppointment(OffsetDateTime.parse("2020-12-04T10:42:43+00:00"), durationInMinutes, rescheduledDeliusAppointmentId, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
     assertThat(updatedAppointment.attended).isEqualTo(NO)
-    assertThat(updatedAppointment.additionalAttendanceInformation).isEqualTo("non attended")
+    assertThat(updatedAppointment.attendanceFailureInformation).isEqualTo("non attended")
     assertThat(updatedAppointment.attendanceBehaviour).isNull()
     assertThat(updatedAppointment.notifyPPOfAttendanceBehaviour).isNull()
   }
@@ -328,7 +328,7 @@ class AppointmentServiceTest {
     )
     verifySavedAppointment(appointmentTime, durationInMinutes, additionalDeliusAppointmentId, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
     assertThat(newAppointment.attended).isEqualTo(NO)
-    assertThat(newAppointment.additionalAttendanceInformation).isEqualTo("non attended")
+    assertThat(newAppointment.attendanceFailureInformation).isEqualTo("non attended")
     assertThat(newAppointment.attendanceBehaviour).isNull()
     assertThat(newAppointment.notifyPPOfAttendanceBehaviour).isNull()
     assertThat(newAppointment.attendanceSubmittedAt).isNotNull
@@ -480,14 +480,14 @@ class AppointmentServiceTest {
     fun `appointment attendance can be updated`() {
       val appointmentId = UUID.randomUUID()
       val attended = YES
-      val additionalAttendanceInformation = "information"
+      val attendanceFailureInformation = "information"
       val appointment = appointmentFactory.create(id = appointmentId, appointmentTime = OffsetDateTime.now())
       val submittedBy = authUserFactory.create()
 
       whenever(appointmentRepository.save(any())).thenReturn(appointment)
       whenever(authUserRepository.save(any())).thenReturn(submittedBy)
 
-      appointmentService.recordAppointmentAttendance(appointment, attended, additionalAttendanceInformation, submittedBy)
+      appointmentService.recordAppointmentAttendance(appointment, attended, attendanceFailureInformation, submittedBy)
 
       val argumentCaptor = argumentCaptor<Appointment>()
       verify(appointmentRepository, times(1)).save(argumentCaptor.capture())
@@ -495,7 +495,7 @@ class AppointmentServiceTest {
 
       assertThat(arguments.id).isEqualTo(appointmentId)
       assertThat(arguments.attended).isEqualTo(attended)
-      assertThat(arguments.additionalAttendanceInformation).isEqualTo(additionalAttendanceInformation)
+      assertThat(arguments.attendanceFailureInformation).isEqualTo(attendanceFailureInformation)
       assertThat(arguments.attendanceSubmittedAt).isNotNull
       assertThat(arguments.attendanceSubmittedBy).isEqualTo(submittedBy)
     }

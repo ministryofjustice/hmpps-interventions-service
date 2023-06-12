@@ -312,7 +312,7 @@ internal class DeliverySessionControllerTest {
     val updatedSession = deliverySessionFactory.createAttended(
       sessionNumber = sessionNumber,
       attended = Attended.YES,
-      additionalAttendanceInformation = "more info",
+      attendanceFailureInformation = "more info",
     )
 
     whenever(
@@ -321,7 +321,7 @@ internal class DeliverySessionControllerTest {
         actionPlan.id,
         sessionNumber,
         update.attended,
-        update.additionalAttendanceInformation,
+        update.attendanceFailureInformation,
       ),
     ).thenReturn(updatedSession)
 
@@ -329,6 +329,6 @@ internal class DeliverySessionControllerTest {
 
     val sessionResponse = sessionsController.recordAttendance(actionPlan.id, sessionNumber, update, userToken)
 
-    assertThat(sessionResponse.sessionFeedback.attendance.additionalAttendanceInformation).isEqualTo("more info")
+    assertThat(sessionResponse.sessionFeedback.attendance.attendanceFailureInformation).isEqualTo("more info")
   }
 }

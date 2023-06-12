@@ -52,7 +52,7 @@ data class DeliverySessionAppointmentScheduleDetailsDTO(
 
 data class UpdateAppointmentAttendanceDTO(
   val attended: Attended,
-  val additionalAttendanceInformation: String?,
+  val attendanceFailureInformation: String?,
 )
 
 data class RecordAppointmentBehaviourDTO(
@@ -133,7 +133,7 @@ data class SessionFeedbackDTO(
           appointment.appointmentFeedbackSubmittedAt !== null,
           appointment.appointmentFeedbackSubmittedBy?.let { AuthUserDTO.from(it) },
         )
-      } ?: SessionFeedbackDTO(AttendanceDTO(null, null, null, null), BehaviourDTO(null, null), false, null)
+      } ?: SessionFeedbackDTO(AttendanceDTO(null, null, null, null, null), BehaviourDTO(null, null), false, null)
     }
   }
 }
@@ -141,12 +141,13 @@ data class SessionFeedbackDTO(
 data class AttendanceDTO(
   val attended: Attended?,
   val additionalAttendanceInformation: String?,
+  val attendanceFailureInformation: String?,
   val submittedAt: OffsetDateTime?,
   val submittedBy: AuthUserDTO?,
 ) {
   companion object {
     fun from(appointment: Appointment): AttendanceDTO {
-      return AttendanceDTO(attended = appointment.attended, additionalAttendanceInformation = appointment.additionalAttendanceInformation, appointment.attendanceSubmittedAt, appointment.attendanceSubmittedBy?.let { AuthUserDTO.from(it) } ?: null)
+      return AttendanceDTO(attended = appointment.attended, additionalAttendanceInformation = appointment.additionalAttendanceInformation, attendanceFailureInformation = appointment.attendanceFailureInformation, appointment.attendanceSubmittedAt, appointment.attendanceSubmittedBy?.let { AuthUserDTO.from(it) } ?: null)
     }
   }
 }
