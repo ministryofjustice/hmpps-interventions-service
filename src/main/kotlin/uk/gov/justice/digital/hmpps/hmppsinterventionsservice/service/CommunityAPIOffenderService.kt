@@ -1,9 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.RestClient
@@ -13,19 +11,25 @@ data class Offender(
   val crnNumber: String,
 )
 
+private data class ManagedCases(val managedCases: List<CaseIdentifier>)
+private data class CaseIdentifier(val crn: String, val nomsId: String? = null)
+
 data class ServiceUserAccessResult(
   val canAccess: Boolean,
   val messages: List<String>,
 )
 
-private data class UserAccessResponse(
-  val exclusionMessage: String?,
-  val restrictionMessage: String?,
-)
+private data class CaseAccess(
+  val crn: String,
+  val userExcluded: Boolean,
+  val userRestricted: Boolean,
+  val exclusionMessage: String? = null,
+  val restrictionMessage: String? = null,
+) {
+  val limited = userExcluded || userRestricted
+}
 
-private data class StaffDetailsResponse(
-  val staffIdentifier: Long,
-)
+private data class UserAccessResponse(val access: List<CaseAccess>)
 
 data class OffenderIdentifiersResponse(
   val primaryIdentifiers: PrimaryIdentifiersResponse?,
@@ -37,72 +41,45 @@ data class PrimaryIdentifiersResponse(
 
 @Service
 class CommunityAPIOffenderService(
-  @Value("\${community-api.locations.offender-access}") private val offenderAccessLocation: String,
-  @Value("\${community-api.locations.managed-offenders}") private val managedOffendersLocation: String,
-  @Value("\${community-api.locations.staff-details}") private val staffDetailsLocation: String,
-  @Value("\${community-api.locations.offender-identifiers}") private val offenderIdentifiersLocation: String,
-  private val communityApiClient: RestClient,
+  @Value("\${refer-and-monitor-and-delius.locations.case-access}") private val caseAccessLocation: String,
+  @Value("\${refer-and-monitor-and-delius.locations.managed-cases}") private val managedCasesLocation: String,
+  @Value("\${refer-and-monitor-and-delius.locations.case-identifiers}") private val caseIdentifiersLocation: String,
+  private val ramDeliusApiClient: RestClient,
 ) {
   fun checkIfAuthenticatedDeliusUserHasAccessToServiceUser(user: AuthUser, crn: String): ServiceUserAccessResult {
-    val userAccessPath = UriComponentsBuilder.fromPath(offenderAccessLocation)
-      .buildAndExpand(crn, user.userName)
+    val userAccessPath = UriComponentsBuilder.fromPath(caseAccessLocation)
+      .buildAndExpand(user.userName)
       .toString()
 
-    val response = communityApiClient.get(userAccessPath)
+    val response = ramDeliusApiClient.post(userAccessPath, listOf(crn))
       .retrieve()
-      .onStatus({ it.equals(HttpStatus.FORBIDDEN) }, { Mono.empty() })
-      .toEntity(UserAccessResponse::class.java)
+      .bodyToMono(UserAccessResponse::class.java)
       .block()
-
+    val userAccess = response?.access?.firstOrNull { it.crn == crn }
     return ServiceUserAccessResult(
-      !response.statusCode.equals(HttpStatus.FORBIDDEN),
-      listOfNotNull(response.body.restrictionMessage, response.body.exclusionMessage),
+      userAccess?.limited == false,
+      listOfNotNull(userAccess?.restrictionMessage, userAccess?.exclusionMessage),
     )
   }
 
   fun getManagedOffendersForDeliusUser(user: AuthUser): List<Offender> {
-    val staffIdentifier = getStaffIdentifier(user)
-      // if a delius user does not have a staff identifier it's not an error;
-      // but it does mean they do not have any managed offenders allocated.
-      ?: return emptyList()
-
-    val managedOffendersPath = UriComponentsBuilder.fromPath(managedOffendersLocation)
-      .buildAndExpand(staffIdentifier)
-      .toString()
-
-    return communityApiClient.get(managedOffendersPath)
-      .retrieve()
-      .bodyToFlux(Offender::class.java)
-      .collectList()
-      .block()
-  }
-
-  fun getStaffIdentifier(user: AuthUser): Long? {
-    val staffDetailsPath = UriComponentsBuilder.fromPath(staffDetailsLocation)
+    val managedOffendersPath = UriComponentsBuilder.fromPath(managedCasesLocation)
       .buildAndExpand(user.userName)
       .toString()
 
-    return communityApiClient.get(staffDetailsPath)
+    return ramDeliusApiClient.get(managedOffendersPath)
       .retrieve()
-      .bodyToMono(StaffDetailsResponse::class.java)
-      .onErrorResume(WebClientResponseException::class.java) { e ->
-        when (e.statusCode) {
-          // not all delius users are staff
-          HttpStatus.NOT_FOUND -> Mono.empty()
-          else -> Mono.error(e)
-        }
-      }
-      .block()
-      ?.staffIdentifier
+      .bodyToMono(ManagedCases::class.java)
+      .block().let { res -> res?.managedCases?.map { Offender(it.crn) } ?: listOf() }
   }
 
   fun getOffenderIdentifiers(crn: String): Mono<OffenderIdentifiersResponse> {
-    val offenderIdentifiersPath = UriComponentsBuilder.fromPath(offenderIdentifiersLocation)
+    val offenderIdentifiersPath = UriComponentsBuilder.fromPath(caseIdentifiersLocation)
       .buildAndExpand(crn)
       .toString()
 
-    return communityApiClient.get(offenderIdentifiersPath)
+    return ramDeliusApiClient.get(offenderIdentifiersPath)
       .retrieve()
-      .bodyToMono(OffenderIdentifiersResponse::class.java)
+      .bodyToMono(CaseIdentifier::class.java).map { OffenderIdentifiersResponse(PrimaryIdentifiersResponse(it.nomsId)) }
   }
 }

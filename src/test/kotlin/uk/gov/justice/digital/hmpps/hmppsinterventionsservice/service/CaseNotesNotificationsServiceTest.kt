@@ -22,7 +22,6 @@ internal class CaseNotesNotificationsServiceTest {
   private val referralService = mock<ReferralService>()
   private val emailSender = mock<EmailSender>()
   private val hmppsAuthService = mock<HMPPSAuthService>()
-  private val communityAPIOffenderService = mock<CommunityAPIOffenderService>()
 
   private val caseNotesNotificationsService = CaseNotesNotificationsService(
     "sent-template",
@@ -88,7 +87,6 @@ internal class CaseNotesNotificationsServiceTest {
       ResponsibleProbationPractitioner("pp", "pp@justice.gov.uk", "N01UTAA", null, "last"),
     )
     whenever(referralService.isUserTheResponsibleOfficer(any(), any())).thenReturn(true)
-    whenever(communityAPIOffenderService.getStaffIdentifier(any())).thenReturn(123L)
 
     val sender = authUserFactory.createPP(id = "pp_sender")
     val referral = referralFactory.createAssigned()
