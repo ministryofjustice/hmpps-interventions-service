@@ -64,7 +64,7 @@ import javax.validation.constraints.NotNull
   ],
 )
 @Entity(name = "referral")
-@Table(name = "referral", indexes = arrayOf(Index(columnList = "created_by_id")))
+@Table(name = "referral", indexes = [Index(columnList = "created_by_id")])
 class SentReferralSummary(
   @Id val id: UUID,
   @ElementCollection
@@ -93,6 +93,12 @@ class SentReferralSummary(
   @OneToOne(mappedBy = "referral")
   @Fetch(FetchMode.JOIN)
   var supplierAssessment: SupplierAssessment? = null,
+  @OneToOne(mappedBy = "referral")
+  @Fetch(FetchMode.JOIN)
+  var referralLocation: ReferralLocation? = null,
+  @OneToOne(mappedBy = "referral")
+  @Fetch(FetchMode.JOIN)
+  var probationPractitionerDetails: ProbationPractitionerDetails? = null,
   @OneToMany(fetch = FetchType.LAZY)
   @JoinColumn(name = "referral_id")
   var actionPlans: MutableList<ActionPlan>? = null,

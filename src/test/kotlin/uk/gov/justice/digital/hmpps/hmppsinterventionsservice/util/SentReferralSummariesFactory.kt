@@ -96,6 +96,8 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
       serviceUserData = referral.serviceUserData,
       actionPlans = referral.actionPlans,
       supplierAssessment = referral.supplierAssessment,
+      referralLocation = referral.referralLocation,
+      probationPractitionerDetails = referral.probationPractitionerDetails,
     )
   }
 }

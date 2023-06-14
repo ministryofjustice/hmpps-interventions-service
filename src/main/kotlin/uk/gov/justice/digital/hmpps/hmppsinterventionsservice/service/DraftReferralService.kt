@@ -520,7 +520,7 @@ class DraftReferralService(
           name = draftReferral.ppName,
           emailAddress = draftReferral.ppEmailAddress,
           pdu = draftReferral.ppPdu,
-          probationOffice = draftReferral.ppProbationOffice!!,
+          probationOffice = draftReferral.ppProbationOffice,
         ),
       )
       referralRepository.save(referral)
