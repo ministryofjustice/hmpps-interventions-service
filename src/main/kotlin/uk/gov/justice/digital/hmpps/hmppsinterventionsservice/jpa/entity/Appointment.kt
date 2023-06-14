@@ -38,6 +38,14 @@ data class Appointment(
   @Fetch(FetchMode.JOIN)
   var attendanceBehaviourSubmittedBy: AuthUser? = null,
 
+  var sessionSummary: String? = null,
+  var sessionResponse: String? = null,
+  var sessionConcerns: String? = null,
+  var sessionFeedbackSubmittedAt: OffsetDateTime? = null,
+  @ManyToOne
+  @Fetch(FetchMode.JOIN)
+  var sessionFeedbackSubmittedBy: AuthUser? = null,
+
   var notifyPPOfAttendanceBehaviour: Boolean? = null,
 
   var appointmentFeedbackSubmittedAt: OffsetDateTime? = null,

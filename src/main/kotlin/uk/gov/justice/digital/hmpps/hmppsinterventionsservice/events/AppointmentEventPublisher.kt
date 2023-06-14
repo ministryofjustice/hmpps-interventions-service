@@ -11,8 +11,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.NotifyAppo
 
 enum class AppointmentEventType {
   ATTENDANCE_RECORDED,
-  BEHAVIOUR_RECORDED,
   SESSION_FEEDBACK_RECORDED,
+  APPOINTMENT_FEEDBACK_RECORDED,
   SCHEDULED,
 }
 
@@ -61,11 +61,11 @@ class AppointmentEventPublisher(
     )
   }
 
-  fun behaviourRecordedEvent(appointment: Appointment, notifyPP: Boolean, appointmentType: AppointmentType) {
+  fun sessionFeedbackRecordedEvent(appointment: Appointment, notifyPP: Boolean, appointmentType: AppointmentType) {
     applicationEventPublisher.publishEvent(
       AppointmentEvent(
         this,
-        AppointmentEventType.BEHAVIOUR_RECORDED,
+        AppointmentEventType.SESSION_FEEDBACK_RECORDED,
         appointment,
         getAppointmentURL(appointment, appointmentType),
         notifyPP,
@@ -74,11 +74,11 @@ class AppointmentEventPublisher(
     )
   }
 
-  fun sessionFeedbackRecordedEvent(appointment: Appointment, notifyPP: Boolean, appointmentType: AppointmentType) {
+  fun appointmentFeedbackRecordedEvent(appointment: Appointment, notifyPP: Boolean, appointmentType: AppointmentType) {
     applicationEventPublisher.publishEvent(
       AppointmentEvent(
         this,
-        AppointmentEventType.SESSION_FEEDBACK_RECORDED,
+        AppointmentEventType.APPOINTMENT_FEEDBACK_RECORDED,
         appointment,
         getAppointmentURL(appointment, appointmentType),
         notifyPP,

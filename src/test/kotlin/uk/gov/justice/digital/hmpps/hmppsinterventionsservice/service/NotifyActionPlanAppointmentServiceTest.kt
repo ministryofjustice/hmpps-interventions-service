@@ -97,25 +97,25 @@ class NotifyActionPlanAppointmentServiceTest {
   }
 
   @Test
-  fun `appointment behaviour recorded event does not send email when user details are not available`() {
+  fun `appointment session feedback recorded event does not send email when user details are not available`() {
     whenever(referralService.getResponsibleProbationPractitioner(any())).thenThrow(RuntimeException::class.java)
     assertThrows<RuntimeException> {
-      notifyService().onApplicationEvent(generateAppointmentEvent(ActionPlanAppointmentEventType.BEHAVIOUR_RECORDED, true))
+      notifyService().onApplicationEvent(generateAppointmentEvent(ActionPlanAppointmentEventType.SESSION_FEEDBACK_RECORDED, true))
     }
     verifyNoInteractions(emailSender)
   }
 
   @Test
-  fun `appointment behaviour recorded event does not send email when notifyPP is false`() {
-    notifyService().onApplicationEvent(generateAppointmentEvent(ActionPlanAppointmentEventType.BEHAVIOUR_RECORDED, false))
+  fun `appointment session feedback recorded event does not send email when notifyPP is false`() {
+    notifyService().onApplicationEvent(generateAppointmentEvent(ActionPlanAppointmentEventType.SESSION_FEEDBACK_RECORDED, false))
     verifyNoInteractions(emailSender)
   }
 
   @Test
-  fun `appointment behaviour recorded event calls email client`() {
+  fun `appointment session feedback recorded event calls email client`() {
     whenever(referralService.getResponsibleProbationPractitioner(any(), any(), any())).thenReturn(ResponsibleProbationPractitioner("abc", "abc@abc.com", null, null, "def"))
 
-    val actionPlanAppointmentEvent = generateAppointmentEvent(ActionPlanAppointmentEventType.BEHAVIOUR_RECORDED, true)
+    val actionPlanAppointmentEvent = generateAppointmentEvent(ActionPlanAppointmentEventType.SESSION_FEEDBACK_RECORDED, true)
     val appointmentId = actionPlanAppointmentEvent.deliverySession.appointmentId
 
     notifyService().onApplicationEvent(actionPlanAppointmentEvent)

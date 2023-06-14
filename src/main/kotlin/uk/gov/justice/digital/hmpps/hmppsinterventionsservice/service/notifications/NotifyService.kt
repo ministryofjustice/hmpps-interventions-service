@@ -117,9 +117,9 @@ class NotifyActionPlanAppointmentService(
 ) : ApplicationListener<ActionPlanAppointmentEvent>, NotifyService {
   private fun notifyPP(event: ActionPlanAppointmentEvent): Boolean {
     return when (event.type) {
-      ActionPlanAppointmentEventType.ATTENDANCE_RECORDED -> event.deliverySession.sessionFeedback.attendance.attended!! == Attended.NO
-      ActionPlanAppointmentEventType.BEHAVIOUR_RECORDED -> event.deliverySession.sessionFeedback.behaviour.notifyProbationPractitioner!!
-      ActionPlanAppointmentEventType.SESSION_FEEDBACK_RECORDED -> event.deliverySession.sessionFeedback.behaviour.notifyProbationPractitioner ?: false
+      ActionPlanAppointmentEventType.ATTENDANCE_RECORDED -> event.deliverySession.appointmentFeedback.attendanceFeedback.attended!! == Attended.NO
+      ActionPlanAppointmentEventType.SESSION_FEEDBACK_RECORDED -> event.deliverySession.appointmentFeedback.sessionFeedback.notifyProbationPractitioner!!
+      ActionPlanAppointmentEventType.APPOINTMENT_FEEDBACK_RECORDED -> event.deliverySession.appointmentFeedback.sessionFeedback.notifyProbationPractitioner ?: false
     }
   }
 
@@ -154,7 +154,7 @@ class NotifyActionPlanAppointmentService(
             ),
           )
         }
-        ActionPlanAppointmentEventType.BEHAVIOUR_RECORDED -> {
+        ActionPlanAppointmentEventType.SESSION_FEEDBACK_RECORDED -> {
           emailSender.sendEmail(
             concerningBehaviourTemplateID,
             recipient.email,
@@ -218,7 +218,7 @@ class NotifyAppointmentService(
             ),
           )
         }
-        AppointmentEventType.BEHAVIOUR_RECORDED -> {
+        AppointmentEventType.SESSION_FEEDBACK_RECORDED -> {
           emailSender.sendEmail(
             concerningBehaviourTemplateID,
             recipient.email,

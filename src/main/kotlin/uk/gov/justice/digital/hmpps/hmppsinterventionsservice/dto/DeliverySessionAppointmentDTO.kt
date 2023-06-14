@@ -15,7 +15,7 @@ data class DeliverySessionAppointmentDTO(
   val sessionType: AppointmentSessionType?,
   val npsOfficeCode: String?,
   val appointmentDeliveryAddress: AddressDTO?,
-  val sessionFeedback: SessionFeedbackDTO,
+  val appointmentFeedback: AppointmentFeedbackDTO,
 ) {
   companion object {
     fun from(sessionNumber: Int, appointment: Appointment): DeliverySessionAppointmentDTO {
@@ -40,7 +40,7 @@ data class DeliverySessionAppointmentDTO(
         sessionType = appointment.appointmentDelivery?.appointmentSessionType,
         appointmentDeliveryAddress = address,
         npsOfficeCode = appointment.appointmentDelivery?.npsOfficeCode,
-        sessionFeedback = SessionFeedbackDTO.from(appointment),
+        appointmentFeedback = AppointmentFeedbackDTO.from(appointment),
       )
     }
   }

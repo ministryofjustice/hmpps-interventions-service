@@ -11,8 +11,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Deliver
 
 enum class ActionPlanAppointmentEventType {
   ATTENDANCE_RECORDED,
-  BEHAVIOUR_RECORDED,
   SESSION_FEEDBACK_RECORDED,
+  APPOINTMENT_FEEDBACK_RECORDED,
 }
 
 class ActionPlanAppointmentEvent(
@@ -57,15 +57,15 @@ class ActionPlanAppointmentEventPublisher(
     )
   }
 
-  fun behaviourRecordedEvent(session: DeliverySession) {
-    applicationEventPublisher.publishEvent(
-      ActionPlanAppointmentEvent.from(this, ActionPlanAppointmentEventType.BEHAVIOUR_RECORDED, session, getAppointmentURL(session)),
-    )
-  }
-
   fun sessionFeedbackRecordedEvent(session: DeliverySession) {
     applicationEventPublisher.publishEvent(
       ActionPlanAppointmentEvent.from(this, ActionPlanAppointmentEventType.SESSION_FEEDBACK_RECORDED, session, getAppointmentURL(session)),
+    )
+  }
+
+  fun appointmentFeedbackRecordedEvent(session: DeliverySession) {
+    applicationEventPublisher.publishEvent(
+      ActionPlanAppointmentEvent.from(this, ActionPlanAppointmentEventType.APPOINTMENT_FEEDBACK_RECORDED, session, getAppointmentURL(session)),
     )
   }
 

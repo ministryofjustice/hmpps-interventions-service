@@ -45,24 +45,7 @@ class AppointmentEventPublisherTest {
   }
 
   @Test
-  fun `builds an appointment behaviour recorded event and publishes it`() {
-    val appointment = appointmentFactory.create()
-
-    publisher.behaviourRecordedEvent(appointment, true, AppointmentType.SUPPLIER_ASSESSMENT)
-
-    val eventCaptor = argumentCaptor<AppointmentEvent>()
-    verify(eventPublisher).publishEvent(eventCaptor.capture())
-    val event = eventCaptor.firstValue
-
-    Assertions.assertThat(event.source).isSameAs(publisher)
-    Assertions.assertThat(event.type).isSameAs(AppointmentEventType.BEHAVIOUR_RECORDED)
-    Assertions.assertThat(event.appointment).isSameAs(appointment)
-    Assertions.assertThat(event.detailUrl).isEqualTo("http://localhost/sent-referral/123/supplier-assessment")
-    Assertions.assertThat(event.notifyPP).isTrue
-  }
-
-  @Test
-  fun `builds an appointment session feedback event and publishes it`() {
+  fun `builds an appointment session feedback recorded event and publishes it`() {
     val appointment = appointmentFactory.create()
 
     publisher.sessionFeedbackRecordedEvent(appointment, true, AppointmentType.SUPPLIER_ASSESSMENT)
@@ -73,6 +56,23 @@ class AppointmentEventPublisherTest {
 
     Assertions.assertThat(event.source).isSameAs(publisher)
     Assertions.assertThat(event.type).isSameAs(AppointmentEventType.SESSION_FEEDBACK_RECORDED)
+    Assertions.assertThat(event.appointment).isSameAs(appointment)
+    Assertions.assertThat(event.detailUrl).isEqualTo("http://localhost/sent-referral/123/supplier-assessment")
+    Assertions.assertThat(event.notifyPP).isTrue
+  }
+
+  @Test
+  fun `builds an appointment appointment feedback event and publishes it`() {
+    val appointment = appointmentFactory.create()
+
+    publisher.appointmentFeedbackRecordedEvent(appointment, true, AppointmentType.SUPPLIER_ASSESSMENT)
+
+    val eventCaptor = argumentCaptor<AppointmentEvent>()
+    verify(eventPublisher).publishEvent(eventCaptor.capture())
+    val event = eventCaptor.firstValue
+
+    Assertions.assertThat(event.source).isSameAs(publisher)
+    Assertions.assertThat(event.type).isSameAs(AppointmentEventType.APPOINTMENT_FEEDBACK_RECORDED)
     Assertions.assertThat(event.appointment).isSameAs(appointment)
     Assertions.assertThat(event.detailUrl).isEqualTo("http://localhost/sent-referral/123/supplier-assessment")
     Assertions.assertThat(event.notifyPP).isTrue

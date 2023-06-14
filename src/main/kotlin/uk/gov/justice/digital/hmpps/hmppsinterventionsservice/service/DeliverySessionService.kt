@@ -79,7 +79,9 @@ class DeliverySessionService(
     attended: Attended? = null,
     attendanceFailureInformation: String? = null,
     notifyProbationPractitioner: Boolean? = null,
-    behaviourDescription: String? = null,
+    sessionSummary: String? = null,
+    sessionResponse: String? = null,
+    sessionConcerns: String? = null,
   ): DeliverySession {
     val session = getDeliverySession(referralId, sessionNumber) ?: throw EntityNotFoundException("Session not found for referral [referralId=$referralId, sessionNumber=$sessionNumber]")
     val existingAppointment = session.currentAppointment?.let {
@@ -115,7 +117,7 @@ class DeliverySessionService(
       appointmentRepository.save(existingAppointment)
     }
     return scheduleDeliverySessionAppointment(
-      session, appointment, existingAppointment, appointmentTime, durationInMinutes, appointmentDeliveryType, createdBy, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode, attended, attendanceFailureInformation, notifyProbationPractitioner, behaviourDescription,
+      session, appointment, existingAppointment, appointmentTime, durationInMinutes, appointmentDeliveryType, createdBy, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode, attended, attendanceFailureInformation, notifyProbationPractitioner, sessionSummary, sessionResponse, sessionConcerns,
     )
   }
 
@@ -133,7 +135,9 @@ class DeliverySessionService(
     attended: Attended? = null,
     attendanceFailureInformation: String? = null,
     notifyProbationPractitioner: Boolean? = null,
-    behaviourDescription: String? = null,
+    sessionSummary: String? = null,
+    sessionResponse: String? = null,
+    sessionConcerns: String? = null,
   ): DeliverySession {
     val session = getDeliverySession(referralId, sessionNumber) ?: throw EntityNotFoundException("Session not found for referral [referralId=$referralId, sessionNumber=$sessionNumber]")
     val existingAppointment = session.currentAppointment
@@ -150,7 +154,7 @@ class DeliverySessionService(
       referral = session.referral,
     )
     return scheduleDeliverySessionAppointment(
-      session, appointment, existingAppointment, appointmentTime, durationInMinutes, appointmentDeliveryType, updatedBy, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode, attended, attendanceFailureInformation, notifyProbationPractitioner, behaviourDescription,
+      session, appointment, existingAppointment, appointmentTime, durationInMinutes, appointmentDeliveryType, updatedBy, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode, attended, attendanceFailureInformation, notifyProbationPractitioner, sessionSummary, sessionResponse, sessionConcerns,
     )
   }
 
@@ -168,7 +172,9 @@ class DeliverySessionService(
     attended: Attended? = null,
     attendanceFailureInformation: String? = null,
     notifyProbationPractitioner: Boolean? = null,
-    behaviourDescription: String? = null,
+    sessionSummary: String? = null,
+    sessionResponse: String? = null,
+    sessionConcerns: String? = null,
   ): DeliverySession {
     if (appointmentTime.isBefore(OffsetDateTime.now()) && attended == null) {
       throw IllegalArgumentException("Appointment feedback must be provided for appointments in the past.")
@@ -197,7 +203,7 @@ class DeliverySessionService(
     deliverySession.appointments.add(toSchedule)
     return deliverySessionRepository.saveAndFlush(deliverySession).also {
       // Occurring after saving the session to ensure that session has the latest appointment attached when publishing the session feedback event.
-      setAttendanceAndBehaviourIfHistoricAppointment(deliverySession, toSchedule, attended, attendanceFailureInformation, behaviourDescription, notifyProbationPractitioner, scheduledBy)
+      setAttendanceAndFeedbackIfHistoricAppointment(deliverySession, toSchedule, attended, attendanceFailureInformation, sessionSummary, sessionResponse, sessionConcerns, notifyProbationPractitioner, scheduledBy)
     }
   }
 
@@ -215,7 +221,9 @@ class DeliverySessionService(
     attended: Attended? = null,
     attendanceFailureInformation: String? = null,
     notifyProbationPractitioner: Boolean? = null,
-    behaviourDescription: String? = null,
+    sessionSummary: String? = null,
+    sessionResponse: String? = null,
+    sessionConcerns: String? = null,
   ): DeliverySession {
     val session = getDeliverySessionByActionPlanIdOrThrowException(actionPlanId, sessionNumber)
     val existingAppointment = session.currentAppointment
@@ -260,12 +268,12 @@ class DeliverySessionService(
     session.appointments.add(appointment)
     return deliverySessionRepository.saveAndFlush(session).also {
       // Occurring after saving the session to ensure that session has the latest appointment attached when publishing the session feedback event.
-      setAttendanceAndBehaviourIfHistoricAppointment(session, appointment, attended, attendanceFailureInformation, behaviourDescription, notifyProbationPractitioner, updatedBy)
+      setAttendanceAndFeedbackIfHistoricAppointment(session, appointment, attended, attendanceFailureInformation, sessionSummary, sessionResponse, sessionConcerns, notifyProbationPractitioner, updatedBy)
     }
   }
 
   @Deprecated("Deprecated in favour of method that uses common AppointmentService")
-  fun recordAppointmentAttendance(
+  fun recordAttendanceFeedback(
     actor: AuthUser,
     actionPlanId: UUID,
     sessionNumber: Int,
@@ -285,7 +293,7 @@ class DeliverySessionService(
   }
 
   // TODO: Returning Pair because Appointment does not link to DeliverySession. Suggestion to create a new DeliverySessionAppointment entity (it is currently embedded in DeliverySession)
-  fun recordAppointmentAttendance(
+  fun recordAttendanceFeedback(
     referralId: UUID,
     appointmentId: UUID,
     actor: AuthUser,
@@ -301,11 +309,13 @@ class DeliverySessionService(
   }
 
   @Deprecated("Deprecated in favour of method that uses common AppointmentService")
-  fun recordBehaviour(
+  fun recordSessionFeedback(
     actor: AuthUser,
     actionPlanId: UUID,
     sessionNumber: Int,
-    behaviourDescription: String,
+    sessionSummary: String,
+    sessionResponse: String,
+    sessionConcerns: String?,
     notifyProbationPractitioner: Boolean,
   ): DeliverySession {
     val session = getDeliverySessionByActionPlanIdOrThrowException(actionPlanId, sessionNumber)
@@ -316,32 +326,34 @@ class DeliverySessionService(
       throw ResponseStatusException(HttpStatus.CONFLICT, "session feedback has already been submitted for this session")
     }
 
-    setBehaviourFields(appointment, behaviourDescription, notifyProbationPractitioner, actor)
+    setFeedbackFields(appointment, sessionSummary, sessionResponse, sessionConcerns, notifyProbationPractitioner, actor)
     appointmentRepository.save(appointment)
     return deliverySessionRepository.save(session)
   }
 
-  fun recordAppointmentBehaviour(
+  fun recordSessionFeedback(
     referralId: UUID,
     appointmentId: UUID,
     actor: AuthUser,
-    behaviourDescription: String,
+    sessionSummary: String,
+    sessionResponse: String,
+    sessionConcerns: String?,
     notifyProbationPractitioner: Boolean,
   ): Pair<DeliverySession, Appointment> {
     val sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
-    val updatedAppointment = appointmentService.recordBehaviour(sessionAndAppointment.second, behaviourDescription, notifyProbationPractitioner, actor)
+    val updatedAppointment = appointmentService.recordSessionFeedback(sessionAndAppointment.second, sessionSummary, sessionResponse, sessionConcerns, notifyProbationPractitioner, actor)
     return Pair(sessionAndAppointment.first, updatedAppointment)
   }
 
   @Deprecated("Deprecated in favour of method that uses common AppointmentService")
-  fun submitSessionFeedback(actionPlanId: UUID, sessionNumber: Int, submitter: AuthUser): DeliverySession {
+  fun submitAppointmentFeedback(actionPlanId: UUID, sessionNumber: Int, submitter: AuthUser): DeliverySession {
     val session = getDeliverySessionByActionPlanIdOrThrowException(actionPlanId, sessionNumber)
     val appointment = session.currentAppointment
-    this.submitSessionFeedback(session, appointment, submitter)
+    this.submitAppointmentFeedback(session, appointment, submitter)
     return session
   }
 
-  private fun submitSessionFeedback(session: DeliverySession, appointment: Appointment?, submitter: AuthUser) {
+  private fun submitAppointmentFeedback(session: DeliverySession, appointment: Appointment?, submitter: AuthUser) {
     if (appointment?.appointmentFeedbackSubmittedAt != null) {
       throw ResponseStatusException(HttpStatus.CONFLICT, "session feedback has already been submitted for this session")
     }
@@ -361,20 +373,20 @@ class DeliverySessionService(
 
     actionPlanAppointmentEventPublisher.attendanceRecordedEvent(session)
 
-    if (appointment.attendanceBehaviourSubmittedAt != null) { // excluding the case of non attendance
-      actionPlanAppointmentEventPublisher.behaviourRecordedEvent(session)
+    if (appointment.sessionFeedbackSubmittedAt != null) { // excluding the case of non attendance
+      actionPlanAppointmentEventPublisher.sessionFeedbackRecordedEvent(session)
     }
 
-    actionPlanAppointmentEventPublisher.sessionFeedbackRecordedEvent(session)
+    actionPlanAppointmentEventPublisher.appointmentFeedbackRecordedEvent(session)
   }
 
-  fun submitSessionFeedback(referralId: UUID, appointmentId: UUID, submitter: AuthUser): Pair<DeliverySession, Appointment> {
+  fun submitAppointmentFeedback(referralId: UUID, appointmentId: UUID, submitter: AuthUser): Pair<DeliverySession, Appointment> {
     val sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
     val appointment = sessionAndAppointment.second
     if (appointment.appointmentTime.isAfter(OffsetDateTime.now())) {
       throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot submit feedback for a future appointment [id=${appointment.id}]")
     }
-    val updatedAppointment = appointmentService.submitSessionFeedback(appointment, submitter, SERVICE_DELIVERY)
+    val updatedAppointment = appointmentService.submitAppointmentFeedback(appointment, submitter, SERVICE_DELIVERY)
     return Pair(sessionAndAppointment.first, updatedAppointment)
   }
 
@@ -386,21 +398,23 @@ class DeliverySessionService(
     return getDeliverySessionOrThrowException(referralId, sessionNumber)
   }
 
-  private fun setAttendanceAndBehaviourIfHistoricAppointment(
+  private fun setAttendanceAndFeedbackIfHistoricAppointment(
     session: DeliverySession,
     appointment: Appointment,
     attended: Attended?,
     attendanceFailureInformation: String?,
-    behaviourDescription: String?,
+    sessionSummary: String?,
+    sessionResponse: String?,
+    sessionConcerns: String?,
     notifyProbationPractitioner: Boolean?,
     updatedBy: AuthUser,
   ) {
     attended?.let {
       setAttendanceFields(appointment, attended, attendanceFailureInformation, updatedBy)
       if (attended != Attended.NO) {
-        setBehaviourFields(appointment, behaviourDescription!!, notifyProbationPractitioner!!, updatedBy)
+        setFeedbackFields(appointment, sessionSummary!!, sessionResponse!!, sessionConcerns, notifyProbationPractitioner!!, updatedBy)
       }
-      this.submitSessionFeedback(session, appointment, updatedBy)
+      this.submitAppointmentFeedback(session, appointment, updatedBy)
     }
   }
   private fun setSuperseded(attended: Attended, appointment: Appointment) {
@@ -422,15 +436,19 @@ class DeliverySessionService(
     appointment.attendanceSubmittedBy = authUserRepository.save(actor)
   }
 
-  private fun setBehaviourFields(
+  private fun setFeedbackFields(
     appointment: Appointment,
-    behaviour: String,
+    sessionSummary: String,
+    sessionResponse: String,
+    sessionConcerns: String?,
     notifyProbationPractitioner: Boolean,
     actor: AuthUser,
   ) {
-    appointment.attendanceBehaviour = behaviour
-    appointment.attendanceBehaviourSubmittedAt = OffsetDateTime.now()
-    appointment.attendanceBehaviourSubmittedBy = authUserRepository.save(actor)
+    appointment.sessionSummary = sessionSummary
+    appointment.sessionResponse = sessionResponse
+    appointment.sessionConcerns = sessionConcerns
+    appointment.sessionFeedbackSubmittedAt = OffsetDateTime.now()
+    appointment.sessionFeedbackSubmittedBy = authUserRepository.save(actor)
     appointment.notifyPPOfAttendanceBehaviour = notifyProbationPractitioner
   }
 

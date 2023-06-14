@@ -13,11 +13,11 @@ import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.LocationMapper
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AttendanceFeedbackRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DeliverySessionAppointmentDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DeliverySessionAppointmentScheduleDetailsDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DeliverySessionAppointmentScheduleDetailsRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DeliverySessionDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.RecordAppointmentBehaviourDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentAttendanceDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SessionFeedbackRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AppointmentService
@@ -60,10 +60,12 @@ class DeliverySessionController(
       updateAppointmentDTO.sessionType,
       updateAppointmentDTO.appointmentDeliveryAddress,
       updateAppointmentDTO.npsOfficeCode,
-      updateAppointmentDTO.appointmentAttendance?.attended,
-      updateAppointmentDTO.appointmentAttendance?.attendanceFailureInformation,
-      updateAppointmentDTO.appointmentBehaviour?.notifyProbationPractitioner,
-      updateAppointmentDTO.appointmentBehaviour?.behaviourDescription,
+      updateAppointmentDTO.attendanceFeedback?.attended,
+      updateAppointmentDTO.attendanceFeedback?.attendanceFailureInformation,
+      updateAppointmentDTO.sessionFeedback?.notifyProbationPractitioner,
+      updateAppointmentDTO.sessionFeedback?.sessionSummary,
+      updateAppointmentDTO.sessionFeedback?.sessionResponse,
+      updateAppointmentDTO.sessionFeedback?.sessionConcerns,
     )
     return DeliverySessionDTO.from(deliverySession)
   }
@@ -104,36 +106,38 @@ class DeliverySessionController(
   fun recordAttendance(
     @PathVariable(name = "id") actionPlanId: UUID,
     @PathVariable sessionNumber: Int,
-    @RequestBody update: UpdateAppointmentAttendanceDTO,
+    @RequestBody request: AttendanceFeedbackRequestDTO,
     authentication: JwtAuthenticationToken,
   ): DeliverySessionDTO {
     val user = userMapper.fromToken(authentication)
-    val updatedSession = deliverySessionService.recordAppointmentAttendance(
+    val updatedSession = deliverySessionService.recordAttendanceFeedback(
       user,
       actionPlanId,
       sessionNumber,
-      update.attended,
-      update.attendanceFailureInformation,
+      request.attended,
+      request.attendanceFailureInformation,
     )
 
     return DeliverySessionDTO.from(updatedSession)
   }
 
-  @Deprecated("superseded by PUT /referral/{referralId}/delivery-session-appointments/{appointmentId}/behaviour")
-  @PostMapping("/action-plan/{actionPlanId}/appointment/{sessionNumber}/record-behaviour")
-  fun recordBehaviour(
+  @Deprecated("superseded by PUT /referral/{referralId}/delivery-session-appointments/{appointmentId}/feedback")
+  @PostMapping("/action-plan/{actionPlanId}/appointment/{sessionNumber}/record-session-feedback")
+  fun recordSessionFeedback(
     @PathVariable actionPlanId: UUID,
     @PathVariable sessionNumber: Int,
-    @RequestBody recordBehaviourDTO: RecordAppointmentBehaviourDTO,
+    @RequestBody request: SessionFeedbackRequestDTO,
     authentication: JwtAuthenticationToken,
   ): DeliverySessionDTO {
     val user = userMapper.fromToken(authentication)
-    val updatedSession = deliverySessionService.recordBehaviour(
+    val updatedSession = deliverySessionService.recordSessionFeedback(
       user,
       actionPlanId,
       sessionNumber,
-      recordBehaviourDTO.behaviourDescription,
-      recordBehaviourDTO.notifyProbationPractitioner,
+      request.sessionSummary,
+      request.sessionResponse,
+      request.sessionConcerns,
+      request.notifyProbationPractitioner,
     )
     return DeliverySessionDTO.from(updatedSession)
   }
@@ -146,7 +150,7 @@ class DeliverySessionController(
     authentication: JwtAuthenticationToken,
   ): DeliverySessionDTO {
     val user = userMapper.fromToken(authentication)
-    return DeliverySessionDTO.from(deliverySessionService.submitSessionFeedback(actionPlanId, sessionNumber, user))
+    return DeliverySessionDTO.from(deliverySessionService.submitAppointmentFeedback(actionPlanId, sessionNumber, user))
   }
 
   @GetMapping("/referral/{referralId}/delivery-session-appointments/{appointmentId}")
@@ -186,7 +190,7 @@ class DeliverySessionController(
   @PostMapping("/referral/{referralId}/delivery-session-appointments")
   fun scheduleNewDeliverySessionAppointment(
     @PathVariable(name = "referralId") referralId: UUID,
-    @RequestBody newDeliverySessionAppointmentRequest: DeliverySessionAppointmentScheduleDetailsDTO,
+    @RequestBody request: DeliverySessionAppointmentScheduleDetailsRequestDTO,
     authentication: JwtAuthenticationToken,
   ): DeliverySessionAppointmentDTO {
     val user = userMapper.fromToken(authentication)
@@ -197,18 +201,20 @@ class DeliverySessionController(
     referralAccessChecker.forUser(referral, user)
     val deliverySession = deliverySessionService.scheduleNewDeliverySessionAppointment(
       referralId,
-      newDeliverySessionAppointmentRequest.sessionId,
-      newDeliverySessionAppointmentRequest.appointmentTime,
-      newDeliverySessionAppointmentRequest.durationInMinutes,
+      request.sessionId,
+      request.appointmentTime,
+      request.durationInMinutes,
       user,
-      newDeliverySessionAppointmentRequest.appointmentDeliveryType,
-      newDeliverySessionAppointmentRequest.sessionType,
-      newDeliverySessionAppointmentRequest.appointmentDeliveryAddress,
-      newDeliverySessionAppointmentRequest.npsOfficeCode,
-      newDeliverySessionAppointmentRequest.appointmentAttendance?.attended,
-      newDeliverySessionAppointmentRequest.appointmentAttendance?.attendanceFailureInformation,
-      newDeliverySessionAppointmentRequest.appointmentBehaviour?.notifyProbationPractitioner,
-      newDeliverySessionAppointmentRequest.appointmentBehaviour?.behaviourDescription,
+      request.appointmentDeliveryType,
+      request.sessionType,
+      request.appointmentDeliveryAddress,
+      request.npsOfficeCode,
+      request.attendanceFeedback?.attended,
+      request.attendanceFeedback?.attendanceFailureInformation,
+      request.sessionFeedback?.notifyProbationPractitioner,
+      request.sessionFeedback?.sessionSummary,
+      request.sessionFeedback?.sessionResponse,
+      request.sessionFeedback?.sessionConcerns,
     )
     return DeliverySessionAppointmentDTO.from(deliverySession.sessionNumber, deliverySession.currentAppointment!!)
   }
@@ -217,7 +223,7 @@ class DeliverySessionController(
   fun rescheduleDeliverySessionAppointment(
     @PathVariable(name = "referralId") referralId: UUID,
     @PathVariable(name = "appointmentId") appointmentId: UUID,
-    @RequestBody newDeliverySessionAppointmentRequest: DeliverySessionAppointmentScheduleDetailsDTO,
+    @RequestBody request: DeliverySessionAppointmentScheduleDetailsRequestDTO,
     authentication: JwtAuthenticationToken,
   ): DeliverySessionAppointmentDTO {
     val user = userMapper.fromToken(authentication)
@@ -228,28 +234,30 @@ class DeliverySessionController(
     referralAccessChecker.forUser(referral, user)
     val deliverySession = deliverySessionService.rescheduleDeliverySessionAppointment(
       referralId,
-      newDeliverySessionAppointmentRequest.sessionId,
+      request.sessionId,
       appointmentId,
-      newDeliverySessionAppointmentRequest.appointmentTime,
-      newDeliverySessionAppointmentRequest.durationInMinutes,
+      request.appointmentTime,
+      request.durationInMinutes,
       user,
-      newDeliverySessionAppointmentRequest.appointmentDeliveryType,
-      newDeliverySessionAppointmentRequest.sessionType,
-      newDeliverySessionAppointmentRequest.appointmentDeliveryAddress,
-      newDeliverySessionAppointmentRequest.npsOfficeCode,
-      newDeliverySessionAppointmentRequest.appointmentAttendance?.attended,
-      newDeliverySessionAppointmentRequest.appointmentAttendance?.attendanceFailureInformation,
-      newDeliverySessionAppointmentRequest.appointmentBehaviour?.notifyProbationPractitioner,
-      newDeliverySessionAppointmentRequest.appointmentBehaviour?.behaviourDescription,
+      request.appointmentDeliveryType,
+      request.sessionType,
+      request.appointmentDeliveryAddress,
+      request.npsOfficeCode,
+      request.attendanceFeedback?.attended,
+      request.attendanceFeedback?.attendanceFailureInformation,
+      request.sessionFeedback?.notifyProbationPractitioner,
+      request.sessionFeedback?.sessionSummary,
+      request.sessionFeedback?.sessionResponse,
+      request.sessionFeedback?.sessionConcerns,
     )
     return DeliverySessionAppointmentDTO.from(deliverySession.sessionNumber, deliverySession.currentAppointment!!)
   }
 
   @PutMapping("/referral/{referralId}/delivery-session-appointments/{appointmentId}/attendance")
-  fun recordAttendance(
+  fun recordAttendanceFeedback(
     @PathVariable(name = "referralId") referralId: UUID,
     @PathVariable(name = "appointmentId") appointmentId: UUID,
-    @RequestBody update: UpdateAppointmentAttendanceDTO,
+    @RequestBody request: AttendanceFeedbackRequestDTO,
     authentication: JwtAuthenticationToken,
   ): DeliverySessionAppointmentDTO {
     val user = userMapper.fromToken(authentication)
@@ -258,21 +266,21 @@ class DeliverySessionController(
       "sent referral not found [referralId=$referralId]",
     )
     referralAccessChecker.forUser(referral, user)
-    val updatedSessionAppointment = deliverySessionService.recordAppointmentAttendance(
+    val updatedSessionAppointment = deliverySessionService.recordAttendanceFeedback(
       referralId,
       appointmentId,
       user,
-      update.attended,
-      update.attendanceFailureInformation,
+      request.attended,
+      request.attendanceFailureInformation,
     )
     return DeliverySessionAppointmentDTO.from(updatedSessionAppointment.first.sessionNumber, updatedSessionAppointment.second)
   }
 
-  @PutMapping("/referral/{referralId}/delivery-session-appointments/{appointmentId}/behaviour")
-  fun recordBehaviour(
+  @PutMapping("/referral/{referralId}/delivery-session-appointments/{appointmentId}/session-feedback")
+  fun recordSessionFeedback(
     @PathVariable(name = "referralId") referralId: UUID,
     @PathVariable(name = "appointmentId") appointmentId: UUID,
-    @RequestBody recordBehaviourDTO: RecordAppointmentBehaviourDTO,
+    @RequestBody request: SessionFeedbackRequestDTO,
     authentication: JwtAuthenticationToken,
   ): DeliverySessionAppointmentDTO {
     val user = userMapper.fromToken(authentication)
@@ -281,12 +289,14 @@ class DeliverySessionController(
       "sent referral not found [referralId=$referralId]",
     )
     referralAccessChecker.forUser(referral, user)
-    val updatedSessionAppointment = deliverySessionService.recordAppointmentBehaviour(
+    val updatedSessionAppointment = deliverySessionService.recordSessionFeedback(
       referralId,
       appointmentId,
       user,
-      recordBehaviourDTO.behaviourDescription,
-      recordBehaviourDTO.notifyProbationPractitioner,
+      request.sessionSummary,
+      request.sessionResponse,
+      request.sessionConcerns,
+      request.notifyProbationPractitioner,
     )
     return DeliverySessionAppointmentDTO.from(updatedSessionAppointment.first.sessionNumber, updatedSessionAppointment.second)
   }
@@ -303,7 +313,7 @@ class DeliverySessionController(
       "sent referral not found [referralId=$referralId]",
     )
     referralAccessChecker.forUser(referral, user)
-    val sessionAndAppointment = deliverySessionService.submitSessionFeedback(referralId, appointmentId, user)
+    val sessionAndAppointment = deliverySessionService.submitAppointmentFeedback(referralId, appointmentId, user)
     return DeliverySessionAppointmentDTO.from(sessionAndAppointment.first.sessionNumber, sessionAndAppointment.second)
   }
 }

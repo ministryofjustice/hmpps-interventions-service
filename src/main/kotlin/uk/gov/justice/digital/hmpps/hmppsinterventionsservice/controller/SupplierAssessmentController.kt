@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AppointmentDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.RecordAppointmentBehaviourDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentAttendanceDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AttendanceFeedbackRequestDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SessionFeedbackRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentType
@@ -50,10 +50,12 @@ class SupplierAssessmentController(
         updateAppointmentDTO.sessionType,
         updateAppointmentDTO.appointmentDeliveryAddress,
         updateAppointmentDTO.npsOfficeCode,
-        updateAppointmentDTO.appointmentAttendance?.attended,
-        updateAppointmentDTO.appointmentAttendance?.attendanceFailureInformation,
-        updateAppointmentDTO.appointmentBehaviour?.notifyProbationPractitioner,
-        updateAppointmentDTO.appointmentBehaviour?.behaviourDescription,
+        updateAppointmentDTO.attendanceFeedback?.attended,
+        updateAppointmentDTO.attendanceFeedback?.attendanceFailureInformation,
+        updateAppointmentDTO.sessionFeedback?.notifyProbationPractitioner,
+        updateAppointmentDTO.sessionFeedback?.sessionSummary,
+        updateAppointmentDTO.sessionFeedback?.sessionResponse,
+        updateAppointmentDTO.sessionFeedback?.sessionConcerns,
       ),
     )
   }
@@ -101,20 +103,22 @@ class SupplierAssessmentController(
     return AppointmentDTO.from(appointment)
   }
 
-  @PutMapping("/referral/{referralId}/supplier-assessment/record-behaviour")
-  fun recordAppointmentBehaviour(
+  @PutMapping("/referral/{referralId}/supplier-assessment/record-session-feedback")
+  fun recordSessionFeedback(
     @PathVariable referralId: UUID,
-    @RequestBody recordBehaviourDTO: RecordAppointmentBehaviourDTO,
+    @RequestBody request: SessionFeedbackRequestDTO,
     authentication: JwtAuthenticationToken,
   ): AppointmentDTO {
     val user = userMapper.fromToken(authentication)
     val supplierAssessmentAppointment = getSupplierAssessmentAppointment(referralId, user)
 
     return AppointmentDTO.from(
-      appointmentService.recordBehaviour(
+      appointmentService.recordSessionFeedback(
         supplierAssessmentAppointment,
-        recordBehaviourDTO.behaviourDescription,
-        recordBehaviourDTO.notifyProbationPractitioner,
+        request.sessionSummary,
+        request.sessionResponse,
+        request.sessionConcerns,
+        request.notifyProbationPractitioner,
         user,
       ),
     )
@@ -123,15 +127,15 @@ class SupplierAssessmentController(
   @PutMapping("/referral/{referralId}/supplier-assessment/record-attendance")
   fun recordAttendance(
     @PathVariable referralId: UUID,
-    @RequestBody update: UpdateAppointmentAttendanceDTO,
+    @RequestBody request: AttendanceFeedbackRequestDTO,
     authentication: JwtAuthenticationToken,
   ): AppointmentDTO {
     val submittedBy = userMapper.fromToken(authentication)
     val supplierAssessmentAppointment = getSupplierAssessmentAppointment(referralId, submittedBy)
     val updatedAppointment = appointmentService.recordAppointmentAttendance(
       supplierAssessmentAppointment,
-      update.attended,
-      update.attendanceFailureInformation,
+      request.attended,
+      request.attendanceFailureInformation,
       submittedBy,
     )
     return AppointmentDTO.from(updatedAppointment)
@@ -144,7 +148,7 @@ class SupplierAssessmentController(
   ): AppointmentDTO {
     val user = userMapper.fromToken(authentication)
     val supplierAssessmentAppointment = getSupplierAssessmentAppointment(referralId, user)
-    return AppointmentDTO.from(appointmentService.submitSessionFeedback(supplierAssessmentAppointment, user, AppointmentType.SUPPLIER_ASSESSMENT))
+    return AppointmentDTO.from(appointmentService.submitAppointmentFeedback(supplierAssessmentAppointment, user, AppointmentType.SUPPLIER_ASSESSMENT))
   }
 
   private fun getSupplierAssessmentAppointment(referralId: UUID, user: AuthUser): Appointment {

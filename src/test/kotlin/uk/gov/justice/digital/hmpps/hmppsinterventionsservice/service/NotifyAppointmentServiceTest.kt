@@ -77,25 +77,25 @@ class NotifyAppointmentServiceTest {
   }
 
   @Test
-  fun `appointment behaviour recorded event does not send email when user details are not available`() {
+  fun `appointment session feedback recorded event does not send email when user details are not available`() {
     whenever(referralService.getResponsibleProbationPractitioner(any())).thenThrow(RuntimeException::class.java)
     assertThrows<RuntimeException> {
-      notifyService().onApplicationEvent(appointmentEvent(AppointmentEventType.BEHAVIOUR_RECORDED, true))
+      notifyService().onApplicationEvent(appointmentEvent(AppointmentEventType.SESSION_FEEDBACK_RECORDED, true))
     }
     verifyNoInteractions(emailSender)
   }
 
   @Test
-  fun `appointment behaviour recorded event does not send email when notifyPP is false`() {
-    notifyService().onApplicationEvent(appointmentEvent(AppointmentEventType.BEHAVIOUR_RECORDED, false))
+  fun `appointment session feedback recorded event does not send email when notifyPP is false`() {
+    notifyService().onApplicationEvent(appointmentEvent(AppointmentEventType.SESSION_FEEDBACK_RECORDED, false))
     verifyNoInteractions(emailSender)
   }
 
   @Test
-  fun `appointment behaviour recorded event calls email client`() {
+  fun `appointment session feedback recorded event calls email client`() {
     whenever(referralService.getResponsibleProbationPractitioner(any())).thenReturn(ResponsibleProbationPractitioner("abc", "abc@abc.com", null, null, "def"))
 
-    notifyService().onApplicationEvent(appointmentEvent(AppointmentEventType.BEHAVIOUR_RECORDED, true))
+    notifyService().onApplicationEvent(appointmentEvent(AppointmentEventType.SESSION_FEEDBACK_RECORDED, true))
     val personalisationCaptor = argumentCaptor<Map<String, String>>()
     verify(emailSender).sendEmail(eq("concerningBehaviourTemplate"), eq("abc@abc.com"), personalisationCaptor.capture())
     Assertions.assertThat(personalisationCaptor.firstValue["ppFirstName"]).isEqualTo("abc")
@@ -105,7 +105,7 @@ class NotifyAppointmentServiceTest {
 
   @Test
   fun `appointment event does not send email for appointment event time service delivery`() {
-    notifyService().onApplicationEvent(appointmentEvent(AppointmentEventType.BEHAVIOUR_RECORDED, false, AppointmentType.SERVICE_DELIVERY))
+    notifyService().onApplicationEvent(appointmentEvent(AppointmentEventType.SESSION_FEEDBACK_RECORDED, false, AppointmentType.SERVICE_DELIVERY))
     verifyNoInteractions(emailSender)
   }
 

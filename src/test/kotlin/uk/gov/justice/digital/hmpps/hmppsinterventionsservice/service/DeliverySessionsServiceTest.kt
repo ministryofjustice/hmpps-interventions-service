@@ -143,11 +143,12 @@ internal class DeliverySessionsServiceTest {
     assertThat(updatedSession.currentAppointment?.attended).isNull()
     assertThat(updatedSession.currentAppointment?.additionalAttendanceInformation).isNull()
     assertThat(updatedSession.currentAppointment?.notifyPPOfAttendanceBehaviour).isNull()
-    assertThat(updatedSession.currentAppointment?.attendanceBehaviour).isNull()
+    assertThat(updatedSession.currentAppointment?.sessionSummary).isNull()
+    assertThat(updatedSession.currentAppointment?.sessionResponse).isNull()
     assertThat(updatedSession.currentAppointment?.attendanceSubmittedAt).isNull()
     assertThat(updatedSession.currentAppointment?.attendanceSubmittedBy).isNull()
-    assertThat(updatedSession.currentAppointment?.attendanceBehaviourSubmittedAt).isNull()
-    assertThat(updatedSession.currentAppointment?.attendanceBehaviourSubmittedBy).isNull()
+    assertThat(updatedSession.currentAppointment?.sessionFeedbackSubmittedAt).isNull()
+    assertThat(updatedSession.currentAppointment?.sessionFeedbackSubmittedBy).isNull()
     assertThat(updatedSession.currentAppointment?.appointmentFeedbackSubmittedAt).isNull()
     assertThat(updatedSession.currentAppointment?.appointmentFeedbackSubmittedBy).isNull()
   }
@@ -182,24 +183,26 @@ internal class DeliverySessionsServiceTest {
       Attended.YES,
       "attendance failure information",
       false,
-      "description",
+      "summary",
+      "response",
     )
 
     verify(appointmentService, times(1)).createOrUpdateAppointmentDeliveryDetails(any(), eq(AppointmentDeliveryType.PHONE_CALL), eq(AppointmentSessionType.ONE_TO_ONE), isNull(), isNull())
     verify(actionPlanAppointmentEventPublisher).attendanceRecordedEvent(updatedSession)
-    verify(actionPlanAppointmentEventPublisher).behaviourRecordedEvent(updatedSession)
     verify(actionPlanAppointmentEventPublisher).sessionFeedbackRecordedEvent(updatedSession)
+    verify(actionPlanAppointmentEventPublisher).appointmentFeedbackRecordedEvent(updatedSession)
     assertThat(updatedSession.currentAppointment?.appointmentTime).isEqualTo(appointmentTime)
     assertThat(updatedSession.currentAppointment?.durationInMinutes).isEqualTo(durationInMinutes)
     assertThat(updatedSession.currentAppointment?.createdBy?.userName).isEqualTo("scheduler")
     assertThat(updatedSession.currentAppointment?.attended).isEqualTo(Attended.YES)
     assertThat(updatedSession.currentAppointment?.attendanceFailureInformation).isEqualTo("attendance failure information")
     assertThat(updatedSession.currentAppointment?.notifyPPOfAttendanceBehaviour).isEqualTo(false)
-    assertThat(updatedSession.currentAppointment?.attendanceBehaviour).isEqualTo("description")
+    assertThat(updatedSession.currentAppointment?.sessionSummary).isEqualTo("summary")
+    assertThat(updatedSession.currentAppointment?.sessionResponse).isEqualTo("response")
     assertThat(updatedSession.currentAppointment?.attendanceSubmittedAt).isNotNull
     assertThat(updatedSession.currentAppointment?.attendanceSubmittedBy).isNotNull
-    assertThat(updatedSession.currentAppointment?.attendanceBehaviourSubmittedAt).isNotNull
-    assertThat(updatedSession.currentAppointment?.attendanceBehaviourSubmittedBy).isNotNull
+    assertThat(updatedSession.currentAppointment?.sessionFeedbackSubmittedAt).isNotNull
+    assertThat(updatedSession.currentAppointment?.sessionFeedbackSubmittedBy).isNotNull
     assertThat(updatedSession.currentAppointment?.appointmentFeedbackSubmittedAt).isNotNull
     assertThat(updatedSession.currentAppointment?.appointmentFeedbackSubmittedBy).isNotNull
   }
@@ -241,11 +244,12 @@ internal class DeliverySessionsServiceTest {
     assertThat(updatedSession.currentAppointment?.attended).isEqualTo(Attended.NO)
     assertThat(updatedSession.currentAppointment?.attendanceFailureInformation).isEqualTo("attendance failure information")
     assertThat(updatedSession.currentAppointment?.notifyPPOfAttendanceBehaviour).isNull()
-    assertThat(updatedSession.currentAppointment?.attendanceBehaviour).isNull()
+    assertThat(updatedSession.currentAppointment?.sessionSummary).isNull()
+    assertThat(updatedSession.currentAppointment?.sessionResponse).isNull()
     assertThat(updatedSession.currentAppointment?.attendanceSubmittedAt).isNotNull
     assertThat(updatedSession.currentAppointment?.attendanceSubmittedBy).isEqualTo(user)
-    assertThat(updatedSession.currentAppointment?.attendanceBehaviourSubmittedAt).isNull()
-    assertThat(updatedSession.currentAppointment?.attendanceBehaviourSubmittedBy).isNull()
+    assertThat(updatedSession.currentAppointment?.sessionFeedbackSubmittedAt).isNull()
+    assertThat(updatedSession.currentAppointment?.sessionFeedbackSubmittedBy).isNull()
     assertThat(updatedSession.currentAppointment?.appointmentFeedbackSubmittedAt).isNotNull
     assertThat(updatedSession.currentAppointment?.appointmentFeedbackSubmittedBy).isEqualTo(user)
   }
@@ -285,11 +289,12 @@ internal class DeliverySessionsServiceTest {
     assertThat(updatedSession.currentAppointment?.attended).isNull()
     assertThat(updatedSession.currentAppointment?.additionalAttendanceInformation).isNull()
     assertThat(updatedSession.currentAppointment?.notifyPPOfAttendanceBehaviour).isNull()
-    assertThat(updatedSession.currentAppointment?.attendanceBehaviour).isNull()
+    assertThat(updatedSession.currentAppointment?.sessionSummary).isNull()
+    assertThat(updatedSession.currentAppointment?.sessionResponse).isNull()
     assertThat(updatedSession.currentAppointment?.attendanceSubmittedAt).isNull()
     assertThat(updatedSession.currentAppointment?.attendanceSubmittedBy).isNull()
-    assertThat(updatedSession.currentAppointment?.attendanceBehaviourSubmittedAt).isNull()
-    assertThat(updatedSession.currentAppointment?.attendanceBehaviourSubmittedBy).isNull()
+    assertThat(updatedSession.currentAppointment?.sessionFeedbackSubmittedAt).isNull()
+    assertThat(updatedSession.currentAppointment?.sessionFeedbackSubmittedBy).isNull()
     assertThat(updatedSession.currentAppointment?.appointmentFeedbackSubmittedAt).isNull()
   }
 
@@ -469,7 +474,7 @@ internal class DeliverySessionsServiceTest {
     whenever(deliverySessionRepository.save(any())).thenReturn(existingSession)
 
     val actor = createActor("attendance_submitter")
-    val savedSession = deliverySessionsService.recordAppointmentAttendance(actor, actionPlanId, 1, attended, attendanceFailureInformation)
+    val savedSession = deliverySessionsService.recordAttendanceFeedback(actor, actionPlanId, 1, attended, attendanceFailureInformation)
     val argumentCaptor: ArgumentCaptor<DeliverySession> = ArgumentCaptor.forClass(DeliverySession::class.java)
 
 //    verify(appointmentEventPublisher).appointmentNotAttendedEvent(existingSession)
@@ -493,28 +498,29 @@ internal class DeliverySessionsServiceTest {
 
     val actor = createActor()
     val exception = assertThrows(EntityNotFoundException::class.java) {
-      deliverySessionsService.recordAppointmentAttendance(actor, actionPlanId, 1, attended, attendanceFailureInformation)
+      deliverySessionsService.recordAttendanceFeedback(actor, actionPlanId, 1, attended, attendanceFailureInformation)
     }
 
     assertThat(exception.message).isEqualTo("Action plan session not found [actionPlanId=$actionPlanId, sessionNumber=$sessionNumber]")
   }
 
   @Test
-  fun `updating session behaviour sets relevant fields`() {
+  fun `updating session feedback sets relevant fields`() {
     val actionPlanId = UUID.randomUUID()
     val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(any(), any())).thenReturn(session)
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
 
     val actor = createActor("behaviour_submitter")
-    val updatedSession = deliverySessionsService.recordBehaviour(actor, actionPlanId, 1, "not good", false)
+    val updatedSession = deliverySessionsService.recordSessionFeedback(actor, actionPlanId, 1, "activities", "not good", "concerns", false)
 
     verify(deliverySessionRepository, times(1)).save(session)
     assertThat(updatedSession).isSameAs(session)
-    assertThat(session.currentAppointment?.attendanceBehaviour).isEqualTo("not good")
+    assertThat(session.currentAppointment?.sessionResponse).isEqualTo("not good")
+    assertThat(session.currentAppointment?.sessionConcerns).isEqualTo("concerns")
     assertThat(session.currentAppointment?.notifyPPOfAttendanceBehaviour).isFalse
-    assertThat(session.currentAppointment?.attendanceBehaviourSubmittedAt).isNotNull
-    assertThat(session.currentAppointment?.attendanceBehaviourSubmittedBy?.userName).isEqualTo("behaviour_submitter")
+    assertThat(session.currentAppointment?.sessionFeedbackSubmittedAt).isNotNull
+    assertThat(session.currentAppointment?.sessionFeedbackSubmittedBy?.userName).isEqualTo("behaviour_submitter")
   }
 
   @Test
@@ -523,12 +529,12 @@ internal class DeliverySessionsServiceTest {
     whenever(deliverySessionRepository.findByReferralIdAndSessionNumber(any(), any())).thenReturn(null)
 
     assertThrows(EntityNotFoundException::class.java) {
-      deliverySessionsService.recordBehaviour(actor, UUID.randomUUID(), 1, "not good", false)
+      deliverySessionsService.recordSessionFeedback(actor, UUID.randomUUID(), 1, "activities", "not good", null, false)
     }
   }
 
   @Test
-  fun `session feedback cant be submitted more than once`() {
+  fun `appointment feedback cant be submitted more than once`() {
     val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
     val actionPlanId = UUID.randomUUID()
 
@@ -536,18 +542,18 @@ internal class DeliverySessionsServiceTest {
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
 
     val actor = createActor()
-    deliverySessionsService.recordAppointmentAttendance(actor, actionPlanId, 1, Attended.YES, "")
-    deliverySessionsService.recordBehaviour(actor, actionPlanId, 1, "bad", false)
+    deliverySessionsService.recordAttendanceFeedback(actor, actionPlanId, 1, Attended.YES, "")
+    deliverySessionsService.recordSessionFeedback(actor, actionPlanId, 1, "activities", "bad", null, false)
 
-    deliverySessionsService.submitSessionFeedback(actionPlanId, 1, actor)
+    deliverySessionsService.submitAppointmentFeedback(actionPlanId, 1, actor)
     val exception = assertThrows(ResponseStatusException::class.java) {
-      deliverySessionsService.submitSessionFeedback(actionPlanId, 1, actor)
+      deliverySessionsService.submitAppointmentFeedback(actionPlanId, 1, actor)
     }
     assertThat(exception.status).isEqualTo(HttpStatus.CONFLICT)
   }
 
   @Test
-  fun `session feedback can't be submitted without attendance`() {
+  fun `appointment feedback can't be submitted without attendance`() {
     val session = deliverySessionFactory.createScheduled()
     val actionPlanId = UUID.randomUUID()
 
@@ -555,16 +561,16 @@ internal class DeliverySessionsServiceTest {
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(session)
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
 
-    deliverySessionsService.recordBehaviour(actor, actionPlanId, 1, "bad", false)
+    deliverySessionsService.recordSessionFeedback(actor, actionPlanId, 1, "activities", "bad", null, false)
 
     val exception = assertThrows(ResponseStatusException::class.java) {
-      deliverySessionsService.submitSessionFeedback(actionPlanId, 1, actor)
+      deliverySessionsService.submitAppointmentFeedback(actionPlanId, 1, actor)
     }
     assertThat(exception.status).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY)
   }
 
   @Test
-  fun `session feedback can be submitted and stores time and actor`() {
+  fun `appointment feedback can be submitted and stores time and actor`() {
     val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
     val actionPlanId = UUID.randomUUID()
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(
@@ -573,11 +579,11 @@ internal class DeliverySessionsServiceTest {
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
 
     val user = createActor()
-    deliverySessionsService.recordAppointmentAttendance(user, actionPlanId, 1, Attended.YES, "")
-    deliverySessionsService.recordBehaviour(user, actionPlanId, 1, "bad", true)
+    deliverySessionsService.recordAttendanceFeedback(user, actionPlanId, 1, Attended.YES, "")
+    deliverySessionsService.recordSessionFeedback(user, actionPlanId, 1, "activities", "bad", null, true)
 
     val submitter = createActor("test-submitter")
-    deliverySessionsService.submitSessionFeedback(actionPlanId, 1, submitter)
+    deliverySessionsService.submitAppointmentFeedback(actionPlanId, 1, submitter)
 
     val sessionCaptor = argumentCaptor<DeliverySession>()
     verify(deliverySessionRepository, atLeastOnce()).save(sessionCaptor.capture())
@@ -593,7 +599,7 @@ internal class DeliverySessionsServiceTest {
   }
 
   @Test
-  fun `session feedback emits application events`() {
+  fun `appointment feedback emits application events`() {
     val user = createActor()
     val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
     val actionPlanId = UUID.randomUUID()
@@ -601,41 +607,41 @@ internal class DeliverySessionsServiceTest {
       session,
     )
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
-    deliverySessionsService.recordAppointmentAttendance(user, actionPlanId, 1, Attended.YES, "")
-    deliverySessionsService.recordBehaviour(user, actionPlanId, 1, "bad", true)
+    deliverySessionsService.recordAttendanceFeedback(user, actionPlanId, 1, Attended.YES, "")
+    deliverySessionsService.recordSessionFeedback(user, actionPlanId, 1, "activities", "bad", null, true)
 
-    deliverySessionsService.submitSessionFeedback(actionPlanId, 1, session.referral.createdBy)
+    deliverySessionsService.submitAppointmentFeedback(actionPlanId, 1, session.referral.createdBy)
     verify(actionPlanAppointmentEventPublisher).attendanceRecordedEvent(session)
-    verify(actionPlanAppointmentEventPublisher).behaviourRecordedEvent(session)
+    verify(actionPlanAppointmentEventPublisher).sessionFeedbackRecordedEvent(session)
     verify(actionPlanAppointmentEventPublisher).sessionFeedbackRecordedEvent(session)
   }
 
   @Test
-  fun `attendance can't be updated once session feedback has been submitted`() {
+  fun `attendance can't be updated once appointment feedback has been submitted`() {
     val user = createActor()
     val session = deliverySessionFactory.createAttended()
     val actionPlanId = UUID.randomUUID()
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(session)
 
     assertThrows(ResponseStatusException::class.java) {
-      deliverySessionsService.recordAppointmentAttendance(user, actionPlanId, 1, Attended.YES, "")
+      deliverySessionsService.recordAttendanceFeedback(user, actionPlanId, 1, Attended.YES, "")
     }
   }
 
   @Test
-  fun `behaviour can't be updated once session feedback has been submitted`() {
+  fun `session feedback can't be updated once appointment feedback has been submitted`() {
     val user = createActor()
     val session = deliverySessionFactory.createAttended()
     val actionPlanId = UUID.randomUUID()
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(session)
 
     assertThrows(ResponseStatusException::class.java) {
-      deliverySessionsService.recordBehaviour(user, actionPlanId, 1, "bad", false)
+      deliverySessionsService.recordSessionFeedback(user, actionPlanId, 1, "activities", "bad", null, false)
     }
   }
 
   @Test
-  fun `session feedback can be submitted when session not attended`() {
+  fun `appointment feedback can be submitted when session not attended`() {
     val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
     val actionPlanId = UUID.randomUUID()
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(
@@ -644,30 +650,12 @@ internal class DeliverySessionsServiceTest {
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
 
     val user = createActor()
-    deliverySessionsService.recordAppointmentAttendance(user, actionPlanId, 1, Attended.NO, "")
-    deliverySessionsService.submitSessionFeedback(actionPlanId, 1, user)
+    deliverySessionsService.recordAttendanceFeedback(user, actionPlanId, 1, Attended.NO, "")
+    deliverySessionsService.submitAppointmentFeedback(actionPlanId, 1, user)
 
     verify(deliverySessionRepository, atLeastOnce()).save(session)
     verify(actionPlanAppointmentEventPublisher).attendanceRecordedEvent(session)
-    verify(actionPlanAppointmentEventPublisher).sessionFeedbackRecordedEvent(session)
-  }
-
-  @Test
-  fun `session feedback can be submitted when session is attended and there is no behaviour feedback`() {
-    val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
-    val actionPlanId = UUID.randomUUID()
-    whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(
-      session,
-    )
-    whenever(deliverySessionRepository.save(any())).thenReturn(session)
-
-    val user = createActor()
-    deliverySessionsService.recordAppointmentAttendance(user, actionPlanId, 1, Attended.YES, "")
-    deliverySessionsService.submitSessionFeedback(actionPlanId, 1, user)
-
-    verify(deliverySessionRepository, atLeastOnce()).save(session)
-    verify(actionPlanAppointmentEventPublisher).attendanceRecordedEvent(session)
-    verify(actionPlanAppointmentEventPublisher).sessionFeedbackRecordedEvent(session)
+    verify(actionPlanAppointmentEventPublisher).appointmentFeedbackRecordedEvent(session)
   }
 
   @Test
