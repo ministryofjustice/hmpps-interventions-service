@@ -157,7 +157,7 @@ class NotifyActionPlanAppointmentService(
         ActionPlanAppointmentEventType.BEHAVIOUR_RECORDED -> {
           emailSender.sendEmail(
             concerningBehaviourTemplateID,
-            "marco.collura@digital.justice.gov.uk",
+            recipient.email,
             mapOf(
               "ppFirstName" to recipient.firstName,
               "popfullname" to popFullName,
@@ -210,7 +210,7 @@ class NotifyAppointmentService(
         AppointmentEventType.ATTENDANCE_RECORDED -> {
           emailSender.sendEmail(
             appointmentNotAttendedTemplateID,
-            "marco.collura@digital.justice.gov.uk",
+            recipient.email,
             mapOf(
               "ppFirstName" to recipient.firstName,
               "popfullname" to popFullName,

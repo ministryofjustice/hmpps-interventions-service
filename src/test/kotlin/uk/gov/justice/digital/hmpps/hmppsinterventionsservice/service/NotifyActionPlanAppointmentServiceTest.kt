@@ -122,7 +122,7 @@ class NotifyActionPlanAppointmentServiceTest {
     val personalisationCaptor = argumentCaptor<Map<String, String>>()
     verify(emailSender).sendEmail(eq("template"), eq("abc@abc.com"), personalisationCaptor.capture())
     Assertions.assertThat(personalisationCaptor.firstValue["ppFirstName"]).isEqualTo("abc")
-    Assertions.assertThat(personalisationCaptor.firstValue["referenceNumber"]).isEqualTo("HAS71263")
+    Assertions.assertThat(personalisationCaptor.firstValue["popfullname"]).isEqualTo("Bob Green")
     Assertions.assertThat(personalisationCaptor.firstValue["sessionUrl"]).isEqualTo("http://example.com/pp/referrals/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080/session/1/appointment/$appointmentId/feedback")
   }
 }
