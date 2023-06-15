@@ -28,6 +28,8 @@ data class SentReferralSummariesDTO(
         referral.probationPractitionerDetails?.probationOffice
       } else if (referral.probationPractitionerDetails?.pdu != null) {
         referral.probationPractitionerDetails?.pdu
+      } else if (referral.probationPractitionerDetails?.nDeliusPDU != null) {
+        referral.probationPractitionerDetails?.nDeliusPDU
       } else {
         "Not available"
       }
