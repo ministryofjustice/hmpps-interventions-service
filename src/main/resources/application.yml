@@ -139,16 +139,14 @@ interventions-ui:
 
 refer-and-monitor-and-delius:
   locations:
-    referral-start: "/probation-case/{crn}/referrals"
     appointment-merge: "/probation-case/{crn}/referrals/{referralId}/appointments"
+    case-access: "/users/{username}/access"
+    case-identifiers: "/probation-case/{crn}/identifiers"
+    managed-cases: "/users/{username}/managed-cases"
+    referral-start: "/probation-case/{crn}/referrals"
     responsible-officer: "/probation-case/{crn}/responsible-officer"
 
 community-api:
-  locations:
-    offender-access: "/secure/offenders/crn/{crn}/user/{username}/userAccess"
-    managed-offenders: "/secure/staff/staffIdentifier/{staffIdentifier}/managedOffenders"
-    staff-details: "/secure/staff/username/{username}"
-    offender-identifiers: "/secure/offenders/crn/{crn}/identifiers"
   appointments:
     bookings:
       enabled: true

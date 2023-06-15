@@ -2,11 +2,9 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.RestClient
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
@@ -19,10 +17,9 @@ data class MockedResponse(
 
 internal class CommunityAPIOffenderServiceTest {
   private val user = AuthUserFactory().create()
-  private val offenderAccessLocation = "offender-access"
-  private val managedOffendersLocation = "managed-offenders"
-  private val staffDetailsLocation = "staff-details"
-  private val offenderIdentifiersLocation = "offender-identifiers"
+  private val offenderAccessLocation = "case-access"
+  private val managedOffendersLocation = "managed-cases"
+  private val offenderIdentifiersLocation = "case-identifiers"
 
   private fun createMockedRestClient(vararg responses: MockedResponse): RestClient {
     return RestClient(
@@ -46,12 +43,12 @@ internal class CommunityAPIOffenderServiceTest {
   }
 
   private fun offenderServiceFactory(restClient: RestClient): CommunityAPIOffenderService {
-    return CommunityAPIOffenderService(offenderAccessLocation, managedOffendersLocation, staffDetailsLocation, offenderIdentifiersLocation, restClient)
+    return CommunityAPIOffenderService(offenderAccessLocation, managedOffendersLocation, offenderIdentifiersLocation, restClient)
   }
 
   @Test
   fun `checkIfAuthenticatedDeliusUserHasAccessToServiceUser success`() {
-    val response = MockedResponse(offenderAccessLocation, HttpStatus.OK, "{\"exclusionMessage\": null, \"restrictionMessage\": null}")
+    val response = MockedResponse(offenderAccessLocation, HttpStatus.OK, "{\"access\":[{\"crn\":\"X123456\", \"userExcluded\":false, \"userRestricted\":false, \"exclusionMessage\": null, \"restrictionMessage\": null}]}")
     val offenderService = offenderServiceFactory(createMockedRestClient(response))
     val result = offenderService.checkIfAuthenticatedDeliusUserHasAccessToServiceUser(user, "X123456")
     assertThat(result.canAccess).isTrue
@@ -59,8 +56,8 @@ internal class CommunityAPIOffenderServiceTest {
   }
 
   @Test
-  fun `checkIfAuthenticatedDeliusUserHasAccessToServiceUser forbidden`() {
-    val response = MockedResponse(offenderAccessLocation, HttpStatus.FORBIDDEN, "{\"exclusionMessage\": \"family exclusion\", \"restrictionMessage\": null}")
+  fun `checkIfAuthenticatedDeliusUserHasAccessToServiceUser limited access`() {
+    val response = MockedResponse(offenderAccessLocation, HttpStatus.OK, "{\"access\":[{\"crn\":\"X123456\", \"userExcluded\":true, \"userRestricted\":false, \"exclusionMessage\": \"family exclusion\", \"restrictionMessage\": null}]}")
     val offenderService = offenderServiceFactory(createMockedRestClient(response))
     val result = offenderService.checkIfAuthenticatedDeliusUserHasAccessToServiceUser(user, "X123456")
     assertThat(result.canAccess).isFalse
@@ -68,27 +65,9 @@ internal class CommunityAPIOffenderServiceTest {
   }
 
   @Test
-  fun `checkIfAuthenticatedDeliusUserHasAccessToServiceUser unhandled error`() {
-    val response = MockedResponse(offenderAccessLocation, HttpStatus.INTERNAL_SERVER_ERROR, "")
-    val offenderService = offenderServiceFactory(createMockedRestClient(response))
-    assertThrows<WebClientResponseException> {
-      offenderService.checkIfAuthenticatedDeliusUserHasAccessToServiceUser(user, "X123456")
-    }
-  }
-
-  @Test
-  fun `getManagedOffendersForDeliusUser returns empty list if user has no staff identifier`() {
-    val response = MockedResponse(staffDetailsLocation, HttpStatus.NOT_FOUND, "")
-    val offenderService = offenderServiceFactory(createMockedRestClient(response))
-    val result = offenderService.getManagedOffendersForDeliusUser(user)
-    assertThat(result.isEmpty())
-  }
-
-  @Test
   fun `getManagedOffendersForDeliusUser returns list of offenders`() {
-    val staffResponse = MockedResponse(staffDetailsLocation, HttpStatus.OK, "{\"staffIdentifier\": \"123\"}")
-    val offendersResponse = MockedResponse(managedOffendersLocation, HttpStatus.OK, "[{\"crnNumber\": \"CRN123\"}, {\"crnNumber\": \"CRN456\"}]")
-    val offenderService = offenderServiceFactory(createMockedRestClient(staffResponse, offendersResponse))
+    val offendersResponse = MockedResponse(managedOffendersLocation, HttpStatus.OK, "{\"managedCases\": [{\"crn\": \"CRN123\"}, {\"crn\": \"CRN456\"}]}")
+    val offenderService = offenderServiceFactory(createMockedRestClient(offendersResponse))
     val result = offenderService.getManagedOffendersForDeliusUser(user)
     assertThat(result).isEqualTo(listOf(Offender("CRN123"), Offender("CRN456")))
   }
