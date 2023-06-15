@@ -29,7 +29,7 @@ data class SentReferralSummariesDTO(
       } else if (referral.probationPractitionerDetails?.pdu != null) {
         referral.probationPractitionerDetails?.pdu
       } else {
-        null
+        "Not available"
       }
       return SentReferralSummariesDTO(
         id = referral.id,
