@@ -13,11 +13,11 @@ import javax.persistence.Table
 data class ProbationPractitionerDetails(
   @Id val id: UUID,
   @OneToOne(fetch = FetchType.LAZY) val referral: Referral,
-  @Column(name = "ndelius_name") var nDeliusName: String?,
-  @Column(name = "ndelius_email_address") var nDeliusEmailAddress: String?,
-  @Column(name = "ndelius_pdu") var nDeliusPDU: String?,
-  @Column(name = "name") var name: String?,
-  @Column(name = "email_address") var emailAddress: String?,
-  @Column(name = "pdu") var pdu: String?,
-  @Column(name = "probation_office") var probationOffice: String?,
+  @Column(name = "ndelius_name") var nDeliusName: String? = null,
+  @Column(name = "ndelius_email_address") var nDeliusEmailAddress: String? = null,
+  @Column(name = "ndelius_pdu") var nDeliusPDU: String? = null,
+  @Column(name = "name") var name: String? = null,
+  @Column(name = "email_address") var emailAddress: String? = null,
+  @Column(name = "pdu") var pdu: String? = null,
+  @Column(name = "probation_office") var probationOffice: String? = null,
 )

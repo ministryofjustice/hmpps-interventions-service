@@ -77,6 +77,66 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
     )
   }
 
+  fun createSentReferralSummaryWithReferral(
+    id: UUID = UUID.randomUUID(),
+    createdAt: OffsetDateTime = OffsetDateTime.now(),
+    concludedAt: OffsetDateTime? = createdAt.plusHours(3),
+    createdBy: AuthUser = authUserFactory.create(),
+    serviceUserCRN: String = "X123456",
+    relevantSentenceId: Long = 1234567L,
+    intervention: Intervention = interventionFactory.create(),
+    selectedServiceCategories: MutableSet<ServiceCategory>? = null,
+    desiredOutcomes: List<DesiredOutcome> = emptyList(),
+    actionPlans: MutableList<ActionPlan>? = mutableListOf(),
+
+    sentAt: OffsetDateTime = OffsetDateTime.now(),
+    sentBy: AuthUser = authUserFactory.create(),
+    referenceNumber: String = "JS18726AC",
+    supplementaryRiskId: UUID = UUID.randomUUID(),
+
+    assignments: List<ReferralAssignment> = emptyList(),
+
+    supplierAssessment: SupplierAssessment? = null,
+    serviceUserData: ServiceUserData? = null,
+  ): Pair<SentReferralSummary, Referral> {
+    val referral = createReferral(
+      id = id,
+      createdAt = createdAt,
+      createdBy = createdBy,
+      serviceUserCRN = serviceUserCRN,
+      intervention = intervention,
+      relevantSentenceId = relevantSentenceId,
+      desiredOutcomes = desiredOutcomes,
+      serviceUserData = serviceUserData,
+      actionPlans = actionPlans,
+      selectedServiceCategories = selectedServiceCategories,
+      sentAt = sentAt,
+      sentBy = sentBy,
+      referenceNumber = referenceNumber,
+      supplementaryRiskId = supplementaryRiskId,
+      assignments = assignments,
+      concludedAt = concludedAt,
+      supplierAssessment = supplierAssessment,
+    )
+
+    val sentReferralSummary = SentReferralSummary(
+      id = id,
+      serviceUserCRN = serviceUserCRN,
+      intervention = intervention,
+      createdBy = createdBy,
+      sentAt = sentAt,
+      sentBy = sentBy,
+      referenceNumber = referenceNumber,
+      concludedAt = concludedAt,
+      assignments = assignments.toMutableList(),
+      serviceUserData = serviceUserData,
+      actionPlans = actionPlans,
+      supplierAssessment = supplierAssessment,
+    )
+
+    return sentReferralSummary to referral
+  }
+
   fun getReferralSummary(
     referral: Referral,
     endOfServiceReport: EndOfServiceReport? = null,
