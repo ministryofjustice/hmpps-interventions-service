@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto
 
+import org.apache.commons.lang3.StringUtils.isNotEmpty
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SentReferralSummary
 import java.time.LocalDate
@@ -24,11 +25,11 @@ data class SentReferralSummariesDTO(
     fun from(referral: SentReferralSummary): SentReferralSummariesDTO {
       val location = if (referral.referralLocation?.type == PersonCurrentLocationType.CUSTODY) {
         referral.referralLocation?.prisonId
-      } else if (referral.probationPractitionerDetails?.probationOffice != null) {
+      } else if (isNotEmpty(referral.probationPractitionerDetails?.probationOffice)) {
         referral.probationPractitionerDetails?.probationOffice
-      } else if (referral.probationPractitionerDetails?.pdu != null) {
+      } else if (isNotEmpty(referral.probationPractitionerDetails?.pdu)) {
         referral.probationPractitionerDetails?.pdu
-      } else if (referral.probationPractitionerDetails?.nDeliusPDU != null) {
+      } else if (isNotEmpty(referral.probationPractitionerDetails?.nDeliusPDU)) {
         referral.probationPractitionerDetails?.nDeliusPDU
       } else {
         "Not available"
