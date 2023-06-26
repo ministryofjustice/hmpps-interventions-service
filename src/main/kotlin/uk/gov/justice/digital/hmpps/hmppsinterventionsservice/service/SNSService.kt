@@ -146,7 +146,7 @@ class SNSActionPlanAppointmentService(
 
         snsPublisher.publish(referral.id, event.deliverySession.appointmentFeedback.attendanceFeedback.submittedBy!!, snsEvent)
       }
-      ActionPlanAppointmentEventType.SESSION_FEEDBACK_RECORDED -> {
+      ActionPlanAppointmentEventType.APPOINTMENT_FEEDBACK_RECORDED -> {
         val referral = event.referral
         event.deliverySession.appointmentTime ?: throw RuntimeException("event triggered for session with no appointments")
 
