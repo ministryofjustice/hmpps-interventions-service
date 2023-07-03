@@ -70,7 +70,7 @@ class SupplierAssessmentContracts(private val setupAssistant: SetupAssistant) {
       attended = attended,
       sessionSummary = "",
       sessionResponse = "",
-      notifyPPOfAttendanceBehaviour = notifyPPOfAttendanceBehaviour
+      notifyPPOfAttendanceBehaviour = notifyPPOfAttendanceBehaviour,
     )
   }
 
