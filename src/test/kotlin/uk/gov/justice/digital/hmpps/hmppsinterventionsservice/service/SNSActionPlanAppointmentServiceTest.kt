@@ -52,9 +52,9 @@ internal class SNSActionPlanAppointmentServiceTest {
     "http://localhost:8080/action-plan/77df9f6c-3fcb-4ec6-8fcf-96551cd9b080/session/1",
   )
 
-  private fun sessionFeedbackEvent(attendance: Attended) = ActionPlanAppointmentEvent.from(
+  private fun appointmentFeedbackEvent(attendance: Attended) = ActionPlanAppointmentEvent.from(
     "source",
-    ActionPlanAppointmentEventType.SESSION_FEEDBACK_RECORDED,
+    ActionPlanAppointmentEventType.APPOINTMENT_FEEDBACK_RECORDED,
     deliverySessionFactory.createAttended(
       referral = referralFactory.createSent(
         id = UUID.fromString("56b40f96-0657-4e01-925c-da208a6fbcfd"),
@@ -92,7 +92,7 @@ internal class SNSActionPlanAppointmentServiceTest {
 
   @Test
   fun `appointment feedback submitted event publishes message with valid DTO`() {
-    snsAppointmentService.onApplicationEvent(sessionFeedbackEvent(Attended.YES))
+    snsAppointmentService.onApplicationEvent(appointmentFeedbackEvent(Attended.YES))
 
     val referralId = UUID.fromString("56b40f96-0657-4e01-925c-da208a6fbcfd")
     val eventDTO = EventDTO(

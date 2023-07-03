@@ -20,7 +20,8 @@ class ActionPlanContracts(private val setupAssistant: SetupAssistant) {
       120,
       OffsetDateTime.parse("2021-05-13T13:30:00+01:00"),
       Attended.LATE,
-      "Alex missed the bus",
+      sessionSummary = "Discussed accommodation",
+      sessionResponse = "Engaged well",
       referral = referral,
     )
   }
@@ -158,7 +159,6 @@ class ActionPlanContracts(private val setupAssistant: SetupAssistant) {
       120,
       OffsetDateTime.parse("2021-05-13T13:30:00+01:00"),
       Attended.LATE,
-      "Alex missed the bus",
       behaviour = "Alex was well behaved",
       notifyPPOfBehaviour = false,
       referral = referral,

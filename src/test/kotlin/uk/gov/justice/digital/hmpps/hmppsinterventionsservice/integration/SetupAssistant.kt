@@ -433,9 +433,9 @@ class SetupAssistant(
         probationPractitionerDetails = probationPractitionerDetails,
       ),
     )
-    val probationPractitionerDetails = probationPractitionerDetailsFactory.create(referral = referral)
-    probationPractitionerDetailsRepository.save(probationPractitionerDetails)
-    referral.probationPractitionerDetails = probationPractitionerDetails
+    val updatedProbationPractitionerDetails = probationPractitionerDetailsFactory.create(referral = referral)
+    probationPractitionerDetailsRepository.save(updatedProbationPractitionerDetails)
+    referral.probationPractitionerDetails = updatedProbationPractitionerDetails
     referral.supplierAssessment = createSupplierAssessment(referral = referral)
     referralRepository.save(referral)
     return referral
@@ -448,7 +448,9 @@ class SetupAssistant(
     appointmentDeliveryAddress: AddressDTO? = null,
     attended: Attended? = null,
     additionalAttendanceInformation: String? = null,
-    attendanceBehaviour: String? = null,
+    sessionSummary: String? = null,
+    sessionResponse: String? = null,
+    sessionConcerns: String? = null,
     notifyPPOfAttendanceBehaviour: Boolean? = null,
     appointmentTime: OffsetDateTime = OffsetDateTime.now().plusMonths(2),
   ) {
@@ -460,11 +462,13 @@ class SetupAssistant(
       appointment.attendanceSubmittedBy = createSPUser()
     }
 
-    if (attendanceBehaviour !== null) {
-      appointment.attendanceBehaviour = attendanceBehaviour
+    if (sessionSummary !== null && sessionResponse !== null) {
+      appointment.sessionSummary = sessionSummary
+      appointment.sessionResponse = sessionResponse
+      appointment.sessionConcerns = sessionConcerns
       appointment.notifyPPOfAttendanceBehaviour = notifyPPOfAttendanceBehaviour
-      appointment.attendanceBehaviourSubmittedAt = OffsetDateTime.now()
-      appointment.attendanceBehaviourSubmittedBy = createSPUser()
+      appointment.sessionFeedbackSubmittedAt = OffsetDateTime.now()
+      appointment.sessionFeedbackSubmittedBy = createSPUser()
     }
 
     appointmentRepository.save(appointment)
@@ -473,7 +477,7 @@ class SetupAssistant(
     val appointmentDelivery = appointmentDeliveryFactory.create(appointmentId = appointment.id, appointmentDeliveryType = appointmentDeliveryType)
     appointment.appointmentDelivery = appointmentDeliveryRepository.saveAndFlush(appointmentDelivery)
     if (appointmentDeliveryAddress != null) {
-      val appointmentDeliveryAddress = appointmentDeliveryAddressFactory.create(
+      val updatedAppointmentDeliveryAddress = appointmentDeliveryAddressFactory.create(
         appointmentDeliveryId = appointmentDelivery.appointmentId,
         firstAddressLine = appointmentDeliveryAddress.firstAddressLine,
         secondAddressLine = appointmentDeliveryAddress.secondAddressLine,
@@ -481,7 +485,7 @@ class SetupAssistant(
         county = appointmentDeliveryAddress.county,
         postCode = appointmentDeliveryAddress.postCode,
       )
-      appointmentDelivery.appointmentDeliveryAddress = appointmentDeliveryAddressRepository.save(appointmentDeliveryAddress)
+      appointmentDelivery.appointmentDeliveryAddress = appointmentDeliveryAddressRepository.save(updatedAppointmentDeliveryAddress)
     }
   }
 
@@ -528,18 +532,18 @@ class SetupAssistant(
   }
 
   fun createAssignedReferral(id: UUID = UUID.randomUUID(), intervention: Intervention? = null): Referral {
-    val intervention = intervention ?: createIntervention()
+    val updatedIntervention = intervention ?: createIntervention()
     val ppUser = createPPUser()
     val spUser = createSPUser()
     createDraftReferral(
       id = id,
-      intervention = intervention,
+      intervention = updatedIntervention,
       createdBy = ppUser,
     )
     val referral = referralRepository.save(
       referralFactory.createSent(
         id = id,
-        intervention = intervention,
+        intervention = updatedIntervention,
         createdBy = ppUser,
         sentBy = ppUser,
         assignments = listOf(ReferralAssignment(OffsetDateTime.now(), spUser, spUser)),
@@ -640,6 +644,11 @@ class SetupAssistant(
     appointmentTime: OffsetDateTime,
     attended: Attended? = null,
     attendanceFailureInformation: String? = null,
+    sessionSummary: String? = null,
+    sessionResponse: String? = null,
+    sessionConcerns: String? = null,
+    sessionFeedbackSubmittedAt: OffsetDateTime? = null,
+    sessionFeedbackSubmittedBy: AuthUser? = null,
     behaviour: String? = null,
     notifyPPOfBehaviour: Boolean? = null,
     appointmentFeedbackSubmittedAt: OffsetDateTime? = null,
@@ -657,6 +666,11 @@ class SetupAssistant(
       createdAt = now,
       attended = attended,
       attendanceFailureInformation = attendanceFailureInformation,
+      sessionSummary = sessionSummary,
+      sessionResponse = sessionResponse,
+      sessionConcerns = sessionConcerns,
+      sessionFeedbackSubmittedAt = sessionFeedbackSubmittedAt,
+      sessionFeedbackSubmittedBy = sessionFeedbackSubmittedBy,
       attendanceSubmittedAt = if (attended != null) now else null,
       attendanceBehaviour = behaviour,
       attendanceBehaviourSubmittedAt = if (behaviour != null) now else null,
@@ -673,7 +687,7 @@ class SetupAssistant(
       )
       appointmentDeliveryRepository.save(appointmentDelivery)
       if (appointmentDeliveryAddress != null) {
-        val appointmentDeliveryAddress = appointmentDeliveryAddressFactory.create(
+        val updatedAppointmentDeliveryAddress = appointmentDeliveryAddressFactory.create(
           appointmentDeliveryId = appointmentDelivery.appointmentId,
           firstAddressLine = appointmentDeliveryAddress.firstAddressLine,
           secondAddressLine = appointmentDeliveryAddress.secondAddressLine,
@@ -681,7 +695,7 @@ class SetupAssistant(
           county = appointmentDeliveryAddress.county,
           postCode = appointmentDeliveryAddress.postCode,
         )
-        appointmentDeliveryAddressRepository.save(appointmentDeliveryAddress)
+        appointmentDeliveryAddressRepository.save(updatedAppointmentDeliveryAddress)
       }
     }
     val session = DeliverySession(
@@ -911,7 +925,7 @@ class SetupAssistant(
     authUser: AuthUser = createSPUser(),
     superseded: Boolean = false,
   ): Appointment {
-    var deliverySession = deliverySessionRepository.findByReferralIdAndSessionNumber(referral.id, 1)
+    val deliverySession = deliverySessionRepository.findByReferralIdAndSessionNumber(referral.id, 1)
 
     val appointment = appointmentFactory.create(
       id,
@@ -927,7 +941,9 @@ class SetupAssistant(
     }
 
     appointmentRepository.save(appointment)
-    deliverySessionRepository.save(deliverySession)
+    if (deliverySession != null) {
+      deliverySessionRepository.save(deliverySession)
+    }
     return appointment
   }
   fun changeAppointmentId(targetAppointment: Appointment, newId: UUID, deliverySession: DeliverySession) {
