@@ -44,28 +44,8 @@ class ActionPlanAppointmentEventPublisherTest {
   }
 
   @Test
-  fun `builds an appointment behaviour recorded event and publishes it`() {
+  fun `builds an appointment session feedback recorded event and publishes it`() {
     val appointment = DeliverySessionFactory().createScheduled()
-
-    publisher.behaviourRecordedEvent(appointment)
-
-    val eventCaptor = argumentCaptor<ActionPlanAppointmentEvent>()
-    verify(eventPublisher).publishEvent(eventCaptor.capture())
-    val event = eventCaptor.firstValue
-
-    Assertions.assertThat(event.source).isSameAs(publisher)
-    Assertions.assertThat(event.type).isSameAs(ActionPlanAppointmentEventType.BEHAVIOUR_RECORDED)
-    Assertions.assertThat(event.deliverySession.id).isSameAs(appointment.id)
-    Assertions.assertThat(event.detailUrl).isEqualTo("http://localhost/action-plan/123/appointments/1")
-  }
-
-  @Test
-  fun `builds an appointment session feedback event and publishes it`() {
-    val appointment = DeliverySessionFactory().createAttended(
-      attended = LATE,
-      additionalAttendanceInformation = "Behaviour was fine",
-      attendanceSubmittedAt = OffsetDateTime.now(),
-    )
 
     publisher.sessionFeedbackRecordedEvent(appointment)
 
@@ -75,6 +55,25 @@ class ActionPlanAppointmentEventPublisherTest {
 
     Assertions.assertThat(event.source).isSameAs(publisher)
     Assertions.assertThat(event.type).isSameAs(ActionPlanAppointmentEventType.SESSION_FEEDBACK_RECORDED)
+    Assertions.assertThat(event.deliverySession.id).isSameAs(appointment.id)
+    Assertions.assertThat(event.detailUrl).isEqualTo("http://localhost/action-plan/123/appointments/1")
+  }
+
+  @Test
+  fun `builds an appointment appointment feedback event and publishes it`() {
+    val appointment = DeliverySessionFactory().createAttended(
+      attended = LATE,
+      attendanceSubmittedAt = OffsetDateTime.now(),
+    )
+
+    publisher.appointmentFeedbackRecordedEvent(appointment)
+
+    val eventCaptor = argumentCaptor<ActionPlanAppointmentEvent>()
+    verify(eventPublisher).publishEvent(eventCaptor.capture())
+    val event = eventCaptor.firstValue
+
+    Assertions.assertThat(event.source).isSameAs(publisher)
+    Assertions.assertThat(event.type).isSameAs(ActionPlanAppointmentEventType.APPOINTMENT_FEEDBACK_RECORDED)
     Assertions.assertThat(event.deliverySession.id).isSameAs(appointment.id)
   }
 }

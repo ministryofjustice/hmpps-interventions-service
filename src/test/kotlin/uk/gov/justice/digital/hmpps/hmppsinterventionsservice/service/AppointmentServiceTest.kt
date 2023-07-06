@@ -155,7 +155,8 @@ class AppointmentServiceTest {
       YES,
       "additional information",
       false,
-      "description",
+      "session summary",
+      "session response",
     )
 
     // Then
@@ -170,16 +171,17 @@ class AppointmentServiceTest {
     )
     verifySavedAppointment(appointmentTime, durationInMinutes, deliusAppointmentId, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
     verify(appointmentEventPublisher).attendanceRecordedEvent(newAppointment, false, AppointmentType.SUPPLIER_ASSESSMENT)
-    verify(appointmentEventPublisher).behaviourRecordedEvent(newAppointment, false, AppointmentType.SUPPLIER_ASSESSMENT)
     verify(appointmentEventPublisher).sessionFeedbackRecordedEvent(newAppointment, false, AppointmentType.SUPPLIER_ASSESSMENT)
+    verify(appointmentEventPublisher).appointmentFeedbackRecordedEvent(newAppointment, false, AppointmentType.SUPPLIER_ASSESSMENT)
     assertThat(newAppointment.attended).isEqualTo(YES)
-    assertThat(newAppointment.additionalAttendanceInformation).isEqualTo("additional information")
-    assertThat(newAppointment.attendanceBehaviour).isEqualTo("description")
+    assertThat(newAppointment.attendanceFailureInformation).isEqualTo("additional information")
+    assertThat(newAppointment.sessionSummary).isEqualTo("session summary")
+    assertThat(newAppointment.sessionResponse).isEqualTo("session response")
     assertThat(newAppointment.notifyPPOfAttendanceBehaviour).isEqualTo(false)
     assertThat(newAppointment.attendanceSubmittedAt).isNotNull
     assertThat(newAppointment.attendanceSubmittedBy).isEqualTo(createdByUser)
-    assertThat(newAppointment.attendanceBehaviourSubmittedAt).isNotNull
-    assertThat(newAppointment.attendanceBehaviourSubmittedBy).isEqualTo(createdByUser)
+    assertThat(newAppointment.sessionFeedbackSubmittedAt).isNotNull
+    assertThat(newAppointment.sessionFeedbackSubmittedBy).isEqualTo(createdByUser)
     assertThat(newAppointment.appointmentFeedbackSubmittedAt).isNotNull
     assertThat(newAppointment.appointmentFeedbackSubmittedBy).isEqualTo(createdByUser)
   }
@@ -295,7 +297,7 @@ class AppointmentServiceTest {
     )
     verifySavedAppointment(OffsetDateTime.parse("2020-12-04T10:42:43+00:00"), durationInMinutes, rescheduledDeliusAppointmentId, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
     assertThat(updatedAppointment.attended).isEqualTo(NO)
-    assertThat(updatedAppointment.additionalAttendanceInformation).isEqualTo("non attended")
+    assertThat(updatedAppointment.attendanceFailureInformation).isEqualTo("non attended")
     assertThat(updatedAppointment.attendanceBehaviour).isNull()
     assertThat(updatedAppointment.notifyPPOfAttendanceBehaviour).isNull()
   }
@@ -328,7 +330,7 @@ class AppointmentServiceTest {
     )
     verifySavedAppointment(appointmentTime, durationInMinutes, additionalDeliusAppointmentId, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
     assertThat(newAppointment.attended).isEqualTo(NO)
-    assertThat(newAppointment.additionalAttendanceInformation).isEqualTo("non attended")
+    assertThat(newAppointment.attendanceFailureInformation).isEqualTo("non attended")
     assertThat(newAppointment.attendanceBehaviour).isNull()
     assertThat(newAppointment.notifyPPOfAttendanceBehaviour).isNull()
     assertThat(newAppointment.attendanceSubmittedAt).isNotNull
@@ -437,7 +439,8 @@ class AppointmentServiceTest {
     @Test
     fun `appointment behaviour can be updated`() {
       val appointmentId = UUID.randomUUID()
-      val behaviourDescription = "description"
+      val sessionSummary = "summary"
+      val sessionResponse = "response"
       val notifyProbationPractitioner = true
       val appointment = appointmentFactory.create(id = appointmentId)
       val submittedBy = authUserFactory.create()
@@ -445,30 +448,31 @@ class AppointmentServiceTest {
       whenever(appointmentRepository.save(any())).thenReturn(appointment)
       whenever(authUserRepository.save(any())).thenReturn(submittedBy)
 
-      appointmentService.recordBehaviour(appointment, behaviourDescription, notifyProbationPractitioner, submittedBy)
+      appointmentService.recordSessionFeedback(appointment, sessionSummary, sessionResponse, null, notifyProbationPractitioner, submittedBy)
 
       val argumentCaptor = argumentCaptor<Appointment>()
       verify(appointmentRepository, times(1)).save(argumentCaptor.capture())
       val arguments = argumentCaptor.firstValue
 
       assertThat(arguments.id).isEqualTo(appointmentId)
-      assertThat(arguments.attendanceBehaviour).isEqualTo(behaviourDescription)
+      assertThat(arguments.sessionSummary).isEqualTo(sessionSummary)
       assertThat(arguments.notifyPPOfAttendanceBehaviour).isEqualTo(notifyProbationPractitioner)
-      assertThat(arguments.attendanceBehaviourSubmittedAt).isNotNull
-      assertThat(arguments.attendanceBehaviourSubmittedBy).isEqualTo(submittedBy)
+      assertThat(arguments.sessionFeedbackSubmittedAt).isNotNull
+      assertThat(arguments.sessionFeedbackSubmittedBy).isEqualTo(submittedBy)
     }
 
     @Test
     fun `appointment behaviour cannot be updated if feedback has been submitted`() {
       val appointmentId = UUID.randomUUID()
-      val behaviourDescription = "description"
+      val sessionSummary = "summary"
+      val sessionResponse = "response"
       val notifyProbationPractitioner = true
       val submittedBy = authUserFactory.create()
       val feedbackSubmittedAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
       val appointment = appointmentFactory.create(id = appointmentId, appointmentFeedbackSubmittedAt = feedbackSubmittedAt)
 
       val error = assertThrows<ResponseStatusException> {
-        appointmentService.recordBehaviour(appointment, behaviourDescription, notifyProbationPractitioner, submittedBy)
+        appointmentService.recordSessionFeedback(appointment, sessionSummary, sessionResponse, null, notifyProbationPractitioner, submittedBy)
       }
       assertThat(error.message).contains("Feedback has already been submitted for this appointment [id=$appointmentId]")
     }
@@ -480,14 +484,14 @@ class AppointmentServiceTest {
     fun `appointment attendance can be updated`() {
       val appointmentId = UUID.randomUUID()
       val attended = YES
-      val additionalAttendanceInformation = "information"
+      val attendanceFailureInformation = "information"
       val appointment = appointmentFactory.create(id = appointmentId, appointmentTime = OffsetDateTime.now())
       val submittedBy = authUserFactory.create()
 
       whenever(appointmentRepository.save(any())).thenReturn(appointment)
       whenever(authUserRepository.save(any())).thenReturn(submittedBy)
 
-      appointmentService.recordAppointmentAttendance(appointment, attended, additionalAttendanceInformation, submittedBy)
+      appointmentService.recordAppointmentAttendance(appointment, attended, attendanceFailureInformation, submittedBy)
 
       val argumentCaptor = argumentCaptor<Appointment>()
       verify(appointmentRepository, times(1)).save(argumentCaptor.capture())
@@ -495,7 +499,7 @@ class AppointmentServiceTest {
 
       assertThat(arguments.id).isEqualTo(appointmentId)
       assertThat(arguments.attended).isEqualTo(attended)
-      assertThat(arguments.additionalAttendanceInformation).isEqualTo(additionalAttendanceInformation)
+      assertThat(arguments.attendanceFailureInformation).isEqualTo(attendanceFailureInformation)
       assertThat(arguments.attendanceSubmittedAt).isNotNull
       assertThat(arguments.attendanceSubmittedBy).isEqualTo(submittedBy)
     }
@@ -544,7 +548,7 @@ class AppointmentServiceTest {
       whenever(appointmentRepository.save(any())).thenReturn(appointment)
       whenever(authUserRepository.save(any())).thenReturn(submittedBy)
 
-      appointmentService.submitSessionFeedback(appointment, submittedBy, SUPPLIER_ASSESSMENT)
+      appointmentService.submitAppointmentFeedback(appointment, submittedBy, SUPPLIER_ASSESSMENT)
 
       val argumentCaptor = argumentCaptor<Appointment>()
       verify(appointmentRepository, times(1)).save(argumentCaptor.capture())
@@ -554,7 +558,7 @@ class AppointmentServiceTest {
       assertThat(arguments.appointmentFeedbackSubmittedAt).isNotNull
       assertThat(arguments.appointmentFeedbackSubmittedBy).isEqualTo(submittedBy)
 
-      verify(appointmentEventPublisher).sessionFeedbackRecordedEvent(appointment, false, SUPPLIER_ASSESSMENT)
+      verify(appointmentEventPublisher).appointmentFeedbackRecordedEvent(appointment, false, SUPPLIER_ASSESSMENT)
     }
 
     @Test
@@ -566,7 +570,7 @@ class AppointmentServiceTest {
       appointment.appointmentFeedbackSubmittedAt = OffsetDateTime.now()
 
       val exception = assertThrows<ResponseStatusException> {
-        appointmentService.submitSessionFeedback(appointment, submittedBy, SUPPLIER_ASSESSMENT)
+        appointmentService.submitAppointmentFeedback(appointment, submittedBy, SUPPLIER_ASSESSMENT)
       }
       assertThat(exception.message).contains("appointment feedback has already been submitted")
     }
@@ -578,29 +582,29 @@ class AppointmentServiceTest {
       val submittedBy = authUserFactory.create()
 
       val exception = assertThrows<ResponseStatusException> {
-        appointmentService.submitSessionFeedback(appointment, submittedBy, SUPPLIER_ASSESSMENT)
+        appointmentService.submitAppointmentFeedback(appointment, submittedBy, SUPPLIER_ASSESSMENT)
       }
       assertThat(exception.message).contains("can't submit feedback unless attendance has been recorded")
     }
 
     @Test
-    fun `session feedback emits application events`() {
+    fun `appointment feedback emits application events`() {
       val appointmentId = UUID.randomUUID()
       val appointment = appointmentFactory.create(id = appointmentId)
       val submittedBy = authUserFactory.create()
 
       appointment.attendanceSubmittedAt = OffsetDateTime.now()
       appointment.attended = NO
-      appointment.attendanceBehaviourSubmittedAt = OffsetDateTime.now()
+      appointment.sessionFeedbackSubmittedAt = OffsetDateTime.now()
       appointment.notifyPPOfAttendanceBehaviour = true
 
       whenever(appointmentRepository.save(any())).thenReturn(appointment)
       whenever(authUserRepository.save(any())).thenReturn(submittedBy)
 
-      appointmentService.submitSessionFeedback(appointment, submittedBy, SUPPLIER_ASSESSMENT)
+      appointmentService.submitAppointmentFeedback(appointment, submittedBy, SUPPLIER_ASSESSMENT)
 
       verify(appointmentEventPublisher).attendanceRecordedEvent(appointment, true, SUPPLIER_ASSESSMENT)
-      verify(appointmentEventPublisher).behaviourRecordedEvent(appointment, true, SUPPLIER_ASSESSMENT)
+      verify(appointmentEventPublisher).sessionFeedbackRecordedEvent(appointment, true, SUPPLIER_ASSESSMENT)
     }
   }
 }

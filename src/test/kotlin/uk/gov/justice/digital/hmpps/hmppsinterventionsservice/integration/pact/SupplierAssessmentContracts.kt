@@ -55,18 +55,23 @@ class SupplierAssessmentContracts(private val setupAssistant: SetupAssistant) {
   fun `create a sent referral with supplier assessment having attendance recorded`() {
     val referral = setupAssistant.createSentReferral(id = UUID.fromString("caac2a85-578f-4b0b-996d-2893311eb60e"))
     val attended = Attended.YES
-    val additionalAttendanceInformation = "Alex picked up the phone on time."
-    setupAssistant.addSupplierAssessmentAppointment(referral.supplierAssessment!!, referral = referral, appointmentDeliveryType = AppointmentDeliveryType.PHONE_CALL, attended = attended, additionalAttendanceInformation = additionalAttendanceInformation)
+    setupAssistant.addSupplierAssessmentAppointment(referral.supplierAssessment!!, referral = referral, appointmentDeliveryType = AppointmentDeliveryType.PHONE_CALL, attended = attended)
   }
 
-  @State("There is an existing sent referral with ID cd8f46a2-78f2-457b-ab14-7d77adce73d1 and the supplier assessment attendance and behaviour details have been recorded")
+  @State("There is an existing sent referral with ID cd8f46a2-78f2-457b-ab14-7d77adce73d1 and the supplier assessment attendance and session feedback have been recorded")
   fun `create a sent referral with supplier assessment having behaviour recorded`() {
     val referral = setupAssistant.createSentReferral(id = UUID.fromString("cd8f46a2-78f2-457b-ab14-7d77adce73d1"))
     val attended = Attended.YES
-    val additionalAttendanceInformation = "Alex picked up the phone on time."
-    val attendanceBehaviour = "We were having a good time on the phone."
     val notifyPPOfAttendanceBehaviour = false
-    setupAssistant.addSupplierAssessmentAppointment(referral.supplierAssessment!!, referral = referral, appointmentDeliveryType = AppointmentDeliveryType.PHONE_CALL, attended = attended, additionalAttendanceInformation = additionalAttendanceInformation, attendanceBehaviour = attendanceBehaviour, notifyPPOfAttendanceBehaviour = notifyPPOfAttendanceBehaviour)
+    setupAssistant.addSupplierAssessmentAppointment(
+      referral.supplierAssessment!!,
+      referral = referral,
+      appointmentDeliveryType = AppointmentDeliveryType.PHONE_CALL,
+      attended = attended,
+      sessionSummary = "",
+      sessionResponse = "",
+      notifyPPOfAttendanceBehaviour = notifyPPOfAttendanceBehaviour,
+    )
   }
 
   @State("There is an existing sent referral with ID 61352917-3076-4ad1-bf17-7a37f286dddb and the supplier assessment attendance and behaviour details have been recorded to notify PP")
@@ -74,8 +79,7 @@ class SupplierAssessmentContracts(private val setupAssistant: SetupAssistant) {
     val referral = setupAssistant.createSentReferral(id = UUID.fromString("61352917-3076-4ad1-bf17-7a37f286dddb"))
     val attended = Attended.YES
     val additionalAttendanceInformation = "Alex picked up the phone on time."
-    val attendanceBehaviour = "They hung up the phone after 1 minute."
     val notifyPPOfAttendanceBehaviour = true
-    setupAssistant.addSupplierAssessmentAppointment(referral.supplierAssessment!!, referral = referral, appointmentDeliveryType = AppointmentDeliveryType.PHONE_CALL, attended = attended, additionalAttendanceInformation = additionalAttendanceInformation, attendanceBehaviour = attendanceBehaviour, notifyPPOfAttendanceBehaviour = notifyPPOfAttendanceBehaviour)
+    setupAssistant.addSupplierAssessmentAppointment(referral.supplierAssessment!!, referral = referral, appointmentDeliveryType = AppointmentDeliveryType.PHONE_CALL, attended = attended, additionalAttendanceInformation = additionalAttendanceInformation, notifyPPOfAttendanceBehaviour = notifyPPOfAttendanceBehaviour)
   }
 }

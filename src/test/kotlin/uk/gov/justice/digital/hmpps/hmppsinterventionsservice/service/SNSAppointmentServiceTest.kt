@@ -46,9 +46,9 @@ internal class SNSAppointmentServiceTest {
     appointmentType = AppointmentType.SUPPLIER_ASSESSMENT,
   )
 
-  private fun feedbackSubmittedEvent(attendance: Attended) = AppointmentEvent(
+  private fun appointmentFeedbackSubmittedEvent(attendance: Attended) = AppointmentEvent(
     "source",
-    AppointmentEventType.SESSION_FEEDBACK_RECORDED,
+    AppointmentEventType.APPOINTMENT_FEEDBACK_RECORDED,
     appointmentFactory.create(
       referral = referral,
       attended = attendance,
@@ -84,7 +84,7 @@ internal class SNSAppointmentServiceTest {
 
   @Test
   fun `appointment feedback submitted event publishes message with valid DTO`() {
-    snsAppointmentService.onApplicationEvent(feedbackSubmittedEvent(Attended.YES))
+    snsAppointmentService.onApplicationEvent(appointmentFeedbackSubmittedEvent(Attended.YES))
 
     val referralId = UUID.fromString("56b40f96-0657-4e01-925c-da208a6fbcfd")
     val eventDTO = EventDTO(

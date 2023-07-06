@@ -48,9 +48,11 @@ class AppointmentService(
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
     attended: Attended? = null,
-    additionalAttendanceInformation: String? = null,
+    attendanceFailureInformation: String? = null,
     notifyProbationPractitioner: Boolean? = null,
-    behaviourDescription: String? = null,
+    sessionSummary: String? = null,
+    sessionResponse: String? = null,
+    sessionConcerns: String? = null,
   ): Appointment {
     val appointment = when {
       // an initial appointment is required or an additional appointment is required
@@ -68,9 +70,11 @@ class AppointmentService(
           referral,
           npsOfficeCode,
           attended,
-          additionalAttendanceInformation,
+          attendanceFailureInformation,
           notifyProbationPractitioner,
-          behaviourDescription,
+          sessionSummary,
+          sessionResponse,
+          sessionConcerns,
           appointmentType,
           appointmentId,
         )
@@ -91,9 +95,11 @@ class AppointmentService(
           npsOfficeCode,
           attended,
           referral,
-          additionalAttendanceInformation,
+          attendanceFailureInformation,
           notifyProbationPractitioner,
-          behaviourDescription,
+          sessionSummary,
+          sessionResponse,
+          sessionConcerns,
           appointmentType,
           appointmentId,
         )
@@ -131,9 +137,11 @@ class AppointmentService(
     }
   }
 
-  fun recordBehaviour(
+  fun recordSessionFeedback(
     appointment: Appointment,
-    behaviourDescription: String,
+    sessionSummary: String,
+    sessionResponse: String,
+    sessionConcerns: String?,
     notifyProbationPractitioner: Boolean,
     submittedBy: AuthUser,
   ): Appointment {
@@ -143,14 +151,14 @@ class AppointmentService(
         "Feedback has already been submitted for this appointment [id=${appointment.id}]",
       )
     }
-    setBehaviourFields(appointment, behaviourDescription, notifyProbationPractitioner, submittedBy)
+    setFeedbackFields(appointment, sessionSummary, sessionResponse, sessionConcerns, notifyProbationPractitioner, submittedBy)
     return appointmentRepository.save(appointment)
   }
 
   fun recordAppointmentAttendance(
     appointment: Appointment,
     attended: Attended,
-    additionalAttendanceInformation: String?,
+    attendanceFailureInformation: String?,
     submittedBy: AuthUser,
   ): Appointment {
     if (appointment.appointmentFeedbackSubmittedAt != null) {
@@ -165,11 +173,11 @@ class AppointmentService(
         "Cannot submit feedback for a future appointment [id=${appointment.id}]",
       )
     }
-    setAttendanceFields(appointment, attended, additionalAttendanceInformation, submittedBy)
+    setAttendanceFields(appointment, attended, attendanceFailureInformation, submittedBy)
     return appointmentRepository.save(appointment)
   }
 
-  fun submitSessionFeedback(
+  fun submitAppointmentFeedback(
     appointment: Appointment,
     submitter: AuthUser,
     appointmentType: AppointmentType,
@@ -195,15 +203,15 @@ class AppointmentService(
       appointmentType,
     )
 
-    if (appointment.attendanceBehaviourSubmittedAt != null) { // excluding the case of non attendance
-      appointmentEventPublisher.behaviourRecordedEvent(
+    if (appointment.sessionFeedbackSubmittedAt != null) { // excluding the case of non attendance
+      appointmentEventPublisher.sessionFeedbackRecordedEvent(
         appointment,
         appointment.notifyPPOfAttendanceBehaviour!!,
         appointmentType,
       )
     }
 
-    appointmentEventPublisher.sessionFeedbackRecordedEvent(
+    appointmentEventPublisher.appointmentFeedbackRecordedEvent(
       appointment,
       appointment.notifyPPOfAttendanceBehaviour ?: false,
       appointmentType,
@@ -215,25 +223,29 @@ class AppointmentService(
   private fun setAttendanceFields(
     appointment: Appointment,
     attended: Attended,
-    additionalInformation: String?,
+    attendanceFailureInformation: String?,
     submittedBy: AuthUser,
   ) {
     appointment.attended = attended
-    additionalInformation?.let { appointment.additionalAttendanceInformation = additionalInformation }
+    attendanceFailureInformation?.let { appointment.attendanceFailureInformation = attendanceFailureInformation }
     appointment.attendanceSubmittedAt = OffsetDateTime.now()
     appointment.attendanceSubmittedBy = authUserRepository.save(submittedBy)
   }
 
-  private fun setBehaviourFields(
+  private fun setFeedbackFields(
     appointment: Appointment,
-    behaviour: String,
+    sessionSummary: String,
+    sessionResponse: String,
+    sessionConcerns: String?,
     notifyProbationPractitioner: Boolean,
     submittedBy: AuthUser,
   ) {
-    appointment.attendanceBehaviour = behaviour
-    appointment.attendanceBehaviourSubmittedAt = OffsetDateTime.now()
+    appointment.sessionSummary = sessionSummary
+    appointment.sessionResponse = sessionResponse
+    appointment.sessionConcerns = sessionConcerns
+    appointment.sessionFeedbackSubmittedAt = OffsetDateTime.now()
     appointment.notifyPPOfAttendanceBehaviour = notifyProbationPractitioner
-    appointment.attendanceBehaviourSubmittedBy = authUserRepository.save(submittedBy)
+    appointment.sessionFeedbackSubmittedBy = authUserRepository.save(submittedBy)
   }
 
   private fun createAppointment(
@@ -247,9 +259,11 @@ class AppointmentService(
     referral: Referral,
     npsOfficeCode: String?,
     attended: Attended?,
-    additionalAttendanceInformation: String?,
+    attendanceFailureInformation: String?,
     notifyProbationPractitioner: Boolean?,
-    behaviourDescription: String?,
+    sessionSummary: String?,
+    sessionResponse: String?,
+    sessionConcerns: String?,
     appointmentType: AppointmentType,
     uuid: UUID? = null,
   ): Appointment {
@@ -262,7 +276,7 @@ class AppointmentService(
       createdAt = OffsetDateTime.now(),
       referral = referral,
     )
-    setAttendanceAndBehaviourIfHistoricAppointment(appointment, attended, additionalAttendanceInformation, behaviourDescription, notifyProbationPractitioner, createdByUser, appointmentType)
+    setAttendanceAndSessionFeedbackIfHistoricAppointment(appointment, attended, attendanceFailureInformation, sessionSummary, sessionResponse, sessionConcerns, notifyProbationPractitioner, createdByUser, appointmentType)
     appointmentRepository.saveAndFlush(appointment)
     createOrUpdateAppointmentDeliveryDetails(appointment, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
     return appointment
@@ -280,9 +294,11 @@ class AppointmentService(
     npsOfficeCode: String?,
     attended: Attended?,
     referral: Referral,
-    additionalAttendanceInformation: String?,
+    attendanceFailureInformation: String?,
     notifyProbationPractitioner: Boolean?,
-    behaviourDescription: String?,
+    sessionSummary: String?,
+    sessionResponse: String?,
+    sessionConcerns: String?,
     appointmentType: AppointmentType,
     uuid: UUID?,
   ): Appointment {
@@ -297,9 +313,11 @@ class AppointmentService(
       referral,
       npsOfficeCode,
       attended,
-      additionalAttendanceInformation,
+      attendanceFailureInformation,
       notifyProbationPractitioner,
-      behaviourDescription,
+      sessionSummary,
+      sessionResponse,
+      sessionConcerns,
       appointmentType,
       uuid,
     )
@@ -390,21 +408,23 @@ class AppointmentService(
     return rescheduled
   }
 
-  private fun setAttendanceAndBehaviourIfHistoricAppointment(
+  private fun setAttendanceAndSessionFeedbackIfHistoricAppointment(
     appointment: Appointment,
     attended: Attended?,
-    additionalAttendanceInformation: String?,
-    behaviourDescription: String?,
+    attendanceFailureInformation: String?,
+    sessionSummary: String?,
+    sessionResponse: String?,
+    sessionConcerns: String?,
     notifyProbationPractitioner: Boolean?,
     updatedBy: AuthUser,
     appointmentType: AppointmentType,
   ) {
     attended?.let {
-      setAttendanceFields(appointment, attended, additionalAttendanceInformation, updatedBy)
+      setAttendanceFields(appointment, attended, attendanceFailureInformation, updatedBy)
       if (Attended.NO != attended) {
-        setBehaviourFields(appointment, behaviourDescription!!, notifyProbationPractitioner!!, updatedBy)
+        setFeedbackFields(appointment, sessionSummary!!, sessionResponse!!, sessionConcerns, notifyProbationPractitioner!!, updatedBy)
       }
-      this.submitSessionFeedback(appointment, updatedBy, appointmentType)
+      this.submitAppointmentFeedback(appointment, updatedBy, appointmentType)
     }
   }
 }

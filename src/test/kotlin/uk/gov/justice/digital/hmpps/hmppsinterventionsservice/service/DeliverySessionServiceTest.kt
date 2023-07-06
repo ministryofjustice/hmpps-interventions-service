@@ -147,9 +147,10 @@ class DeliverySessionServiceTest @Autowired constructor(
         assertThat(session.currentAppointment?.appointmentFeedbackSubmittedAt).isNotNull()
         assertThat(session.currentAppointment?.appointmentFeedbackSubmittedBy).isNotNull()
         assertThat(session.currentAppointment?.attended).isEqualTo(Attended.YES)
-        assertThat(session.currentAppointment?.additionalAttendanceInformation).isEqualTo("additionalAttendanceInformation")
+        assertThat(session.currentAppointment?.attendanceFailureInformation).isEqualTo("attendanceFailureInformation")
         assertThat(session.currentAppointment?.notifyPPOfAttendanceBehaviour).isEqualTo(false)
-        assertThat(session.currentAppointment?.attendanceBehaviour).isEqualTo("behaviourDescription")
+        assertThat(session.currentAppointment?.sessionSummary).isEqualTo("sessionSummary")
+        assertThat(session.currentAppointment?.sessionResponse).isEqualTo("sessionResponse")
         null
       }
 
@@ -158,7 +159,7 @@ class DeliverySessionServiceTest @Autowired constructor(
 
       val updatedSession = deliverySessionService.scheduleNewDeliverySessionAppointment(
         session.referral.id, session.sessionNumber, pastDate, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE,
-        attended = Attended.YES, additionalAttendanceInformation = "additionalAttendanceInformation", notifyProbationPractitioner = false, behaviourDescription = "behaviourDescription",
+        attended = Attended.YES, attendanceFailureInformation = "attendanceFailureInformation", notifyProbationPractitioner = false, sessionSummary = "sessionSummary", sessionResponse = "sessionResponse",
       )
 
       assertThat(updatedSession.appointments.size).isEqualTo(1)
@@ -167,9 +168,10 @@ class DeliverySessionServiceTest @Autowired constructor(
       assertThat(appointment.durationInMinutes).isEqualTo(defaultDuration)
       assertThat(appointment.createdBy).isEqualTo(defaultUser)
       assertThat(appointment.attended).isEqualTo(Attended.YES)
-      assertThat(appointment.additionalAttendanceInformation).isEqualTo("additionalAttendanceInformation")
+      assertThat(appointment.attendanceFailureInformation).isEqualTo("attendanceFailureInformation")
       assertThat(appointment.notifyPPOfAttendanceBehaviour).isEqualTo(false)
-      assertThat(appointment.attendanceBehaviour).isEqualTo("behaviourDescription")
+      assertThat(appointment.sessionSummary).isEqualTo("sessionSummary")
+      assertThat(appointment.sessionResponse).isEqualTo("sessionResponse")
       assertThat(appointment.attendanceSubmittedAt).isNotNull()
       assertThat(appointment.attendanceSubmittedBy).isEqualTo(defaultUser)
       assertThat(appointment.appointmentDelivery?.appointmentDeliveryType).isEqualTo(AppointmentDeliveryType.PHONE_CALL)
@@ -224,7 +226,7 @@ class DeliverySessionServiceTest @Autowired constructor(
     val session = deliverySessionFactory.createScheduled(attended = Attended.YES, referral = actionPlan.referral)
 
     val deliverySession = session.currentAppointment?.attended?.let {
-      deliverySessionService.recordAppointmentAttendance(
+      deliverySessionService.recordAttendanceFeedback(
         defaultUser,
         actionPlan.id,
         session.sessionNumber,
@@ -239,7 +241,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       val session = deliverySessionFactory.createScheduled(attended = Attended.NO, referral = actionPlan.referral)
 
       val deliverySession = session.currentAppointment?.attended?.let {
-        deliverySessionService.recordAppointmentAttendance(
+        deliverySessionService.recordAttendanceFeedback(
           defaultUser,
           actionPlan.id,
           session.sessionNumber,
@@ -290,9 +292,10 @@ class DeliverySessionServiceTest @Autowired constructor(
         assertThat(session.currentAppointment?.appointmentFeedbackSubmittedAt).isNotNull()
         assertThat(session.currentAppointment?.appointmentFeedbackSubmittedBy).isNotNull()
         assertThat(session.currentAppointment?.attended).isEqualTo(Attended.YES)
-        assertThat(session.currentAppointment?.additionalAttendanceInformation).isEqualTo("additionalAttendanceInformation")
+        assertThat(session.currentAppointment?.attendanceFailureInformation).isEqualTo("attendanceFailureInformation")
         assertThat(session.currentAppointment?.notifyPPOfAttendanceBehaviour).isEqualTo(false)
-        assertThat(session.currentAppointment?.attendanceBehaviour).isEqualTo("behaviourDescription")
+        assertThat(session.currentAppointment?.sessionSummary).isEqualTo("sessionSummary")
+        assertThat(session.currentAppointment?.sessionResponse).isEqualTo("sessionResponse")
         null
       }
 
@@ -301,7 +304,7 @@ class DeliverySessionServiceTest @Autowired constructor(
 
       val updatedSession = deliverySessionService.rescheduleDeliverySessionAppointment(
         session.referral.id, session.sessionNumber, existingAppointment.id, pastDate, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE,
-        attended = Attended.YES, additionalAttendanceInformation = "additionalAttendanceInformation", notifyProbationPractitioner = false, behaviourDescription = "behaviourDescription",
+        attended = Attended.YES, attendanceFailureInformation = "attendanceFailureInformation", notifyProbationPractitioner = false, sessionSummary = "sessionSummary", sessionResponse = "sessionResponse",
       )
 
       assertThat(updatedSession.appointments.size).isEqualTo(2)
@@ -310,9 +313,10 @@ class DeliverySessionServiceTest @Autowired constructor(
       assertThat(appointment.durationInMinutes).isEqualTo(defaultDuration)
       assertThat(appointment.createdBy).isEqualTo(defaultUser)
       assertThat(appointment.attended).isEqualTo(Attended.YES)
-      assertThat(appointment.additionalAttendanceInformation).isEqualTo("additionalAttendanceInformation")
+      assertThat(appointment.attendanceFailureInformation).isEqualTo("attendanceFailureInformation")
       assertThat(appointment.notifyPPOfAttendanceBehaviour).isEqualTo(false)
-      assertThat(appointment.attendanceBehaviour).isEqualTo("behaviourDescription")
+      assertThat(appointment.sessionSummary).isEqualTo("sessionSummary")
+      assertThat(appointment.sessionResponse).isEqualTo("sessionResponse")
       assertThat(appointment.attendanceSubmittedAt).isNotNull()
       assertThat(appointment.attendanceSubmittedBy).isEqualTo(defaultUser)
       assertThat(appointment.appointmentDelivery?.appointmentDeliveryType).isEqualTo(AppointmentDeliveryType.PHONE_CALL)
@@ -372,13 +376,13 @@ class DeliverySessionServiceTest @Autowired constructor(
   }
 
   @Nested
-  inner class RecordAppointmentAttendance {
+  inner class RecordAttendanceFeedback {
     @Test
     fun `can record attendance`() {
       val deliverySession = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
       val referral = deliverySession.referral
       val appointment = deliverySession.currentAppointment!!
-      val pair = deliverySessionService.recordAppointmentAttendance(referral.id, appointment.id, defaultUser, Attended.YES, "additionalInformation")
+      val pair = deliverySessionService.recordAttendanceFeedback(referral.id, appointment.id, defaultUser, Attended.YES, "attendanceFailureInformation")
       assertThat(pair.first).isEqualTo(deliverySession)
       assertThat(pair.second).isEqualTo(appointment)
     }
@@ -386,7 +390,7 @@ class DeliverySessionServiceTest @Autowired constructor(
     @Test
     fun `expect failure when no referral exists`() {
       val error = assertThrows<EntityNotFoundException> {
-        deliverySessionService.recordAppointmentAttendance(UUID.randomUUID(), UUID.randomUUID(), defaultUser, Attended.YES, "additionalInformation")
+        deliverySessionService.recordAttendanceFeedback(UUID.randomUUID(), UUID.randomUUID(), defaultUser, Attended.YES, "attendanceFailureInformation")
       }
       assertThat(error.message).contains("No Delivery Session Appointment found")
     }
@@ -395,7 +399,7 @@ class DeliverySessionServiceTest @Autowired constructor(
     fun `expect failure when no session exists`() {
       val referral = referralFactory.createSent()
       val error = assertThrows<EntityNotFoundException> {
-        deliverySessionService.recordAppointmentAttendance(referral.id, UUID.randomUUID(), defaultUser, Attended.YES, "additionalInformation")
+        deliverySessionService.recordAttendanceFeedback(referral.id, UUID.randomUUID(), defaultUser, Attended.YES, "attendanceFailureInformation")
       }
       assertThat(error.message).contains("No Delivery Session Appointment found")
     }
@@ -405,7 +409,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       val deliverySession = deliverySessionFactory.createUnscheduled()
       val referral = deliverySession.referral
       val error = assertThrows<EntityNotFoundException> {
-        deliverySessionService.recordAppointmentAttendance(referral.id, UUID.randomUUID(), defaultUser, Attended.YES, "additionalInformation")
+        deliverySessionService.recordAttendanceFeedback(referral.id, UUID.randomUUID(), defaultUser, Attended.YES, "attendanceFailureInformation")
       }
       assertThat(error.message).contains("No Delivery Session Appointment found")
     }
@@ -415,7 +419,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       val deliverySession = deliverySessionFactory.createScheduled()
       val referral = deliverySession.referral
       val error = assertThrows<EntityNotFoundException> {
-        deliverySessionService.recordAppointmentAttendance(referral.id, UUID.randomUUID(), defaultUser, Attended.YES, "additionalInformation")
+        deliverySessionService.recordAttendanceFeedback(referral.id, UUID.randomUUID(), defaultUser, Attended.YES, "attendanceFailureInformation")
       }
       assertThat(error.message).contains("No Delivery Session Appointment found")
     }
@@ -427,20 +431,20 @@ class DeliverySessionServiceTest @Autowired constructor(
       val appointment = deliverySession.currentAppointment!!
 
       val error = assertThrows<ResponseStatusException> {
-        deliverySessionService.recordAppointmentAttendance(referral.id, appointment.id, defaultUser, Attended.YES, "additionalInformation")
+        deliverySessionService.recordAttendanceFeedback(referral.id, appointment.id, defaultUser, Attended.YES, "attendanceFailureInformation")
       }
       assertThat(error.message).contains("Cannot submit feedback for a future appointment [id=${appointment.id}]")
     }
   }
 
   @Nested
-  inner class RecordAppointmentBehaviour {
+  inner class RecordSessionFeedback {
     @Test
-    fun `can record behaviour`() {
+    fun `can record session feedback`() {
       val deliverySession = deliverySessionFactory.createScheduled()
       val referral = deliverySession.referral
       val appointment = deliverySession.currentAppointment!!
-      val pair = deliverySessionService.recordAppointmentBehaviour(referral.id, appointment.id, defaultUser, "good", false)
+      val pair = deliverySessionService.recordSessionFeedback(referral.id, appointment.id, defaultUser, "good", "good", null, false)
       assertThat(pair.first).isEqualTo(deliverySession)
       assertThat(pair.second).isEqualTo(appointment)
     }
@@ -448,7 +452,7 @@ class DeliverySessionServiceTest @Autowired constructor(
     @Test
     fun `expect failure when no referral exists`() {
       val error = assertThrows<EntityNotFoundException> {
-        deliverySessionService.recordAppointmentBehaviour(UUID.randomUUID(), UUID.randomUUID(), defaultUser, "good", false)
+        deliverySessionService.recordSessionFeedback(UUID.randomUUID(), UUID.randomUUID(), defaultUser, "good", "good", null, false)
       }
       assertThat(error.message).contains("No Delivery Session Appointment found")
     }
@@ -457,7 +461,7 @@ class DeliverySessionServiceTest @Autowired constructor(
     fun `expect failure when no session exists`() {
       val referral = referralFactory.createSent()
       val error = assertThrows<EntityNotFoundException> {
-        deliverySessionService.recordAppointmentBehaviour(referral.id, UUID.randomUUID(), defaultUser, "good", false)
+        deliverySessionService.recordSessionFeedback(referral.id, UUID.randomUUID(), defaultUser, "good", "good", null, false)
       }
       assertThat(error.message).contains("No Delivery Session Appointment found")
     }
@@ -467,7 +471,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       val deliverySession = deliverySessionFactory.createUnscheduled()
       val referral = deliverySession.referral
       val error = assertThrows<EntityNotFoundException> {
-        deliverySessionService.recordAppointmentBehaviour(referral.id, UUID.randomUUID(), defaultUser, "good", false)
+        deliverySessionService.recordSessionFeedback(referral.id, UUID.randomUUID(), defaultUser, "good", "good", null, false)
       }
       assertThat(error.message).contains("No Delivery Session Appointment found")
     }
@@ -477,14 +481,14 @@ class DeliverySessionServiceTest @Autowired constructor(
       val deliverySession = deliverySessionFactory.createScheduled()
       val referral = deliverySession.referral
       val error = assertThrows<EntityNotFoundException> {
-        deliverySessionService.recordAppointmentBehaviour(referral.id, UUID.randomUUID(), defaultUser, "good", false)
+        deliverySessionService.recordSessionFeedback(referral.id, UUID.randomUUID(), defaultUser, "good", "good", null, false)
       }
       assertThat(error.message).contains("No Delivery Session Appointment found")
     }
   }
 
   @Nested
-  inner class SubmitSessionFeedback {
+  inner class SubmitAppointmentFeedback {
     @Test
     fun `can submit feedback`() {
       val deliverySession = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
@@ -493,7 +497,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       appointment.attended = Attended.NO
       appointment.attendanceSubmittedAt = OffsetDateTime.now()
       appointmentRepository.save(appointment)
-      val pair = deliverySessionService.submitSessionFeedback(referral.id, appointment.id, defaultUser)
+      val pair = deliverySessionService.submitAppointmentFeedback(referral.id, appointment.id, defaultUser)
       assertThat(pair.first).isEqualTo(deliverySession)
       assertThat(pair.second).isEqualTo(appointment)
     }
@@ -501,7 +505,7 @@ class DeliverySessionServiceTest @Autowired constructor(
     @Test
     fun `expect failure when no referral exists`() {
       val error = assertThrows<EntityNotFoundException> {
-        deliverySessionService.submitSessionFeedback(UUID.randomUUID(), UUID.randomUUID(), defaultUser)
+        deliverySessionService.submitAppointmentFeedback(UUID.randomUUID(), UUID.randomUUID(), defaultUser)
       }
       assertThat(error.message).contains("No Delivery Session Appointment found")
     }
@@ -510,7 +514,7 @@ class DeliverySessionServiceTest @Autowired constructor(
     fun `expect failure when no session exists`() {
       val referral = referralFactory.createSent()
       val error = assertThrows<EntityNotFoundException> {
-        deliverySessionService.submitSessionFeedback(referral.id, UUID.randomUUID(), defaultUser)
+        deliverySessionService.submitAppointmentFeedback(referral.id, UUID.randomUUID(), defaultUser)
       }
       assertThat(error.message).contains("No Delivery Session Appointment found")
     }
@@ -520,7 +524,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       val deliverySession = deliverySessionFactory.createUnscheduled()
       val referral = deliverySession.referral
       val error = assertThrows<EntityNotFoundException> {
-        deliverySessionService.submitSessionFeedback(referral.id, UUID.randomUUID(), defaultUser)
+        deliverySessionService.submitAppointmentFeedback(referral.id, UUID.randomUUID(), defaultUser)
       }
       assertThat(error.message).contains("No Delivery Session Appointment found")
     }
@@ -530,7 +534,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       val deliverySession = deliverySessionFactory.createScheduled()
       val referral = deliverySession.referral
       val error = assertThrows<EntityNotFoundException> {
-        deliverySessionService.submitSessionFeedback(referral.id, UUID.randomUUID(), defaultUser)
+        deliverySessionService.submitAppointmentFeedback(referral.id, UUID.randomUUID(), defaultUser)
       }
       assertThat(error.message).contains("No Delivery Session Appointment found")
     }
@@ -549,9 +553,10 @@ class DeliverySessionServiceTest @Autowired constructor(
         assertThat(session.currentAppointment?.appointmentFeedbackSubmittedAt).isNotNull
         assertThat(session.currentAppointment?.appointmentFeedbackSubmittedBy).isNotNull
         assertThat(session.currentAppointment?.attended).isEqualTo(Attended.YES)
-        assertThat(session.currentAppointment?.additionalAttendanceInformation).isEqualTo("additionalAttendanceInformation")
+        assertThat(session.currentAppointment?.attendanceFailureInformation).isEqualTo("attendanceFailureInformation")
         assertThat(session.currentAppointment?.notifyPPOfAttendanceBehaviour).isEqualTo(true)
-        assertThat(session.currentAppointment?.attendanceBehaviour).isEqualTo("behaviourDescription")
+        assertThat(session.currentAppointment?.sessionSummary).isEqualTo("sessionSummary")
+        assertThat(session.currentAppointment?.sessionResponse).isEqualTo("sessionResponse")
         null
       }
 
@@ -563,9 +568,10 @@ class DeliverySessionServiceTest @Autowired constructor(
         null,
         null,
         Attended.YES,
-        "additionalAttendanceInformation",
+        "attendanceFailureInformation",
         true,
-        "behaviourDescription",
+        "sessionSummary",
+        "sessionResponse",
       )
 
       assertThat(updatedSession.appointments.size).isEqualTo(1)
@@ -574,9 +580,10 @@ class DeliverySessionServiceTest @Autowired constructor(
       assertThat(appointment.durationInMinutes).isEqualTo(defaultDuration)
       assertThat(appointment.createdBy).isEqualTo(defaultUser)
       assertThat(appointment.attended).isEqualTo(Attended.YES)
-      assertThat(appointment.additionalAttendanceInformation).isEqualTo("additionalAttendanceInformation")
+      assertThat(appointment.attendanceFailureInformation).isEqualTo("attendanceFailureInformation")
       assertThat(appointment.notifyPPOfAttendanceBehaviour).isEqualTo(true)
-      assertThat(appointment.attendanceBehaviour).isEqualTo("behaviourDescription")
+      assertThat(appointment.sessionSummary).isEqualTo("sessionSummary")
+      assertThat(appointment.sessionResponse).isEqualTo("sessionResponse")
       assertThat(appointment.appointmentFeedbackSubmittedAt).isNotNull
       assertThat(appointment.appointmentFeedbackSubmittedBy).isNotNull
       assertThat(appointment.appointmentDelivery?.appointmentDeliveryType).isEqualTo(AppointmentDeliveryType.PHONE_CALL)
@@ -593,9 +600,10 @@ class DeliverySessionServiceTest @Autowired constructor(
         assertThat(session.currentAppointment?.appointmentFeedbackSubmittedAt).isNotNull()
         assertThat(session.currentAppointment?.appointmentFeedbackSubmittedBy).isNotNull()
         assertThat(session.currentAppointment?.attended).isEqualTo(Attended.YES)
-        assertThat(session.currentAppointment?.additionalAttendanceInformation).isEqualTo("additionalAttendanceInformation")
+        assertThat(session.currentAppointment?.attendanceFailureInformation).isEqualTo("attendanceFailureInformation")
         assertThat(session.currentAppointment?.notifyPPOfAttendanceBehaviour).isEqualTo(true)
-        assertThat(session.currentAppointment?.attendanceBehaviour).isEqualTo("behaviourDescription")
+        assertThat(session.currentAppointment?.sessionSummary).isEqualTo("sessionSummary")
+        assertThat(session.currentAppointment?.sessionResponse).isEqualTo("sessionResponse")
         null
       }
 
@@ -607,9 +615,10 @@ class DeliverySessionServiceTest @Autowired constructor(
         null,
         null,
         Attended.YES,
-        "additionalAttendanceInformation",
+        "attendanceFailureInformation",
         true,
-        "behaviourDescription",
+        "sessionSummary",
+        "sessionResponse",
       )
 
       assertThat(updatedSession.appointments.size).isEqualTo(2)
@@ -618,9 +627,10 @@ class DeliverySessionServiceTest @Autowired constructor(
       assertThat(appointment.durationInMinutes).isEqualTo(defaultDuration)
       assertThat(appointment.createdBy).isEqualTo(defaultUser)
       assertThat(appointment.attended).isEqualTo(Attended.YES)
-      assertThat(appointment.additionalAttendanceInformation).isEqualTo("additionalAttendanceInformation")
+      assertThat(appointment.attendanceFailureInformation).isEqualTo("attendanceFailureInformation")
       assertThat(appointment.notifyPPOfAttendanceBehaviour).isEqualTo(true)
-      assertThat(appointment.attendanceBehaviour).isEqualTo("behaviourDescription")
+      assertThat(appointment.sessionSummary).isEqualTo("sessionSummary")
+      assertThat(appointment.sessionResponse).isEqualTo("sessionResponse")
       assertThat(appointment.appointmentFeedbackSubmittedAt).isNotNull()
       assertThat(appointment.appointmentFeedbackSubmittedBy).isNotNull()
       assertThat(appointment.appointmentDelivery?.appointmentDeliveryType).isEqualTo(AppointmentDeliveryType.PHONE_CALL)
@@ -684,7 +694,8 @@ class DeliverySessionServiceTest @Autowired constructor(
         assertThat(session.currentAppointment?.attended).isEqualTo(Attended.YES)
         assertThat(session.currentAppointment?.additionalAttendanceInformation).isNull()
         assertThat(session.currentAppointment?.notifyPPOfAttendanceBehaviour).isTrue
-        assertThat(session.currentAppointment?.attendanceBehaviour).isNotNull
+        assertThat(session.currentAppointment?.sessionSummary).isNotNull
+        assertThat(session.currentAppointment?.sessionResponse).isNotNull
 
         null
       }
@@ -699,7 +710,8 @@ class DeliverySessionServiceTest @Autowired constructor(
         Attended.YES,
         null,
         true,
-        "some description",
+        "session summary",
+        "session response",
       )
 
       assertThat(updatedSession.appointments.size).isEqualTo(2)
@@ -710,7 +722,8 @@ class DeliverySessionServiceTest @Autowired constructor(
       assertThat(appointment.attended).isEqualTo(Attended.YES)
       assertThat(appointment.additionalAttendanceInformation).isNull()
       assertThat(appointment.notifyPPOfAttendanceBehaviour).isNotNull
-      assertThat(appointment.attendanceBehaviour).isNotNull
+      assertThat(appointment.sessionSummary).isNotNull
+      assertThat(appointment.sessionResponse).isNotNull
       assertThat(appointment.appointmentFeedbackSubmittedAt).isNotNull
       assertThat(appointment.appointmentFeedbackSubmittedBy).isNotNull
       assertThat(appointment.appointmentDelivery?.appointmentDeliveryType).isNotNull

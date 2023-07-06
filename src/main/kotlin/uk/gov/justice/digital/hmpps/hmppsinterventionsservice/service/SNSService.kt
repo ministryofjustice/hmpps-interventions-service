@@ -129,7 +129,7 @@ class SNSActionPlanAppointmentService(
         val referral = event.referral
         event.deliverySession.appointmentTime ?: throw RuntimeException("event triggered for session with no appointments")
 
-        val eventType = "intervention.session-appointment.${when (event.deliverySession.sessionFeedback.attendance.attended) {
+        val eventType = "intervention.session-appointment.${when (event.deliverySession.appointmentFeedback.attendanceFeedback.attended) {
           Attended.YES, Attended.LATE -> "attended"
           Attended.NO -> "missed"
           null -> throw RuntimeException("event triggered for appointment with no recorded attendance")
@@ -139,14 +139,14 @@ class SNSActionPlanAppointmentService(
           eventType,
           "Attendance was recorded for a session appointment",
           event.detailUrl,
-          event.deliverySession.sessionFeedback.attendance.submittedAt!!,
+          event.deliverySession.appointmentFeedback.attendanceFeedback.submittedAt!!,
           mapOf("serviceUserCRN" to referral.serviceUserCRN, "referralId" to referral.id),
           PersonReference.crn(event.referral.serviceUserCRN),
         )
 
-        snsPublisher.publish(referral.id, event.deliverySession.sessionFeedback.attendance.submittedBy!!, snsEvent)
+        snsPublisher.publish(referral.id, event.deliverySession.appointmentFeedback.attendanceFeedback.submittedBy!!, snsEvent)
       }
-      ActionPlanAppointmentEventType.SESSION_FEEDBACK_RECORDED -> {
+      ActionPlanAppointmentEventType.APPOINTMENT_FEEDBACK_RECORDED -> {
         val referral = event.referral
         event.deliverySession.appointmentTime ?: throw RuntimeException("event triggered for session with no appointments")
 
@@ -161,7 +161,7 @@ class SNSActionPlanAppointmentService(
           eventType,
           "Session feedback submitted for a session appointment",
           event.detailUrl,
-          event.deliverySession.sessionFeedback.attendance.submittedAt!!,
+          event.deliverySession.appointmentFeedback.attendanceFeedback.submittedAt!!,
           mapOf(
             "serviceUserCRN" to referral.serviceUserCRN,
             "referralId" to referral.id,
@@ -174,7 +174,7 @@ class SNSActionPlanAppointmentService(
           PersonReference.crn(referral.serviceUserCRN),
         )
 
-        snsPublisher.publish(referral.id, event.deliverySession.sessionFeedback.submittedBy!!, snsEvent)
+        snsPublisher.publish(referral.id, event.deliverySession.appointmentFeedback.submittedBy!!, snsEvent)
       }
       else -> {}
     }
@@ -212,7 +212,7 @@ class SNSAppointmentService(
 
         snsPublisher.publish(referral.id, appointment.appointmentFeedbackSubmittedBy!!, snsEvent)
       }
-      AppointmentEventType.SESSION_FEEDBACK_RECORDED -> {
+      AppointmentEventType.APPOINTMENT_FEEDBACK_RECORDED -> {
         val referral = event.appointment.referral
         val appointment = event.appointment
 

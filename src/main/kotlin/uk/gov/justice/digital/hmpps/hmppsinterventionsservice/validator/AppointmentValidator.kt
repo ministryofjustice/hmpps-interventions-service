@@ -55,9 +55,11 @@ class AppointmentValidator {
 
     validateAttendanceAndBehaviourFieldsIfHistoricAppointment(
       updateAppointmentDTO.appointmentTime,
-      updateAppointmentDTO.appointmentAttendance?.attended,
-      updateAppointmentDTO.appointmentBehaviour?.notifyProbationPractitioner,
-      updateAppointmentDTO.appointmentBehaviour?.behaviourDescription,
+      updateAppointmentDTO.attendanceFeedback?.attended,
+      updateAppointmentDTO.sessionFeedback?.notifyProbationPractitioner,
+      updateAppointmentDTO.sessionFeedback?.sessionSummary,
+      updateAppointmentDTO.sessionFeedback?.sessionResponse,
+      updateAppointmentDTO.sessionFeedback?.sessionConcerns,
       errors,
     )
     if (errors.isNotEmpty()) {
@@ -81,7 +83,9 @@ class AppointmentValidator {
     appointmentTime: OffsetDateTime,
     attended: Attended?,
     notifyProbationPractitioner: Boolean?,
-    behaviourDescription: String?,
+    sessionSummary: String?,
+    sessionResponse: String?,
+    sessionConcerns: String?,
     errors: MutableList<FieldError>,
   ) {
     // if the appointment occurred today or on a date in the future, no attendance validation is required
@@ -96,12 +100,14 @@ class AppointmentValidator {
 
     when (attended) {
       NO -> {
-        checkValueNotSupplied(notifyProbationPractitioner, "appointmentBehaviour.notifyProbationPractitioner", Code.INVALID_VALUE, errors)
-        checkValueNotSupplied(behaviourDescription, "appointmentBehaviour.behaviourDescription", Code.INVALID_VALUE, errors)
+        checkValueNotSupplied(notifyProbationPractitioner, "sessionFeedback.notifyProbationPractitioner", Code.INVALID_VALUE, errors)
+        checkValueNotSupplied(sessionSummary, "sessionFeedback.sessionSummary", Code.INVALID_VALUE, errors)
+        checkValueNotSupplied(sessionResponse, "sessionFeedback.sessionResponse", Code.INVALID_VALUE, errors)
       }
       else -> { // YES OR LATE
-        checkValueSupplied(notifyProbationPractitioner, "appointmentBehaviour.notifyProbationPractitioner", Code.CANNOT_BE_EMPTY, errors)
-        checkValueSupplied(behaviourDescription, "appointmentBehaviour.behaviourDescription", Code.CANNOT_BE_EMPTY, errors)
+        checkValueSupplied(notifyProbationPractitioner, "sessionFeedback.notifyProbationPractitioner", Code.CANNOT_BE_EMPTY, errors)
+        checkValueSupplied(sessionSummary, "sessionFeedback.sessionSummary", Code.CANNOT_BE_EMPTY, errors)
+        checkValueSupplied(sessionResponse, "sessionFeedback.sessionResponse", Code.CANNOT_BE_EMPTY, errors)
       }
     }
   }

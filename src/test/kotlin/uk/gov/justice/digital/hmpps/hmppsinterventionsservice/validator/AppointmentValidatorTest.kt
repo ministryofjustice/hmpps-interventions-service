@@ -9,7 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.Code
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.FieldError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.ValidationError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AddressDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentAttendanceDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AttendanceFeedbackRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentDeliveryType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentSessionType
@@ -126,8 +126,8 @@ internal class AppointmentValidatorTest {
           appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE,
           sessionType = AppointmentSessionType.ONE_TO_ONE,
           npsOfficeCode = "CRSEXT",
-          appointmentAttendance = null,
-          appointmentBehaviour = null,
+          attendanceFeedback = null,
+          sessionFeedback = null,
         )
         assertDoesNotThrow {
           deliverySessionValidator.validateUpdateAppointment(updateAppointmentDTO, OffsetDateTime.now().minusMonths(1))
@@ -142,8 +142,8 @@ internal class AppointmentValidatorTest {
           appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE,
           sessionType = AppointmentSessionType.ONE_TO_ONE,
           npsOfficeCode = "CRSEXT",
-          appointmentAttendance = null,
-          appointmentBehaviour = null,
+          attendanceFeedback = null,
+          sessionFeedback = null,
 
         )
 
@@ -164,8 +164,8 @@ internal class AppointmentValidatorTest {
           appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE,
           sessionType = AppointmentSessionType.ONE_TO_ONE,
           npsOfficeCode = "CRSEXT",
-          appointmentAttendance = null,
-          appointmentBehaviour = null,
+          attendanceFeedback = null,
+          sessionFeedback = null,
         )
 
         var exception = assertThrows<ValidationError> {
@@ -185,8 +185,8 @@ internal class AppointmentValidatorTest {
           appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE,
           sessionType = AppointmentSessionType.ONE_TO_ONE,
           npsOfficeCode = "CRSEXT",
-          appointmentAttendance = null,
-          appointmentBehaviour = null,
+          attendanceFeedback = null,
+          sessionFeedback = null,
         )
         val exception = assertThrows<ValidationError> {
           deliverySessionValidator.validateUpdateAppointment(updateAppointmentDTO, OffsetDateTime.now().minusMonths(1))
@@ -197,22 +197,23 @@ internal class AppointmentValidatorTest {
       }
 
       @Test
-      fun `past appointment fails if attendance reported as yes but behaviour is not`() {
+      fun `past appointment fails if attendance reported as yes but session feedback is not`() {
         val updateAppointmentDTO = UpdateAppointmentDTO(
           appointmentTime = OffsetDateTime.now().minusDays(1),
           durationInMinutes = 1,
           appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE,
           sessionType = AppointmentSessionType.ONE_TO_ONE,
           npsOfficeCode = "CRSEXT",
-          appointmentAttendance = UpdateAppointmentAttendanceDTO(Attended.YES, null),
-          appointmentBehaviour = null,
+          attendanceFeedback = AttendanceFeedbackRequestDTO(Attended.YES, null),
+          sessionFeedback = null,
         )
         val exception = assertThrows<ValidationError> {
           deliverySessionValidator.validateUpdateAppointment(updateAppointmentDTO, OffsetDateTime.now().minusMonths(1))
         }
         assertThat(exception.errors).containsExactly(
-          FieldError("appointmentBehaviour.notifyProbationPractitioner", Code.CANNOT_BE_EMPTY),
-          FieldError("appointmentBehaviour.behaviourDescription", Code.CANNOT_BE_EMPTY),
+          FieldError("sessionFeedback.notifyProbationPractitioner", Code.CANNOT_BE_EMPTY),
+          FieldError("sessionFeedback.sessionSummary", Code.CANNOT_BE_EMPTY),
+          FieldError("sessionFeedback.sessionResponse", Code.CANNOT_BE_EMPTY),
         )
       }
 
@@ -224,15 +225,16 @@ internal class AppointmentValidatorTest {
           appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE,
           sessionType = AppointmentSessionType.ONE_TO_ONE,
           npsOfficeCode = "CRSEXT",
-          appointmentAttendance = UpdateAppointmentAttendanceDTO(Attended.LATE, null),
-          appointmentBehaviour = null,
+          attendanceFeedback = AttendanceFeedbackRequestDTO(Attended.LATE, null),
+          sessionFeedback = null,
         )
         val exception = assertThrows<ValidationError> {
           deliverySessionValidator.validateUpdateAppointment(updateAppointmentDTO, OffsetDateTime.now().minusMonths(1))
         }
         assertThat(exception.errors).containsExactly(
-          FieldError("appointmentBehaviour.notifyProbationPractitioner", Code.CANNOT_BE_EMPTY),
-          FieldError("appointmentBehaviour.behaviourDescription", Code.CANNOT_BE_EMPTY),
+          FieldError("sessionFeedback.notifyProbationPractitioner", Code.CANNOT_BE_EMPTY),
+          FieldError("sessionFeedback.sessionSummary", Code.CANNOT_BE_EMPTY),
+          FieldError("sessionFeedback.sessionResponse", Code.CANNOT_BE_EMPTY),
         )
       }
     }

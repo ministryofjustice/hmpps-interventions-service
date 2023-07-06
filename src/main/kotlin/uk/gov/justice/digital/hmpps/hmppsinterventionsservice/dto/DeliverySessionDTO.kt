@@ -34,11 +34,11 @@ data class UpdateAppointmentDTO(
   val sessionType: AppointmentSessionType? = null,
   val appointmentDeliveryAddress: AddressDTO? = null,
   val npsOfficeCode: String? = null,
-  val appointmentAttendance: UpdateAppointmentAttendanceDTO? = null,
-  val appointmentBehaviour: RecordAppointmentBehaviourDTO? = null,
+  val attendanceFeedback: AttendanceFeedbackRequestDTO? = null,
+  val sessionFeedback: SessionFeedbackRequestDTO? = null,
 )
 
-data class DeliverySessionAppointmentScheduleDetailsDTO(
+data class DeliverySessionAppointmentScheduleDetailsRequestDTO(
   val sessionId: Int,
   val appointmentTime: OffsetDateTime,
   @JsonProperty(required = true) val durationInMinutes: Int,
@@ -46,17 +46,19 @@ data class DeliverySessionAppointmentScheduleDetailsDTO(
   val sessionType: AppointmentSessionType,
   val appointmentDeliveryAddress: AddressDTO? = null,
   val npsOfficeCode: String? = null,
-  val appointmentAttendance: UpdateAppointmentAttendanceDTO? = null,
-  val appointmentBehaviour: RecordAppointmentBehaviourDTO? = null,
+  val attendanceFeedback: AttendanceFeedbackRequestDTO? = null,
+  val sessionFeedback: SessionFeedbackRequestDTO? = null,
 )
 
-data class UpdateAppointmentAttendanceDTO(
+data class AttendanceFeedbackRequestDTO(
   val attended: Attended,
-  val additionalAttendanceInformation: String?,
+  val attendanceFailureInformation: String?,
 )
 
-data class RecordAppointmentBehaviourDTO(
-  val behaviourDescription: String,
+data class SessionFeedbackRequestDTO(
+  val sessionSummary: String,
+  val sessionResponse: String,
+  val sessionConcerns: String?,
   val notifyProbationPractitioner: Boolean,
 )
 
@@ -70,7 +72,7 @@ data class DeliverySessionDTO(
   val sessionType: AppointmentSessionType?,
   val npsOfficeCode: String?,
   val appointmentDeliveryAddress: AddressDTO?,
-  val sessionFeedback: SessionFeedbackDTO,
+  val appointmentFeedback: AppointmentFeedbackDTO,
   val deliusAppointmentId: Long?,
   val appointmentId: UUID?,
 ) {
@@ -105,7 +107,7 @@ data class DeliverySessionDTO(
           .filterNot { it == session.currentAppointment }
           .mapTo(HashSet()) { AppointmentDTO.from(it) },
         npsOfficeCode = session.currentAppointment?.appointmentDelivery?.npsOfficeCode,
-        sessionFeedback = SessionFeedbackDTO.from(session.currentAppointment),
+        appointmentFeedback = AppointmentFeedbackDTO.from(session.currentAppointment),
         deliusAppointmentId = session.currentAppointment?.deliusAppointmentId,
         appointmentId = session.currentAppointment?.id,
       )
@@ -116,48 +118,52 @@ data class DeliverySessionDTO(
   }
 }
 
-data class SessionFeedbackDTO(
-  val attendance: AttendanceDTO,
-  val behaviour: BehaviourDTO,
+data class AppointmentFeedbackDTO(
+  val attendanceFeedback: AttendanceFeedbackDTO,
+  val sessionFeedback: SessionFeedbackDTO,
   val submitted: Boolean,
   val submittedBy: AuthUserDTO?,
 ) {
   companion object {
     fun from(
       appointment: Appointment?,
-    ): SessionFeedbackDTO {
+    ): AppointmentFeedbackDTO {
       return appointment?.let {
-        SessionFeedbackDTO(
-          AttendanceDTO.from(appointment),
-          BehaviourDTO.from(appointment),
+        AppointmentFeedbackDTO(
+          AttendanceFeedbackDTO.from(appointment),
+          SessionFeedbackDTO.from(appointment),
           appointment.appointmentFeedbackSubmittedAt !== null,
           appointment.appointmentFeedbackSubmittedBy?.let { AuthUserDTO.from(it) },
         )
-      } ?: SessionFeedbackDTO(AttendanceDTO(null, null, null, null), BehaviourDTO(null, null), false, null)
+      } ?: AppointmentFeedbackDTO(AttendanceFeedbackDTO(null, null, null, null, null), SessionFeedbackDTO(null, null, null, null, null), false, null)
     }
   }
 }
 
-data class AttendanceDTO(
+data class AttendanceFeedbackDTO(
   val attended: Attended?,
   val additionalAttendanceInformation: String?,
+  val attendanceFailureInformation: String?,
   val submittedAt: OffsetDateTime?,
   val submittedBy: AuthUserDTO?,
 ) {
   companion object {
-    fun from(appointment: Appointment): AttendanceDTO {
-      return AttendanceDTO(attended = appointment.attended, additionalAttendanceInformation = appointment.additionalAttendanceInformation, appointment.attendanceSubmittedAt, appointment.attendanceSubmittedBy?.let { AuthUserDTO.from(it) } ?: null)
+    fun from(appointment: Appointment): AttendanceFeedbackDTO {
+      return AttendanceFeedbackDTO(attended = appointment.attended, additionalAttendanceInformation = appointment.additionalAttendanceInformation, attendanceFailureInformation = appointment.attendanceFailureInformation, appointment.attendanceSubmittedAt, appointment.attendanceSubmittedBy?.let { AuthUserDTO.from(it) } ?: null)
     }
   }
 }
 
-data class BehaviourDTO(
+data class SessionFeedbackDTO(
   val behaviourDescription: String?,
+  val sessionSummary: String?,
+  val sessionResponse: String?,
+  val sessionConcerns: String?,
   val notifyProbationPractitioner: Boolean?,
 ) {
   companion object {
-    fun from(appointment: Appointment): BehaviourDTO {
-      return BehaviourDTO(appointment.attendanceBehaviour, appointment.notifyPPOfAttendanceBehaviour)
+    fun from(appointment: Appointment): SessionFeedbackDTO {
+      return SessionFeedbackDTO(appointment.attendanceBehaviour, appointment.sessionSummary, appointment.sessionResponse, appointment.sessionConcerns, appointment.notifyPPOfAttendanceBehaviour)
     }
   }
 }

@@ -26,6 +26,7 @@ data class Appointment(
   @Enumerated(EnumType.STRING)
   var attended: Attended? = null,
   var additionalAttendanceInformation: String? = null,
+  var attendanceFailureInformation: String? = null,
   var attendanceSubmittedAt: OffsetDateTime? = null,
   @ManyToOne
   @Fetch(FetchMode.JOIN)
@@ -36,6 +37,14 @@ data class Appointment(
   @ManyToOne
   @Fetch(FetchMode.JOIN)
   var attendanceBehaviourSubmittedBy: AuthUser? = null,
+
+  var sessionSummary: String? = null,
+  var sessionResponse: String? = null,
+  var sessionConcerns: String? = null,
+  var sessionFeedbackSubmittedAt: OffsetDateTime? = null,
+  @ManyToOne
+  @Fetch(FetchMode.JOIN)
+  var sessionFeedbackSubmittedBy: AuthUser? = null,
 
   var notifyPPOfAttendanceBehaviour: Boolean? = null,
 
