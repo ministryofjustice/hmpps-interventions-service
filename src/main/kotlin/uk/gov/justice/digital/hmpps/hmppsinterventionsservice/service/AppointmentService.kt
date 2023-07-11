@@ -155,6 +155,37 @@ class AppointmentService(
     return appointmentRepository.save(appointment)
   }
 
+  fun clearSessionFeedback(
+    appointment: Appointment
+  ): Appointment {
+    if (appointment.appointmentFeedbackSubmittedAt != null) {
+      throw ResponseStatusException(
+        HttpStatus.CONFLICT,
+        "Feedback has already been submitted for this appointment [id=${appointment.id}]",
+      )
+    }
+    appointment.sessionSummary = null
+    appointment.sessionResponse = null
+    appointment.sessionConcerns = null
+    appointment.sessionFeedbackSubmittedBy = null
+    appointment.sessionFeedbackSubmittedAt = null
+    appointment.notifyPPOfAttendanceBehaviour = null
+    return appointmentRepository.save(appointment)
+  }
+
+  fun clearAttendanceFeedback(
+    appointment: Appointment
+  ): Appointment {
+    if (appointment.appointmentFeedbackSubmittedAt != null) {
+      throw ResponseStatusException(
+        HttpStatus.CONFLICT,
+        "Feedback has already been submitted for this appointment [id=${appointment.id}]",
+      )
+    }
+    appointment.attendanceFailureInformation = null
+    return appointmentRepository.save(appointment)
+  }
+
   fun recordAppointmentAttendance(
     appointment: Appointment,
     attended: Attended,
@@ -227,7 +258,7 @@ class AppointmentService(
     submittedBy: AuthUser,
   ) {
     appointment.attended = attended
-    attendanceFailureInformation?.let { appointment.attendanceFailureInformation = attendanceFailureInformation }
+    appointment.attendanceFailureInformation = attendanceFailureInformation
     appointment.attendanceSubmittedAt = OffsetDateTime.now()
     appointment.attendanceSubmittedBy = authUserRepository.save(submittedBy)
   }

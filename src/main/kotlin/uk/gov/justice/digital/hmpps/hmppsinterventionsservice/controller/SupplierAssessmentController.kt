@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SessionFeedbac
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentType
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AppointmentService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
@@ -132,6 +133,12 @@ class SupplierAssessmentController(
   ): AppointmentDTO {
     val submittedBy = userMapper.fromToken(authentication)
     val supplierAssessmentAppointment = getSupplierAssessmentAppointment(referralId, submittedBy)
+    if (request.attended == Attended.NO) {
+      appointmentService.clearSessionFeedback(supplierAssessmentAppointment)
+    }
+    if (request.attended != Attended.NO) {
+      appointmentService.clearAttendanceFeedback(supplierAssessmentAppointment)
+    }
     val updatedAppointment = appointmentService.recordAppointmentAttendance(
       supplierAssessmentAppointment,
       request.attended,
