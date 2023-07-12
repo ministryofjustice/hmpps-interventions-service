@@ -155,6 +155,23 @@ class AppointmentService(
     return appointmentRepository.save(appointment)
   }
 
+  fun clearSessionFeedback(
+    appointment: Appointment,
+  ) {
+    appointment.sessionSummary = null
+    appointment.sessionResponse = null
+    appointment.sessionConcerns = null
+    appointment.sessionFeedbackSubmittedBy = null
+    appointment.sessionFeedbackSubmittedAt = null
+    appointment.notifyPPOfAttendanceBehaviour = null
+  }
+
+  fun clearAttendanceFeedback(
+    appointment: Appointment,
+  ) {
+    appointment.attendanceFailureInformation = null
+  }
+
   fun recordAppointmentAttendance(
     appointment: Appointment,
     attended: Attended,
@@ -172,6 +189,12 @@ class AppointmentService(
         HttpStatus.BAD_REQUEST,
         "Cannot submit feedback for a future appointment [id=${appointment.id}]",
       )
+    }
+    if (attended == Attended.NO) {
+      clearSessionFeedback(appointment)
+    }
+    if (attended != Attended.NO) {
+      clearAttendanceFeedback(appointment)
     }
     setAttendanceFields(appointment, attended, attendanceFailureInformation, submittedBy)
     return appointmentRepository.save(appointment)
@@ -227,7 +250,7 @@ class AppointmentService(
     submittedBy: AuthUser,
   ) {
     appointment.attended = attended
-    attendanceFailureInformation?.let { appointment.attendanceFailureInformation = attendanceFailureInformation }
+    appointment.attendanceFailureInformation = attendanceFailureInformation
     appointment.attendanceSubmittedAt = OffsetDateTime.now()
     appointment.attendanceSubmittedBy = authUserRepository.save(submittedBy)
   }
