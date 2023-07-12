@@ -133,12 +133,6 @@ class SupplierAssessmentController(
   ): AppointmentDTO {
     val submittedBy = userMapper.fromToken(authentication)
     val supplierAssessmentAppointment = getSupplierAssessmentAppointment(referralId, submittedBy)
-    if (request.attended == Attended.NO) {
-      appointmentService.clearSessionFeedback(supplierAssessmentAppointment)
-    }
-    if (request.attended != Attended.NO) {
-      appointmentService.clearAttendanceFeedback(supplierAssessmentAppointment)
-    }
     val updatedAppointment = appointmentService.recordAppointmentAttendance(
       supplierAssessmentAppointment,
       request.attended,

@@ -287,7 +287,12 @@ class DeliverySessionService(
     if (appointment.appointmentFeedbackSubmittedAt != null) {
       throw ResponseStatusException(HttpStatus.CONFLICT, "session feedback has already been submitted for this session")
     }
-
+    if (attended == Attended.NO) {
+      appointmentService.clearSessionFeedback(appointment)
+    }
+    if (attended != Attended.NO) {
+      appointmentService.clearAttendanceFeedback(appointment)
+    }
     setAttendanceFields(appointment, attended, attendanceFailureInformation, actor)
     return deliverySessionRepository.save(session)
   }
