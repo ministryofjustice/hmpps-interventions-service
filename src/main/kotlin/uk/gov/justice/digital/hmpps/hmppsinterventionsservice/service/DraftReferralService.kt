@@ -124,7 +124,10 @@ class DraftReferralService(
     updateServiceCategoryDetails(referral, update)
     if (currentLocationEnabled) {
       updatePersonCurrentLocation(referral, update)
-      updatePersonExpectedReleaseDate(referral, update)
+
+      if (update.personCustodyPrisonId != null) {
+        updatePersonExpectedReleaseDate(referral, update)
+      }
     }
 
     if (saveProbationPractitionerDetails) {
@@ -223,7 +226,7 @@ class DraftReferralService(
   fun updatePersonCurrentLocation(draftReferral: DraftReferral, update: DraftReferralDTO) {
     update.personCurrentLocationType?.let {
       draftReferral.personCurrentLocationType = it
-      if (it == PersonCurrentLocationType.CUSTODY) {
+      if (it == PersonCurrentLocationType.CUSTODY && update.personCustodyPrisonId != null) {
         draftReferral.personCustodyPrisonId = update.personCustodyPrisonId
       } else {
         draftReferral.personCustodyPrisonId = null
@@ -386,14 +389,6 @@ class DraftReferralService(
   private fun validateDraftReferralUpdate(draftReferral: DraftReferral, update: DraftReferralDTO) {
     val errors = mutableListOf<FieldError>()
 
-    if (currentLocationEnabled) {
-      update.personCurrentLocationType?.let {
-        if (it == PersonCurrentLocationType.CUSTODY && update.personCustodyPrisonId == null) {
-          errors.add(FieldError(field = "personCustodyPrisonId", error = Code.CONDITIONAL_FIELD_MUST_BE_SET))
-        }
-      }
-    }
-
     update.completionDeadline?.let {
       if (it.isBefore(LocalDate.now())) {
         errors.add(FieldError(field = "completionDeadline", error = Code.DATE_MUST_BE_IN_THE_FUTURE))
@@ -421,10 +416,7 @@ class DraftReferralService(
     }
 
     update.serviceCategoryIds?.let {
-      if (!draftReferral.intervention.dynamicFrameworkContract.contractType.serviceCategories.map {
-          serviceCategory ->
-        serviceCategory.id
-      }.containsAll(it)
+      if (!draftReferral.intervention.dynamicFrameworkContract.contractType.serviceCategories.map { serviceCategory -> serviceCategory.id }.containsAll(it)
       ) {
         errors.add(FieldError(field = "serviceCategoryIds", error = Code.INVALID_SERVICE_CATEGORY_FOR_CONTRACT))
       }

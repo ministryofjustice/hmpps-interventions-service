@@ -268,7 +268,7 @@ class DraftReferralServiceTest @Autowired constructor(
       sampleDraftReferral.expectedReleaseDate = LocalDate.now().plusDays(10)
       entityManager.persistAndFlush(sampleDraftReferral)
 
-      val draftReferral = DraftReferralDTO(expectedReleaseDate = LocalDate.now().plusDays(8))
+      val draftReferral = DraftReferralDTO(personCustodyPrisonId = "ABC", expectedReleaseDate = LocalDate.now().plusDays(8))
       draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
       val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
       assertThat(savedDraftReferral).isNotNull
@@ -283,7 +283,7 @@ class DraftReferralServiceTest @Autowired constructor(
       sampleDraftReferral.expectedReleaseDateMissingReason = "It will be known pretty soon"
       entityManager.persistAndFlush(sampleDraftReferral)
 
-      val draftReferral = DraftReferralDTO(expectedReleaseDateMissingReason = "It will be tomorrow")
+      val draftReferral = DraftReferralDTO(personCustodyPrisonId = "ABC", expectedReleaseDateMissingReason = "It will be tomorrow")
       draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
       val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
       assertThat(savedDraftReferral).isNotNull
@@ -298,7 +298,7 @@ class DraftReferralServiceTest @Autowired constructor(
       sampleDraftReferral.expectedReleaseDate = LocalDate.now().plusDays(10)
       entityManager.persistAndFlush(sampleDraftReferral)
 
-      val draftReferral = DraftReferralDTO(expectedReleaseDateMissingReason = "It will be known tomorrow")
+      val draftReferral = DraftReferralDTO(personCustodyPrisonId = "ABC", expectedReleaseDateMissingReason = "It will be known tomorrow")
       draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
       val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
       assertThat(savedDraftReferral).isNotNull
@@ -314,7 +314,7 @@ class DraftReferralServiceTest @Autowired constructor(
       sampleDraftReferral.expectedReleaseDateMissingReason = "It will be known tomorrow"
       entityManager.persistAndFlush(sampleDraftReferral)
 
-      val draftReferral = DraftReferralDTO(expectedReleaseDate = LocalDate.now().plusDays(8))
+      val draftReferral = DraftReferralDTO(personCustodyPrisonId = "ABC", expectedReleaseDate = LocalDate.now().plusDays(8))
       draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
       val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
       assertThat(savedDraftReferral).isNotNull
