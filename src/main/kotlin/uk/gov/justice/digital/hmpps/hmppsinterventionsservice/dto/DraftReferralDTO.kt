@@ -61,6 +61,9 @@ data class DraftReferralDTO(
   val ppPdu: String? = null,
   val ppProbationOffice: String? = null,
   val hasValidDeliusPPDetails: Boolean? = null,
+  val hasMainPointOfContactDetails: Boolean? = null,
+  val isReferralReleasingIn12Weeks: Boolean? = null,
+  val roleOrJobTitle: String? = null,
 ) {
   companion object {
     fun from(referral: DraftReferral): DraftReferralDTO {
@@ -110,6 +113,9 @@ data class DraftReferralDTO(
         ppPdu = referral.ppPdu,
         ppProbationOffice = referral.ppProbationOffice,
         hasValidDeliusPPDetails = referral.hasValidDeliusPPDetails,
+        isReferralReleasingIn12Weeks = referral.isReferralReleasingIn12Weeks,
+        hasMainPointOfContactDetails = referral.hasMainPointOfContactDetails,
+        roleOrJobTitle = referral.roleOrJobTitle,
       )
     }
 
@@ -153,6 +159,7 @@ data class DraftReferralDTO(
         personCustodyPrisonId = referral.referralLocation?.prisonId,
         expectedReleaseDate = referral.referralLocation?.expectedReleaseDate,
         expectedReleaseDateMissingReason = referral.referralLocation?.expectedReleaseDateMissingReason,
+        isReferralReleasingIn12Weeks = referral.referralLocation?.isReferralReleasingIn12Weeks,
         ndeliusPPName = referral.probationPractitionerDetails?.nDeliusName,
         ndeliusPPEmailAddress = referral.probationPractitionerDetails?.nDeliusEmailAddress,
         ndeliusPDU = referral.probationPractitionerDetails?.nDeliusPDU,
@@ -162,6 +169,10 @@ data class DraftReferralDTO(
         ppProbationOffice = referral.probationPractitionerDetails?.probationOffice,
         hasValidDeliusPPDetails = referral.probationPractitionerDetails?.let {
           it.nDeliusName != null || it.nDeliusEmailAddress != null || it.nDeliusPDU != null
+        },
+        roleOrJobTitle = referral.probationPractitionerDetails?.roleOrJobTitle,
+        hasMainPointOfContactDetails = referral.probationPractitionerDetails?.let {
+          it.name != null || it.roleOrJobTitle != null || it.emailAddress != null
         },
       )
     }

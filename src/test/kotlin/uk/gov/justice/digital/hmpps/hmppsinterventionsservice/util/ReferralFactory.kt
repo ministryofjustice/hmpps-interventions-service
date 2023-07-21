@@ -53,6 +53,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     ppProbationOffice: String? = "London",
     ppPdu: String? = "East Sussex",
     hasValidDeliusPPDetails: Boolean = false,
+    isReferralReleasingIn12Weeks: Boolean = false,
   ): DraftReferral {
     return createDraftReferral(
       id = id,
@@ -78,6 +79,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       ppProbationOffice = ppProbationOffice,
       ppPdu = ppPdu,
       hasValidDeliusPPDetails = hasValidDeliusPPDetails,
+      isReferralReleasingIn12Weeks = isReferralReleasingIn12Weeks,
     )
   }
 

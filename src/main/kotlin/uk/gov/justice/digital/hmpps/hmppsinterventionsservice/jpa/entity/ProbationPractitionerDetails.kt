@@ -20,4 +20,5 @@ data class ProbationPractitionerDetails(
   @Column(name = "email_address") var emailAddress: String? = null,
   @Column(name = "pdu") var pdu: String? = null,
   @Column(name = "probation_office") var probationOffice: String? = null,
+  @Column(name = "role_job_title") var roleOrJobTitle: String? = null,
 )

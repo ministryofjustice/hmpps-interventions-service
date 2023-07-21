@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 import com.microsoft.applicationinsights.TelemetryClient
 import mu.KotlinLogging
 import net.logstash.logback.argument.StructuredArguments
+import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -124,15 +125,14 @@ class DraftReferralService(
     updateServiceCategoryDetails(referral, update)
     if (currentLocationEnabled) {
       updatePersonCurrentLocation(referral, update)
-
-      if (update.personCustodyPrisonId != null) {
-        updatePersonExpectedReleaseDate(referral, update)
-      }
+      updatePersonExpectedReleaseDate(referral, update)
     }
 
     if (saveProbationPractitionerDetails) {
       updateProbationPractitionerDetails(referral, update)
     }
+
+    updateMainPointOfContactDetails(referral, update)
 
     // this field doesn't fit into any other categories - is this a smell?
     update.relevantSentenceId?.let {
@@ -187,6 +187,23 @@ class DraftReferralService(
     }
   }
 
+  private fun updateMainPointOfContactDetails(referral: DraftReferral, update: DraftReferralDTO) {
+    if (update.hasMainPointOfContactDetails != null) {
+      referral.ppName = update.ppName
+      referral.roleOrJobTitle = update.roleOrJobTitle
+      referral.ppEmailAddress = update.ppEmailAddress
+      referral.hasMainPointOfContactDetails = update.hasMainPointOfContactDetails
+      if (StringUtils.isNotEmpty(update.ppPdu)) {
+        referral.ppPdu = update.ppPdu
+        referral.ppProbationOffice = null
+      }
+      if (StringUtils.isNotEmpty(update.ppProbationOffice)) {
+        referral.ppProbationOffice = update.ppProbationOffice
+        referral.ppPdu = null
+      }
+    }
+  }
+
   fun updateDraftReferralDetails(referral: DraftReferral, update: UpdateReferralDetailsDTO, actor: AuthUser): ReferralDetails? {
     if (!update.isValidUpdate) {
       return null
@@ -224,15 +241,20 @@ class DraftReferralService(
   }
 
   fun updatePersonCurrentLocation(draftReferral: DraftReferral, update: DraftReferralDTO) {
-    update.personCurrentLocationType?.let {
-      draftReferral.personCurrentLocationType = it
-      if (it == PersonCurrentLocationType.CUSTODY && update.personCustodyPrisonId != null) {
-        draftReferral.personCustodyPrisonId = update.personCustodyPrisonId
-      } else {
+    update.personCurrentLocationType?.let { personCurrentLocationType ->
+      draftReferral.personCurrentLocationType = personCurrentLocationType
+      if (personCurrentLocationType == PersonCurrentLocationType.COMMUNITY) {
         draftReferral.personCustodyPrisonId = null
         draftReferral.expectedReleaseDate = null
         draftReferral.expectedReleaseDateMissingReason = null
+      } else {
+        update.isReferralReleasingIn12Weeks?.let {
+          draftReferral.isReferralReleasingIn12Weeks = it
+        }
       }
+    }
+    update.personCustodyPrisonId?.let {
+      draftReferral.personCustodyPrisonId = update.personCustodyPrisonId
     }
   }
 
@@ -377,6 +399,7 @@ class DraftReferralService(
     if (currentLocationEnabled) {
       draftReferral.personCurrentLocationType?.let {
         if (it == PersonCurrentLocationType.CUSTODY &&
+          draftReferral.isReferralReleasingIn12Weeks == null &&
           draftReferral.expectedReleaseDate == null &&
           draftReferral.expectedReleaseDateMissingReason == null
         ) {
@@ -494,6 +517,7 @@ class DraftReferralService(
           prisonId = draftReferral.personCustodyPrisonId,
           expectedReleaseDate = draftReferral.expectedReleaseDate,
           expectedReleaseDateMissingReason = draftReferral.expectedReleaseDateMissingReason,
+          isReferralReleasingIn12Weeks = draftReferral.isReferralReleasingIn12Weeks,
         ),
       )
       referralRepository.save(referral)
@@ -513,6 +537,7 @@ class DraftReferralService(
           emailAddress = draftReferral.ppEmailAddress,
           pdu = draftReferral.ppPdu,
           probationOffice = draftReferral.ppProbationOffice,
+          roleOrJobTitle = draftReferral.roleOrJobTitle,
         ),
       )
       referralRepository.save(referral)
