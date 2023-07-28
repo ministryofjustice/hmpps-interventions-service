@@ -24,9 +24,12 @@ class WebClientConfiguration(
   @Value("\${webclient.read-timeout-seconds}") private val defaultReadTimeoutSeconds: Int,
   @Value("\${webclient.hmpps-auth.read-timeout-seconds}") private val hmppsReadTimeoutSeconds: Int,
   @Value("\${webclient.hmpps-auth.connect-timeout-seconds}") private val hmppsAuthConnectTimeoutSeconds: Long,
+  @Value("\${webclient.manage-users.read-timeout-seconds}") private val manageUsersReadTimeoutSeconds: Int,
+  @Value("\${webclient.manage-users.connect-timeout-seconds}") private val manageUsersAuthConnectTimeoutSeconds: Long,
   @Value("\${webclient.write-timeout-seconds}") private val writeTimeoutSeconds: Int,
   @Value("\${community-api.baseurl}") private val communityApiBaseUrl: String,
   @Value("\${hmppsauth.baseurl}") private val hmppsAuthBaseUrl: String,
+  @Value("\${manage-users.baseurl}") private val manageUsersAuthBaseUrl: String,
   @Value("\${assess-risks-and-needs.baseurl}") private val assessRisksAndNeedsBaseUrl: String,
   @Value("\${prisoner-offender-search.baseurl}") private val prisonerOffenderSearchApiUrl: String,
   @Value("\${refer-and-monitor-and-delius.baseurl}") private val ramDelius: String,
@@ -47,6 +50,14 @@ class WebClientConfiguration(
   fun hmppsAuthApiClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient {
     return RestClient(
       createAuthorizedWebClient(authorizedClientManager, hmppsAuthBaseUrl, hmppsReadTimeoutSeconds, hmppsAuthConnectTimeoutSeconds),
+      interventionsClientRegistrationId,
+    )
+  }
+
+  @Bean
+  fun mangeUsersAuthApiClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient {
+    return RestClient(
+      createAuthorizedWebClient(authorizedClientManager, manageUsersAuthBaseUrl, manageUsersReadTimeoutSeconds, manageUsersAuthConnectTimeoutSeconds),
       interventionsClientRegistrationId,
     )
   }

@@ -22,6 +22,7 @@ env_details:
 
 env:
   HMPPSAUTH_BASEURL: "https://sign-in.hmpps.service.justice.gov.uk/auth"
+  MANAGEUSERS_BASEURL: "https://manage-users-api.hmpps.service.justice.gov.uk"
   INTERVENTIONSUI_BASEURL: "https://refer-monitor-intervention.service.justice.gov.uk"
   COMMUNITYAPI_BASEURL: "https://community-api-secure.probation.service.justice.gov.uk"
   REFERANDMONITORANDDELIUS_BASEURL: "https://refer-and-monitor-and-delius.hmpps.service.justice.gov.uk"

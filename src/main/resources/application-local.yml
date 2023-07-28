@@ -50,6 +50,8 @@ aws:
 
 hmppsauth:
   baseurl: http://hmpps-auth:8090/auth
+manage-users:
+  baseurl: http://manage-users:8095/auth
 
 postgres:
   uri: localhost:5432
