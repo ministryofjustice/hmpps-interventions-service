@@ -62,7 +62,7 @@ class HMPPSAuthService(
 
   fun getUserGroups(user: AuthUser): List<AuthGroupID>? {
     val url = UriComponentsBuilder.fromPath(authUserGroupsLocation)
-      .buildAndExpand(user.userName)
+      .buildAndExpand(user.id)
       .toString()
 
     return mangeUsersAuthApiClient.get(url)
