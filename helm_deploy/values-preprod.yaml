@@ -24,6 +24,7 @@ env_details:
 
 env:
   HMPPSAUTH_BASEURL: "https://sign-in-preprod.hmpps.service.justice.gov.uk/auth"
+  MANAGEUSERS_BASEURL: "https://manage-users-api-preprod.hmpps.service.justice.gov.uk"
   INTERVENTIONSUI_BASEURL: "https://hmpps-interventions-ui-preprod.apps.live-1.cloud-platform.service.justice.gov.uk"
   COMMUNITYAPI_BASEURL: "https://community-api-secure.pre-prod.delius.probation.hmpps.dsd.io"
   REFERANDMONITORANDDELIUS_BASEURL: "https://refer-and-monitor-and-delius-preprod.hmpps.service.justice.gov.uk"

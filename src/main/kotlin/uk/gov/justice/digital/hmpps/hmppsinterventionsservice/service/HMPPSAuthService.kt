@@ -51,21 +51,21 @@ private data class UserDetailResponse(
 @Service
 @Transactional
 class HMPPSAuthService(
-  @Value("\${hmppsauth.api.locations.auth-user-groups}") private val authUserGroupsLocation: String,
-  @Value("\${hmppsauth.api.locations.auth-user-detail}") private val authUserDetailLocation: String,
-  @Value("\${hmppsauth.api.locations.user-email}") private val userEmailLocation: String,
-  @Value("\${hmppsauth.api.locations.user-detail}") private val userDetailLocation: String,
+  @Value("\${manage-users.api.locations.auth-user-groups}") private val authUserGroupsLocation: String,
+  @Value("\${manage-users.api.locations.auth-user-detail}") private val authUserDetailLocation: String,
+  @Value("\${manage-users.api.locations.user-email}") private val userEmailLocation: String,
+  @Value("\${manage-users.api.locations.user-detail}") private val userDetailLocation: String,
   @Value("\${webclient.hmpps-auth.max-retry-attempts}") private val maxRetryAttempts: Long,
-  private val hmppsAuthApiClient: RestClient,
+  private val mangeUsersAuthApiClient: RestClient,
 ) {
   companion object : KLogging()
 
   fun getUserGroups(user: AuthUser): List<AuthGroupID>? {
     val url = UriComponentsBuilder.fromPath(authUserGroupsLocation)
-      .buildAndExpand(user.userName)
+      .buildAndExpand(user.id)
       .toString()
 
-    return hmppsAuthApiClient.get(url)
+    return mangeUsersAuthApiClient.get(url)
       .retrieve()
       .onStatus({ HttpStatus.NOT_FOUND == it }, { Mono.just(null) })
       .bodyToFlux(AuthGroupResponse::class.java)
@@ -81,7 +81,7 @@ class HMPPSAuthService(
   fun getUserDetail(user: AuthUserDTO): UserDetail {
     return if (user.authSource == "auth") {
       val url = UriComponentsBuilder.fromPath(authUserDetailLocation).buildAndExpand(user.username).toString()
-      hmppsAuthApiClient.get(url)
+      mangeUsersAuthApiClient.get(url)
         .retrieve()
         .bodyToMono(AuthUserDetailResponse::class.java)
         .withRetryPolicy()
@@ -96,12 +96,12 @@ class HMPPSAuthService(
       val detailUrl = UriComponentsBuilder.fromPath(userDetailLocation).buildAndExpand(user.username).toString()
       val emailUrl = UriComponentsBuilder.fromPath(userEmailLocation).buildAndExpand(user.username).toString()
       Mono.zip(
-        hmppsAuthApiClient.get(detailUrl)
+        mangeUsersAuthApiClient.get(detailUrl)
           .retrieve()
           .bodyToMono(UserDetailResponse::class.java)
           .withRetryPolicy()
           .map { Pair(it.name.substringBefore(' '), it.name.substringAfterLast(' ')) },
-        hmppsAuthApiClient.get(emailUrl)
+        mangeUsersAuthApiClient.get(emailUrl)
           .retrieve()
           .onStatus({ it.equals(HttpStatus.NO_CONTENT) }, { Mono.error(UnverifiedEmailException()) })
           .bodyToMono(UserEmailResponse::class.java)

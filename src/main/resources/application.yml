@@ -165,13 +165,13 @@ community-api:
       enabled: true
   integration-context: commissioned-rehabilitation-services
 
-hmppsauth:
+manage-users:
   api:
     locations:
-      auth-user-groups: "/api/authuser/{username}/groups"
-      auth-user-detail: "/api/authuser/{username}"
-      user-email: "/api/user/{username}/email"
-      user-detail: "/api/user/{username}"
+      auth-user-groups: "/externalusers/{userId}/groups"
+      auth-user-detail: "/externalusers/{username}"
+      user-email: "/users/{username}/email"
+      user-detail: "/users/{username}"
 
 assess-risks-and-needs:
   locations:
@@ -199,6 +199,10 @@ webclient:
   read-timeout-seconds: 10
   write-timeout-seconds: 10
   hmpps-auth:
+    max-retry-attempts: 2
+    connect-timeout-seconds: 20
+    read-timeout-seconds: 3
+  manage-users:
     max-retry-attempts: 2
     connect-timeout-seconds: 20
     read-timeout-seconds: 3
