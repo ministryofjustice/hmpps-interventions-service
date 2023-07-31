@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.9.2"
-  kotlin("plugin.spring") version "1.8.22"
-  id("org.jetbrains.kotlin.plugin.jpa") version "1.8.22"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.9.3"
+  kotlin("plugin.spring") version "1.9.0"
+  id("org.jetbrains.kotlin.plugin.jpa") version "1.9.0"
   id("jacoco")
 }
 
@@ -70,7 +70,7 @@ tasks {
 
 dependencyManagement {
   dependencies {
-    dependency("net.minidev:json-smart:2.4.11")
+    dependency("net.minidev:json-smart:2.5.0")
   }
 }
 
@@ -80,10 +80,10 @@ dependencies {
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
-  implementation("io.sentry:sentry-spring-boot-starter:6.23.0")
-  implementation("io.sentry:sentry-logback:6.23.0")
+  implementation("io.sentry:sentry-spring-boot-starter:6.27.0")
+  implementation("io.sentry:sentry-logback:6.27.0")
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
-  implementation("net.logstash.logback:logstash-logback-encoder:7.3")
+  implementation("net.logstash.logback:logstash-logback-encoder:7.4")
   runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2") // needed for OffsetDateTime for AppInsights
 
   // openapi
@@ -93,14 +93,14 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:4.1.0-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.20.86")
-  implementation("software.amazon.awssdk:s3:2.20.86")
+  implementation("software.amazon.awssdk:sns:2.20.116")
+  implementation("software.amazon.awssdk:s3:2.20.116")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-  implementation("com.nimbusds:oauth2-oidc-sdk:10.9.1")
+  implementation("com.nimbusds:oauth2-oidc-sdk:10.12")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -114,7 +114,7 @@ dependencies {
   implementation("com.github.java-json-tools:json-patch:1.13")
   implementation("org.apache.commons:commons-csv:1.10.0")
 
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.0")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.1")
   testImplementation("com.squareup.okhttp3:okhttp:4.11.0")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.11.0")
   testImplementation("org.mockito:mockito-inline:5.2.0")
