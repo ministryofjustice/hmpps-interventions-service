@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.9.3"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.10.0-beta"
   kotlin("plugin.spring") version "1.9.0"
   id("org.jetbrains.kotlin.plugin.jpa") version "1.9.0"
   id("jacoco")
@@ -98,9 +98,9 @@ dependencies {
   implementation("software.amazon.awssdk:s3:2.20.116")
 
   // security
-  implementation("org.springframework.boot:spring-boot-starter-webflux")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+  implementation("org.springframework.boot:spring-boot-starter-webflux:2.7.14")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.7.14")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:2.7.14")
   implementation("com.nimbusds:oauth2-oidc-sdk:10.12")
 
   // database
