@@ -98,9 +98,9 @@ dependencies {
   implementation("software.amazon.awssdk:s3:2.20.116")
 
   // security
-  implementation("org.springframework.boot:spring-boot-starter-webflux:2.7.14")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.7.14")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:2.7.14")
+  implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.2")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.1.2")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.1.2")
   implementation("com.nimbusds:oauth2-oidc-sdk:10.12")
 
   // database
