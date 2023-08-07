@@ -3,18 +3,19 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.RestClient
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.InvalidAssumptionError
 
 internal class RamDeliusAPIOffenderServiceTest {
   private val responsibleOfficerLocation = "responsible-officer"
-  private val telemetryService = TelemetryService(mock())
+  private val telemetryService = mock<TelemetryService>()
 
   private fun createMockedRestClient(vararg responses: MockedResponse): RestClient {
     return RestClient(
@@ -71,7 +72,8 @@ internal class RamDeliusAPIOffenderServiceTest {
   }
 
   @Test
-  fun `getResponsibleOfficerDetails fails when there are no responsible officers`() {
+  fun `getResponsibleOfficerDetails sends an InterventionsInvalidAssumption event to AppInsights when there are no responsible officers`() {
+    val crn = "X123456"
     val offenderService = offenderServiceFactory(
       createMockedRestClient(
         MockedResponse(
@@ -93,17 +95,12 @@ internal class RamDeliusAPIOffenderServiceTest {
       ),
     )
 
-    assertThrows<InvalidAssumptionError> {
-      offenderService.getResponsibleOfficerDetails("X123456")
-    }
-  }
-
-  @Test
-  fun `getResponsibleOfficerDetails throws not found`() {
-    val offenderService = offenderServiceFactory(createMockedRestClient(MockedResponse(responsibleOfficerLocation, HttpStatus.NOT_FOUND, "")))
-    assertThrows<InvalidAssumptionError> {
-      offenderService.getResponsibleOfficerDetails("X123456")
-    }
+    offenderService.getResponsibleOfficerDetails(crn)
+    verify(telemetryService).reportInvalidAssumption(
+      eq("service users always have a responsible officer"),
+      eq(mapOf("crn" to crn)),
+      eq(false),
+    )
   }
 
   @Test
