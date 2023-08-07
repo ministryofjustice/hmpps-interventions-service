@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.10.0-beta"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.10.0"
   kotlin("plugin.spring") version "1.9.0"
   id("org.jetbrains.kotlin.plugin.jpa") version "1.9.0"
   id("jacoco")
@@ -80,8 +80,8 @@ dependencies {
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
-  implementation("io.sentry:sentry-spring-boot-starter:6.27.0")
-  implementation("io.sentry:sentry-logback:6.27.0")
+  implementation("io.sentry:sentry-spring-boot-starter:6.28.0")
+  implementation("io.sentry:sentry-logback:6.28.0")
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
   implementation("net.logstash.logback:logstash-logback-encoder:7.3")
 
@@ -94,14 +94,14 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:4.1.0-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.20.116")
-  implementation("software.amazon.awssdk:s3:2.20.116")
+  implementation("software.amazon.awssdk:sns:2.20.120")
+  implementation("software.amazon.awssdk:s3:2.20.120")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.2")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.1.2")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.1.2")
-  implementation("com.nimbusds:oauth2-oidc-sdk:10.12")
+  implementation("com.nimbusds:oauth2-oidc-sdk:10.13.2")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
