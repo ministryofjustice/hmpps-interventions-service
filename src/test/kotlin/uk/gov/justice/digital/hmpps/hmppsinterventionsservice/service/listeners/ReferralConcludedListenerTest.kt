@@ -8,6 +8,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.EmailSender
@@ -123,5 +124,25 @@ internal class ReferralConcludedNotificationListenerTest {
     )
     Assertions.assertThat(personalisationCaptor.firstValue["sp_first_name"]).isEqualTo("tom")
     Assertions.assertThat(personalisationCaptor.firstValue["referral_number"]).isEqualTo("JS8762AC")
+  }
+
+  @Test
+  fun `referral sent event will not send an email if the referral is not assigned to everyone`() {
+    whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("tom", "tom@tom.tom", "jones"))
+    val sentReferral = referralFactory.createSent(
+      id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
+      referenceNumber = "JS8762AC",
+      assignments = emptyList(),
+    )
+
+    val referralCancelledEvent = ReferralConcludedEvent(
+      "source",
+      ReferralConcludedState.CANCELLED,
+      sentReferral,
+      "http://localhost:8080/sent-referral/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
+    )
+    notifyService().onApplicationEvent(referralCancelledEvent)
+    verify(hmppsAuthService, times(0)).getUserDetail(any<AuthUser>())
+    verify(emailSender, times(0)).sendEmail(any(), any(), any())
   }
 }
