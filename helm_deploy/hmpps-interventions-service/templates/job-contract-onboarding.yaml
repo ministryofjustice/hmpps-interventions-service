@@ -4,6 +4,7 @@ metadata:
   name: contract-onboarding
 spec:
   schedule: "0 2 * * *"
+  suspend: true
   jobTemplate:
     spec:
       template:
