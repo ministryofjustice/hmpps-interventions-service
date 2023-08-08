@@ -46,15 +46,17 @@ class ReferralConcludedNotificationListener(
   override fun onApplicationEvent(event: ReferralConcludedEvent) {
     when (event.type) {
       ReferralConcludedState.CANCELLED -> {
-        val userDetails = hmppsAuthService.getUserDetail(event.referral.currentAssignee!!)
-        emailSender.sendEmail(
-          cancelledReferralTemplateID,
-          userDetails.email,
-          mapOf(
-            "sp_first_name" to userDetails.firstName,
-            "referral_number" to event.referral.referenceNumber!!,
-          ),
-        )
+        event.referral.currentAssignee?.let {
+          val userDetails = hmppsAuthService.getUserDetail(event.referral.currentAssignee!!)
+          emailSender.sendEmail(
+            cancelledReferralTemplateID,
+            userDetails.email,
+            mapOf(
+              "sp_first_name" to userDetails.firstName,
+              "referral_number" to event.referral.referenceNumber!!,
+            ),
+          )
+        }
       }
       ReferralConcludedState.PREMATURELY_ENDED,
       ReferralConcludedState.COMPLETED,
