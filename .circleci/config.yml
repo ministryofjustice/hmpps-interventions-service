@@ -12,7 +12,7 @@ parameters:
     default: interventions-dev-notifications
   releases-slack-channel:
     type: string
-    default: interventions
+    default: interventions-team
 
 orbs:
   hmpps: ministryofjustice/hmpps@7.3.3
