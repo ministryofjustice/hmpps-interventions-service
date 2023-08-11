@@ -8,6 +8,9 @@ spec:
     spec:
       template:
         spec:
+          {{- if .Values.serviceAccountName }}
+          serviceAccountName: {{ .Values.serviceAccountName }}
+          {{- end }}
           restartPolicy: "Never"
           containers:
             - name: ndmis-performance-report

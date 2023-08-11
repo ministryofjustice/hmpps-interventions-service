@@ -3,5 +3,4 @@ generic-data-analytics-extractor:
   databaseSecretName: postgres14
   analyticalPlatformSecretName: analytical-platform-reporting-s3-bucket
 
-env:
-  serviceAccountName: "hmpps-interventions"
+serviceAccountName: "hmpps-interventions"

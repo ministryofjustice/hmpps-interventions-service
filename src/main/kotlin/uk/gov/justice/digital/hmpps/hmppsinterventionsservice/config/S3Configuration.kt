@@ -5,7 +5,6 @@ import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
 import java.net.URI
@@ -54,7 +53,6 @@ class S3Configuration(
   private fun bucketFactory(config: S3BucketConfiguration): S3Bucket {
     val builder = S3Client.builder()
       .region(Region.of(config.region))
-      .credentialsProvider { AwsBasicCredentials.create(config.accessKeyId, config.secretAccessKey) }
 
     val client = config.endpoint?.let {
       builder
