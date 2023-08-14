@@ -14,8 +14,6 @@ data class S3Bucket(val enabled: Boolean, val bucketName: String, val client: S3
 data class S3BucketConfiguration(
   val enabled: Boolean,
   val region: String,
-  val accessKeyId: String,
-  val secretAccessKey: String,
   val endpoint: Endpoint?,
   val bucket: Bucket,
 ) {
