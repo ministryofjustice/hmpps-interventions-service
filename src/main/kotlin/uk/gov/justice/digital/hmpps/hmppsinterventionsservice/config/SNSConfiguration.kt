@@ -11,8 +11,6 @@ import java.net.URI
 class SNSConfiguration(
   @Value("\${aws.sns.provider}") private val provider: String,
   @Value("\${aws.sns.region}") private val region: String,
-  @Value("\${aws.sns.access-key-id}") private val accessKeyId: String,
-  @Value("\${aws.sns.secret-access-key}") private val secretAccessKey: String,
   @Value("\${aws.sns.endpoint.uri:}") private val uri: String,
 
 ) {
