@@ -8,6 +8,9 @@ spec:
     spec:
       template:
         spec:
+          {{- if .Values.serviceAccountName }}
+          serviceAccountName: {{ .Values.serviceAccountName }}
+          {{- end }}
           restartPolicy: "Never"
           containers:
             - name: transfer-dec2022-womens-referrals
