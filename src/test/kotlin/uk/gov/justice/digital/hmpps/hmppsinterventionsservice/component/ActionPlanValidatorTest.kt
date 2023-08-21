@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.Code
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.ValidationError
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -96,8 +97,11 @@ class ActionPlanValidatorTest {
 
   @Test
   fun `submit action plan fails validation - number of sessions is empty`() {
-    val draftActionPlanId = UUID.randomUUID()
-    val actionPlanUpdate = SampleData.sampleActionPlan(id = draftActionPlanId, numberOfSessions = null)
+    val referral = SampleData.sampleReferral("CRN123", "Service Provider")
+    val appointment = SampleData.sampleAppointment(referral = referral, attended = Attended.YES, sessionFeedbackSubmittedAt = OffsetDateTime.now())
+    val supplierAssessment = SampleData.sampleSupplierAssessment(referral = referral, appointments = mutableSetOf(appointment))
+    referral.supplierAssessment = supplierAssessment
+    val actionPlanUpdate = SampleData.sampleActionPlan(id = UUID.randomUUID(), referral = referral, numberOfSessions = null)
 
     val exception = Assertions.assertThrows(ValidationError::class.java) {
       actionPlanValidator.validateSubmittedActionPlan(actionPlanUpdate)
@@ -105,5 +109,31 @@ class ActionPlanValidatorTest {
     assertThat(exception.errors.size).isEqualTo(1)
     assertThat(exception.errors[0].field).isEqualTo("numberOfSessions")
     assertThat(exception.errors[0].error).isEqualTo(Code.CANNOT_BE_EMPTY)
+  }
+
+  @Test
+  fun `submit action plan fails validation if supplier assessment has not been completed`() {
+    val draftActionPlanId = UUID.randomUUID()
+    val actionPlanUpdate = SampleData.sampleActionPlan(id = draftActionPlanId)
+
+    val exception = Assertions.assertThrows(ValidationError::class.java) {
+      actionPlanValidator.validateSubmittedActionPlan(actionPlanUpdate)
+    }
+    assertThat(exception.errors.size).isEqualTo(1)
+    assertThat(exception.errors[0].field).isEqualTo("supplierAssessmentAppointment")
+    assertThat(exception.errors[0].error).isEqualTo(Code.APPOINTMENT_MUST_BE_COMPLETED)
+  }
+
+  @Test
+  fun `submit action plan passes validation if supplier assessment has been completed`() {
+    val referral = SampleData.sampleReferral("CRN123", "Service Provider")
+    val appointment = SampleData.sampleAppointment(referral = referral, attended = Attended.YES, sessionFeedbackSubmittedAt = OffsetDateTime.now())
+    val supplierAssessment = SampleData.sampleSupplierAssessment(referral = referral, appointments = mutableSetOf(appointment))
+    referral.supplierAssessment = supplierAssessment
+    val actionPlanUpdate = SampleData.sampleActionPlan(id = UUID.randomUUID(), referral = referral)
+
+    actionPlanValidator.validateSubmittedActionPlan(actionPlanUpdate)
+
+    // no exception should be raised
   }
 }
