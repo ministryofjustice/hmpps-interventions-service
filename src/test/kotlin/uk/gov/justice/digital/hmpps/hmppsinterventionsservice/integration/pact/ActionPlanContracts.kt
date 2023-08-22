@@ -133,7 +133,17 @@ class ActionPlanContracts(private val setupAssistant: SetupAssistant) {
     "a draft action plan with ID 6e8dfb5c-127f-46ea-9846-f82b5fd60d27 exists and it has an activity with ID fd1b6653-ea7b-4e12-9d45-72ff9b1a3ea0",
   )
   fun `create a an draft plan with activities`() {
+    val referral = setupAssistant.createSentReferral()
+    setupAssistant.addSupplierAssessmentAppointment(
+      referral.supplierAssessment!!,
+      referral = referral,
+      appointmentDeliveryType = AppointmentDeliveryType.PHONE_CALL,
+      attended = Attended.YES,
+      sessionSummary = "test",
+      sessionResponse = "test",
+    )
     setupAssistant.createActionPlan(
+      referral = referral,
       id = UUID.fromString("6e8dfb5c-127f-46ea-9846-f82b5fd60d27"),
       numberOfSessions = 4,
       activities = mutableListOf(
