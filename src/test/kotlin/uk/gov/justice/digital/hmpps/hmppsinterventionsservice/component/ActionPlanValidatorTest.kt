@@ -5,12 +5,21 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.Code
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.ValidationError
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAssessmentFactory
 import java.time.OffsetDateTime
 import java.util.UUID
 
 class ActionPlanValidatorTest {
   private val actionPlanValidator = ActionPlanValidator()
+  private val referralFactory = ReferralFactory()
+  private val appointmentFactory = AppointmentFactory()
+  private val supplierAssessmentFactory = SupplierAssessmentFactory()
+  private val actionPlanFactory = ActionPlanFactory()
 
   @Test
   fun `update action plan fails validation - number of sessions negative`() {
@@ -96,14 +105,42 @@ class ActionPlanValidatorTest {
 
   @Test
   fun `submit action plan fails validation - number of sessions is empty`() {
-    val draftActionPlanId = UUID.randomUUID()
-    val actionPlanUpdate = SampleData.sampleActionPlan(id = draftActionPlanId, numberOfSessions = null)
+    val referral = referralFactory.createSent()
+    val appointment = appointmentFactory.create(attended = Attended.YES, sessionFeedbackSubmittedAt = OffsetDateTime.now())
+    val supplierAssessment = supplierAssessmentFactory.create(appointment = appointment)
+    referral.supplierAssessment = supplierAssessment
+    val actionPlan = actionPlanFactory.create(referral = referral)
 
     val exception = Assertions.assertThrows(ValidationError::class.java) {
-      actionPlanValidator.validateSubmittedActionPlan(actionPlanUpdate)
+      actionPlanValidator.validateSubmittedActionPlan(actionPlan)
     }
     assertThat(exception.errors.size).isEqualTo(1)
     assertThat(exception.errors[0].field).isEqualTo("numberOfSessions")
     assertThat(exception.errors[0].error).isEqualTo(Code.CANNOT_BE_EMPTY)
+  }
+
+  @Test
+  fun `submit action plan fails validation if supplier assessment has not been completed`() {
+    val actionPlan = actionPlanFactory.create(numberOfSessions = 1)
+
+    val exception = Assertions.assertThrows(ValidationError::class.java) {
+      actionPlanValidator.validateSubmittedActionPlan(actionPlan)
+    }
+    assertThat(exception.errors.size).isEqualTo(1)
+    assertThat(exception.errors[0].field).isEqualTo("supplierAssessmentAppointment")
+    assertThat(exception.errors[0].error).isEqualTo(Code.APPOINTMENT_MUST_BE_COMPLETED)
+  }
+
+  @Test
+  fun `submit action plan passes validation if supplier assessment has been completed`() {
+    val referral = referralFactory.createSent()
+    val appointment = appointmentFactory.create(attended = Attended.YES, sessionFeedbackSubmittedAt = OffsetDateTime.now())
+    val supplierAssessment = supplierAssessmentFactory.create(appointment = appointment)
+    referral.supplierAssessment = supplierAssessment
+    val actionPlan = actionPlanFactory.create(referral = referral, numberOfSessions = 1)
+
+    actionPlanValidator.validateSubmittedActionPlan(actionPlan)
+
+    // no exception should be raised
   }
 }

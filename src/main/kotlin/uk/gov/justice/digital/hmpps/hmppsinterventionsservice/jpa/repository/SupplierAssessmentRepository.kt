@@ -7,4 +7,6 @@ import java.util.UUID
 
 interface SupplierAssessmentRepository : JpaRepository<SupplierAssessment, UUID> {
   fun findByReferral(referral: Referral): SupplierAssessment
+
+  fun findByReferralId(referralId: UUID): SupplierAssessment?
 }
