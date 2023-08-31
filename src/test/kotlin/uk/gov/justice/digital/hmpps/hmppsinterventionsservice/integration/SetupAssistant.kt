@@ -453,6 +453,7 @@ class SetupAssistant(
     sessionConcerns: String? = null,
     notifyPPOfAttendanceBehaviour: Boolean? = null,
     appointmentTime: OffsetDateTime = OffsetDateTime.now().plusMonths(2),
+    appointmentFeedbackSubmittedAt: OffsetDateTime? = null,
   ) {
     val appointment: Appointment = appointmentFactory.create(createdBy = createPPUser(), referral = referral, appointmentTime = appointmentTime)
     if (attended !== null) {
@@ -469,6 +470,7 @@ class SetupAssistant(
       appointment.notifyPPOfAttendanceBehaviour = notifyPPOfAttendanceBehaviour
       appointment.sessionFeedbackSubmittedAt = OffsetDateTime.now()
       appointment.sessionFeedbackSubmittedBy = createSPUser()
+      appointment.appointmentFeedbackSubmittedAt = appointmentFeedbackSubmittedAt
     }
 
     appointmentRepository.save(appointment)
