@@ -141,6 +141,7 @@ class ActionPlanContracts(private val setupAssistant: SetupAssistant) {
       attended = Attended.YES,
       sessionSummary = "test",
       sessionResponse = "test",
+      appointmentFeedbackSubmittedAt = OffsetDateTime.now(),
     )
     setupAssistant.createActionPlan(
       referral = referral,
