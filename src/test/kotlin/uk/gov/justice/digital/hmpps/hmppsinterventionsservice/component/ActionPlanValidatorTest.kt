@@ -106,7 +106,7 @@ class ActionPlanValidatorTest {
   @Test
   fun `submit action plan fails validation - number of sessions is empty`() {
     val referral = referralFactory.createSent()
-    val appointment = appointmentFactory.create(attended = Attended.YES, sessionFeedbackSubmittedAt = OffsetDateTime.now())
+    val appointment = appointmentFactory.create(attended = Attended.YES, appointmentFeedbackSubmittedAt = OffsetDateTime.now())
     val supplierAssessment = supplierAssessmentFactory.create(appointment = appointment)
     referral.supplierAssessment = supplierAssessment
     val actionPlan = actionPlanFactory.create(referral = referral)
@@ -134,7 +134,7 @@ class ActionPlanValidatorTest {
   @Test
   fun `submit action plan passes validation if supplier assessment has been completed`() {
     val referral = referralFactory.createSent()
-    val appointment = appointmentFactory.create(attended = Attended.YES, sessionFeedbackSubmittedAt = OffsetDateTime.now())
+    val appointment = appointmentFactory.create(attended = Attended.YES, appointmentFeedbackSubmittedAt = OffsetDateTime.now())
     val supplierAssessment = supplierAssessmentFactory.create(appointment = appointment)
     referral.supplierAssessment = supplierAssessment
     val actionPlan = actionPlanFactory.create(referral = referral, numberOfSessions = 1)

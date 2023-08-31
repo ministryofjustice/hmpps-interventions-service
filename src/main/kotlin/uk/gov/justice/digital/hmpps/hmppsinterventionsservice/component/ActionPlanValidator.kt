@@ -55,7 +55,7 @@ class ActionPlanValidator {
     if (
       supplierAssessmentAppointment == null ||
       supplierAssessmentAppointment.attended == Attended.NO ||
-      supplierAssessmentAppointment.sessionFeedbackSubmittedAt == null
+      supplierAssessmentAppointment.appointmentFeedbackSubmittedAt == null
     ) {
       errors.add(FieldError(field = "supplierAssessmentAppointment", error = APPOINTMENT_MUST_BE_COMPLETED))
     }
