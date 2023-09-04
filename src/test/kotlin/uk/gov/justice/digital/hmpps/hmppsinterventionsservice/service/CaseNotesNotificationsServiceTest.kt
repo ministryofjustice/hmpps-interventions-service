@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.EmailSen
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.CreateCaseNoteEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.notifications.CaseNotesNotificationsService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.CaseNoteFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
