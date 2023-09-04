@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller
 
 import com.fasterxml.jackson.annotation.JsonView
+import jakarta.persistence.EntityNotFoundException
 import mu.KLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -27,7 +28,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DraftOasys
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DraftReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcluder
 import java.util.UUID
-import javax.persistence.EntityNotFoundException
 
 @RestController
 class DraftReferralController(

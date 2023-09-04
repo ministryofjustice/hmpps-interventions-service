@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller
 import ServiceProviderSentReferralSummaryDTO
 import com.fasterxml.jackson.annotation.JsonView
 import com.microsoft.applicationinsights.TelemetryClient
-import jakarta.persistence.EntityNotFoundException
 import mu.KLogging
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

@@ -6,12 +6,14 @@ import org.springframework.batch.core.Step
 import org.springframework.batch.core.StepContribution
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
 import org.springframework.batch.core.configuration.annotation.JobScope
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.core.job.DefaultJobParametersValidator
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.scope.context.ChunkContext
 import org.springframework.batch.core.step.builder.StepBuilder
+import org.springframework.batch.item.database.HibernateCursorItemReader
 import org.springframework.batch.item.database.JpaCursorItemReader
 import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
@@ -36,8 +38,9 @@ import java.nio.file.Path
 @Configuration
 @EnableBatchProcessing
 class NdmisPerformanceReportJobConfiguration(
-  private val jobRepository: JobRepository,
   private val transactionManager: PlatformTransactionManager,
+  private val stepBuilderFactory: StepBuilderFactory,
+  private val jobRepository: JobRepository,
   private val batchUtils: BatchUtils,
   private val s3Service: S3Service,
   private val ndmisS3Bucket: S3Bucket,
