@@ -1,28 +1,21 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType
-import org.hibernate.annotations.Type
-import org.hibernate.annotations.TypeDef
-import org.hibernate.annotations.TypeDefs
-import java.util.UUID
 import jakarta.persistence.Column
+import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
-import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import javax.validation.constraints.NotNull
+import org.hibernate.annotations.Type
+import java.util.UUID
 
 @Entity
-@TypeDefs(
-  value = [
-    TypeDef(name = "complexities", typeClass = PostgreSQLEnumType::class),
-  ],
-)
 data class ComplexityLevel(
   @Id val id: UUID,
   val title: String,
   val description: String,
-  @Type(type = "complexities")
+  @Type(PostgreSQLEnumType::class)
   @Enumerated(EnumType.STRING)
   @Column(name = "complexity")
   val complexity: Complexity,
@@ -35,5 +28,4 @@ enum class Complexity {
   LOW,
   MEDIUM,
   HIGH,
-  ;
 }
