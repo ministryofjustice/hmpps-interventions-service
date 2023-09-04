@@ -34,7 +34,7 @@ internal class ErrorConfigurationTest {
     val responseBody = response.body
     assertThat(responseBody?.status).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value())
     assertThat(responseBody?.error).isEqualTo("Call to dependency request exception")
-    assertThat(responseBody?.message).isEqualTo("An Error")//; nested exception is java.lang.IllegalStateException: An Error")
+    assertThat(responseBody?.message).isEqualTo("An Error")// ; nested exception is java.lang.IllegalStateException: An Error")
     assertThat(responseBody?.userMessage).isEqualTo("System is experiencing issues. Please try again later and if the issue persists contact Support")
   }
 
