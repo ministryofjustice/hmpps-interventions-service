@@ -19,7 +19,7 @@ import java.util.UUID
 @Transactional
 class CaseNotesNotificationsService(
   @Value("\${notify.templates.case-note-sent}") private val sentTemplate: String,
-  @Value("\${notify.templates.case-note-sent-pp}") private val  ppSentTemplate: String,
+  @Value("\${notify.templates.case-note-sent-pp}") private val ppSentTemplate: String,
   @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
   @Value("\${interventions-ui.locations.service-provider.case-note-details}") private val spCaseNoteLocation: String,
   @Value("\${interventions-ui.locations.probation-practitioner.case-note-details}") private val ppCaseNoteLocation: String,
@@ -56,7 +56,7 @@ class CaseNotesNotificationsService(
           "pp_first_name" to responsibleOfficer.firstName,
           "referralNumber" to referral.referenceNumber!!,
           "caseNoteUrl" to generateResourceUrl(interventionsUIBaseURL, ppCaseNoteLocation, caseNoteId).toString(),
-          "popFullName" to popFullName
+          "popFullName" to popFullName,
         ),
       )
     }
@@ -80,7 +80,7 @@ class CaseNotesNotificationsService(
             "recipientFirstName" to assigneeDetails.firstName,
             "referralNumber" to referral.referenceNumber!!,
             "caseNoteUrl" to generateResourceUrl(interventionsUIBaseURL, spCaseNoteLocation, caseNoteId).toString(),
-            "popFullName" to popFullName
+            "popFullName" to popFullName,
           ),
         )
       }

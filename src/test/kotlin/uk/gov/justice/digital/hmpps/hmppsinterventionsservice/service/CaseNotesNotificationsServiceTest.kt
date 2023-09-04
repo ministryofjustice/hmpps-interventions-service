@@ -73,7 +73,7 @@ internal class CaseNotesNotificationsServiceTest {
         "recipientFirstName" to "sp",
         "referralNumber" to caseNote.referral.referenceNumber!!,
         "caseNoteUrl" to "https://interventions.gov.uk/service-provider/case-note/${caseNote.id}",
-        "popFullName" to "Sp Bob"
+        "popFullName" to "Sp Bob",
       ),
     )
     verify(emailSender, times(1)).sendEmail(
@@ -83,7 +83,7 @@ internal class CaseNotesNotificationsServiceTest {
         "pp_first_name" to "pp",
         "referralNumber" to caseNote.referral.referenceNumber!!,
         "caseNoteUrl" to "https://interventions.gov.uk/probation-practitioner/case-note/${caseNote.id}",
-        "popFullName" to "Sp Bob"
+        "popFullName" to "Sp Bob",
       ),
     )
   }
@@ -121,7 +121,7 @@ internal class CaseNotesNotificationsServiceTest {
         "recipientFirstName" to "sp",
         "referralNumber" to caseNote.referral.referenceNumber!!,
         "caseNoteUrl" to "https://interventions.gov.uk/service-provider/case-note/${caseNote.id}",
-        "popFullName" to "Sp Bob"
+        "popFullName" to "Sp Bob",
       ),
     )
   }
@@ -160,7 +160,7 @@ internal class CaseNotesNotificationsServiceTest {
         "recipientFirstName" to "sp",
         "referralNumber" to caseNote.referral.referenceNumber!!,
         "caseNoteUrl" to "https://interventions.gov.uk/service-provider/case-note/${caseNote.id}",
-        "popFullName" to "Sp Bob"
+        "popFullName" to "Sp Bob",
       ),
     )
   }
@@ -198,7 +198,7 @@ internal class CaseNotesNotificationsServiceTest {
         "pp_first_name" to "pp",
         "referralNumber" to caseNote.referral.referenceNumber!!,
         "caseNoteUrl" to "https://interventions.gov.uk/probation-practitioner/case-note/${caseNote.id}",
-        "popFullName" to "Sp Bob"
+        "popFullName" to "Sp Bob",
       ),
     )
   }
@@ -242,7 +242,7 @@ internal class CaseNotesNotificationsServiceTest {
         "pp_first_name" to "pp",
         "referralNumber" to caseNote.referral.referenceNumber!!,
         "caseNoteUrl" to "https://interventions.gov.uk/probation-practitioner/case-note/${caseNote.id}",
-        "popFullName" to "Sp Bob"
+        "popFullName" to "Sp Bob",
       ),
     )
   }
@@ -280,7 +280,7 @@ internal class CaseNotesNotificationsServiceTest {
         "pp_first_name" to "pp",
         "referralNumber" to caseNote.referral.referenceNumber!!,
         "caseNoteUrl" to "https://interventions.gov.uk/probation-practitioner/case-note/${caseNote.id}",
-        "popFullName" to "Sp Bob"
+        "popFullName" to "Sp Bob",
       ),
     )
   }
