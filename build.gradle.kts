@@ -121,5 +121,5 @@ dependencies {
   testImplementation("com.squareup.okhttp3:mockwebserver:4.11.0")
   testImplementation("org.mockito:mockito-inline:5.2.0")
   testImplementation("org.springframework.batch:spring-batch-test")
-  testImplementation("com.github.tomakehurst:wiremock-jre8:2.35.0")
+  testImplementation("com.github.tomakehurst:wiremock-jre8:3.0.1")
 }
