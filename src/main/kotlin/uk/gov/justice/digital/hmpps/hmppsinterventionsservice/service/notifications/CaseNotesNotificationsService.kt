@@ -51,7 +51,7 @@ class CaseNotesNotificationsService(
 
       emailSender.sendEmail(
         ppSentTemplate,
-        "ryan.forsyth@digital.justice.gov.uk",//responsibleOfficer.email,
+        responsibleOfficer.email,
         mapOf(
           "pp_first_name" to responsibleOfficer.firstName,
           "referralNumber" to referral.referenceNumber!!,
@@ -75,7 +75,7 @@ class CaseNotesNotificationsService(
 
         emailSender.sendEmail(
           sentTemplate,
-          "ryan.forsyth@digital.justice.gov.uk",//assigneeDetails.email,
+          assigneeDetails.email,
           mapOf(
             "recipientFirstName" to assigneeDetails.firstName,
             "referralNumber" to referral.referenceNumber!!,
