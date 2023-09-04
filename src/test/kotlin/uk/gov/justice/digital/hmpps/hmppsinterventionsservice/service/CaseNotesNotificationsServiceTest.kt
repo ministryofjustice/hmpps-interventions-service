@@ -12,9 +12,12 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.EmailSen
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.CreateCaseNoteEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.notifications.CaseNotesNotificationsService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.CaseNoteFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceUserFactory
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -25,6 +28,7 @@ internal class CaseNotesNotificationsServiceTest {
 
   private val caseNotesNotificationsService = CaseNotesNotificationsService(
     "sent-template",
+    "sent-template-pp",
     "https://interventions.gov.uk",
     "/service-provider/case-note/{id}",
     "/probation-practitioner/case-note/{id}",
@@ -36,6 +40,7 @@ internal class CaseNotesNotificationsServiceTest {
   private val authUserFactory = AuthUserFactory()
   private val referralFactory = ReferralFactory()
   private val caseNoteFactory = CaseNoteFactory()
+  private val serviceUserFactory = ServiceUserFactory()
 
   @Test
   fun `both PPs (responsible officer) and SPs (assignee) get notifications for a sent case note as long as they didn't send it`() {
@@ -47,6 +52,7 @@ internal class CaseNotesNotificationsServiceTest {
 
     val sender = authUserFactory.createSP(id = "sp_sender", userName = "sp_user_name")
     val referral = referralFactory.createAssigned()
+    referral.serviceUserData = ServiceUserData(firstName = "sp", lastName = "bob")
     val caseNote = caseNoteFactory.create(referral = referral, sentBy = sender, subject = "from sp", body = "body")
     whenever(referralService.getSentReferralForUser(referral.id, sender)).thenReturn(referral)
     val eventRequiringSPNotification = CreateCaseNoteEvent(
@@ -65,17 +71,19 @@ internal class CaseNotesNotificationsServiceTest {
       "sp@provider.co.uk",
       mapOf(
         "recipientFirstName" to "sp",
-        "referralReference" to caseNote.referral.referenceNumber!!,
+        "referralNumber" to caseNote.referral.referenceNumber!!,
         "caseNoteUrl" to "https://interventions.gov.uk/service-provider/case-note/${caseNote.id}",
+        "popFullName" to "Sp Bob",
       ),
     )
     verify(emailSender, times(1)).sendEmail(
-      "sent-template",
+      "sent-template-pp",
       "pp@justice.gov.uk",
       mapOf(
-        "recipientFirstName" to "pp",
-        "referralReference" to caseNote.referral.referenceNumber!!,
+        "pp_first_name" to "pp",
+        "referralNumber" to caseNote.referral.referenceNumber!!,
         "caseNoteUrl" to "https://interventions.gov.uk/probation-practitioner/case-note/${caseNote.id}",
+        "popFullName" to "Sp Bob",
       ),
     )
   }
@@ -90,6 +98,7 @@ internal class CaseNotesNotificationsServiceTest {
 
     val sender = authUserFactory.createPP(id = "pp_sender")
     val referral = referralFactory.createAssigned()
+    referral.serviceUserData = ServiceUserData(firstName = "sp", lastName = "bob")
     val caseNote = caseNoteFactory.create(referral = referral, sentBy = sender, subject = "from pp", body = "body")
     whenever(referralService.getSentReferralForUser(referral.id, sender)).thenReturn(referral)
     val eventRequiringSPNotification = CreateCaseNoteEvent(
@@ -110,8 +119,9 @@ internal class CaseNotesNotificationsServiceTest {
       "sp@provider.co.uk",
       mapOf(
         "recipientFirstName" to "sp",
-        "referralReference" to caseNote.referral.referenceNumber!!,
+        "referralNumber" to caseNote.referral.referenceNumber!!,
         "caseNoteUrl" to "https://interventions.gov.uk/service-provider/case-note/${caseNote.id}",
+        "popFullName" to "Sp Bob",
       ),
     )
   }
@@ -127,6 +137,7 @@ internal class CaseNotesNotificationsServiceTest {
     whenever(referralService.isUserTheResponsibleOfficer(any(), any())).thenReturn(true)
 
     val referral = referralFactory.createAssigned()
+    referral.serviceUserData = ServiceUserData(firstName = "sp", lastName = "bob")
     val caseNote = caseNoteFactory.create(referral = referral, sentBy = sender, subject = "from pp", body = "body")
     whenever(referralService.getSentReferralForUser(referral.id, sender)).thenReturn(referral)
     val eventRequiringSPNotification = CreateCaseNoteEvent(
@@ -147,8 +158,9 @@ internal class CaseNotesNotificationsServiceTest {
       "sp@provider.co.uk",
       mapOf(
         "recipientFirstName" to "sp",
-        "referralReference" to caseNote.referral.referenceNumber!!,
+        "referralNumber" to caseNote.referral.referenceNumber!!,
         "caseNoteUrl" to "https://interventions.gov.uk/service-provider/case-note/${caseNote.id}",
+        "popFullName" to "Sp Bob",
       ),
     )
   }
@@ -163,6 +175,7 @@ internal class CaseNotesNotificationsServiceTest {
 
     val sender = authUserFactory.createSP(id = "sp_sender")
     val referral = referralFactory.createAssigned(assignments = listOf(ReferralAssignment(OffsetDateTime.now(), sender, sender)))
+    referral.serviceUserData = ServiceUserData(firstName = "sp", lastName = "bob")
     val caseNote = caseNoteFactory.create(referral = referral, sentBy = sender, subject = "from sp", body = "body")
     whenever(referralService.getSentReferralForUser(referral.id, sender)).thenReturn(referral)
     val eventRequiringSPNotification = CreateCaseNoteEvent(
@@ -179,12 +192,13 @@ internal class CaseNotesNotificationsServiceTest {
     verify(emailSender, times(1)).sendEmail(any(), any(), any())
     // with pp details
     verify(emailSender).sendEmail(
-      "sent-template",
+      "sent-template-pp",
       "pp@justice.gov.uk",
       mapOf(
-        "recipientFirstName" to "pp",
-        "referralReference" to caseNote.referral.referenceNumber!!,
+        "pp_first_name" to "pp",
+        "referralNumber" to caseNote.referral.referenceNumber!!,
         "caseNoteUrl" to "https://interventions.gov.uk/probation-practitioner/case-note/${caseNote.id}",
+        "popFullName" to "Sp Bob",
       ),
     )
   }
@@ -203,6 +217,7 @@ internal class CaseNotesNotificationsServiceTest {
 
     val assignedToId = authUserFactory.createSP(id = "sp_assignedToId", userName = "sameUserName")
     val referral = referralFactory.createAssigned(assignments = listOf(ReferralAssignment(OffsetDateTime.now(), assignedToId, assignedToId)))
+    referral.serviceUserData = ServiceUserData(firstName = "sp", lastName = "bob")
 
     val sender = authUserFactory.createSP(id = "sp_sender", userName = "sameUserName")
     val caseNote = caseNoteFactory.create(referral = referral, sentBy = sender, subject = "from sp", body = "body")
@@ -221,12 +236,13 @@ internal class CaseNotesNotificationsServiceTest {
     verify(emailSender, times(1)).sendEmail(any(), any(), any())
     // with pp details
     verify(emailSender).sendEmail(
-      "sent-template",
+      "sent-template-pp",
       "pp@justice.gov.uk",
       mapOf(
-        "recipientFirstName" to "pp",
-        "referralReference" to caseNote.referral.referenceNumber!!,
+        "pp_first_name" to "pp",
+        "referralNumber" to caseNote.referral.referenceNumber!!,
         "caseNoteUrl" to "https://interventions.gov.uk/probation-practitioner/case-note/${caseNote.id}",
+        "popFullName" to "Sp Bob",
       ),
     )
   }
@@ -240,7 +256,9 @@ internal class CaseNotesNotificationsServiceTest {
     whenever(referralService.isUserTheResponsibleOfficer(any(), any())).thenReturn(false)
 
     val sender = authUserFactory.createPP(id = "sender")
-    val caseNote = caseNoteFactory.create(sentBy = sender, subject = "from pp", body = "body")
+    val referral = referralFactory.createSent()
+    referral.serviceUserData = ServiceUserData(firstName = "sp", lastName = "bob")
+    val caseNote = caseNoteFactory.create(referral = referral, sentBy = sender, subject = "from pp", body = "body")
     whenever(referralService.getSentReferralForUser(caseNote.referral.id, sender)).thenReturn(caseNote.referral)
     val event = CreateCaseNoteEvent(
       "source",
@@ -256,12 +274,13 @@ internal class CaseNotesNotificationsServiceTest {
     verify(emailSender, times(1)).sendEmail(any(), any(), any())
     // with pp details
     verify(emailSender).sendEmail(
-      "sent-template",
+      "sent-template-pp",
       "pp@justice.gov.uk",
       mapOf(
-        "recipientFirstName" to "pp",
-        "referralReference" to caseNote.referral.referenceNumber!!,
+        "pp_first_name" to "pp",
+        "referralNumber" to caseNote.referral.referenceNumber!!,
         "caseNoteUrl" to "https://interventions.gov.uk/probation-practitioner/case-note/${caseNote.id}",
+        "popFullName" to "Sp Bob",
       ),
     )
   }
