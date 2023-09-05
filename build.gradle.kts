@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.10.0"
-  kotlin("plugin.spring") version "1.9.0"
-  id("org.jetbrains.kotlin.plugin.jpa") version "1.9.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.11.0"
+  kotlin("plugin.spring") version "1.9.10"
+  id("org.jetbrains.kotlin.plugin.jpa") version "1.9.10"
   id("jacoco")
 }
 
@@ -94,15 +94,15 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:4.1.0-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.20.130")
-  implementation("software.amazon.awssdk:s3:2.20.130")
-  implementation("software.amazon.awssdk:sts:2.20.130")
+  implementation("software.amazon.awssdk:sns:2.20.140")
+  implementation("software.amazon.awssdk:s3:2.20.140")
+  implementation("software.amazon.awssdk:sts:2.20.140")
 
   // security
-  implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.2")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.1.2")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.1.2")
-  implementation("com.nimbusds:oauth2-oidc-sdk:10.13.2")
+  implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.3")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.1.3")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.1.3")
+  implementation("com.nimbusds:oauth2-oidc-sdk:10.14.2")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
