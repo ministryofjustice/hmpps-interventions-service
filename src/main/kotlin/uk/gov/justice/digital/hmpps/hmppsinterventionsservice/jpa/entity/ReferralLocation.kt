@@ -16,12 +16,14 @@ import java.util.UUID
 @Entity
 data class ReferralLocation(
   @Id val id: UUID,
-  @OneToOne(fetch = FetchType.LAZY) val referral: Referral,
+  @OneToOne(fetch = FetchType.LAZY)
+  val referral: Referral,
 
   @Enumerated(EnumType.STRING)
   @Column(name = "type", columnDefinition = "person_current_location_type")
   @Type(PostgreSQLEnumType::class)
-  @NotNull val type: PersonCurrentLocationType,
+  @NotNull
+  val type: PersonCurrentLocationType,
 
   @Column(name = "prison_id") val prisonId: String?,
   @Column(name = "expected_release_date") val expectedReleaseDate: LocalDate?,

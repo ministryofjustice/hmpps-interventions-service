@@ -112,8 +112,7 @@ class SupplierAssessmentService(
         referral = sentReferral,
       )
     }
-    supplierAssessment.currentAppointment?.let {
-      latestAppointment ->
+    supplierAssessment.currentAppointment?.let { latestAppointment ->
       if (latestAppointment.appointmentTime.isAfter(appointmentTime)) {
         throw EntityExistsException("can't schedule new supplier assessment appointment; new appointment occurs before previously scheduled appointment [referralId=$referralId]")
       }
@@ -152,8 +151,7 @@ class SupplierAssessmentService(
     }
     val referral = referralRepository.findByIdAndSentAtIsNotNull(referralId) ?: throw EntityNotFoundException("Sent Referral not found [referralId=$referralId]")
     val supplierAssessment = referral.supplierAssessment ?: throw EntityNotFoundException("Supplier Assessment not found for referral [referralId=$referralId]")
-    supplierAssessment.currentAppointment?.let {
-      latestAppointment ->
+    supplierAssessment.currentAppointment?.let { latestAppointment ->
       if (latestAppointment.id != appointmentId) throw ValidationError("Supplier Assessment Appointment is not the latest [appointmentId=$appointmentId]", listOf())
       latestAppointment
     } ?: throw EntityNotFoundException("Supplier Assessment Appointment not found [appointmentId=$appointmentId]")
