@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller
 import ServiceProviderSentReferralSummaryDTO
 import com.fasterxml.jackson.annotation.JsonView
 import com.microsoft.applicationinsights.TelemetryClient
+import jakarta.annotation.Nullable
 import mu.KLogging
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -40,7 +41,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralCo
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ServiceCategoryService
 import java.util.UUID
-import javax.annotation.Nullable
 
 @RestController
 class ReferralController(
