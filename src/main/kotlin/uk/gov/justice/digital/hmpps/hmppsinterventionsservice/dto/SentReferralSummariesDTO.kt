@@ -20,6 +20,7 @@ data class SentReferralSummariesDTO(
   val expectedReleaseDate: LocalDate?,
   val location: String?,
   val locationType: String?,
+  val isReferralReleasingIn12Weeks: Boolean?,
 ) {
   companion object {
     fun from(referral: SentReferralSummary): SentReferralSummariesDTO {
@@ -47,6 +48,7 @@ data class SentReferralSummariesDTO(
         expectedReleaseDate = referral.referralLocation?.expectedReleaseDate,
         location = location,
         locationType = referral.referralLocation?.type?.name,
+        isReferralReleasingIn12Weeks = referral.referralLocation?.isReferralReleasingIn12Weeks,
       )
     }
   }
