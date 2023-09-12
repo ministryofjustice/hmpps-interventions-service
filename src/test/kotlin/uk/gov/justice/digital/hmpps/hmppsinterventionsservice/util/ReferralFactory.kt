@@ -54,6 +54,8 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     ppPdu: String? = "East Sussex",
     hasValidDeliusPPDetails: Boolean = false,
     isReferralReleasingIn12Weeks: Boolean = false,
+    hasMainPointOfContactDetails: Boolean = false,
+    roleOrJobTitle: String? = "Probation Practitioner",
   ): DraftReferral {
     return createDraftReferral(
       id = id,
@@ -80,6 +82,8 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       ppPdu = ppPdu,
       hasValidDeliusPPDetails = hasValidDeliusPPDetails,
       isReferralReleasingIn12Weeks = isReferralReleasingIn12Weeks,
+      hasMainPointOfContactDetails = hasMainPointOfContactDetails,
+      roleOrJobTitle = roleOrJobTitle,
     )
   }
 
@@ -140,8 +144,6 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       referralDetails = referralDetail,
       hasAdditionalResponsibilities = hasAdditionalResponsibilities,
       whenUnavailable = whenUnavailable,
-      completionDeadline = completionDeadline,
-      maximumEnforceableDays = maximumEnforceableDays,
       assignments = assignments,
       supplierAssessment = supplierAssessment,
       additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt,

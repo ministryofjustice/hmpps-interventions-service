@@ -56,8 +56,6 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     additionalNeedsInformation: String? = null,
     needsInterpreter: Boolean? = null,
     interpreterLanguage: String? = null,
-    completionDeadline: LocalDate? = null,
-    maximumEnforceableDays: Int? = null,
     probationPractitionerDetails: ProbationPractitionerDetails? = null,
   ): Referral {
     val referral = save(
@@ -99,7 +97,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
               ReferralDetails(
                 UUID.randomUUID(),
                 null,
-                it!!.referralId,
+                it.referralId,
                 createdAt,
                 createdBy.id,
                 "initial referral details",
@@ -146,6 +144,8 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     ppPdu: String? = "East Sussex",
     hasValidDeliusPPDetails: Boolean = false,
     isReferralReleasingIn12Weeks: Boolean = false,
+    hasMainPointOfContactDetails: Boolean = false,
+    roleOrJobTitle: String? = "Probation Practitioner",
   ): DraftReferral {
     val draftReferral = DraftReferral(
       id = id,
@@ -171,6 +171,8 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
       ppPdu = ppPdu,
       hasValidDeliusPPDetails = hasValidDeliusPPDetails,
       isReferralReleasingIn12Weeks = isReferralReleasingIn12Weeks,
+      hasMainPointOfContactDetails = hasMainPointOfContactDetails,
+      roleOrJobTitle = roleOrJobTitle,
       referralDetailsHistory = if (referralDetails != null) {
         setOf(
           referralDetails.let {

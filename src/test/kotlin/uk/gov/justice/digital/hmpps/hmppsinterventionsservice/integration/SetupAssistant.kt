@@ -272,6 +272,9 @@ class SetupAssistant(
     ppProbationOffice: String? = "London",
     ppPdu: String? = "East Sussex",
     hasValidDeliusPPDetails: Boolean = false,
+    isReferralReleasingIn12Weeks: Boolean = false,
+    hasMainPointOfContactDetails: Boolean = false,
+    roleOrJobTitle: String? = "Probation Practitioner",
   ): DraftReferral {
     return draftReferralRepository.save(
       referralFactory.createDraft(
@@ -293,6 +296,9 @@ class SetupAssistant(
         ppProbationOffice = ppProbationOffice,
         ppPdu = ppPdu,
         hasValidDeliusPPDetails = hasValidDeliusPPDetails,
+        hasMainPointOfContactDetails = hasMainPointOfContactDetails,
+        roleOrJobTitle = roleOrJobTitle,
+        isReferralReleasingIn12Weeks = isReferralReleasingIn12Weeks,
       ),
     )
   }
@@ -324,6 +330,9 @@ class SetupAssistant(
     ppProbationOffice: String? = "London",
     ppPdu: String? = "East Sussex",
     hasValidDeliusPPDetails: Boolean = false,
+    isReferralReleasingIn12Weeks: Boolean = false,
+    hasMainPointOfContactDetails: Boolean = false,
+    roleOrJobTitle: String? = "Probation Practitioner",
   ): Referral {
     val ppUser = createPPUser()
     val spUser = createSPUser()
@@ -343,6 +352,9 @@ class SetupAssistant(
         ppProbationOffice = ppProbationOffice,
         ppPdu = ppPdu,
         hasValidDeliusPPDetails = hasValidDeliusPPDetails,
+        isReferralReleasingIn12Weeks = isReferralReleasingIn12Weeks,
+        hasMainPointOfContactDetails = hasMainPointOfContactDetails,
+        roleOrJobTitle = roleOrJobTitle,
       ),
     )
 
@@ -752,6 +764,7 @@ class SetupAssistant(
       prisonId = "aaa",
       expectedReleaseDate = LocalDate.now().plusDays(1),
       expectedReleaseDateMissingReason = null,
+      isReferralReleasingIn12Weeks = false,
     ),
     probationPractitionerDetails: ProbationPractitionerDetails = referral.probationPractitionerDetails ?: ProbationPractitionerDetails(
       id = UUID.randomUUID(),
