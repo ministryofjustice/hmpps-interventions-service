@@ -32,8 +32,8 @@ internal class ProbationCaseControllerTest {
     val referral = referralFactory.createSent()
 
     val responsibleOfficer = ResponsibleProbationPractitioner(firstName = "responsible", lastName = "practitioner", email = "aa", deliusStaffCode = "aa", authUser = null)
-    val referringOfficerDetails = UserDetail(firstName = "referring", lastName = "officer", email= "aaa")
-    val serviceProviderUser = UserDetail(firstName = "service", lastName = "provider", email= "aaa")
+    val referringOfficerDetails = UserDetail(firstName = "referring", lastName = "officer", email = "aaa")
+    val serviceProviderUser = UserDetail(firstName = "service", lastName = "provider", email = "aaa")
     val uri = URI.create("http://localhost/1234")
 
     val result = ProbationCaseReferralDTO.from(referral, responsibleOfficer, serviceProviderUser, referringOfficerDetails)

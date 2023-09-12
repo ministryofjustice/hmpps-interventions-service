@@ -28,8 +28,8 @@ internal class ProbationCaseServiceTest {
     referralFactory.createAssigned(serviceUserCRN = "ABC123")
 
     val responsibleOfficer = ResponsibleProbationPractitioner(firstName = "responsible", lastName = "practitioner", email = "aa", deliusStaffCode = "aa", authUser = null)
-    val referringOfficerDetails = UserDetail(firstName = "referring", lastName = "officer", email= "aaa")
-    val serviceProviderUser = UserDetail(firstName = "service", lastName = "provider", email= "aaa")
+    val referringOfficerDetails = UserDetail(firstName = "referring", lastName = "officer", email = "aaa")
+    val serviceProviderUser = UserDetail(firstName = "service", lastName = "provider", email = "aaa")
 
     whenever(referralRepository.findByServiceUserCRN(crn)).thenReturn(listOf(referral))
     whenever(referralService.getResponsibleProbationPractitioner(referral)).thenReturn(responsibleOfficer)
@@ -53,8 +53,8 @@ internal class ProbationCaseServiceTest {
     val referrals = listOf(referral, referral2)
 
     val responsibleOfficer = ResponsibleProbationPractitioner(firstName = "responsible", lastName = "practitioner", email = "aa", deliusStaffCode = "aa", authUser = null)
-    val referringOfficerDetails = UserDetail(firstName = "referring", lastName = "officer", email= "aaa")
-    val serviceProviderUser = UserDetail(firstName = "service", lastName = "provider", email= "aaa")
+    val referringOfficerDetails = UserDetail(firstName = "referring", lastName = "officer", email = "aaa")
+    val serviceProviderUser = UserDetail(firstName = "service", lastName = "provider", email = "aaa")
 
     whenever(referralRepository.findByServiceUserCRN(crn)).thenReturn(referrals)
     whenever(referralService.getResponsibleProbationPractitioner(referral)).thenReturn(responsibleOfficer)
@@ -67,7 +67,7 @@ internal class ProbationCaseServiceTest {
 
     val expectedResult = listOf(
       ProbationCaseReferralDTO.from(referral, responsibleOfficer, serviceProviderUser, referringOfficerDetails),
-      ProbationCaseReferralDTO.from(referral2, responsibleOfficer, serviceProviderUser, referringOfficerDetails)
+      ProbationCaseReferralDTO.from(referral2, responsibleOfficer, serviceProviderUser, referringOfficerDetails),
     )
 
     val result = probationCaseService.getProbationCaseDetails(crn)
@@ -83,7 +83,7 @@ internal class ProbationCaseServiceTest {
     val referral = referralFactory.createSent(serviceUserCRN = crn)
 
     val responsibleOfficer = ResponsibleProbationPractitioner(firstName = "responsible", lastName = "practitioner", email = "aa", deliusStaffCode = "aa", authUser = null)
-    val referringOfficerDetails = UserDetail(firstName = "referring", lastName = "officer", email= "aaa")
+    val referringOfficerDetails = UserDetail(firstName = "referring", lastName = "officer", email = "aaa")
 
     whenever(referralRepository.findByServiceUserCRN(crn)).thenReturn(listOf(referral))
     whenever(referralService.getResponsibleProbationPractitioner(referral)).thenReturn(responsibleOfficer)
