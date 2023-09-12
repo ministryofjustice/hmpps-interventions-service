@@ -268,7 +268,7 @@ class DraftReferralServiceTest @Autowired constructor(
       sampleDraftReferral.expectedReleaseDate = LocalDate.now().plusDays(10)
       entityManager.persistAndFlush(sampleDraftReferral)
 
-      val draftReferral = DraftReferralDTO(expectedReleaseDate = LocalDate.now().plusDays(8))
+      val draftReferral = DraftReferralDTO(personCustodyPrisonId = "ABC", expectedReleaseDate = LocalDate.now().plusDays(8))
       draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
       val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
       assertThat(savedDraftReferral).isNotNull
@@ -283,7 +283,7 @@ class DraftReferralServiceTest @Autowired constructor(
       sampleDraftReferral.expectedReleaseDateMissingReason = "It will be known pretty soon"
       entityManager.persistAndFlush(sampleDraftReferral)
 
-      val draftReferral = DraftReferralDTO(expectedReleaseDateMissingReason = "It will be tomorrow")
+      val draftReferral = DraftReferralDTO(personCustodyPrisonId = "ABC", expectedReleaseDateMissingReason = "It will be tomorrow")
       draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
       val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
       assertThat(savedDraftReferral).isNotNull
@@ -298,7 +298,7 @@ class DraftReferralServiceTest @Autowired constructor(
       sampleDraftReferral.expectedReleaseDate = LocalDate.now().plusDays(10)
       entityManager.persistAndFlush(sampleDraftReferral)
 
-      val draftReferral = DraftReferralDTO(expectedReleaseDateMissingReason = "It will be known tomorrow")
+      val draftReferral = DraftReferralDTO(personCustodyPrisonId = "ABC", expectedReleaseDateMissingReason = "It will be known tomorrow")
       draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
       val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
       assertThat(savedDraftReferral).isNotNull
@@ -314,7 +314,7 @@ class DraftReferralServiceTest @Autowired constructor(
       sampleDraftReferral.expectedReleaseDateMissingReason = "It will be known tomorrow"
       entityManager.persistAndFlush(sampleDraftReferral)
 
-      val draftReferral = DraftReferralDTO(expectedReleaseDate = LocalDate.now().plusDays(8))
+      val draftReferral = DraftReferralDTO(personCustodyPrisonId = "ABC", expectedReleaseDate = LocalDate.now().plusDays(8))
       draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
       val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
       assertThat(savedDraftReferral).isNotNull
@@ -604,11 +604,12 @@ class DraftReferralServiceTest @Autowired constructor(
     fun `sending a draft referral creates a referral with referral location`() {
       val user = AuthUser("user_id", "delius", "user_name")
       val draftReferral = draftReferralService.createDraftReferral(user, "X123456", sampleIntervention.id)
-      setDraftReferralRequiredFields(draftReferral)
+      setDraftReferralRequiredFields(draftReferral, isReferralReleasingWithIn12Weeks = true)
 
       val sentReferral = draftReferralService.sendDraftReferral(draftReferral, user)
       assertThat(referralRepository.findById(sentReferral.id).get().referralLocation?.prisonId).isEqualTo(draftReferral.personCustodyPrisonId)
       assertThat(referralRepository.findById(sentReferral.id).get().referralLocation?.type).isEqualTo(draftReferral.personCurrentLocationType)
+      assertThat(referralRepository.findById(sentReferral.id).get().referralLocation?.isReferralReleasingIn12Weeks).isEqualTo(draftReferral.isReferralReleasingIn12Weeks)
     }
 
     @Test
@@ -771,6 +772,7 @@ class DraftReferralServiceTest @Autowired constructor(
     expectedReleaseDate: LocalDate ? = LocalDate.of(2050, 11, 1),
     probationOffice: String? = "probation-office1",
     hasValidDeliusPPDetails: Boolean = false,
+    isReferralReleasingWithIn12Weeks: Boolean = false,
   ) {
     draftReferral.additionalRiskInformation = additionalRiskInformation
     draftReferral.additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt
@@ -779,6 +781,7 @@ class DraftReferralServiceTest @Autowired constructor(
     draftReferral.expectedReleaseDate = expectedReleaseDate
     draftReferral.ppProbationOffice = probationOffice
     draftReferral.hasValidDeliusPPDetails = hasValidDeliusPPDetails
+    draftReferral.isReferralReleasingIn12Weeks = isReferralReleasingWithIn12Weeks
   }
 
   private fun setProbationPractitionerDetails(

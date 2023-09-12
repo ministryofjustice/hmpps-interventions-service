@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.AdditionalAnswers.returnsFirstArg
 import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.any
@@ -604,6 +606,7 @@ class DraftReferralServiceUnitTest {
     referral.additionalRiskInformationUpdatedAt = OffsetDateTime.now()
     referral.personCurrentLocationType = PersonCurrentLocationType.CUSTODY
     referral.personCustodyPrisonId = "Prison ID 123"
+    referral.isReferralReleasingIn12Weeks = null
     val authUser = authUserFactory.create()
 
     val e = assertThrows<ServerWebInputException> {
@@ -769,15 +772,16 @@ class DraftReferralServiceUnitTest {
   @Nested
   inner class UpdateCurrentLocation {
     @Test
-    fun `cant set person current location when no person custody prison id has been selected`() {
+    fun `can set person current location when no person custody prison id has been selected`() {
       val referral = referralFactory.createDraft()
       val update = DraftReferralDTO(personCurrentLocationType = PersonCurrentLocationType.CUSTODY)
-      val e = assertThrows<ValidationError> {
-        draftReferralService.updateDraftReferral(referral, update)
-      }
 
-      assertThat(e.message).isEqualTo("draft referral update invalid")
-      assertThat(e.errors[0]).isEqualTo(FieldError(field = "personCustodyPrisonId", error = Code.CONDITIONAL_FIELD_MUST_BE_SET))
+      whenever(draftReferralRepository.save(referral)).thenReturn(referral)
+
+      val e = assertDoesNotThrow {
+        var updatedReferral = draftReferralService.updateDraftReferral(referral, update)
+        assertThat(updatedReferral.personCurrentLocationType).isEqualTo(PersonCurrentLocationType.CUSTODY)
+      }
     }
 
     @Test
@@ -790,6 +794,18 @@ class DraftReferralServiceUnitTest {
 
       assertThat(referral.personCurrentLocationType).isEqualTo(PersonCurrentLocationType.CUSTODY)
       assertThat(referral.personCustodyPrisonId).isEqualTo("ABC")
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `can set whether a person is released from prison within 12 weeks`(data: Boolean) {
+      val referral = referralFactory.createDraft()
+      val update = DraftReferralDTO(isReferralReleasingIn12Weeks = data, personCurrentLocationType = PersonCurrentLocationType.CUSTODY)
+
+      whenever(draftReferralRepository.save(any())).thenReturn(referral)
+      draftReferralService.updateDraftReferral(referral, update)
+
+      assertThat(referral.isReferralReleasingIn12Weeks).isEqualTo(data)
     }
   }
 

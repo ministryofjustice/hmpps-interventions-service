@@ -173,4 +173,8 @@ COMMENT ON TABLE draft_referral IS 'adding probation practitioner details';
 
 COMMENT ON TABLE probation_practitioner_details IS 'storing the probation practitioner details for a particular referral';
 
+COMMENT ON TABLE draft_referral IS 'adding unallocated com related details';
+
+COMMENT ON TABLE referral_location IS 'adding unallocated com related details';
+
 -- some definitions are in V1_34__document_contract_table.sql; needs lifting

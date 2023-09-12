@@ -33,4 +33,5 @@ data class ReferralLocation(
   @Column(name = "nomis_conditional_release_date") var nomisConditionalReleaseDate: LocalDate? = null,
   @Column(name = "nomis_actual_parole_date") var nomisActualParoleDate: LocalDate? = null,
   @Column(name = "nomis_discharge_date") var nomisDischargeDate: LocalDate? = null,
+  @Column(name = "referral_releasing_12_weeks") var isReferralReleasingIn12Weeks: Boolean? = null,
 )
