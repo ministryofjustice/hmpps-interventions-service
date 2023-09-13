@@ -17,6 +17,7 @@ class ProbationPractitionerDetailsFactory(em: TestEntityManager? = null) : Entit
     emailAddress: String? = "c.d@xyz.com",
     pdu: String? = "pdu2",
     probationOffice: String? = "probation-office",
+    roleOrJobTitle: String? = "Probabation Practitioner",
   ): ProbationPractitionerDetails {
     return save(
       ProbationPractitionerDetails(
@@ -29,6 +30,7 @@ class ProbationPractitionerDetailsFactory(em: TestEntityManager? = null) : Entit
         emailAddress = emailAddress,
         pdu = pdu,
         probationOffice = probationOffice,
+        roleOrJobTitle = roleOrJobTitle,
       ),
     )
   }
