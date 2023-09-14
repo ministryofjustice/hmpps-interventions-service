@@ -193,13 +193,13 @@ class DraftReferralService(
       referral.roleOrJobTitle = update.roleOrJobTitle
       referral.ppEmailAddress = update.ppEmailAddress
       referral.hasMainPointOfContactDetails = update.hasMainPointOfContactDetails
-      if (StringUtils.isNotEmpty(update.ppPdu)) {
-        referral.ppPdu = update.ppPdu
+      if (StringUtils.isNotEmpty(update.ppEstablishment)) {
+        referral.ppEstablishment = update.ppEstablishment
         referral.ppProbationOffice = null
       }
       if (StringUtils.isNotEmpty(update.ppProbationOffice)) {
         referral.ppProbationOffice = update.ppProbationOffice
-        referral.ppPdu = null
+        referral.ppEstablishment = null
       }
     }
   }
@@ -537,6 +537,7 @@ class DraftReferralService(
           emailAddress = draftReferral.ppEmailAddress,
           pdu = draftReferral.ppPdu,
           probationOffice = draftReferral.ppProbationOffice,
+          establishment = draftReferral.ppEstablishment,
           roleOrJobTitle = draftReferral.roleOrJobTitle,
         ),
       )

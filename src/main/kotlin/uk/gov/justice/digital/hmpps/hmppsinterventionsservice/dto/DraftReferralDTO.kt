@@ -60,6 +60,7 @@ data class DraftReferralDTO(
   val ppEmailAddress: String? = null,
   val ppPdu: String? = null,
   val ppProbationOffice: String? = null,
+  val ppEstablishment: String? = null,
   val hasValidDeliusPPDetails: Boolean? = null,
   val hasMainPointOfContactDetails: Boolean? = null,
   val isReferralReleasingIn12Weeks: Boolean? = null,
@@ -111,6 +112,7 @@ data class DraftReferralDTO(
         ppName = referral.ppName,
         ppEmailAddress = referral.ppEmailAddress,
         ppPdu = referral.ppPdu,
+        ppEstablishment = referral.ppEstablishment,
         ppProbationOffice = referral.ppProbationOffice,
         hasValidDeliusPPDetails = referral.hasValidDeliusPPDetails,
         isReferralReleasingIn12Weeks = referral.isReferralReleasingIn12Weeks,
@@ -166,6 +168,7 @@ data class DraftReferralDTO(
         ppName = referral.probationPractitionerDetails?.name,
         ppEmailAddress = referral.probationPractitionerDetails?.emailAddress,
         ppPdu = referral.probationPractitionerDetails?.pdu,
+        ppEstablishment = referral.probationPractitionerDetails?.establishment,
         ppProbationOffice = referral.probationPractitionerDetails?.probationOffice,
         hasValidDeliusPPDetails = referral.probationPractitionerDetails?.let {
           it.nDeliusName != null || it.nDeliusEmailAddress != null || it.nDeliusPDU != null
