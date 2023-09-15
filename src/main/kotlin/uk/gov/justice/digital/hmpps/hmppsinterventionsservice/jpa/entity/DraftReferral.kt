@@ -100,6 +100,7 @@ class DraftReferral(
   @Column(name = "role_job_title") var roleOrJobTitle: String? = null,
   @Column(name = "referral_releasing_12_weeks") var isReferralReleasingIn12Weeks: Boolean? = null,
   @Column(name = "has_main_point_of_contact_details") var hasMainPointOfContactDetails: Boolean? = null,
+  @Column(name = "pp_establishment") var ppEstablishment: String? = null,
 ) {
   val referralDetails: ReferralDetails? get() {
     return referralDetailsHistory?.firstOrNull { it.supersededById == null }
