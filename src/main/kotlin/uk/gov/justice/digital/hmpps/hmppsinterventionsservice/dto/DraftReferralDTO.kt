@@ -65,6 +65,7 @@ data class DraftReferralDTO(
   val hasMainPointOfContactDetails: Boolean? = null,
   val isReferralReleasingIn12Weeks: Boolean? = null,
   val roleOrJobTitle: String? = null,
+  val ppLocationType: String? = null,
 ) {
   companion object {
     fun from(referral: DraftReferral): DraftReferralDTO {

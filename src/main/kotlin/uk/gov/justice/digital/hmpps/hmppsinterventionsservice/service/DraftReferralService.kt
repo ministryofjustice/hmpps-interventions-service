@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 import com.microsoft.applicationinsights.TelemetryClient
 import mu.KotlinLogging
 import net.logstash.logback.argument.StructuredArguments
-import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -193,11 +192,11 @@ class DraftReferralService(
       referral.roleOrJobTitle = update.roleOrJobTitle
       referral.ppEmailAddress = update.ppEmailAddress
       referral.hasMainPointOfContactDetails = update.hasMainPointOfContactDetails
-      if (StringUtils.isNotEmpty(update.ppEstablishment)) {
+      if (update.ppLocationType == "establishment") {
         referral.ppEstablishment = update.ppEstablishment
         referral.ppProbationOffice = null
       }
-      if (StringUtils.isNotEmpty(update.ppProbationOffice)) {
+      if (update.ppLocationType == "probation office") {
         referral.ppProbationOffice = update.ppProbationOffice
         referral.ppEstablishment = null
       }

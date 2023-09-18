@@ -6,7 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appoint
 import java.util.UUID
 
 class AppointmentDeliveryAddressFactory(em: TestEntityManager? = null) : EntityFactory(em) {
-  val appointmentDeliveryFactory = AppointmentDeliveryFactory(em)
+  private val appointmentDeliveryFactory = AppointmentDeliveryFactory(em)
   fun create(
     appointmentDeliveryId: UUID? = null,
     firstAddressLine: String = "Harmony Living Office, Room 4",
