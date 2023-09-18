@@ -14,4 +14,6 @@ interface DraftReferralRepository : JpaRepository<DraftReferral, UUID> {
       (select r from Referral r where r.id = dr.id)""",
   )
   fun findByCreatedById(userId: String): List<DraftReferral>
+
+  fun findByServiceUserCRN(crn: String): List<DraftReferral>
 }
