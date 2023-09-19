@@ -146,6 +146,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     isReferralReleasingIn12Weeks: Boolean = false,
     hasMainPointOfContactDetails: Boolean = false,
     roleOrJobTitle: String? = "Probation Practitioner",
+    ppEstablishment: String? = "aaa",
   ): DraftReferral {
     val draftReferral = DraftReferral(
       id = id,
@@ -173,6 +174,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
       isReferralReleasingIn12Weeks = isReferralReleasingIn12Weeks,
       hasMainPointOfContactDetails = hasMainPointOfContactDetails,
       roleOrJobTitle = roleOrJobTitle,
+      ppEstablishment = ppEstablishment,
       referralDetailsHistory = if (referralDetails != null) {
         setOf(
           referralDetails.let {

@@ -275,6 +275,7 @@ class SetupAssistant(
     isReferralReleasingIn12Weeks: Boolean = false,
     hasMainPointOfContactDetails: Boolean = false,
     roleOrJobTitle: String? = "Probation Practitioner",
+    ppEstablishment: String? = "aaa",
   ): DraftReferral {
     return draftReferralRepository.save(
       referralFactory.createDraft(
@@ -299,6 +300,7 @@ class SetupAssistant(
         hasMainPointOfContactDetails = hasMainPointOfContactDetails,
         roleOrJobTitle = roleOrJobTitle,
         isReferralReleasingIn12Weeks = isReferralReleasingIn12Weeks,
+        ppEstablishment = ppEstablishment,
       ),
     )
   }
@@ -333,16 +335,17 @@ class SetupAssistant(
     isReferralReleasingIn12Weeks: Boolean = false,
     hasMainPointOfContactDetails: Boolean = false,
     roleOrJobTitle: String? = "Probation Practitioner",
+    ppEstablishment: String? = "London",
   ): Referral {
     val ppUser = createPPUser()
     val spUser = createSPUser()
     draftReferralRepository.save(
       referralFactory.createDraft(
         id = id,
-        intervention = intervention,
         createdBy = ppUser,
-        personCustodyPrisonId = personCustodyPrisonId,
+        intervention = intervention,
         personCurrentLocationType = personCurrentLocationType,
+        personCustodyPrisonId = personCustodyPrisonId,
         expectedReleaseDate = expectedReleaseDate,
         ndeliusPPName = ndeliusPPName,
         ndeliusPPEmailAddress = ndeliusPPEmailAddress,
@@ -355,6 +358,7 @@ class SetupAssistant(
         isReferralReleasingIn12Weeks = isReferralReleasingIn12Weeks,
         hasMainPointOfContactDetails = hasMainPointOfContactDetails,
         roleOrJobTitle = roleOrJobTitle,
+        ppEstablishment = ppEstablishment,
       ),
     )
 
@@ -398,14 +402,26 @@ class SetupAssistant(
   fun createCancelledReferral(id: UUID = UUID.randomUUID(), intervention: Intervention = createIntervention(), endRequestedReason: CancellationReason? = randomCancellationReason(), endRequestedComments: String? = null): Referral {
     val ppUser = createPPUser()
     val spUser = createSPUser()
-    draftReferralRepository.save(referralFactory.createDraft(id = id, intervention = intervention, createdBy = ppUser))
+    draftReferralRepository.save(
+      referralFactory.createDraft(
+        id = id,
+        createdBy = ppUser,
+        intervention = intervention,
+      ),
+    )
     return referralRepository.save(referralFactory.createEnded(id = id, intervention = intervention, createdBy = ppUser, sentBy = ppUser, endRequestedBy = ppUser, assignments = listOf(ReferralAssignment(OffsetDateTime.now(), spUser, spUser)), endRequestedReason = endRequestedReason, endRequestedComments = endRequestedComments, concludedAt = OffsetDateTime.now()))
   }
 
   fun createCompletedReferral(id: UUID = UUID.randomUUID(), intervention: Intervention = createIntervention(), endRequestedReason: CancellationReason? = randomCancellationReason(), endRequestedComments: String? = null): Referral {
     val ppUser = createPPUser()
     val spUser = createSPUser()
-    draftReferralRepository.save(referralFactory.createDraft(id = id, intervention = intervention, createdBy = ppUser))
+    draftReferralRepository.save(
+      referralFactory.createDraft(
+        id = id,
+        createdBy = ppUser,
+        intervention = intervention,
+      ),
+    )
     val referral = referralRepository.save(referralFactory.createEnded(id = id, intervention = intervention, createdBy = ppUser, sentBy = ppUser, endRequestedBy = ppUser, assignments = listOf(ReferralAssignment(OffsetDateTime.now(), spUser, spUser)), endRequestedReason = endRequestedReason, endRequestedComments = endRequestedComments, concludedAt = OffsetDateTime.now()))
     createEndOfServiceReport(referral = referral)
     return referral
