@@ -56,6 +56,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     isReferralReleasingIn12Weeks: Boolean = false,
     hasMainPointOfContactDetails: Boolean = false,
     roleOrJobTitle: String? = "Probation Practitioner",
+    ppEstablishment: String? = "aaa",
   ): DraftReferral {
     return createDraftReferral(
       id = id,
@@ -84,6 +85,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       isReferralReleasingIn12Weeks = isReferralReleasingIn12Weeks,
       hasMainPointOfContactDetails = hasMainPointOfContactDetails,
       roleOrJobTitle = roleOrJobTitle,
+      ppEstablishment = ppEstablishment,
     )
   }
 
@@ -117,6 +119,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     needsInterpreter: Boolean? = null,
     interpreterLanguage: String? = null,
     probationPractitionerDetails: ProbationPractitionerDetails? = null,
+    ppEstablishment: String? = null,
   ): Referral {
     if (createDraft) {
       createDraft(
@@ -125,6 +128,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
         createdBy = createdBy,
         serviceUserCRN = serviceUserCRN,
         intervention = intervention,
+        ppEstablishment = ppEstablishment,
       )
     }
     val referral = createReferral(

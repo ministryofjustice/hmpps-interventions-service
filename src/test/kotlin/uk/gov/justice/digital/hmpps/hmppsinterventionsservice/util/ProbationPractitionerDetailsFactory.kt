@@ -18,6 +18,7 @@ class ProbationPractitionerDetailsFactory(em: TestEntityManager? = null) : Entit
     pdu: String? = "pdu2",
     probationOffice: String? = "probation-office",
     roleOrJobTitle: String? = "Probabation Practitioner",
+    ppEstablishment: String? = "aaa",
   ): ProbationPractitionerDetails {
     return save(
       ProbationPractitionerDetails(
@@ -31,6 +32,7 @@ class ProbationPractitionerDetailsFactory(em: TestEntityManager? = null) : Entit
         pdu = pdu,
         probationOffice = probationOffice,
         roleOrJobTitle = roleOrJobTitle,
+        establishment = ppEstablishment,
       ),
     )
   }
