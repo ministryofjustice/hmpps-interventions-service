@@ -94,15 +94,15 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:4.1.0-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.20.144")
-  implementation("software.amazon.awssdk:s3:2.20.144")
-  implementation("software.amazon.awssdk:sts:2.20.144")
+  implementation("software.amazon.awssdk:sns:2.20.151")
+  implementation("software.amazon.awssdk:s3:2.20.151")
+  implementation("software.amazon.awssdk:sts:2.20.151")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.3")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.1.3")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.1.3")
-  implementation("com.nimbusds:oauth2-oidc-sdk:10.14.2")
+  implementation("com.nimbusds:oauth2-oidc-sdk:10.15")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
