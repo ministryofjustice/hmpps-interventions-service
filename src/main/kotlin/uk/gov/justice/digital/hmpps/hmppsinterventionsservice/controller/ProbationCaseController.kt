@@ -17,7 +17,7 @@ class ProbationCaseController(
   val referralService: ReferralService,
   val locationMapper: LocationMapper,
 ) {
-  @PreAuthorize("hasRole('ROLE_PROBATION_CASE')")
+  @PreAuthorize("hasRole('ROLE_INTERVENTIONS_REFER_AND_MONITOR')")
   @GetMapping("/probation-case/{crn}/referral")
   fun getReferralByCrn(
     @PathVariable crn: String,
