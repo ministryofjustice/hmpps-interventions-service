@@ -36,13 +36,14 @@ spring:
           issuer-uri: ${hmppsauth.baseurl}/issuer
           jwk-set-uri: ${hmppsauth.baseurl}/.well-known/jwks.json
   datasource:
+    driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${postgres.uri}/${postgres.db}
     username: ${postgres.username}
     password: ${postgres.password}
   jpa:
     hibernate:
       ddl-auto: validate
-      dialect: PostgreSQLDialect
+      dialect: PostgresSQLDialect
     show-sql: false
   batch:
     job:
@@ -65,7 +66,6 @@ spring:
     web:
       pageable:
         one-indexed-parameters: true
-
 server:
   port: 8080
   servlet:

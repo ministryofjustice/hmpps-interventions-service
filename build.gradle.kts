@@ -107,10 +107,13 @@ dependencies {
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
-  implementation("org.hibernate:hibernate-core:6.1.7.Final")
+  implementation("org.hibernate:hibernate-core:6.3.0.Final")
+  // implementation("org.hibernate:hibernate-entity-manager:6.3.0.Final")
   implementation("com.vladmihalcea:hibernate-types-60:2.21.1")
+  // implementation("org.hibernate:hibernate-commons-annotations:3.2.0.Final")
+
   runtimeOnly("org.flywaydb:flyway-core")
-  runtimeOnly("org.postgresql:postgresql:42.6.0")
+  runtimeOnly("org.postgresql:postgresql")
 
   // json and csv
   implementation("com.github.java-json-tools:json-patch:1.13")
