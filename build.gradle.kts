@@ -102,7 +102,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.3")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.1.3")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.1.3")
-  implementation("com.nimbusds:oauth2-oidc-sdk:10.15")
+  implementation("com.nimbusds:oauth2-oidc-sdk:11.0")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
