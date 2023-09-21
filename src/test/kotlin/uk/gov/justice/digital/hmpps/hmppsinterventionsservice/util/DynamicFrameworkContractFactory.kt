@@ -14,6 +14,7 @@ import java.util.UUID
 class DynamicFrameworkContractFactory(em: TestEntityManager? = null) : EntityFactory(em) {
   private val serviceProviderFactory = ServiceProviderFactory(em)
   private val contractTypeFactory = ContractTypeFactory(em)
+  private val pccRegionFactory = PCCRegionFactory(em)
 
   fun create(
     id: UUID = UUID.randomUUID(),
@@ -26,7 +27,7 @@ class DynamicFrameworkContractFactory(em: TestEntityManager? = null) : EntityFac
     allowsMale: Boolean = true,
     allowsFemale: Boolean = true,
     npsRegion: NPSRegion? = null,
-    pccRegion: PCCRegion? = null,
+    pccRegion: PCCRegion? = pccRegionFactory.create(),
     contractReference: String = RandomStringUtils.randomAlphanumeric(8),
     subcontractorProviders: Set<ServiceProvider> = setOf(),
     referralStartDate: LocalDate = LocalDate.of(2021, 6, 1),
