@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType
+import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType
 import jakarta.persistence.CascadeType
 import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column
@@ -35,7 +35,9 @@ enum class PersonCurrentLocationType {
 @Table(name = "draft_referral", indexes = [Index(columnList = "created_by_id")])
 class DraftReferral(
   // draft referral fields
-  @OneToOne(mappedBy = "draftReferral", cascade = [CascadeType.ALL]) @PrimaryKeyJoinColumn var serviceUserData: ServiceUserData? = null,
+  @OneToOne(mappedBy = "draftReferral", cascade = [CascadeType.ALL])
+  @PrimaryKeyJoinColumn
+  var serviceUserData: ServiceUserData? = null,
   @Column(name = "draft_supplementary_risk") var additionalRiskInformation: String? = null,
   @Column(name = "draft_supplementary_risk_updated_at") var additionalRiskInformationUpdatedAt: OffsetDateTime? = null,
   var additionalNeedsInformation: String? = null,

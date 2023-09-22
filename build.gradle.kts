@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.1.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.4.0"
   kotlin("plugin.spring") version "1.9.10"
   id("org.jetbrains.kotlin.plugin.jpa") version "1.9.10"
   id("jacoco")
@@ -107,10 +107,8 @@ dependencies {
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
-  implementation("org.hibernate:hibernate-core:6.3.0.Final")
-  // implementation("org.hibernate:hibernate-entity-manager:6.3.0.Final")
-  implementation("com.vladmihalcea:hibernate-types-60:2.21.1")
-  // implementation("org.hibernate:hibernate-commons-annotations:3.2.0.Final")
+  implementation("org.hibernate:hibernate-core:6.2.7.Final")
+  implementation("io.hypersistence:hypersistence-utils-hibernate-62:3.5.3")
 
   runtimeOnly("org.flywaydb:flyway-core")
   runtimeOnly("org.postgresql:postgresql")

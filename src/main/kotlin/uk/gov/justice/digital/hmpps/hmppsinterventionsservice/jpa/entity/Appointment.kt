@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
 import com.fasterxml.jackson.annotation.JsonValue
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType
+import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
