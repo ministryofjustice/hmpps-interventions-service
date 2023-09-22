@@ -431,9 +431,7 @@ class DraftReferralService(
     }
 
     update.serviceCategoryIds?.let {
-      if (!draftReferral.intervention.dynamicFrameworkContract.contractType.serviceCategories.map { serviceCategory ->
-          serviceCategory.id
-        }.containsAll(it)
+      if (!draftReferral.intervention.dynamicFrameworkContract.contractType.serviceCategories.map { serviceCategory -> serviceCategory.id }.containsAll(it)
       ) {
         errors.add(FieldError(field = "serviceCategoryIds", error = Code.INVALID_SERVICE_CATEGORY_FOR_CONTRACT))
       }
