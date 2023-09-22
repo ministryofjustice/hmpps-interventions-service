@@ -163,8 +163,8 @@ class ReferralServiceTest @Autowired constructor(
     private val truncateSeconds: Comparator<OffsetDateTime> = Comparator { a, exp ->
       if (exp != null && a != null) {
         if (a
-            .truncatedTo(ChronoUnit.SECONDS)
-            .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
+          .truncatedTo(ChronoUnit.SECONDS)
+          .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
         ) {
           0
         } else {
@@ -736,8 +736,8 @@ class ReferralServiceTest @Autowired constructor(
     private val truncateSeconds: Comparator<OffsetDateTime> = Comparator { a, exp ->
       if (exp != null && a != null) {
         if (a
-            .truncatedTo(ChronoUnit.SECONDS)
-            .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
+          .truncatedTo(ChronoUnit.SECONDS)
+          .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
         ) {
           0
         } else {
