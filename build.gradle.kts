@@ -83,7 +83,7 @@ dependencies {
   implementation("io.sentry:sentry-spring-boot-starter:6.29.0")
   implementation("io.sentry:sentry-logback:6.29.0")
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
-  implementation("net.logstash.logback:logstash-logback-encoder:7.3")
+  implementation("net.logstash.logback:logstash-logback-encoder:7.4")
 
   runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2") // needed for OffsetDateTime for AppInsights
 
@@ -94,14 +94,14 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:4.1.0-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.20.151")
-  implementation("software.amazon.awssdk:s3:2.20.151")
-  implementation("software.amazon.awssdk:sts:2.20.151")
+  implementation("software.amazon.awssdk:sns:2.20.155")
+  implementation("software.amazon.awssdk:s3:2.20.155")
+  implementation("software.amazon.awssdk:sts:2.20.155")
 
   // security
-  implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.3")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.1.3")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.1.3")
+  implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.4")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.1.4")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.1.4")
   implementation("com.nimbusds:oauth2-oidc-sdk:11.0")
 
   // database
@@ -116,7 +116,7 @@ dependencies {
   implementation("com.github.java-json-tools:json-patch:1.13")
   implementation("org.apache.commons:commons-csv:1.10.0")
 
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.2")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.3")
   testImplementation("com.squareup.okhttp3:okhttp:4.11.0")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.11.0")
   testImplementation("org.mockito:mockito-inline:5.2.0")
