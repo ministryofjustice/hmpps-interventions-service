@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance
 
+import jakarta.persistence.EntityManagerFactory
 import mu.KLogging
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
@@ -16,6 +17,7 @@ import org.springframework.batch.item.database.JpaCursorItemReader
 import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
 import org.springframework.batch.repeat.RepeatStatus
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
@@ -53,6 +55,9 @@ class NdmisPerformanceReportJobConfiguration(
   private val outcomeReportFilename = "crs_performance_report-v2-outcomes.csv"
   private val skipPolicy = NPESkipPolicy()
 
+  @Autowired
+  lateinit var entityManagerFactory: EntityManagerFactory
+
   @Bean
   fun ndmisPerformanceReportJobLauncher(ndmisPerformanceReportJob: Job): ApplicationRunner {
     return onStartupJobLauncherFactory.makeBatchLauncher(ndmisPerformanceReportJob)
@@ -63,8 +68,9 @@ class NdmisPerformanceReportJobConfiguration(
   fun ndmisReader(): JpaCursorItemReader<Referral> {
     return JpaCursorItemReaderBuilder<Referral>()
       .name("ndmisPerformanceReportReader")
-      .queryString("select r from Referral r where sent_at is not null")
+      .queryString("select r from Referral r where r.sentAt is not null")
       // do we need .maxItemCount(pageSize)?
+      .entityManagerFactory(entityManagerFactory)
       .build()
   }
 
