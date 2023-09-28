@@ -57,7 +57,9 @@ class Referral(
   var concludedAt: OffsetDateTime? = null,
 
   // draft referral fields
-  @OneToOne(mappedBy = "draftReferral", cascade = [CascadeType.ALL]) @PrimaryKeyJoinColumn var serviceUserData: ServiceUserData? = null,
+  @OneToOne(mappedBy = "referral", cascade = [CascadeType.ALL])
+  @PrimaryKeyJoinColumn
+  var serviceUserData: ReferralServiceUserData? = null,
   @Column(name = "draft_supplementary_risk") var additionalRiskInformation: String? = null,
   @Column(name = "draft_supplementary_risk_updated_at") var additionalRiskInformationUpdatedAt: OffsetDateTime? = null,
   var additionalNeedsInformation: String? = null,

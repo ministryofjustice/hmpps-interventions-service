@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance
 
+import mu.KLogging
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.batch.core.ExitStatus
@@ -38,6 +39,8 @@ class NdmisPerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
 }
 
 class NdmisPerformanceReportJobConfigurationTest : IntegrationTestBase() {
+
+  companion object : KLogging()
   @Autowired
   lateinit var jobLauncher: JobLauncher
 
@@ -65,6 +68,7 @@ class NdmisPerformanceReportJobConfigurationTest : IntegrationTestBase() {
     )
 
     val execution = executeJob(job)
+    // throw execution.allFailureExceptions.get(0)
     assertThat(execution.exitStatus).isEqualTo(ExitStatus.COMPLETED)
 
     assertThat(outputDir.resolve("crs_performance_report-v2-referrals.csv"))

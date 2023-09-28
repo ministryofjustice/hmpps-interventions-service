@@ -57,6 +57,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceR
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralDetailsFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralServiceUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SentReferralSummariesFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceProviderFactory
@@ -95,6 +96,7 @@ class ReferralServiceTest @Autowired constructor(
   private val appointmentFactory = AppointmentFactory(entityManager)
   private val supplierAssessmentFactory = SupplierAssessmentFactory(entityManager)
   private val serviceUserDataFactory = ServiceUserFactory(entityManager)
+  private val referralServiceUserDataFactory = ReferralServiceUserFactory(entityManager)
   private val referralDetailsFactory = ReferralDetailsFactory(entityManager)
 
   private val referralEventPublisher: ReferralEventPublisher = mock()
@@ -195,17 +197,17 @@ class ReferralServiceTest @Autowired constructor(
       val user = userFactory.create("pp_user_1", "delius")
       val startDraftReferral1 = referralFactory.createDraft(createdBy = user)
       val startedReferral1 = referralFactory.createSent(id = startDraftReferral1.id, createdBy = user, createDraft = false)
-      val serviceUserData1 = serviceUserDataFactory.create("Zack", "Synder", startDraftReferral1)
+      val serviceUserData1 = referralServiceUserDataFactory.create("Zack", "Synder", startedReferral1)
       startedReferral1.serviceUserData = serviceUserData1
       entityManager.refresh(startedReferral1)
       val startDraftReferral2 = referralFactory.createDraft(createdBy = user)
       val startedReferral2 = referralFactory.createSent(id = startDraftReferral2.id, createdBy = user, createDraft = false)
-      val serviceUserData2 = serviceUserDataFactory.create("Dom", "Barnett", startDraftReferral2)
+      val serviceUserData2 = referralServiceUserDataFactory.create("Dom", "Barnett", startedReferral2)
       startedReferral2.serviceUserData = serviceUserData2
       entityManager.refresh(startedReferral2)
       val startDraftReferral3 = referralFactory.createDraft(createdBy = user)
       val startedReferral3 = referralFactory.createSent(id = startDraftReferral3.id, createdBy = user)
-      val serviceUserData3 = serviceUserDataFactory.create("Alice", "Wonderland", startDraftReferral3)
+      val serviceUserData3 = referralServiceUserDataFactory.create("Alice", "Wonderland", startedReferral3)
       startedReferral3.serviceUserData = serviceUserData3
       entityManager.refresh(startedReferral3)
 
@@ -596,15 +598,15 @@ class ReferralServiceTest @Autowired constructor(
 
       val serviceUserData = serviceUserDataFactory.create(firstName = "john", lastName = "smith")
       referral = referralFactory.createSent(id = serviceUserData.draftReferral!!.id, intervention = intervention, createDraft = false)
-      referral.serviceUserData = serviceUserData
+      // referral.serviceUserData = serviceUserData
 
       val serviceUserData2 = serviceUserDataFactory.create(firstName = "john", lastName = "smith")
       referral2 = referralFactory.createSent(id = serviceUserData2.draftReferral!!.id, intervention = intervention, createDraft = false)
-      referral2.serviceUserData = serviceUserData2
+      // referral2.serviceUserData = serviceUserData2
 
       val serviceUserData3 = serviceUserDataFactory.create(firstName = "tim", lastName = "brown")
       referral3 = referralFactory.createSent(id = serviceUserData3.draftReferral!!.id, intervention = intervention, createDraft = false)
-      referral3.serviceUserData = serviceUserData3
+      // referral3.serviceUserData = serviceUserData3
 
       whenever(serviceProviderAccessScopeMapper.fromUser(user))
         .thenReturn(ServiceProviderAccessScope(setOf(provider), setOf(intervention.dynamicFrameworkContract)))
@@ -628,8 +630,9 @@ class ReferralServiceTest @Autowired constructor(
     @Test
     fun `hyphenated names are returned in the search results `() {
       val serviceUserData2 = serviceUserDataFactory.create(firstName = "bob-blue", lastName = "green")
+      val referralServiceUserData2 = referralServiceUserDataFactory.create(firstName = "bob-blue", lastName = "green")
       val referralWithHyphenatedName = referralFactory.createSent(id = serviceUserData2.draftReferral!!.id, intervention = intervention, createDraft = false)
-      referralWithHyphenatedName.serviceUserData = serviceUserData2
+      referralWithHyphenatedName.serviceUserData = referralServiceUserData2
 
       val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest, "bob-blue green")
       assertThat(result).size().isEqualTo(1)
@@ -669,11 +672,11 @@ class ReferralServiceTest @Autowired constructor(
 
       val serviceUserData = serviceUserDataFactory.create(firstName = "john", lastName = "smith")
       referral = referralFactory.createSent(id = serviceUserData.draftReferral!!.id, referenceNumber = "AJ1827DR", intervention = intervention, createDraft = false)
-      referral.serviceUserData = serviceUserData
+      // referral.serviceUserData = serviceUserData
 
       val serviceUserData2 = serviceUserDataFactory.create(firstName = "john", lastName = "smith")
       referral2 = referralFactory.createSent(id = serviceUserData2.draftReferral!!.id, referenceNumber = "EJ3892AC", intervention = intervention, createDraft = false)
-      referral2.serviceUserData = serviceUserData2
+      // referral2.serviceUserData = serviceUserData2
 
       whenever(serviceProviderAccessScopeMapper.fromUser(user))
         .thenReturn(ServiceProviderAccessScope(setOf(provider), setOf(intervention.dynamicFrameworkContract)))

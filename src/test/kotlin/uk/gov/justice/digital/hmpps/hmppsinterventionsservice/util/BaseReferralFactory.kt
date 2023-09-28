@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Probati
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SelectedDesiredOutcomesMapping
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
@@ -31,7 +32,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     intervention: Intervention,
     relevantSentenceId: Long? = null,
     desiredOutcomes: List<DesiredOutcome> = emptyList(),
-    serviceUserData: ServiceUserData? = null,
+    serviceUserData: ReferralServiceUserData? = null,
     actionPlans: MutableList<ActionPlan>? = null,
     selectedServiceCategories: MutableSet<ServiceCategory>? = null,
     complexityLevelIds: MutableMap<UUID, UUID>? = null,
