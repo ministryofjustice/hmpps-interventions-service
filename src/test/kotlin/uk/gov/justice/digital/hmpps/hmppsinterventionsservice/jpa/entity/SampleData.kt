@@ -71,7 +71,7 @@ class SampleData {
         ),
       ),
       supplementaryRiskId: UUID? = null,
-      serviceUserData: ServiceUserData = ServiceUserData(),
+      serviceUserData: ReferralServiceUserData = ReferralServiceUserData(),
     ): Referral {
       val referral = Referral(
         serviceUserCRN = crn,

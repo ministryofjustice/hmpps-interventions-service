@@ -8,9 +8,9 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfSe
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SentReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -39,7 +39,7 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
     assignments: List<ReferralAssignment> = emptyList(),
 
     supplierAssessment: SupplierAssessment? = null,
-    serviceUserData: ServiceUserData? = null,
+    serviceUserData: ReferralServiceUserData? = null,
   ): SentReferralSummary {
     createReferral(
       id = id,
@@ -97,7 +97,7 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
     assignments: List<ReferralAssignment> = emptyList(),
 
     supplierAssessment: SupplierAssessment? = null,
-    serviceUserData: ServiceUserData? = null,
+    serviceUserData: ReferralServiceUserData? = null,
   ): Pair<SentReferralSummary, Referral> {
     val referral = createReferral(
       id = id,

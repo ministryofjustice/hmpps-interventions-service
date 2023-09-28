@@ -14,8 +14,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.EmailSen
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanAppointmentEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanAppointmentEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DeliverySessionFactory
@@ -46,7 +46,7 @@ class NotifyActionPlanAppointmentServiceTest {
           actionPlans = mutableListOf(actionPlanFactory.create(id = UUID.fromString("4907ffb5-94cf-4eff-8cf9-dcf09765be42"))),
           relevantSentenceId = 123456,
           supplementaryRiskId = UUID.randomUUID(),
-          serviceUserData = ServiceUserData(firstName = "Bob", lastName = "Green"),
+          serviceUserData = ReferralServiceUserData(firstName = "Bob", lastName = "Green"),
         ),
         createdBy = SampleData.sampleAuthUser(),
         attended = attended,

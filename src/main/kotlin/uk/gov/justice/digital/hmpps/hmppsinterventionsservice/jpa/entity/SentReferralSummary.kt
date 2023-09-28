@@ -51,7 +51,7 @@ import java.util.UUID
       name = "serviceUserData",
       attributeNodes = [
         NamedAttributeNode("disabilities"),
-        NamedAttributeNode("draftReferral"),
+        NamedAttributeNode("referral"),
       ],
     ),
     NamedSubgraph(
@@ -77,7 +77,8 @@ class SentReferralSummary(
   var sentAt: OffsetDateTime,
   var concludedAt: OffsetDateTime? = null,
   var referenceNumber: String,
-  @OneToOne(mappedBy = "draftReferral", cascade = [CascadeType.ALL]) @PrimaryKeyJoinColumn var serviceUserData: ServiceUserData?,
+  @OneToOne(mappedBy = "referral", cascade = [CascadeType.ALL]) @PrimaryKeyJoinColumn
+  var serviceUserData: ReferralServiceUserData?,
   @NotNull
   @ManyToOne
   @Fetch(FetchMode.JOIN)

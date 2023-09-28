@@ -12,7 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.EmailSen
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.CreateCaseNoteEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.notifications.CaseNotesNotificationsService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.CaseNoteFactory
@@ -52,7 +52,7 @@ internal class CaseNotesNotificationsServiceTest {
 
     val sender = authUserFactory.createSP(id = "sp_sender", userName = "sp_user_name")
     val referral = referralFactory.createAssigned()
-    referral.serviceUserData = ServiceUserData(firstName = "sp", lastName = "bob")
+    referral.serviceUserData = ReferralServiceUserData(firstName = "sp", lastName = "bob")
     val caseNote = caseNoteFactory.create(referral = referral, sentBy = sender, subject = "from sp", body = "body")
     whenever(referralService.getSentReferralForUser(referral.id, sender)).thenReturn(referral)
     val eventRequiringSPNotification = CreateCaseNoteEvent(
@@ -98,7 +98,7 @@ internal class CaseNotesNotificationsServiceTest {
 
     val sender = authUserFactory.createPP(id = "pp_sender")
     val referral = referralFactory.createAssigned()
-    referral.serviceUserData = ServiceUserData(firstName = "sp", lastName = "bob")
+    referral.serviceUserData = ReferralServiceUserData(firstName = "sp", lastName = "bob")
     val caseNote = caseNoteFactory.create(referral = referral, sentBy = sender, subject = "from pp", body = "body")
     whenever(referralService.getSentReferralForUser(referral.id, sender)).thenReturn(referral)
     val eventRequiringSPNotification = CreateCaseNoteEvent(
@@ -137,7 +137,7 @@ internal class CaseNotesNotificationsServiceTest {
     whenever(referralService.isUserTheResponsibleOfficer(any(), any())).thenReturn(true)
 
     val referral = referralFactory.createAssigned()
-    referral.serviceUserData = ServiceUserData(firstName = "sp", lastName = "bob")
+    referral.serviceUserData = ReferralServiceUserData(firstName = "sp", lastName = "bob")
     val caseNote = caseNoteFactory.create(referral = referral, sentBy = sender, subject = "from pp", body = "body")
     whenever(referralService.getSentReferralForUser(referral.id, sender)).thenReturn(referral)
     val eventRequiringSPNotification = CreateCaseNoteEvent(
@@ -175,7 +175,7 @@ internal class CaseNotesNotificationsServiceTest {
 
     val sender = authUserFactory.createSP(id = "sp_sender")
     val referral = referralFactory.createAssigned(assignments = listOf(ReferralAssignment(OffsetDateTime.now(), sender, sender)))
-    referral.serviceUserData = ServiceUserData(firstName = "sp", lastName = "bob")
+    referral.serviceUserData = ReferralServiceUserData(firstName = "sp", lastName = "bob")
     val caseNote = caseNoteFactory.create(referral = referral, sentBy = sender, subject = "from sp", body = "body")
     whenever(referralService.getSentReferralForUser(referral.id, sender)).thenReturn(referral)
     val eventRequiringSPNotification = CreateCaseNoteEvent(
@@ -217,7 +217,7 @@ internal class CaseNotesNotificationsServiceTest {
 
     val assignedToId = authUserFactory.createSP(id = "sp_assignedToId", userName = "sameUserName")
     val referral = referralFactory.createAssigned(assignments = listOf(ReferralAssignment(OffsetDateTime.now(), assignedToId, assignedToId)))
-    referral.serviceUserData = ServiceUserData(firstName = "sp", lastName = "bob")
+    referral.serviceUserData = ReferralServiceUserData(firstName = "sp", lastName = "bob")
 
     val sender = authUserFactory.createSP(id = "sp_sender", userName = "sameUserName")
     val caseNote = caseNoteFactory.create(referral = referral, sentBy = sender, subject = "from sp", body = "body")
@@ -257,7 +257,7 @@ internal class CaseNotesNotificationsServiceTest {
 
     val sender = authUserFactory.createPP(id = "sender")
     val referral = referralFactory.createSent()
-    referral.serviceUserData = ServiceUserData(firstName = "sp", lastName = "bob")
+    referral.serviceUserData = ReferralServiceUserData(firstName = "sp", lastName = "bob")
     val caseNote = caseNoteFactory.create(referral = referral, sentBy = sender, subject = "from pp", body = "body")
     whenever(referralService.getSentReferralForUser(caseNote.referral.id, sender)).thenReturn(caseNote.referral)
     val event = CreateCaseNoteEvent(

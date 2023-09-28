@@ -14,7 +14,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUse
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ProbationPractitionerDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralLocation
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SentReferralSummariesFactory
 import java.time.LocalDate
@@ -107,7 +107,7 @@ class SentReferralSummariesDTOTest(@Autowired private val json: JacksonTester<Se
     val id = UUID.fromString("3B9ED289-8412-41A9-8291-45E33E60276C")
     val sentAt = OffsetDateTime.parse("2021-01-13T21:57:13+00:00")
     val sentBy = AuthUser("id", "source", "username")
-    val serviceUserData = ServiceUserData(
+    val serviceUserData = ReferralServiceUserData(
       "Mr",
       "Jamie",
       "Smith",
@@ -146,7 +146,7 @@ class SentReferralSummariesDTOTest(@Autowired private val json: JacksonTester<Se
     val id = UUID.fromString("3B9ED289-8412-41A9-8291-45E33E60276C")
     val sentAt = OffsetDateTime.parse("2021-01-13T21:57:13+00:00")
     val sentBy = AuthUser("id", "source", "username")
-    val serviceUserData = ServiceUserData(
+    val serviceUserData = ReferralServiceUserData(
       "Mr",
       "Jamie",
       "Smith",
@@ -186,7 +186,7 @@ class SentReferralSummariesDTOTest(@Autowired private val json: JacksonTester<Se
     val id = UUID.fromString("3B9ED289-8412-41A9-8291-45E33E60276C")
     val sentAt = OffsetDateTime.parse("2021-01-13T21:57:13+00:00")
     val sentBy = AuthUser("id", "source", "username")
-    val serviceUserData = ServiceUserData(
+    val serviceUserData = ReferralServiceUserData(
       "Mr",
       "Jamie",
       "Smith",

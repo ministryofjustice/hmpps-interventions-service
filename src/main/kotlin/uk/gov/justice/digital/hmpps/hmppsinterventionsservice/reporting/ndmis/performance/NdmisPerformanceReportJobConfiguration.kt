@@ -44,6 +44,7 @@ class NdmisPerformanceReportJobConfiguration(
   private val s3Service: S3Service,
   private val ndmisS3Bucket: S3Bucket,
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
+  private val entityManagerFactory: EntityManagerFactory,
   @Value("\${spring.batch.jobs.ndmis.performance-report.page-size}") private val pageSize: Int,
   @Value("\${spring.batch.jobs.ndmis.performance-report.chunk-size}") private val chunkSize: Int,
 ) {
@@ -55,9 +56,6 @@ class NdmisPerformanceReportJobConfiguration(
   private val appointmentReportFilename = "crs_performance_report-v2-appointments.csv"
   private val outcomeReportFilename = "crs_performance_report-v2-outcomes.csv"
   private val skipPolicy = NPESkipPolicy()
-
-  @Autowired
-  lateinit var entityManagerFactory: EntityManagerFactory
 
   @Bean
   fun ndmisPerformanceReportJobLauncher(ndmisPerformanceReportJob: Job): ApplicationRunner {
@@ -146,7 +144,6 @@ class NdmisPerformanceReportJobConfiguration(
     ndmisReader: JpaCursorItemReader<Referral>,
     processor: ReferralsProcessor,
     writer: FlatFileItemWriter<ReferralsData>,
-    transactionManager: PlatformTransactionManager,
   ): Step {
     return StepBuilder("ndmisWriteReferralToCsvStep", jobRepository)
       .chunk<Referral, ReferralsData>(chunkSize, transactionManager)
@@ -199,13 +196,12 @@ class NdmisPerformanceReportJobConfiguration(
     writer: FlatFileItemWriter<Collection<OutcomeData>>,
   ): Step {
     return StepBuilder("ndmisWriteOutcomeToCsvStep", jobRepository)
-      .chunk<Referral, List<OutcomeData>>(chunkSize)
+      .chunk<Referral, List<OutcomeData>>(chunkSize, transactionManager)
       .reader(ndmisReader)
       .processor(processor)
       .writer(writer)
       .faultTolerant()
       .skipPolicy(skipPolicy)
-      .transactionManager(transactionManager)
       .build()
   }
 

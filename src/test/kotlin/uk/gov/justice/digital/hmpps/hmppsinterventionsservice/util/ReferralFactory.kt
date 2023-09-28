@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Probati
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
@@ -108,7 +109,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     additionalRiskInformationUpdatedAt: OffsetDateTime? = null,
     assignments: List<ReferralAssignment> = emptyList(),
     supplierAssessment: SupplierAssessment? = null,
-    serviceUserData: ServiceUserData? = null,
+    serviceUserData: ReferralServiceUserData? = null,
     complexityLevelIds: MutableMap<UUID, UUID>? = null,
     createDraft: Boolean = true,
     accessibilityNeeds: String? = null,
@@ -186,7 +187,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     ),
 
     supplierAssessment: SupplierAssessment? = null,
-    serviceUserData: ServiceUserData? = null,
+    serviceUserData: ReferralServiceUserData? = null,
   ): Referral {
     createDraft(
       id = id,
