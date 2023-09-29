@@ -1,0 +1,271 @@
+{
+  "internal_contract_id": "cda7996f-3507-424d-ba90-659499def371",
+  "contract_reference": "PRJ_5815",
+  "contract_type_id": "WOS",
+  "region": {
+    "nps_region_code": null,
+    "pcc_region_code": "south-yorkshire"
+  },
+  "eligibility": {
+    "allows_female": true,
+    "allows_male": false,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "CHANGING_LIVES",
+    "subcontractor_codes": [
+      "GROW",
+      "TOGETHER_WOMEN_PROJECT"
+    ]
+  },
+  "internal_intervention_id": "d39051f2-d1d4-4967-ba31-a394e0bfd328",
+  "intervention_title": "Women's Services in South Yorkshire",
+  "short_description": "A holistic service for women which secure improved outcomes in relation to the following rehabilitative needs:  \n•        Accommodation \n•        ETE  \n•        Dependency and Recovery  \n•        Finance, Benefits and Debt  \n•        Emotional Wellbeing   \n•        Family and Significant Others \n•        Lifestyle and Associates \n•        Social Inclusion, including mentoring \n \nThe Women's Specific Service is intended to ensure that the Interventions are responsive to the specific needs and characteristics of Women Service Users. The service will be delivered in an environment which is safe and suitable for women and by staff who are trained in trauma-informed and trauma-responsive approaches and also in women-only group(s) and/or with the option for woman member of the Supplier Personnel. \n \nServices are available for female Service Users, irrespective of risk level or complexity level, on a Community/ Suspended Sentence Order with a RAR or on Licence/Post-Sentence Supervision. The Accommodation and Social Inclusion ‘mentoring’ service will also be delivered pre-release for those who will be released under Probation supervision (to be consistent with accommodation one).   Appointments which are part of sentence delivery will be enforceable. \n \nA range of approaches will be used including direct delivery of interventions, support and advocacy, and advice and guidance. Interventions need to be tailored to reflect the complexity of an individual woman’s needs and to recognise and respond to barriers (including child-care commitments, social isolation, religion, language and other cultural barriers, sexual orientation, domestic abuse, involvement with the sex industry, childhood sexual & physical abuse, controlling coercive relationships; substance dependency and lack of self-esteem) to achieving personal change.",
+  "activities": [
+    {
+      "need_area": "ETE",
+      "activity": "Introduction toTraining and Employability Package",
+      "delivery_method": "Group, 1-2-1, Online (tbc)",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Skills for Employment",
+      "delivery_method": "Group, 1-2-1, Online (tbc)",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "OCN Career Prep",
+      "delivery_method": "Group basis.",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "OCN Employability and Development Skills",
+      "delivery_method": "Group basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Industry standard qualifications",
+      "delivery_method": "Group basis, with external participants.",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "IAG",
+      "delivery_method": "One-to-one and Group basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Safeguard Existing ETE",
+      "delivery_method": "One to one",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Secure and sustain tenancies",
+      "delivery_method": "One to one, individual needs basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Secure accommodation",
+      "delivery_method": "One to one, individual needs basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Grant Applications",
+      "delivery_method": "One to one or on behalf of the individual, approximately 2 hours session.",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Tenancy Management Course",
+      "delivery_method": "Group basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Accommodation",
+      "activity": "Good Tenant Portfolio",
+      "delivery_method": "One to one or Group basis, in person on online",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Welfare Benefits",
+      "delivery_method": "Approximately 2 hours duration, One to one basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Managing your money",
+      "delivery_method": "Group or One to one basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Money Advice",
+      "delivery_method": "Group basis, with any follow-up undertaken One to one",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Alcohol Awarness",
+      "delivery_method": "Group or One to one basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Helping Women to Recover (introduction)",
+      "delivery_method": "Group basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Gambling support",
+      "delivery_method": "Group or One to one basis, ongoing support on needs led basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Commissioned Services - Outreach support",
+      "delivery_method": "One to one, individual needs basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Preparing for Treatment",
+      "delivery_method": "Group or One to one basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Partnerships and Pathways",
+      "delivery_method": "Group basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Safety Planning and Safeguarding",
+      "delivery_method": "One to one, individual needs basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Domestic Abuse Outreach",
+      "delivery_method": "One to one, individual needs basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Healthy Relationships",
+      "delivery_method": "Group basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Beyond Trauma",
+      "delivery_method": "Group basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Childrens Safeguarding",
+      "delivery_method": "One to one, individual needs basis, expected to be a minimum of 10 hours intervention",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Sex Work and Exploitation",
+      "delivery_method": "Group basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Positive Parenting",
+      "delivery_method": "Group basis",
+      "delivery_location": "Sheffield only"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Respect",
+      "delivery_method": "Group or One to one basis.",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Keeping Safe Online and Presenting yourself on Social Media",
+      "delivery_method": "Group or One to one basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Future Steps (for Young Adults)",
+      "delivery_method": "Group basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Making Good Programme",
+      "delivery_method": "Group or One to one basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Neuro-diverse needs",
+      "delivery_method": "One to one",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Chrysalis Programme",
+      "delivery_method": "Group basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Self Belief",
+      "delivery_method": "Group or One to one basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Health and Wellbeing",
+      "delivery_method": "Group basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Counselling",
+      "delivery_method": "One to one basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Listening Ear",
+      "delivery_method": "One to one basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Transition from Custody to Community",
+      "delivery_method": "One to one basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Mentoring",
+      "delivery_method": "Group and One to one basis",
+      "delivery_location": "Barnsley,, Doncaster,, Rotherham,, Sheffield."
+    }
+  ]
+}

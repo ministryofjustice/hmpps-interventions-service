@@ -17,7 +17,7 @@ class BatchConfiguration(
   fun asyncJobLauncher(jobRepository: JobRepository): JobLauncher {
     val taskExecutor = ThreadPoolTaskExecutor()
     taskExecutor.corePoolSize = poolSize
-    taskExecutor.setQueueCapacity(queueSize)
+    taskExecutor.queueCapacity = queueSize
     taskExecutor.afterPropertiesSet()
 
     val launcher = SimpleJobLauncher()

@@ -1,0 +1,62 @@
+{
+  "internal_contract_id": "6319857e-52bf-488c-8b21-7432e1cb7fcd",
+  "contract_reference": "PRJ_5470",
+  "contract_type_id": "ETE",
+  "region": {
+    "nps_region_code": "K",
+    "pcc_region_code": null
+  },
+  "eligibility": {
+    "allows_female": false,
+    "allows_male": true,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "SEETEC_BUS_TECH_CTR_LTD",
+    "subcontractor_codes": [
+      "KSS_CRC",
+      "KAREN_MACKEY",
+      "PLUSS_ORG_CIC"
+    ]
+  },
+  "internal_intervention_id": "11a6eada-335e-4548-ad6d-673dacf29aaf",
+  "intervention_title": "ETE Services for Kent, Surrey & Sussex",
+  "short_description": "Services are available for all adult male Service Users, irrespective of risk level or complexity level, on a Community/ Suspended Sentence Order with a RAR or on Licence/Post-Sentence Supervision. They will not be delivered pre-release. Appointments which are part of sentence delivery will be enforceable.\nA range of approaches need to be used including: direct delivery of interventions, support and advocacy, and advice and guidance.\nInterventions need to be tailored to reflect the complexity of a Service User’s needs and should aim to secure one or more of the following outcomes:\n· Service User's obtain suitable training, education and employment.\n· Service User overcomes barriers to obtaining/maintaining suitable training, education and employment.\n· Service User's maintain suitable training, education and employment.\n· Service User's demonstrate improvement in the skills and attitude which enable self-development and increase employability.",
+  "activities": [
+    {
+      "need_area": "ETE",
+      "activity": "Job Club",
+      "delivery_method": "Group, 1-2-1, Online",
+      "delivery_location": "Ashford, Folkestone, Medway, Isle of Sheppey, Thanet, Canterbury, Sittingbourne, Maidstone, Guilford, Staines, Redhill, Brighton, Crawley, Hastings, Worthing"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Disclosure and overcoming barriers workshop",
+      "delivery_method": "Group, 1-2-1, Online",
+      "delivery_location": "Ashford, Folkestone, Medway, Isle of Sheppey, Thanet, Canterbury, Sittingbourne, Maidstone, Guilford, Staines, Redhill, Brighton, Crawley, Hastings, Worthing"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Preparation for Work",
+      "delivery_method": "Group, 1-2-1, Online",
+      "delivery_location": "Ashford, Folkestone, Medway, Isle of Sheppey, Thanet, Canterbury, Sittingbourne, Maidstone, Guilford, Staines, Redhill, Brighton, Crawley, Hastings, Worthing"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Neurodiversity",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Ashford, Folkestone, Medway, Isle of Sheppey, Thanet, Canterbury, Sittingbourne, Maidstone, Guilford, Staines, Redhill, Brighton, Crawley, Hastings, Worthing"
+    },
+    {
+      "need_area": "ETE",
+      "activity": "Education and Training",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Ashford, Folkestone, Medway, Isle of Sheppey, Thanet, Canterbury, Sittingbourne, Maidstone, Guilford, Staines, Redhill, Brighton, Crawley, Hastings, Worthing"
+    }
+  ]
+}

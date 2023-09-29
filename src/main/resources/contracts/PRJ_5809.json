@@ -1,0 +1,31 @@
+{
+  "internal_contract_id": "cda97fb8-ebd4-4c2a-a930-6727e38ffea7",
+  "contract_reference": "PRJ_5809",
+  "contract_type_id": "WOS",
+  "region": {
+    "nps_region_code": null,
+    "pcc_region_code": "nottinghamshire"
+  },
+  "eligibility": {
+    "allows_female": true,
+    "allows_male": false,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "NOTT_WOMENS_CENTRE",
+    "subcontractor_codes": [
+
+    ]
+  },
+  "internal_intervention_id": "96a74e8b-3b4a-46b4-89c7-f20534b15a0f",
+  "intervention_title": "Women's Services in Nottinghamshire",
+  "short_description": "A holistic service for women which secure improved outcomes in relation to the following rehabilitative needs:  \n•        Accommodation \n•        ETE  \n•        Dependency and Recovery  \n•        Finance, Benefits and Debt  \n•        Emotional Wellbeing   \n•        Family and Significant Others \n•        Lifestyle and Associates \n•        Social Inclusion, including mentoring \n \nThe Women's Specific Service is intended to ensure that the Interventions are responsive to the specific needs and characteristics of Women Service Users. The service will be delivered in an environment which is safe and suitable for women and by staff who are trained in trauma-informed and trauma-responsive approaches and also in women-only group(s) and/or with the option for woman member of the Supplier Personnel. \n \nServices are available for female Service Users, irrespective of risk level or complexity level, on a Community/ Suspended Sentence Order with a RAR or on Licence/Post-Sentence Supervision. The Accommodation and Social Inclusion ‘mentoring’ service will also be delivered pre-release for those who will be released under Probation supervision.  Appointments which are part of sentence delivery will be enforceable. \n \nA range of approaches will be used including direct delivery of interventions, support and advocacy, and advice and guidance. Interventions need to be tailored to reflect the complexity of an individual woman’s needs and to recognise and respond to barriers (including child-care commitments, social isolation, religion, language and other cultural barriers, sexual orientation, domestic abuse, involvement with the sex industry, childhood sexual & physical abuse, controlling coercive relationships; substance dependency and lack of self-esteem) to achieving personal change.",
+  "activities": [
+
+  ]
+}

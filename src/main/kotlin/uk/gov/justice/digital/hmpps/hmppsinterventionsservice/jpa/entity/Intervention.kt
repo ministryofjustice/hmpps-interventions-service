@@ -14,8 +14,8 @@ data class Intervention(
   val id: UUID,
   @NotNull val createdAt: OffsetDateTime,
 
-  @NotNull val title: String,
-  @NotNull val description: String,
+  @NotNull var title: String,
+  @NotNull var description: String,
   @NotNull val incomingReferralDistributionEmail: String,
 
   @NotNull

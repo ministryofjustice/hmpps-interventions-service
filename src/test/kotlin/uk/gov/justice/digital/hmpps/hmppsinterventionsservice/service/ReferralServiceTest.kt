@@ -381,9 +381,9 @@ class ReferralServiceTest @Autowired constructor(
     fun `user with multiple providers can see referrals where the providers are subcontractors`() {
       val userProviders = listOf("test_org_1", "test_org_2", "test_org_3", "test_org_4", "test_org_5").map { id -> serviceProviderFactory.create(id = id, name = id) }
       val contractWithUserProviderAsPrime = contractFactory.create(primeProvider = userProviders[0])
-      val contractWithUserProviderAsSub1 = contractFactory.create(subcontractorProviders = setOf(userProviders[1]))
-      val contractWithUserProviderAsSub2 = contractFactory.create(subcontractorProviders = setOf(userProviders[2]))
-      val contractWithUserProviderAsBothPrimeAndSub = contractFactory.create(primeProvider = userProviders[3], subcontractorProviders = setOf(userProviders[4]))
+      val contractWithUserProviderAsSub1 = contractFactory.create(subcontractorProviders = mutableSetOf(userProviders[1]))
+      val contractWithUserProviderAsSub2 = contractFactory.create(subcontractorProviders = mutableSetOf(userProviders[2]))
+      val contractWithUserProviderAsBothPrimeAndSub = contractFactory.create(primeProvider = userProviders[3], subcontractorProviders = mutableSetOf(userProviders[4]))
       val contractWithNoUserProviders = contractFactory.create()
 
       val primeRef = referralFactory.createSent(intervention = interventionFactory.create(contract = contractWithUserProviderAsPrime))

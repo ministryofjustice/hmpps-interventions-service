@@ -1,0 +1,36 @@
+{
+  "internal_contract_id": "bdf5341c-9686-469f-9958-36e7903dffeb",
+  "contract_reference": "DN535743",
+  "contract_type_id": "ETE",
+  "region": {
+    "nps_region_code": "L",
+    "pcc_region_code": null
+  },
+  "eligibility": {
+    "allows_female": true,
+    "allows_male": true,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "ACHIEVE_NW",
+    "subcontractor_codes": [
+
+    ]
+  },
+  "internal_intervention_id": "a5206eeb-897d-4c6c-bbc8-dca0bde5148a",
+  "intervention_title": "GM - ETE",
+  "short_description": "The service is to deliver Education, Training & Employment (ETE) for POPs sentenced to an ETE RAR or with an ETE need, currently on licence or a community order. The Probation practitioner will identify complexity level and send the completed referral form to GM-ETE via the Refer & Monitor system - Dependent upon complexity, GM-ETE will deliver 121 work; group work; job clubs and digital interventions to support the POP with ETE:\n\nGM-ETE will deliver:\n\n1.2.1 Sessions - CV building, disclosure advice, mock interviews, job searching, application forms. ID, bank accounts, referral on to other services, identifying training needs and support for training, further learning advice and support\n\nGroup Work sessions - Employability support, job clubs, accredited courses focussing on employability e.g. Award in Skills for Further Learning \n\nJob Club - Weekly drop-in sessions delivering employability support - including, but not limited to - job search, application form support, CV and cover letter support, job hunting techniques, mock interviews, disclosure letters \n\nDigital Delivery - Innovative online learning portal ‘ConnectMyCareer’ which enables SUs 24/7 access to a library of learning materials, EMSI labour market data, and further employability resources. Digital platforms (e.g., Zoom) will support online delivery, and we will facilitate access to IT equipment for PoPs who require it \n\nEmployer Engagement - Liasion with employers to identify job opportunities, advocacy on behalf of PoP, referral and support with interview -  Meeting employer and PoP needs with regards to training and qualifications. \n\n\nEligibility Criteria - All People on Probation (PoP), male and female, aged 18+\n\nComplexity Levels:\n\nLow complexity – Service User has satisfactory basic numeracy & literacy skills. The Service User has previously been employed though there may be gaps with periods of inactivity due to redundancy/periods of imprisonment. There has been no critical development need to find a new job in their previous field of competence. The Service User values benefits of working but needs guidance to re-enter the workforce, change jobs or career path.\n \nMedium complexity – Service User has gaps in basic numeracy and literacy skills. The Service User has no or limited working experience. The Service User has partially completed vocational training but requires support with building confidence and motivation to develop training and/or employability skills, and also require support and coaching to develop or enhance skills to obtain and sustain employment. The Service User may require significant support to improve  their self-belief.\n\nHigh complexity – Service User lacks basic literacy & numeracy skills and/or may have Learning Difficulties and/or Learning Disabilities. The Service User has no or limited working experience and/or have no qualifications or current qualifications and/or may have many barriers and restrictions to employment due to the nature of their offences (e.g. sexual, violent, or fraud/deception offences). The Service User requires significant support and coaching to build motivation, confidence and basic skills to enter employment / training. The Service User may have multiple complex needs linked to trauma, poor mental health, previous or ongoing experience of abuse and requires significant additional support to move forward.\n\n\nGM-ETE staff will be co-located in each Probation Office on a date and time agreed to meet the needs of each individual Centre",
+  "activities": [
+    {
+      "need_area": "ETE",
+      "activity": "Employment, Training, Education",
+      "delivery_method": "1:2:1, Group Work, Job Clubs, Digital Delivery, Employer Engagement",
+      "delivery_location": "Manchester, Oldham, Trafford, Salford, Tameside, Bury, Bolton, Rochdale, Wigan, Stockport"
+    }
+  ]
+}

@@ -10,6 +10,7 @@ import javax.persistence.Entity
 import javax.persistence.EnumType
 import javax.persistence.Enumerated
 import javax.persistence.Id
+import javax.validation.constraints.NotNull
 
 @Entity
 @TypeDefs(
@@ -25,6 +26,9 @@ data class ComplexityLevel(
   @Enumerated(EnumType.STRING)
   @Column(name = "complexity")
   val complexity: Complexity,
+  @NotNull
+  @Column(name = "service_category_id")
+  val serviceCategoryId: UUID? = null,
 )
 
 enum class Complexity {

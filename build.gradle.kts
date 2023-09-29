@@ -77,6 +77,7 @@ dependencyManagement {
 dependencies {
   // batch processing
   implementation("org.springframework.boot:spring-boot-starter-batch")
+  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2") // also needed runtime for AppInsights
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")

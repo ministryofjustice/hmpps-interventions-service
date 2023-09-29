@@ -399,7 +399,7 @@ class ReferralRepositoryTest @Autowired constructor(
         contractReference = random(10),
       )
       else -> dynamicFrameworkContractFactory.create(
-        subcontractorProviders = setOf(serviceProvider),
+        subcontractorProviders = mutableSetOf(serviceProvider),
         contractReference = random(10),
       )
     }
@@ -461,7 +461,7 @@ class ReferralRepositoryTest @Autowired constructor(
     val serviceProvider = serviceProviderFactory.create(random(13), random(14))
     val contract = when {
       asPrime -> dynamicFrameworkContractFactory.create(primeProvider = serviceProvider, contractReference = random(10))
-      else -> dynamicFrameworkContractFactory.create(subcontractorProviders = setOf(serviceProvider), contractReference = random(10))
+      else -> dynamicFrameworkContractFactory.create(subcontractorProviders = mutableSetOf(serviceProvider), contractReference = random(10))
     }
     val intervention = interventionFactory.create(contract = contract)
     val referral = referralFactory.createDraft(intervention = intervention)

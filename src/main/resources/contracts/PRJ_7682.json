@@ -1,0 +1,102 @@
+{
+  "internal_contract_id": "cd6a3bf4-d67c-4e4e-b05c-a98f6eadee27",
+  "contract_reference": "PRJ_7682",
+  "contract_type_id": "DNR-SY",
+  "region": {
+    "nps_region_code": null,
+    "pcc_region_code": "south-yorkshire"
+  },
+  "eligibility": {
+    "allows_female": false,
+    "allows_male": true,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "CHANGE_GROW_LIVE_LTD",
+    "subcontractor_codes": [
+
+    ]
+  },
+  "internal_intervention_id": "9f137480-85bf-4152-9a9b-43cd812a3f7b",
+  "intervention_title": "Dependence and Recovery services in South Yorkshire",
+  "short_description": "Services are available for all adult males on probation either:\n\n- on a Community Sentence or Suspended Sentence Order and subject to a Rehabilitation Activity Requirement (RAR) whereby a specified number of RAR Activity Days will be allocated.\n\n- pre-release to people who are convicted.  For most cases a pre-release referral will be beneficial to support the person prior to release, by building and maintaining relationships to maximise engagement once released, develop close working relationships with treatment providers and support post release appointments with local substance misuse teams.\n\n- released on licence and post-sentence supervision.  \n\n\nAny Sessions delivered as part of a RAR Activity Day or as a mandated Licence or Post Sentence Supervision appointment will be Enforceable.  \n\nServices are offered as either, Medium or High complexity. \n\n A range of delivery methods need to be used including skills-building, support and advocacy and advice/, guidance/information.   \n\nInterventions must be tailored to meet the specific needs of each Person(s) on Probation to enable them to make progress towards their agreed outcomes, as identified in the Person(s) on Probations Action Plan and aim to secure one or more of the following outcomes:   \n\n Person on probation achieves abstinence or controlled/ non-dependent or non-problematic substance misuse. \n\nPerson on probation enhances their skills to manage risky situations which may pose a trigger or relapse. \n\nPerson on probation enhances their belief in ability to manage/ desist from addiction(s). \n\nPerson on probation improves their physical health and mental resilience. \n\nPerson(s) on Probation establishes Dependency Pathways to manage a range of addictive behaviours, including supporting access into other treatment providers and detox programmes. \n\nPerson(s) on Probation increases their understanding of addictive behaviours and triggers and options to reduce dependency.",
+  "activities": [
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Alcohol Brief Intervention – one-off identification and brief advice support session for low-level alcohol dependency",
+      "delivery_method": "1:1/group/digital",
+      "delivery_location": "Barnsley; Rotherham; Sheffield; Doncaster."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Alcohol Extended Brief Intervention (EBI) – six-session programme for more intensive advice/strategies and support to sustain recovery for PoP with Alcohol Abstinence Monitoring Requirement and/or borderline dependency",
+      "delivery_method": "1:1/group/digital",
+      "delivery_location": "Barnsley; Rotherham; Sheffield; Doncaster."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Foundations of Recovery (FoRecovery) – CGL’s core psychosocial, dependency & recovery suite develops PoP’s recovery capital & resilience, building on identified recovery goals",
+      "delivery_method": "1:1/group/digital",
+      "delivery_location": "Barnsley; Rotherham; Sheffield; Doncaster."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Foundations of Rehabilitation (FoRehab) – flexible modules centred on thinking skills, motivation and behaviour change with a criminal justice and desistance focus (18 sessions)",
+      "delivery_method": "1:1/group/digital",
+      "delivery_location": "Barnsley; Rotherham; Sheffield; Doncaster."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Harm Reduction materials – a series of age/substance-specific harm reduction guides and sessions covering psychoactive substances, Chemsex, cannabis, etc.",
+      "delivery_method": "1:1/group/digital",
+      "delivery_location": "Barnsley; Rotherham; Sheffield; Doncaster."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Life in the 21st Century – a workbook and accompanying session, preparing men for life outside of prison – can be delivered to men pre-release/on recall.",
+      "delivery_method": "1:1/group/digital",
+      "delivery_location": "Barnsley; Rotherham; Sheffield; Doncaster."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Breaking Free Online: an online 24/7 service delivering evidence-based psychosocial intervention strategies (compliant with NICE guidance 115/51) available through mobile Apps (Staying Free) and desktops.",
+      "delivery_method": "1:1/group/digital",
+      "delivery_location": "Barnsley; Rotherham; Sheffield; Doncaster."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "One You - Drinks Tracker",
+      "delivery_method": "1:1/group/digital",
+      "delivery_location": "Barnsley; Rotherham; Sheffield; Doncaster."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Drinkaware",
+      "delivery_method": "1:1/group/digital",
+      "delivery_location": "Barnsley; Rotherham; Sheffield; Doncaster."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Happify is a self-improvement program offered in both website and app form. It measures a user’s emotional well-being - measures it for them, and provides little tasks and games to help you increase it.Happify lets you train yourself for happiness and resilience through life’s challenges",
+      "delivery_method": "1:1/group/digital",
+      "delivery_location": "Barnsley; Rotherham; Sheffield; Doncaster."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Insight Timer",
+      "delivery_method": "1:1/group/digital",
+      "delivery_location": "Barnsley; Rotherham; Sheffield; Doncaster."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Lower My Drinking is a digital platform that facilitates a preventative approach to alcohol harm on a population-wide scale.",
+      "delivery_method": "1:1/group/digital",
+      "delivery_location": "Barnsley; Rotherham; Sheffield; Doncaster."
+    }
+  ]
+}

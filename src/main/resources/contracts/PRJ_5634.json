@@ -1,0 +1,31 @@
+{
+  "internal_contract_id": "09470283-0456-47ed-9b93-dfc58b274fe7",
+  "contract_reference": "PRJ_5634",
+  "contract_type_id": "PWB",
+  "region": {
+    "nps_region_code": null,
+    "pcc_region_code": "north-yorkshire"
+  },
+  "eligibility": {
+    "allows_female": false,
+    "allows_male": true,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "FOUNDATION",
+    "subcontractor_codes": [
+      "ST_GILES_TRUST"
+    ]
+  },
+  "internal_intervention_id": "e59c4125-35f4-4760-9eb5-394127a019aa",
+  "intervention_title": "Personal Wellbeing Services in North Yorkshire",
+  "short_description": "A holistic service which addresses the following rehabilitative needs: Emotional Wellbeing, Family and Significant Others, Lifestyle and Associates and Social Inclusion. \n \nServices are available for all adult male Service Users, irrespective of risk level or complexity level, on a Community/ Suspended Sentence Order with a RAR or on Licence/Post-Sentence Supervision The Social Inclusion ‘mentoring’ service will also be available pre-release for those who will be released under Probation supervision.  Appointments which are part of sentence delivery will be enforceable. \n \nA range of approaches will be used including:\ndirect delivery of interventions, support and advocacy, and advice and guidance. Interventions will be tailored to reflect the complexity of an individual Service User’s needs. \n \nInterventions will be tailored to reflect the complexity of needs and should aim to secure one or more of the following outcomes for Service Users: \n•\timproved pro-social self-identity and ability to access community-based support networks \n•\tsustained engagement in pro-social leisure interests and purposeful activities \n•\treduced engagement with pro-criminal associates and activities \n•\ta decreased reliance on negative peer relationships or networks, such as organised crime groups or extremism groups. \n•\tengaged in their community and able to make a positive contribution. \n•\tpositive family relationships and avoids harmful relationships are developed or maintained.  \n•\tconfident and responsible parenting behaviours are demonstrated (where applicable). \n•\tImproved ability to develop positive intimate relationships including communication, resilience, negotiation and assertiveness skills.  \n•\tpositive coping strategies in the event of temporary or irretrievable breakdown of familial or other relationships are demonstrated.  \n•\tcompliance with any voluntary or mandatory family or relationship-focused therapeutic/behavioural change programmes. \n•\tdevelopment of:  \n\tcoping skills and strategies to regulate mood and demonstrate perspective-taking and self-care by avoiding risky situations. \n\tlevels of self-efficacy, resilience and confidence \n\tability to access and engage with mental health services. \n\tability to recognise and manage triggers to worsening wellbeing. \n\tability to build and maintain appropriate social interactions. \n•\tcompliance with any medication/treatment/therapy programmes \n•\tsocial networks to reduce initial social isolation are developed or sustained. \n•\tearly post-release engagement with community-based services is secured. \n•\tresilience and perseverance to cope with challenges and barriers on return to the community is developed",
+  "activities": [
+
+  ]
+}

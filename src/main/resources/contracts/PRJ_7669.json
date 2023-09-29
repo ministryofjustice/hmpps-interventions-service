@@ -1,0 +1,102 @@
+{
+  "internal_contract_id": "3778cce0-f517-41b9-b958-b48a3b309701",
+  "contract_reference": "PRJ_7669",
+  "contract_type_id": "DNR-K",
+  "region": {
+    "nps_region_code": "K",
+    "pcc_region_code": null
+  },
+  "eligibility": {
+    "allows_female": false,
+    "allows_male": true,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "CHANGE_GROW_LIVE_LTD",
+    "subcontractor_codes": [
+
+    ]
+  },
+  "internal_intervention_id": "3f511fa5-a85e-41b9-822d-415819d9f654",
+  "intervention_title": "Dependency and Recovery Services in Kent, Surrey & Sussex",
+  "short_description": "Services are available for all adult males on probation either:\n\n- on a Community Sentence or Suspended Sentence Order and subject to a Rehabilitation Activity Requirement (RAR) whereby a specified number of RAR Activity Days will be allocated.\n\n- pre-release to people who are convicted.  For most cases a pre-release referral will be beneficial to support the person prior to release, by building and maintaining relationships to maximise engagement once released, develop close working relationships with treatment providers and support post release appointments with local substance misuse teams.\n\n- released on licence and post-sentence supervision.  \n\nAny Sessions delivered as part of a RAR Activity Day or as a mandated Licence or Post Sentence Supervision appointment will be Enforceable.  \n\nServices are offered as either, Medium or High complexity. \n\nA range of delivery methods need to be used including: skills-building, support and advocacy and advice/, guidance/information.   \nInterventions must be tailored to meet the specific needs of each Person(s) on Probation to enable them to make progress towards  their agreed outcomes, as identified in the Person(s) on Probations Action Plan and aim to secure one or more of the following outcomes:   \n\nPerson on probation achieves abstinence or controlled/ non-dependent or non-problematic substance misuse. \n\nPerson on probation enhances their skills to manage risky situations which may pose a trigger or relapse. \n\nPerson on probation enhances their belief in ability to manage/ desist from addiction(s). \n\nPerson on probation improves their physical health and mental resilience. \n\nPerson(s) on Probation establishes Dependency Pathways to manage a range of addictive behaviours, including supporting access into other treatment providers and detox programmes. \n\nPerson(s) on Probation increases their understanding of addictive behaviours and triggers and options to reduce dependency. \n\nPerson on probation has continuity of care from prison into the community where there is no other available resource or commissioned service\n\nPerson on probation has a minimised risk of overdose following release from prison",
+  "activities": [
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Alcohol Brief Intervention – one-off identification and brief advice support session for low-level alcohol dependency",
+      "delivery_method": "1:1/group/digital",
+      "delivery_location": "Ashford; Canterbury; Folkestone; Ramsgate; Sittingbourne; Thanet/Margate; Chatham; Gravesend; Maidstone; Tunbridge Wells; Guildford; Redhill; Staines; Brighton; Eastbourne; Hastings; Crawley; Littlehampton; Worthing."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Alcohol Extended Brief Intervention (EBI) – six-session programme for more intensive advice/strategies and support to sustain recovery for PoP with Alcohol Abstinence Monitoring Requirement and/or borderline dependency",
+      "delivery_method": "1:1/group/digital",
+      "delivery_location": "Ashford; Canterbury; Folkestone; Ramsgate; Sittingbourne; Thanet/Margate; Chatham; Gravesend; Maidstone; Tunbridge Wells; Guildford; Redhill; Staines; Brighton; Eastbourne; Hastings; Crawley; Littlehampton; Worthing."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Foundations of Recovery (FoRecovery) – CGL’s core psychosocial, dependency & recovery suite develops PoP’s recovery capital & resilience, building on identified recovery goals",
+      "delivery_method": "1:1/group/digital",
+      "delivery_location": "Ashford; Canterbury; Folkestone; Ramsgate; Sittingbourne; Thanet/Margate; Chatham; Gravesend; Maidstone; Tunbridge Wells; Guildford; Redhill; Staines; Brighton; Eastbourne; Hastings; Crawley; Littlehampton; Worthing."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Foundations of Rehabilitation (FoRehab) – flexible modules centred on thinking skills, motivation and behaviour change with a criminal justice and desistance focus (18 sessions)",
+      "delivery_method": "1:1/group/digital",
+      "delivery_location": "Ashford; Canterbury; Folkestone; Ramsgate; Sittingbourne; Thanet/Margate; Chatham; Gravesend; Maidstone; Tunbridge Wells; Guildford; Redhill; Staines; Brighton; Eastbourne; Hastings; Crawley; Littlehampton; Worthing."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Harm Reduction materials – a series of age/substance-specific harm reduction guides and sessions covering psychoactive substances, Chemsex, cannabis, etc.",
+      "delivery_method": "1:1/group/digital",
+      "delivery_location": "Ashford; Canterbury; Folkestone; Ramsgate; Sittingbourne; Thanet/Margate; Chatham; Gravesend; Maidstone; Tunbridge Wells; Guildford; Redhill; Staines; Brighton; Eastbourne; Hastings; Crawley; Littlehampton; Worthing."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Life in the 21st Century – a workbook and accompanying session, preparing men for life outside of prison – can be delivered to men pre-release/on recall.",
+      "delivery_method": "1:1/group/digital",
+      "delivery_location": "Ashford; Canterbury; Folkestone; Ramsgate; Sittingbourne; Thanet/Margate; Chatham; Gravesend; Maidstone; Tunbridge Wells; Guildford; Redhill; Staines; Brighton; Eastbourne; Hastings; Crawley; Littlehampton; Worthing."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Non-opiates – group sessions and 1:1 interventions that explore stimulants, cannabis, and other ‘novel psychoactive substances’",
+      "delivery_method": "1:1/group/digital",
+      "delivery_location": "Ashford; Canterbury; Folkestone; Ramsgate; Sittingbourne; Thanet/Margate; Chatham; Gravesend; Maidstone; Tunbridge Wells; Guildford; Redhill; Staines; Brighton; Eastbourne; Hastings; Crawley; Littlehampton; Worthing."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "One you drinks tracker",
+      "delivery_method": "Digital",
+      "delivery_location": "Ashford; Canterbury; Folkestone; Ramsgate; Sittingbourne; Thanet/Margate; Chatham; Gravesend; Maidstone; Tunbridge Wells; Guildford; Redhill; Staines; Brighton; Eastbourne; Hastings; Crawley; Littlehampton; Worthing."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Drinkaware App",
+      "delivery_method": "Digital",
+      "delivery_location": "Ashford; Canterbury; Folkestone; Ramsgate; Sittingbourne; Thanet/Margate; Chatham; Gravesend; Maidstone; Tunbridge Wells; Guildford; Redhill; Staines; Brighton; Eastbourne; Hastings; Crawley; Littlehampton; Worthing."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Happify",
+      "delivery_method": "Digital",
+      "delivery_location": "Ashford; Canterbury; Folkestone; Ramsgate; Sittingbourne; Thanet/Margate; Chatham; Gravesend; Maidstone; Tunbridge Wells; Guildford; Redhill; Staines; Brighton; Eastbourne; Hastings; Crawley; Littlehampton; Worthing."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Insight Timer",
+      "delivery_method": "Digital",
+      "delivery_location": "Ashford; Canterbury; Folkestone; Ramsgate; Sittingbourne; Thanet/Margate; Chatham; Gravesend; Maidstone; Tunbridge Wells; Guildford; Redhill; Staines; Brighton; Eastbourne; Hastings; Crawley; Littlehampton; Worthing."
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Lower my Drinking",
+      "delivery_method": "Digital",
+      "delivery_location": "Ashford; Canterbury; Folkestone; Ramsgate; Sittingbourne; Thanet/Margate; Chatham; Gravesend; Maidstone; Tunbridge Wells; Guildford; Redhill; Staines; Brighton; Eastbourne; Hastings; Crawley; Littlehampton; Worthing."
+    }
+  ]
+}

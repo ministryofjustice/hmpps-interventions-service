@@ -1,0 +1,242 @@
+{
+  "internal_contract_id": "bf7a7f57-e641-47b7-a83a-10ff0b67393a",
+  "contract_reference": "PRJ_6521",
+  "contract_type_id": "PWB",
+  "region": {
+    "nps_region_code": null,
+    "pcc_region_code": "dyfed-powys"
+  },
+  "eligibility": {
+    "allows_female": false,
+    "allows_male": true,
+    "minimum_age": 26,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "ST_GILES_WISE_GRP",
+    "subcontractor_codes": [
+      "ST_GILES_TRUST",
+      "THE_WISE_GROUP_LTD",
+      "THE_WISE_GROUP_LTD"
+    ]
+  },
+  "internal_intervention_id": "bc235f7f-8963-4491-af8d-b13e0a713064",
+  "intervention_title": "Personal Wellbeing Services in Dyfed-Powys DA",
+  "short_description": "A holistic service which addresses the following rehabilitative needs: Emotional Wellbeing, Family and Significant Others, Lifestyle and Associates and Social Inclusion. \n \nServices are available for all adult male Service Users, irrespective of risk level or complexity level, on a Community/ Suspended Sentence Order with a RAR or on Licence/Post-Sentence Supervision The Social Inclusion ‘mentoring’ service will also be available pre-release for those who will be released under Probation supervision.  Appointments which are part of sentence delivery will be enforceable. \n \nA range of approaches will be used including:\ndirect delivery of interventions, support and advocacy, and advice and guidance. Interventions will be tailored to reflect the complexity of an individual Service User’s needs. \n \nInterventions will be tailored to reflect the complexity of needs and should aim to secure one or more of the following outcomes for Service Users: \n•        improved pro-social self-identity and ability to access community-based support networks \n•        sustained engagement in pro-social leisure interests and purposeful activities \n•        reduced engagement with pro-criminal associates and activities \n•        a decreased reliance on negative peer relationships or networks, such as organised crime groups or extremism groups. \n•        engaged in their community and able to make a positive contribution. \n•        positive family relationships and avoids harmful relationships are developed or maintained.  \n•        confident and responsible parenting behaviours are demonstrated (where applicable). \n•        Improved ability to develop positive intimate relationships including communication, resilience, negotiation and assertiveness skills.  \n•        positive coping strategies in the event of temporary or irretrievable breakdown of familial or other relationships are demonstrated.  \n•        compliance with any voluntary or mandatory family or relationship-focused therapeutic/behavioural change programmes. \n•        development of:  \n        coping skills and strategies to regulate mood and demonstrate perspective-taking and self-care by avoiding risky situations. \n        levels of self-efficacy, resilience and confidence \n        ability to access and engage with mental health services. \n        ability to recognise and manage triggers to worsening wellbeing. \n        ability to build and maintain appropriate social interactions. \n•        compliance with any medication/treatment/therapy programmes \n•        social networks to reduce initial social isolation are developed or sustained. \n•        early post-release engagement with community-based services is secured. \n•        resilience and perseverance to cope with challenges and barriers on return to the community is developed",
+  "activities": [
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "ReACT Programme",
+      "delivery_method": "Group, 1-2-1, Virtual (pre-recorder)",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "ReACT Programme.",
+      "delivery_method": "Group, 1-2-1, Virtual (pre-recorder)",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "ReACT Programme",
+      "delivery_method": "Group, 1-2-1, Virtual (pre-recorder)",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "ReACT Programme",
+      "delivery_method": "Group, 1-2-1, Virtual (pre-recorder)",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "WRAP - Victim Awareness",
+      "delivery_method": "Group, 1-2-1, Virtual (pre-recorder)",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "WRAP - Restorative Family Group Meetings",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "WRAP - Netcare",
+      "delivery_method": "Group",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "WRAP - Negative feelings",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "WRAP - Wellbeing",
+      "delivery_method": "Group, 1-2-1, Virtual (pre-recorder)",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Anxiety, Mood, and Coping Skills",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Parenting Skills",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Substance Misuse and Addiction",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Values and Support",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Day 1 of Release",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Who am I?",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Who’s important to me?",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "What’s the positive and negatives in my life?",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Who impacts and inputs to my life?",
+      "delivery_method": "1-2-1, Group Work",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Where am I now and where do I want to be?",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "What’s my future and how I’m going to get there?",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "What’s the consequence?",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "Wider Impacts?",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Healthy Relationships",
+      "delivery_method": "1-2-1, Group Work",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "How to parent effectively",
+      "delivery_method": "1-2-1, Group Work",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "How to handle conflict",
+      "delivery_method": "1-2-1, Group Work",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "How to positively participate",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Helping to overcome difficulties and adversities",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Undertaking and Accessing Treatment",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Understanding Me",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Understanding My Emotions",
+      "delivery_method": "1-2-1, Group Work",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Understanding and Developing Coping Strategies",
+      "delivery_method": "1-2-1, Group Work",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Understanding Social Impacts",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Society, it’s impacts and my place",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Services and what I need",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Strengthening and thriving",
+      "delivery_method": "1-2-1",
+      "delivery_location": "Aberystwyth, Brecon, Carmarthen, Haverfordwest, Llandrindod, Llanelli, Newtown"
+    }
+  ]
+}

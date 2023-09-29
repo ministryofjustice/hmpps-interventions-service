@@ -1,0 +1,48 @@
+{
+  "internal_contract_id": "13ca0794-a2e1-4973-a11d-c93c205b3991",
+  "contract_reference": "GMIRSDR_4",
+  "contract_type_id": "DNR",
+  "region": {
+    "nps_region_code": "L",
+    "pcc_region_code": null
+  },
+  "eligibility": {
+    "allows_female": true,
+    "allows_male": true,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "PENNINE_CARE_NHS_FT",
+    "subcontractor_codes": [
+
+    ]
+  },
+  "internal_intervention_id": "8c87797e-630c-463d-b6e1-365af15d05c9",
+  "intervention_title": "Dependency and Recovery in Stockport",
+  "short_description": "\"The Dependency and Recovery Service will provide pre- and post-sentence support for individuals under the supervision of the Probation Service in Greater Manchester identified as having drug and alcohol needs.\nThe key aims of the Dependency and Recovery Service are to:\n· Reduce drug and alcohol related reoffending\n· Reduce drug and alcohol related health harms for the offender\n· Improve community safety by reducing the risk of drug and alcohol related harms to others.                                                                                                                          \n\nDependency and Recovery Key Workers will conduct assessments both pre- and post-sentence and will focus on adressing need and minimising risk. There are dedicated consultation clinics in each GM Probation Delivery Unit. The process of ongoing assessment and review will contribute to ensuring that drug and alcohol related health needs are met inclusive of those contributing to offending risk.                                                                                       Specific objectives and appropriate interventions will be determined that take full account of complexity in addressing individual drug and alcohol related need, supporting social (re)integration, and enabling people to lead meaningful and purposeful lives.\n\nDependency and Recovery Key Workers will have a thorough understanding of the medical and psycho-social interventions provided by specialist substance misuse services and the thresholds and referral pathways for accessing them.                                                                                 Delivered interventions (1:1 or group) will promote recovery and resilience with the overall aim being to reduce drug and alcohol related harm to the POP and the wider community.  \"",
+  "activities": [
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Re-lapse prevention",
+      "delivery_method": "Both group and One to one",
+      "delivery_location": "Stockport PDU's"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Delivery of Drug and/or Alcohol Extended Brief Interventions",
+      "delivery_method": "Both group and One to one",
+      "delivery_location": "Stockport PDU's"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Provision of additional Support for high complexity POP's",
+      "delivery_method": "One to one",
+      "delivery_location": "Stockport PDU's"
+    }
+  ]
+}

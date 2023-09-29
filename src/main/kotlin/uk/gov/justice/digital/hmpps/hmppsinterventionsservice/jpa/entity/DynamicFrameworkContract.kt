@@ -48,10 +48,14 @@ data class DynamicFrameworkContract(
   @JoinColumn(name = "prime_provider_id")
   val primeProvider: ServiceProvider,
 
-  @NotNull val startDate: LocalDate,
-  @NotNull val endDate: LocalDate,
+  @Deprecated("use referralStartDate (hideBefore) instead")
+  @NotNull
+  val startDate: LocalDate,
+  @Deprecated("use referralEndAt (hideAfter) instead")
+  @NotNull
+  val endDate: LocalDate,
 
-  @NotNull val referralStartDate: LocalDate,
+  @NotNull var referralStartDate: LocalDate,
   var referralEndAt: OffsetDateTime? = null,
 
   @ManyToOne
@@ -75,7 +79,7 @@ data class DynamicFrameworkContract(
     joinColumns = [JoinColumn(name = "dynamic_framework_contract_id")],
     inverseJoinColumns = [JoinColumn(name = "subcontractor_provider_id")],
   )
-  val subcontractorProviders: Set<ServiceProvider> = setOf(),
+  val subcontractorProviders: MutableSet<ServiceProvider> = mutableSetOf(),
 
   @NotNull
   @ManyToOne
