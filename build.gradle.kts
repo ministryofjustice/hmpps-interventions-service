@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.11.1"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.12.0"
   kotlin("plugin.spring") version "1.9.10"
   id("org.jetbrains.kotlin.plugin.jpa") version "1.9.10"
   id("jacoco")
@@ -77,14 +77,14 @@ dependencyManagement {
 dependencies {
   // batch processing
   implementation("org.springframework.boot:spring-boot-starter-batch")
-  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2") // also needed runtime for AppInsights
+  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2") // also needed runtime for AppInsights
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
-  implementation("io.sentry:sentry-spring-boot-starter:6.29.0")
-  implementation("io.sentry:sentry-logback:6.29.0")
+  implementation("io.sentry:sentry-spring-boot-starter:6.30.0")
+  implementation("io.sentry:sentry-logback:6.30.0")
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
-  implementation("net.logstash.logback:logstash-logback-encoder:7.3")
+  implementation("net.logstash.logback:logstash-logback-encoder:7.4")
 
   runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2") // needed for OffsetDateTime for AppInsights
 
@@ -95,9 +95,9 @@ dependencies {
   implementation("uk.gov.service.notify:notifications-java-client:4.1.0-RELEASE")
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.20.155")
-  implementation("software.amazon.awssdk:s3:2.20.155")
-  implementation("software.amazon.awssdk:sts:2.20.155")
+  implementation("software.amazon.awssdk:sns:2.20.157")
+  implementation("software.amazon.awssdk:s3:2.20.157")
+  implementation("software.amazon.awssdk:sts:2.20.157")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.4")
