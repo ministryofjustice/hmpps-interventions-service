@@ -59,7 +59,21 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Ref
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceProviderRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SupplierAssessmentRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.*
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentDeliveryAddressFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentDeliveryFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.CaseNoteFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ChangeLogFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFrameworkContractFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportOutcomeFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ProbationPractitionerDetailsFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralServiceUserFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceProviderFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceUserFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAssessmentFactory
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.Random
@@ -438,18 +452,20 @@ class SetupAssistant(
       personCustodyPrisonId = personCustodyPrisonId,
       expectedReleaseDate = expectedReleaseDate,
     )
-    val referral = referralRepository.save(
-      referralFactory.createSent(
-        id = id,
-        intervention = intervention,
-        createdBy = ppUser,
-        sentBy = ppUser,
-        sentAt = sentAt,
-        completionDeadline = completionDeadline,
-        needsInterpreter = needsInterpreter,
-        interpreterLanguage = interpreterLanguage,
-        probationPractitionerDetails = probationPractitionerDetails,
-      ),
+    var referral = referralFactory.createSent(
+      id = id,
+      intervention = intervention,
+      createdBy = ppUser,
+      sentBy = ppUser,
+      sentAt = sentAt,
+      completionDeadline = completionDeadline,
+      needsInterpreter = needsInterpreter,
+      interpreterLanguage = interpreterLanguage,
+      probationPractitionerDetails = probationPractitionerDetails,
+    )
+
+    referral = referralRepository.save(
+      referral,
     )
     val updatedProbationPractitionerDetails = probationPractitionerDetailsFactory.create(referral = referral)
     probationPractitionerDetailsRepository.save(updatedProbationPractitionerDetails)
