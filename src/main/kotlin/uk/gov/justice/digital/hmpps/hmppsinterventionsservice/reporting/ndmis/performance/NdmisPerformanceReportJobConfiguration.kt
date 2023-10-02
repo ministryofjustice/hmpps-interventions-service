@@ -6,8 +6,6 @@ import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.StepContribution
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
-import org.springframework.batch.core.configuration.annotation.JobScope
-import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.core.job.DefaultJobParametersValidator
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
@@ -17,7 +15,6 @@ import org.springframework.batch.item.database.JpaCursorItemReader
 import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
 import org.springframework.batch.repeat.RepeatStatus
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
@@ -39,12 +36,12 @@ import java.nio.file.Path
 @EnableBatchProcessing
 class NdmisPerformanceReportJobConfiguration(
   private val transactionManager: PlatformTransactionManager,
+  private val entityManagerFactory: EntityManagerFactory,
   private val jobRepository: JobRepository,
   private val batchUtils: BatchUtils,
   private val s3Service: S3Service,
   private val ndmisS3Bucket: S3Bucket,
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
-  private val entityManagerFactory: EntityManagerFactory,
   @Value("\${spring.batch.jobs.ndmis.performance-report.page-size}") private val pageSize: Int,
   @Value("\${spring.batch.jobs.ndmis.performance-report.chunk-size}") private val chunkSize: Int,
 ) {
@@ -63,7 +60,6 @@ class NdmisPerformanceReportJobConfiguration(
   }
 
   @Bean
-  @JobScope
   fun ndmisReader(): JpaCursorItemReader<Referral> {
     return JpaCursorItemReaderBuilder<Referral>()
       .name("ndmisPerformanceReportReader")
@@ -74,8 +70,8 @@ class NdmisPerformanceReportJobConfiguration(
   }
 
   @Bean
-  @StepScope
-  fun ndmisReferralsWriter(@Value("#{jobParameters['outputPath']}") outputPath: String): FlatFileItemWriter<ReferralsData> {
+  fun ndmisReferralsWriter(): FlatFileItemWriter<ReferralsData> {
+    var outputPath = ""
     return batchUtils.csvFileWriter(
       "ndmisReferralsPerformanceReportWriter",
       FileSystemResource(Path.of(outputPath).resolve(referralReportFilename)),
@@ -85,8 +81,8 @@ class NdmisPerformanceReportJobConfiguration(
   }
 
   @Bean
-  @StepScope
-  fun ndmisComplexityWriter(@Value("#{jobParameters['outputPath']}") outputPath: String): FlatFileItemWriter<Collection<ComplexityData>> {
+  fun ndmisComplexityWriter(): FlatFileItemWriter<Collection<ComplexityData>> {
+    var outputPath = ""
     return batchUtils.recursiveCollectionCsvFileWriter(
       "ndmisComplexityPerformanceReportWriter",
       FileSystemResource(Path.of(outputPath).resolve(complexityReportFilename)),
@@ -96,8 +92,8 @@ class NdmisPerformanceReportJobConfiguration(
   }
 
   @Bean
-  @StepScope
-  fun ndmisAppointmentWriter(@Value("#{jobParameters['outputPath']}") outputPath: String): FlatFileItemWriter<Collection<AppointmentData>> {
+  fun ndmisAppointmentWriter(): FlatFileItemWriter<Collection<AppointmentData>> {
+    var outputPath = ""
     return batchUtils.recursiveCollectionCsvFileWriter(
       "ndmisAppointmentPerformanceReportWriter",
       FileSystemResource(Path.of(outputPath).resolve(appointmentReportFilename)),
@@ -107,8 +103,8 @@ class NdmisPerformanceReportJobConfiguration(
   }
 
   @Bean
-  @StepScope
-  fun ndmisOutcomeWriter(@Value("#{jobParameters['outputPath']}") outputPath: String): FlatFileItemWriter<Collection<OutcomeData>> {
+  fun ndmisOutcomeWriter(): FlatFileItemWriter<Collection<OutcomeData>> {
+    var outputPath = ""
     return batchUtils.recursiveCollectionCsvFileWriter(
       "ndmisOutcomePerformanceReportWriter",
       FileSystemResource(Path.of(outputPath).resolve(outcomeReportFilename)),
@@ -127,7 +123,6 @@ class NdmisPerformanceReportJobConfiguration(
   ): Job {
     val validator = DefaultJobParametersValidator()
     validator.setRequiredKeys(arrayOf("timestamp", "outputPath"))
-
     return JobBuilder("ndmisPerformanceReportJob", jobRepository)
       .incrementer { parameters -> OutputPathIncrementer().getNext(TimestampIncrementer().getNext(parameters)) }
       .validator(validator)
@@ -152,6 +147,7 @@ class NdmisPerformanceReportJobConfiguration(
       .writer(writer)
       .faultTolerant()
       .skipPolicy(skipPolicy)
+      .transactionManager(transactionManager)
       .build()
   }
 
@@ -202,14 +198,15 @@ class NdmisPerformanceReportJobConfiguration(
       .writer(writer)
       .faultTolerant()
       .skipPolicy(skipPolicy)
+      .transactionManager(transactionManager)
       .build()
   }
 
   @Bean
-  @JobScope
-  fun pushToS3Step(@Value("#{jobParameters['outputPath']}") outputPath: String): Step =
-    StepBuilder("pushToS3Step", jobRepository).tasklet(pushFilesToS3(outputPath), transactionManager).build()
-
+  fun pushToS3Step(): Step {
+    var outputPath = ""
+    return StepBuilder("pushToS3Step", jobRepository).tasklet(pushFilesToS3(outputPath), transactionManager).build()
+  }
   private fun pushFilesToS3(outputPath: String) = { _: StepContribution, _: ChunkContext ->
     listOf(referralReportFilename, complexityReportFilename, appointmentReportFilename, outcomeReportFilename).forEach { file ->
       val path = Path.of(outputPath).resolve(file)
