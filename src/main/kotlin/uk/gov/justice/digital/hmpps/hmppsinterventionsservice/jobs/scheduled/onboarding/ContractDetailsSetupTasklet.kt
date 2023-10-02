@@ -9,7 +9,6 @@ import org.springframework.batch.core.step.tasklet.Tasklet
 import org.springframework.batch.repeat.RepeatStatus
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import org.springframework.util.ResourceUtils
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ContractType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
@@ -33,7 +32,7 @@ class ContractDetailsSetupTasklet @Autowired constructor(
   override fun execute(contribution: StepContribution, chunkContext: ChunkContext): RepeatStatus {
     logger.info("Setting up contract types, desired outcomes and complexity levels")
 
-    val contractDetails = ResourceUtils.getFile("classpath:desiredoutcomes/contractDetails.json")
+    val contractDetails = ContractOnboardingFileReaderHelper.getResource("classpath:desiredoutcomes/contractDetails.json")
     val contractDetailsDefinitions =
       ObjectMapper().readValue(contractDetails, object : TypeReference<List<ContractDetailsDefinition>>() {})
     contractDetailsDefinitions.forEach {

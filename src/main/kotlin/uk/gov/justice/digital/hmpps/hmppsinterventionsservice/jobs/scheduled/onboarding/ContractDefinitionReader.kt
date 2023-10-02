@@ -5,14 +5,12 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import mu.KLogging
 import org.springframework.batch.item.ItemReader
 import org.springframework.stereotype.Component
-import org.springframework.util.ResourceUtils
-import java.io.File
 
 @Component
 class ContractDefinitionReader : ItemReader<ContractDefinition> {
   companion object : KLogging()
 
-  private var files: Array<File> = ResourceUtils.getFile("classpath:contracts/").listFiles()
+  val files = ContractOnboardingFileReaderHelper.getResourceUrls("classpath:/contracts/*.json")
   private var index = 0
   private val objectMapper = ObjectMapper().registerModule(JavaTimeModule())
 
@@ -24,6 +22,6 @@ class ContractDefinitionReader : ItemReader<ContractDefinition> {
 
     val file = files[currentIndex]
     logger.info("Reading file $index/${this.files.size}: $file")
-    return objectMapper.readValue(file, ContractDefinition::class.java)
+    return objectMapper.readValue(ContractOnboardingFileReaderHelper.getResource(file), ContractDefinition::class.java)
   }
 }
