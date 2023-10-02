@@ -8,7 +8,6 @@ import org.springframework.batch.core.step.tasklet.Tasklet
 import org.springframework.batch.repeat.RepeatStatus
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import org.springframework.util.ResourceUtils
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceProvider
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceProviderRepository
 import kotlin.jvm.optionals.getOrElse
@@ -22,7 +21,7 @@ class ProviderSetupTasklet @Autowired constructor(
   override fun execute(contribution: StepContribution, chunkContext: ChunkContext): RepeatStatus {
     logger.info("Setting up providers")
 
-    val providers = ResourceUtils.getFile("classpath:providers/providers.json")
+    val providers = ContractOnboardingFileReaderHelper.getResource("classpath:providers/providers.json")
     ObjectMapper().readTree(providers)
       .map { upsertProvider(it.get("code").asText(), it.get("name").asText()) }
       .also { providerRepository.saveAll(it) }

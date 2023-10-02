@@ -24,7 +24,7 @@ class TransferReferralsJobListener : JobExecutionListener {
 
       else -> {
         logger.warn(
-          "aaaunexpected status encountered for performance report {} {}",
+          "unexpected status encountered for performance report {} {}",
           kv("status", jobExecution.status),
           kv("exitDescription", jobExecution.exitStatus.exitDescription),
         )
