@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.p
 
 import mu.KLogging
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Ignore
 import org.springframework.batch.core.ExitStatus
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobExecution
@@ -20,7 +19,6 @@ import java.time.OffsetDateTime
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.pathString
 
-@SpringBatchTest
 @Component
 class NdmisPerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
   @Autowired
@@ -52,7 +50,6 @@ class NdmisPerformanceReportJobConfigurationTest : IntegrationTestBase() {
   }
 
   // @Test
-  @Ignore
   fun `job writes non-empty CSV export files`() {
     val referral = setupAssistant.createSentReferral()
       .also { setupAssistant.fillReferralFields(it) }
