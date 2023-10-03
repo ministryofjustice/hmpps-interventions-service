@@ -6,6 +6,8 @@ import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.StepContribution
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
+import org.springframework.batch.core.configuration.annotation.JobScope
+import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.core.job.DefaultJobParametersValidator
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
@@ -59,6 +61,7 @@ class NdmisPerformanceReportJobConfiguration(
     return onStartupJobLauncherFactory.makeBatchLauncher(ndmisPerformanceReportJob)
   }
 
+  @JobScope
   @Bean
   fun ndmisReader(): JpaCursorItemReader<Referral> {
     return JpaCursorItemReaderBuilder<Referral>()
@@ -70,8 +73,8 @@ class NdmisPerformanceReportJobConfiguration(
   }
 
   @Bean
-  fun ndmisReferralsWriter(): FlatFileItemWriter<ReferralsData> {
-    var outputPath = ""
+  @StepScope
+  fun ndmisReferralsWriter(@Value("#{jobParameters['outputPath']}") outputPath: String): FlatFileItemWriter<ReferralsData> {
     return batchUtils.csvFileWriter(
       "ndmisReferralsPerformanceReportWriter",
       FileSystemResource(Path.of(outputPath).resolve(referralReportFilename)),
@@ -80,9 +83,9 @@ class NdmisPerformanceReportJobConfiguration(
     )
   }
 
+  @StepScope
   @Bean
-  fun ndmisComplexityWriter(): FlatFileItemWriter<Collection<ComplexityData>> {
-    var outputPath = ""
+  fun ndmisComplexityWriter(@Value("#{jobParameters['outputPath']}") outputPath: String): FlatFileItemWriter<Collection<ComplexityData>> {
     return batchUtils.recursiveCollectionCsvFileWriter(
       "ndmisComplexityPerformanceReportWriter",
       FileSystemResource(Path.of(outputPath).resolve(complexityReportFilename)),
@@ -91,9 +94,9 @@ class NdmisPerformanceReportJobConfiguration(
     )
   }
 
+  @StepScope
   @Bean
-  fun ndmisAppointmentWriter(): FlatFileItemWriter<Collection<AppointmentData>> {
-    var outputPath = ""
+  fun ndmisAppointmentWriter(@Value("#{jobParameters['outputPath']}") outputPath: String): FlatFileItemWriter<Collection<AppointmentData>> {
     return batchUtils.recursiveCollectionCsvFileWriter(
       "ndmisAppointmentPerformanceReportWriter",
       FileSystemResource(Path.of(outputPath).resolve(appointmentReportFilename)),
@@ -103,8 +106,8 @@ class NdmisPerformanceReportJobConfiguration(
   }
 
   @Bean
-  fun ndmisOutcomeWriter(): FlatFileItemWriter<Collection<OutcomeData>> {
-    var outputPath = ""
+  @StepScope
+  fun ndmisOutcomeWriter(@Value("#{jobParameters['outputPath']}") outputPath: String): FlatFileItemWriter<Collection<OutcomeData>> {
     return batchUtils.recursiveCollectionCsvFileWriter(
       "ndmisOutcomePerformanceReportWriter",
       FileSystemResource(Path.of(outputPath).resolve(outcomeReportFilename)),
@@ -202,11 +205,11 @@ class NdmisPerformanceReportJobConfiguration(
       .build()
   }
 
+  @JobScope
   @Bean
-  fun pushToS3Step(): Step {
-    var outputPath = ""
-    return StepBuilder("pushToS3Step", jobRepository).tasklet(pushFilesToS3(outputPath), transactionManager).build()
-  }
+  fun pushToS3Step(@Value("#{jobParameters['outputPath']}") outputPath: String): Step =
+    StepBuilder("pushToS3Step", jobRepository).tasklet(pushFilesToS3(outputPath), transactionManager).build()
+
   private fun pushFilesToS3(outputPath: String) = { _: StepContribution, _: ChunkContext ->
     listOf(referralReportFilename, complexityReportFilename, appointmentReportFilename, outcomeReportFilename).forEach { file ->
       val path = Path.of(outputPath).resolve(file)
