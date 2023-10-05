@@ -109,6 +109,8 @@ class UpsertContractProcessor(
     val contractType = contractTypeRepository.findByCode(item.contractTypeCode)!!
     val prime = providerRepository.findById(item.providers.primeProviderId).get()
     val subcontractors = providerRepository.findAllById(item.providers.subcontractorIds).toMutableSet()
+    val pccRegion = if (item.region.pccCode != null) pccRegionRepository.findById(item.region.pccCode).get() else null
+    val npsRegion = if (item.region.npsCode != null) npsRegionRepository.findById(item.region.npsCode).get() else null
 
     val definedContract = DynamicFrameworkContract(
       id = item.internalContractId,
@@ -124,6 +126,8 @@ class UpsertContractProcessor(
       referralStartDate = item.scheduling.hideBefore,
       primeProvider = prime,
       subcontractorProviders = subcontractors,
+      pccRegion = pccRegion,
+      npsRegion = npsRegion,
     )
 
     val foundContract = dynamicFrameworkContractRepository.findById(item.internalContractId)

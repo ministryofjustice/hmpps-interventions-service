@@ -1,30 +1,28 @@
 [
   {
-    "contract_type": "Accommodation",
-    "contract_code": "ACC",
-    "service_category": "Accommodation",
+    "contract_type": "Finance, Benefit and Debt (South West)",
+    "contract_code": "FBD-SW",
+    "service_category": "Finance, Benefit and Debt (South West)",
     "desired_outcomes": [
-      "All barriers as identified in the Service user action plan, for example financial, behavioural, physical, mental or offence-type related), to obtaining or sustaining accommodation, are successfully removed.",
-      "Service user makes progress in obtaining accommodation.",
-      "Service user is helped to secure social or supported housing.",
-      "Service user is helped to secure a tenancy in the private rented sector (PRS).",
-      "Service user is helped to sustain existing accommodation.",
-      "Service user is prevented from becoming homeless.",
-      "Service user at risk of losing their tenancy are successfully helped to retain it.",
-      "Intervention ends before the Service user has sustained accommodation for three months, but s/he has a strong prospect of sustaining it for at least three months (including for those serving custodial sentences of less than 6 months)."
+      "Person(s) on Probation’s financial management skills are developed and/or enhanced, including online banking skills.",
+      "Person(s) on Probation can successfully navigate the benefits system.",
+      "Pathways are established to help Person(s) on Probation maintain and sustain an income, safely manage money and reduce debt.",
+      "Person(s) on Probation has access to appropriate financial products, advice and/or services.",
+      "Person(s) on Probation/Person(s) in Prison gains quick access to universal credit, including pre-release referrals.",
+      "Person(s) in Prison is supported to complete tasks that they would not otherwise be able to do whilst being in custody e.g.support with banking or debt management."
     ],
     "complexity_levels": [
       {
         "severity": "LOW",
-        "description": "Service user has some capacity and means to secure and/or maintain suitable accommodation but requires some support and guidance to do so."
+        "description": "Service user has prior experience of successfully dealing with their own finance, benefit and debt needs. Service users circumstances may be currently leading to significant financial pressure. Service user will require some advice, guidance and/or support across some specific but limited finance, benefit and debt needs, but will be able to support themselves with other aspects."
       },
       {
         "severity": "MEDIUM",
-        "description": "Service user is at risk of homelessness/is homeless, or will be on release from prison. Service user has had some success in maintaining a tenancy but may have additional needs e.g. Learning Difficulties and/or Learning Disabilities or other challenges currently."
+        "description": "Service user has limited prior experience of successfully dealing with their own finance, benefit and debt needs. Service users circumstances are currently leading to significant financial pressure and they require support to address these needs. Service user will need either significant support to meet a limited number of needs – for instance the Service user may have additional needs (i.e. learning difficulties) or other challenges which impact on their ability to fully manage – or they will need limited support to meet a wider range of finance, benefit and debt - related needs."
       },
       {
         "severity":"HIGH",
-        "description": "Service user is homeless or in temporary/unstable accommodation, or will be on release from prison. Service user has poor accommodation history, complex needs and limited skills to secure or sustain a tenancy."
+        "description": "Service user has minimal or no prior experience of successfully dealing with their own finance, benefit and debt needs and does not have necessary identification documents or bank account. Service users circumstances are currently leading to extreme financial pressure and/or they have complex finance, benefit and debt-related needs which require a range of Activities to address these needs. Service user may have a poor finance history and wider complex needs, such as mental health issues, substance misuse and/or addiction issues."
       }
     ]
   }

@@ -1,0 +1,160 @@
+{
+  "internal_contract_id": "5e2d95b5-34c1-416b-adbf-5d77da402f89",
+  "contract_reference": "PRJ_9446_AS",
+  "contract_type_id": "FBD-SW",
+  "region": {
+    "nps_region_code": null,
+    "pcc_region_code": "avon-and-somerset"
+  },
+  "eligibility": {
+    "allows_female": false,
+    "allows_male": true,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2021-01-01",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "INGEUS_UK_LIMITED",
+    "subcontractor_codes": []
+  },
+  "internal_intervention_id": "ace33a31-9d38-43ed-afe4-3c72423ac4cf",
+  "intervention_title": "Finance Benefit & Debt Services in Avon and Somerset",
+  "short_description": "Services are available for all adult males on probation either:\n\n- on a Community Sentence or Suspended Sentence Order and subject to a Rehabilitation Activity Requirement (RAR) whereby a specified number of RAR Activity Days will be allocated.\n- pre-release to people who are sentenced.\n- released on licence and post-sentence supervision.\n\nServices are available to all adult males pre-release who are sentenced.  These services can be delivered at any point during the custodial element of the sentence and can be accessed by all people sentenced, regardless of the location they will be released to. Interventions commenced in custody, but not completed prior to release, may continue in the community until the intervention is completed under the same referral.\n\nServices can be delivered as part of a Rehabilitation Activity Requirement (RAR) whereby a specified number of RAR Activity Days will be allocated by the Probation Service for those subject to a Community Sentence or Suspended Sentence Order. Any Sessions delivered as part of a RAR Activity Day or as a mandated Licence or Post Sentence Supervision appointment will be Enforceable.\n\nServices are offered as either Low, Medium & High complexity.\n\nA range of delivery methods need to be used including designing and delivery, support and advocacy and advice, guidance and information.  \n\nInterventions must be tailored to meet the specific needs of each Person(s) on Probation to enable them to make progress towards  their agreed outcomes, as identified in the Person(s) on Probation's Action Plan and aim to secure one or more of the following outcomes:  \n\nthe person referred’s financial management skills are developed and/or enhanced, including online banking skills. \n\nthe person referred can successfully navigate the benefits system. \n\nPathways are established to help the person referred to maintain and sustain an income, safely manage money and reduce debt. \n\nthe person referred has access to appropriate financial products, advice and/or services \n\nthe person referred gains quick access to universal credit, including pre-release referrals \n\nthe person referred is supported to complete tasks that they would not otherwise be able to do whilst being in custody e.g. support with banking or debt management",
+  "activities": [
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Looking at Banking",
+      "delivery_method": "Delivered in groups or one to one with additional digital content where permitted",
+      "delivery_location": "Bridgwater, Taunton, Yeovil, Frome, Weston-super-Mare, Bath, Bristol, Kingswood/Staple Hill, North Bristol including Southmead, Chard, South Bristol/Knowle, HMP Leyhill, HMP Bristol"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Looking at benefits calculators",
+      "delivery_method": "Delivered in groups or one to one with additional digital content where permitted",
+      "delivery_location": "Bridgwater, Taunton, Yeovil, Frome, Weston-super-Mare, Bath, Bristol, Kingswood/Staple Hill, North Bristol including Southmead, Chard, South Bristol/Knowle, HMP Leyhill, HMP Bristol"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Looking at benefits",
+      "delivery_method": "Delivered in groups or one to one with additional digital content where permitted",
+      "delivery_location": "Bridgwater, Taunton, Yeovil, Frome, Weston-super-Mare, Bath, Bristol, Kingswood/Staple Hill, North Bristol including Southmead, Chard, South Bristol/Knowle, HMP Leyhill, HMP Bristol"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Looking at budgeting",
+      "delivery_method": "Delivered in groups or one to one with additional digital content where permitted",
+      "delivery_location": "Bridgwater, Taunton, Yeovil, Frome, Weston-super-Mare, Bath, Bristol, Kingswood/Staple Hill, North Bristol including Southmead, Chard, South Bristol/Knowle, HMP Leyhill, HMP Bristol"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Looking at my budget",
+      "delivery_method": "Delivered one to one with additional digital content where permitted",
+      "delivery_location": "Bridgwater, Taunton, Yeovil, Frome, Weston-super-Mare, Bath, Bristol, Kingswood/Staple Hill, North Bristol including Southmead, Chard, South Bristol/Knowle, HMP Leyhill, HMP Bristol"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Looking at debts",
+      "delivery_method": "Delivered in groups or one to one with additional digital content where permitted",
+      "delivery_location": "Bridgwater, Taunton, Yeovil, Frome, Weston-super-Mare, Bath, Bristol, Kingswood/Staple Hill, North Bristol including Southmead, Chard, South Bristol/Knowle, HMP Leyhill, HMP Bristol"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Looking at loans and sanctions",
+      "delivery_method": "Delivered in groups or one to one with additional digital content where permitted",
+      "delivery_location": "Bridgwater, Taunton, Yeovil, Frome, Weston-super-Mare, Bath, Bristol, Kingswood/Staple Hill, North Bristol including Southmead, Chard, South Bristol/Knowle, HMP Leyhill, HMP Bristol"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Looking at financial awareness",
+      "delivery_method": "Delivered in groups or one to one with additional digital content where permitted",
+      "delivery_location": "Bridgwater, Taunton, Yeovil, Frome, Weston-super-Mare, Bath, Bristol, Kingswood/Staple Hill, North Bristol including Southmead, Chard, South Bristol/Knowle, HMP Leyhill, HMP Bristol"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Quantifying debt and type of debt",
+      "delivery_method": "Delivered one to one with additional digital content where permitted",
+      "delivery_location": "Bridgwater, Taunton, Yeovil, Frome, Weston-super-Mare, Bath, Bristol, Kingswood/Staple Hill, North Bristol including Southmead, Chard, South Bristol/Knowle, HMP Leyhill, HMP Bristol"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Benefits Health Check",
+      "delivery_method": "Delivered one to one with additional digital content where permitted",
+      "delivery_location": "Bridgwater, Taunton, Yeovil, Frome, Weston-super-Mare, Bath, Bristol, Kingswood/Staple Hill, North Bristol including Southmead, Chard, South Bristol/Knowle, HMP Leyhill, HMP Bristol"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Managing ID documentation",
+      "delivery_method": "Delivered one to one with additional digital content where permitted",
+      "delivery_location": "Bridgwater, Taunton, Yeovil, Frome, Weston-super-Mare, Bath, Bristol, Kingswood/Staple Hill, North Bristol including Southmead, Chard, South Bristol/Knowle, HMP Leyhill, HMP Bristol"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Opening a Bank Account",
+      "delivery_method": "Delivered one to one with additional digital content where permitted",
+      "delivery_location": "Bridgwater, Taunton, Yeovil, Frome, Weston-super-Mare, Bath, Bristol, Kingswood/Staple Hill, North Bristol including Southmead, Chard, South Bristol/Knowle, HMP Leyhill, HMP Bristol"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Engaging the Right Service",
+      "delivery_method": "Delivered one to one with additional digital content where permitted",
+      "delivery_location": "Bridgwater, Taunton, Yeovil, Frome, Weston-super-Mare, Bath, Bristol, Kingswood/Staple Hill, North Bristol including Southmead, Chard, South Bristol/Knowle, HMP Leyhill, HMP Bristol"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Engaging with Employment",
+      "delivery_method": "Delivered one to one with additional digital content where permitted",
+      "delivery_location": "Bridgwater, Taunton, Yeovil, Frome, Weston-super-Mare, Bath, Bristol, Kingswood/Staple Hill, North Bristol including Southmead, Chard, South Bristol/Knowle"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Contacting Creditors",
+      "delivery_method": "Delivered one to one with additional digital content where permitted",
+      "delivery_location": "Bridgwater, Taunton, Yeovil, Frome, Weston-super-Mare, Bath, Bristol, Kingswood/Staple Hill, North Bristol including Southmead, Chard, South Bristol/Knowle"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Benefits Appeals and Decisions",
+      "delivery_method": "Delivered one to one with additional digital content where permitted",
+      "delivery_location": "Bridgwater, Taunton, Yeovil, Frome, Weston-super-Mare, Bath, Bristol, Kingswood/Staple Hill, North Bristol including Southmead, Chard, South Bristol/Knowle"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Personalised support to address complex issues and obtain legal/ financial advice",
+      "delivery_method": "Delivered one to one with additional digital content where permitted",
+      "delivery_location": "Bridgwater, Taunton, Yeovil, Frome, Weston-super-Mare, Bath, Bristol, Kingswood/Staple Hill, North Bristol including Southmead, Chard, South Bristol/Knowle"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Accessing Benefits and Engaging Services",
+      "delivery_method": "Delivered one to one",
+      "delivery_location": "HMP Leyhill, HMP Bristol"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Managing Benefit Under/ Over-Payments",
+      "delivery_method": "Delivered one to one",
+      "delivery_location": "HMP Leyhill, HMP Bristol"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Understanding debt management advice and updating Community PP/ Resettlement Team",
+      "delivery_method": "Delivered one to one",
+      "delivery_location": "HMP Leyhill, HMP Bristol"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Understanding Debt Advice and Guidance",
+      "delivery_method": "Delivered one to one",
+      "delivery_location": "HMP Leyhill, HMP Bristol"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Managing ID documentation",
+      "delivery_method": "Delivered one to one",
+      "delivery_location": "HMP Leyhill, HMP Bristol"
+    }
+  ]
+}
