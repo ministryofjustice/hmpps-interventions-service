@@ -213,8 +213,11 @@ workflows:
   build_test_and_deploy:
     unless: << pipeline.parameters.only_pacts >>
     jobs:
-      - validate
+
       - validate_db
+      - validate:
+          requires:
+            - validate_db
       - publish_data:
           requires:
             - build_docker
