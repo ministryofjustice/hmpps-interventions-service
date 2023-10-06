@@ -67,16 +67,16 @@ jobs:
       - run:
           name: Run main migrations then branch migrations to detect clashes
           command: |
-            flyway clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
+            FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK="false" flyway clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
             git reset --hard origin/main
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
+            FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK="false" flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
             git reset --hard "$CIRCLE_SHA1"
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
+            FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK="false" flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
       - run:
           name: Run migrations and local seeds
           command: |
-            flyway clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration,src/main/resources/db/local"
+            FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK="false" flyway clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
+            FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK="false" flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration,src/main/resources/db/local"
       - run:
           name: Validate metadata
           command: |
@@ -96,7 +96,7 @@ jobs:
           command: |
             wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/8.5.13/flyway-commandline-8.5.13-linux-x64.tar.gz | \
               tar xvz && sudo ln -s `pwd`/flyway-8.5.13/flyway /usr/local/bin
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
+            FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK="false" flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
       - setup_remote_docker
       - run:
           name: Build data dictionary
