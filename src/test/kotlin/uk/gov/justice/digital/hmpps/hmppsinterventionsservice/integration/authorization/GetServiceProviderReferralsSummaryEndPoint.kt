@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.authorization
 
-import jakarta.persistence.EntityManagerFactory
-import jakarta.persistence.Persistence
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.whenever
