@@ -36,13 +36,14 @@ jobs:
     docker: *db_docker_config
     environment:
       _JAVA_OPTIONS: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=true -Dkotlin.compiler.execution.strategy=in-process
+      FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK: false
     steps:
       - checkout
       - gradle/with_cache:
           deps_checksum_file: "build.gradle.kts"
           cache_key: v2
           steps:
-            - run: FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK="false" ./gradlew check jacocoTestCoverageVerification -i
+            - run: ./gradlew check jacocoTestCoverageVerification -i
       - store_test_results:
           path: build/test-results
       - store_artifacts:
