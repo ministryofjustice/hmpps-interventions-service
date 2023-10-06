@@ -93,7 +93,6 @@ jobs:
             PGPASSWORD="$POSTGRES_PASSWORD" script/validate-metadata.sh
 
   publish_data:
-    unless: true
     environment:
       FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK: false
     executor:
@@ -221,6 +220,7 @@ workflows:
             - validate_db
       - publish_data:
           requires:
+            - validate
             - build_docker
             - build_and_publish_docker
       - validate_helm:
