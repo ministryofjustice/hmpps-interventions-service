@@ -66,8 +66,8 @@ jobs:
       - run:
           name: Setup flyway and psql
           command: |
-            wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/9.22.2/flyway-commandline-9.22.2-linux-x64.tar.gz | \
-              tar xvz && sudo ln -s `pwd`/flyway-9.22.2/flyway /usr/local/bin
+            wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/8.5.13/flyway-commandline-8.5.13-linux-x64.tar.gz | \
+              tar xvz && sudo ln -s `pwd`/flyway-8.5.13/flyway /usr/local/bin
             sudo apt update
             sudo apt install postgresql-client
       - run:
@@ -108,8 +108,8 @@ jobs:
           environment:
             FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK: false
           command: |
-            wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/9.22.2/flyway-commandline-9.22.2-linux-x64.tar.gz | \
-              tar xvz && sudo ln -s `pwd`/flyway-9.22.2/flyway /usr/local/bin
+            wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/8.5.13/flyway-commandline-8.5.13-linux-x64.tar.gz | \
+              tar xvz && sudo ln -s `pwd`/flyway-8.5.13/flyway /usr/local/bin
             flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
       - setup_remote_docker
       - run:
