@@ -130,17 +130,17 @@ class UpsertContractProcessor(
       npsRegion = npsRegion,
     )
 
-    val foundContract = dynamicFrameworkContractRepository.findById(item.internalContractId)
-      .getOrElse {
-        logger.info("Creating missing contract ${item.contractReference} with ID ${item.internalContractId}")
-        definedContract
-      }.also {
-        // allowable overrides
-        it.referralEndAt = item.scheduling.hideAfter
-        it.referralStartDate = item.scheduling.hideBefore
-        it.subcontractorProviders.addAll(subcontractors)
-        it.subcontractorProviders.retainAll(subcontractors)
-      }
+    val foundContract = dynamicFrameworkContractRepository.findByContractReference(item.contractReference)
+    if (foundContract == null) {
+      logger.info("Creating missing contract ${item.contractReference} with ID ${item.internalContractId}")
+      return dynamicFrameworkContractRepository.save(definedContract)
+    } else {
+      // allowable overrides
+      foundContract.referralEndAt = item.scheduling.hideAfter
+      foundContract.referralStartDate = item.scheduling.hideBefore
+      foundContract.subcontractorProviders.addAll(subcontractors)
+      foundContract.subcontractorProviders.retainAll(subcontractors)
+    }
 
     return dynamicFrameworkContractRepository.save(foundContract)
   }
@@ -160,15 +160,14 @@ class UpsertContractProcessor(
       createdAt = OffsetDateTime.now(),
     )
 
-    val foundIntervention = interventionRepository.findById(item.internalInterventionId)
-      .getOrElse {
-        logger.info("Creating missing intervention for contract ${item.contractReference} with ID ${item.internalInterventionId}")
-        definedIntervention
-      }.also {
-        it.title = item.interventionTitle
-        it.description = description
-      }
-
+    val foundIntervention = interventionRepository.findByDynamicFrameworkContractContractReference(item.contractReference)
+    if (foundIntervention == null) {
+      logger.info("Creating missing intervention for contract ${item.contractReference} with ID ${item.internalInterventionId}")
+      return interventionRepository.save(definedIntervention)
+    } else {
+      foundIntervention.title = item.interventionTitle
+      foundIntervention.description = description
+    }
     return interventionRepository.save(foundIntervention)
   }
 

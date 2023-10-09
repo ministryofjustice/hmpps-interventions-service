@@ -9,4 +9,5 @@ interface DynamicFrameworkContractRepository : CrudRepository<DynamicFrameworkCo
 
   @EntityGraph(value = "entity-dynamicFrameWorkContract-graph")
   fun findAllByContractReferenceIn(references: List<String>): List<DynamicFrameworkContract>
+  fun findByContractReference(reference: String): DynamicFrameworkContract?
 }
