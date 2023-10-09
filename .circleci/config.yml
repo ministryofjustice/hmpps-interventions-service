@@ -35,8 +35,7 @@ jobs:
       tag: "17"
     docker: *db_docker_config
     environment:
-      _JAVA_OPTIONS: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=true -Dkotlin.compiler.execution.strategy=in-process
-      JAVA_ARGS: -Dflyway.postgresql.transactional.lock=false
+      _JAVA_OPTIONS: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Dflyway.postgresql.transactional.lock=false -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=true -Dkotlin.compiler.execution.strategy=in-process
     steps:
       - checkout
       - gradle/with_cache:
