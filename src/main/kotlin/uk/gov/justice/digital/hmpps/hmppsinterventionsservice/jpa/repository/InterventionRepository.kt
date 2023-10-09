@@ -10,5 +10,5 @@ interface InterventionRepository : JpaRepository<Intervention, UUID>, Interventi
   fun findByDynamicFrameworkContractIdIn(ids: Iterable<UUID>): List<Intervention>
 
   @Query("select i from Intervention i where i.dynamicFrameworkContract.contractReference = :contractReference")
-  fun findByDynamicFrameworkContractContractReference(contractReference: String): Intervention
+  fun findByDynamicFrameworkContractContractReference(contractReference: String): Intervention?
 }

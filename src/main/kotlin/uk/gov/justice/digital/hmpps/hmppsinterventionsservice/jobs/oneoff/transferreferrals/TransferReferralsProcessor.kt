@@ -34,7 +34,7 @@ class TransferReferralsProcessor(
 
   fun updateReferralIntervention(referral: Referral): Referral {
     val newIntervention = interventionRepository.findByDynamicFrameworkContractContractReference(toContract)
-    referral.intervention = newIntervention
+    referral.intervention = newIntervention!!
     return referralRepository.save(referral)
   }
 
@@ -45,7 +45,7 @@ class TransferReferralsProcessor(
       id = UUID.randomUUID(),
       referral = referral,
       subject = "Case transferred",
-      body = "Automated transfer from ${fromIntervention.title} to ${toIntervention.title}",
+      body = "Automated transfer from ${fromIntervention?.title} to ${toIntervention?.title}",
       sentBy = AuthUser.interventionsServiceUser,
       sentAt = OffsetDateTime.now(),
     )
