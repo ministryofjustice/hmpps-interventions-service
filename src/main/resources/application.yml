@@ -67,9 +67,9 @@ spring:
     web:
       pageable:
         one-indexed-parameters: true
-  flyway:
-    postgresql:
-      transactional-lock: false
+flyway:
+  postgresql:
+    transactional-lock: false
 server:
   port: 8080
   servlet:
