@@ -30,8 +30,8 @@ class UpsertContractsJobConfiguration(
     return jobBuilderFactory["upsertContractsJob"]
       .incrementer(TimestampIncrementer())
       .start(upsertProvidersStep)
-      .next(upsertContractStep)
       .next(upsertContractDetailsStep)
+      .next(upsertContractStep)
       .build()
   }
 
