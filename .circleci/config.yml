@@ -75,7 +75,7 @@ jobs:
           environment:
               FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK: false
           command: |
-            flyway clean -postgresql.transactional.lock=false -cleanDisabled="false" -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
+            flyway clean -cleanDisabled="false" -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
             git reset --hard origin/main
             flyway migrate -postgresql.transactional.lock=false -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
             git reset --hard "$CIRCLE_SHA1"
@@ -85,7 +85,7 @@ jobs:
           environment:
             FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK: false
           command: |
-            flyway clean -postgresql.transactional.lock=false -cleanDisabled="false" -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
+            flyway clean -cleanDisabled="false" -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
             flyway migrate -postgresql.transactional.lock=false -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration,src/main/resources/db/local"
       - run:
           name: Validate metadata
