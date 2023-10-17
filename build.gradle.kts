@@ -93,6 +93,11 @@ dependencies {
 
   // notifications
   implementation("uk.gov.service.notify:notifications-java-client:4.1.0-RELEASE")
+  implementation("org.json:json") {
+    version {
+      strictly("20231013")
+    }
+  }
 
   // aws
   implementation("software.amazon.awssdk:sns:2.21.0")
