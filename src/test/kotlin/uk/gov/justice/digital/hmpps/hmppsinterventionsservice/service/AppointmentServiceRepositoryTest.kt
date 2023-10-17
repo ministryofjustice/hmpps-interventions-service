@@ -73,7 +73,7 @@ class AppointmentServiceRepositoryTest @Autowired constructor(
     fun `can schedule new appointment`() {
       val referral = referralFactory.createSent()
 
-      whenever(communityAPIBookingService.book(any(), isNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()))
+      whenever(communityAPIBookingService.book(any(), isNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
         .thenReturn(Pair(563729L, UUID.randomUUID()))
 
       val appointment = appointmentService.scheduleNewAppointment(
@@ -114,7 +114,7 @@ class AppointmentServiceRepositoryTest @Autowired constructor(
     fun `can reschedule existing appointment`() {
       val appointment = appointmentFactory.create(appointmentTime = OffsetDateTime.now().plusMinutes(60), durationInMinutes = 60)
 
-      whenever(communityAPIBookingService.book(any(), isNotNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()))
+      whenever(communityAPIBookingService.book(any(), isNotNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
         .thenReturn(Pair(56473882L, UUID.randomUUID()))
 
       val rescheduledAppointment = appointmentService.rescheduleExistingAppointment(

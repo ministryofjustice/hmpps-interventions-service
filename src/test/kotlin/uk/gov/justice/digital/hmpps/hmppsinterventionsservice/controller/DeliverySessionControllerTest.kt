@@ -19,7 +19,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointm
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentDeliveryType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentSessionType
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.NO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.YES
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
@@ -28,6 +27,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.Appointmen
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DeliverySessionService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DeliverySessionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFactory
@@ -50,6 +50,7 @@ internal class DeliverySessionControllerTest {
   private val sessionsController = DeliverySessionController(actionPlanService, sessionsService, locationMapper, userMapper, appointmentValidator, referralAccessChecker, referralService, appointmentService)
   private val actionPlanFactory = ActionPlanFactory()
   private val deliverySessionFactory = DeliverySessionFactory()
+  private val appointmentFactory = AppointmentFactory()
   private val jwtTokenFactory = JwtTokenFactory()
   private val authUserFactory = AuthUserFactory()
 
@@ -83,12 +84,6 @@ internal class DeliverySessionControllerTest {
           user,
           AppointmentDeliveryType.PHONE_CALL,
           AppointmentSessionType.ONE_TO_ONE,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
         ),
       ).thenReturn(deliverySession)
 
@@ -105,8 +100,13 @@ internal class DeliverySessionControllerTest {
       val actionPlanId = UUID.randomUUID()
       val sessionNumber = deliverySession.sessionNumber
 
-      val attendanceFeedbackRequestDTO = AttendanceFeedbackRequestDTO(YES, "attended")
-      val sessionFeedbackRequestDTO = SessionFeedbackRequestDTO("summary", "response", null, false)
+      val attendanceFeedbackRequestDTO = AttendanceFeedbackRequestDTO(YES, true)
+      val sessionFeedbackRequestDTO = SessionFeedbackRequestDTO(
+        late = false,
+        sessionSummary = "summary",
+        sessionResponse = "response",
+        notifyProbationPractitioner = false,
+      )
       val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, attendanceFeedbackRequestDTO, sessionFeedbackRequestDTO)
 
       whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
@@ -126,13 +126,12 @@ internal class DeliverySessionControllerTest {
           user,
           AppointmentDeliveryType.PHONE_CALL,
           AppointmentSessionType.ONE_TO_ONE,
-          null,
-          null,
-          YES,
-          "attended",
-          false,
-          "summary",
-          "response",
+          attended = YES,
+          didSessionHappen = true,
+          notifyProbationPractitioner = false,
+          late = false,
+          sessionSummary = "summary",
+          sessionResponse = "response",
         ),
       ).thenReturn(deliverySession)
 
@@ -149,8 +148,13 @@ internal class DeliverySessionControllerTest {
       val actionPlanId = UUID.randomUUID()
       val sessionNumber = deliverySession.sessionNumber
 
-      val attendanceFeedbackRequestDTO = AttendanceFeedbackRequestDTO(NO, "attended")
-      val sessionFeedbackRequestDTO = SessionFeedbackRequestDTO("summary", "response", null, false)
+      val attendanceFeedbackRequestDTO = AttendanceFeedbackRequestDTO(NO, true)
+      val sessionFeedbackRequestDTO = SessionFeedbackRequestDTO(
+        late = false,
+        sessionSummary = "summary",
+        sessionResponse = "response",
+        notifyProbationPractitioner = false,
+      )
       val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, attendanceFeedbackRequestDTO, sessionFeedbackRequestDTO)
       val newAppointment = Appointment(
         id = UUID.randomUUID(),
@@ -173,13 +177,12 @@ internal class DeliverySessionControllerTest {
           user,
           AppointmentDeliveryType.PHONE_CALL,
           AppointmentSessionType.ONE_TO_ONE,
-          null,
-          null,
-          NO,
-          "attended",
-          false,
-          "summary",
-          "response",
+          attended = NO,
+          didSessionHappen = true,
+          notifyProbationPractitioner = false,
+          late = false,
+          sessionSummary = "summary",
+          sessionResponse = "response",
         ),
       ).thenReturn(deliverySession)
 
@@ -307,30 +310,35 @@ internal class DeliverySessionControllerTest {
   fun `updates session appointment with attendance details`() {
     val user = authUserFactory.create()
     val userToken = jwtTokenFactory.create(user)
-    val request = AttendanceFeedbackRequestDTO(Attended.YES, "more info")
-    val actionPlan = actionPlanFactory.create()
-    val sessionNumber = 1
+    val request = AttendanceFeedbackRequestDTO(YES, true)
+    val deliverySession = deliverySessionFactory.createScheduled()
+    val referral = deliverySession.referral
+    val appointment = deliverySession.currentAppointment!!
 
-    val updatedSession = deliverySessionFactory.createAttended(
-      sessionNumber = sessionNumber,
-      attended = Attended.YES,
-      attendanceFailureInformation = "more info",
+    val updateAppointment = appointmentFactory.create(
+      attended = YES,
+      didSessionHappen = true,
     )
 
     whenever(
       sessionsService.recordAttendanceFeedback(
+        referral.id,
+        appointment.id,
         user,
-        actionPlan.id,
-        sessionNumber,
         request.attended,
-        request.attendanceFailureInformation,
+        request.didSessionHappen,
       ),
-    ).thenReturn(updatedSession)
+    ).thenReturn(Pair(deliverySession, updateAppointment))
+
+    whenever(
+      referralService.getSentReferral(referral.id),
+    ).thenReturn(deliverySession.referral)
 
     whenever(authUserRepository.save(any())).thenReturn(user)
 
-    val sessionResponse = sessionsController.recordAttendance(actionPlan.id, sessionNumber, request, userToken)
+    val sessionResponse = sessionsController.recordAttendanceFeedback(referral.id, appointment.id, request, userToken)
 
-    assertThat(sessionResponse.appointmentFeedback.attendanceFeedback.attendanceFailureInformation).isEqualTo("more info")
+    assertThat(sessionResponse.appointmentFeedback.attendanceFeedback.didSessionHappen).isEqualTo(true)
+    assertThat(sessionResponse.appointmentFeedback.attendanceFeedback.attended).isEqualTo(YES)
   }
 }

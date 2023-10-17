@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.EndOfServic
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.AsyncEventExceptionHandling
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 
 interface SNSService
@@ -186,16 +187,21 @@ class SNSAppointmentService(
   private val snsPublisher: SNSPublisher,
   @Value("\${interventions-ui.baseurl}") private val interventionsUiBaseUrl: String,
   @Value("\${interventions-ui.locations.probation-practitioner.supplier-assessment-feedback}") private val saFeedbackLocation: String,
+  @Value("\${interventions-ui.locations.probation-practitioner.session-feedback}") private val ppSessionFeedbackLocation: String,
 ) : ApplicationListener<AppointmentEvent>, SNSService {
 
   @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: AppointmentEvent) {
+    val appointmentType = if (event.appointmentType == AppointmentType.SERVICE_DELIVERY) "session-appointment" else "initial-assessment-appointment"
+    val feedbackLocation = if (event.appointmentType == AppointmentType.SERVICE_DELIVERY) ppSessionFeedbackLocation else saFeedbackLocation
+    val appointmentTypeDescription = if (event.appointmentType == AppointmentType.SERVICE_DELIVERY) "a session appointment" else "an initial assessment appointment"
+
     when (event.type) {
       AppointmentEventType.ATTENDANCE_RECORDED -> {
         val referral = event.appointment.referral
         val appointment = event.appointment
 
-        val eventType = "intervention.initial-assessment-appointment.${when (appointment.attended) {
+        val eventType = "intervention.$appointmentType.${when (appointment.attended) {
           Attended.YES, Attended.LATE -> "attended"
           Attended.NO -> "missed"
           null -> throw RuntimeException("event triggered for appointment with no recorded attendance")
@@ -203,7 +209,7 @@ class SNSAppointmentService(
 
         val snsEvent = EventDTO(
           eventType,
-          "Attendance was recorded for an initial assessment appointment",
+          "Attendance was recorded for $appointmentTypeDescription",
           event.detailUrl,
           appointment.attendanceSubmittedAt!!,
           mapOf("serviceUserCRN" to referral.serviceUserCRN, "referralId" to referral.id),
@@ -216,9 +222,9 @@ class SNSAppointmentService(
         val referral = event.appointment.referral
         val appointment = event.appointment
 
-        val eventType = "intervention.initial-assessment-appointment.session-feedback-submitted"
+        val eventType = "intervention.$appointmentType.session-feedback-submitted"
         val url = UriComponentsBuilder.fromHttpUrl(interventionsUiBaseUrl)
-          .path(saFeedbackLocation)
+          .path(feedbackLocation)
           .buildAndExpand(referral.id)
           .toString()
         val contractTypeName = referral.intervention.dynamicFrameworkContract.contractType.name
@@ -226,7 +232,7 @@ class SNSAppointmentService(
 
         val snsEvent = EventDTO(
           eventType,
-          "Session feedback submitted for an initial assessment appointment",
+          "Session feedback submitted for $appointmentTypeDescription",
           event.detailUrl,
           appointment.appointmentFeedbackSubmittedAt!!,
           listOfNotNull(

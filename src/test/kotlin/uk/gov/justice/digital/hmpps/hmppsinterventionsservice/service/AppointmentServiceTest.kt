@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appoint
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentType.SUPPLIER_ASSESSMENT
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.NO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.YES
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NoSessionReasonType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentDeliveryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
@@ -136,7 +137,7 @@ class AppointmentServiceTest {
     val referral = referralFactory.createSent()
     val deliusAppointmentId = 99L
 
-    whenever(communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null, YES, false))
+    whenever(communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null, YES, false, false, NoSessionReasonType.LOGISTICS))
       .thenReturn(Pair(deliusAppointmentId, UUID.randomUUID()))
     whenever(appointmentRepository.save(any())).thenAnswer { it.arguments[0] }
 
@@ -152,11 +153,13 @@ class AppointmentServiceTest {
       AppointmentSessionType.ONE_TO_ONE,
       null,
       null,
-      YES,
-      "additional information",
-      false,
-      "session summary",
-      "session response",
+      attended = YES,
+      notifyProbationPractitioner = false,
+      didSessionHappen = false,
+      late = false,
+      sessionSummary = "session summary",
+      sessionResponse = "session response",
+      noSessionReasonType = NoSessionReasonType.LOGISTICS
     )
 
     // Then
@@ -174,7 +177,7 @@ class AppointmentServiceTest {
     verify(appointmentEventPublisher).sessionFeedbackRecordedEvent(newAppointment, false, AppointmentType.SUPPLIER_ASSESSMENT)
     verify(appointmentEventPublisher).appointmentFeedbackRecordedEvent(newAppointment, false, AppointmentType.SUPPLIER_ASSESSMENT)
     assertThat(newAppointment.attended).isEqualTo(YES)
-    assertThat(newAppointment.attendanceFailureInformation).isEqualTo("additional information")
+    assertThat(newAppointment.noAttendanceInformation).isEqualTo(null)
     assertThat(newAppointment.sessionSummary).isEqualTo("session summary")
     assertThat(newAppointment.sessionResponse).isEqualTo("session response")
     assertThat(newAppointment.notifyPPOfAttendanceBehaviour).isEqualTo(false)
@@ -235,7 +238,7 @@ class AppointmentServiceTest {
     // Given
     val durationInMinutes = 60
     val appointmentTime = OffsetDateTime.parse("2022-12-04T10:42:43+00:00")
-    val existingAppointment = appointmentFactory.create(deliusAppointmentId = 98L, attended = NO)
+    val existingAppointment = appointmentFactory.create(deliusAppointmentId = 98L, didSessionHappen = false)
     val referral = referralFactory.createSent()
     val additionalDeliusAppointmentId = 99L
 
@@ -278,12 +281,26 @@ class AppointmentServiceTest {
     val referral = referralFactory.createSent()
     val rescheduledDeliusAppointmentId = 99L
 
-    whenever(communityAPIBookingService.book(referral, existingAppointment, pastAppointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null, NO, null))
+    whenever(communityAPIBookingService.book(referral, existingAppointment, pastAppointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null, NO, false, false, NoSessionReasonType.POP_ACCEPTABLE))
       .thenReturn(Pair(rescheduledDeliusAppointmentId, UUID.randomUUID()))
     whenever(appointmentRepository.save(any())).thenAnswer { it.arguments[0] }
 
     // When
-    val updatedAppointment = appointmentService.createOrUpdateAppointment(referral, existingAppointment, durationInMinutes, pastAppointmentTime, SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, NO, "non attended", null, null)
+    val updatedAppointment = appointmentService.createOrUpdateAppointment(
+      referral,
+      existingAppointment,
+      durationInMinutes,
+      pastAppointmentTime,
+      SUPPLIER_ASSESSMENT,
+      createdByUser,
+      AppointmentDeliveryType.PHONE_CALL,
+      AppointmentSessionType.ONE_TO_ONE,
+      attended = NO,
+      notifyProbationPractitioner = false,
+      didSessionHappen = false,
+      noSessionReasonType = NoSessionReasonType.POP_ACCEPTABLE,
+      late = false
+    )
 
     // Then
     verifyResponse(
@@ -297,48 +314,10 @@ class AppointmentServiceTest {
     )
     verifySavedAppointment(OffsetDateTime.parse("2020-12-04T10:42:43+00:00"), durationInMinutes, rescheduledDeliusAppointmentId, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
     assertThat(updatedAppointment.attended).isEqualTo(NO)
-    assertThat(updatedAppointment.attendanceFailureInformation).isEqualTo("non attended")
+    assertThat(updatedAppointment.didSessionHappen).isEqualTo(false)
+    assertThat(updatedAppointment.noAttendanceInformation).isEqualTo(null)
     assertThat(updatedAppointment.attendanceBehaviour).isNull()
-    assertThat(updatedAppointment.notifyPPOfAttendanceBehaviour).isNull()
-  }
-
-  @Test
-  fun `appointment with none attendance will create a new historic appointment`() {
-    // Given
-    val durationInMinutes = 60
-    val appointmentTime = OffsetDateTime.parse("2021-12-04T10:42:43+00:00")
-    val existingAppointment = appointmentFactory.create(deliusAppointmentId = 98L, attended = NO)
-    val referral = referralFactory.createSent()
-    val additionalDeliusAppointmentId = 99L
-
-    whenever(communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null, NO, null))
-      .thenReturn(Pair(additionalDeliusAppointmentId, UUID.randomUUID()))
-    whenever(appointmentRepository.save(any())).thenAnswer { it.arguments[0] }
-
-    // When
-    val newAppointment = appointmentService.createOrUpdateAppointment(referral, existingAppointment, durationInMinutes, appointmentTime, SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, NO, "non attended", null, null)
-
-    // Then
-    verifyResponse(
-      newAppointment,
-      existingAppointment.id,
-      additionalDeliusAppointmentId,
-      appointmentTime,
-      durationInMinutes,
-      AppointmentDeliveryType.PHONE_CALL,
-      AppointmentSessionType.ONE_TO_ONE,
-    )
-    verifySavedAppointment(appointmentTime, durationInMinutes, additionalDeliusAppointmentId, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
-    assertThat(newAppointment.attended).isEqualTo(NO)
-    assertThat(newAppointment.attendanceFailureInformation).isEqualTo("non attended")
-    assertThat(newAppointment.attendanceBehaviour).isNull()
-    assertThat(newAppointment.notifyPPOfAttendanceBehaviour).isNull()
-    assertThat(newAppointment.attendanceSubmittedAt).isNotNull
-    assertThat(newAppointment.attendanceSubmittedBy).isEqualTo(createdByUser)
-    assertThat(newAppointment.attendanceBehaviourSubmittedAt).isNull()
-    assertThat(newAppointment.attendanceBehaviourSubmittedBy).isNull()
-    assertThat(newAppointment.appointmentFeedbackSubmittedAt).isNotNull
-    assertThat(newAppointment.appointmentFeedbackSubmittedBy).isEqualTo(createdByUser)
+    assertThat(updatedAppointment.notifyPPOfAttendanceBehaviour).isFalse
   }
 
   @Test
@@ -346,13 +325,13 @@ class AppointmentServiceTest {
     val durationInMinutes = 60
     val appointmentTime = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
     val createdByUser = authUserFactory.create()
-    val appointment = appointmentFactory.create(attended = YES)
+    val appointment = appointmentFactory.create(didSessionHappen = true)
     val referral = referralFactory.createSent()
 
     val error = assertThrows<IllegalStateException> {
       appointmentService.createOrUpdateAppointment(referral, appointment, durationInMinutes, appointmentTime, SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
     }
-    assertThat(error.message).contains("Is it not possible to update an appointment that has already been attended")
+    assertThat(error.message).contains("It is not possible to update an appointment where a session has already happened.")
   }
 
   private fun verifyResponse(
@@ -448,7 +427,22 @@ class AppointmentServiceTest {
       whenever(appointmentRepository.save(any())).thenReturn(appointment)
       whenever(authUserRepository.save(any())).thenReturn(submittedBy)
 
-      appointmentService.recordSessionFeedback(appointment, sessionSummary, sessionResponse, null, notifyProbationPractitioner, submittedBy)
+      appointmentService.recordSessionFeedback(
+        appointment,
+        false,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        sessionSummary,
+        sessionResponse,
+        null,
+        notifyProbationPractitioner,
+        submittedBy,
+      )
 
       val argumentCaptor = argumentCaptor<Appointment>()
       verify(appointmentRepository, times(1)).save(argumentCaptor.capture())
@@ -472,7 +466,22 @@ class AppointmentServiceTest {
       val appointment = appointmentFactory.create(id = appointmentId, appointmentFeedbackSubmittedAt = feedbackSubmittedAt)
 
       val error = assertThrows<ResponseStatusException> {
-        appointmentService.recordSessionFeedback(appointment, sessionSummary, sessionResponse, null, notifyProbationPractitioner, submittedBy)
+        appointmentService.recordSessionFeedback(
+          appointment,
+          false,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          sessionSummary,
+          sessionResponse,
+          null,
+          notifyProbationPractitioner,
+          submittedBy,
+        )
       }
       assertThat(error.message).contains("Feedback has already been submitted for this appointment [id=$appointmentId]")
     }
@@ -484,14 +493,13 @@ class AppointmentServiceTest {
     fun `appointment attendance can be updated`() {
       val appointmentId = UUID.randomUUID()
       val attended = YES
-      val attendanceFailureInformation = "information"
       val appointment = appointmentFactory.create(id = appointmentId, appointmentTime = OffsetDateTime.now())
       val submittedBy = authUserFactory.create()
 
       whenever(appointmentRepository.save(any())).thenReturn(appointment)
       whenever(authUserRepository.save(any())).thenReturn(submittedBy)
 
-      appointmentService.recordAppointmentAttendance(appointment, attended, attendanceFailureInformation, submittedBy)
+      appointmentService.recordAppointmentAttendance(appointment, attended, true, submittedBy)
 
       val argumentCaptor = argumentCaptor<Appointment>()
       verify(appointmentRepository, times(1)).save(argumentCaptor.capture())
@@ -499,22 +507,106 @@ class AppointmentServiceTest {
 
       assertThat(arguments.id).isEqualTo(appointmentId)
       assertThat(arguments.attended).isEqualTo(attended)
-      assertThat(arguments.attendanceFailureInformation).isEqualTo(attendanceFailureInformation)
+      assertThat(arguments.attendanceFailureInformation).isEqualTo(null)
       assertThat(arguments.attendanceSubmittedAt).isNotNull
       assertThat(arguments.attendanceSubmittedBy).isEqualTo(submittedBy)
+    }
+
+    @Test
+    fun `previously saved session feedback fields are cleared when recording attendance and didSessionHappen value has changed`() {
+      val appointmentId = UUID.randomUUID()
+      val attended = YES
+      val appointment = appointmentFactory.create(
+        id = appointmentId,
+        appointmentTime = OffsetDateTime.now(),
+        didSessionHappen = true,
+        sessionSummary = "sessionSummary",
+        sessionResponse = "sessionResponse",
+      )
+      val submittedBy = authUserFactory.create()
+
+      whenever(appointmentRepository.save(any())).thenReturn(appointment)
+      whenever(authUserRepository.save(any())).thenReturn(submittedBy)
+
+      appointmentService.recordAppointmentAttendance(appointment, attended, false, submittedBy)
+
+      val argumentCaptor = argumentCaptor<Appointment>()
+      verify(appointmentRepository, times(1)).save(argumentCaptor.capture())
+      val arguments = argumentCaptor.firstValue
+
+      assertThat(arguments.id).isEqualTo(appointmentId)
+      assertThat(arguments.attended).isEqualTo(attended)
+      assertThat(arguments.sessionSummary).isNull()
+      assertThat(arguments.sessionResponse).isNull()
+    }
+
+    @Test
+    fun `previously saved session feedback fields are cleared when recording attendance and didSessionHappen has not changed but is false and attendance has changed`() {
+      val appointmentId = UUID.randomUUID()
+      val appointment = appointmentFactory.create(
+        id = appointmentId,
+        appointmentTime = OffsetDateTime.now(),
+        attended = YES,
+        didSessionHappen = false,
+        noSessionReasonType = NoSessionReasonType.POP_ACCEPTABLE,
+        noSessionReasonPopAcceptable = "noSessionReasonPopAcceptable",
+      )
+      val submittedBy = authUserFactory.create()
+
+      whenever(appointmentRepository.save(any())).thenReturn(appointment)
+      whenever(authUserRepository.save(any())).thenReturn(submittedBy)
+
+      appointmentService.recordAppointmentAttendance(appointment, NO, false, submittedBy)
+
+      val argumentCaptor = argumentCaptor<Appointment>()
+      verify(appointmentRepository, times(1)).save(argumentCaptor.capture())
+      val arguments = argumentCaptor.firstValue
+
+      assertThat(arguments.id).isEqualTo(appointmentId)
+      assertThat(arguments.attended).isEqualTo(NO)
+      assertThat(arguments.didSessionHappen).isEqualTo(false)
+      assertThat(arguments.noSessionReasonType).isNull()
+      assertThat(arguments.noSessionReasonPopAcceptable).isNull()
+    }
+
+    @Test
+    fun `previously saved session feedback fields are not cleared when recording attendance and didSessionHappen value has not changed`() {
+      val appointmentId = UUID.randomUUID()
+      val attended = YES
+      val appointment = appointmentFactory.create(
+        id = appointmentId,
+        appointmentTime = OffsetDateTime.now(),
+        didSessionHappen = true,
+        sessionSummary = "sessionSummary",
+        sessionResponse = "sessionResponse",
+      )
+      val submittedBy = authUserFactory.create()
+
+      whenever(appointmentRepository.save(any())).thenReturn(appointment)
+      whenever(authUserRepository.save(any())).thenReturn(submittedBy)
+
+      appointmentService.recordAppointmentAttendance(appointment, attended, true, submittedBy)
+
+      val argumentCaptor = argumentCaptor<Appointment>()
+      verify(appointmentRepository, times(1)).save(argumentCaptor.capture())
+      val arguments = argumentCaptor.firstValue
+
+      assertThat(arguments.id).isEqualTo(appointmentId)
+      assertThat(arguments.attended).isEqualTo(attended)
+      assertThat(arguments.sessionSummary).isEqualTo("sessionSummary")
+      assertThat(arguments.sessionResponse).isEqualTo("sessionResponse")
     }
 
     @Test
     fun `appointment attendance cannot be updated if feedback has been submitted`() {
       val appointmentId = UUID.randomUUID()
       val attended = YES
-      val additionalAttendanceInformation = "information"
       val submittedBy = authUserFactory.create()
       val feedbackSubmittedAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
       val appointment = appointmentFactory.create(id = appointmentId, appointmentFeedbackSubmittedAt = feedbackSubmittedAt)
 
       val error = assertThrows<ResponseStatusException> {
-        appointmentService.recordAppointmentAttendance(appointment, attended, additionalAttendanceInformation, submittedBy)
+        appointmentService.recordAppointmentAttendance(appointment, attended, true, submittedBy)
       }
       assertThat(error.message).contains("Feedback has already been submitted for this appointment [id=$appointmentId]")
     }
@@ -523,12 +615,11 @@ class AppointmentServiceTest {
     fun `appointment attendance cannot be updated if session has a future date`() {
       val appointmentId = UUID.randomUUID()
       val attended = YES
-      val additionalAttendanceInformation = "information"
       val submittedBy = authUserFactory.create()
       val appointment = appointmentFactory.create(id = appointmentId, appointmentTime = OffsetDateTime.now().plusMonths(2))
 
       val error = assertThrows<ResponseStatusException> {
-        appointmentService.recordAppointmentAttendance(appointment, attended, additionalAttendanceInformation, submittedBy)
+        appointmentService.recordAppointmentAttendance(appointment, attended, true, submittedBy)
       }
       assertThat(error.message).contains("Cannot submit feedback for a future appointment [id=${appointment.id}]")
     }

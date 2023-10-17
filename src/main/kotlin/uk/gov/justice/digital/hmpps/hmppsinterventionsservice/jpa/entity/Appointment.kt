@@ -21,6 +21,7 @@ import javax.validation.constraints.NotNull
 
 @Entity
 @TypeDef(name = "attended", typeClass = PostgreSQLEnumType::class)
+@TypeDef(name = "no_session_reason_type", typeClass = PostgreSQLEnumType::class)
 data class Appointment(
   @Type(type = "attended")
   @Enumerated(EnumType.STRING)
@@ -42,6 +43,20 @@ data class Appointment(
   var sessionResponse: String? = null,
   var sessionConcerns: String? = null,
   var sessionFeedbackSubmittedAt: OffsetDateTime? = null,
+
+  var didSessionHappen: Boolean? = null,
+  var late: Boolean? = null,
+  var lateReason: String? = null,
+  var futureSessionPlans: String? = null,
+  var noAttendanceInformation: String? = null,
+
+  @Type(type = "no_session_reason_type")
+  @Enumerated(EnumType.STRING)
+  var noSessionReasonType: NoSessionReasonType? = null,
+  var noSessionReasonPopAcceptable: String? = null,
+  var noSessionReasonPopUnacceptable: String? = null,
+  var noSessionReasonLogistics: String? = null,
+
   @ManyToOne
   @Fetch(FetchMode.JOIN)
   var sessionFeedbackSubmittedBy: AuthUser? = null,
@@ -96,6 +111,13 @@ enum class Attended {
   open fun toLower(): String? {
     return this.toString().lowercase()
   }
+}
+
+enum class NoSessionReasonType {
+  POP_ACCEPTABLE,
+  POP_UNACCEPTABLE,
+  LOGISTICS,
+  ;
 }
 
 enum class AppointmentType {

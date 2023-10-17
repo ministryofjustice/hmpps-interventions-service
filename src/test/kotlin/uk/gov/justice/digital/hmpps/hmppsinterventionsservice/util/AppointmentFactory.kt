@@ -4,6 +4,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NoSessionReasonType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -20,6 +21,15 @@ class AppointmentFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     durationInMinutes: Int = 60,
     attended: Attended? = null,
     attendanceFailureInformation: String? = null,
+    noAttendanceInformation: String? = null,
+    didSessionHappen: Boolean? = null,
+    late: Boolean? = null,
+    lateReason: String? = null,
+    futureSessionPlans: String? = null,
+    noSessionReasonType: NoSessionReasonType? = null,
+    noSessionReasonPopAcceptable: String? = null,
+    noSessionReasonPopUnacceptable: String? = null,
+    noSessionReasonLogistics: String? = null,
     sessionSummary: String? = null,
     sessionResponse: String? = null,
     sessionConcerns: String? = null,
@@ -46,6 +56,15 @@ class AppointmentFactory(em: TestEntityManager? = null) : EntityFactory(em) {
         durationInMinutes = durationInMinutes,
         attended = attended,
         attendanceFailureInformation = attendanceFailureInformation,
+        didSessionHappen = didSessionHappen,
+        late = late,
+        lateReason = lateReason,
+        futureSessionPlans = futureSessionPlans,
+        noSessionReasonType = noSessionReasonType,
+        noSessionReasonPopAcceptable = noSessionReasonPopAcceptable,
+        noSessionReasonPopUnacceptable = noSessionReasonPopUnacceptable,
+        noSessionReasonLogistics = noSessionReasonLogistics,
+        noAttendanceInformation = noAttendanceInformation,
         sessionSummary = sessionSummary,
         sessionResponse = sessionResponse,
         sessionConcerns = sessionConcerns,

@@ -63,8 +63,16 @@ class DeliverySessionController(
       updateAppointmentDTO.appointmentDeliveryAddress,
       updateAppointmentDTO.npsOfficeCode,
       updateAppointmentDTO.attendanceFeedback?.attended,
-      updateAppointmentDTO.attendanceFeedback?.attendanceFailureInformation,
+      updateAppointmentDTO.attendanceFeedback?.didSessionHappen,
       updateAppointmentDTO.sessionFeedback?.notifyProbationPractitioner,
+      updateAppointmentDTO.sessionFeedback?.late,
+      updateAppointmentDTO.sessionFeedback?.lateReason,
+      updateAppointmentDTO.sessionFeedback?.futureSessionPlans,
+      updateAppointmentDTO.sessionFeedback?.noAttendanceInformation,
+      updateAppointmentDTO.sessionFeedback?.noSessionReasonType,
+      updateAppointmentDTO.sessionFeedback?.noSessionReasonPopAcceptable,
+      updateAppointmentDTO.sessionFeedback?.noSessionReasonPopUnacceptable,
+      updateAppointmentDTO.sessionFeedback?.noSessionReasonLogistics,
       updateAppointmentDTO.sessionFeedback?.sessionSummary,
       updateAppointmentDTO.sessionFeedback?.sessionResponse,
       updateAppointmentDTO.sessionFeedback?.sessionConcerns,
@@ -101,58 +109,6 @@ class DeliverySessionController(
   ): DeliverySessionDTO {
     val deliverySession = deliverySessionService.getSession(referralId, sessionNumber)
     return DeliverySessionDTO.from(deliverySession)
-  }
-
-  @Deprecated("superseded by PUT /referral/{referralId}/delivery-session-appointments/{appointmentId}/attendance")
-  @PostMapping("/action-plan/{id}/appointment/{sessionNumber}/record-attendance")
-  fun recordAttendance(
-    @PathVariable(name = "id") actionPlanId: UUID,
-    @PathVariable sessionNumber: Int,
-    @RequestBody request: AttendanceFeedbackRequestDTO,
-    authentication: JwtAuthenticationToken,
-  ): DeliverySessionDTO {
-    val user = userMapper.fromToken(authentication)
-    val updatedSession = deliverySessionService.recordAttendanceFeedback(
-      user,
-      actionPlanId,
-      sessionNumber,
-      request.attended,
-      request.attendanceFailureInformation,
-    )
-
-    return DeliverySessionDTO.from(updatedSession)
-  }
-
-  @Deprecated("superseded by PUT /referral/{referralId}/delivery-session-appointments/{appointmentId}/feedback")
-  @PostMapping("/action-plan/{actionPlanId}/appointment/{sessionNumber}/record-session-feedback")
-  fun recordSessionFeedback(
-    @PathVariable actionPlanId: UUID,
-    @PathVariable sessionNumber: Int,
-    @RequestBody request: SessionFeedbackRequestDTO,
-    authentication: JwtAuthenticationToken,
-  ): DeliverySessionDTO {
-    val user = userMapper.fromToken(authentication)
-    val updatedSession = deliverySessionService.recordSessionFeedback(
-      user,
-      actionPlanId,
-      sessionNumber,
-      request.sessionSummary,
-      request.sessionResponse,
-      request.sessionConcerns,
-      request.notifyProbationPractitioner,
-    )
-    return DeliverySessionDTO.from(updatedSession)
-  }
-
-  @Deprecated("superseded by POST /referral/{referralId}/delivery-session-appointments/{appointmentId}/submit-feedback")
-  @PostMapping("/action-plan/{actionPlanId}/appointment/{sessionNumber}/submit")
-  fun submitSessionFeedback(
-    @PathVariable actionPlanId: UUID,
-    @PathVariable sessionNumber: Int,
-    authentication: JwtAuthenticationToken,
-  ): DeliverySessionDTO {
-    val user = userMapper.fromToken(authentication)
-    return DeliverySessionDTO.from(deliverySessionService.submitAppointmentFeedback(actionPlanId, sessionNumber, user))
   }
 
   @GetMapping("/referral/{referralId}/delivery-session-appointments/{appointmentId}")
@@ -212,8 +168,16 @@ class DeliverySessionController(
       request.appointmentDeliveryAddress,
       request.npsOfficeCode,
       request.attendanceFeedback?.attended,
-      request.attendanceFeedback?.attendanceFailureInformation,
+      request.attendanceFeedback?.didSessionHappen,
       request.sessionFeedback?.notifyProbationPractitioner,
+      request.sessionFeedback?.late,
+      request.sessionFeedback?.lateReason,
+      request.sessionFeedback?.futureSessionPlans,
+      request.sessionFeedback?.noAttendanceInformation,
+      request.sessionFeedback?.noSessionReasonType,
+      request.sessionFeedback?.noSessionReasonPopAcceptable,
+      request.sessionFeedback?.noSessionReasonPopUnacceptable,
+      request.sessionFeedback?.noSessionReasonLogistics,
       request.sessionFeedback?.sessionSummary,
       request.sessionFeedback?.sessionResponse,
       request.sessionFeedback?.sessionConcerns,
@@ -246,8 +210,16 @@ class DeliverySessionController(
       request.appointmentDeliveryAddress,
       request.npsOfficeCode,
       request.attendanceFeedback?.attended,
-      request.attendanceFeedback?.attendanceFailureInformation,
+      request.attendanceFeedback?.didSessionHappen,
       request.sessionFeedback?.notifyProbationPractitioner,
+      request.sessionFeedback?.late,
+      request.sessionFeedback?.lateReason,
+      request.sessionFeedback?.futureSessionPlans,
+      request.sessionFeedback?.noAttendanceInformation,
+      request.sessionFeedback?.noSessionReasonType,
+      request.sessionFeedback?.noSessionReasonPopAcceptable,
+      request.sessionFeedback?.noSessionReasonPopUnacceptable,
+      request.sessionFeedback?.noSessionReasonLogistics,
       request.sessionFeedback?.sessionSummary,
       request.sessionFeedback?.sessionResponse,
       request.sessionFeedback?.sessionConcerns,
@@ -273,7 +245,7 @@ class DeliverySessionController(
       appointmentId,
       user,
       request.attended,
-      request.attendanceFailureInformation,
+      request.didSessionHappen,
     )
     return DeliverySessionAppointmentDTO.from(updatedSessionAppointment.first.sessionNumber, updatedSessionAppointment.second)
   }
@@ -295,6 +267,14 @@ class DeliverySessionController(
       referralId,
       appointmentId,
       user,
+      request.late,
+      request.lateReason,
+      request.futureSessionPlans,
+      request.noAttendanceInformation,
+      request.noSessionReasonType,
+      request.noSessionReasonPopAcceptable,
+      request.noSessionReasonPopUnacceptable,
+      request.noSessionReasonLogistics,
       request.sessionSummary,
       request.sessionResponse,
       request.sessionConcerns,

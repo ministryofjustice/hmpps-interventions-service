@@ -24,7 +24,8 @@ internal class SNSAppointmentServiceTest {
   private val publisher = mock<SNSPublisher>()
   private val uiBaseUrl = "http://url"
   private val supplierAssessmentUrl = "/pp/{referralId}/supplier-assessment"
-  private val snsAppointmentService = SNSAppointmentService(publisher, uiBaseUrl, supplierAssessmentUrl)
+  private val sessionUrl = "/pp/{referralId}/session"
+  private val snsAppointmentService = SNSAppointmentService(publisher, uiBaseUrl, supplierAssessmentUrl, sessionUrl)
 
   private val appointmentFactory = AppointmentFactory()
   private val authUserFactory = AuthUserFactory()

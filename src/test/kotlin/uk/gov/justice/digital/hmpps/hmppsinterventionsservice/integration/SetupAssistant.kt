@@ -24,6 +24,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfSe
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReportOutcome
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NPSRegion
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NoSessionReasonType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ProbationPractitionerDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
@@ -674,9 +675,18 @@ class SetupAssistant(
     appointmentTime: OffsetDateTime,
     attended: Attended? = null,
     attendanceFailureInformation: String? = null,
+    didSessionHappen: Boolean? = null,
     sessionSummary: String? = null,
     sessionResponse: String? = null,
     sessionConcerns: String? = null,
+    futureSessionPlans: String? = null,
+    late: Boolean? = null,
+    lateReason: String? = null,
+    noAttendanceInformation: String? = null,
+    noSessionReasonLogistics: String? = null,
+    noSessionReasonPopAcceptable: String? = null,
+    noSessionReasonPopUnacceptable: String? = null,
+    noSessionReasonType: NoSessionReasonType? = null,
     sessionFeedbackSubmittedAt: OffsetDateTime? = null,
     sessionFeedbackSubmittedBy: AuthUser? = null,
     behaviour: String? = null,
@@ -696,9 +706,18 @@ class SetupAssistant(
       createdAt = now,
       attended = attended,
       attendanceFailureInformation = attendanceFailureInformation,
+      didSessionHappen = didSessionHappen,
       sessionSummary = sessionSummary,
       sessionResponse = sessionResponse,
       sessionConcerns = sessionConcerns,
+      futureSessionPlans = futureSessionPlans,
+      late = late,
+      lateReason = lateReason,
+      noAttendanceInformation = noAttendanceInformation,
+      noSessionReasonLogistics = noSessionReasonLogistics,
+      noSessionReasonPopAcceptable = noSessionReasonPopAcceptable,
+      noSessionReasonPopUnacceptable = noSessionReasonPopUnacceptable,
+      noSessionReasonType = noSessionReasonType,
       sessionFeedbackSubmittedAt = sessionFeedbackSubmittedAt,
       sessionFeedbackSubmittedBy = sessionFeedbackSubmittedBy,
       attendanceSubmittedAt = if (attended != null) now else null,
