@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller
 
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -19,6 +20,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.EndOfServi
 import java.util.UUID
 
 @RestController
+@PreAuthorize("hasRole('INTERVENTIONS_SERVICE')")
 class EndOfServiceReportController(
   val userMapper: UserMapper,
   val locationMapper: LocationMapper,

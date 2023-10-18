@@ -4,6 +4,7 @@ import mu.KLogging
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -20,6 +21,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthS
 import java.util.UUID
 
 @RestController
+@PreAuthorize("hasRole('INTERVENTIONS_SERVICE')")
 class AmendReferralController(
   private val amendReferralService: AmendReferralService,
   private val hmppsAuthService: HMPPSAuthService,
