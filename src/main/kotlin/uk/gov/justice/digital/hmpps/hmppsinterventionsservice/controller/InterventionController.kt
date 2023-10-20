@@ -16,7 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.Interventi
 import java.util.UUID
 
 @RestController
-@PreAuthorize("hasRole('INTERVENTIONS_SERVICE')")
+@PreAuthorize("hasRole('ROLE_PROBATION') or hasRole('ROLE_CRS_PROVIDER')")
 class InterventionController(
   private val interventionService: InterventionService,
   private val userMapper: UserMapper,

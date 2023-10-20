@@ -7,7 +7,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.PCCRegionDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.PCCRegionService
 
 @RestController
-@PreAuthorize("hasRole('INTERVENTIONS_SERVICE')")
+@PreAuthorize("hasRole('ROLE_PROBATION') or hasRole('ROLE_CRS_PROVIDER')")
 class PCCRegionController(private val pccRegionService: PCCRegionService) {
   @GetMapping("/pcc-regions")
   fun getAllPCCRegions(): List<PCCRegionDTO> {

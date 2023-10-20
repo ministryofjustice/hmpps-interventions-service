@@ -21,7 +21,7 @@ import java.util.UUID
 import javax.persistence.EntityNotFoundException
 
 @RestController
-@PreAuthorize("hasRole('INTERVENTIONS_SERVICE')")
+@PreAuthorize("hasRole('ROLE_PROBATION') or hasRole('ROLE_CRS_PROVIDER')")
 class CaseNoteController(
   val userMapper: UserMapper,
   val caseNoteService: CaseNoteService,

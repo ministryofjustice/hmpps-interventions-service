@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@PreAuthorize("hasRole('INTERVENTIONS_SERVICE')")
+@PreAuthorize("hasRole('ROLE_PROBATION') or hasRole('ROLE_CRS_PROVIDER')")
 class ExceptionTestController {
 
   @GetMapping("/exception")
