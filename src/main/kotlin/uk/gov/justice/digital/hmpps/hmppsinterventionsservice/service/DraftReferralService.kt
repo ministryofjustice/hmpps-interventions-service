@@ -255,6 +255,9 @@ class DraftReferralService(
     update.personCustodyPrisonId?.let {
       draftReferral.personCustodyPrisonId = update.personCustodyPrisonId
     }
+    update.allocatedCommunityPP?.let {
+      draftReferral.allocatedCommunityPP = update.allocatedCommunityPP
+    }
   }
 
   fun updatePersonExpectedReleaseDate(draftReferral: DraftReferral, update: DraftReferralDTO) {
