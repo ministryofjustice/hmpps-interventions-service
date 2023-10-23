@@ -57,6 +57,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     hasMainPointOfContactDetails: Boolean = false,
     roleOrJobTitle: String? = "Probation Practitioner",
     ppEstablishment: String? = "aaa",
+    allocatedCommunityPP: Boolean = false,
   ): DraftReferral {
     return createDraftReferral(
       id = id,
@@ -86,6 +87,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       hasMainPointOfContactDetails = hasMainPointOfContactDetails,
       roleOrJobTitle = roleOrJobTitle,
       ppEstablishment = ppEstablishment,
+      allocatedCommunityPP = allocatedCommunityPP,
     )
   }
 
