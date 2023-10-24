@@ -147,7 +147,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     hasMainPointOfContactDetails: Boolean = false,
     roleOrJobTitle: String? = "Probation Practitioner",
     ppEstablishment: String? = "aaa",
-    allocatedCommunityPP: Boolean = false,
+    allocatedCommunityPP: Boolean? = null,
   ): DraftReferral {
     val draftReferral = DraftReferral(
       id = id,
