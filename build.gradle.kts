@@ -17,7 +17,7 @@ configurations {
 }
 
 jacoco {
-  toolVersion = "0.8.10"
+  toolVersion = "0.8.11"
 }
 
 tasks {
@@ -81,8 +81,8 @@ dependencies {
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
-  implementation("io.sentry:sentry-spring-boot-starter:6.31.0")
-  implementation("io.sentry:sentry-logback:6.31.0")
+  implementation("io.sentry:sentry-spring-boot-starter:6.32.0")
+  implementation("io.sentry:sentry-logback:6.32.0")
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
   implementation("net.logstash.logback:logstash-logback-encoder:7.3")
 
@@ -100,15 +100,15 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.21.0")
-  implementation("software.amazon.awssdk:s3:2.21.0")
-  implementation("software.amazon.awssdk:sts:2.21.0")
+  implementation("software.amazon.awssdk:sns:2.21.5")
+  implementation("software.amazon.awssdk:s3:2.21.5")
+  implementation("software.amazon.awssdk:sts:2.21.5")
 
   // security
-  implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.4")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.1.4")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.1.4")
-  implementation("com.nimbusds:oauth2-oidc-sdk:11.2")
+  implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.5")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.1.5")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.1.5")
+  implementation("com.nimbusds:oauth2-oidc-sdk:11.4")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -123,8 +123,8 @@ dependencies {
   implementation("org.apache.commons:commons-csv:1.10.0")
 
   testImplementation("au.com.dius.pact.provider:junit5spring:4.6.3")
-  testImplementation("com.squareup.okhttp3:okhttp:4.11.0")
-  testImplementation("com.squareup.okhttp3:mockwebserver:4.11.0")
+  testImplementation("com.squareup.okhttp3:okhttp:4.12.0")
+  testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
   testImplementation("org.mockito:mockito-inline:5.2.0")
   testImplementation("org.springframework.batch:spring-batch-test")
   testImplementation("com.github.tomakehurst:wiremock-jre8:3.0.1")
