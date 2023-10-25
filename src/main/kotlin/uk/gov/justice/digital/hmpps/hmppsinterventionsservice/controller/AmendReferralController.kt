@@ -21,7 +21,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthS
 import java.util.UUID
 
 @RestController
-@PreAuthorize("hasRole('ROLE_PROBATION') or hasRole('ROLE_CRS_PROVIDER')")
+@PreAuthorize("hasRole('ROLE_PROBATION') or hasRole('ROLE_CRS_PROVIDER') or hasRole('ROLE_INTERVENTIONS_API_READ_ALL')")
 class AmendReferralController(
   private val amendReferralService: AmendReferralService,
   private val hmppsAuthService: HMPPSAuthService,

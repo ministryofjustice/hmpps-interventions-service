@@ -88,8 +88,8 @@ class SingleReferralEndpoints : IntegrationTestBase() {
     return setupAssistant.createSentReferral(intervention = setupAssistant.createIntervention(dynamicFrameworkContract = contract))
   }
 
-  private fun createEncodedTokenForUser(user: AuthUser): String {
-    return tokenFactory.createEncodedToken(userID = user.id, userName = user.userName, authSource = user.authSource, roles = listOf("ROLE_INTERVENTIONS_SERVICE"))
+  private fun createEncodedTokenForUser(user: AuthUser, roles: List<String> = listOf("ROLE_PROBATION", "ROLE_CRS_PROVIDER")): String {
+    return tokenFactory.createEncodedToken(userID = user.id, userName = user.userName, authSource = user.authSource, roles = roles)
   }
 
   @ParameterizedTest(name = "{displayName} ({argumentsWithNames})")
@@ -440,7 +440,7 @@ class SingleReferralEndpoints : IntegrationTestBase() {
   @MethodSource("sentReferralRequests")
   fun `nomis users can never access anything`(request: Request) {
     val referral = setupAssistant.createSentReferral()
-    val token = tokenFactory.createEncodedToken("123456", "nomis", "tom", listOf("ROLE_INTERVENTIONS_SERVICE"))
+    val token = tokenFactory.createEncodedToken("123456", "nomis", "tom", listOf("ROLE_PROBATION"))
 
     val response = requestFactory.create(request, token, referral.id.toString()).exchange()
     response.expectStatus().isForbidden
@@ -474,7 +474,7 @@ class SingleReferralEndpoints : IntegrationTestBase() {
   @ParameterizedTest(name = "{displayName} ({argumentsWithNames})")
   @MethodSource("allReferralRequests")
   fun `auth tokens with missing claims can never access anything`(request: Request) {
-    val token = tokenFactory.createEncodedToken("123456", null, null, listOf("ROLE_INTERVENTIONS_SERVICE"))
+    val token = tokenFactory.createEncodedToken("123456", null, null, listOf("ROLE_PROBATION"))
     val response = requestFactory.create(request, token, UUID.randomUUID().toString()).exchange()
     response.expectStatus().isForbidden
     response.expectBody().json(

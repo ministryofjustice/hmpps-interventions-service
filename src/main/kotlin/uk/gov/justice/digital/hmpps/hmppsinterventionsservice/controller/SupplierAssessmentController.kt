@@ -24,7 +24,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.validator.Appointm
 import java.util.UUID
 
 @RestController
-@PreAuthorize("hasRole('ROLE_INTERVENTIONS_SERVICE')")
+@PreAuthorize("hasRole('ROLE_PROBATION') or hasRole('ROLE_CRS_PROVIDER') or hasRole('ROLE_INTERVENTIONS_API_READ_ALL')")
 class SupplierAssessmentController(
   private val referralService: ReferralService,
   private val supplierAssessmentService: SupplierAssessmentService,

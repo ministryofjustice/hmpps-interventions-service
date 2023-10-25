@@ -44,7 +44,7 @@ import java.util.UUID
 import javax.annotation.Nullable
 
 @RestController
-@PreAuthorize("hasRole('ROLE_PROBATION') or hasRole('ROLE_CRS_PROVIDER')")
+@PreAuthorize("hasRole('ROLE_PROBATION') or hasRole('ROLE_CRS_PROVIDER') or hasRole('ROLE_INTERVENTIONS_API_READ_ALL')")
 class ReferralController(
   private val referralService: ReferralService,
   private val referralConcluder: ReferralConcluder,
