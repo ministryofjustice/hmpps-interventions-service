@@ -27,7 +27,6 @@ class PerformanceReportJobConfiguration(
   private val stepBuilderFactory: StepBuilderFactory,
   private val batchUtils: BatchUtils,
   private val listener: PerformanceReportJobListener,
-  @Value("\${spring.batch.jobs.service-provider.performance-report.page-size}") private val pageSize: Int,
   @Value("\${spring.batch.jobs.service-provider.performance-report.chunk-size}") private val chunkSize: Int,
 ) {
   @Bean
