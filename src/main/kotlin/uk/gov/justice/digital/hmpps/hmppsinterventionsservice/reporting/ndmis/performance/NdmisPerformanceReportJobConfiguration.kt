@@ -41,7 +41,6 @@ class NdmisPerformanceReportJobConfiguration(
   private val s3Service: S3Service,
   private val ndmisS3Bucket: S3Bucket,
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
-  @Value("\${spring.batch.jobs.ndmis.performance-report.page-size}") private val pageSize: Int,
   @Value("\${spring.batch.jobs.ndmis.performance-report.chunk-size}") private val chunkSize: Int,
 ) {
   companion object : KLogging()
@@ -67,7 +66,7 @@ class NdmisPerformanceReportJobConfiguration(
     return HibernateCursorItemReaderBuilder<Referral>()
       .name("ndmisPerformanceReportReader")
       .sessionFactory(sessionFactory)
-      .queryString("select r from Referral r where sent_at is not null")
+      .queryString("from Referral")
       .build()
   }
 

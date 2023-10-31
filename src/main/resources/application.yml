@@ -55,12 +55,10 @@ spring:
     jobs:
       service-provider:
         performance-report:
-          page-size: 100
           chunk-size: 20
       ndmis:
         performance-report:
-          page-size: 100
-          chunk-size: 20
+          chunk-size: 100
   data:
     web:
       pageable:
