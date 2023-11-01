@@ -10,10 +10,10 @@ import javax.persistence.ManyToOne
 class ReferralAssignment(
   val assignedAt: OffsetDateTime,
   @ManyToOne
-  @Fetch(FetchMode.SELECT)
+  @Fetch(FetchMode.JOIN)
   val assignedBy: AuthUser,
   @ManyToOne
-  @Fetch(FetchMode.SELECT)
+  @Fetch(FetchMode.JOIN)
   val assignedTo: AuthUser,
   var superseded: Boolean = false,
 )
