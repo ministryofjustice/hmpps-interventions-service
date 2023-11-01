@@ -56,12 +56,14 @@ class JwtTokenFactory {
     userID: String? = "user",
     authSource: String? = "authSource",
     userName: String? = "username",
+    roles: List<String>? = null,
   ): String {
     val jwk = RSAKeyGenerator(2048).keyID("123").generate()
     val claimsBuilder = JWTClaimsSet.Builder()
     userID?.let { claimsBuilder.claim("user_id", it) }
     authSource?.let { claimsBuilder.claim("auth_source", it) }
     userName?.let { claimsBuilder.claim("user_name", userName) }
+    roles?.let { claimsBuilder.claim("authorities", roles) }
     val claims = claimsBuilder.build()
     val jwsHeader: JWSHeader = JWSHeader.Builder(JWSAlgorithm.RS256).keyID(jwk.keyID).build()
     val jwt = SignedJWT(jwsHeader, claims)

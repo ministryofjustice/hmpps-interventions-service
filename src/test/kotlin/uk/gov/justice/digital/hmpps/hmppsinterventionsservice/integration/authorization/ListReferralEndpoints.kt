@@ -37,7 +37,7 @@ class ListReferralEndpoints : IntegrationTestBase() {
   }
 
   private fun createEncodedTokenForUser(user: AuthUser): String {
-    return tokenFactory.createEncodedToken(userID = user.id, userName = user.userName, authSource = user.authSource)
+    return tokenFactory.createEncodedToken(userID = user.id, userName = user.userName, authSource = user.authSource, roles = listOf("ROLE_PROBATION", "ROLE_CRS_PROVIDER", "ROLE_INTERVENTIONS_API_READ_ALL"))
   }
 
   @Test
@@ -221,7 +221,7 @@ class ListReferralEndpoints : IntegrationTestBase() {
   @Test
   fun `nomis users can't access sent referrals`() {
     setupAssistant.createSentReferral()
-    val token = tokenFactory.createEncodedToken("123456", "nomis", "tom")
+    val token = tokenFactory.createEncodedToken("123456", "nomis", "tom", listOf("ROLE_PROBATION"))
 
     val response = requestFactory.create(Request.GetSentReferralSummaries, token).exchange()
     response.expectStatus().isForbidden
