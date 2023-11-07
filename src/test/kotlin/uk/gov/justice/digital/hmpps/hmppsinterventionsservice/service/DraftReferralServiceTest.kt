@@ -91,8 +91,6 @@ class DraftReferralServiceTest @Autowired constructor(
   private val hmppsAuthService: HMPPSAuthService = mock()
   private val draftOasysRiskInformationService: DraftOasysRiskInformationService = mock()
   private val telemetryClient = mock<TelemetryClient>()
-  private var currentLocationEnabled: Boolean = true
-  private var saveProbationPractitionerDetails: Boolean = true
 
   private val draftReferralService = DraftReferralService(
     referralRepository,
@@ -116,8 +114,6 @@ class DraftReferralServiceTest @Autowired constructor(
     referralLocationRepository,
     probationPractitionerDetailsRepository,
     telemetryClient,
-    currentLocationEnabled,
-    saveProbationPractitionerDetails,
   )
 
   @AfterEach
