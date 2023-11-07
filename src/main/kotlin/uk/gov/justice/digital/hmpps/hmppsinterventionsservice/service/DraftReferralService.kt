@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 import com.microsoft.applicationinsights.TelemetryClient
 import mu.KotlinLogging
 import net.logstash.logback.argument.StructuredArguments
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -65,8 +64,6 @@ class DraftReferralService(
   val referralLocationRepository: ReferralLocationRepository,
   val probationPractitionerDetailsRepository: ProbationPractitionerDetailsRepository,
   val telemetryClient: TelemetryClient,
-  @Value("\${feature-flags.current-location.enabled}") private val currentLocationEnabled: Boolean,
-  @Value("\${feature-flags.save-probation-practitioner-details.enabled}") private val saveProbationPractitionerDetails: Boolean,
 ) {
   companion object {
     private val logger = KotlinLogging.logger {}
@@ -122,14 +119,9 @@ class DraftReferralService(
     updateServiceUserNeeds(referral, update)
     updateDraftRiskInformation(referral, update)
     updateServiceCategoryDetails(referral, update)
-    if (currentLocationEnabled) {
-      updatePersonCurrentLocation(referral, update)
-      updatePersonExpectedReleaseDate(referral, update)
-    }
-
-    if (saveProbationPractitionerDetails) {
-      updateProbationPractitionerDetails(referral, update)
-    }
+    updatePersonCurrentLocation(referral, update)
+    updatePersonExpectedReleaseDate(referral, update)
+    updateProbationPractitionerDetails(referral, update)
 
     updateMainPointOfContactDetails(referral, update)
 
@@ -398,15 +390,13 @@ class DraftReferralService(
   }
 
   private fun validateSendReferralCandidate(draftReferral: DraftReferral) {
-    if (currentLocationEnabled) {
-      draftReferral.personCurrentLocationType?.let {
-        if (it == PersonCurrentLocationType.CUSTODY &&
-          draftReferral.isReferralReleasingIn12Weeks == null &&
-          draftReferral.expectedReleaseDate == null &&
-          draftReferral.expectedReleaseDateMissingReason == null
-        ) {
-          throw ServerWebInputException("cannot submit a referral for a person in custody without either expected release date or reason")
-        }
+    draftReferral.personCurrentLocationType?.let {
+      if (it == PersonCurrentLocationType.CUSTODY &&
+        draftReferral.isReferralReleasingIn12Weeks == null &&
+        draftReferral.expectedReleaseDate == null &&
+        draftReferral.expectedReleaseDateMissingReason == null
+      ) {
+        throw ServerWebInputException("cannot submit a referral for a person in custody without either expected release date or reason")
       }
     }
   }
@@ -509,43 +499,39 @@ class DraftReferralService(
   }
 
   private fun createReferralLocation(draftReferral: DraftReferral, referral: Referral) {
-    if (currentLocationEnabled) {
-      referral.referralLocation = referralLocationRepository.save(
-        ReferralLocation(
-          id = UUID.randomUUID(),
-          referral = referral,
-          type = draftReferral.personCurrentLocationType
-            ?: throw ServerWebInputException("can't submit a referral without current location"),
-          prisonId = draftReferral.personCustodyPrisonId,
-          expectedReleaseDate = draftReferral.expectedReleaseDate,
-          expectedReleaseDateMissingReason = draftReferral.expectedReleaseDateMissingReason,
-          isReferralReleasingIn12Weeks = draftReferral.isReferralReleasingIn12Weeks,
-        ),
-      )
-      referralRepository.save(referral)
-    }
+    referral.referralLocation = referralLocationRepository.save(
+      ReferralLocation(
+        id = UUID.randomUUID(),
+        referral = referral,
+        type = draftReferral.personCurrentLocationType
+          ?: throw ServerWebInputException("can't submit a referral without current location"),
+        prisonId = draftReferral.personCustodyPrisonId,
+        expectedReleaseDate = draftReferral.expectedReleaseDate,
+        expectedReleaseDateMissingReason = draftReferral.expectedReleaseDateMissingReason,
+        isReferralReleasingIn12Weeks = draftReferral.isReferralReleasingIn12Weeks,
+      ),
+    )
+    referralRepository.save(referral)
   }
 
   private fun createProbationPractitionerDetails(draftReferral: DraftReferral, referral: Referral) {
-    if (saveProbationPractitionerDetails) {
-      referral.probationPractitionerDetails = probationPractitionerDetailsRepository.save(
-        ProbationPractitionerDetails(
-          id = UUID.randomUUID(),
-          referral = referral,
-          nDeliusName = draftReferral.nDeliusPPName,
-          nDeliusEmailAddress = draftReferral.nDeliusPPEmailAddress,
-          nDeliusPDU = draftReferral.nDeliusPPPDU,
-          name = draftReferral.ppName,
-          emailAddress = draftReferral.ppEmailAddress,
-          pdu = draftReferral.ppPdu,
-          probationOffice = draftReferral.ppProbationOffice,
-          establishment = draftReferral.ppEstablishment,
-          roleOrJobTitle = draftReferral.roleOrJobTitle,
-        ),
-      )
-      referralRepository.save(referral)
-      checkAndMeasureDeliusData(draftReferral)
-    }
+    referral.probationPractitionerDetails = probationPractitionerDetailsRepository.save(
+      ProbationPractitionerDetails(
+        id = UUID.randomUUID(),
+        referral = referral,
+        nDeliusName = draftReferral.nDeliusPPName,
+        nDeliusEmailAddress = draftReferral.nDeliusPPEmailAddress,
+        nDeliusPDU = draftReferral.nDeliusPPPDU,
+        name = draftReferral.ppName,
+        emailAddress = draftReferral.ppEmailAddress,
+        pdu = draftReferral.ppPdu,
+        probationOffice = draftReferral.ppProbationOffice,
+        establishment = draftReferral.ppEstablishment,
+        roleOrJobTitle = draftReferral.roleOrJobTitle,
+      ),
+    )
+    referralRepository.save(referral)
+    checkAndMeasureDeliusData(draftReferral)
   }
 
   private fun checkAndMeasureDeliusData(draftReferral: DraftReferral) {
