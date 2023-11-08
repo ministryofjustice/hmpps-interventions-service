@@ -81,8 +81,8 @@ dependencies {
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
-  implementation("io.sentry:sentry-spring-boot-starter:6.33.0")
-  implementation("io.sentry:sentry-logback:6.33.0")
+  implementation("io.sentry:sentry-spring-boot-starter:6.33.1")
+  implementation("io.sentry:sentry-logback:6.33.1")
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
   implementation("net.logstash.logback:logstash-logback-encoder:7.3")
 
@@ -100,15 +100,15 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.21.14")
-  implementation("software.amazon.awssdk:s3:2.21.14")
-  implementation("software.amazon.awssdk:sts:2.21.14")
+  implementation("software.amazon.awssdk:sns:2.21.16")
+  implementation("software.amazon.awssdk:s3:2.21.16")
+  implementation("software.amazon.awssdk:sts:2.21.17")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.5")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.1.5")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.1.5")
-  implementation("com.nimbusds:oauth2-oidc-sdk:11.5")
+  implementation("com.nimbusds:oauth2-oidc-sdk:11.6")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
