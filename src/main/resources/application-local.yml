@@ -58,6 +58,11 @@ postgres:
   db: interventions
   username: postgres
   password: password
+  readonly:
+    uri: localhost:5432
+    db: interventions
+    username: postgres
+    password: password
 
 spring:
   main:

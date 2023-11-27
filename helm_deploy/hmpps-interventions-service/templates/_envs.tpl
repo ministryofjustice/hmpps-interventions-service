@@ -54,6 +54,30 @@ env:
         name: postgres14
         key: database_password
 
+  - name: POSTGRES_READONLY_URI
+    valueFrom:
+      secretKeyRef:
+        name: hmpps-interventions-postgres14-rds-replica-output
+        key: rds_instance_endpoint
+
+  - name: POSTGRES_READONLY_DB
+    valueFrom:
+      secretKeyRef:
+        name: hmpps-interventions-postgres14-rds-replica-output
+        key: database_name
+
+  - name: POSTGRES_READONLY_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: hmpps-interventions-postgres14-rds-replica-output
+        key: database_username
+
+  - name: POSTGRES_READONLY_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: hmpps-interventions-postgres14-rds-replica-output
+        key: database_password
+
   - name: AWS_SNS_TOPIC_ARN
     valueFrom:
       secretKeyRef:

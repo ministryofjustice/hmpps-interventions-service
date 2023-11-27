@@ -42,9 +42,9 @@ spring:
       password: ${postgres.password}
       hibernate-hbm2ddl-auto: validate
     reporting:
-      url: jdbc:postgresql://${postgres.uri}/${postgres.db}
-      username: ${postgres.username}
-      password: ${postgres.password}
+      url: jdbc:postgresql://${postgres.readonly.uri}/${postgres.readonly.db}
+      username: ${postgres.readonly.username}
+      password: ${postgres.readonly.password}
       hibernate-hbm2ddl-auto: validate
   jpa:
     hibernate:
