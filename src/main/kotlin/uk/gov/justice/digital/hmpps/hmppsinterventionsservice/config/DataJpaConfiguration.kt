@@ -24,7 +24,7 @@ class DataJpaConfiguration {
     val vendorAdapter = HibernateJpaVendorAdapter()
     vendorAdapter.setDatabasePlatform("org.hibernate.dialect.PostgreSQLDialect")
     vendorAdapter.setGenerateDdl(false)
-    vendorAdapter.setShowSql(true)
+    vendorAdapter.setShowSql(false)
     val factory = LocalContainerEntityManagerFactoryBean()
     factory.jpaVendorAdapter = vendorAdapter
     factory.dataSource = dataSource
@@ -56,7 +56,7 @@ class DataJpaConfiguration {
     val vendorAdapter = HibernateJpaVendorAdapter()
     vendorAdapter.setDatabasePlatform("org.hibernate.dialect.PostgreSQLDialect")
     vendorAdapter.setGenerateDdl(false)
-    vendorAdapter.setShowSql(true)
+    vendorAdapter.setShowSql(false)
     val factory = LocalContainerEntityManagerFactoryBean()
     factory.jpaVendorAdapter = vendorAdapter
     factory.dataSource = dataSource
