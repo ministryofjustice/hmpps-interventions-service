@@ -36,9 +36,16 @@ spring:
           issuer-uri: ${hmppsauth.baseurl}/issuer
           jwk-set-uri: ${hmppsauth.baseurl}/.well-known/jwks.json
   datasource:
-    url: jdbc:postgresql://${postgres.uri}/${postgres.db}
-    username: ${postgres.username}
-    password: ${postgres.password}
+    main:
+      url: jdbc:postgresql://${postgres.uri}/${postgres.db}
+      username: ${postgres.username}
+      password: ${postgres.password}
+      hibernate-hbm2ddl-auto: validate
+    reporting:
+      url: jdbc:postgresql://${postgres.uri}/${postgres.db}
+      username: ${postgres.username}
+      password: ${postgres.password}
+      hibernate-hbm2ddl-auto: validate
   jpa:
     hibernate:
       ddl-auto: validate

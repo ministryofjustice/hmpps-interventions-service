@@ -12,6 +12,7 @@ import org.springframework.batch.item.ItemProcessor
 import org.springframework.batch.item.database.HibernateCursorItemReader
 import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -35,7 +36,7 @@ class PerformanceReportJobConfiguration(
     @Value("#{jobParameters['contractReferences']}") contractReferences: String,
     @Value("#{jobParameters['from']}") from: Date,
     @Value("#{jobParameters['to']}") to: Date,
-    sessionFactory: SessionFactory,
+    @Qualifier("reportingEntityManagerFactory") sessionFactory: SessionFactory,
   ): HibernateCursorItemReader<Referral> {
     // this reader returns referral entities which need processing for the report.
     return HibernateCursorItemReaderBuilder<Referral>()
