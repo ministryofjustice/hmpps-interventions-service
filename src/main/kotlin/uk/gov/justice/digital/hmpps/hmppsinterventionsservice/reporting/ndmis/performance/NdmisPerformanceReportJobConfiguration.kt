@@ -66,7 +66,7 @@ class NdmisPerformanceReportJobConfiguration(
   fun ndmisReader(): JpaCursorItemReader<Referral> {
     return JpaCursorItemReaderBuilder<Referral>()
       .name("ndmisPerformanceReportReader")
-      .queryString("select r from Referral r where r.sentAt is not null")
+      .queryString("select r from Referral r")
       // do we need .maxItemCount(pageSize)?
       .entityManagerFactory(entityManagerFactory)
       .build()
