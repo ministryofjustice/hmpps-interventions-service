@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.authorization
 
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.whenever
@@ -203,5 +204,9 @@ class GetServiceProviderReferralsSummaryEndPoint : IntegrationTestBase() {
       ]}
       """.trimIndent(),
     )
+  }
+  @AfterEach
+  fun `clear referrals`() {
+    setupAssistant.cleanAll()
   }
 }
