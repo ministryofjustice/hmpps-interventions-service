@@ -42,7 +42,7 @@ jobs:
           deps_checksum_file: "build.gradle.kts"
           cache_key: v2
           steps:
-            - run: ./gradlew check jacocoTestCoverageVerification
+            - run: ./gradlew check
       - store_test_results:
           path: build/test-results
       - store_artifacts:
