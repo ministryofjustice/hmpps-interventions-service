@@ -55,7 +55,8 @@ spring:
     jobs:
       service-provider:
         performance-report:
-          chunk-size: 20
+          chunk-size: 500
+          page-size: 500
       ndmis:
         performance-report:
           chunk-size: 100
