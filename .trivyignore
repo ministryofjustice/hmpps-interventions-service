@@ -35,3 +35,6 @@ CVE-2022-45868
 # Suppression for spring-web 5.3.24 as bundled with spring boot
 #   can be suppressed as we are not using java serialization and deserialization explicitly
 CVE-2016-1000027
+# Suppression for reactor-netty-http 1.0.38 as bundled with spring boot
+#   can be suppressed as we are not using directory traversal in our application
+CVE-2023-34062
