@@ -50,7 +50,7 @@ class DataJpaConfiguration {
     return transactionManager
   }
 
-  @Bean
+  @Bean(name = ["reportingEntityManagerFactory"])
   @Autowired
   fun reportingEntityManagerFactory(@Qualifier("reportingDataSource") dataSource: DataSource): LocalContainerEntityManagerFactoryBean {
     val vendorAdapter = HibernateJpaVendorAdapter()

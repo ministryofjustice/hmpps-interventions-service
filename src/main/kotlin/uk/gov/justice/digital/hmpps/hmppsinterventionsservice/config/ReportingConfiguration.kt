@@ -10,13 +10,13 @@ import javax.sql.DataSource
 @Configuration
 class ReportingConfiguration {
 
-  @Bean("reportingDataSourceProperties")
+  @Bean(name = ["reportingDataSourceProperties"])
   @ConfigurationProperties("spring.datasource.reporting")
   fun reportingDataSourceProperties(): DataSourceProperties {
     return DataSourceProperties()
   }
 
-  @Bean("reportingDataSource")
+  @Bean(name = ["reportingDataSource"])
   @ConfigurationProperties("spring.datasource.reporting")
   fun reportingDataSource(@Qualifier("reportingDataSourceProperties") reportingDataSourceProperties: DataSourceProperties?): DataSource {
     return reportingDataSourceProperties()
