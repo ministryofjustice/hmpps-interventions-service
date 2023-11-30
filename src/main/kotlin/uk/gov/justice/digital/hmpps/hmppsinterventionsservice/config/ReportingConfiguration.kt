@@ -18,7 +18,7 @@ class ReportingConfiguration {
 
   @Bean("reportingDataSource")
   @ConfigurationProperties("spring.datasource.reporting")
-  fun reportingDataSource(@Qualifier("reportingDataSourceProperties") mainDataSourceProperties: DataSourceProperties?): DataSource {
+  fun reportingDataSource(@Qualifier("reportingDataSourceProperties") reportingDataSourceProperties: DataSourceProperties?): DataSource {
     return reportingDataSourceProperties()
       .initializeDataSourceBuilder()
       .build()
