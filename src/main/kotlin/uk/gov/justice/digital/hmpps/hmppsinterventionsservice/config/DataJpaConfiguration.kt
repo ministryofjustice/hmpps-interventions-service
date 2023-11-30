@@ -36,6 +36,7 @@ class DataJpaConfiguration {
 
   fun additionalJpaProperties(): Properties {
     val map: MutableMap<String, String> = HashMap()
+    map["hibernate.dataSourceClassName"] = "org.postgresql.Driver"
     map["hibernate.hbm2ddl.auto"] = "validate"
     map["hibernate.dialect"] = "org.hibernate.dialect.PostgreSQL10Dialect"
     map["hibernate.show_sql"] = "false"
@@ -44,6 +45,7 @@ class DataJpaConfiguration {
   }
 
   @Bean(name = ["reportingTransactionManager"])
+  @Autowired
   fun dbTransactionManager(@Qualifier("reportingEntityManagerFactory") entityManagerFactory: LocalContainerEntityManagerFactoryBean): PlatformTransactionManager {
     val transactionManager = JpaTransactionManager()
     transactionManager.entityManagerFactory = entityManagerFactory.getObject()
