@@ -16,6 +16,7 @@ import org.springframework.batch.item.database.HibernateCursorItemReader
 import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
 import org.springframework.batch.repeat.RepeatStatus
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.ApplicationRunner
@@ -60,6 +61,7 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   @JobScope
+  @Autowired
   fun ndmisReader(
     @Qualifier("reportingEntityManagerFactory") sessionFactory: SessionFactory,
   ): HibernateCursorItemReader<Referral> {

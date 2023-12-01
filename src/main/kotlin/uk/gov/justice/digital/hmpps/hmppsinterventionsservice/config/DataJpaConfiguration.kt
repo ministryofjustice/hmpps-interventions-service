@@ -17,7 +17,7 @@ import kotlin.collections.HashMap
 @EnableJpaRepositories("uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa")
 @Configuration
 class DataJpaConfiguration {
-  @Bean
+  @Bean(name = ["entityManagerFactory", "mainEntityManagerFactory"])
   @Primary
   @Autowired
   fun entityManagerFactory(@Qualifier("mainDataSource") dataSource: DataSource): LocalContainerEntityManagerFactoryBean {
@@ -44,14 +44,6 @@ class DataJpaConfiguration {
     return map.toProperties()
   }
 
-  @Bean(name = ["reportingTransactionManager"])
-  @Autowired
-  fun dbTransactionManager(@Qualifier("reportingEntityManagerFactory") entityManagerFactory: LocalContainerEntityManagerFactoryBean): PlatformTransactionManager {
-    val transactionManager = JpaTransactionManager()
-    transactionManager.entityManagerFactory = entityManagerFactory.getObject()
-    return transactionManager
-  }
-
   @Bean(name = ["reportingEntityManagerFactory"])
   @Autowired
   fun reportingEntityManagerFactory(@Qualifier("reportingDataSource") dataSource: DataSource): LocalContainerEntityManagerFactoryBean {
@@ -66,5 +58,22 @@ class DataJpaConfiguration {
     factory.setPackagesToScan("uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa")
     factory.setJpaProperties(additionalJpaProperties())
     return factory
+  }
+
+  @Bean(name = ["mainTransactionManager"])
+  @Primary
+  @Autowired
+  fun mainTransactionManager(@Qualifier("mainEntityManagerFactory") entityManagerFactory: LocalContainerEntityManagerFactoryBean): PlatformTransactionManager {
+    val transactionManager = JpaTransactionManager()
+    transactionManager.entityManagerFactory = entityManagerFactory.getObject()
+    return transactionManager
+  }
+
+  @Bean(name = ["reportingTransactionManager"])
+  @Autowired
+  fun reportingTransactionManager(@Qualifier("reportingEntityManagerFactory") entityManagerFactory: LocalContainerEntityManagerFactoryBean): PlatformTransactionManager {
+    val transactionManager = JpaTransactionManager()
+    transactionManager.entityManagerFactory = entityManagerFactory.getObject()
+    return transactionManager
   }
 }
