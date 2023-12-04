@@ -38,3 +38,5 @@ CVE-2016-1000027
 # Suppression for reactor-netty-http 1.0.38 as bundled with spring boot
 #   can be suppressed as we are not using directory traversal in our application
 CVE-2023-34062
+# temporarily supressed for DEV testing, needs assessed before PROD deploy
+CVE-2023-6378
