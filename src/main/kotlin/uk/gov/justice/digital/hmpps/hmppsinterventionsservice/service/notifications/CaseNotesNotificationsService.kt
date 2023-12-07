@@ -33,7 +33,7 @@ class CaseNotesNotificationsService(
   override fun onApplicationEvent(event: CreateCaseNoteEvent) {
     referralService.getSentReferralForUser(event.referralId, event.sentBy)?.let { referral ->
       emailAssignedCaseWorker(referral, event.sentBy, event.caseNoteId)
-      if (event.sendEmail) {
+      if (event.sendEmail == null || event.sendEmail) {
         emailResponsibleProbationPractitioner(referral, event.sentBy, event.caseNoteId)
       }
     } ?: run {

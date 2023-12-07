@@ -24,7 +24,7 @@ class CaseNoteService(
   val caseNoteEventPublisher: CaseNoteEventPublisher,
 ) {
 
-  fun createCaseNote(referralId: UUID, subject: String, body: String, sendEmail: Boolean, sentByUser: AuthUser): CaseNote {
+  fun createCaseNote(referralId: UUID, subject: String, body: String, sendEmail: Boolean?, sentByUser: AuthUser): CaseNote {
     val caseNote = CaseNote(
       id = UUID.randomUUID(),
       referral = referralRepository.getById(referralId),

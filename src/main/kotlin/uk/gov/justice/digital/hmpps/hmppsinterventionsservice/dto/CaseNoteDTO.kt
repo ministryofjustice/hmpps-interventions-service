@@ -23,5 +23,5 @@ data class CreateCaseNoteDTO(
   val referralId: UUID,
   val subject: String,
   val body: String,
-  val sendEmail: Boolean,
+  val sendEmail: Boolean? = null,
 )

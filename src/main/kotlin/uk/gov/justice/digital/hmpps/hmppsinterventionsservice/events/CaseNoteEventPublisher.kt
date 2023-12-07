@@ -15,7 +15,7 @@ class CreateCaseNoteEvent(
   val sentBy: AuthUser,
   val detailUrl: String,
   val referralId: UUID,
-  val sendEmail: Boolean,
+  val sendEmail: Boolean?,
 ) : ApplicationEvent(source) {
   override fun toString(): String = "CreateCaseNoteEvent(caseNoteId=$caseNoteId, referralId=$referralId)"
 }
@@ -25,7 +25,7 @@ class CaseNoteEventPublisher(
   private val applicationEventPublisher: ApplicationEventPublisher,
   private val locationMapper: LocationMapper,
 ) {
-  fun caseNoteSentEvent(caseNote: CaseNote, sendEmail: Boolean) {
+  fun caseNoteSentEvent(caseNote: CaseNote, sendEmail: Boolean?) {
     applicationEventPublisher.publishEvent(
       CreateCaseNoteEvent(
         this,
