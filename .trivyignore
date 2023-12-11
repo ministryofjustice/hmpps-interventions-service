@@ -41,3 +41,4 @@ CVE-2023-34062
 # temporarily supressed for DEV testing, remove when spring upgrade complete
 CVE-2023-6378
 CVE-2023-34054
+CVE-2023-6481
