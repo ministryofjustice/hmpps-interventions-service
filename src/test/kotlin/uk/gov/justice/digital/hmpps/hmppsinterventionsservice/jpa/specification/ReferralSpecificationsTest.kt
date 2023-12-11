@@ -15,7 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Dyn
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSummariesRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralSummariesRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SupplierAssessmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AssignmentsFactory
@@ -24,8 +24,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFramew
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralSummaryFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SentReferralSummariesFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAssessmentFactory
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
@@ -34,7 +34,7 @@ import java.time.temporal.ChronoUnit
 class ReferralSpecificationsTest @Autowired constructor(
   val entityManager: TestEntityManager,
   val referralRepository: ReferralRepository,
-  val sentReferralSummariesRepository: SentReferralSummariesRepository,
+  val referralSummariesRepository: ReferralSummariesRepository,
   val authUserRepository: AuthUserRepository,
   val interventionRepository: InterventionRepository,
   val endOfServiceReportRepository: EndOfServiceReportRepository,
@@ -46,7 +46,7 @@ class ReferralSpecificationsTest @Autowired constructor(
 ) {
 
   private val referralFactory = ReferralFactory(entityManager)
-  private val referralSumariesFactory = SentReferralSummariesFactory(entityManager)
+  private val referralSumariesFactory = ReferralSummaryFactory(entityManager)
   private val authUserFactory = AuthUserFactory(entityManager)
   private val endOfServiceReportFactory = EndOfServiceReportFactory(entityManager)
   private val interventionFactory = InterventionFactory(entityManager)
@@ -89,19 +89,6 @@ class ReferralSpecificationsTest @Autowired constructor(
   }
 
   @Nested
-  inner class sent {
-    @Test
-    fun `only sent referrals are returned`() {
-      val sent = referralFactory.createSent()
-      val sentReferralSummary = referralSumariesFactory.getReferralSummary(sent)
-      val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.sent())
-      assertThat(result)
-        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
-        .containsExactly(sentReferralSummary)
-    }
-  }
-
-  @Nested
   inner class concluded {
     @Test
     fun `only concluded referrals are returned`() {
@@ -116,11 +103,10 @@ class ReferralSpecificationsTest @Autowired constructor(
         supplierAssessmentFactory.createWithMultipleAppointments(appointments = mutableSetOf(appointment, superSededAppointment), referral = completed)
       completed.supplierAssessment = supplierAssessmentAppointment
       entityManager.refresh(completed)
-      val endOfServiceReport = endOfServiceReportFactory.create(referral = completed)
       val sentReferralSummary = referralSumariesFactory.getReferralSummary(sent)
       val cancelledReferralSummary = referralSumariesFactory.getReferralSummary(cancelled)
-      val completedReferralSummary = referralSumariesFactory.getReferralSummary(completed, endOfServiceReport)
-      val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.concluded(true))
+      val completedReferralSummary = referralSumariesFactory.getReferralSummary(completed)
+      val result = referralSummariesRepository.findAll(ReferralSummarySpecifications.concluded(true))
       assertThat(result)
         .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
         .contains(completedReferralSummary)
@@ -138,8 +124,8 @@ class ReferralSpecificationsTest @Autowired constructor(
       val completed = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now(), concludedAt = OffsetDateTime.now())
       val endOfServiceReport = endOfServiceReportFactory.create(referral = completed)
       val cancelledReferralSummary = referralSumariesFactory.getReferralSummary(cancelled)
-      val completedReferralSummary = referralSumariesFactory.getReferralSummary(completed, endOfServiceReport)
-      val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.cancelled())
+      val completedReferralSummary = referralSumariesFactory.getReferralSummary(completed)
+      val result = referralSummariesRepository.findAll(ReferralSummarySpecifications.cancelled())
       assertThat(result)
         .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
         .containsExactly(cancelledReferralSummary)
@@ -154,7 +140,7 @@ class ReferralSpecificationsTest @Autowired constructor(
       referralFactory.createSent()
       referralFactory.createAssigned()
 
-      val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.withSPAccess(setOf()))
+      val result = referralSummariesRepository.findAll(ReferralSummarySpecifications.withSPAccess(setOf()))
       assertThat(result).isEmpty()
     }
 
@@ -169,10 +155,10 @@ class ReferralSpecificationsTest @Autowired constructor(
 
       val someOtherContract = dynamicFrameworkContractFactory.create(contractReference = "someOtherContractRef")
       val someOtherIntervention = interventionFactory.create(contract = someOtherContract)
-      referralFactory.createSent(intervention = someOtherIntervention)
-      val someOtherReferralSummaryWithSpContract = referralSumariesFactory.getReferralSummary(referralWithSpContract)
+      val someOtherReferral = referralFactory.createSent(intervention = someOtherIntervention)
+      val someOtherReferralSummaryWithSpContract = referralSumariesFactory.getReferralSummary(someOtherReferral)
 
-      val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.withSPAccess(setOf(spContract, unrelatedSpContract)))
+      val result = referralSummariesRepository.findAll(ReferralSummarySpecifications.withSPAccess(setOf(spContract.id, unrelatedSpContract.id)))
       assertThat(result)
         .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
         .containsExactly(referralSummaryWithSpContract)
@@ -189,7 +175,7 @@ class ReferralSpecificationsTest @Autowired constructor(
       val assignments = assignmentsFactory.createInOrder(someOtherUser, user)
 
       val assignedReferral = referralFactory.createAssigned(assignments = assignments)
-      val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.currentlyAssignedTo(user.id))
+      val result = referralSummariesRepository.findAll(ReferralSummarySpecifications.currentlyAssignedTo(user.id))
 
       assertThat(result.map { it.id }).containsExactly(assignedReferral.id)
     }
@@ -201,7 +187,7 @@ class ReferralSpecificationsTest @Autowired constructor(
       val assignments = assignmentsFactory.createInOrder(user, someOtherUser)
 
       referralFactory.createAssigned(assignments = assignments)
-      val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.currentlyAssignedTo(user.id))
+      val result = referralSummariesRepository.findAll(ReferralSummarySpecifications.currentlyAssignedTo(user.id))
       assertThat(result).isEmpty()
     }
 
@@ -214,7 +200,7 @@ class ReferralSpecificationsTest @Autowired constructor(
       referralFactory.createAssigned(assignments = assignments)
       referralFactory.createAssigned(assignments = emptyList())
 
-      val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.currentlyAssignedTo(user.id))
+      val result = referralSummariesRepository.findAll(ReferralSummarySpecifications.currentlyAssignedTo(user.id))
       assertThat(result).isEmpty()
     }
   }

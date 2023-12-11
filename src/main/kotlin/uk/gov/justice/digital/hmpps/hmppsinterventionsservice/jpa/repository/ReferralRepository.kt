@@ -12,7 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.servicep
 import java.time.OffsetDateTime
 import java.util.UUID
 
-interface ReferralRepository : JpaRepository<Referral, UUID>, JpaSpecificationExecutor<Referral>, ReferralSummaryRepository {
+interface ReferralRepository : JpaRepository<Referral, UUID>, JpaSpecificationExecutor<Referral> {
   // queries for sent referrals
   fun findByIdAndSentAtIsNotNull(id: UUID): Referral?
   fun existsByReferenceNumber(reference: String): Boolean

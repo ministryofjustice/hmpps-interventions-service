@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller
 
-import ServiceProviderSentReferralSummaryDTO
 import com.fasterxml.jackson.annotation.JsonView
 import com.microsoft.applicationinsights.TelemetryClient
 import mu.KLogging
@@ -21,7 +20,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.Clie
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller.mappers.CancellationReasonMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ActionPlanSummaryDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DashboardType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EndReferralRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAssignmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralDetailsDTO
@@ -34,8 +32,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.Views
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SentReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.model.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcluder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
@@ -106,34 +104,13 @@ class ReferralController(
     @PageableDefault(page = 0, size = 50, sort = ["sentAt"]) page: Pageable,
   ): Page<SentReferralSummariesDTO> {
     val user = userMapper.fromToken(authentication)
-    return (referralService.getSentReferralSummaryForUser(user, concluded, cancelled, unassigned, assignedToUserId, page, searchText) as Page<SentReferralSummary>).map { SentReferralSummariesDTO.from(it) }.also {
+    return (referralService.getSentReferralSummaryForUser(user, concluded, cancelled, unassigned, assignedToUserId, page, searchText) as Page<ReferralSummary>).map { SentReferralSummariesDTO.from(it) }.also {
       telemetryClient.trackEvent(
         "PagedDashboardRequest",
         null,
         mutableMapOf("totalNumberOfReferrals" to it.totalElements.toDouble(), "pageSize" to page.pageSize.toDouble()),
       )
     }
-  }
-
-  @Deprecated(message = "This is a temporary solution to by-pass the extremely long wait times in production that occurs with /sent-referrals")
-  @JsonView(Views.SentReferral::class)
-  @GetMapping("/sent-referrals/summary/service-provider")
-  fun getServiceProviderSentReferralsSummary(
-    authentication: JwtAuthenticationToken,
-    @Nullable
-    @RequestParam(name = "dashboardType", required = false)
-    dashboardTypeSelection: String?,
-  ): List<ServiceProviderSentReferralSummaryDTO> {
-    val user = userMapper.fromToken(authentication)
-    val dashboardType = dashboardTypeSelection?.let { DashboardType.valueOf(it) }
-    return referralService.getServiceProviderSummaries(user, dashboardType)
-      .map { ServiceProviderSentReferralSummaryDTO.from(it) }.also {
-        telemetryClient.trackEvent(
-          "ServiceProviderReferralSummaryRequest",
-          null,
-          mutableMapOf("totalNumberOfReferrals" to it.size.toDouble()),
-        )
-      }
   }
 
   @JsonView(Views.SentReferral::class)

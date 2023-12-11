@@ -149,7 +149,7 @@ class ServiceProviderAccessScopeMapper(
 
   private fun getContracts(contractGroups: List<String>, warnings: MutableList<String>): List<DynamicFrameworkContract> {
     val contracts = dynamicFrameworkContractRepository.findAllByContractReferenceIn(contractGroups)
-    val unidentifiedContracts = contractGroups.subtract(contracts.map { it.contractReference })
+    val unidentifiedContracts = contractGroups.subtract(contracts.map { it.contractReference }.toSet())
     unidentifiedContracts.forEach { undefinedContract ->
       warnings.add("unidentified contract '$undefinedContract': group does not exist in the reference data")
     }
