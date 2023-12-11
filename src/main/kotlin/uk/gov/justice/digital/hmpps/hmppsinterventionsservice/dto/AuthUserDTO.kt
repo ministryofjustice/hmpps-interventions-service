@@ -15,5 +15,13 @@ data class AuthUserDTO(
         userId = user.id,
       )
     }
+
+    fun from(userName: String, userAuthSource: String, userId: String): AuthUserDTO {
+      return AuthUserDTO(
+        username = userName,
+        authSource = userAuthSource,
+        userId = userId,
+      )
+    }
   }
 }

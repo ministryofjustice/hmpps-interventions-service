@@ -177,4 +177,34 @@ COMMENT ON TABLE draft_referral IS 'adding unallocated com related details';
 
 COMMENT ON TABLE referral_location IS 'adding unallocated com related details';
 
+COMMENT ON VIEW referral_summary IS 'referral summary';
+COMMENT ON COLUMN referral_summary.id IS 'referral unique identifier';
+COMMENT ON COLUMN referral_summary.sent_at IS 'when the referral was sent';
+COMMENT ON COLUMN referral_summary.sent_by IS 'referral sent by';
+COMMENT ON COLUMN referral_summary.reference_number IS 'referral number';
+COMMENT ON COLUMN referral_summary.crn IS 'service user crn';
+COMMENT ON COLUMN referral_summary.created_by IS 'id of the person creating the referral';
+COMMENT ON COLUMN referral_summary.assigned_to_id IS 'referral assigend to id';
+COMMENT ON COLUMN referral_summary.assigned_auth_source IS 'auth source of the assigned person';
+COMMENT ON COLUMN referral_summary.assigned_user_name IS 'name of the assigned person';
+COMMENT ON COLUMN referral_summary.sent_auth_source IS 'source of the sent person';
+COMMENT ON COLUMN referral_summary.sent_user_name IS 'name of the sent person';
+COMMENT ON COLUMN referral_summary.service_user_first_name IS 'first name of the service user';
+COMMENT ON COLUMN referral_summary.service_user_last_name IS 'last name of the service user';
+COMMENT ON COLUMN referral_summary.service_provider_id IS 'service provider id';
+COMMENT ON COLUMN referral_summary.service_provider_name IS 'service provider name';
+COMMENT ON COLUMN referral_summary.intervention_title IS 'intervention title';
+COMMENT ON COLUMN referral_summary.concluded_at IS 'referral concluded at';
+COMMENT ON COLUMN referral_summary.expected_release_date IS 'referral expected release date';
+COMMENT ON COLUMN referral_summary.is_referral_releasing_in12weeks IS 'is referral releasing in 12 weeks';
+COMMENT ON COLUMN referral_summary.referral_type IS 'referral type';
+COMMENT ON COLUMN referral_summary.prison_id IS 'prison id where referral is in';
+COMMENT ON COLUMN referral_summary.probation_office IS 'probation office where referral is in';
+COMMENT ON COLUMN referral_summary.pdu IS 'pdu where referral is in';
+COMMENT ON COLUMN referral_summary.ndelius_pdu IS 'pdu stored in delius';
+COMMENT ON COLUMN referral_summary.contract_id IS 'dynamic framework contract id';
+COMMENT ON COLUMN referral_summary.end_requested_at IS 'referral end requested at';
+COMMENT ON COLUMN referral_summary.eosr_id IS 'referral end of service id';
+COMMENT ON COLUMN referral_summary.appointment_id IS 'supplier assessment appointment id';
+
 -- some definitions are in V1_34__document_contract_table.sql; needs lifting
