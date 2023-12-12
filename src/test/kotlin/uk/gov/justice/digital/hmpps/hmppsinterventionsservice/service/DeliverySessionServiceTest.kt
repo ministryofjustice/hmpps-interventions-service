@@ -952,7 +952,7 @@ class DeliverySessionServiceTest @Autowired constructor(
           anyOrNull(),
           anyOrNull(),
           anyOrNull(),
-          anyOrNull()
+          anyOrNull(),
         ),
       ).thenReturn(Pair(56381916L, UUID.randomUUID()))
 

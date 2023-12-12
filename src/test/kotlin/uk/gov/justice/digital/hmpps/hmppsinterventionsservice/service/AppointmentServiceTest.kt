@@ -159,7 +159,7 @@ class AppointmentServiceTest {
       late = false,
       sessionSummary = "session summary",
       sessionResponse = "session response",
-      noSessionReasonType = NoSessionReasonType.LOGISTICS
+      noSessionReasonType = NoSessionReasonType.LOGISTICS,
     )
 
     // Then
@@ -299,7 +299,7 @@ class AppointmentServiceTest {
       notifyProbationPractitioner = false,
       didSessionHappen = false,
       noSessionReasonType = NoSessionReasonType.POP_ACCEPTABLE,
-      late = false
+      late = false,
     )
 
     // Then
