@@ -25,7 +25,7 @@ internal class CaseNoteEventPublisherTest {
     whenever(locationMapper.getPathFromControllerMethod(CaseNoteController::getCaseNote)).thenReturn("/case-note/{id}")
     val publisher = CaseNoteEventPublisher(eventPublisher, locationMapper)
 
-    publisher.caseNoteSentEvent(caseNote, true)
+    publisher.caseNoteSentEvent(caseNote)
 
     val eventCaptor = argumentCaptor<CreateCaseNoteEvent>()
     verify(eventPublisher).publishEvent(eventCaptor.capture())
@@ -36,6 +36,5 @@ internal class CaseNoteEventPublisherTest {
     assertThat(event.sentBy).isSameAs(caseNote.sentBy)
     assertThat(event.detailUrl).isEqualTo(uri.toString())
     assertThat(event.referralId).isSameAs(caseNote.referral.id)
-    assertThat(event.sendEmail).isEqualTo(true)
   }
 }

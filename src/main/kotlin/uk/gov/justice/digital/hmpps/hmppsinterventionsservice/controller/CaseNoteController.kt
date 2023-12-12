@@ -41,7 +41,6 @@ class CaseNoteController(
       referralId = sentReferral.id,
       subject = createCaseNote.subject,
       body = createCaseNote.body,
-      sendEmail = createCaseNote.sendEmail,
       sentByUser = user,
     )
     return CaseNoteDTO.from(caseNote)

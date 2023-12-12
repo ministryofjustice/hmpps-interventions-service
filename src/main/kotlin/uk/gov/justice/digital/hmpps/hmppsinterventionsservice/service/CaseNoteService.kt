@@ -24,7 +24,7 @@ class CaseNoteService(
   val caseNoteEventPublisher: CaseNoteEventPublisher,
 ) {
 
-  fun createCaseNote(referralId: UUID, subject: String, body: String, sendEmail: Boolean?, sentByUser: AuthUser): CaseNote {
+  fun createCaseNote(referralId: UUID, subject: String, body: String, sentByUser: AuthUser): CaseNote {
     val caseNote = CaseNote(
       id = UUID.randomUUID(),
       referral = referralRepository.getById(referralId),
@@ -34,7 +34,7 @@ class CaseNoteService(
       sentAt = OffsetDateTime.now(),
     )
     return caseNoteRepository.save(caseNote).also {
-      caseNoteEventPublisher.caseNoteSentEvent(it, sendEmail)
+      caseNoteEventPublisher.caseNoteSentEvent(it)
     }
   }
 
