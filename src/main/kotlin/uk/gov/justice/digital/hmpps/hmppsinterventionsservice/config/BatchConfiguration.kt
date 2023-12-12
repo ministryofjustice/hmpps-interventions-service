@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config
 
 import com.github.marschall.spring.batch.inmemory.NullJobRepository
+import org.springframework.batch.core.launch.JobLauncher
 import org.springframework.batch.core.launch.support.SimpleJobLauncher
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.beans.factory.annotation.Value
@@ -14,7 +15,7 @@ class BatchConfiguration(
   @Value("\${spring.batch.concurrency.queue-size}") private val queueSize: Int,
 ) {
   @Bean
-  fun asyncJobLauncher(jobRepository: JobRepository): SimpleJobLauncher {
+  fun asyncJobLauncher(jobRepository: JobRepository): JobLauncher {
     val taskExecutor = ThreadPoolTaskExecutor()
     taskExecutor.corePoolSize = poolSize
     taskExecutor.queueCapacity = queueSize
