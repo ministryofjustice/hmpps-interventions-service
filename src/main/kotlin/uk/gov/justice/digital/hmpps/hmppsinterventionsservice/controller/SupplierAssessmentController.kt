@@ -53,8 +53,16 @@ class SupplierAssessmentController(
         updateAppointmentDTO.appointmentDeliveryAddress,
         updateAppointmentDTO.npsOfficeCode,
         updateAppointmentDTO.attendanceFeedback?.attended,
-        updateAppointmentDTO.attendanceFeedback?.attendanceFailureInformation,
+        updateAppointmentDTO.attendanceFeedback?.didSessionHappen,
         updateAppointmentDTO.sessionFeedback?.notifyProbationPractitioner,
+        updateAppointmentDTO.sessionFeedback?.late,
+        updateAppointmentDTO.sessionFeedback?.lateReason,
+        updateAppointmentDTO.sessionFeedback?.futureSessionPlans,
+        updateAppointmentDTO.sessionFeedback?.noAttendanceInformation,
+        updateAppointmentDTO.sessionFeedback?.noSessionReasonType,
+        updateAppointmentDTO.sessionFeedback?.noSessionReasonPopAcceptable,
+        updateAppointmentDTO.sessionFeedback?.noSessionReasonPopUnacceptable,
+        updateAppointmentDTO.sessionFeedback?.noSessionReasonLogistics,
         updateAppointmentDTO.sessionFeedback?.sessionSummary,
         updateAppointmentDTO.sessionFeedback?.sessionResponse,
         updateAppointmentDTO.sessionFeedback?.sessionConcerns,
@@ -117,6 +125,14 @@ class SupplierAssessmentController(
     return AppointmentDTO.from(
       appointmentService.recordSessionFeedback(
         supplierAssessmentAppointment,
+        request.late,
+        request.lateReason,
+        request.futureSessionPlans,
+        request.noAttendanceInformation,
+        request.noSessionReasonType,
+        request.noSessionReasonPopAcceptable,
+        request.noSessionReasonPopUnacceptable,
+        request.noSessionReasonLogistics,
         request.sessionSummary,
         request.sessionResponse,
         request.sessionConcerns,
@@ -137,7 +153,7 @@ class SupplierAssessmentController(
     val updatedAppointment = appointmentService.recordAppointmentAttendance(
       supplierAssessmentAppointment,
       request.attended,
-      request.attendanceFailureInformation,
+      request.didSessionHappen,
       submittedBy,
     )
     return AppointmentDTO.from(updatedAppointment)

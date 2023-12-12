@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appoint
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentType.SUPPLIER_ASSESSMENT
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NoSessionReasonType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
@@ -49,8 +50,16 @@ class SupplierAssessmentService(
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
     attended: Attended? = null,
-    additionalAttendanceInformation: String? = null,
+    didSessionHappen: Boolean? = null,
     notifyProbationPractitioner: Boolean? = null,
+    late: Boolean? = null,
+    lateReason: String? = null,
+    futureSessionPlans: String? = null,
+    noAttendanceInformation: String? = null,
+    noSessionReasonType: NoSessionReasonType? = null,
+    noSessionReasonPopAcceptable: String? = null,
+    noSessionReasonPopUnacceptable: String? = null,
+    noSessionReasonLogistics: String? = null,
     sessionSummary: String? = null,
     sessionResponse: String? = null,
     sessionConcerns: String? = null,
@@ -68,8 +77,16 @@ class SupplierAssessmentService(
       appointmentDeliveryAddress,
       npsOfficeCode,
       attended,
-      additionalAttendanceInformation,
       notifyProbationPractitioner,
+      didSessionHappen,
+      late,
+      lateReason,
+      futureSessionPlans,
+      noAttendanceInformation,
+      noSessionReasonType,
+      noSessionReasonPopAcceptable,
+      noSessionReasonPopUnacceptable,
+      noSessionReasonLogistics,
       sessionSummary,
       sessionResponse,
       sessionConcerns,

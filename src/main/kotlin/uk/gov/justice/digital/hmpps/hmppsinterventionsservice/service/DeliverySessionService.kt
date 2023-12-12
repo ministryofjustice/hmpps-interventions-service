@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.ValidationError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AddressDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanAppointmentEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentDeliveryType
@@ -15,6 +14,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appoint
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DeliverySession
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NoSessionReasonType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
@@ -33,7 +33,6 @@ class DeliverySessionService(
   val deliverySessionRepository: DeliverySessionRepository,
   val actionPlanRepository: ActionPlanRepository,
   val authUserRepository: AuthUserRepository,
-  val actionPlanAppointmentEventPublisher: ActionPlanAppointmentEventPublisher,
   val communityAPIBookingService: CommunityAPIBookingService,
   val appointmentService: AppointmentService,
   val appointmentRepository: AppointmentRepository,
@@ -77,8 +76,16 @@ class DeliverySessionService(
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
     attended: Attended? = null,
-    attendanceFailureInformation: String? = null,
+    didSessionHappen: Boolean? = null,
     notifyProbationPractitioner: Boolean? = null,
+    late: Boolean? = null,
+    lateReason: String? = null,
+    futureSessionPlans: String? = null,
+    noAttendanceInformation: String? = null,
+    noSessionReasonType: NoSessionReasonType? = null,
+    noSessionReasonPopAcceptable: String? = null,
+    noSessionReasonPopUnacceptable: String? = null,
+    noSessionReasonLogistics: String? = null,
     sessionSummary: String? = null,
     sessionResponse: String? = null,
     sessionConcerns: String? = null,
@@ -117,7 +124,30 @@ class DeliverySessionService(
       appointmentRepository.save(existingAppointment)
     }
     return scheduleDeliverySessionAppointment(
-      session, appointment, existingAppointment, appointmentTime, durationInMinutes, appointmentDeliveryType, createdBy, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode, attended, attendanceFailureInformation, notifyProbationPractitioner, sessionSummary, sessionResponse, sessionConcerns,
+      session,
+      appointment,
+      existingAppointment,
+      appointmentTime,
+      durationInMinutes,
+      appointmentDeliveryType,
+      createdBy,
+      appointmentSessionType,
+      appointmentDeliveryAddress,
+      npsOfficeCode,
+      attended,
+      didSessionHappen,
+      notifyProbationPractitioner,
+      late,
+      lateReason,
+      futureSessionPlans,
+      noAttendanceInformation,
+      noSessionReasonType,
+      noSessionReasonPopAcceptable,
+      noSessionReasonPopUnacceptable,
+      noSessionReasonLogistics,
+      sessionSummary,
+      sessionResponse,
+      sessionConcerns,
     )
   }
 
@@ -133,8 +163,16 @@ class DeliverySessionService(
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
     attended: Attended? = null,
-    attendanceFailureInformation: String? = null,
+    didSessionHappen: Boolean? = null,
     notifyProbationPractitioner: Boolean? = null,
+    late: Boolean? = null,
+    lateReason: String? = null,
+    futureSessionPlans: String? = null,
+    noAttendanceInformation: String? = null,
+    noSessionReasonType: NoSessionReasonType? = null,
+    noSessionReasonPopAcceptable: String? = null,
+    noSessionReasonPopUnacceptable: String? = null,
+    noSessionReasonLogistics: String? = null,
     sessionSummary: String? = null,
     sessionResponse: String? = null,
     sessionConcerns: String? = null,
@@ -154,7 +192,30 @@ class DeliverySessionService(
       referral = session.referral,
     )
     return scheduleDeliverySessionAppointment(
-      session, appointment, existingAppointment, appointmentTime, durationInMinutes, appointmentDeliveryType, updatedBy, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode, attended, attendanceFailureInformation, notifyProbationPractitioner, sessionSummary, sessionResponse, sessionConcerns,
+      session,
+      appointment,
+      existingAppointment,
+      appointmentTime,
+      durationInMinutes,
+      appointmentDeliveryType,
+      updatedBy,
+      appointmentSessionType,
+      appointmentDeliveryAddress,
+      npsOfficeCode,
+      attended,
+      didSessionHappen,
+      notifyProbationPractitioner,
+      late,
+      lateReason,
+      futureSessionPlans,
+      noAttendanceInformation,
+      noSessionReasonType,
+      noSessionReasonPopAcceptable,
+      noSessionReasonPopUnacceptable,
+      noSessionReasonLogistics,
+      sessionSummary,
+      sessionResponse,
+      sessionConcerns,
     )
   }
 
@@ -170,8 +231,16 @@ class DeliverySessionService(
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
     attended: Attended? = null,
-    attendanceFailureInformation: String? = null,
+    didSessionHappen: Boolean ? = null,
     notifyProbationPractitioner: Boolean? = null,
+    late: Boolean?,
+    lateReason: String?,
+    futureSessionPlans: String?,
+    noAttendanceInformation: String?,
+    noSessionReasonType: NoSessionReasonType?,
+    noSessionReasonPopAcceptable: String?,
+    noSessionReasonPopUnacceptable: String?,
+    noSessionReasonLogistics: String?,
     sessionSummary: String? = null,
     sessionResponse: String? = null,
     sessionConcerns: String? = null,
@@ -203,7 +272,25 @@ class DeliverySessionService(
     deliverySession.appointments.add(toSchedule)
     return deliverySessionRepository.saveAndFlush(deliverySession).also {
       // Occurring after saving the session to ensure that session has the latest appointment attached when publishing the session feedback event.
-      setAttendanceAndFeedbackIfHistoricAppointment(deliverySession, toSchedule, attended, attendanceFailureInformation, sessionSummary, sessionResponse, sessionConcerns, notifyProbationPractitioner, scheduledBy)
+      setAttendanceAndFeedbackIfHistoricAppointment(
+        deliverySession,
+        toSchedule,
+        attended,
+        didSessionHappen,
+        late,
+        lateReason,
+        futureSessionPlans,
+        noAttendanceInformation,
+        noSessionReasonType,
+        noSessionReasonPopAcceptable,
+        noSessionReasonPopUnacceptable,
+        noSessionReasonLogistics,
+        sessionSummary,
+        sessionResponse,
+        sessionConcerns,
+        notifyProbationPractitioner,
+        scheduledBy,
+      )
     }
   }
 
@@ -219,8 +306,16 @@ class DeliverySessionService(
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
     attended: Attended? = null,
-    attendanceFailureInformation: String? = null,
+    didSessionHappen: Boolean? = null,
     notifyProbationPractitioner: Boolean? = null,
+    late: Boolean? = null,
+    lateReason: String? = null,
+    futureSessionPlans: String? = null,
+    noAttendanceInformation: String? = null,
+    noSessionReasonType: NoSessionReasonType? = null,
+    noSessionReasonPopAcceptable: String? = null,
+    noSessionReasonPopUnacceptable: String? = null,
+    noSessionReasonLogistics: String? = null,
     sessionSummary: String? = null,
     sessionResponse: String? = null,
     sessionConcerns: String? = null,
@@ -238,6 +333,8 @@ class DeliverySessionService(
       npsOfficeCode,
       attended,
       notifyProbationPractitioner,
+      didSessionHappen,
+      noSessionReasonType,
     )
 
     // creating a new appointment from the existing appointment or else create a new appointment
@@ -268,33 +365,26 @@ class DeliverySessionService(
     session.appointments.add(appointment)
     return deliverySessionRepository.saveAndFlush(session).also {
       // Occurring after saving the session to ensure that session has the latest appointment attached when publishing the session feedback event.
-      setAttendanceAndFeedbackIfHistoricAppointment(session, appointment, attended, attendanceFailureInformation, sessionSummary, sessionResponse, sessionConcerns, notifyProbationPractitioner, updatedBy)
+      setAttendanceAndFeedbackIfHistoricAppointment(
+        session,
+        appointment,
+        attended,
+        didSessionHappen,
+        late,
+        lateReason,
+        futureSessionPlans,
+        noAttendanceInformation,
+        noSessionReasonType,
+        noSessionReasonPopAcceptable,
+        noSessionReasonPopUnacceptable,
+        noSessionReasonLogistics,
+        sessionSummary,
+        sessionResponse,
+        sessionConcerns,
+        notifyProbationPractitioner,
+        updatedBy,
+      )
     }
-  }
-
-  @Deprecated("Deprecated in favour of method that uses common AppointmentService")
-  fun recordAttendanceFeedback(
-    actor: AuthUser,
-    actionPlanId: UUID,
-    sessionNumber: Int,
-    attended: Attended,
-    attendanceFailureInformation: String?,
-  ): DeliverySession {
-    val session = getDeliverySessionByActionPlanIdOrThrowException(actionPlanId, sessionNumber)
-    val appointment = session.currentAppointment
-      ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "can't record appointment attendance; no appointments have been booked for this session")
-
-    if (appointment.appointmentFeedbackSubmittedAt != null) {
-      throw ResponseStatusException(HttpStatus.CONFLICT, "session feedback has already been submitted for this session")
-    }
-    if (attended == Attended.NO) {
-      appointmentService.clearSessionFeedback(appointment)
-    }
-    if (attended != Attended.NO) {
-      appointmentService.clearAttendanceFeedback(appointment)
-    }
-    setAttendanceFields(appointment, attended, attendanceFailureInformation, actor)
-    return deliverySessionRepository.save(session)
   }
 
   // TODO: Returning Pair because Appointment does not link to DeliverySession. Suggestion to create a new DeliverySessionAppointment entity (it is currently embedded in DeliverySession)
@@ -303,86 +393,51 @@ class DeliverySessionService(
     appointmentId: UUID,
     actor: AuthUser,
     attended: Attended,
-    attendanceFailureInformation: String?,
+    didSessionHappen: Boolean,
   ): Pair<DeliverySession, Appointment> {
     val sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
     if (sessionAndAppointment.second.appointmentTime.isAfter(OffsetDateTime.now())) {
       throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot submit feedback for a future appointment [id=${sessionAndAppointment.second.id}]")
     }
-    val updatedAppointment = appointmentService.recordAppointmentAttendance(sessionAndAppointment.second, attended, attendanceFailureInformation, actor)
+    val updatedAppointment = appointmentService.recordAppointmentAttendance(sessionAndAppointment.second, attended, didSessionHappen, actor)
     return Pair(sessionAndAppointment.first, updatedAppointment)
-  }
-
-  @Deprecated("Deprecated in favour of method that uses common AppointmentService")
-  fun recordSessionFeedback(
-    actor: AuthUser,
-    actionPlanId: UUID,
-    sessionNumber: Int,
-    sessionSummary: String,
-    sessionResponse: String,
-    sessionConcerns: String?,
-    notifyProbationPractitioner: Boolean,
-  ): DeliverySession {
-    val session = getDeliverySessionByActionPlanIdOrThrowException(actionPlanId, sessionNumber)
-    val appointment = session.currentAppointment
-      ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "can't record appointment behaviour; no appointments have been booked for this session")
-
-    if (appointment.appointmentFeedbackSubmittedAt != null) {
-      throw ResponseStatusException(HttpStatus.CONFLICT, "session feedback has already been submitted for this session")
-    }
-
-    setFeedbackFields(appointment, sessionSummary, sessionResponse, sessionConcerns, notifyProbationPractitioner, actor)
-    appointmentRepository.save(appointment)
-    return deliverySessionRepository.save(session)
   }
 
   fun recordSessionFeedback(
     referralId: UUID,
     appointmentId: UUID,
     actor: AuthUser,
-    sessionSummary: String,
-    sessionResponse: String,
+    late: Boolean?,
+    lateReason: String?,
+    futureSessionPlans: String?,
+    noAttendanceInformation: String?,
+    noSessionReasonType: NoSessionReasonType?,
+    noSessionReasonPopAcceptable: String?,
+    noSessionReasonPopUnacceptable: String?,
+    noSessionReasonLogistics: String?,
+    sessionSummary: String?,
+    sessionResponse: String?,
     sessionConcerns: String?,
     notifyProbationPractitioner: Boolean,
   ): Pair<DeliverySession, Appointment> {
     val sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
-    val updatedAppointment = appointmentService.recordSessionFeedback(sessionAndAppointment.second, sessionSummary, sessionResponse, sessionConcerns, notifyProbationPractitioner, actor)
+    val updatedAppointment = appointmentService.recordSessionFeedback(
+      sessionAndAppointment.second,
+      late,
+      lateReason,
+      futureSessionPlans,
+      noAttendanceInformation,
+      noSessionReasonType,
+      noSessionReasonPopAcceptable,
+      noSessionReasonPopUnacceptable,
+      noSessionReasonLogistics,
+      sessionSummary,
+      sessionResponse,
+      sessionConcerns,
+      notifyProbationPractitioner,
+      actor,
+    )
     return Pair(sessionAndAppointment.first, updatedAppointment)
-  }
-
-  @Deprecated("Deprecated in favour of method that uses common AppointmentService")
-  fun submitAppointmentFeedback(actionPlanId: UUID, sessionNumber: Int, submitter: AuthUser): DeliverySession {
-    val session = getDeliverySessionByActionPlanIdOrThrowException(actionPlanId, sessionNumber)
-    val appointment = session.currentAppointment
-    this.submitAppointmentFeedback(session, appointment, submitter)
-    return session
-  }
-
-  private fun submitAppointmentFeedback(session: DeliverySession, appointment: Appointment?, submitter: AuthUser) {
-    if (appointment?.appointmentFeedbackSubmittedAt != null) {
-      throw ResponseStatusException(HttpStatus.CONFLICT, "session feedback has already been submitted for this session")
-    }
-
-    if (appointment?.attendanceSubmittedAt == null) {
-      throw ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "can't submit session feedback unless attendance has been recorded")
-    }
-
-    if (appointment.appointmentTime.isAfter(OffsetDateTime.now())) {
-      throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot submit feedback for a future appointment [id=${appointment.id}]")
-    }
-
-    appointment.appointmentFeedbackSubmittedAt = OffsetDateTime.now()
-    appointment.appointmentFeedbackSubmittedBy = authUserRepository.save(submitter)
-    appointmentRepository.saveAndFlush(appointment)
-    deliverySessionRepository.save(session)
-
-    actionPlanAppointmentEventPublisher.attendanceRecordedEvent(session)
-
-    if (appointment.sessionFeedbackSubmittedAt != null) { // excluding the case of non attendance
-      actionPlanAppointmentEventPublisher.sessionFeedbackRecordedEvent(session)
-    }
-
-    actionPlanAppointmentEventPublisher.appointmentFeedbackRecordedEvent(session)
   }
 
   fun submitAppointmentFeedback(referralId: UUID, appointmentId: UUID, submitter: AuthUser): Pair<DeliverySession, Appointment> {
@@ -407,7 +462,15 @@ class DeliverySessionService(
     session: DeliverySession,
     appointment: Appointment,
     attended: Attended?,
-    attendanceFailureInformation: String?,
+    didSessionHappen: Boolean?,
+    late: Boolean?,
+    lateReason: String?,
+    futureSessionPlans: String?,
+    noAttendanceInformation: String?,
+    noSessionReasonType: NoSessionReasonType?,
+    noSessionReasonPopAcceptable: String?,
+    noSessionReasonPopUnacceptable: String?,
+    noSessionReasonLogistics: String?,
     sessionSummary: String?,
     sessionResponse: String?,
     sessionConcerns: String?,
@@ -415,11 +478,24 @@ class DeliverySessionService(
     updatedBy: AuthUser,
   ) {
     attended?.let {
-      setAttendanceFields(appointment, attended, attendanceFailureInformation, updatedBy)
-      if (attended != Attended.NO) {
-        setFeedbackFields(appointment, sessionSummary!!, sessionResponse!!, sessionConcerns, notifyProbationPractitioner!!, updatedBy)
-      }
-      this.submitAppointmentFeedback(session, appointment, updatedBy)
+      setAttendanceFields(appointment, attended, didSessionHappen, updatedBy)
+      setFeedbackFields(
+        appointment,
+        late,
+        lateReason,
+        futureSessionPlans,
+        noAttendanceInformation,
+        noSessionReasonType,
+        noSessionReasonPopAcceptable,
+        noSessionReasonPopUnacceptable,
+        noSessionReasonLogistics,
+        sessionSummary,
+        sessionResponse,
+        sessionConcerns,
+        notifyProbationPractitioner!!,
+        updatedBy,
+      )
+      appointmentService.submitAppointmentFeedback(appointment, updatedBy, SERVICE_DELIVERY)
     }
   }
   private fun setSuperseded(attended: Attended, appointment: Appointment) {
@@ -431,24 +507,40 @@ class DeliverySessionService(
   private fun setAttendanceFields(
     appointment: Appointment,
     attended: Attended,
-    attendanceFailureInformation: String?,
+    didSessionHappen: Boolean?,
     actor: AuthUser,
   ) {
     setSuperseded(attended, appointment)
     appointment.attended = attended
-    attendanceFailureInformation?.let { appointment.attendanceFailureInformation = attendanceFailureInformation }
+    appointment.didSessionHappen = didSessionHappen
     appointment.attendanceSubmittedAt = OffsetDateTime.now()
     appointment.attendanceSubmittedBy = authUserRepository.save(actor)
   }
 
   private fun setFeedbackFields(
     appointment: Appointment,
-    sessionSummary: String,
-    sessionResponse: String,
+    late: Boolean?,
+    lateReason: String?,
+    futureSessionPlans: String?,
+    noAttendanceInformation: String?,
+    noSessionReasonType: NoSessionReasonType?,
+    noSessionReasonPopAcceptable: String?,
+    noSessionReasonPopUnacceptable: String?,
+    noSessionReasonLogistics: String?,
+    sessionSummary: String?,
+    sessionResponse: String?,
     sessionConcerns: String?,
     notifyProbationPractitioner: Boolean,
     actor: AuthUser,
   ) {
+    appointment.late = late
+    appointment.lateReason = lateReason
+    appointment.futureSessionPlans = futureSessionPlans
+    appointment.noAttendanceInformation = noAttendanceInformation
+    appointment.noSessionReasonType = noSessionReasonType
+    appointment.noSessionReasonPopAcceptable = noSessionReasonPopAcceptable
+    appointment.noSessionReasonPopUnacceptable = noSessionReasonPopUnacceptable
+    appointment.noSessionReasonLogistics = noSessionReasonLogistics
     appointment.sessionSummary = sessionSummary
     appointment.sessionResponse = sessionResponse
     appointment.sessionConcerns = sessionConcerns

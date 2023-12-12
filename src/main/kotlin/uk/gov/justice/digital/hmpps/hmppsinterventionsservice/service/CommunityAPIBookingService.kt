@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attende
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.LATE
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.NO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.YES
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NoSessionReasonType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -41,12 +42,14 @@ class CommunityAPIBookingService(
     npsOfficeCode: String?,
     attended: Attended? = null,
     notifyPPOfAttendanceBehaviour: Boolean? = null,
+    didSessionHappen: Boolean? = null,
+    noSessionReasonType: NoSessionReasonType? = null,
   ): Pair<Long?, UUID?> {
     if (!bookingsEnabled) {
       return existingAppointment?.deliusAppointmentId to null
     }
 
-    return processingBooking(referral, existingAppointment, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode, attended, notifyPPOfAttendanceBehaviour)
+    return processingBooking(referral, existingAppointment, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode, attended, notifyPPOfAttendanceBehaviour, didSessionHappen, noSessionReasonType)
   }
 
   private fun processingBooking(
@@ -58,6 +61,8 @@ class CommunityAPIBookingService(
     npsOfficeCode: String?,
     attended: Attended?,
     notifyPPOfAttendanceBehaviour: Boolean?,
+    didSessionHappen: Boolean?,
+    noSessionReasonType: NoSessionReasonType?,
   ): Pair<Long?, UUID> {
     return existingAppointment?.let {
       if (isDifferentTimings(existingAppointment, appointmentTime, durationInMinutes) ||
@@ -70,6 +75,8 @@ class CommunityAPIBookingService(
           appointmentTime,
           durationInMinutes,
           attended,
+          didSessionHappen,
+          noSessionReasonType,
         )
         mergeAppointment(appointmentMerge)
       } else {
@@ -92,7 +99,7 @@ class CommunityAPIBookingService(
         ),
         npsOfficeCode ?: defaultOfficeLocation,
         get(appointmentType, countsTowardsRarDays),
-        attended?.let { AppointmentMerge.Outcome(it.forMerge(), (attended == NO || notifyPPOfAttendanceBehaviour == true)) },
+        attended?.let { AppointmentMerge.Outcome(it.forMerge(), (attended == NO || notifyPPOfAttendanceBehaviour == true), didSessionHappen, noSessionReasonType) },
         null,
         null,
       )
@@ -107,6 +114,8 @@ class CommunityAPIBookingService(
     appointmentTime: OffsetDateTime,
     durationInMinutes: Int,
     attended: Attended?,
+    didSessionHappen: Boolean?,
+    noSessionReasonType: NoSessionReasonType?,
   ) = AppointmentMerge(
     UUID.randomUUID(),
     referral.id,
@@ -123,7 +132,7 @@ class CommunityAPIBookingService(
     npsOfficeCode,
     get(appointmentType, countsTowardsRarDays),
     attended?.let {
-      AppointmentMerge.Outcome(it.forMerge(), attended == NO || notifyOfAttendanceBehaviour)
+      AppointmentMerge.Outcome(it.forMerge(), attended == NO || notifyOfAttendanceBehaviour, didSessionHappen, noSessionReasonType)
     },
     id,
     deliusAppointmentId,
@@ -189,6 +198,8 @@ data class AppointmentMerge(
   data class Outcome(
     val attended: Attended,
     val notify: Boolean = true,
+    val didSessionHappen: Boolean?,
+    val noSessionReasonType: NoSessionReasonType?,
   ) {
     enum class Attended {
       YES,

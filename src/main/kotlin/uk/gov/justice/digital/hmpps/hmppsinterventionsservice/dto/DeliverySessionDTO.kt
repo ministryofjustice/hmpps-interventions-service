@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appoint
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentSessionType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DeliverySession
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NoSessionReasonType
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -52,13 +53,21 @@ data class DeliverySessionAppointmentScheduleDetailsRequestDTO(
 
 data class AttendanceFeedbackRequestDTO(
   val attended: Attended,
-  val attendanceFailureInformation: String?,
+  val didSessionHappen: Boolean,
 )
 
 data class SessionFeedbackRequestDTO(
-  val sessionSummary: String,
-  val sessionResponse: String,
-  val sessionConcerns: String?,
+  val late: Boolean? = null,
+  val lateReason: String? = null,
+  val futureSessionPlans: String? = null,
+  val noAttendanceInformation: String? = null,
+  val noSessionReasonType: NoSessionReasonType? = null,
+  val noSessionReasonPopAcceptable: String? = null,
+  val noSessionReasonPopUnacceptable: String? = null,
+  val noSessionReasonLogistics: String? = null,
+  val sessionSummary: String? = null,
+  val sessionResponse: String? = null,
+  val sessionConcerns: String? = null,
   val notifyProbationPractitioner: Boolean,
 )
 
@@ -135,35 +144,71 @@ data class AppointmentFeedbackDTO(
           appointment.appointmentFeedbackSubmittedAt !== null,
           appointment.appointmentFeedbackSubmittedBy?.let { AuthUserDTO.from(it) },
         )
-      } ?: AppointmentFeedbackDTO(AttendanceFeedbackDTO(null, null, null, null, null), SessionFeedbackDTO(null, null, null, null, null), false, null)
+      }
+        ?: AppointmentFeedbackDTO(
+          AttendanceFeedbackDTO(),
+          SessionFeedbackDTO(),
+          false,
+          null,
+        )
     }
   }
 }
 
 data class AttendanceFeedbackDTO(
-  val attended: Attended?,
-  val additionalAttendanceInformation: String?,
-  val attendanceFailureInformation: String?,
-  val submittedAt: OffsetDateTime?,
-  val submittedBy: AuthUserDTO?,
+  val didSessionHappen: Boolean? = null,
+  val attended: Attended? = null,
+  val additionalAttendanceInformation: String? = null,
+  val attendanceFailureInformation: String? = null,
+  val submittedAt: OffsetDateTime? = null,
+  val submittedBy: AuthUserDTO? = null,
 ) {
   companion object {
     fun from(appointment: Appointment): AttendanceFeedbackDTO {
-      return AttendanceFeedbackDTO(attended = appointment.attended, additionalAttendanceInformation = appointment.additionalAttendanceInformation, attendanceFailureInformation = appointment.attendanceFailureInformation, appointment.attendanceSubmittedAt, appointment.attendanceSubmittedBy?.let { AuthUserDTO.from(it) } ?: null)
+      return AttendanceFeedbackDTO(
+        didSessionHappen = appointment.didSessionHappen,
+        attended = appointment.attended,
+        additionalAttendanceInformation = appointment.additionalAttendanceInformation,
+        attendanceFailureInformation = appointment.attendanceFailureInformation,
+        appointment.attendanceSubmittedAt,
+        appointment.attendanceSubmittedBy?.let { AuthUserDTO.from(it) },
+      )
     }
   }
 }
 
 data class SessionFeedbackDTO(
-  val behaviourDescription: String?,
-  val sessionSummary: String?,
-  val sessionResponse: String?,
-  val sessionConcerns: String?,
-  val notifyProbationPractitioner: Boolean?,
+  val late: Boolean? = null,
+  val lateReason: String? = null,
+  val futureSessionPlans: String? = null,
+  val noAttendanceInformation: String? = null,
+  val noSessionReasonType: NoSessionReasonType? = null,
+  val noSessionReasonPopAcceptable: String? = null,
+  val noSessionReasonPopUnacceptable: String? = null,
+  val noSessionReasonLogistics: String? = null,
+  val behaviourDescription: String? = null,
+  val sessionSummary: String? = null,
+  val sessionResponse: String? = null,
+  val sessionConcerns: String? = null,
+  val notifyProbationPractitioner: Boolean? = null,
 ) {
   companion object {
     fun from(appointment: Appointment): SessionFeedbackDTO {
-      return SessionFeedbackDTO(appointment.attendanceBehaviour, appointment.sessionSummary, appointment.sessionResponse, appointment.sessionConcerns, appointment.notifyPPOfAttendanceBehaviour)
+      return SessionFeedbackDTO(
+        appointment.late,
+        appointment.lateReason,
+        appointment.futureSessionPlans,
+        appointment.noAttendanceInformation,
+        appointment.noSessionReasonType,
+        appointment.noSessionReasonPopAcceptable,
+        appointment.noSessionReasonPopUnacceptable,
+        appointment.noSessionReasonLogistics,
+        appointment.attendanceBehaviour,
+        appointment.sessionSummary,
+        appointment.sessionResponse,
+        appointment.sessionConcerns,
+        appointment.notifyPPOfAttendanceBehaviour,
+      )
     }
   }
 }

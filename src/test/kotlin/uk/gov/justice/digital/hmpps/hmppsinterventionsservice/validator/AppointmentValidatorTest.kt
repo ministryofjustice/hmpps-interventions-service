@@ -10,10 +10,12 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.FieldError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.ValidationError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AddressDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AttendanceFeedbackRequestDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SessionFeedbackRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentDeliveryType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentSessionType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NoSessionReasonType
 import java.time.OffsetDateTime
 
 internal class AppointmentValidatorTest {
@@ -178,7 +180,7 @@ internal class AppointmentValidatorTest {
       }
 
       @Test
-      fun `past appointment fails if no attendance reported`() {
+      fun `past appointment fails if did session happen not reported`() {
         val updateAppointmentDTO = UpdateAppointmentDTO(
           appointmentTime = OffsetDateTime.now().minusDays(1),
           durationInMinutes = 1,
@@ -192,49 +194,108 @@ internal class AppointmentValidatorTest {
           deliverySessionValidator.validateUpdateAppointment(updateAppointmentDTO, OffsetDateTime.now().minusMonths(1))
         }
         assertThat(exception.errors).containsExactly(
-          FieldError("appointmentAttendance.attended", Code.CANNOT_BE_EMPTY),
+          FieldError("attendanceFeedback.didSessionHappen", Code.CANNOT_BE_EMPTY),
         )
       }
 
       @Test
-      fun `past appointment fails if attendance reported as yes but session feedback is not`() {
+      fun `past appointment fails if the session happened but session feedback is null`() {
         val updateAppointmentDTO = UpdateAppointmentDTO(
           appointmentTime = OffsetDateTime.now().minusDays(1),
           durationInMinutes = 1,
           appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE,
           sessionType = AppointmentSessionType.ONE_TO_ONE,
           npsOfficeCode = "CRSEXT",
-          attendanceFeedback = AttendanceFeedbackRequestDTO(Attended.YES, null),
+          attendanceFeedback = AttendanceFeedbackRequestDTO(Attended.YES, true),
           sessionFeedback = null,
         )
         val exception = assertThrows<ValidationError> {
           deliverySessionValidator.validateUpdateAppointment(updateAppointmentDTO, OffsetDateTime.now().minusMonths(1))
         }
         assertThat(exception.errors).containsExactly(
-          FieldError("sessionFeedback.notifyProbationPractitioner", Code.CANNOT_BE_EMPTY),
-          FieldError("sessionFeedback.sessionSummary", Code.CANNOT_BE_EMPTY),
-          FieldError("sessionFeedback.sessionResponse", Code.CANNOT_BE_EMPTY),
+          FieldError("sessionFeedback.late", Code.CANNOT_BE_EMPTY),
         )
       }
 
       @Test
-      fun `past appointment fails if attendance reported as late but behaviour is not`() {
+      fun `past appointment fails if the session happened but attendance reported as no`() {
         val updateAppointmentDTO = UpdateAppointmentDTO(
           appointmentTime = OffsetDateTime.now().minusDays(1),
           durationInMinutes = 1,
           appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE,
           sessionType = AppointmentSessionType.ONE_TO_ONE,
           npsOfficeCode = "CRSEXT",
-          attendanceFeedback = AttendanceFeedbackRequestDTO(Attended.LATE, null),
+          attendanceFeedback = AttendanceFeedbackRequestDTO(Attended.NO, true),
           sessionFeedback = null,
         )
         val exception = assertThrows<ValidationError> {
           deliverySessionValidator.validateUpdateAppointment(updateAppointmentDTO, OffsetDateTime.now().minusMonths(1))
         }
         assertThat(exception.errors).containsExactly(
-          FieldError("sessionFeedback.notifyProbationPractitioner", Code.CANNOT_BE_EMPTY),
+          FieldError("attendanceFeedback.attended", Code.INVALID_VALUE),
+        )
+      }
+
+      @Test
+      fun `past appointment fails if the session happened but sessionResponse is null`() {
+        val updateAppointmentDTO = UpdateAppointmentDTO(
+          appointmentTime = OffsetDateTime.now().minusDays(1),
+          durationInMinutes = 1,
+          appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE,
+          sessionType = AppointmentSessionType.ONE_TO_ONE,
+          npsOfficeCode = "CRSEXT",
+          attendanceFeedback = AttendanceFeedbackRequestDTO(Attended.YES, true),
+          sessionFeedback = SessionFeedbackRequestDTO(
+            false,
+            "lateReason",
+            "futureSessionPlans",
+            "noAttendanceInformation",
+            NoSessionReasonType.POP_ACCEPTABLE, "noSessionReasonPopAcceptable",
+            null,
+            null,
+            null,
+            "sessionResponse",
+            null,
+            false,
+          ),
+        )
+        val exception = assertThrows<ValidationError> {
+          deliverySessionValidator.validateUpdateAppointment(updateAppointmentDTO, OffsetDateTime.now().minusMonths(1))
+        }
+        assertThat(exception.errors).containsExactly(
           FieldError("sessionFeedback.sessionSummary", Code.CANNOT_BE_EMPTY),
-          FieldError("sessionFeedback.sessionResponse", Code.CANNOT_BE_EMPTY),
+        )
+      }
+
+      @Test
+      fun `past appointment fails if the session did not happen and attended reported as yes but no session reason is not given`() {
+        val updateAppointmentDTO = UpdateAppointmentDTO(
+          appointmentTime = OffsetDateTime.now().minusDays(1),
+          durationInMinutes = 1,
+          appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE,
+          sessionType = AppointmentSessionType.ONE_TO_ONE,
+          npsOfficeCode = "CRSEXT",
+          attendanceFeedback = AttendanceFeedbackRequestDTO(Attended.YES, false),
+          sessionFeedback = SessionFeedbackRequestDTO(
+            false,
+            "lateReason",
+            "futureSessionPlans",
+            "noAttendanceInformation",
+            NoSessionReasonType.POP_ACCEPTABLE,
+            null,
+            null,
+            null,
+            "sessionSummary",
+            "sessionResponse",
+            null,
+            false,
+          ),
+        )
+        val exception = assertThrows<ValidationError> {
+          deliverySessionValidator.validateUpdateAppointment(updateAppointmentDTO, OffsetDateTime.now().minusMonths(1))
+        }
+        assertThat(exception.errors).containsExactly(
+          FieldError("sessionFeedback.noSessionReasonPopAcceptable", Code.CANNOT_BE_EMPTY),
         )
       }
     }

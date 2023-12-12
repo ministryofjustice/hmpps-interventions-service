@@ -3,13 +3,10 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.firstValue
 import org.mockito.kotlin.isNotNull
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
@@ -18,7 +15,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanAppointmentEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentDeliveryType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentSessionType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentType.SERVICE_DELIVERY
@@ -44,7 +40,6 @@ internal class DeliverySessionsServiceTest {
   private val actionPlanRepository: ActionPlanRepository = mock()
   private val deliverySessionRepository: DeliverySessionRepository = mock()
   private val authUserRepository: AuthUserRepository = mock()
-  private val actionPlanAppointmentEventPublisher: ActionPlanAppointmentEventPublisher = mock()
   private val communityAPIBookingService: CommunityAPIBookingService = mock()
   private val appointmentRepository: AppointmentRepository = mock()
   private val appointmentService: AppointmentService = mock()
@@ -58,7 +53,6 @@ internal class DeliverySessionsServiceTest {
     deliverySessionRepository,
     actionPlanRepository,
     authUserRepository,
-    actionPlanAppointmentEventPublisher,
     communityAPIBookingService,
     appointmentService,
     appointmentRepository,
@@ -167,7 +161,7 @@ internal class DeliverySessionsServiceTest {
     val durationInMinutes = 200
     val appointment = session.currentAppointment
 
-    whenever(communityAPIBookingService.book(session.referral, appointment, appointmentTime, durationInMinutes, SERVICE_DELIVERY, null, Attended.YES, false))
+    whenever(communityAPIBookingService.book(session.referral, appointment, appointmentTime, durationInMinutes, SERVICE_DELIVERY, null, Attended.YES, false, true, null))
       .thenReturn(Pair(929478456763L, UUID.randomUUID()))
 
     val updatedSession = deliverySessionsService.updateSessionAppointment(
@@ -178,24 +172,21 @@ internal class DeliverySessionsServiceTest {
       user,
       AppointmentDeliveryType.PHONE_CALL,
       AppointmentSessionType.ONE_TO_ONE,
-      null,
-      null,
-      Attended.YES,
-      "attendance failure information",
-      false,
-      "summary",
-      "response",
+      attended = Attended.YES,
+      didSessionHappen = true,
+      notifyProbationPractitioner = false,
+      late = false,
+      sessionSummary = "summary",
+      sessionResponse = "response",
     )
 
     verify(appointmentService, times(1)).createOrUpdateAppointmentDeliveryDetails(any(), eq(AppointmentDeliveryType.PHONE_CALL), eq(AppointmentSessionType.ONE_TO_ONE), isNull(), isNull())
-    verify(actionPlanAppointmentEventPublisher).attendanceRecordedEvent(updatedSession)
-    verify(actionPlanAppointmentEventPublisher).sessionFeedbackRecordedEvent(updatedSession)
-    verify(actionPlanAppointmentEventPublisher).appointmentFeedbackRecordedEvent(updatedSession)
+    verify(appointmentService).submitAppointmentFeedback(session.currentAppointment!!, user, SERVICE_DELIVERY)
     assertThat(updatedSession.currentAppointment?.appointmentTime).isEqualTo(appointmentTime)
     assertThat(updatedSession.currentAppointment?.durationInMinutes).isEqualTo(durationInMinutes)
     assertThat(updatedSession.currentAppointment?.createdBy?.userName).isEqualTo("scheduler")
     assertThat(updatedSession.currentAppointment?.attended).isEqualTo(Attended.YES)
-    assertThat(updatedSession.currentAppointment?.attendanceFailureInformation).isEqualTo("attendance failure information")
+    assertThat(updatedSession.currentAppointment?.didSessionHappen).isEqualTo(true)
     assertThat(updatedSession.currentAppointment?.notifyPPOfAttendanceBehaviour).isEqualTo(false)
     assertThat(updatedSession.currentAppointment?.sessionSummary).isEqualTo("summary")
     assertThat(updatedSession.currentAppointment?.sessionResponse).isEqualTo("response")
@@ -203,8 +194,6 @@ internal class DeliverySessionsServiceTest {
     assertThat(updatedSession.currentAppointment?.attendanceSubmittedBy).isNotNull
     assertThat(updatedSession.currentAppointment?.sessionFeedbackSubmittedAt).isNotNull
     assertThat(updatedSession.currentAppointment?.sessionFeedbackSubmittedBy).isNotNull
-    assertThat(updatedSession.currentAppointment?.appointmentFeedbackSubmittedAt).isNotNull
-    assertThat(updatedSession.currentAppointment?.appointmentFeedbackSubmittedBy).isNotNull
   }
 
   @Test
@@ -220,7 +209,7 @@ internal class DeliverySessionsServiceTest {
     val appointmentTime = OffsetDateTime.now()
     val durationInMinutes = 200
 
-    whenever(communityAPIBookingService.book(any(), isNull(), any(), any(), eq(SERVICE_DELIVERY), isNull(), eq(Attended.NO), isNull()))
+    whenever(communityAPIBookingService.book(any(), isNull(), any(), any(), eq(SERVICE_DELIVERY), isNull(), eq(Attended.NO), eq(false), eq(true), isNull()))
       .thenReturn(Pair(46298523523L, UUID.randomUUID()))
 
     val updatedSession = deliverySessionsService.updateSessionAppointment(
@@ -231,10 +220,9 @@ internal class DeliverySessionsServiceTest {
       user,
       AppointmentDeliveryType.PHONE_CALL,
       AppointmentSessionType.ONE_TO_ONE,
-      null,
-      null,
-      Attended.NO,
-      "attendance failure information",
+      attended = Attended.NO,
+      didSessionHappen = true,
+      notifyProbationPractitioner = false,
     )
 
     verify(appointmentService, times(1)).createOrUpdateAppointmentDeliveryDetails(any(), eq(AppointmentDeliveryType.PHONE_CALL), eq(AppointmentSessionType.ONE_TO_ONE), isNull(), isNull())
@@ -242,16 +230,12 @@ internal class DeliverySessionsServiceTest {
     assertThat(updatedSession.currentAppointment?.durationInMinutes).isEqualTo(durationInMinutes)
     assertThat(updatedSession.currentAppointment?.createdBy?.userName).isEqualTo("scheduler")
     assertThat(updatedSession.currentAppointment?.attended).isEqualTo(Attended.NO)
-    assertThat(updatedSession.currentAppointment?.attendanceFailureInformation).isEqualTo("attendance failure information")
-    assertThat(updatedSession.currentAppointment?.notifyPPOfAttendanceBehaviour).isNull()
+    assertThat(updatedSession.currentAppointment?.didSessionHappen).isEqualTo(true)
+    assertThat(updatedSession.currentAppointment?.notifyPPOfAttendanceBehaviour).isFalse()
     assertThat(updatedSession.currentAppointment?.sessionSummary).isNull()
     assertThat(updatedSession.currentAppointment?.sessionResponse).isNull()
     assertThat(updatedSession.currentAppointment?.attendanceSubmittedAt).isNotNull
     assertThat(updatedSession.currentAppointment?.attendanceSubmittedBy).isEqualTo(user)
-    assertThat(updatedSession.currentAppointment?.sessionFeedbackSubmittedAt).isNull()
-    assertThat(updatedSession.currentAppointment?.sessionFeedbackSubmittedBy).isNull()
-    assertThat(updatedSession.currentAppointment?.appointmentFeedbackSubmittedAt).isNotNull
-    assertThat(updatedSession.currentAppointment?.appointmentFeedbackSubmittedBy).isEqualTo(user)
   }
 
   @Test
@@ -266,7 +250,7 @@ internal class DeliverySessionsServiceTest {
     val newTime = OffsetDateTime.now()
     val newDuration = 200
 
-    whenever(communityAPIBookingService.book(any(), isNotNull(), eq(newTime), eq(newDuration), eq(SERVICE_DELIVERY), isNull(), isNull(), isNull()))
+    whenever(communityAPIBookingService.book(any(), isNotNull(), eq(newTime), eq(newDuration), eq(SERVICE_DELIVERY), isNull(), isNull(), isNull(), isNull(), isNull()))
       .thenReturn(Pair(23523541087L, UUID.randomUUID()))
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(session)
     whenever(deliverySessionRepository.saveAndFlush(any())).thenAnswer { it.arguments[0] }
@@ -464,63 +448,107 @@ internal class DeliverySessionsServiceTest {
   @Test
   fun `update session with attendance`() {
     val attended = Attended.YES
-    val attendanceFailureInformation = "extra info"
+    val didSessionHappen = true
 
-    val existingSession = deliverySessionFactory.createScheduled(sessionNumber = 1)
-    val actionPlanId = UUID.randomUUID()
+    val existingSession = deliverySessionFactory.createScheduled(sessionNumber = 1, appointmentTime = OffsetDateTime.now())
+    val referralId = existingSession.referral.id
+    val appointmentId = existingSession.currentAppointment!!.id
 
-    whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1))
-      .thenReturn(existingSession)
+    whenever(deliverySessionRepository.findAllByReferralId(referralId)).thenReturn(listOf(existingSession))
     whenever(deliverySessionRepository.save(any())).thenReturn(existingSession)
 
     val actor = createActor("attendance_submitter")
-    val savedSession = deliverySessionsService.recordAttendanceFeedback(actor, actionPlanId, 1, attended, attendanceFailureInformation)
-    val argumentCaptor: ArgumentCaptor<DeliverySession> = ArgumentCaptor.forClass(DeliverySession::class.java)
+    val savedSession = deliverySessionsService.recordAttendanceFeedback(referralId, appointmentId, actor, attended, didSessionHappen)
 
-//    verify(appointmentEventPublisher).appointmentNotAttendedEvent(existingSession)
-    verify(deliverySessionRepository).save(argumentCaptor.capture())
-    assertThat(argumentCaptor.firstValue.currentAppointment?.attended).isEqualTo(attended)
-    assertThat(argumentCaptor.firstValue.currentAppointment?.attendanceFailureInformation).isEqualTo(attendanceFailureInformation)
-    assertThat(argumentCaptor.firstValue.currentAppointment?.attendanceSubmittedAt).isNotNull
-    assertThat(argumentCaptor.firstValue.currentAppointment?.attendanceSubmittedBy?.userName).isEqualTo("attendance_submitter")
+    verify(appointmentService).recordAppointmentAttendance(existingSession.currentAppointment!!, attended, didSessionHappen, actor)
     assertThat(savedSession).isNotNull
   }
 
   @Test
   fun `update session with attendance - no session found`() {
-    val actionPlanId = UUID.randomUUID()
-    val sessionNumber = 1
     val attended = Attended.YES
-    val attendanceFailureInformation = "extra info"
+    val didSessionHappen = true
+    val referralId = UUID.randomUUID()
+    val appointmentId = UUID.randomUUID()
 
-    whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber))
-      .thenReturn(null)
+    whenever(deliverySessionRepository.findAllByReferralId(referralId)).thenReturn(listOf())
 
     val actor = createActor()
     val exception = assertThrows(EntityNotFoundException::class.java) {
-      deliverySessionsService.recordAttendanceFeedback(actor, actionPlanId, 1, attended, attendanceFailureInformation)
+      deliverySessionsService.recordAttendanceFeedback(referralId, appointmentId, actor, attended, didSessionHappen)
     }
 
-    assertThat(exception.message).isEqualTo("Action plan session not found [actionPlanId=$actionPlanId, sessionNumber=$sessionNumber]")
+    assertThat(exception.message).isEqualTo("No Delivery Session Appointment found [referralId=$referralId, appointmentId=$appointmentId]")
   }
 
   @Test
   fun `updating session feedback sets relevant fields`() {
-    val actionPlanId = UUID.randomUUID()
     val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
-    whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(any(), any())).thenReturn(session)
-    whenever(deliverySessionRepository.save(any())).thenReturn(session)
-
     val actor = createActor("behaviour_submitter")
-    val updatedSession = deliverySessionsService.recordSessionFeedback(actor, actionPlanId, 1, "activities", "not good", "concerns", false)
+    val referral = session.referral
+    val appointment = session.currentAppointment!!
 
-    verify(deliverySessionRepository, times(1)).save(session)
-    assertThat(updatedSession).isSameAs(session)
-    assertThat(session.currentAppointment?.sessionResponse).isEqualTo("not good")
-    assertThat(session.currentAppointment?.sessionConcerns).isEqualTo("concerns")
-    assertThat(session.currentAppointment?.notifyPPOfAttendanceBehaviour).isFalse
-    assertThat(session.currentAppointment?.sessionFeedbackSubmittedAt).isNotNull
-    assertThat(session.currentAppointment?.sessionFeedbackSubmittedBy?.userName).isEqualTo("behaviour_submitter")
+    whenever(deliverySessionRepository.findAllByReferralId(any())).thenReturn(listOf(session))
+    whenever(deliverySessionRepository.save(any())).thenReturn(session)
+    whenever(
+      appointmentService.recordSessionFeedback(
+        appointment,
+        false,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        "activities",
+        "not good",
+        "concerns",
+        false,
+        actor,
+      ),
+    ).thenReturn(appointment.copy(sessionSummary = "activities", sessionResponse = "not good", sessionConcerns = "concerns", notifyPPOfAttendanceBehaviour = false, sessionFeedbackSubmittedAt = OffsetDateTime.now(), sessionFeedbackSubmittedBy = actor))
+
+    val sessionAndAppointment = deliverySessionsService.recordSessionFeedback(
+      referral.id,
+      appointment.id,
+      actor,
+      false,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "activities",
+      "not good",
+      "concerns",
+      false,
+    )
+
+    verify(appointmentService).recordSessionFeedback(
+      appointment,
+      false,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "activities",
+      "not good",
+      "concerns",
+      false,
+      actor,
+    )
+    assertThat(sessionAndAppointment.first).isSameAs(session)
+    assertThat(sessionAndAppointment.second.sessionResponse).isEqualTo("not good")
+    assertThat(sessionAndAppointment.second.sessionConcerns).isEqualTo("concerns")
+    assertThat(sessionAndAppointment.second.notifyPPOfAttendanceBehaviour).isFalse
+    assertThat(sessionAndAppointment.second.sessionFeedbackSubmittedAt).isNotNull
+    assertThat(sessionAndAppointment.second.sessionFeedbackSubmittedBy?.userName).isEqualTo("behaviour_submitter")
   }
 
   @Test
@@ -529,42 +557,98 @@ internal class DeliverySessionsServiceTest {
     whenever(deliverySessionRepository.findByReferralIdAndSessionNumber(any(), any())).thenReturn(null)
 
     assertThrows(EntityNotFoundException::class.java) {
-      deliverySessionsService.recordSessionFeedback(actor, UUID.randomUUID(), 1, "activities", "not good", null, false)
+      deliverySessionsService.recordSessionFeedback(
+        UUID.randomUUID(),
+        UUID.randomUUID(),
+        actor,
+        false,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        "activities",
+        "not good",
+        null,
+        false,
+      )
     }
   }
 
   @Test
   fun `appointment feedback cant be submitted more than once`() {
     val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
-    val actionPlanId = UUID.randomUUID()
-
-    whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(session)
-    whenever(deliverySessionRepository.save(any())).thenReturn(session)
-
+    val referralId = session.referral.id
+    val appointmentId = session.currentAppointment!!.id
     val actor = createActor()
-    deliverySessionsService.recordAttendanceFeedback(actor, actionPlanId, 1, Attended.YES, "")
-    deliverySessionsService.recordSessionFeedback(actor, actionPlanId, 1, "activities", "bad", null, false)
 
-    deliverySessionsService.submitAppointmentFeedback(actionPlanId, 1, actor)
+    whenever(deliverySessionRepository.findAllByReferralId(referralId)).thenReturn(listOf(session))
+    whenever(deliverySessionRepository.save(any())).thenReturn(session)
+    whenever(appointmentService.submitAppointmentFeedback(session.currentAppointment!!, actor, SERVICE_DELIVERY)).thenThrow(ResponseStatusException(HttpStatus.CONFLICT, "appointment feedback has already been submitted"))
+
+    deliverySessionsService.recordAttendanceFeedback(referralId, appointmentId, actor, Attended.YES, true)
+    deliverySessionsService.recordSessionFeedback(
+      referralId,
+      appointmentId,
+      actor,
+      false,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "activities",
+      "bad",
+      null,
+      false,
+    )
+
     val exception = assertThrows(ResponseStatusException::class.java) {
-      deliverySessionsService.submitAppointmentFeedback(actionPlanId, 1, actor)
+      deliverySessionsService.submitAppointmentFeedback(referralId, appointmentId, actor)
     }
     assertThat(exception.status).isEqualTo(HttpStatus.CONFLICT)
   }
 
   @Test
   fun `appointment feedback can't be submitted without attendance`() {
-    val session = deliverySessionFactory.createScheduled()
-    val actionPlanId = UUID.randomUUID()
+    val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
+    val referralId = session.referral.id
+    val appointmentId = session.currentAppointment!!.id
 
     val actor = createActor()
-    whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(session)
+    whenever(deliverySessionRepository.findAllByReferralId(referralId)).thenReturn(listOf(session))
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
+    whenever(appointmentService.submitAppointmentFeedback(session.currentAppointment!!, actor, SERVICE_DELIVERY)).thenThrow(
+      ResponseStatusException(
+        HttpStatus.UNPROCESSABLE_ENTITY,
+        "can't submit feedback unless attendance has been recorded",
+      ),
+    )
 
-    deliverySessionsService.recordSessionFeedback(actor, actionPlanId, 1, "activities", "bad", null, false)
+    deliverySessionsService.recordSessionFeedback(
+      referralId,
+      appointmentId,
+      actor,
+      false,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "activities",
+      "bad",
+      null,
+      false,
+    )
 
     val exception = assertThrows(ResponseStatusException::class.java) {
-      deliverySessionsService.submitAppointmentFeedback(actionPlanId, 1, actor)
+      deliverySessionsService.submitAppointmentFeedback(referralId, appointmentId, actor)
     }
     assertThat(exception.status).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY)
   }
@@ -572,21 +656,36 @@ internal class DeliverySessionsServiceTest {
   @Test
   fun `appointment feedback can be submitted and stores time and actor`() {
     val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
-    val actionPlanId = UUID.randomUUID()
-    whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(
-      session,
-    )
+    val referralId = session.referral.id
+    val appointmentId = session.currentAppointment!!.id
+    whenever(deliverySessionRepository.findAllByReferralId(referralId)).thenReturn(listOf(session))
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
 
-    val user = createActor()
-    deliverySessionsService.recordAttendanceFeedback(user, actionPlanId, 1, Attended.YES, "")
-    deliverySessionsService.recordSessionFeedback(user, actionPlanId, 1, "activities", "bad", null, true)
+    val actor = createActor()
+    deliverySessionsService.recordAttendanceFeedback(referralId, appointmentId, actor, Attended.YES, true)
+    deliverySessionsService.recordSessionFeedback(
+      referralId,
+      appointmentId,
+      actor,
+      false,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "activities",
+      "bad",
+      null,
+      false,
+    )
 
     val submitter = createActor("test-submitter")
-    deliverySessionsService.submitAppointmentFeedback(actionPlanId, 1, submitter)
+    deliverySessionsService.submitAppointmentFeedback(referralId, appointmentId, submitter)
 
+    verify(appointmentService).submitAppointmentFeedback(session.currentAppointment!!, submitter, SERVICE_DELIVERY)
     val sessionCaptor = argumentCaptor<DeliverySession>()
-    verify(deliverySessionRepository, atLeastOnce()).save(sessionCaptor.capture())
     sessionCaptor.allValues.forEach {
       if (it == sessionCaptor.lastValue) {
         assertThat(it.currentAppointment?.appointmentFeedbackSubmittedAt != null)
@@ -600,62 +699,127 @@ internal class DeliverySessionsServiceTest {
 
   @Test
   fun `appointment feedback emits application events`() {
-    val user = createActor()
+    val actor = createActor()
     val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
-    val actionPlanId = UUID.randomUUID()
-    whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(
-      session,
+    val referral = session.referral
+    val appointment = session.currentAppointment!!
+    whenever(deliverySessionRepository.findAllByReferralId(referral.id)).thenReturn(
+      listOf(session),
     )
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
-    deliverySessionsService.recordAttendanceFeedback(user, actionPlanId, 1, Attended.YES, "")
-    deliverySessionsService.recordSessionFeedback(user, actionPlanId, 1, "activities", "bad", null, true)
 
-    deliverySessionsService.submitAppointmentFeedback(actionPlanId, 1, session.referral.createdBy)
-    verify(actionPlanAppointmentEventPublisher).attendanceRecordedEvent(session)
-    verify(actionPlanAppointmentEventPublisher).sessionFeedbackRecordedEvent(session)
-    verify(actionPlanAppointmentEventPublisher).sessionFeedbackRecordedEvent(session)
+    deliverySessionsService.recordAttendanceFeedback(referral.id, appointment.id, actor, Attended.YES, true)
+    deliverySessionsService.recordSessionFeedback(
+      referral.id,
+      appointment.id,
+      actor,
+      false,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "activities",
+      "bad",
+      null,
+      false,
+    )
+    deliverySessionsService.submitAppointmentFeedback(referral.id, appointment.id, actor)
+
+    verify(appointmentService).recordAppointmentAttendance(appointment, Attended.YES, true, actor)
+    verify(appointmentService).recordSessionFeedback(
+      appointment, false,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "activities",
+      "bad",
+      null,
+      false,
+      actor,
+    )
+    verify(appointmentService).submitAppointmentFeedback(appointment, actor, SERVICE_DELIVERY)
   }
 
   @Test
   fun `attendance can't be updated once appointment feedback has been submitted`() {
     val user = createActor()
     val session = deliverySessionFactory.createAttended()
-    val actionPlanId = UUID.randomUUID()
-    whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(session)
+    val referralId = session.referral.id
+    val appointmentId = session.currentAppointment!!.id
+    whenever(deliverySessionRepository.findAllByReferralId(referralId)).thenReturn(listOf(session))
+    whenever(appointmentService.recordAppointmentAttendance(session.currentAppointment!!, Attended.YES, true, user)).thenThrow(ResponseStatusException::class.java)
 
     assertThrows(ResponseStatusException::class.java) {
-      deliverySessionsService.recordAttendanceFeedback(user, actionPlanId, 1, Attended.YES, "")
+      deliverySessionsService.recordAttendanceFeedback(referralId, appointmentId, user, Attended.YES, true)
     }
   }
 
   @Test
   fun `session feedback can't be updated once appointment feedback has been submitted`() {
-    val user = createActor()
+    val actor = createActor()
     val session = deliverySessionFactory.createAttended()
-    val actionPlanId = UUID.randomUUID()
-    whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(session)
+    val referralId = session.referral.id
+    val appointmentId = session.currentAppointment!!.id
+    whenever(deliverySessionRepository.findAllByReferralId(referralId)).thenReturn(listOf(session))
+    whenever(
+      appointmentService.recordSessionFeedback(
+        session.currentAppointment!!,
+        false,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        "activities",
+        "bad",
+        null,
+        false,
+        actor,
+      ),
+    ).thenThrow(ResponseStatusException::class.java)
 
     assertThrows(ResponseStatusException::class.java) {
-      deliverySessionsService.recordSessionFeedback(user, actionPlanId, 1, "activities", "bad", null, false)
+      deliverySessionsService.recordSessionFeedback(
+        referralId,
+        appointmentId,
+        actor, false,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        "activities",
+        "bad",
+        null,
+        false,
+      )
     }
   }
 
   @Test
   fun `appointment feedback can be submitted when session not attended`() {
     val session = deliverySessionFactory.createScheduled(appointmentTime = OffsetDateTime.now())
-    val actionPlanId = UUID.randomUUID()
-    whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, 1)).thenReturn(
-      session,
-    )
+    val referralId = session.referral.id
+    val appointmentId = session.currentAppointment!!.id
+    whenever(deliverySessionRepository.findAllByReferralId(referralId)).thenReturn(listOf(session))
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
 
-    val user = createActor()
-    deliverySessionsService.recordAttendanceFeedback(user, actionPlanId, 1, Attended.NO, "")
-    deliverySessionsService.submitAppointmentFeedback(actionPlanId, 1, user)
+    val actor = createActor()
+    deliverySessionsService.recordAttendanceFeedback(referralId, appointmentId, actor, Attended.NO, true)
+    deliverySessionsService.submitAppointmentFeedback(referralId, appointmentId, actor)
 
-    verify(deliverySessionRepository, atLeastOnce()).save(session)
-    verify(actionPlanAppointmentEventPublisher).attendanceRecordedEvent(session)
-    verify(actionPlanAppointmentEventPublisher).appointmentFeedbackRecordedEvent(session)
+    verify(appointmentService).submitAppointmentFeedback(session.currentAppointment!!, actor, SERVICE_DELIVERY)
   }
 
   @Test

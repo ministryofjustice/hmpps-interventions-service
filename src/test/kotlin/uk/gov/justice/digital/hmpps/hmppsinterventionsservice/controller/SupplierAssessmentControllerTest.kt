@@ -89,8 +89,14 @@ class SupplierAssessmentControllerTest {
       val npsOfficeCode = "CRSEXT"
       val appointmentSessionType = AppointmentSessionType.ONE_TO_ONE
       val addressDTO = null
-      val attendanceFeedbackRequestDTO = AttendanceFeedbackRequestDTO(LATE, "attended")
-      val sessionFeedbackRequestDTO = SessionFeedbackRequestDTO("summary", "response", null, true)
+      val attendanceFeedbackRequestDTO = AttendanceFeedbackRequestDTO(LATE, true)
+      val sessionFeedbackRequestDTO = SessionFeedbackRequestDTO(
+        late = true,
+        lateReason = "missed bus",
+        sessionSummary = "summary",
+        sessionResponse = "response",
+        notifyProbationPractitioner = true,
+      )
       val update = UpdateAppointmentDTO(appointmentTime, durationInMinutes, appointmentDeliveryType, appointmentSessionType, addressDTO, npsOfficeCode, attendanceFeedbackRequestDTO, sessionFeedbackRequestDTO)
       val user = authUserFactory.create()
       val token = tokenFactory.create()
@@ -99,7 +105,25 @@ class SupplierAssessmentControllerTest {
       whenever(userMapper.fromToken(token)).thenReturn(user)
       whenever(referralService.getSentReferralForUser(referral.id, user)).thenReturn(referral)
       whenever(supplierAssessmentService.getSupplierAssessmentById(any())).thenReturn(supplierAssessment)
-      whenever(supplierAssessmentService.createOrUpdateSupplierAssessmentAppointment(supplierAssessment, durationInMinutes, appointmentTime, user, appointmentDeliveryType, appointmentSessionType, addressDTO, npsOfficeCode, LATE, "attended", true, "summary", "response")).thenReturn(supplierAssessment.currentAppointment)
+      whenever(
+        supplierAssessmentService.createOrUpdateSupplierAssessmentAppointment(
+          supplierAssessment,
+          durationInMinutes,
+          appointmentTime,
+          user,
+          appointmentDeliveryType,
+          appointmentSessionType,
+          addressDTO,
+          npsOfficeCode,
+          attended = LATE,
+          didSessionHappen = true,
+          notifyProbationPractitioner = true,
+          late = true,
+          lateReason = "missed bus",
+          sessionSummary = "summary",
+          sessionResponse = "response",
+        ),
+      ).thenReturn(supplierAssessment.currentAppointment)
 
       val response = supplierAssessmentController.updateSupplierAssessmentAppointment(referral.id, update, token)
       verify(appointmentValidator).validateUpdateAppointment(eq(update), any())
@@ -123,9 +147,32 @@ class SupplierAssessmentControllerTest {
       supplierAssessment.referral.supplierAssessment = supplierAssessment
       whenever(userMapper.fromToken(token)).thenReturn(submittedBy)
       whenever(referralService.getSentReferralForUser(eq(referralId), eq(submittedBy))).thenReturn(supplierAssessment.referral)
-      whenever(appointmentService.recordSessionFeedback(eq(supplierAssessment!!.currentAppointment!!), eq(sessionSummary), eq(sessionResponse), eq(sessionConcerns), eq(notifyProbationPractitioner), eq(submittedBy))).thenReturn(appointmentFactory.create())
+      whenever(
+        appointmentService.recordSessionFeedback(
+          eq(supplierAssessment!!.currentAppointment!!),
+          eq(false),
+          eq(null),
+          eq(null),
+          eq(null),
+          eq(null),
+          eq(null),
+          eq(null),
+          eq(null),
+          eq(sessionSummary),
+          eq(sessionResponse),
+          eq(sessionConcerns),
+          eq(notifyProbationPractitioner),
+          eq(submittedBy),
+        ),
+      ).thenReturn(appointmentFactory.create())
 
-      val request = SessionFeedbackRequestDTO(sessionSummary, sessionResponse, sessionConcerns, notifyProbationPractitioner)
+      val request = SessionFeedbackRequestDTO(
+        late = false,
+        sessionSummary = sessionSummary,
+        sessionResponse = sessionResponse,
+        sessionConcerns = sessionConcerns,
+        notifyProbationPractitioner = notifyProbationPractitioner,
+      )
       val result = supplierAssessmentController.recordSessionFeedback(referralId, request, token)
       assertThat(result).isNotNull
     }
@@ -142,7 +189,12 @@ class SupplierAssessmentControllerTest {
       whenever(userMapper.fromToken(token)).thenReturn(submittedBy)
       whenever(referralService.getSentReferralForUser(eq(referralId), eq(submittedBy))).thenReturn(null)
 
-      val request = SessionFeedbackRequestDTO(sessionSummary, sessionResponse, null, notifyProbationPractitioner)
+      val request = SessionFeedbackRequestDTO(
+        late = false,
+        sessionSummary = sessionSummary,
+        sessionResponse = sessionResponse,
+        notifyProbationPractitioner = notifyProbationPractitioner,
+      )
       val exception = assertThrows<ResponseStatusException> {
         supplierAssessmentController.recordSessionFeedback(referralId, request, token)
       }
@@ -163,7 +215,12 @@ class SupplierAssessmentControllerTest {
       whenever(userMapper.fromToken(token)).thenReturn(submittedBy)
       whenever(referralService.getSentReferralForUser(eq(referralId), eq(submittedBy))).thenReturn(referral)
 
-      val request = SessionFeedbackRequestDTO(sessionSummary, sessionResponse, null, notifyProbationPractitioner)
+      val request = SessionFeedbackRequestDTO(
+        late = false,
+        sessionSummary = sessionSummary,
+        sessionResponse = sessionResponse,
+        notifyProbationPractitioner = notifyProbationPractitioner,
+      )
       val exception = assertThrows<ResponseStatusException> {
         supplierAssessmentController.recordSessionFeedback(referralId, request, token)
       }
@@ -186,7 +243,12 @@ class SupplierAssessmentControllerTest {
       whenever(userMapper.fromToken(token)).thenReturn(submittedBy)
       whenever(referralService.getSentReferralForUser(eq(referralId), eq(submittedBy))).thenReturn(supplierAssessment.referral)
 
-      val request = SessionFeedbackRequestDTO(sessionSummary, sessionResponse, null, notifyProbationPractitioner)
+      val request = SessionFeedbackRequestDTO(
+        late = false,
+        sessionSummary = sessionSummary,
+        sessionResponse = sessionResponse,
+        notifyProbationPractitioner = notifyProbationPractitioner,
+      )
       val exception = assertThrows<ResponseStatusException> {
         supplierAssessmentController.recordSessionFeedback(referralId, request, token)
       }
@@ -201,7 +263,6 @@ class SupplierAssessmentControllerTest {
     fun `can record appointment attendance`() {
       val referralId = UUID.randomUUID()
       val attended = Attended.YES
-      val attendanceFailureInformation = "information"
       val submittedBy = authUserFactory.createSP()
       val token = tokenFactory.create()
 
@@ -209,9 +270,16 @@ class SupplierAssessmentControllerTest {
       supplierAssessment.referral.supplierAssessment = supplierAssessment
       whenever(userMapper.fromToken(token)).thenReturn(submittedBy)
       whenever(referralService.getSentReferralForUser(eq(referralId), eq(submittedBy))).thenReturn(supplierAssessment.referral)
-      whenever(appointmentService.recordAppointmentAttendance(eq(supplierAssessment!!.currentAppointment!!), eq(attended), eq(attendanceFailureInformation), eq(submittedBy))).thenReturn(appointmentFactory.create())
+      whenever(
+        appointmentService.recordAppointmentAttendance(
+          eq(supplierAssessment!!.currentAppointment!!),
+          eq(attended),
+          eq(true),
+          eq(submittedBy),
+        ),
+      ).thenReturn(appointmentFactory.create())
 
-      val request = AttendanceFeedbackRequestDTO(attended, attendanceFailureInformation)
+      val request = AttendanceFeedbackRequestDTO(attended, true)
       val result = supplierAssessmentController.recordAttendance(referralId, request, token)
       assertThat(result).isNotNull
     }
@@ -220,14 +288,13 @@ class SupplierAssessmentControllerTest {
     fun `expect not found if referral does not exist`() {
       val referralId = UUID.randomUUID()
       val attended = Attended.YES
-      val attendanceFailureInformation = "information"
       val submittedBy = authUserFactory.createSP()
       val token = tokenFactory.create()
 
       whenever(userMapper.fromToken(token)).thenReturn(submittedBy)
       whenever(referralService.getSentReferralForUser(eq(referralId), eq(submittedBy))).thenReturn(null)
 
-      val request = AttendanceFeedbackRequestDTO(attended, attendanceFailureInformation)
+      val request = AttendanceFeedbackRequestDTO(attended, true)
       val exception = assertThrows<ResponseStatusException> {
         supplierAssessmentController.recordAttendance(referralId, request, token)
       }
@@ -239,7 +306,6 @@ class SupplierAssessmentControllerTest {
     fun `expect not found if supplier assessment does not exist`() {
       val referralId = UUID.randomUUID()
       val attended = Attended.YES
-      val attendanceFailureInformation = "information"
       val submittedBy = authUserFactory.createSP()
       val token = tokenFactory.create()
 
@@ -247,7 +313,7 @@ class SupplierAssessmentControllerTest {
       whenever(userMapper.fromToken(token)).thenReturn(submittedBy)
       whenever(referralService.getSentReferralForUser(eq(referralId), eq(submittedBy))).thenReturn(referral)
 
-      val request = AttendanceFeedbackRequestDTO(attended, attendanceFailureInformation)
+      val request = AttendanceFeedbackRequestDTO(attended, true)
       val exception = assertThrows<ResponseStatusException> {
         supplierAssessmentController.recordAttendance(referralId, request, token)
       }
@@ -259,7 +325,6 @@ class SupplierAssessmentControllerTest {
     fun `expect not found if current appointment does not exist`() {
       val referralId = UUID.randomUUID()
       val attended = Attended.YES
-      val attendanceFailureInformation = "information"
       val submittedBy = authUserFactory.createSP()
       val token = tokenFactory.create()
 
@@ -269,7 +334,7 @@ class SupplierAssessmentControllerTest {
       whenever(userMapper.fromToken(token)).thenReturn(submittedBy)
       whenever(referralService.getSentReferralForUser(eq(referralId), eq(submittedBy))).thenReturn(supplierAssessment.referral)
 
-      val request = AttendanceFeedbackRequestDTO(attended, attendanceFailureInformation)
+      val request = AttendanceFeedbackRequestDTO(attended, true)
       val exception = assertThrows<ResponseStatusException> {
         supplierAssessmentController.recordAttendance(referralId, request, token)
       }
