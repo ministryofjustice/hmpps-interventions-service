@@ -45,11 +45,11 @@ class CaseNoteControllerTest {
       val userToken = tokenFactory.create(user)
       val caseNote = caseNoteFactory.create(subject = "subject", body = "body")
       val referralId = caseNote.referral.id
-      val createCaseNoteDTO = CreateCaseNoteDTO(referralId = referralId, subject = "subject", body = "body", sendEmail = true)
+      val createCaseNoteDTO = CreateCaseNoteDTO(referralId = referralId, subject = "subject", body = "body")
 
       whenever(authUserRepository.save(any())).thenReturn(user)
       whenever(referralService.getSentReferralForUser(id = referralId, user = user)).thenReturn(referralFactory.createSent(id = referralId))
-      whenever(caseNoteService.createCaseNote(referralId = referralId, subject = "subject", body = "body", sendEmail = true, sentByUser = user)).thenReturn(caseNote)
+      whenever(caseNoteService.createCaseNote(referralId = referralId, subject = "subject", body = "body", sentByUser = user)).thenReturn(caseNote)
 
       val caseNoteDTO = caseNoteController.createCaseNote(createCaseNoteDTO, userToken)
       assertThat(caseNoteDTO).isEqualTo(CaseNoteDTO.from(caseNote))
@@ -61,7 +61,7 @@ class CaseNoteControllerTest {
       val userToken = tokenFactory.create(user)
       val caseNote = caseNoteFactory.create(subject = "subject", body = "body")
       val referralId = caseNote.referral.id
-      val createCaseNoteDTO = CreateCaseNoteDTO(referralId = referralId, subject = "subject", body = "body", sendEmail = true)
+      val createCaseNoteDTO = CreateCaseNoteDTO(referralId = referralId, subject = "subject", body = "body")
       whenever(referralService.getSentReferralForUser(id = referralId, user = user)).thenReturn(null)
       whenever(authUserRepository.save(any())).thenReturn(user)
       val e = assertThrows<ResponseStatusException> {
