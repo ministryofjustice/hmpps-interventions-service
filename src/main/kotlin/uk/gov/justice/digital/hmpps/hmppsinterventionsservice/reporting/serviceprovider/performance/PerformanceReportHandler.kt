@@ -55,7 +55,7 @@ class PerformanceReportHandler(
 
   private fun beforeProcess(userId: String, timestamp: String): Path {
     // create a temp file for the handler to write to and store the path in the execution context
-    val path = createTempDirectory().resolve("${userId}_${timestamp}.csv")
+    val path = createTempDirectory().resolve("${userId}_$timestamp.csv")
 
     PerformanceReportHandler.logger.debug("creating csv file for service provider performance report {}", StructuredArguments.kv("path", path))
     return path
