@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.13.0"
-  kotlin("plugin.spring") version "1.9.20"
-  id("org.jetbrains.kotlin.plugin.jpa") version "1.9.20"
+  kotlin("plugin.spring") version "1.9.21"
+  id("org.jetbrains.kotlin.plugin.jpa") version "1.9.21"
   id("jacoco")
 }
 
@@ -77,22 +77,22 @@ dependencyManagement {
 dependencies {
   // batch processing
   implementation("org.springframework.boot:spring-boot-starter-batch")
-  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.3") // also needed runtime for AppInsights
+  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.0") // also needed runtime for AppInsights
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
-  implementation("io.sentry:sentry-spring-boot-starter:7.0.0")
-  implementation("io.sentry:sentry-logback:7.0.0")
+  implementation("io.sentry:sentry-spring-boot-starter:7.1.0")
+  implementation("io.sentry:sentry-logback:7.1.0")
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
-  implementation("net.logstash.logback:logstash-logback-encoder:7.3")
+  implementation("net.logstash.logback:logstash-logback-encoder:7.4")
 
-  runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.3") // needed for OffsetDateTime for AppInsights
+  runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.0") // needed for OffsetDateTime for AppInsights
 
   // openapi
   implementation("org.springdoc:springdoc-openapi-ui:1.7.0")
 
   // notifications
-  implementation("uk.gov.service.notify:notifications-java-client:4.1.0-RELEASE")
+  implementation("uk.gov.service.notify:notifications-java-client:4.1.1-RELEASE")
   implementation("org.json:json") {
     version {
       strictly("20231013")
@@ -100,15 +100,15 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.21.16")
-  implementation("software.amazon.awssdk:s3:2.21.16")
-  implementation("software.amazon.awssdk:sts:2.21.17")
+  implementation("software.amazon.awssdk:sns:2.22.0")
+  implementation("software.amazon.awssdk:s3:2.22.0")
+  implementation("software.amazon.awssdk:sts:2.22.0")
 
   // security
-  implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.5")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.1.5")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.1.5")
-  implementation("com.nimbusds:oauth2-oidc-sdk:11.6")
+  implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.0")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.2.0")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.2.0")
+  implementation("com.nimbusds:oauth2-oidc-sdk:11.8")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -117,13 +117,13 @@ dependencies {
   implementation("com.vladmihalcea:hibernate-types-55:2.21.1")
   implementation("com.h2database:h2:2.2.224")
   runtimeOnly("org.flywaydb:flyway-core")
-  runtimeOnly("org.postgresql:postgresql:42.6.0")
+  runtimeOnly("org.postgresql:postgresql:42.7.1")
 
   // json and csv
   implementation("com.github.java-json-tools:json-patch:1.13")
   implementation("org.apache.commons:commons-csv:1.10.0")
 
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.3")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.4")
   testImplementation("com.squareup.okhttp3:okhttp:4.12.0")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
   testImplementation("org.mockito:mockito-inline:5.2.0")
