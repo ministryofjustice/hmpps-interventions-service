@@ -6,6 +6,7 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.job.DefaultJobParametersValidator
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -16,8 +17,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.Timestam
 @Configuration
 @EnableBatchProcessing
 class TransferReferralsJobConfiguration(
-  private val jobBuilderFactory: JobBuilderFactory,
-  private val stepBuilderFactory: StepBuilderFactory,
+  @Qualifier("batchJobBuilderFactory") private val jobBuilderFactory: JobBuilderFactory,
+  @Qualifier("batchStepBuilderFactory") private val stepBuilderFactory: StepBuilderFactory,
   private val listener: TransferReferralsJobListener,
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
 ) {
