@@ -28,16 +28,19 @@ class BatchConfiguration(
   }
 
   @Bean
-  fun asyncJobLauncher(jobRepository: JobRepository): JobLauncher {
-    val taskExecutor = ThreadPoolTaskExecutor()
-    taskExecutor.corePoolSize = poolSize
-    taskExecutor.queueCapacity = queueSize
-    taskExecutor.afterPropertiesSet()
-
+  fun asyncJobLauncher(jobRepository: JobRepository, taskExecutor: ThreadPoolTaskExecutor): JobLauncher {
     val launcher = SimpleJobLauncher()
     launcher.setJobRepository(createJobRepository())
     launcher.setTaskExecutor(taskExecutor)
     launcher.afterPropertiesSet()
     return launcher
+  }
+
+  @Bean("reportingTaskExecutor")
+  fun taskExecutor() {
+    val taskExecutor = ThreadPoolTaskExecutor()
+    taskExecutor.corePoolSize = poolSize
+    taskExecutor.queueCapacity = queueSize
+    taskExecutor.afterPropertiesSet()
   }
 }

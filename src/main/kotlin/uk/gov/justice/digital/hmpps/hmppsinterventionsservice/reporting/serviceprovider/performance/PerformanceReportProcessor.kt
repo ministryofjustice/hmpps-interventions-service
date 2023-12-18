@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.service
 
 import mu.KLogging
 import net.logstash.logback.argument.StructuredArguments.kv
-import org.springframework.batch.item.ItemProcessor
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model.PerformanceReportReferral
@@ -12,10 +11,10 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlan
 class PerformanceReportProcessor(
   private val actionPlanService: ActionPlanService,
   private val endOfServiceReportRepository: EndOfServiceReportRepository,
-) : ItemProcessor<PerformanceReportReferral, PerformanceReportData> {
+) {
   companion object : KLogging()
 
-  override fun process(referral: PerformanceReportReferral): PerformanceReportData {
+  fun process(referral: PerformanceReportReferral): PerformanceReportData {
     logger.debug("processing referral {}", kv("referralId", referral.referralId))
 
     return PerformanceReportData(

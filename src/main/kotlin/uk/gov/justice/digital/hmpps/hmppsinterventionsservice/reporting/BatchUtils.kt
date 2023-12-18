@@ -42,6 +42,11 @@ class BatchUtils {
     return date.toInstant().atOffset(zoneOffset)
   }
 
+  fun parseLocalDateToOffsetDateTime(date: LocalDate): OffsetDateTime {
+    // convenience function combining the two above
+    return parseDateToOffsetDateTime(this.parseLocalDateToDate(date))
+  }
+
   private fun <T> csvFileWriterBase(
     name: String,
     resource: Resource,
