@@ -15,6 +15,9 @@ spring:
   jpa:
     properties:
       hibernate.enable_lazy_load_no_trans: true
+  h2:
+    console:
+      enabled: true
   batch:
     jobs:
       mark-stale-appointments:

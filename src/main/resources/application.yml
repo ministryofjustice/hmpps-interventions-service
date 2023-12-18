@@ -5,6 +5,9 @@ info.app:
 spring:
   main:
     banner-mode: off
+  h2:
+    console:
+      enabled: true
   application:
     name: hmpps-interventions-service
   codec:
