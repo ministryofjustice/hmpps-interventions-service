@@ -48,7 +48,7 @@ class CommunityAPIOffenderService(
 ) {
   fun checkIfAuthenticatedDeliusUserHasAccessToServiceUser(user: AuthUser, crn: String): ServiceUserAccessResult {
     val userAccessPath = UriComponentsBuilder.fromPath(caseAccessLocation)
-      .buildAndExpand(user.userName)
+      .buildAndExpand(user.id)
       .toString()
 
     val response = ramDeliusApiClient.post(userAccessPath, listOf(crn))
@@ -64,7 +64,7 @@ class CommunityAPIOffenderService(
 
   fun getManagedOffendersForDeliusUser(user: AuthUser): List<Offender> {
     val managedOffendersPath = UriComponentsBuilder.fromPath(managedCasesLocation)
-      .buildAndExpand(user.userName)
+      .buildAndExpand(user.id)
       .toString()
 
     return ramDeliusApiClient.get(managedOffendersPath)

@@ -142,9 +142,9 @@ interventions-ui:
 refer-and-monitor-and-delius:
   locations:
     appointment-merge: "/probation-case/{crn}/referrals/{referralId}/appointments"
-    case-access: "/users/{username}/access"
+    case-access: "/users/{userId}/access"
     case-identifiers: "/probation-case/{crn}/identifiers"
-    managed-cases: "/users/{username}/managed-cases"
+    managed-cases: "/users/{userId}/managed-cases"
     referral-start: "/probation-case/{crn}/referrals"
     responsible-officer: "/probation-case/{crn}/responsible-officer"
 
