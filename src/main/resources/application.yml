@@ -172,8 +172,8 @@ manage-users:
     locations:
       auth-user-groups: "/externalusers/{userId}/groups"
       auth-user-detail: "/externalusers/{username}"
-      user-email: "/users/{username}/email"
-      user-detail: "/users/{username}"
+      user-email: "/users/{userId}/email"
+      user-detail: "/users/{userId}"
 
 assess-risks-and-needs:
   locations:

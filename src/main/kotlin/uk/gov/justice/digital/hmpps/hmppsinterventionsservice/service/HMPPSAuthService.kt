@@ -80,7 +80,7 @@ class HMPPSAuthService(
 
   fun getUserDetail(user: AuthUserDTO): UserDetail {
     return if (user.authSource == "auth") {
-      val url = UriComponentsBuilder.fromPath(authUserDetailLocation).buildAndExpand(user.username).toString()
+      val url = UriComponentsBuilder.fromPath(authUserDetailLocation).buildAndExpand(user.userId).toString()
       mangeUsersAuthApiClient.get(url)
         .retrieve()
         .bodyToMono(AuthUserDetailResponse::class.java)
@@ -93,8 +93,8 @@ class HMPPSAuthService(
         }
         .block()
     } else {
-      val detailUrl = UriComponentsBuilder.fromPath(userDetailLocation).buildAndExpand(user.username).toString()
-      val emailUrl = UriComponentsBuilder.fromPath(userEmailLocation).buildAndExpand(user.username).toString()
+      val detailUrl = UriComponentsBuilder.fromPath(userDetailLocation).buildAndExpand(user.userId).toString()
+      val emailUrl = UriComponentsBuilder.fromPath(userEmailLocation).buildAndExpand(user.userId).toString()
       Mono.zip(
         mangeUsersAuthApiClient.get(detailUrl)
           .retrieve()
