@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.13.0"
-  kotlin("plugin.spring") version "1.9.21"
-  id("org.jetbrains.kotlin.plugin.jpa") version "1.9.21"
+  kotlin("plugin.spring") version "1.9.22"
+  id("org.jetbrains.kotlin.plugin.jpa") version "1.9.22"
   id("jacoco")
 }
 
@@ -86,7 +86,7 @@ dependencies {
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
   implementation("net.logstash.logback:logstash-logback-encoder:7.3")
 
-  runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.3") // needed for OffsetDateTime for AppInsights
+  runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.1") // needed for OffsetDateTime for AppInsights
 
   // openapi
   implementation("org.springdoc:springdoc-openapi-ui:1.7.0")
@@ -100,19 +100,19 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.21.43")
-  implementation("software.amazon.awssdk:s3:2.21.42")
-  implementation("software.amazon.awssdk:sts:2.21.42")
+  implementation("software.amazon.awssdk:sns:2.22.9")
+  implementation("software.amazon.awssdk:s3:2.22.9")
+  implementation("software.amazon.awssdk:sts:2.22.9")
 
   // security
-  implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.0")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.2.0")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.2.0")
-  implementation("com.nimbusds:oauth2-oidc-sdk:11.7.1")
-  implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.0")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.2.0")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.2.0")
-  implementation("com.nimbusds:oauth2-oidc-sdk:11.8")
+  implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.1")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.2.1")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.2.1")
+  implementation("com.nimbusds:oauth2-oidc-sdk:11.9")
+  implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.1")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.2.1")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.2.1")
+  implementation("com.nimbusds:oauth2-oidc-sdk:11.9")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
