@@ -92,7 +92,7 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-ui:1.7.0")
 
   // notifications
-  implementation("uk.gov.service.notify:notifications-java-client:4.1.1-RELEASE")
+  implementation("uk.gov.service.notify:notifications-java-client:5.0.0-RELEASE")
   implementation("org.json:json") {
     version {
       strictly("20231013")
