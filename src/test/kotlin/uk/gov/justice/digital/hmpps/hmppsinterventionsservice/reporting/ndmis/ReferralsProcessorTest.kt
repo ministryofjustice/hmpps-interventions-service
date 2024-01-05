@@ -34,6 +34,7 @@ internal class ReferralsProcessorTest {
 
     val actionPlanFirst = actionPlanFactory.createApproved(submittedAt = apSubmittedAt, approvedAt = apApprovedAt)
     val actionPlanSecond = actionPlanFactory.createApproved(submittedAt = apSubmittedAt.plusDays(1), approvedAt = apApprovedAt.plusDays(1))
+
     val referral = referralFactory.createEnded(
       sentAt = sentAt,
       concludedAt = concludedAt,
@@ -43,7 +44,6 @@ internal class ReferralsProcessorTest {
     )
 
     whenever(actionPlanService.getAllCompletedAppointments(anyOrNull())).thenReturn(listOf(appointmentFactory.create()))
-
     val result = processor.process(referral)!!
 
     assertThat(result.referralReference).isEqualTo(referral.referenceNumber)
