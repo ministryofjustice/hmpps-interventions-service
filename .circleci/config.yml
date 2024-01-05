@@ -15,7 +15,7 @@ parameters:
     default: interventions-team
 
 orbs:
-  hmpps: ministryofjustice/hmpps@8.0.3
+  hmpps: ministryofjustice/hmpps@8.1.0
   gradle: circleci/gradle@3.0.0
   mem: circleci/rememborb@0.0.2
 
