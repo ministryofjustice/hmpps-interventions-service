@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance.NdmisDateTime
@@ -34,6 +33,7 @@ internal class ReferralsProcessorTest {
 
     val actionPlanFirst = actionPlanFactory.createApproved(submittedAt = apSubmittedAt, approvedAt = apApprovedAt)
     val actionPlanSecond = actionPlanFactory.createApproved(submittedAt = apSubmittedAt.plusDays(1), approvedAt = apApprovedAt.plusDays(1))
+
     val referral = referralFactory.createEnded(
       sentAt = sentAt,
       concludedAt = concludedAt,
@@ -42,8 +42,7 @@ internal class ReferralsProcessorTest {
       actionPlans = mutableListOf(actionPlanFirst, actionPlanSecond),
     )
 
-    whenever(actionPlanService.getAllAttendedAppointments(anyOrNull())).thenReturn(listOf(appointmentFactory.create()))
-
+    whenever(actionPlanService.getAllAttendedAppointments(actionPlanSecond)).thenReturn(listOf(appointmentFactory.create()))
     val result = processor.process(referral)!!
 
     assertThat(result.referralReference).isEqualTo(referral.referenceNumber)
