@@ -5,17 +5,17 @@ import net.logstash.logback.argument.StructuredArguments.kv
 import org.springframework.batch.item.ItemProcessor
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model.PerformanceReportReferral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model.ReferralPerformanceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
 
 @Component
 class PerformanceReportProcessor(
   private val actionPlanService: ActionPlanService,
   private val endOfServiceReportRepository: EndOfServiceReportRepository,
-) : ItemProcessor<PerformanceReportReferral, PerformanceReportData> {
+) : ItemProcessor<ReferralPerformanceReport, PerformanceReportData> {
   companion object : KLogging()
 
-  override fun process(referral: PerformanceReportReferral): PerformanceReportData {
+  override fun process(referral: ReferralPerformanceReport): PerformanceReportData {
     logger.debug("processing referral {}", kv("referralId", referral.referralId))
 
     return PerformanceReportData(
@@ -24,7 +24,7 @@ class PerformanceReportProcessor(
       contractReference = referral.contractReference,
       organisationId = referral.organisationId,
       currentAssigneeEmail = referral.currentAssigneeEmail,
-      serviceUserCRN = referral.serviceUserCRN,
+      serviceUserCRN = referral.crn,
       dateReferralReceived = referral.dateReferralReceived,
       dateSupplierAssessmentFirstArranged = referral.dateSupplierAssessmentFirstArranged,
       dateSupplierAssessmentFirstScheduledFor = referral.dateSupplierAssessmentFirstScheduledFor,
@@ -51,7 +51,7 @@ class PerformanceReportProcessor(
     )
   }
 
-  private fun endState(referral: PerformanceReportReferral): String? {
+  private fun endState(referral: ReferralPerformanceReport): String? {
     if (referral.concludedAt == null) {
       return null
     }

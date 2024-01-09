@@ -9,7 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attende
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.PerformanceReportProcessor
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model.PerformanceReportReferral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model.ReferralPerformanceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
@@ -48,13 +48,13 @@ internal class PerformanceReportDataProcessorTest {
     val referral = referralFactory.createSent(actionPlans = mutableListOf(actionPlan), supplierAssessment = supplierAssessment)
 >>>>>>> 67ee2944 (Revert "Revert "using native queries to retrieve data for performance reporting."")
 
-    val performanceReportReferral = PerformanceReportReferral(
+    val referralPerformanceReport = ReferralPerformanceReport(
       referralReference = referral.referenceNumber!!,
       referralId = referral.id,
       contractReference = referral.intervention.dynamicFrameworkContract.contractReference,
       organisationId = referral.intervention.dynamicFrameworkContract.primeProvider.id,
       currentAssigneeEmail = "a.b@xyz.com",
-      serviceUserCRN = referral.serviceUserCRN,
+      crn = referral.serviceUserCRN,
       dateReferralReceived = referral.sentAt!!,
       dateSupplierAssessmentFirstArranged = supplierAssessmentFirstAppointment.createdAt,
       dateSupplierAssessmentFirstScheduledFor = supplierAssessmentFirstAppointment.appointmentTime,
@@ -80,7 +80,7 @@ internal class PerformanceReportDataProcessorTest {
     whenever(actionPlanService.getFirstAttendedAppointment(referral.id)).thenReturn(approvedActionPlanAppointment)
     whenever(actionPlanService.getAllAttendedAppointments(referral.id)).thenReturn(listOf(unApprovedAppointment, approvedActionPlanAppointment))
 
-    val performanceReportData = processor.process(performanceReportReferral)
+    val performanceReportData = processor.process(referralPerformanceReport)
 
     assertThat(performanceReportData.referralId).isEqualTo(referral.id)
     assertThat(performanceReportData.dateReferralReceived).isEqualTo(referral.sentAt)
