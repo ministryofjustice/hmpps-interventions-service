@@ -18,9 +18,9 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.FileSystemResource
 import org.springframework.data.domain.Sort
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralPerformanceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUtils
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model.PerformanceReportReferral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model.ReferralPerformanceReport
 import java.util.Date
 
 @Configuration
@@ -30,7 +30,7 @@ class PerformanceReportJobConfiguration(
   @Qualifier("batchStepBuilderFactory") private val stepBuilderFactory: StepBuilderFactory,
   private val batchUtils: BatchUtils,
   private val listener: PerformanceReportJobListener,
-  private val referralRepository: ReferralRepository,
+  private val referralPerformanceReportRepository: ReferralPerformanceReportRepository,
   @Value("\${spring.batch.jobs.service-provider.performance-report.chunk-size}") private val chunkSize: Int,
   @Value("\${spring.batch.jobs.service-provider.performance-report.page-size}") private val pageSize: Int,
 ) {
@@ -41,11 +41,11 @@ class PerformanceReportJobConfiguration(
     @Value("#{jobParameters['from']}") from: Date,
     @Value("#{jobParameters['to']}") to: Date,
     sessionFactory: SessionFactory,
-  ): RepositoryItemReader<PerformanceReportReferral> {
+  ): RepositoryItemReader<ReferralPerformanceReport> {
     // this reader returns referral entities which need processing for the report.
-    return RepositoryItemReaderBuilder<PerformanceReportReferral>()
-      .repository(referralRepository)
-      .methodName("findPerformanceReportReferral")
+    return RepositoryItemReaderBuilder<ReferralPerformanceReport>()
+      .repository(referralPerformanceReportRepository)
+      .methodName("serviceProviderReportReferrals")
       .arguments(
         listOf(
           batchUtils.parseDateToOffsetDateTime(from),
@@ -94,12 +94,12 @@ class PerformanceReportJobConfiguration(
 
   @Bean
   fun writeToCsvStep(
-    reader: RepositoryItemReader<PerformanceReportReferral>,
-    processor: ItemProcessor<PerformanceReportReferral, PerformanceReportData>,
+    reader: RepositoryItemReader<ReferralPerformanceReport>,
+    processor: ItemProcessor<ReferralPerformanceReport, PerformanceReportData>,
     writer: FlatFileItemWriter<PerformanceReportData>,
   ): Step {
     return stepBuilderFactory.get("writeToCsvStep")
-      .chunk<PerformanceReportReferral, PerformanceReportData>(chunkSize)
+      .chunk<ReferralPerformanceReport, PerformanceReportData>(chunkSize)
       .reader(reader)
       .processor(processor)
       .writer(writer)
