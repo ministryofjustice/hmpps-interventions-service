@@ -207,13 +207,4 @@ COMMENT ON COLUMN referral_summary.end_requested_at IS 'referral end requested a
 COMMENT ON COLUMN referral_summary.eosr_id IS 'referral end of service id';
 COMMENT ON COLUMN referral_summary.appointment_id IS 'supplier assessment appointment id';
 
-COMMENT ON TABLE test_reports IS 'testing read replica works fine';
-
-COMMENT ON COLUMN test_reports.referral_id IS 'referral uuid';
-COMMENT ON COLUMN test_reports.test_id IS 'id for the table';
-COMMENT ON COLUMN test_reports.topic IS 'topic for the test';
-
-COMMENT ON COLUMN referral_location.test_reports IS 'additional column for testing'
-
-
 -- some definitions are in V1_34__document_contract_table.sql; needs lifting
