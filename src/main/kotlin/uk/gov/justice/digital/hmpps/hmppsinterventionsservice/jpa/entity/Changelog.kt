@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
-import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -10,8 +9,9 @@ import jakarta.persistence.ManyToOne
 import jakarta.validation.constraints.NotNull
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
+import org.hibernate.annotations.JdbcType
 import org.hibernate.annotations.JdbcTypeCode
-import org.hibernate.annotations.Type
+import org.hibernate.dialect.PostgreSQLEnumJdbcType
 import org.hibernate.type.SqlTypes
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendTopic
@@ -28,7 +28,7 @@ data class Changelog(
 
   @Enumerated(EnumType.STRING)
   @Column(columnDefinition = "amendtypes")
-  @Type(PostgreSQLEnumType::class)
+  @JdbcType(PostgreSQLEnumJdbcType::class)
   var topic: AmendTopic,
 
   @JdbcTypeCode(SqlTypes.JSON)
