@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
-import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -8,7 +7,8 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.FetchType
 import jakarta.persistence.Id
 import jakarta.persistence.OneToOne
-import org.hibernate.annotations.Type
+import org.hibernate.annotations.JdbcType
+import org.hibernate.dialect.PostgreSQLEnumJdbcType
 import org.jetbrains.annotations.NotNull
 import java.time.LocalDate
 import java.util.UUID
@@ -21,7 +21,7 @@ data class ReferralLocation(
 
   @Enumerated(EnumType.STRING)
   @Column(name = "type", columnDefinition = "person_current_location_type")
-  @Type(PostgreSQLEnumType::class)
+  @JdbcType(PostgreSQLEnumJdbcType::class)
   @NotNull
   val type: PersonCurrentLocationType,
 

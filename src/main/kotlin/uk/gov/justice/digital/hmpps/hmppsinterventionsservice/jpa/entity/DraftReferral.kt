@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
-import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType
 import jakarta.persistence.CascadeType
 import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column
@@ -22,7 +21,8 @@ import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode.JOIN
-import org.hibernate.annotations.Type
+import org.hibernate.annotations.JdbcType
+import org.hibernate.dialect.PostgreSQLEnumJdbcType
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -52,7 +52,7 @@ class DraftReferral(
 
   @Enumerated(EnumType.STRING)
   @Column(columnDefinition = "person_current_location_type")
-  @Type(PostgreSQLEnumType::class)
+  @JdbcType(PostgreSQLEnumJdbcType::class)
   var personCurrentLocationType: PersonCurrentLocationType? = null,
 
   var personCustodyPrisonId: String? = null,

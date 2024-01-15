@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
 import com.fasterxml.jackson.annotation.JsonValue
-import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -15,7 +14,8 @@ import jakarta.persistence.PrimaryKeyJoinColumn
 import jakarta.validation.constraints.NotNull
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
-import org.hibernate.annotations.Type
+import org.hibernate.annotations.JdbcType
+import org.hibernate.dialect.PostgreSQLEnumJdbcType
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -23,7 +23,7 @@ import java.util.UUID
 data class Appointment(
   @Enumerated(EnumType.STRING)
   @Column(columnDefinition = "attended")
-  @Type(PostgreSQLEnumType::class)
+  @JdbcType(PostgreSQLEnumJdbcType::class)
   var attended: Attended? = null,
 
   var additionalAttendanceInformation: String? = null,
@@ -50,8 +50,9 @@ data class Appointment(
   var futureSessionPlans: String? = null,
   var noAttendanceInformation: String? = null,
 
-  @Type(type = "no_session_reason_type")
   @Enumerated(EnumType.STRING)
+  @Column(columnDefinition = "no_session_reason_type")
+  @JdbcType(PostgreSQLEnumJdbcType::class)
   var noSessionReasonType: NoSessionReasonType? = null,
   var noSessionReasonPopAcceptable: String? = null,
   var noSessionReasonPopUnacceptable: String? = null,
@@ -117,7 +118,6 @@ enum class NoSessionReasonType {
   POP_ACCEPTABLE,
   POP_UNACCEPTABLE,
   LOGISTICS,
-  ;
 }
 
 enum class AppointmentType {

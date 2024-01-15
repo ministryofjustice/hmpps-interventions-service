@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
-import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -10,7 +9,8 @@ import jakarta.persistence.Id
 import jakarta.persistence.OneToOne
 import jakarta.persistence.PrimaryKeyJoinColumn
 import jakarta.validation.constraints.NotNull
-import org.hibernate.annotations.Type
+import org.hibernate.annotations.JdbcType
+import org.hibernate.dialect.PostgreSQLEnumJdbcType
 import java.util.UUID
 
 @Entity
@@ -20,14 +20,14 @@ data class AppointmentDelivery(
 
   @Column(columnDefinition = "appointment_delivery_type")
   @Enumerated(EnumType.STRING)
-  @Type(PostgreSQLEnumType::class)
+  @JdbcType(PostgreSQLEnumJdbcType::class)
   @NotNull
   var appointmentDeliveryType: AppointmentDeliveryType,
 
   // TODO: Transform to @NotNull this change is live
   @Column(columnDefinition = "appointment_session_type")
   @Enumerated(EnumType.STRING)
-  @Type(PostgreSQLEnumType::class)
+  @JdbcType(PostgreSQLEnumJdbcType::class)
   var appointmentSessionType: AppointmentSessionType? = null,
 
   var npsOfficeCode: String? = null,
