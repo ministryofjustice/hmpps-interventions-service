@@ -51,8 +51,7 @@ class EndOfServiceReportService(
       ?: throw EntityNotFoundException("End of service report not found for referral [id=$referralId]")
   }
 
-  fun updateEndOfServiceReport(endOfServiceReportId: UUID, furtherInformation: String?, outcome: EndOfServiceReportOutcome?):
-    EndOfServiceReport {
+  fun updateEndOfServiceReport(endOfServiceReportId: UUID, furtherInformation: String?, outcome: EndOfServiceReportOutcome?): EndOfServiceReport {
     val endOfServiceReport = getEndOfServiceReport(endOfServiceReportId)
 
     updateEndOfServiceReport(endOfServiceReport, furtherInformation)

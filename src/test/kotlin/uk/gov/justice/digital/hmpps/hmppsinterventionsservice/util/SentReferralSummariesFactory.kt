@@ -30,14 +30,11 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
     selectedServiceCategories: MutableSet<ServiceCategory>? = null,
     desiredOutcomes: List<DesiredOutcome> = emptyList(),
     actionPlans: MutableList<ActionPlan>? = mutableListOf(),
-
     sentAt: OffsetDateTime = OffsetDateTime.now(),
     sentBy: AuthUser = authUserFactory.create(),
     referenceNumber: String = "JS18726AC",
     supplementaryRiskId: UUID = UUID.randomUUID(),
-
     assignments: List<ReferralAssignment> = emptyList(),
-
     supplierAssessment: SupplierAssessment? = null,
     serviceUserData: ReferralServiceUserData? = null,
   ): SentReferralSummary {
@@ -88,14 +85,11 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
     selectedServiceCategories: MutableSet<ServiceCategory>? = null,
     desiredOutcomes: List<DesiredOutcome> = emptyList(),
     actionPlans: MutableList<ActionPlan>? = mutableListOf(),
-
     sentAt: OffsetDateTime = OffsetDateTime.now(),
     sentBy: AuthUser = authUserFactory.create(),
     referenceNumber: String = "JS18726AC",
     supplementaryRiskId: UUID = UUID.randomUUID(),
-
     assignments: List<ReferralAssignment> = emptyList(),
-
     supplierAssessment: SupplierAssessment? = null,
     serviceUserData: ReferralServiceUserData? = null,
   ): Pair<SentReferralSummary, Referral> {

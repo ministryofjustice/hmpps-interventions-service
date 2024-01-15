@@ -26,7 +26,7 @@ data class UserDetail(
   override val lastName: String,
 ) : ContactablePerson
 
-private const val AuthServiceProviderGroupPrefix = "INT_SP_"
+private const val AUTH_SERVICE_PROVIDER_GROUP_PREFIX = "INT_SP_"
 
 private data class AuthGroupResponse(
   val groupCode: String,

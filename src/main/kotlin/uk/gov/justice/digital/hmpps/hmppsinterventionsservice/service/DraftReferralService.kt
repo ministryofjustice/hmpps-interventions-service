@@ -67,7 +67,7 @@ class DraftReferralService(
 ) {
   companion object {
     private val logger = KotlinLogging.logger {}
-    private const val maxReferenceNumberTries = 10
+    private const val MAX_REFERENCE_NUNMBER_TRIES = 10
   }
 
   fun createDraftReferral(
@@ -635,7 +635,7 @@ class DraftReferralService(
   private fun generateReferenceNumber(draftReferral: DraftReferral): String? {
     val type = draftReferral.intervention.dynamicFrameworkContract.contractType.name
 
-    for (i in 1..maxReferenceNumberTries) {
+    for (i in 1..MAX_REFERENCE_NUNMBER_TRIES) {
       val candidate = referenceGenerator.generate(type)
       if (!referralRepository.existsByReferenceNumber(candidate)) {
         return candidate
@@ -649,7 +649,7 @@ class DraftReferralService(
 
     logger.error(
       "Unable to generate a referral number {} {}",
-      StructuredArguments.kv("tries", maxReferenceNumberTries),
+      StructuredArguments.kv("tries", MAX_REFERENCE_NUNMBER_TRIES),
       StructuredArguments.kv("referral_id", draftReferral.id),
     )
     return null

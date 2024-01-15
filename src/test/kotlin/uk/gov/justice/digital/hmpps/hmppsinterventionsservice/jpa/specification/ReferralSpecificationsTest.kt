@@ -29,7 +29,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SentReferralS
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAssessmentFactory
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
-
 @RepositoryTest
 class ReferralSpecificationsTest @Autowired constructor(
   val entityManager: TestEntityManager,
@@ -74,14 +73,16 @@ class ReferralSpecificationsTest @Autowired constructor(
     val truncateSeconds: Comparator<OffsetDateTime> = Comparator { a, exp ->
       if (exp != null && a != null) {
         if (a
-          .truncatedTo(ChronoUnit.SECONDS)
-          .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
+            .truncatedTo(ChronoUnit.SECONDS)
+            .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
         ) {
           0
         } else {
           1
         }
-      } else { 0 }
+      } else {
+        0
+      }
     }
     recursiveComparisonConfiguration = recursiveComparisonConfigurationBuilder
       .withComparatorForType(truncateSeconds, OffsetDateTime::class.java)

@@ -23,5 +23,7 @@ data class EndOfServiceReportOutcome(
 )
 
 enum class AchievementLevel {
-  ACHIEVED, PARTIALLY_ACHIEVED, NOT_ACHIEVED
+  ACHIEVED,
+  PARTIALLY_ACHIEVED,
+  NOT_ACHIEVED,
 }

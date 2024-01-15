@@ -23,11 +23,14 @@ enum class DeliveryState(
 }
 
 enum class ReferralEndState {
-  AWAITING_END_OF_SERVICE_REPORT, CAN_CONCLUDE
+  AWAITING_END_OF_SERVICE_REPORT,
+  CAN_CONCLUDE,
 }
 
 enum class ReferralConcludedState {
-  CANCELLED, PREMATURELY_ENDED, COMPLETED
+  CANCELLED,
+  PREMATURELY_ENDED,
+  COMPLETED,
 }
 
 @Service

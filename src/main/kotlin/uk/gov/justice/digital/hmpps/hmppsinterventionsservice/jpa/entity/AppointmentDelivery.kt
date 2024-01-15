@@ -44,5 +44,6 @@ enum class AppointmentDeliveryType {
 }
 
 enum class AppointmentSessionType {
-  ONE_TO_ONE, GROUP
+  ONE_TO_ONE,
+  GROUP,
 }

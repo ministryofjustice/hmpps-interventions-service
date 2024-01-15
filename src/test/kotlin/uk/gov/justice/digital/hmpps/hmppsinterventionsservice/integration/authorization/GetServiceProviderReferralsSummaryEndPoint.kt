@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthS
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFactory
 
 class GetServiceProviderReferralsSummaryEndPoint : IntegrationTestBase() {
+
   @MockBean
   lateinit var mockHmppsAuthService: HMPPSAuthService
 

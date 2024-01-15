@@ -28,7 +28,8 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 enum class PersonCurrentLocationType {
-  CUSTODY, COMMUNITY
+  CUSTODY,
+  COMMUNITY,
 }
 
 @Entity

@@ -58,6 +58,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionF
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralDetailsFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralServiceUserFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralSummaryFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SentReferralSummariesFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceProviderFactory
@@ -165,14 +166,16 @@ class ReferralServiceTest @Autowired constructor(
     private val truncateSeconds: Comparator<OffsetDateTime> = Comparator { a, exp ->
       if (exp != null && a != null) {
         if (a
-          .truncatedTo(ChronoUnit.SECONDS)
-          .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
+            .truncatedTo(ChronoUnit.SECONDS)
+            .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
         ) {
           0
         } else {
           1
         }
-      } else { 0 }
+      } else {
+        0
+      }
     }
 
     private val recursiveComparisonConfiguration: RecursiveComparisonConfiguration = recursiveComparisonConfigurationBuilder
@@ -739,14 +742,16 @@ class ReferralServiceTest @Autowired constructor(
     private val truncateSeconds: Comparator<OffsetDateTime> = Comparator { a, exp ->
       if (exp != null && a != null) {
         if (a
-          .truncatedTo(ChronoUnit.SECONDS)
-          .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
+            .truncatedTo(ChronoUnit.SECONDS)
+            .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
         ) {
           0
         } else {
           1
         }
-      } else { 0 }
+      } else {
+        0
+      }
     }
 
     private val recursiveComparisonConfiguration: RecursiveComparisonConfiguration = recursiveComparisonConfigurationBuilder

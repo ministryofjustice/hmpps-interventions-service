@@ -178,16 +178,13 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     selectedServiceCategories: MutableSet<ServiceCategory>? = null,
     desiredOutcomes: List<DesiredOutcome> = emptyList(),
     actionPlans: MutableList<ActionPlan>? = mutableListOf(),
-
     sentAt: OffsetDateTime = OffsetDateTime.now(),
     sentBy: AuthUser = authUserFactory.create(),
     referenceNumber: String? = "JS18726AC",
     supplementaryRiskId: UUID = UUID.randomUUID(),
-
     assignments: List<ReferralAssignment> = listOf(
       ReferralAssignment(OffsetDateTime.now(), authUserFactory.createSP(), authUserFactory.createSP()),
     ),
-
     supplierAssessment: SupplierAssessment? = null,
     serviceUserData: ReferralServiceUserData? = null,
   ): Referral {
@@ -240,16 +237,12 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     actionPlans: MutableList<ActionPlan>? = mutableListOf(),
     supplierAssessment: SupplierAssessment? = null,
     desiredOutcomes: List<DesiredOutcome> = emptyList(),
-
     assignments: List<ReferralAssignment> = emptyList(),
-
     endRequestedAt: OffsetDateTime? = OffsetDateTime.now(),
     endRequestedBy: AuthUser? = authUserFactory.create(),
     endRequestedReason: CancellationReason? = cancellationReasonFactory.create(),
     endRequestedComments: String? = null,
-
     concludedAt: OffsetDateTime? = null,
-
     endOfServiceReport: EndOfServiceReport? = null,
     ndeliusPPName: String? = "Bob",
     ndeliusPPEmailAddress: String? = "bob@example.com",

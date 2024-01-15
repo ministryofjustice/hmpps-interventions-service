@@ -32,8 +32,8 @@ class NdmisPerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
     testJobLauncher.setJobRepository(jobRepository)
     testJobLauncher.afterPropertiesSet()
     super.setJobLauncher(testJobLauncher)
-
-  fun setJob(@Qualifier("ndmisPerformanceReportJob") job: Job) {
+  }
+  override fun setJob(@Qualifier("ndmisPerformanceReportJob") job: Job) {
     super.setJob(job)
   }
 }

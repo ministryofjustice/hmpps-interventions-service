@@ -11,8 +11,7 @@ class PCCRegionFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     id: String = "avon-and-somerset",
     name: String = "Avon & Somerset",
     npsRegion: NPSRegion? = null,
-  ):
-    PCCRegion {
+  ): PCCRegion {
     return save(PCCRegion(id = id, name = name, npsRegion = npsRegion ?: npsRegionFactory.create()))
   }
 }

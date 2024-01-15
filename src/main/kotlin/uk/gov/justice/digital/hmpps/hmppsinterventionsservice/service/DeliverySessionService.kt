@@ -231,7 +231,7 @@ class DeliverySessionService(
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
     attended: Attended? = null,
-    didSessionHappen: Boolean ? = null,
+    didSessionHappen: Boolean? = null,
     notifyProbationPractitioner: Boolean? = null,
     late: Boolean?,
     lateReason: String?,
@@ -501,7 +501,9 @@ class DeliverySessionService(
   }
   private fun setSuperseded(attended: Attended, appointment: Appointment) {
     when (attended) {
-      Attended.LATE, Attended.YES -> { appointment.superseded = false }
+      Attended.LATE, Attended.YES -> {
+        appointment.superseded = false
+      }
       else -> return
     }
   }

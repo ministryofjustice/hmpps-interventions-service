@@ -8,7 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Service
 import java.time.Instant
 import java.util.UUID
 
-class ReferralSummariesRepositoryImpl : ReferralSummariesRepository {
+class ReferralSummariesRepositoryImpl {
 
   @PersistenceContext
   private lateinit var entityManager: EntityManager
@@ -63,7 +63,7 @@ class ReferralSummariesRepositoryImpl : ReferralSummariesRepository {
 ) a where assigned_at_desc_seq = 1 $dashboardRestrictionCriteria"""
   }
 
-  override fun getSentReferralSummaries(authUser: AuthUser, serviceProviders: List<String>, dashboardType: DashboardType?): List<ServiceProviderSentReferralSummary> {
+  fun getSentReferralSummaries(authUser: AuthUser, serviceProviders: List<String>, dashboardType: DashboardType?): List<ServiceProviderSentReferralSummary> {
     val query = entityManager.createNativeQuery(summariesQuery(constructCustomCriteria(dashboardType)))
     query.setParameter("serviceProviders", serviceProviders)
     if (dashboardType == DashboardType.MyCases) {
