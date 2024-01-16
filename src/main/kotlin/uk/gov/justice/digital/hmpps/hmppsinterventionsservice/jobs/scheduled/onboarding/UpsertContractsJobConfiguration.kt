@@ -6,6 +6,7 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.step.builder.StepBuilder
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -18,7 +19,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.Timestam
 @EnableBatchProcessing
 class UpsertContractsJobConfiguration(
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
-  private val jobRepository: JobRepository,
+  @Qualifier("batchJobRepository") private val jobRepository: JobRepository,
   private val platformTransactionManager: PlatformTransactionManager,
 ) {
 

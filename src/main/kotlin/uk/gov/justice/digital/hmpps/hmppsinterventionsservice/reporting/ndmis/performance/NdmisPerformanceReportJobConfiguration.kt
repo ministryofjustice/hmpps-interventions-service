@@ -17,6 +17,7 @@ import org.springframework.batch.item.database.JpaCursorItemReader
 import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
 import org.springframework.batch.repeat.RepeatStatus
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
@@ -39,7 +40,7 @@ import java.nio.file.Path
 class NdmisPerformanceReportJobConfiguration(
   private val transactionManager: PlatformTransactionManager,
   private val entityManagerFactory: EntityManagerFactory,
-  private val jobRepository: JobRepository,
+  @Qualifier("batchJobRepository") private val jobRepository: JobRepository,
   private val batchUtils: BatchUtils,
   private val s3Service: S3Service,
   private val ndmisS3Bucket: S3Bucket,

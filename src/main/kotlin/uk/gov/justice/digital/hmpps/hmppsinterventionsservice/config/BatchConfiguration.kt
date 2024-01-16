@@ -71,9 +71,12 @@ class BatchConfiguration(
   }
 
   @Bean("batchJobExplorer")
-  fun jobExplorer(@Qualifier("batchDataSource") dataSource: DataSource): JobExplorer {
+  fun jobExplorer(@Qualifier("batchDataSource") dataSource: DataSource,
+                  transactionManager: PlatformTransactionManager,
+  ): JobExplorer {
     val factory = JobExplorerFactoryBean()
     factory.setDataSource(dataSource)
+    factory.setTransactionManager(transactionManager)
     factory.afterPropertiesSet()
     return factory.getObject()
   }
