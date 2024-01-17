@@ -327,10 +327,11 @@ class DraftReferralServiceTest @Autowired constructor(
         ndeliusPPName = "chris patt",
         ndeliusPPEmailAddress = "pp@abc.com",
         ndeliusPDU = "pdu1",
+        ndeliusPhoneNumber = "07343434343",
+        ndeliusTeamPhoneNumber = "020-3434343434",
         ppName = "chris pratt",
         ppEmailAddress = "rr@abc.com",
         ppPdu = "pdu2",
-        hasValidDeliusPPDetails = false,
       )
       draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
       val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
@@ -339,10 +340,11 @@ class DraftReferralServiceTest @Autowired constructor(
       assertThat(savedDraftReferral?.nDeliusPPName).isEqualTo("chris patt")
       assertThat(savedDraftReferral?.nDeliusPPEmailAddress).isEqualTo("pp@abc.com")
       assertThat(savedDraftReferral?.nDeliusPPPDU).isEqualTo("pdu1")
+      assertThat(savedDraftReferral?.nDeliusPPTelephoneNumber).isEqualTo("07343434343")
+      assertThat(savedDraftReferral?.nDeliusPPTeamTelephoneNumber).isEqualTo("020-3434343434")
       assertThat(savedDraftReferral?.ppName).isEqualTo("chris pratt")
       assertThat(savedDraftReferral?.ppEmailAddress).isEqualTo("rr@abc.com")
       assertThat(savedDraftReferral?.ppPdu).isEqualTo("pdu2")
-      assertThat(savedDraftReferral?.hasValidDeliusPPDetails).isFalse
     }
 
     @Test
@@ -365,7 +367,6 @@ class DraftReferralServiceTest @Autowired constructor(
       assertThat(savedDraftReferral?.ppName).isEqualTo("chris pratt")
       assertThat(savedDraftReferral?.ppEmailAddress).isEqualTo("rr@abc.com")
       assertThat(savedDraftReferral?.ppPdu).isEqualTo("pdu2")
-      assertThat(savedDraftReferral?.hasValidDeliusPPDetails).isTrue
     }
 
     @Test
@@ -376,7 +377,9 @@ class DraftReferralServiceTest @Autowired constructor(
         ndeliusPPName = "chris patt",
         ndeliusPPEmailAddress = "pp@abc.com",
         ndeliusPDU = "pdu1",
-        hasValidDeliusPPDetails = false,
+        ndeliusPhoneNumber = "073434343243",
+        ndeliusTeamPhoneNumber = "020-4544343434",
+
       )
       draftReferralService.updateDraftReferral(sampleDraftReferral, draftReferral)
       val savedDraftReferral = draftReferralService.getDraftReferralForUser(sampleDraftReferral.id, userFactory.create())
@@ -385,10 +388,11 @@ class DraftReferralServiceTest @Autowired constructor(
       assertThat(savedDraftReferral?.nDeliusPPName).isEqualTo("chris patt")
       assertThat(savedDraftReferral?.nDeliusPPEmailAddress).isEqualTo("pp@abc.com")
       assertThat(savedDraftReferral?.nDeliusPPPDU).isEqualTo("pdu1")
+      assertThat(savedDraftReferral?.nDeliusPPTelephoneNumber).isEqualTo("073434343243")
+      assertThat(savedDraftReferral?.nDeliusPPTeamTelephoneNumber).isEqualTo("020-4544343434")
       assertThat(savedDraftReferral?.ppName).isNull()
       assertThat(savedDraftReferral?.ppEmailAddress).isNull()
       assertThat(savedDraftReferral?.ppPdu).isNull()
-      assertThat(savedDraftReferral?.hasValidDeliusPPDetails).isFalse
     }
 
     @Test

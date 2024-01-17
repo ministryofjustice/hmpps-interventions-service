@@ -121,6 +121,7 @@ class DraftReferralService(
     updateServiceCategoryDetails(referral, update)
     updatePersonCurrentLocation(referral, update)
     updatePersonExpectedReleaseDate(referral, update)
+    updateDeliusProbationPractitionerDetails(referral, update)
     updateProbationPractitionerDetails(referral, update)
 
     updateMainPointOfContactDetails(referral, update)
@@ -165,16 +166,59 @@ class DraftReferralService(
     }
   }
 
-  private fun updateProbationPractitionerDetails(referral: DraftReferral, update: DraftReferralDTO) {
-    if (update.hasValidDeliusPPDetails != null) {
+  private fun updateDeliusProbationPractitionerDetails(referral: DraftReferral, update: DraftReferralDTO) {
+    if (update.ndeliusPPName != null) {
       referral.nDeliusPPName = update.ndeliusPPName
-      referral.nDeliusPPEmailAddress = update.ndeliusPPEmailAddress
+    }
+    if (update.ndeliusPDU != null) {
       referral.nDeliusPPPDU = update.ndeliusPDU
+    }
+    if (update.ndeliusPPEmailAddress == "") {
+      referral.nDeliusPPEmailAddress = null
+    } else if (update.ndeliusPPEmailAddress != null) {
+      referral.nDeliusPPEmailAddress = update.ndeliusPPEmailAddress
+    }
+    if (update.ndeliusPhoneNumber == "") {
+      referral.nDeliusPPTelephoneNumber = null
+    } else if (update.ndeliusPhoneNumber != null) {
+      referral.nDeliusPPTelephoneNumber = update.ndeliusPhoneNumber
+    }
+    if (update.ndeliusTeamPhoneNumber == "") {
+      referral.nDeliusPPTeamTelephoneNumber = null
+    } else if (update.ndeliusTeamPhoneNumber != null) {
+      referral.nDeliusPPTeamTelephoneNumber = update.ndeliusTeamPhoneNumber
+    }
+  }
+
+  private fun updateProbationPractitionerDetails(referral: DraftReferral, update: DraftReferralDTO) {
+    if (update.ppName != null) {
       referral.ppName = update.ppName
-      referral.ppEmailAddress = update.ppEmailAddress
+    }
+    if (update.ppPdu != null) {
       referral.ppPdu = update.ppPdu
+    }
+    if (update.ppEmailAddress == "") {
+      referral.ppEmailAddress = null
+    } else if (update.ppEmailAddress != null) {
+      referral.ppEmailAddress = update.ppEmailAddress
+    }
+
+    if (update.ppPhoneNumber == "") {
+      referral.ppPhoneNumber = null
+    } else if (update.ppPhoneNumber != null) {
+      referral.ppPhoneNumber = update.ppPhoneNumber
+    }
+
+    if (update.ppTeamPhoneNumber == "") {
+      referral.ppTeamTelephoneNumber = null
+    } else if (update.ppTeamPhoneNumber != null) {
+      referral.ppTeamTelephoneNumber = update.ppTeamPhoneNumber
+    }
+
+    if (update.ppProbationOffice == "") {
+      referral.ppProbationOffice = null
+    } else if (update.ppProbationOffice != null) {
       referral.ppProbationOffice = update.ppProbationOffice
-      referral.hasValidDeliusPPDetails = update.hasValidDeliusPPDetails
     }
   }
 
@@ -522,10 +566,14 @@ class DraftReferralService(
         nDeliusName = draftReferral.nDeliusPPName,
         nDeliusEmailAddress = draftReferral.nDeliusPPEmailAddress,
         nDeliusPDU = draftReferral.nDeliusPPPDU,
+        nDeliusPPTelephoneNumber = draftReferral.nDeliusPPTelephoneNumber,
+        nDeliusPPTeamTelephoneNumber = draftReferral.nDeliusPPTeamTelephoneNumber,
         name = draftReferral.ppName,
         emailAddress = draftReferral.ppEmailAddress,
         pdu = draftReferral.ppPdu,
         probationOffice = draftReferral.ppProbationOffice,
+        ppPhoneNumber = draftReferral.ppPhoneNumber,
+        ppTeamTelephoneNumber = draftReferral.ppTeamTelephoneNumber,
         establishment = draftReferral.ppEstablishment,
         roleOrJobTitle = draftReferral.roleOrJobTitle,
       ),
