@@ -123,7 +123,8 @@ internal class AppointmentValidatorTest {
       @Test
       fun `past appointment on same day allowed if no attendance reported`() {
         val updateAppointmentDTO = UpdateAppointmentDTO(
-          appointmentTime = OffsetDateTime.now().minusMinutes(1), // will fail if the test runs just after midnight
+          appointmentTime = OffsetDateTime.now().minusMinutes(1),
+          // will fail if the test runs just after midnight
           durationInMinutes = 1,
           appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE,
           sessionType = AppointmentSessionType.ONE_TO_ONE,
@@ -161,7 +162,8 @@ internal class AppointmentValidatorTest {
       @Test
       fun `appointment date greater than 6 months ahead throws validation error`() {
         val updateAppointmentDTO = UpdateAppointmentDTO(
-          appointmentTime = OffsetDateTime.now().plusMonths(7), // will fail if the test runs just after midnight
+          appointmentTime = OffsetDateTime.now().plusMonths(7),
+          // will fail if the test runs just after midnight
           durationInMinutes = 1,
           appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE,
           sessionType = AppointmentSessionType.ONE_TO_ONE,

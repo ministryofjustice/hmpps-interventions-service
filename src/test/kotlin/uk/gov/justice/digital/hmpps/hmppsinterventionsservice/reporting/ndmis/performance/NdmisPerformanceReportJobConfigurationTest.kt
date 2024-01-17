@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.p
 
 import mu.KLogging
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
 import org.springframework.batch.core.ExitStatus
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobExecution
@@ -60,8 +61,9 @@ class NdmisPerformanceReportJobConfigurationTest : IntegrationTestBase() {
     return jobLauncher.run(job, parametersWithTimestamp)
   }
 
-  // @Test
-  fun `job writes non-empty CSV export files`() {
+  @Test
+  fun jobWritesNonEmptyCsvExportFiles() {
+    // job writes non-empty CSV export files
     val referral = setupAssistant.createSentReferral()
       .also { setupAssistant.fillReferralFields(it) }
       .also { setupAssistant.addEndOfServiceReportWithOutcome(referral = it) }

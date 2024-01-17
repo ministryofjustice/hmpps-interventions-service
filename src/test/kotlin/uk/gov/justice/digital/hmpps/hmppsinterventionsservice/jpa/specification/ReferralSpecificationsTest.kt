@@ -90,7 +90,7 @@ class ReferralSpecificationsTest @Autowired constructor(
   }
 
   @Nested
-  inner class sent {
+  inner class Sent {
     @Test
     fun `only sent referrals are returned`() {
       val sent = referralFactory.createSent()
@@ -102,8 +102,7 @@ class ReferralSpecificationsTest @Autowired constructor(
     }
   }
 
-  @Nested
-  inner class concluded {
+  inner class Concluded {
     @Test
     fun `only concluded referrals are returned`() {
       val sent = referralFactory.createSent()
@@ -132,7 +131,7 @@ class ReferralSpecificationsTest @Autowired constructor(
   }
 
   @Nested
-  inner class cancelled {
+  inner class Cancelled {
     @Test
     fun `only cancelled referrals are returned`() {
       val cancelled = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now(), concludedAt = OffsetDateTime.now(), endOfServiceReport = null)
@@ -149,7 +148,7 @@ class ReferralSpecificationsTest @Autowired constructor(
   }
 
   @Nested
-  inner class withSPAccess {
+  inner class WithSPAccess {
     @Test
     fun `sp with no contracts should never return a referral`() {
       referralFactory.createSent()
@@ -182,7 +181,7 @@ class ReferralSpecificationsTest @Autowired constructor(
   }
 
   @Nested
-  inner class assignedTo {
+  inner class AssignedTo {
     @Test
     fun `returns referral if user is currently assigned`() {
       val user = authUserFactory.create(id = "loggedInUser")

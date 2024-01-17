@@ -39,7 +39,7 @@ internal class RisksAndNeedsServiceTest : LoggingSpyTest(RisksAndNeedsService::c
   }
 
   @Nested
-  inner class createSupplementaryRisk {
+  inner class CreateSupplementaryRisk {
     val oasysRiskInformation = RedactedRisk(
       "someone",
       "all the time",
