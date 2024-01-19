@@ -64,12 +64,14 @@ class NdmisPerformanceReportJobConfiguration(
   @JobScope
   @Bean
   fun ndmisReader(): JpaCursorItemReader<Referral> {
-    return JpaCursorItemReaderBuilder<Referral>()
+    val reader = JpaCursorItemReaderBuilder<Referral>()
       .name("ndmisPerformanceReportReader")
       .queryString("select r from Referral r")
       // do we need .maxItemCount(pageSize)?
       .entityManagerFactory(entityManagerFactory)
+      .saveState(true)
       .build()
+    return reader
   }
 
   @Bean

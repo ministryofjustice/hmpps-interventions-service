@@ -147,25 +147,34 @@ class SupplierAssessmentControllerTest {
       supplierAssessment.referral.supplierAssessment = supplierAssessment
       whenever(userMapper.fromToken(token)).thenReturn(submittedBy)
       whenever(referralService.getSentReferralForUser(eq(referralId), eq(submittedBy))).thenReturn(supplierAssessment.referral)
+
+      val appointment = appointmentFactory.create()
       whenever(
         appointmentService.recordSessionFeedback(
-          appointment = eq(supplierAssessment!!.currentAppointment!!),
-          sessionSummary = eq(sessionSummary),
-          sessionResponse = eq(sessionResponse),
-          sessionConcerns = eq(sessionConcerns),
-          notifyProbationPractitioner = eq(notifyProbationPractitioner),
-          submittedBy = eq(submittedBy),
-          late = any(),
-          lateReason = any(),
-          futureSessionPlans = any(),
-          noAttendanceInformation = any(),
-          noSessionReasonType = any(),
-          noSessionReasonPopAcceptable = any(),
-          noSessionReasonPopUnacceptable = any(),
-          noSessionReasonLogistics = any(),
+          eq(supplierAssessment!!.currentAppointment!!),
+          eq(false),
+          eq(null),
+          eq(null),
+          eq(null),
+          eq(null),
+          eq(null),
+          eq(null),
+          eq(null),
+          eq(sessionSummary),
+          eq(sessionResponse),
+          eq(sessionConcerns),
+          eq(notifyProbationPractitioner),
+          eq(submittedBy),
         ),
       ).thenReturn(appointmentFactory.create())
-      val request = SessionFeedbackRequestDTO(sessionSummary = sessionSummary, sessionResponse = sessionResponse, sessionConcerns = sessionConcerns, notifyProbationPractitioner = notifyProbationPractitioner)
+
+      val request = SessionFeedbackRequestDTO(
+        late = false,
+        sessionSummary = sessionSummary,
+        sessionResponse = sessionResponse,
+        sessionConcerns = sessionConcerns,
+        notifyProbationPractitioner = notifyProbationPractitioner,
+      )
       val result = supplierAssessmentController.recordSessionFeedback(referralId, request, token)
       assertThat(result).isNotNull
     }
