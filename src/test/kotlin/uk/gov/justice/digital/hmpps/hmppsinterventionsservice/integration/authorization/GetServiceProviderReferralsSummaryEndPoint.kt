@@ -206,6 +206,7 @@ class GetServiceProviderReferralsSummaryEndPoint : IntegrationTestBase() {
       """.trimIndent(),
     )
   }
+
   @AfterEach
   fun `clear referrals`() {
     setupAssistant.cleanAll()
