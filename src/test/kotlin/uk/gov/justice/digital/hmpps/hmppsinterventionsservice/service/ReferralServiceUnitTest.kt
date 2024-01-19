@@ -32,7 +32,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Dra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralSummariesRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSummariesRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.CancellationReasonFactory
@@ -47,7 +47,7 @@ class ReferralServiceUnitTest {
   private val authUserRepository: AuthUserRepository = mock()
   private val referralRepository: ReferralRepository = mock()
   private val draftReferralRepository: DraftReferralRepository = mock()
-  private val referralSummariesRepository: ReferralSummariesRepository = mock()
+  private val sentReferralSummariesRepository: SentReferralSummariesRepository = mock()
   private val interventionRepository: InterventionRepository = mock()
   private val referralEventPublisher: ReferralEventPublisher = mock()
   private val referralConcluder: ReferralConcluder = mock()
@@ -73,7 +73,7 @@ class ReferralServiceUnitTest {
 
   private val referralService = ReferralService(
     referralRepository,
-    referralSummariesRepository,
+    sentReferralSummariesRepository,
     authUserRepository,
     interventionRepository,
     referralConcluder,
@@ -83,6 +83,7 @@ class ReferralServiceUnitTest {
     serviceCategoryRepository,
     referralAccessChecker,
     userTypeChecker,
+    serviceProviderAccessScopeMapper,
     referralAccessFilter,
     communityAPIOffenderService,
     ramDeliusAPIOffenderService,

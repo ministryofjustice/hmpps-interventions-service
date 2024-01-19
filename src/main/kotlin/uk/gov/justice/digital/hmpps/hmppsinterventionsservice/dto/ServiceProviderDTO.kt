@@ -10,9 +10,5 @@ class ServiceProviderDTO(
     fun from(serviceProvider: ServiceProvider): ServiceProviderDTO {
       return ServiceProviderDTO(name = serviceProvider.name, id = serviceProvider.id)
     }
-
-    fun from(serviceProviderName: String, serviceProviderId: String): ServiceProviderDTO {
-      return ServiceProviderDTO(name = serviceProviderName, id = serviceProviderId)
-    }
   }
 }

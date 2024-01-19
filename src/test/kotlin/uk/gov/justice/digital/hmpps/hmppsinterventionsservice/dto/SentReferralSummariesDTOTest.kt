@@ -12,9 +12,11 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest
 import org.springframework.boot.test.json.JacksonTester
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ProbationPractitionerDetails
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralLocation
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralSummaryFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SentReferralSummariesFactory
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -24,7 +26,7 @@ import java.util.stream.Stream
 @JsonTest
 class SentReferralSummariesDTOTest(@Autowired private val json: JacksonTester<SentReferralSummariesDTO>) {
   private val interventionFactory = InterventionFactory()
-  private val referralSummariesFactory = ReferralSummaryFactory()
+  private val sentReferralSummariesFactory = SentReferralSummariesFactory()
 
   companion object {
     @JvmStatic
@@ -114,7 +116,7 @@ class SentReferralSummariesDTOTest(@Autowired private val json: JacksonTester<Se
       ethnicity = "Indian",
     )
 
-    val referralSummary = referralSummariesFactory.createSent(
+    val sentReferralSummary = sentReferralSummariesFactory.createSent(
       id = id,
       serviceUserData = serviceUserData,
       referenceNumber = "something",
@@ -122,17 +124,14 @@ class SentReferralSummariesDTOTest(@Autowired private val json: JacksonTester<Se
       sentBy = sentBy,
     )
 
-    val out = json.write(SentReferralSummariesDTO.from(referralSummary))
-    println("the json is ===>$out")
+    val out = json.write(SentReferralSummariesDTO.from(sentReferralSummary))
     Assertions.assertThat(out).isEqualToJson(
       """
       {
-        "id" : "$id",
         "sentAt": "2021-01-13T21:57:13Z",
         "sentBy": {
           "username": "username",
-          "authSource": "source",
-          "userId":"id",
+          "authSource": "source"
         },
         "referenceNumber": "something",
         "serviceUser": {"crn": "X123456"},
@@ -156,7 +155,7 @@ class SentReferralSummariesDTOTest(@Autowired private val json: JacksonTester<Se
       ethnicity = "Indian",
     )
 
-    val sentReferralSummary = referralSummariesFactory.createSent(
+    val sentReferralSummary = sentReferralSummariesFactory.createSent(
       id = id,
       serviceUserData = serviceUserData,
       referenceNumber = "something",
@@ -196,18 +195,30 @@ class SentReferralSummariesDTOTest(@Autowired private val json: JacksonTester<Se
       ethnicity = "Indian",
     )
 
-    val sentReferralSummary = referralSummariesFactory.createSentReferralSummaryWithReferral(
+    val sentReferralSummary = sentReferralSummariesFactory.createSentReferralSummaryWithReferral(
       id = id,
       serviceUserData = serviceUserData,
       referenceNumber = "something",
       intervention = interventionFactory.create(title = "Accommodation Services for Yorkshire"),
       sentAt = sentAt,
       sentBy = sentBy,
-      type = personCurrentLocationType,
-      prisonId = prisonId,
-      probationOffice = probationOffice,
+    )
+    personCurrentLocationType?.let {
+      sentReferralSummary.first.referralLocation = ReferralLocation(
+        id = UUID.randomUUID(),
+        type = personCurrentLocationType,
+        prisonId = prisonId,
+        expectedReleaseDate = null,
+        expectedReleaseDateMissingReason = null,
+        referral = sentReferralSummary.second,
+      )
+    }
+    sentReferralSummary.first.probationPractitionerDetails = ProbationPractitionerDetails(
+      id = UUID.randomUUID(),
       pdu = pdu,
       nDeliusPDU = nDeliusPDU,
+      probationOffice = probationOffice,
+      referral = sentReferralSummary.second,
     )
 
     val out = json.write(SentReferralSummariesDTO.from(sentReferralSummary.first))

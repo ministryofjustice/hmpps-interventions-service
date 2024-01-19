@@ -32,9 +32,5 @@ data class ServiceUserDTO(
       }
       return dto
     }
-
-    fun from(crn: String, serviceUserFirstName: String?, serviceUserLastName: String?): ServiceUserDTO {
-      return ServiceUserDTO(crn = crn, firstName = serviceUserFirstName, lastName = serviceUserLastName)
-    }
   }
 }
