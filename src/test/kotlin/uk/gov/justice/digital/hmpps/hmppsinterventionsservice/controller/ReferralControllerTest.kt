@@ -25,6 +25,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUse
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DraftOasysRiskInformationService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DraftReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcluder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ServiceCategoryService
@@ -37,6 +39,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAsses
 import java.util.UUID
 
 internal class ReferralControllerTest {
+  private val draftReferralService = mock<DraftReferralService>()
   private val referralService = mock<ReferralService>()
   private val referralConcluder = mock<ReferralConcluder>()
   private val serviceCategoryService = mock<ServiceCategoryService>()
@@ -45,6 +48,7 @@ internal class ReferralControllerTest {
   private val clientApiAccessChecker = ClientApiAccessChecker()
   private val cancellationReasonMapper = mock<CancellationReasonMapper>()
   private val actionPlanService = mock<ActionPlanService>()
+  private val draftOasysRiskInformationService = mock<DraftOasysRiskInformationService>()
   private val telemetryClient = mock<TelemetryClient>()
   private val referralController = ReferralController(
     referralService,
@@ -225,6 +229,67 @@ internal class ReferralControllerTest {
         )
       }
       assertThat(e.message).isEqualTo("could not map auth token to user: [no 'user_id' claim in token, no 'user_name' claim in token]")
+    }
+  }
+
+  @Nested
+  inner class GetServiceProviderSentReferralsSummary {
+    private val token = tokenFactory.create()
+
+    @Test
+    fun `can accept all defined dashboard types`() {
+      whenever(referralService.getServiceProviderSummaries(any(), any())).thenReturn(emptyList())
+      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
+      assertThat(
+        referralController.getServiceProviderSentReferralsSummary(
+          token,
+          "MyCases",
+        ),
+      ).isNotNull
+
+      assertThat(
+        referralController.getServiceProviderSentReferralsSummary(
+          token,
+          "OpenCases",
+        ),
+      ).isNotNull
+
+      assertThat(
+        referralController.getServiceProviderSentReferralsSummary(
+          token,
+          "UnassignedCases",
+        ),
+      ).isNotNull
+
+      assertThat(
+        referralController.getServiceProviderSentReferralsSummary(
+          token,
+          "CompletedCases",
+        ),
+      ).isNotNull
+    }
+
+    @Test
+    fun `returns default list when no dashboardType provided`() {
+      whenever(referralService.getServiceProviderSummaries(any(), any())).thenReturn(emptyList())
+      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
+      val result = referralController.getServiceProviderSentReferralsSummary(
+        token,
+        null,
+      )
+      assertThat(result).isNotNull
+    }
+
+    @Test
+    fun `thros error when invalid dashboardType provided`() {
+      whenever(referralService.getServiceProviderSummaries(any(), any())).thenReturn(emptyList())
+      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
+      assertThrows<IllegalArgumentException> {
+        referralController.getServiceProviderSentReferralsSummary(
+          token,
+          "invalidDashBoardType",
+        )
+      }
     }
   }
 
