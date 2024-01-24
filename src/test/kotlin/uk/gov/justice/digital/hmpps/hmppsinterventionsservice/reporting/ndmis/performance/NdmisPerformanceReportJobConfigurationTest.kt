@@ -6,8 +6,6 @@ import org.springframework.batch.core.ExitStatus
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobParametersBuilder
-import org.springframework.batch.core.launch.support.SimpleJobLauncher
-import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.test.JobLauncherTestUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -23,17 +21,6 @@ import kotlin.io.path.pathString
 class NdmisPerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
   @Autowired
   override fun setJob(@Qualifier("ndmisPerformanceReportJob") job: Job) = super.setJob(job)
-
-  @Autowired
-  override fun setJobRepository(@Qualifier("batchJobRepository") jobRepository: JobRepository) = super.setJobRepository(jobRepository)
-
-  @Autowired
-  fun testJobLauncher(@Qualifier("batchJobRepository") jobRepository: JobRepository) {
-    val testJobLauncher = SimpleJobLauncher()
-    testJobLauncher.setJobRepository(jobRepository)
-    testJobLauncher.afterPropertiesSet()
-    super.setJobLauncher(testJobLauncher)
-  }
 }
 
 class NdmisPerformanceReportJobConfigurationTest : IntegrationTestBase() {
