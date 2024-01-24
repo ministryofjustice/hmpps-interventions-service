@@ -64,7 +64,8 @@ class DeliverySessionController(
       updateAppointmentDTO.npsOfficeCode,
       updateAppointmentDTO.attendanceFeedback?.attended,
       updateAppointmentDTO.attendanceFeedback?.didSessionHappen,
-      updateAppointmentDTO.sessionFeedback?.notifyProbationPractitioner,
+      updateAppointmentDTO.sessionFeedback?.notifyProbationPractitionerOfBehaviour,
+      updateAppointmentDTO.sessionFeedback?.notifyProbationPractitionerOfConcerns,
       updateAppointmentDTO.sessionFeedback?.late,
       updateAppointmentDTO.sessionFeedback?.lateReason,
       updateAppointmentDTO.sessionFeedback?.futureSessionPlans,
@@ -75,6 +76,7 @@ class DeliverySessionController(
       updateAppointmentDTO.sessionFeedback?.noSessionReasonLogistics,
       updateAppointmentDTO.sessionFeedback?.sessionSummary,
       updateAppointmentDTO.sessionFeedback?.sessionResponse,
+      updateAppointmentDTO.sessionFeedback?.sessionBehaviour,
       updateAppointmentDTO.sessionFeedback?.sessionConcerns,
     )
     return DeliverySessionDTO.from(deliverySession)
@@ -169,7 +171,8 @@ class DeliverySessionController(
       request.npsOfficeCode,
       request.attendanceFeedback?.attended,
       request.attendanceFeedback?.didSessionHappen,
-      request.sessionFeedback?.notifyProbationPractitioner,
+      request.sessionFeedback?.notifyProbationPractitionerOfBehaviour,
+      request.sessionFeedback?.notifyProbationPractitionerOfConcerns,
       request.sessionFeedback?.late,
       request.sessionFeedback?.lateReason,
       request.sessionFeedback?.futureSessionPlans,
@@ -180,6 +183,7 @@ class DeliverySessionController(
       request.sessionFeedback?.noSessionReasonLogistics,
       request.sessionFeedback?.sessionSummary,
       request.sessionFeedback?.sessionResponse,
+      request.sessionFeedback?.sessionBehaviour,
       request.sessionFeedback?.sessionConcerns,
     )
     return DeliverySessionAppointmentDTO.from(deliverySession.sessionNumber, deliverySession.currentAppointment!!)
@@ -211,7 +215,8 @@ class DeliverySessionController(
       request.npsOfficeCode,
       request.attendanceFeedback?.attended,
       request.attendanceFeedback?.didSessionHappen,
-      request.sessionFeedback?.notifyProbationPractitioner,
+      request.sessionFeedback?.notifyProbationPractitionerOfBehaviour,
+      request.sessionFeedback?.notifyProbationPractitionerOfConcerns,
       request.sessionFeedback?.late,
       request.sessionFeedback?.lateReason,
       request.sessionFeedback?.futureSessionPlans,
@@ -222,6 +227,7 @@ class DeliverySessionController(
       request.sessionFeedback?.noSessionReasonLogistics,
       request.sessionFeedback?.sessionSummary,
       request.sessionFeedback?.sessionResponse,
+      request.sessionFeedback?.sessionBehaviour,
       request.sessionFeedback?.sessionConcerns,
     )
     return DeliverySessionAppointmentDTO.from(deliverySession.sessionNumber, deliverySession.currentAppointment!!)
@@ -277,8 +283,10 @@ class DeliverySessionController(
       request.noSessionReasonLogistics,
       request.sessionSummary,
       request.sessionResponse,
+      request.sessionBehaviour,
       request.sessionConcerns,
-      request.notifyProbationPractitioner,
+      request.notifyProbationPractitionerOfBehaviour,
+      request.notifyProbationPractitionerOfConcerns,
     )
     return DeliverySessionAppointmentDTO.from(updatedSessionAppointment.first.sessionNumber, updatedSessionAppointment.second)
   }

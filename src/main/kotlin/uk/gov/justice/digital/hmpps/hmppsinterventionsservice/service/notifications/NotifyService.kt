@@ -156,15 +156,28 @@ class NotifyAppointmentService(
           )
         }
         AppointmentEventType.SESSION_FEEDBACK_RECORDED -> {
-          emailSender.sendEmail(
-            concerningBehaviourTemplateID,
-            recipient.email,
-            mapOf(
-              "ppFirstName" to recipient.firstName,
-              "popfullname" to popFullName,
-              "sessionUrl" to sessionFeedbackLocation.toString(),
-            ),
-          )
+          if (event.notifyProbationPractitionerOfBehaviour == true) {
+            emailSender.sendEmail(
+              concerningBehaviourTemplateID,
+              recipient.email,
+              mapOf(
+                "ppFirstName" to recipient.firstName,
+                "popfullname" to popFullName,
+                "sessionUrl" to sessionFeedbackLocation.toString(),
+              ),
+            )
+          }
+          if (event.notifyProbationPractitionerOfConcerns == true) {
+            emailSender.sendEmail(
+              concerningBehaviourTemplateID,
+              recipient.email,
+              mapOf(
+                "ppFirstName" to recipient.firstName,
+                "popfullname" to popFullName,
+                "sessionUrl" to sessionFeedbackLocation.toString(),
+              ),
+            )
+          }
         }
         AppointmentEventType.SCHEDULED -> {
           emailSender.sendEmail(

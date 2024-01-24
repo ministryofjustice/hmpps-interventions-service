@@ -51,7 +51,8 @@ class SupplierAssessmentService(
     npsOfficeCode: String? = null,
     attended: Attended? = null,
     didSessionHappen: Boolean? = null,
-    notifyProbationPractitioner: Boolean? = null,
+    notifyProbationPractitionerOfBehaviour: Boolean? = null,
+    notifyProbationPractitionerOfConcerns: Boolean? = null,
     late: Boolean? = null,
     lateReason: String? = null,
     futureSessionPlans: String? = null,
@@ -62,6 +63,7 @@ class SupplierAssessmentService(
     noSessionReasonLogistics: String? = null,
     sessionSummary: String? = null,
     sessionResponse: String? = null,
+    sessionBehaviour: String? = null,
     sessionConcerns: String? = null,
   ): Appointment {
     val existingAppointment = supplierAssessment.currentAppointment
@@ -77,7 +79,8 @@ class SupplierAssessmentService(
       appointmentDeliveryAddress,
       npsOfficeCode,
       attended,
-      notifyProbationPractitioner,
+      notifyProbationPractitionerOfBehaviour,
+      notifyProbationPractitionerOfConcerns,
       didSessionHappen,
       late,
       lateReason,
@@ -89,6 +92,7 @@ class SupplierAssessmentService(
       noSessionReasonLogistics,
       sessionSummary,
       sessionResponse,
+      sessionBehaviour,
       sessionConcerns,
     )
     supplierAssessment.appointments.add(appointment)

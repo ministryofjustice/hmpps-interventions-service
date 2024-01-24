@@ -41,7 +41,8 @@ class CommunityAPIBookingService(
     appointmentType: AppointmentType,
     npsOfficeCode: String?,
     attended: Attended? = null,
-    notifyPPOfAttendanceBehaviour: Boolean? = null,
+    notifyProbationPractitionerOfBehaviour: Boolean? = null,
+    notifyProbationPractitionerOfConcerns: Boolean? = null,
     didSessionHappen: Boolean? = null,
     noSessionReasonType: NoSessionReasonType? = null,
   ): Pair<Long?, UUID?> {
@@ -49,7 +50,7 @@ class CommunityAPIBookingService(
       return existingAppointment?.deliusAppointmentId to null
     }
 
-    return processingBooking(referral, existingAppointment, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode, attended, notifyPPOfAttendanceBehaviour, didSessionHappen, noSessionReasonType)
+    return processingBooking(referral, existingAppointment, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode, attended, notifyProbationPractitionerOfBehaviour, notifyProbationPractitionerOfConcerns, didSessionHappen, noSessionReasonType)
   }
 
   private fun processingBooking(
@@ -60,7 +61,8 @@ class CommunityAPIBookingService(
     appointmentType: AppointmentType,
     npsOfficeCode: String?,
     attended: Attended?,
-    notifyPPOfAttendanceBehaviour: Boolean?,
+    notifyProbationPractitionerOfBehaviour: Boolean?,
+    notifyProbationPractitionerOfConcerns: Boolean?,
     didSessionHappen: Boolean?,
     noSessionReasonType: NoSessionReasonType?,
   ): Pair<Long?, UUID> {
@@ -71,7 +73,8 @@ class CommunityAPIBookingService(
         val appointmentMerge = existingAppointment.forMerge(
           appointmentType,
           npsOfficeCode ?: defaultOfficeLocation,
-          notifyPPOfAttendanceBehaviour ?: false,
+          notifyProbationPractitionerOfBehaviour ?: false,
+          notifyProbationPractitionerOfConcerns ?: false,
           appointmentTime,
           durationInMinutes,
           attended,
@@ -99,7 +102,7 @@ class CommunityAPIBookingService(
         ),
         npsOfficeCode ?: defaultOfficeLocation,
         get(appointmentType, countsTowardsRarDays),
-        attended?.let { AppointmentMerge.Outcome(it.forMerge(), (attended == NO || notifyPPOfAttendanceBehaviour == true), didSessionHappen, noSessionReasonType) },
+        attended?.let { AppointmentMerge.Outcome(it.forMerge(), attended == NO, notifyProbationPractitionerOfBehaviour == true, notifyProbationPractitionerOfConcerns == true, didSessionHappen, noSessionReasonType) },
         null,
         null,
       )
@@ -110,7 +113,8 @@ class CommunityAPIBookingService(
   private fun Appointment.forMerge(
     appointmentType: AppointmentType,
     npsOfficeCode: String,
-    notifyOfAttendanceBehaviour: Boolean,
+    notifyProbationPractitionerOfBehaviour: Boolean,
+    notifyProbationPractitionerOfConcerns: Boolean,
     appointmentTime: OffsetDateTime,
     durationInMinutes: Int,
     attended: Attended?,
@@ -132,7 +136,7 @@ class CommunityAPIBookingService(
     npsOfficeCode,
     get(appointmentType, countsTowardsRarDays),
     attended?.let {
-      AppointmentMerge.Outcome(it.forMerge(), attended == NO || notifyOfAttendanceBehaviour, didSessionHappen, noSessionReasonType)
+      AppointmentMerge.Outcome(it.forMerge(), attended == NO, notifyProbationPractitionerOfBehaviour, notifyProbationPractitionerOfConcerns, didSessionHappen, noSessionReasonType)
     },
     id,
     deliusAppointmentId,
@@ -197,7 +201,9 @@ data class AppointmentMerge(
 ) {
   data class Outcome(
     val attended: Attended,
-    val notify: Boolean = true,
+    val notifyProbationPractitionerOfAttendanceFailure: Boolean = true,
+    val notifyProbationPractitionerOfBehaviour: Boolean = true,
+    val notifyProbationPractitionerOfConcerns: Boolean = true,
     val didSessionHappen: Boolean?,
     val noSessionReasonType: NoSessionReasonType?,
   ) {
