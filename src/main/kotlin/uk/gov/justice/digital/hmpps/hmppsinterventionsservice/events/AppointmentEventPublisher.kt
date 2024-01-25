@@ -4,10 +4,11 @@ import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.LocationMapper
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller.DeliverySessionController
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller.ReferralController
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentType
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.NotifyAppointmentService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DeliverySession
 
 enum class AppointmentEventType {
   ATTENDANCE_RECORDED,
@@ -24,6 +25,7 @@ AppointmentEvent(
   val detailUrl: String,
   val notifyPP: Boolean,
   val appointmentType: AppointmentType,
+  val deliverySession: DeliverySession? = null,
 ) : ApplicationEvent(source) {
   override fun toString(): String {
     return "AppointmentEvent(type=$type, appointmentId=${appointment.id}, detailUrl='$detailUrl', source=$source)"
@@ -48,49 +50,55 @@ class AppointmentEventPublisher(
     )
   }
 
-  fun attendanceRecordedEvent(appointment: Appointment, notifyPP: Boolean, appointmentType: AppointmentType) {
+  fun attendanceRecordedEvent(appointment: Appointment, notifyPP: Boolean, appointmentType: AppointmentType, deliverySession: DeliverySession? = null) {
     applicationEventPublisher.publishEvent(
       AppointmentEvent(
         this,
         AppointmentEventType.ATTENDANCE_RECORDED,
         appointment,
-        getAppointmentURL(appointment, appointmentType),
+        getAppointmentURL(appointment, appointmentType, deliverySession),
         notifyPP,
         appointmentType,
+        deliverySession,
       ),
     )
   }
 
-  fun sessionFeedbackRecordedEvent(appointment: Appointment, notifyPP: Boolean, appointmentType: AppointmentType) {
+  fun sessionFeedbackRecordedEvent(appointment: Appointment, notifyPP: Boolean, appointmentType: AppointmentType, deliverySession: DeliverySession? = null) {
     applicationEventPublisher.publishEvent(
       AppointmentEvent(
         this,
         AppointmentEventType.SESSION_FEEDBACK_RECORDED,
         appointment,
-        getAppointmentURL(appointment, appointmentType),
+        getAppointmentURL(appointment, appointmentType, deliverySession),
         notifyPP,
         appointmentType,
+        deliverySession,
       ),
     )
   }
 
-  fun appointmentFeedbackRecordedEvent(appointment: Appointment, notifyPP: Boolean, appointmentType: AppointmentType) {
+  fun appointmentFeedbackRecordedEvent(appointment: Appointment, notifyPP: Boolean, appointmentType: AppointmentType, deliverySession: DeliverySession? = null) {
     applicationEventPublisher.publishEvent(
       AppointmentEvent(
         this,
         AppointmentEventType.APPOINTMENT_FEEDBACK_RECORDED,
         appointment,
-        getAppointmentURL(appointment, appointmentType),
+        getAppointmentURL(appointment, appointmentType, deliverySession),
         notifyPP,
         appointmentType,
+        deliverySession,
       ),
     )
   }
 
-  private fun getAppointmentURL(appointment: Appointment, appointmentType: AppointmentType): String {
+  private fun getAppointmentURL(appointment: Appointment, appointmentType: AppointmentType, deliverySession: DeliverySession? = null): String {
     when (appointmentType) {
       AppointmentType.SERVICE_DELIVERY -> run {
-        NotifyAppointmentService.logger.error("action plan session should not be using the shared appointment notify service.")
+        if (deliverySession !== null) {
+          val path = locationMapper.getPathFromControllerMethod(DeliverySessionController::getSessionForReferralId)
+          return locationMapper.expandPathToCurrentContextPathUrl(path, appointment.referral.id, deliverySession.sessionNumber).toString()
+        }
         return ""
       }
       AppointmentType.SUPPLIER_ASSESSMENT -> run {
