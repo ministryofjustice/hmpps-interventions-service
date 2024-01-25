@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config
 
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.explore.JobExplorer
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean
 import org.springframework.batch.core.launch.JobLauncher
@@ -60,16 +58,6 @@ class BatchConfiguration(
       .build()
   }
 
-  @Bean("batchJobBuilderFactory")
-  fun batchJobBuilderFactory(@Qualifier("batchJobRepository") jobRepository: JobRepository): JobBuilderFactory {
-    return JobBuilderFactory(jobRepository)
-  }
-
-  @Bean("batchStepBuilderFactory")
-  fun batchStepBuilderFactory(@Qualifier("batchJobRepository") jobRepository: JobRepository, transactionManager: PlatformTransactionManager): StepBuilderFactory {
-    return StepBuilderFactory(jobRepository, transactionManager)
-  }
-
   @Bean("batchJobExplorer")
   fun jobExplorer(
     @Qualifier("batchDataSource") dataSource: DataSource,
@@ -80,15 +68,5 @@ class BatchConfiguration(
     factory.setTransactionManager(transactionManager)
     factory.afterPropertiesSet()
     return factory.getObject()
-  }
-
-  @Bean("jobBuilderFactory")
-  fun jobBuilderFactory(@Qualifier("jobRepository") jobRepository: JobRepository): JobBuilderFactory {
-    return JobBuilderFactory(jobRepository)
-  }
-
-  @Bean("stepBuilderFactory")
-  fun stepBuilderFactory(@Qualifier("jobRepository") jobRepository: JobRepository, transactionManager: PlatformTransactionManager): StepBuilderFactory {
-    return StepBuilderFactory(jobRepository, transactionManager)
   }
 }
