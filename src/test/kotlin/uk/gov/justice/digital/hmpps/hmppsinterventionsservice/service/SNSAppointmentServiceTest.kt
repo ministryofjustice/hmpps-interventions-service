@@ -66,7 +66,7 @@ internal class SNSAppointmentServiceTest {
       attended = attendance,
       attendanceSubmittedAt = now,
       appointmentFeedbackSubmittedAt = now,
-    )
+    ),
   )
 
   private fun supplierAssessmentAppointmentFeedbackSubmittedEvent(attendance: Attended) = AppointmentEvent(

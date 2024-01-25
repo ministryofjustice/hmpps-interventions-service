@@ -39,11 +39,11 @@ class NotifyAppointmentServiceTest {
       "http://localhost:8080/appointment/42c7d267-0776-4272-a8e8-a673bfe30d0d",
       notifyPP,
       appointmentType,
-      deliverySession
+      deliverySession,
     )
   }
 
-  private fun createDeliverySession(attended: Attended, notifyPP: Boolean): DeliverySession{
+  private fun createDeliverySession(attended: Attended, notifyPP: Boolean): DeliverySession {
     return deliverySessionFactory.createAttended(
       id = UUID.fromString("42c7d267-0776-4272-a8e8-a673bfe30d0d"),
       deliusAppointmentId = 12345L,
@@ -179,7 +179,7 @@ class NotifyAppointmentServiceTest {
   @Test
   fun `delivery session appointment session feedback recorded event calls email client`() {
     whenever(referralService.getResponsibleProbationPractitioner(any())).thenReturn(ResponsibleProbationPractitioner("abc", "abc@abc.com", null, null, "def"))
-    val deliverySession =  createDeliverySession(Attended.NO, true)
+    val deliverySession = createDeliverySession(Attended.NO, true)
     val appointmentId = deliverySession.currentAppointment?.id
 
     notifyService().onApplicationEvent(appointmentEvent(AppointmentEventType.SESSION_FEEDBACK_RECORDED, true, AppointmentType.SERVICE_DELIVERY, deliverySession))

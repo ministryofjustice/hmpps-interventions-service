@@ -181,7 +181,7 @@ internal class DeliverySessionsServiceTest {
     )
 
     verify(appointmentService, times(1)).createOrUpdateAppointmentDeliveryDetails(any(), eq(AppointmentDeliveryType.PHONE_CALL), eq(AppointmentSessionType.ONE_TO_ONE), isNull(), isNull())
-    verify(appointmentService).submitAppointmentFeedback(session.currentAppointment!!, user, SERVICE_DELIVERY)
+    verify(appointmentService).submitAppointmentFeedback(session.currentAppointment!!, user, SERVICE_DELIVERY, session)
     assertThat(updatedSession.currentAppointment?.appointmentTime).isEqualTo(appointmentTime)
     assertThat(updatedSession.currentAppointment?.durationInMinutes).isEqualTo(durationInMinutes)
     assertThat(updatedSession.currentAppointment?.createdBy?.userName).isEqualTo("scheduler")
@@ -586,7 +586,7 @@ internal class DeliverySessionsServiceTest {
 
     whenever(deliverySessionRepository.findAllByReferralId(referralId)).thenReturn(listOf(session))
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
-    whenever(appointmentService.submitAppointmentFeedback(session.currentAppointment!!, actor, SERVICE_DELIVERY)).thenThrow(ResponseStatusException(HttpStatus.CONFLICT, "appointment feedback has already been submitted"))
+    whenever(appointmentService.submitAppointmentFeedback(session.currentAppointment!!, actor, SERVICE_DELIVERY, session)).thenThrow(ResponseStatusException(HttpStatus.CONFLICT, "appointment feedback has already been submitted"))
 
     deliverySessionsService.recordAttendanceFeedback(referralId, appointmentId, actor, Attended.YES, true)
     deliverySessionsService.recordSessionFeedback(
@@ -622,7 +622,7 @@ internal class DeliverySessionsServiceTest {
     val actor = createActor()
     whenever(deliverySessionRepository.findAllByReferralId(referralId)).thenReturn(listOf(session))
     whenever(deliverySessionRepository.save(any())).thenReturn(session)
-    whenever(appointmentService.submitAppointmentFeedback(session.currentAppointment!!, actor, SERVICE_DELIVERY)).thenThrow(
+    whenever(appointmentService.submitAppointmentFeedback(session.currentAppointment!!, actor, SERVICE_DELIVERY, session)).thenThrow(
       ResponseStatusException(
         HttpStatus.UNPROCESSABLE_ENTITY,
         "can't submit feedback unless attendance has been recorded",
@@ -684,7 +684,7 @@ internal class DeliverySessionsServiceTest {
     val submitter = createActor("test-submitter")
     deliverySessionsService.submitAppointmentFeedback(referralId, appointmentId, submitter)
 
-    verify(appointmentService).submitAppointmentFeedback(session.currentAppointment!!, submitter, SERVICE_DELIVERY)
+    verify(appointmentService).submitAppointmentFeedback(session.currentAppointment!!, submitter, SERVICE_DELIVERY, session)
     val sessionCaptor = argumentCaptor<DeliverySession>()
     sessionCaptor.allValues.forEach {
       if (it == sessionCaptor.lastValue) {
@@ -744,7 +744,7 @@ internal class DeliverySessionsServiceTest {
       false,
       actor,
     )
-    verify(appointmentService).submitAppointmentFeedback(appointment, actor, SERVICE_DELIVERY)
+    verify(appointmentService).submitAppointmentFeedback(appointment, actor, SERVICE_DELIVERY, session)
   }
 
   @Test
@@ -819,7 +819,7 @@ internal class DeliverySessionsServiceTest {
     deliverySessionsService.recordAttendanceFeedback(referralId, appointmentId, actor, Attended.NO, true)
     deliverySessionsService.submitAppointmentFeedback(referralId, appointmentId, actor)
 
-    verify(appointmentService).submitAppointmentFeedback(session.currentAppointment!!, actor, SERVICE_DELIVERY)
+    verify(appointmentService).submitAppointmentFeedback(session.currentAppointment!!, actor, SERVICE_DELIVERY, session)
   }
 
   @Test
