@@ -442,11 +442,12 @@ class DeliverySessionService(
 
   fun submitAppointmentFeedback(referralId: UUID, appointmentId: UUID, submitter: AuthUser): Pair<DeliverySession, Appointment> {
     val sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
+    val deliverySession = sessionAndAppointment.first
     val appointment = sessionAndAppointment.second
     if (appointment.appointmentTime.isAfter(OffsetDateTime.now())) {
       throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot submit feedback for a future appointment [id=${appointment.id}]")
     }
-    val updatedAppointment = appointmentService.submitAppointmentFeedback(appointment, submitter, SERVICE_DELIVERY)
+    val updatedAppointment = appointmentService.submitAppointmentFeedback(appointment, submitter, SERVICE_DELIVERY, deliverySession)
     return Pair(sessionAndAppointment.first, updatedAppointment)
   }
 
@@ -495,7 +496,7 @@ class DeliverySessionService(
         notifyProbationPractitioner!!,
         updatedBy,
       )
-      appointmentService.submitAppointmentFeedback(appointment, updatedBy, SERVICE_DELIVERY)
+      appointmentService.submitAppointmentFeedback(appointment, updatedBy, SERVICE_DELIVERY, session)
     }
   }
   private fun setSuperseded(attended: Attended, appointment: Appointment) {

@@ -6,8 +6,6 @@ import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Service
 import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.EmailSender
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanAppointmentEvent
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanAppointmentEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEvent
@@ -16,8 +14,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.EndOfServic
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.EndOfServiceReportEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.AsyncEventExceptionHandling
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentType
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import java.net.URI
 
 interface NotifyService {
@@ -107,71 +103,6 @@ class NotifyEndOfServiceReportService(
 }
 
 @Service
-class NotifyActionPlanAppointmentService(
-  @Value("\${notify.templates.appointment-not-attended}") private val appointmentNotAttendedTemplateID: String,
-  @Value("\${notify.templates.concerning-behaviour}") private val concerningBehaviourTemplateID: String,
-  @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
-  @Value("\${interventions-ui.locations.probation-practitioner.session-feedback}") private val ppSessionFeedbackLocation: String,
-  private val emailSender: EmailSender,
-  private val referralService: ReferralService,
-) : ApplicationListener<ActionPlanAppointmentEvent>, NotifyService {
-  private fun notifyPP(event: ActionPlanAppointmentEvent): Boolean {
-    return when (event.type) {
-      ActionPlanAppointmentEventType.ATTENDANCE_RECORDED -> event.deliverySession.appointmentFeedback.attendanceFeedback.attended!! == Attended.NO
-      ActionPlanAppointmentEventType.SESSION_FEEDBACK_RECORDED -> event.deliverySession.appointmentFeedback.sessionFeedback.notifyProbationPractitioner!!
-      ActionPlanAppointmentEventType.APPOINTMENT_FEEDBACK_RECORDED -> event.deliverySession.appointmentFeedback.sessionFeedback.notifyProbationPractitioner ?: false
-    }
-  }
-
-  @AsyncEventExceptionHandling
-  override fun onApplicationEvent(event: ActionPlanAppointmentEvent) {
-    if (this.notifyPP(event)) {
-      val referral = event.referral
-      val sentBy = AuthUser(referral.sentBy.userId, referral.sentBy.authSource, referral.sentBy.username)
-      val createdBy = AuthUser(referral.createdBy.userId, referral.createdBy.authSource, referral.createdBy.username)
-      val recipient = referralService.getResponsibleProbationPractitioner(referral.serviceUserCRN, sentBy, createdBy)
-      val location = generateResourceUrl(
-        interventionsUIBaseURL,
-        ppSessionFeedbackLocation,
-        event.referral.id,
-        event.deliverySession.sessionNumber,
-        event.deliverySession.appointmentId!!,
-      )
-
-      val popFirstName = referral.referral.serviceUser!!.firstName?.lowercase()?.replaceFirstChar { it.uppercase() }
-      val popLastName = referral.referral.serviceUser.lastName?.lowercase()?.replaceFirstChar { it.uppercase() }
-      val popFullName = "$popFirstName $popLastName"
-
-      when (event.type) {
-        ActionPlanAppointmentEventType.ATTENDANCE_RECORDED -> {
-          emailSender.sendEmail(
-            appointmentNotAttendedTemplateID,
-            recipient.email,
-            mapOf(
-              "ppFirstName" to recipient.firstName,
-              "popfullname" to popFullName,
-              "attendanceUrl" to location.toString(),
-            ),
-          )
-        }
-        ActionPlanAppointmentEventType.SESSION_FEEDBACK_RECORDED -> {
-          emailSender.sendEmail(
-            concerningBehaviourTemplateID,
-            recipient.email,
-            mapOf(
-              "ppFirstName" to recipient.firstName,
-              "popfullname" to popFullName,
-              "sessionUrl" to location.toString(),
-            ),
-          )
-        }
-        else -> {}
-      }
-    }
-  }
-}
-
-@Service
 class NotifyAppointmentService(
   @Value("\${notify.templates.appointment-not-attended}") private val appointmentNotAttendedTemplateID: String,
   @Value("\${notify.templates.concerning-behaviour}") private val concerningBehaviourTemplateID: String,
@@ -179,6 +110,7 @@ class NotifyAppointmentService(
   @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
   @Value("\${interventions-ui.locations.probation-practitioner.intervention-progress}") private val ppInterventionProgressUrl: String,
   @Value("\${interventions-ui.locations.probation-practitioner.supplier-assessment-feedback}") private val ppSAASessionFeedbackLocation: String,
+  @Value("\${interventions-ui.locations.probation-practitioner.session-feedback}") private val ppSessionFeedbackLocation: String,
   private val emailSender: EmailSender,
   private val referralService: ReferralService,
 ) : ApplicationListener<AppointmentEvent>, NotifyService {
@@ -196,9 +128,14 @@ class NotifyAppointmentService(
           ppSAASessionFeedbackLocation,
           event.appointment.referral.id,
         )
-        AppointmentType.SERVICE_DELIVERY -> run {
-          logger.error("action plan session should not be using the shared appointment service.")
-          return
+        AppointmentType.SERVICE_DELIVERY -> event.deliverySession?.let {
+          generateResourceUrl(
+            interventionsUIBaseURL,
+            ppSessionFeedbackLocation,
+            event.appointment.referral.id,
+            it.sessionNumber,
+            event.appointment.id,
+          )
         }
       }
 

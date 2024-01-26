@@ -355,7 +355,7 @@ class SupplierAssessmentControllerTest {
       supplierAssessment.referral.supplierAssessment = supplierAssessment
       whenever(referralService.getSentReferralForUser(eq(referralId), eq(submittedBy))).thenReturn(supplierAssessment.referral)
       whenever(userMapper.fromToken(token)).thenReturn(submittedBy)
-      whenever(appointmentService.submitAppointmentFeedback(eq(supplierAssessment!!.currentAppointment!!), eq(submittedBy), eq(AppointmentType.SUPPLIER_ASSESSMENT))).thenReturn(appointmentFactory.create())
+      whenever(appointmentService.submitAppointmentFeedback(eq(supplierAssessment!!.currentAppointment!!), eq(submittedBy), eq(AppointmentType.SUPPLIER_ASSESSMENT), eq(null))).thenReturn(appointmentFactory.create())
 
       val result = supplierAssessmentController.submitFeedback(referralId, token)
       assertThat(result).isNotNull

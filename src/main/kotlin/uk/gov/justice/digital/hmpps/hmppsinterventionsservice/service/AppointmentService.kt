@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appoint
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DeliverySession
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NoSessionReasonType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentDeliveryRepository
@@ -265,6 +266,7 @@ class AppointmentService(
     appointment: Appointment,
     submitter: AuthUser,
     appointmentType: AppointmentType,
+    deliverySession: DeliverySession? = null,
   ): Appointment {
     if (appointment.appointmentFeedbackSubmittedAt != null) {
       throw ResponseStatusException(HttpStatus.CONFLICT, "appointment feedback has already been submitted")
@@ -285,18 +287,21 @@ class AppointmentService(
       appointment,
       appointment.attended!! == Attended.NO,
       appointmentType,
+      deliverySession,
     )
 
     appointmentEventPublisher.sessionFeedbackRecordedEvent(
       appointment,
       appointment.notifyPPOfAttendanceBehaviour ?: false,
       appointmentType,
+      deliverySession,
     )
 
     appointmentEventPublisher.appointmentFeedbackRecordedEvent(
       appointment,
       appointment.notifyPPOfAttendanceBehaviour ?: false,
       appointmentType,
+      deliverySession,
     )
 
     return appointment

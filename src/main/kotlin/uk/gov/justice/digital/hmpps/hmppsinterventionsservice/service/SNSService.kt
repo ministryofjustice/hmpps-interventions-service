@@ -7,8 +7,6 @@ import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.SNSPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.PersonReference
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanAppointmentEvent
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanAppointmentEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEvent
@@ -117,72 +115,6 @@ class SNSReferralService(
 }
 
 @Service
-class SNSActionPlanAppointmentService(
-  private val snsPublisher: SNSPublisher,
-  @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
-  @Value("\${interventions-ui.locations.probation-practitioner.session-feedback}") private val ppSessionFeedbackLocation: String,
-) : ApplicationListener<ActionPlanAppointmentEvent>, SNSService {
-
-  @AsyncEventExceptionHandling
-  override fun onApplicationEvent(event: ActionPlanAppointmentEvent) {
-    when (event.type) {
-      ActionPlanAppointmentEventType.ATTENDANCE_RECORDED -> {
-        val referral = event.referral
-        event.deliverySession.appointmentTime ?: throw RuntimeException("event triggered for session with no appointments")
-
-        val eventType = "intervention.session-appointment.${when (event.deliverySession.appointmentFeedback.attendanceFeedback.attended) {
-          Attended.YES, Attended.LATE -> "attended"
-          Attended.NO -> "missed"
-          null -> throw RuntimeException("event triggered for appointment with no recorded attendance")
-        }}"
-
-        val snsEvent = EventDTO(
-          eventType,
-          "Attendance was recorded for a session appointment",
-          event.detailUrl,
-          event.deliverySession.appointmentFeedback.attendanceFeedback.submittedAt!!,
-          mapOf("serviceUserCRN" to referral.serviceUserCRN, "referralId" to referral.id),
-          PersonReference.crn(event.referral.serviceUserCRN),
-        )
-
-        snsPublisher.publish(referral.id, event.deliverySession.appointmentFeedback.attendanceFeedback.submittedBy!!, snsEvent)
-      }
-      ActionPlanAppointmentEventType.APPOINTMENT_FEEDBACK_RECORDED -> {
-        val referral = event.referral
-        event.deliverySession.appointmentTime ?: throw RuntimeException("event triggered for session with no appointments")
-
-        val eventType = "intervention.session-appointment.session-feedback-submitted"
-
-        val url = UriComponentsBuilder.fromHttpUrl(interventionsUIBaseURL)
-          .path(ppSessionFeedbackLocation)
-          .buildAndExpand(event.referral.id, event.deliverySession.sessionNumber, event.deliverySession.deliusAppointmentId!!)
-          .toString()
-
-        val snsEvent = EventDTO(
-          eventType,
-          "Session feedback submitted for a session appointment",
-          event.detailUrl,
-          event.deliverySession.appointmentFeedback.attendanceFeedback.submittedAt!!,
-          mapOf(
-            "serviceUserCRN" to referral.serviceUserCRN,
-            "referralId" to referral.id,
-            "referralReference" to referral.referenceNumber,
-            "contractTypeName" to event.contractTypeName,
-            "primeProviderName" to event.primeProviderName,
-            "deliusAppointmentId" to event.deliverySession.deliusAppointmentId.toString(),
-            "referralProbationUserURL" to url,
-          ),
-          PersonReference.crn(referral.serviceUserCRN),
-        )
-
-        snsPublisher.publish(referral.id, event.deliverySession.appointmentFeedback.submittedBy!!, snsEvent)
-      }
-      else -> {}
-    }
-  }
-}
-
-@Service
 class SNSAppointmentService(
   private val snsPublisher: SNSPublisher,
   @Value("\${interventions-ui.baseurl}") private val interventionsUiBaseUrl: String,
@@ -193,7 +125,6 @@ class SNSAppointmentService(
   @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: AppointmentEvent) {
     val appointmentType = if (event.appointmentType == AppointmentType.SERVICE_DELIVERY) "session-appointment" else "initial-assessment-appointment"
-    val feedbackLocation = if (event.appointmentType == AppointmentType.SERVICE_DELIVERY) ppSessionFeedbackLocation else saFeedbackLocation
     val appointmentTypeDescription = if (event.appointmentType == AppointmentType.SERVICE_DELIVERY) "a session appointment" else "an initial assessment appointment"
 
     when (event.type) {
@@ -223,10 +154,18 @@ class SNSAppointmentService(
         val appointment = event.appointment
 
         val eventType = "intervention.$appointmentType.session-feedback-submitted"
-        val url = UriComponentsBuilder.fromHttpUrl(interventionsUiBaseUrl)
-          .path(feedbackLocation)
-          .buildAndExpand(referral.id)
-          .toString()
+        val url =
+          if (event.appointmentType == AppointmentType.SERVICE_DELIVERY) {
+            UriComponentsBuilder.fromHttpUrl(interventionsUiBaseUrl)
+              .path(ppSessionFeedbackLocation)
+              .buildAndExpand(referral.id, event.deliverySession?.sessionNumber, event.appointment.deliusAppointmentId!!)
+              .toString()
+          } else {
+            UriComponentsBuilder.fromHttpUrl(interventionsUiBaseUrl)
+              .path(saFeedbackLocation)
+              .buildAndExpand(referral.id)
+              .toString()
+          }
         val contractTypeName = referral.intervention.dynamicFrameworkContract.contractType.name
         val primeProviderName = referral.intervention.dynamicFrameworkContract.primeProvider.name
 
