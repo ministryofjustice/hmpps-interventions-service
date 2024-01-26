@@ -16,8 +16,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DeliverySession
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DeliverySessionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
@@ -35,7 +35,7 @@ class NotifyAppointmentServiceTest {
     return AppointmentEvent(
       "source",
       type,
-      appointmentFactory.create(id = deliverySession?.currentAppointment?.id ?: UUID.randomUUID(), referral = referralFactory.createSent(id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"), serviceUserData = ServiceUserData(firstName = "Bob", lastName = "Green"))),
+      appointmentFactory.create(id = deliverySession?.currentAppointment?.id ?: UUID.randomUUID(), referral = referralFactory.createSent(id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"), serviceUserData = ReferralServiceUserData(firstName = "Bob", lastName = "Green"))),
       "http://localhost:8080/appointment/42c7d267-0776-4272-a8e8-a673bfe30d0d",
       notifyPP,
       appointmentType,
@@ -55,7 +55,7 @@ class NotifyAppointmentServiceTest {
         sentAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00"),
         relevantSentenceId = 123456,
         supplementaryRiskId = UUID.randomUUID(),
-        serviceUserData = ServiceUserData(firstName = "Bob", lastName = "Green"),
+        serviceUserData = ReferralServiceUserData(firstName = "Bob", lastName = "Green"),
       ),
       createdBy = SampleData.sampleAuthUser(),
       attended = attended,
