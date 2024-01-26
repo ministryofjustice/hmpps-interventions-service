@@ -15,7 +15,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appoint
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DeliverySessionFactory
 import java.net.URI
-import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 class AppointmentEventPublisherTest {
   private val eventPublisher = mock<ApplicationEventPublisher>()
