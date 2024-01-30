@@ -66,7 +66,7 @@ class AppointmentService(
   ): Appointment {
     val appointment = when {
       // an initial appointment is required or an additional appointment is required
-      existingAppointment == null || existingAppointment.didSessionHappen == false -> {
+      existingAppointment == null || (existingAppointment.attended == Attended.NO && existingAppointment.didSessionHappen == null) || existingAppointment.didSessionHappen == false -> {
         val (deliusAppointmentId, appointmentId) =
           communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode, attended, notifyProbationPractitioner, didSessionHappen, noSessionReasonType)
         createAppointment(
