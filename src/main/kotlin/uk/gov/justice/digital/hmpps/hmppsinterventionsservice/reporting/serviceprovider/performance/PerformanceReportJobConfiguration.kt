@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance
 
+import jakarta.persistence.EntityManagerFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
@@ -29,6 +30,7 @@ class PerformanceReportJobConfiguration(
   private val transactionManager: PlatformTransactionManager,
   private val batchUtils: BatchUtils,
   private val listener: PerformanceReportJobListener,
+  private val entityManagerFactory: EntityManagerFactory,
   @Value("\${spring.batch.jobs.service-provider.performance-report.chunk-size}") private val chunkSize: Int,
 ) {
   @Bean
@@ -41,6 +43,7 @@ class PerformanceReportJobConfiguration(
     // this reader returns referral entities which need processing for the report.
     return JpaCursorItemReaderBuilder<Referral>()
       .name("performanceReportReader")
+      .entityManagerFactory(entityManagerFactory)
       .queryString("select r from Referral r where r.sentAt > :from and r.sentAt < :to and r.intervention.dynamicFrameworkContract.contractReference in :contractReferences")
       .parameterValues(
         mapOf(
