@@ -600,18 +600,21 @@
             "uid": "P896B4444D3F0DAB8"
           },
           "dimensions": {
-            "DBInstanceIdentifier": "cloud-platform-e4573fa1c83bbbb9"
+            "DBInstanceIdentifier": "cloud-platform-2e93104969cdd09a"
           },
           "expression": "",
           "id": "",
+          "label": "prod_replica",
           "matchExact": true,
           "metricEditorMode": 0,
           "metricName": "CPUUtilization",
           "metricQueryType": 0,
           "namespace": "AWS/RDS",
           "period": "",
-          "refId": "prod_v10",
+          "queryMode": "Metrics",
+          "refId": "prod_replica",
           "region": "default",
+          "sqlExpression": "",
           "statistic": "Average"
         },
         {
@@ -626,36 +629,17 @@
           "expression": "",
           "hide": false,
           "id": "",
+          "label": "prod_v14",
           "matchExact": true,
           "metricEditorMode": 0,
           "metricName": "CPUUtilization",
           "metricQueryType": 0,
           "namespace": "AWS/RDS",
           "period": "",
+          "queryMode": "Metrics",
           "refId": "prod_v14",
           "region": "default",
-          "statistic": "Average"
-        },
-        {
-          "alias": "preprod_v10",
-          "datasource": {
-            "type": "cloudwatch",
-            "uid": "P896B4444D3F0DAB8"
-          },
-          "dimensions": {
-            "DBInstanceIdentifier": "cloud-platform-a326b0ca8eb97132"
-          },
-          "expression": "",
-          "hide": false,
-          "id": "",
-          "matchExact": true,
-          "metricEditorMode": 0,
-          "metricName": "CPUUtilization",
-          "metricQueryType": 0,
-          "namespace": "AWS/RDS",
-          "period": "",
-          "refId": "B",
-          "region": "default",
+          "sqlExpression": "",
           "statistic": "Average"
         },
         {
@@ -670,14 +654,17 @@
           "expression": "",
           "hide": false,
           "id": "",
+          "label": "preprod_v14",
           "matchExact": true,
           "metricEditorMode": 0,
           "metricName": "CPUUtilization",
           "metricQueryType": 0,
           "namespace": "AWS/RDS",
           "period": "",
-          "refId": "A",
+          "queryMode": "Metrics",
+          "refId": "preprod_v14",
           "region": "default",
+          "sqlExpression": "",
           "statistic": "Average"
         },
         {
@@ -692,14 +679,17 @@
           "expression": "",
           "hide": false,
           "id": "",
+          "label": "prod_v14_5m_avg",
           "matchExact": true,
           "metricEditorMode": 0,
           "metricName": "CPUUtilization",
           "metricQueryType": 0,
           "namespace": "AWS/RDS",
           "period": "5m",
-          "refId": "C",
+          "queryMode": "Metrics",
+          "refId": "prod_v14_5m_avg",
           "region": "default",
+          "sqlExpression": "",
           "statistic": "Average"
         }
       ],
@@ -1406,8 +1396,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
