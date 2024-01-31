@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: generate-ndmis-performance-report
 spec:
-  schedule: "0 20 * * SAT"
+  schedule: "0 18 * * SAT"
   jobTemplate:
     spec:
       template:
@@ -20,7 +20,7 @@ spec:
               volumeMounts:
                 - name: heap-dumps
                   mountPath: /dumps
-  {{- include "deployment.envs" . | nindent 14 }}
+  {{- include "deployment-reporting.envs" . | nindent 14 }}
           volumes:
             - name: heap-dumps
               emptyDir: {}
