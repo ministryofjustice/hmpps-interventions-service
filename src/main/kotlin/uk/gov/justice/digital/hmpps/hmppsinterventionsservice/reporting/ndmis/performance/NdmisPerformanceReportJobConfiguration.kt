@@ -40,7 +40,7 @@ import java.nio.file.Path
 class NdmisPerformanceReportJobConfiguration(
   private val transactionManager: PlatformTransactionManager,
   private val entityManagerFactory: EntityManagerFactory,
-  @Qualifier("batchJobRepository") private val jobRepository: JobRepository,
+  @Qualifier("jobRepository") private val jobRepository: JobRepository,
   private val batchUtils: BatchUtils,
   private val s3Service: S3Service,
   private val ndmisS3Bucket: S3Bucket,

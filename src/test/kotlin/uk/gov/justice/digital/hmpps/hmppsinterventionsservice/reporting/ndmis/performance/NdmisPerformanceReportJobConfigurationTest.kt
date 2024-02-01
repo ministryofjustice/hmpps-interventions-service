@@ -27,7 +27,7 @@ class NdmisPerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
   override fun setJobRepository(@Qualifier("batchJobRepository") jobRepository: JobRepository) = super.setJobRepository(jobRepository)
 
   @Autowired
-  fun testJobLauncher(@Qualifier("batchJobRepository") jobRepository: JobRepository) {
+  fun testJobLauncher(@Qualifier("jobRepository") jobRepository: JobRepository) {
     val testJobLauncher = SimpleJobLauncher()
     testJobLauncher.setJobRepository(jobRepository)
     testJobLauncher.afterPropertiesSet()

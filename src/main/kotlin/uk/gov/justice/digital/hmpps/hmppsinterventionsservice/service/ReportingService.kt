@@ -15,6 +15,7 @@ import kotlin.io.path.pathString
 @Service
 class ReportingService(
   private val asyncJobLauncher: JobLauncher,
+  private val asyncReadOnlyJobLauncher: JobLauncher,
   private val performanceReportJob: Job,
   private val ndmisPerformanceReportJob: Job,
   private val serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper,
@@ -25,7 +26,7 @@ class ReportingService(
     val contracts = serviceProviderAccessScopeMapper.fromUser(user).contracts
     val userDetail = hmppsAuthService.getUserDetail(user)
 
-    asyncJobLauncher.run(
+    asyncReadOnlyJobLauncher.run(
       performanceReportJob,
       JobParametersBuilder()
         .addString("contractReferences", contracts.joinToString(",") { it.contractReference })

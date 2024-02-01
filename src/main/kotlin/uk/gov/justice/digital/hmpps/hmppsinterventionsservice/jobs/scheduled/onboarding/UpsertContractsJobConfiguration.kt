@@ -19,7 +19,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.Timestam
 @EnableBatchProcessing
 class UpsertContractsJobConfiguration(
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
-  @Qualifier("batchJobRepository") private val jobRepository: JobRepository,
+  @Qualifier("jobRepository") private val jobRepository: JobRepository,
   private val platformTransactionManager: PlatformTransactionManager,
 ) {
 

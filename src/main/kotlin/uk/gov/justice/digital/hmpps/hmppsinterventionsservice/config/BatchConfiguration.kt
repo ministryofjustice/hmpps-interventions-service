@@ -23,7 +23,21 @@ class BatchConfiguration(
 ) {
 
   @Bean("asyncJobLauncher")
-  fun asyncJobLauncher(@Qualifier("batchJobRepository") jobRepository: JobRepository): JobLauncher {
+  fun asyncJobLauncher(@Qualifier("jobRepository") jobRepository: JobRepository): JobLauncher {
+    val taskExecutor = ThreadPoolTaskExecutor()
+    taskExecutor.corePoolSize = poolSize
+    taskExecutor.queueCapacity = queueSize
+    taskExecutor.afterPropertiesSet()
+
+    val launcher = SimpleJobLauncher()
+    launcher.setJobRepository(jobRepository)
+    launcher.setTaskExecutor(taskExecutor)
+    launcher.afterPropertiesSet()
+    return launcher
+  }
+
+  @Bean("asyncReadOnlyJobLauncher")
+  fun asyncReadOnlyJobLauncher(@Qualifier("batchJobRepository") jobRepository: JobRepository): JobLauncher {
     val taskExecutor = ThreadPoolTaskExecutor()
     taskExecutor.corePoolSize = poolSize
     taskExecutor.queueCapacity = queueSize
@@ -42,8 +56,21 @@ class BatchConfiguration(
     transactionManager: PlatformTransactionManager,
   ): JobRepository {
     val factory = JobRepositoryFactoryBean()
-    factory.setDataSource(dataSource)
+    factory.setDataSource(batchDataSource())
     factory.setDatabaseType("H2")
+    factory.transactionManager = transactionManager
+    factory.afterPropertiesSet()
+    return factory.`object`
+  }
+
+  @Bean("jobRepository")
+  fun jobRepository(
+    @Qualifier("mainDataSource") dataSource: DataSource,
+    transactionManager: PlatformTransactionManager,
+  ): JobRepository {
+    val factory = JobRepositoryFactoryBean()
+    factory.setDataSource(dataSource)
+    factory.setDatabaseType("POSTGRES")
     factory.transactionManager = transactionManager
     factory.afterPropertiesSet()
     return factory.`object`
