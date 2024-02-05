@@ -81,8 +81,8 @@ dependencies {
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
-  implementation("io.sentry:sentry-spring-boot-starter:7.1.0")
-  implementation("io.sentry:sentry-logback:7.1.0")
+  implementation("io.sentry:sentry-spring-boot-starter:7.3.0")
+  implementation("io.sentry:sentry-logback:7.3.0")
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
   implementation("net.logstash.logback:logstash-logback-encoder:7.3")
 
@@ -100,18 +100,18 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.23.0")
-  implementation("software.amazon.awssdk:s3:2.23.0")
-  implementation("software.amazon.awssdk:sts:2.23.0")
+  implementation("software.amazon.awssdk:sns:2.23.17")
+  implementation("software.amazon.awssdk:s3:2.23.17")
+  implementation("software.amazon.awssdk:sts:2.23.17")
 
   // security
-  implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.1")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.2.1")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.2.1")
+  implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.2")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.2.2")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.2.2")
   implementation("com.nimbusds:oauth2-oidc-sdk:11.9.1")
-  implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.1")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.2.1")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.2.1")
+  implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.2")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.2.2")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.2.2")
   implementation("com.nimbusds:oauth2-oidc-sdk:11.9.1")
 
   // database
@@ -127,7 +127,7 @@ dependencies {
   implementation("com.github.java-json-tools:json-patch:1.13")
   implementation("org.apache.commons:commons-csv:1.10.0")
 
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.4")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.6")
   testImplementation("com.squareup.okhttp3:okhttp:4.12.0")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
   testImplementation("org.mockito:mockito-inline:5.2.0")
