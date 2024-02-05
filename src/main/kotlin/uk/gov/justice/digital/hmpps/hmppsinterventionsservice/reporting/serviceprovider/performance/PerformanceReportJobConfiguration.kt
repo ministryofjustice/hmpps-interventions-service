@@ -9,16 +9,18 @@ import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.job.DefaultJobParametersValidator
 import org.springframework.batch.item.ItemProcessor
-import org.springframework.batch.item.database.HibernateCursorItemReader
-import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder
+import org.springframework.batch.item.data.RepositoryItemReader
+import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.FileSystemResource
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
+import org.springframework.data.domain.Sort
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralPerformanceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUtils
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model.ReferralPerformanceReport
 import java.util.Date
 
 @Configuration
@@ -28,7 +30,9 @@ class PerformanceReportJobConfiguration(
   @Qualifier("batchStepBuilderFactory") private val stepBuilderFactory: StepBuilderFactory,
   private val batchUtils: BatchUtils,
   private val listener: PerformanceReportJobListener,
+  private val referralPerformanceReportRepository: ReferralPerformanceReportRepository,
   @Value("\${spring.batch.jobs.service-provider.performance-report.chunk-size}") private val chunkSize: Int,
+  @Value("\${spring.batch.jobs.service-provider.performance-report.page-size}") private val pageSize: Int,
 ) {
   @Bean
   @JobScope
@@ -37,19 +41,21 @@ class PerformanceReportJobConfiguration(
     @Value("#{jobParameters['from']}") from: Date,
     @Value("#{jobParameters['to']}") to: Date,
     sessionFactory: SessionFactory,
-  ): HibernateCursorItemReader<Referral> {
+  ): RepositoryItemReader<ReferralPerformanceReport> {
     // this reader returns referral entities which need processing for the report.
-    return HibernateCursorItemReaderBuilder<Referral>()
-      .name("performanceReportReader")
-      .sessionFactory(sessionFactory)
-      .queryString("select r from Referral r where r.sentAt > :from and r.sentAt < :to and r.intervention.dynamicFrameworkContract.contractReference in :contractReferences")
-      .parameterValues(
-        mapOf(
-          "from" to batchUtils.parseDateToOffsetDateTime(from),
-          "to" to batchUtils.parseDateToOffsetDateTime(to),
-          "contractReferences" to contractReferences.split(","),
+    return RepositoryItemReaderBuilder<ReferralPerformanceReport>()
+      .repository(referralPerformanceReportRepository)
+      .methodName("serviceProviderReportReferrals")
+      .arguments(
+        listOf(
+          batchUtils.parseDateToOffsetDateTime(from),
+          batchUtils.parseDateToOffsetDateTime(to),
+          contractReferences.split(","),
         ),
       )
+      .pageSize(pageSize)
+      .sorts(mapOf("dateReferralReceived" to Sort.Direction.ASC))
+      .saveState(false)
       .build()
   }
 
@@ -88,12 +94,12 @@ class PerformanceReportJobConfiguration(
 
   @Bean
   fun writeToCsvStep(
-    reader: HibernateCursorItemReader<Referral>,
-    processor: ItemProcessor<Referral, PerformanceReportData>,
+    reader: RepositoryItemReader<ReferralPerformanceReport>,
+    processor: ItemProcessor<ReferralPerformanceReport, PerformanceReportData>,
     writer: FlatFileItemWriter<PerformanceReportData>,
   ): Step {
     return stepBuilderFactory.get("writeToCsvStep")
-      .chunk<Referral, PerformanceReportData>(chunkSize)
+      .chunk<ReferralPerformanceReport, PerformanceReportData>(chunkSize)
       .reader(reader)
       .processor(processor)
       .writer(writer)

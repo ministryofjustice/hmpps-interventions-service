@@ -126,7 +126,11 @@ class ActionPlanService(
   }
 
   fun getAllAttendedAppointments(actionPlan: ActionPlan): List<Appointment> {
-    return deliverySessionRepository.findAllByReferralId(actionPlan.referral.id)
+    return getAllAttendedAppointments(actionPlan.referral.id)
+  }
+
+  fun getAllAttendedAppointments(referralId: UUID): List<Appointment> {
+    return deliverySessionRepository.findAllByReferralId(referralId)
       .flatMap { it.appointments }
       .filter {
         it.appointmentFeedbackSubmittedAt != null &&
@@ -136,6 +140,10 @@ class ActionPlanService(
 
   fun getFirstAttendedAppointment(actionPlan: ActionPlan): Appointment? {
     return getAllAttendedAppointments(actionPlan).minByOrNull { it.appointmentTime }
+  }
+
+  fun getFirstAttendedAppointment(referralId: UUID): Appointment? {
+    return getAllAttendedAppointments(referralId).minByOrNull { it.appointmentTime }
   }
 
   private fun updateDraftActivityPlan(
