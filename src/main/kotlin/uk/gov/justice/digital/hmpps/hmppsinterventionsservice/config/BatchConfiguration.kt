@@ -63,19 +63,6 @@ class BatchConfiguration(
     return factory.`object`
   }
 
-  @Bean("jobRepository")
-  fun jobRepository(
-    @Qualifier("mainDataSource") dataSource: DataSource,
-    transactionManager: PlatformTransactionManager,
-  ): JobRepository {
-    val factory = JobRepositoryFactoryBean()
-    factory.setDataSource(dataSource)
-    factory.setDatabaseType("POSTGRES")
-    factory.transactionManager = transactionManager
-    factory.afterPropertiesSet()
-    return factory.`object`
-  }
-
   @Bean("batchDataSource")
   fun batchDataSource(): DataSource {
     return EmbeddedDatabaseBuilder()
