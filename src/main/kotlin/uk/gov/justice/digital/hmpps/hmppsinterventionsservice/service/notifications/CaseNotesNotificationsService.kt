@@ -57,6 +57,7 @@ class CaseNotesNotificationsService(
           "referralNumber" to referral.referenceNumber!!,
           "caseNoteUrl" to generateResourceUrl(interventionsUIBaseURL, ppCaseNoteLocation, caseNoteId).toString(),
           "popFullName" to popFullName,
+          "crn" to referral.serviceUserCRN,
         ),
       )
     }

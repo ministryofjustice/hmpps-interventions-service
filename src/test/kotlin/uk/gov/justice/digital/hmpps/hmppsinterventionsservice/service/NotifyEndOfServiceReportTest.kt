@@ -13,19 +13,25 @@ import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.EmailSender
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.EndOfServiceReportEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.EndOfServiceReportEventType
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import java.util.UUID
 
 class NotifyEndOfServiceReportTest {
   private val emailSender = mock<EmailSender>()
   private val referralService = mock<ReferralService>()
   private val endOfServiceReportFactory = EndOfServiceReportFactory()
+  private val referralFactory = ReferralFactory()
 
   private val endOfServiceReportSubmittedEvent = EndOfServiceReportEvent(
     "source",
     EndOfServiceReportEventType.SUBMITTED,
     endOfServiceReportFactory.create(
       id = UUID.fromString("42c7d267-0776-4272-a8e8-a673bfe30d0d"),
+      referral = referralFactory.createSent(
+        serviceUserData = ReferralServiceUserData(firstName = "Alex", lastName = "River"),
+      ),
     ),
     "http://localhost:8080/end-of-service-report/42c7d267-0776-4272-a8e8-a673bfe30d0d",
   )

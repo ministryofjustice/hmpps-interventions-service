@@ -84,6 +84,7 @@ internal class CaseNotesNotificationsServiceTest {
         "referralNumber" to caseNote.referral.referenceNumber!!,
         "caseNoteUrl" to "https://interventions.gov.uk/probation-practitioner/case-note/${caseNote.id}",
         "popFullName" to "Sp Bob",
+        "crn" to referral.serviceUserCRN,
       ),
     )
   }
@@ -199,6 +200,7 @@ internal class CaseNotesNotificationsServiceTest {
         "referralNumber" to caseNote.referral.referenceNumber!!,
         "caseNoteUrl" to "https://interventions.gov.uk/probation-practitioner/case-note/${caseNote.id}",
         "popFullName" to "Sp Bob",
+        "crn" to referral.serviceUserCRN,
       ),
     )
   }
@@ -243,6 +245,7 @@ internal class CaseNotesNotificationsServiceTest {
         "referralNumber" to caseNote.referral.referenceNumber!!,
         "caseNoteUrl" to "https://interventions.gov.uk/probation-practitioner/case-note/${caseNote.id}",
         "popFullName" to "Sp Bob",
+        "crn" to referral.serviceUserCRN,
       ),
     )
   }
@@ -281,6 +284,7 @@ internal class CaseNotesNotificationsServiceTest {
         "referralNumber" to caseNote.referral.referenceNumber!!,
         "caseNoteUrl" to "https://interventions.gov.uk/probation-practitioner/case-note/${caseNote.id}",
         "popFullName" to "Sp Bob",
+        "crn" to referral.serviceUserCRN,
       ),
     )
   }
