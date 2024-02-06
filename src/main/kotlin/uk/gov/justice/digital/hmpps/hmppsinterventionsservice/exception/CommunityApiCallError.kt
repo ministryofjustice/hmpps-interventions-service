@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception
 
-import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 
 /**
 User Recoverable Bad Requests
@@ -18,7 +18,7 @@ res.body=409 Conflict from POST https://community-api-secure.probation.service.j
 6) Reschedule appointment conflict
 res.body=409 Conflict from POST https://community-api-secure.probation.service.justice.gov.uk/secure/offenders/crn/D889766/appointments/1761440075/reschedule/context/commissioned-rehabilitation-services
 */
-class CommunityApiCallError(val httpStatus: HttpStatus, causeMessage: String, val responseBody: String, val exception: Throwable) :
+class CommunityApiCallError(val httpStatus: HttpStatusCode, causeMessage: String, val responseBody: String, val exception: Throwable) :
   RuntimeException(
     exception,
   ) {

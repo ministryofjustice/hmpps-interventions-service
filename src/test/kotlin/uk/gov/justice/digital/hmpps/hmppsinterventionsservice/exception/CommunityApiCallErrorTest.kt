@@ -2,15 +2,15 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.CONFLICT
 import org.springframework.http.HttpStatus.GONE
 import org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE
+import org.springframework.http.HttpStatusCode
 
 internal class CommunityApiCallErrorTest {
   data class Example(
-    val response: HttpStatus,
+    val response: HttpStatusCode,
     val causeMessage: String,
     val expectedCategory: String,
     val expectedUserMessage: String,

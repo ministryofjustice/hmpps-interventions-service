@@ -147,6 +147,8 @@ class SupplierAssessmentControllerTest {
       supplierAssessment.referral.supplierAssessment = supplierAssessment
       whenever(userMapper.fromToken(token)).thenReturn(submittedBy)
       whenever(referralService.getSentReferralForUser(eq(referralId), eq(submittedBy))).thenReturn(supplierAssessment.referral)
+
+      val appointment = appointmentFactory.create()
       whenever(
         appointmentService.recordSessionFeedback(
           eq(supplierAssessment!!.currentAppointment!!),
@@ -198,7 +200,7 @@ class SupplierAssessmentControllerTest {
       val exception = assertThrows<ResponseStatusException> {
         supplierAssessmentController.recordSessionFeedback(referralId, request, token)
       }
-      assertThat(exception.status).isEqualTo(HttpStatus.NOT_FOUND)
+      assertThat(exception.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
       assertThat(exception.message).contains("referral not found")
     }
 
@@ -224,7 +226,7 @@ class SupplierAssessmentControllerTest {
       val exception = assertThrows<ResponseStatusException> {
         supplierAssessmentController.recordSessionFeedback(referralId, request, token)
       }
-      assertThat(exception.status).isEqualTo(HttpStatus.NOT_FOUND)
+      assertThat(exception.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
       assertThat(exception.message).contains("supplier assessment not found for referral")
     }
 
@@ -252,7 +254,7 @@ class SupplierAssessmentControllerTest {
       val exception = assertThrows<ResponseStatusException> {
         supplierAssessmentController.recordSessionFeedback(referralId, request, token)
       }
-      assertThat(exception.status).isEqualTo(HttpStatus.NOT_FOUND)
+      assertThat(exception.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
       assertThat(exception.message).contains("no current appointment exists on supplier assessment for referral")
     }
   }
@@ -298,7 +300,7 @@ class SupplierAssessmentControllerTest {
       val exception = assertThrows<ResponseStatusException> {
         supplierAssessmentController.recordAttendance(referralId, request, token)
       }
-      assertThat(exception.status).isEqualTo(HttpStatus.NOT_FOUND)
+      assertThat(exception.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
       assertThat(exception.message).contains("referral not found")
     }
 
@@ -317,7 +319,7 @@ class SupplierAssessmentControllerTest {
       val exception = assertThrows<ResponseStatusException> {
         supplierAssessmentController.recordAttendance(referralId, request, token)
       }
-      assertThat(exception.status).isEqualTo(HttpStatus.NOT_FOUND)
+      assertThat(exception.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
       assertThat(exception.message).contains("supplier assessment not found for referral")
     }
 
@@ -338,7 +340,7 @@ class SupplierAssessmentControllerTest {
       val exception = assertThrows<ResponseStatusException> {
         supplierAssessmentController.recordAttendance(referralId, request, token)
       }
-      assertThat(exception.status).isEqualTo(HttpStatus.NOT_FOUND)
+      assertThat(exception.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
       assertThat(exception.message).contains("no current appointment exists on supplier assessment for referral")
     }
   }
@@ -356,7 +358,6 @@ class SupplierAssessmentControllerTest {
       whenever(referralService.getSentReferralForUser(eq(referralId), eq(submittedBy))).thenReturn(supplierAssessment.referral)
       whenever(userMapper.fromToken(token)).thenReturn(submittedBy)
       whenever(appointmentService.submitAppointmentFeedback(eq(supplierAssessment!!.currentAppointment!!), eq(submittedBy), eq(AppointmentType.SUPPLIER_ASSESSMENT), eq(null))).thenReturn(appointmentFactory.create())
-
       val result = supplierAssessmentController.submitFeedback(referralId, token)
       assertThat(result).isNotNull
     }
@@ -373,7 +374,7 @@ class SupplierAssessmentControllerTest {
       val exception = assertThrows<ResponseStatusException> {
         supplierAssessmentController.submitFeedback(referralId, token)
       }
-      assertThat(exception.status).isEqualTo(HttpStatus.NOT_FOUND)
+      assertThat(exception.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
       assertThat(exception.message).contains("referral not found")
     }
 
@@ -390,7 +391,7 @@ class SupplierAssessmentControllerTest {
       val exception = assertThrows<ResponseStatusException> {
         supplierAssessmentController.submitFeedback(referralId, token)
       }
-      assertThat(exception.status).isEqualTo(HttpStatus.NOT_FOUND)
+      assertThat(exception.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
       assertThat(exception.message).contains("supplier assessment not found for referral")
     }
 
@@ -409,7 +410,7 @@ class SupplierAssessmentControllerTest {
       val exception = assertThrows<ResponseStatusException> {
         supplierAssessmentController.submitFeedback(referralId, token)
       }
-      assertThat(exception.status).isEqualTo(HttpStatus.NOT_FOUND)
+      assertThat(exception.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
       assertThat(exception.message).contains("no current appointment exists on supplier assessment for referral")
     }
   }

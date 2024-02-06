@@ -1,43 +1,44 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType
+import jakarta.persistence.CascadeType
+import jakarta.persistence.CollectionTable
+import jakarta.persistence.Column
+import jakarta.persistence.ElementCollection
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
+import jakarta.persistence.Id
+import jakarta.persistence.Index
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.JoinTable
+import jakarta.persistence.ManyToMany
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToMany
+import jakarta.persistence.OneToOne
+import jakarta.persistence.PrimaryKeyJoinColumn
+import jakarta.persistence.Table
+import jakarta.validation.constraints.NotNull
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode.JOIN
-import org.hibernate.annotations.Type
-import org.hibernate.annotations.TypeDef
+import org.hibernate.annotations.JdbcType
+import org.hibernate.dialect.PostgreSQLEnumJdbcType
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
-import javax.persistence.CascadeType
-import javax.persistence.CollectionTable
-import javax.persistence.Column
-import javax.persistence.ElementCollection
-import javax.persistence.Entity
-import javax.persistence.EnumType
-import javax.persistence.Enumerated
-import javax.persistence.FetchType
-import javax.persistence.Id
-import javax.persistence.Index
-import javax.persistence.JoinColumn
-import javax.persistence.JoinTable
-import javax.persistence.ManyToMany
-import javax.persistence.ManyToOne
-import javax.persistence.OneToMany
-import javax.persistence.OneToOne
-import javax.persistence.PrimaryKeyJoinColumn
-import javax.persistence.Table
-import javax.validation.constraints.NotNull
 
 enum class PersonCurrentLocationType {
-  CUSTODY, COMMUNITY
+  CUSTODY,
+  COMMUNITY,
 }
 
 @Entity
-@TypeDef(name = "person_current_location_type", typeClass = PostgreSQLEnumType::class)
 @Table(name = "draft_referral", indexes = [Index(columnList = "created_by_id")])
 class DraftReferral(
   // draft referral fields
-  @OneToOne(mappedBy = "draftReferral", cascade = [CascadeType.ALL]) @PrimaryKeyJoinColumn var serviceUserData: ServiceUserData? = null,
+  @OneToOne(mappedBy = "draftReferral", cascade = [CascadeType.ALL])
+  @PrimaryKeyJoinColumn
+  var serviceUserData: ServiceUserData? = null,
   @Column(name = "draft_supplementary_risk") var additionalRiskInformation: String? = null,
   @Column(name = "draft_supplementary_risk_updated_at") var additionalRiskInformationUpdatedAt: OffsetDateTime? = null,
   var additionalNeedsInformation: String? = null,
@@ -49,9 +50,11 @@ class DraftReferral(
 
   var relevantSentenceId: Long? = null,
 
-  @Type(type = "person_current_location_type")
   @Enumerated(EnumType.STRING)
+  @Column(columnDefinition = "person_current_location_type")
+  @JdbcType(PostgreSQLEnumJdbcType::class)
   var personCurrentLocationType: PersonCurrentLocationType? = null,
+
   var personCustodyPrisonId: String? = null,
 
   @ManyToMany(fetch = FetchType.LAZY)

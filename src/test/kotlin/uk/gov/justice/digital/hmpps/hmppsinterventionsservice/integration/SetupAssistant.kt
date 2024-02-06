@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration
 
-import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils
+import org.apache.commons.lang3.RandomStringUtils
 import org.springframework.data.repository.findByIdOrNull
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AddressDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
@@ -31,6 +31,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralLocation
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SelectedDesiredOutcomesMapping
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
@@ -69,6 +70,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceR
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ProbationPractitionerDetailsFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralServiceUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceProviderFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAssessmentFactory
@@ -117,6 +119,7 @@ class SetupAssistant(
   private val appointmentDeliveryAddressFactory = AppointmentDeliveryAddressFactory()
   private val supplierAssessmentFactory = SupplierAssessmentFactory()
   private val serviceUserFactory = ServiceUserFactory()
+  private val referralServiceUserFactory = ReferralServiceUserFactory()
   private val caseNoteFactory = CaseNoteFactory()
   private val changelogFactory = ChangeLogFactory()
   private val endOfServiceReportOutcomeFactory = EndOfServiceReportOutcomeFactory()
@@ -449,18 +452,20 @@ class SetupAssistant(
       personCustodyPrisonId = personCustodyPrisonId,
       expectedReleaseDate = expectedReleaseDate,
     )
-    val referral = referralRepository.save(
-      referralFactory.createSent(
-        id = id,
-        intervention = intervention,
-        createdBy = ppUser,
-        sentBy = ppUser,
-        sentAt = sentAt,
-        completionDeadline = completionDeadline,
-        needsInterpreter = needsInterpreter,
-        interpreterLanguage = interpreterLanguage,
-        probationPractitionerDetails = probationPractitionerDetails,
-      ),
+    var referral = referralFactory.createSent(
+      id = id,
+      intervention = intervention,
+      createdBy = ppUser,
+      sentBy = ppUser,
+      sentAt = sentAt,
+      completionDeadline = completionDeadline,
+      needsInterpreter = needsInterpreter,
+      interpreterLanguage = interpreterLanguage,
+      probationPractitionerDetails = probationPractitionerDetails,
+    )
+
+    referral = referralRepository.save(
+      referral,
     )
     val updatedProbationPractitionerDetails = probationPractitionerDetailsFactory.create(referral = referral)
     probationPractitionerDetailsRepository.save(updatedProbationPractitionerDetails)
@@ -634,8 +639,9 @@ class SetupAssistant(
     probationPractitionerDetailsRepository.save(probationPractitionerDetails)
     referral.probationPractitionerDetails = probationPractitionerDetails
     val serviceUser = serviceUserFactory.create(firstName = serviceUserFirstName, lastName = serviceUserLastName, referral = draftReferral)
+    val referralServiceUser = referralServiceUserFactory.create(firstName = serviceUserFirstName, lastName = serviceUserLastName, referral = referral)
     draftReferral.serviceUserData = serviceUser
-    referral.serviceUserData = serviceUser
+    referral.serviceUserData = referralServiceUser
     draftReferralRepository.save(draftReferral)
     referralRepository.save(referral)
     return referral
@@ -774,6 +780,19 @@ class SetupAssistant(
       religionOrBelief = "Agnostic",
       disabilities = listOf("Autism spectrum condition"),
     ),
+    referralServiceUserData: ReferralServiceUserData = ReferralServiceUserData(
+      title = "Mr",
+      firstName = "Alex",
+      lastName = "River",
+      dateOfBirth = LocalDate.of(1980, 1, 1),
+      gender = "Male",
+      preferredLanguage = "English",
+      referral = referralRepository.findById(referral.id).get(),
+      referralID = referral.id,
+      ethnicity = "British",
+      religionOrBelief = "Agnostic",
+      disabilities = listOf("Autism spectrum condition"),
+    ),
     accessibilityNeeds: String = "She uses a wheelchair",
     additionalNeedsInformation: String = "Alex is currently sleeping on her aunt's sofa",
     additionalRiskInformation: String = "A danger to the elderly",
@@ -825,7 +844,7 @@ class SetupAssistant(
     draftReferralRepository.save(draftReferral)
     referralRepository.saveAndFlush(referral)
 
-    referral.serviceUserData = serviceUserData
+    referral.serviceUserData = referralServiceUserData
     referral.selectedDesiredOutcomes = desiredOutcomes.map { SelectedDesiredOutcomesMapping(it.serviceCategoryId, it.id) }.toMutableList()
     referral.accessibilityNeeds = accessibilityNeeds
     referral.additionalNeedsInformation = additionalNeedsInformation

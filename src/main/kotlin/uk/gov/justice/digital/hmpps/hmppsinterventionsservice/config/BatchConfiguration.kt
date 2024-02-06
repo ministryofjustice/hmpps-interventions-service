@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config
 
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.explore.JobExplorer
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean
 import org.springframework.batch.core.launch.JobLauncher
@@ -25,7 +23,21 @@ class BatchConfiguration(
 ) {
 
   @Bean("asyncJobLauncher")
-  fun asyncJobLauncher(@Qualifier("batchJobRepository") jobRepository: JobRepository): JobLauncher {
+  fun asyncJobLauncher(@Qualifier("jobRepository") jobRepository: JobRepository): JobLauncher {
+    val taskExecutor = ThreadPoolTaskExecutor()
+    taskExecutor.corePoolSize = poolSize
+    taskExecutor.queueCapacity = queueSize
+    taskExecutor.afterPropertiesSet()
+
+    val launcher = SimpleJobLauncher()
+    launcher.setJobRepository(jobRepository)
+    launcher.setTaskExecutor(taskExecutor)
+    launcher.afterPropertiesSet()
+    return launcher
+  }
+
+  @Bean("asyncReadOnlyJobLauncher")
+  fun asyncReadOnlyJobLauncher(@Qualifier("batchJobRepository") jobRepository: JobRepository): JobLauncher {
     val taskExecutor = ThreadPoolTaskExecutor()
     taskExecutor.corePoolSize = poolSize
     taskExecutor.queueCapacity = queueSize
@@ -44,8 +56,21 @@ class BatchConfiguration(
     transactionManager: PlatformTransactionManager,
   ): JobRepository {
     val factory = JobRepositoryFactoryBean()
-    factory.setDataSource(dataSource)
+    factory.setDataSource(batchDataSource())
     factory.setDatabaseType("H2")
+    factory.transactionManager = transactionManager
+    factory.afterPropertiesSet()
+    return factory.`object`
+  }
+
+  @Bean("jobRepository")
+  fun jobRepository(
+    @Qualifier("mainDataSource") dataSource: DataSource,
+    transactionManager: PlatformTransactionManager,
+  ): JobRepository {
+    val factory = JobRepositoryFactoryBean()
+    factory.setDataSource(dataSource)
+    factory.setDatabaseType("POSTGRES")
     factory.transactionManager = transactionManager
     factory.afterPropertiesSet()
     return factory.`object`
@@ -60,31 +85,15 @@ class BatchConfiguration(
       .build()
   }
 
-  @Bean("batchJobBuilderFactory")
-  fun batchJobBuilderFactory(@Qualifier("batchJobRepository") jobRepository: JobRepository): JobBuilderFactory {
-    return JobBuilderFactory(jobRepository)
-  }
-
-  @Bean("batchStepBuilderFactory")
-  fun batchStepBuilderFactory(@Qualifier("batchJobRepository") jobRepository: JobRepository, transactionManager: PlatformTransactionManager): StepBuilderFactory {
-    return StepBuilderFactory(jobRepository, transactionManager)
-  }
-
   @Bean("batchJobExplorer")
-  fun jobExplorer(@Qualifier("batchDataSource") dataSource: DataSource): JobExplorer {
+  fun jobExplorer(
+    @Qualifier("batchDataSource") dataSource: DataSource,
+    transactionManager: PlatformTransactionManager,
+  ): JobExplorer {
     val factory = JobExplorerFactoryBean()
     factory.setDataSource(dataSource)
+    factory.setTransactionManager(transactionManager)
     factory.afterPropertiesSet()
     return factory.getObject()
-  }
-
-  @Bean("jobBuilderFactory")
-  fun jobBuilderFactory(@Qualifier("jobRepository") jobRepository: JobRepository): JobBuilderFactory {
-    return JobBuilderFactory(jobRepository)
-  }
-
-  @Bean("stepBuilderFactory")
-  fun stepBuilderFactory(@Qualifier("jobRepository") jobRepository: JobRepository, transactionManager: PlatformTransactionManager): StepBuilderFactory {
-    return StepBuilderFactory(jobRepository, transactionManager)
   }
 }

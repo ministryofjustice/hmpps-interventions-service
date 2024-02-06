@@ -14,7 +14,7 @@ import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder
 import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor
 import org.springframework.batch.item.file.transform.ExtractorLineAggregator
 import org.springframework.batch.item.file.transform.RecursiveCollectionLineAggregator
-import org.springframework.core.io.Resource
+import org.springframework.core.io.WritableResource
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance.NdmisPerformanceReportJobConfiguration
@@ -44,7 +44,7 @@ class BatchUtils {
 
   private fun <T> csvFileWriterBase(
     name: String,
-    resource: Resource,
+    resource: WritableResource,
     headers: List<String>,
   ): FlatFileItemWriterBuilder<T> {
     return FlatFileItemWriterBuilder<T>()
@@ -55,7 +55,7 @@ class BatchUtils {
 
   fun <T> csvFileWriter(
     name: String,
-    resource: Resource,
+    resource: WritableResource,
     headers: List<String>,
     fields: List<String>,
   ): FlatFileItemWriter<T> {
@@ -66,7 +66,7 @@ class BatchUtils {
 
   fun <T> recursiveCollectionCsvFileWriter(
     name: String,
-    resource: Resource,
+    resource: WritableResource,
     headers: List<String>,
     fields: List<String>,
   ): FlatFileItemWriter<Collection<T>> {
@@ -125,7 +125,7 @@ class OutputPathIncrementer : JobParametersIncrementer {
 }
 
 class NPESkipPolicy : SkipPolicy {
-  override fun shouldSkip(t: Throwable, skipCount: Int): Boolean {
+  override fun shouldSkip(t: Throwable, skipCount: Long): Boolean {
     return when (t) {
       is NullPointerException -> {
         NdmisPerformanceReportJobConfiguration.logger.warn("skipping row with unexpected state", t)

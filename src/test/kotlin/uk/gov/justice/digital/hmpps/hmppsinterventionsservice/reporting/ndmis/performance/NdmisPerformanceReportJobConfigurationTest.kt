@@ -1,11 +1,14 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance
 
+import mu.KLogging
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.batch.core.ExitStatus
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobParametersBuilder
+import org.springframework.batch.core.launch.support.SimpleJobLauncher
+import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.test.JobLauncherTestUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -19,11 +22,28 @@ import kotlin.io.path.pathString
 
 @Component
 class NdmisPerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
+
   @Autowired
-  override fun setJob(@Qualifier("ndmisPerformanceReportJob") job: Job) = super.setJob(job)
+  override fun setJobRepository(@Qualifier("batchJobRepository") jobRepository: JobRepository) = super.setJobRepository(jobRepository)
+
+  @Autowired
+  fun testJobLauncher(@Qualifier("jobRepository") jobRepository: JobRepository) {
+    val testJobLauncher = SimpleJobLauncher()
+    testJobLauncher.setJobRepository(jobRepository)
+    testJobLauncher.afterPropertiesSet()
+    super.setJobLauncher(testJobLauncher)
+  }
+
+  @Autowired
+  override fun setJob(@Qualifier("ndmisPerformanceReportJob") job: Job) {
+    super.setJob(job)
+  }
 }
 
 class NdmisPerformanceReportJobConfigurationTest : IntegrationTestBase() {
+
+  companion object : KLogging()
+
   @Autowired
   lateinit var jobLauncher: NdmisPerformanceJobLauncherTestUtils
 
@@ -38,7 +58,8 @@ class NdmisPerformanceReportJobConfigurationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `job writes non-empty CSV export files`() {
+  fun jobWritesNonEmptyCsvExportFiles() {
+    // job writes non-empty CSV export files
     val referral = setupAssistant.createSentReferral()
       .also { setupAssistant.fillReferralFields(it) }
       .also { setupAssistant.addEndOfServiceReportWithOutcome(referral = it) }
@@ -50,7 +71,15 @@ class NdmisPerformanceReportJobConfigurationTest : IntegrationTestBase() {
       referral = referral,
     )
 
+    logger.info { "We are setup" }
+
+    val parameters = JobParametersBuilder()
+      .addString("outputPath", outputDir.pathString)
+      .toJobParameters()
+    val parametersWithTimestamp = TimestampIncrementer().getNext(parameters)
+
     val execution = executeJob()
+
     assertThat(execution.exitStatus).isEqualTo(ExitStatus.COMPLETED)
 
     assertThat(outputDir.resolve("crs_performance_report-v2-referrals.csv"))

@@ -1,29 +1,29 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
+import jakarta.persistence.CascadeType
+import jakarta.persistence.CollectionTable
+import jakarta.persistence.Column
+import jakarta.persistence.ElementCollection
+import jakarta.persistence.Embeddable
+import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.Id
+import jakarta.persistence.Index
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.JoinTable
+import jakarta.persistence.ManyToMany
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToMany
+import jakarta.persistence.OneToOne
+import jakarta.persistence.OrderBy
+import jakarta.persistence.PrePersist
+import jakarta.persistence.PrimaryKeyJoinColumn
+import jakarta.persistence.Table
+import jakarta.validation.constraints.NotNull
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode.JOIN
 import java.time.OffsetDateTime
 import java.util.UUID
-import javax.persistence.CascadeType
-import javax.persistence.CollectionTable
-import javax.persistence.Column
-import javax.persistence.ElementCollection
-import javax.persistence.Embeddable
-import javax.persistence.Entity
-import javax.persistence.FetchType
-import javax.persistence.Id
-import javax.persistence.Index
-import javax.persistence.JoinColumn
-import javax.persistence.JoinTable
-import javax.persistence.ManyToMany
-import javax.persistence.ManyToOne
-import javax.persistence.OneToMany
-import javax.persistence.OneToOne
-import javax.persistence.OrderBy
-import javax.persistence.PrePersist
-import javax.persistence.PrimaryKeyJoinColumn
-import javax.persistence.Table
-import javax.validation.constraints.NotNull
 
 @Embeddable
 class SelectedDesiredOutcomesMapping(
@@ -57,7 +57,9 @@ class Referral(
   var concludedAt: OffsetDateTime? = null,
 
   // draft referral fields
-  @OneToOne(mappedBy = "draftReferral", cascade = [CascadeType.ALL]) @PrimaryKeyJoinColumn var serviceUserData: ServiceUserData? = null,
+  @OneToOne(mappedBy = "referral", cascade = [CascadeType.ALL])
+  @PrimaryKeyJoinColumn
+  var serviceUserData: ReferralServiceUserData? = null,
   @Column(name = "draft_supplementary_risk") var additionalRiskInformation: String? = null,
   @Column(name = "draft_supplementary_risk_updated_at") var additionalRiskInformationUpdatedAt: OffsetDateTime? = null,
   var additionalNeedsInformation: String? = null,

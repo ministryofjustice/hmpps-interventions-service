@@ -1,27 +1,27 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
+import jakarta.persistence.CascadeType
+import jakarta.persistence.CollectionTable
+import jakarta.persistence.ElementCollection
+import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.Id
+import jakarta.persistence.Index
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.NamedAttributeNode
+import jakarta.persistence.NamedEntityGraph
+import jakarta.persistence.NamedSubgraph
+import jakarta.persistence.OneToMany
+import jakarta.persistence.OneToOne
+import jakarta.persistence.PrimaryKeyJoinColumn
+import jakarta.persistence.Table
+import jakarta.validation.constraints.NotNull
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
 import org.hibernate.annotations.Where
 import java.time.OffsetDateTime
 import java.util.UUID
-import javax.persistence.CascadeType
-import javax.persistence.CollectionTable
-import javax.persistence.ElementCollection
-import javax.persistence.Entity
-import javax.persistence.FetchType
-import javax.persistence.Id
-import javax.persistence.Index
-import javax.persistence.JoinColumn
-import javax.persistence.ManyToOne
-import javax.persistence.NamedAttributeNode
-import javax.persistence.NamedEntityGraph
-import javax.persistence.NamedSubgraph
-import javax.persistence.OneToMany
-import javax.persistence.OneToOne
-import javax.persistence.PrimaryKeyJoinColumn
-import javax.persistence.Table
-import javax.validation.constraints.NotNull
 @NamedEntityGraph(
   name = "entity-referral-graph",
   attributeNodes =
@@ -51,7 +51,7 @@ import javax.validation.constraints.NotNull
       name = "serviceUserData",
       attributeNodes = [
         NamedAttributeNode("disabilities"),
-        NamedAttributeNode("draftReferral"),
+        NamedAttributeNode("referral"),
       ],
     ),
     NamedSubgraph(
@@ -77,7 +77,8 @@ class SentReferralSummary(
   var sentAt: OffsetDateTime,
   var concludedAt: OffsetDateTime? = null,
   var referenceNumber: String,
-  @OneToOne(mappedBy = "draftReferral", cascade = [CascadeType.ALL]) @PrimaryKeyJoinColumn var serviceUserData: ServiceUserData?,
+  @OneToOne(mappedBy = "referral", cascade = [CascadeType.ALL]) @PrimaryKeyJoinColumn
+  var serviceUserData: ReferralServiceUserData?,
   @NotNull
   @ManyToOne
   @Fetch(FetchMode.JOIN)

@@ -1,26 +1,30 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
-import org.hibernate.annotations.Type
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
+import jakarta.persistence.Id
+import jakarta.persistence.OneToOne
+import org.hibernate.annotations.JdbcType
+import org.hibernate.dialect.PostgreSQLEnumJdbcType
 import org.jetbrains.annotations.NotNull
 import java.time.LocalDate
 import java.util.UUID
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.EnumType
-import javax.persistence.Enumerated
-import javax.persistence.FetchType
-import javax.persistence.Id
-import javax.persistence.OneToOne
 
 @Entity
 data class ReferralLocation(
   @Id val id: UUID,
-  @OneToOne(fetch = FetchType.LAZY) val referral: Referral,
-  @Type(type = "person_current_location_type")
+  @OneToOne(fetch = FetchType.LAZY)
+  val referral: Referral,
+
   @Enumerated(EnumType.STRING)
+  @Column(name = "type", columnDefinition = "person_current_location_type")
+  @JdbcType(PostgreSQLEnumJdbcType::class)
   @NotNull
-  @Column(name = "type")
   val type: PersonCurrentLocationType,
+
   @Column(name = "prison_id") val prisonId: String?,
   @Column(name = "expected_release_date") val expectedReleaseDate: LocalDate?,
   @Column(name = "expected_release_date_missing_reason") val expectedReleaseDateMissingReason: String?,

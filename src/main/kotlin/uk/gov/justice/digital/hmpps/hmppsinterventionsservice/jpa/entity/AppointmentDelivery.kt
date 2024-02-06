@@ -1,37 +1,35 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType
-import org.hibernate.annotations.Type
-import org.hibernate.annotations.TypeDef
-import org.hibernate.annotations.TypeDefs
+import jakarta.persistence.CascadeType
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.Id
+import jakarta.persistence.OneToOne
+import jakarta.persistence.PrimaryKeyJoinColumn
+import jakarta.validation.constraints.NotNull
+import org.hibernate.annotations.JdbcType
+import org.hibernate.dialect.PostgreSQLEnumJdbcType
 import java.util.UUID
-import javax.persistence.CascadeType
-import javax.persistence.Entity
-import javax.persistence.EnumType
-import javax.persistence.Enumerated
-import javax.persistence.Id
-import javax.persistence.OneToOne
-import javax.persistence.PrimaryKeyJoinColumn
-import javax.validation.constraints.NotNull
 
 @Entity
-@TypeDefs(
-  value = [
-    TypeDef(name = "appointment_delivery_type", typeClass = PostgreSQLEnumType::class),
-    TypeDef(name = "appointment_session_type", typeClass = PostgreSQLEnumType::class),
-  ],
-)
 data class AppointmentDelivery(
   @Id
   var appointmentId: UUID,
-  @Type(type = "appointment_delivery_type")
+
+  @Column(columnDefinition = "appointment_delivery_type")
   @Enumerated(EnumType.STRING)
+  @JdbcType(PostgreSQLEnumJdbcType::class)
   @NotNull
   var appointmentDeliveryType: AppointmentDeliveryType,
+
   // TODO: Transform to @NotNull this change is live
-  @Type(type = "appointment_session_type")
+  @Column(columnDefinition = "appointment_session_type")
   @Enumerated(EnumType.STRING)
+  @JdbcType(PostgreSQLEnumJdbcType::class)
   var appointmentSessionType: AppointmentSessionType? = null,
+
   var npsOfficeCode: String? = null,
   @OneToOne(cascade = [CascadeType.ALL])
   @PrimaryKeyJoinColumn
@@ -43,9 +41,9 @@ enum class AppointmentDeliveryType {
   VIDEO_CALL,
   IN_PERSON_MEETING_PROBATION_OFFICE,
   IN_PERSON_MEETING_OTHER,
-  ;
 }
 
 enum class AppointmentSessionType {
-  ONE_TO_ONE, GROUP
+  ONE_TO_ONE,
+  GROUP,
 }

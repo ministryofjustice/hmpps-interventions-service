@@ -5,12 +5,10 @@ import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2Res
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.config.web.servlet.invoke
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.jwt.JwtDecoder
@@ -20,32 +18,33 @@ import org.springframework.security.oauth2.jwt.MappedJwtClaimSetConverter
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter
+import org.springframework.security.web.SecurityFilterChain
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.TokenVerifier
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
-class ResourceServerConfiguration(private val tokenVerifier: TokenVerifier) : WebSecurityConfigurerAdapter() {
-  override fun configure(http: HttpSecurity) {
-    http {
-      csrf { disable() }
-      sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
-      authorizeRequests {
-        authorize("/health/**", permitAll)
-        authorize("/prometheus/**", permitAll)
-        authorize("/info", permitAll)
-        authorize("/v3/api-docs/**", permitAll)
-        authorize("/swagger-ui/**", permitAll)
-        authorize("/swagger-ui.html", permitAll)
-        authorize(anyRequest, authenticated)
-      }
-      oauth2ResourceServer {
-        jwt {
-          jwtAuthenticationConverter = jwtAuthenticationConverter()
-        }
-      }
+@EnableMethodSecurity(prePostEnabled = true)
+class ResourceServerConfiguration(private val tokenVerifier: TokenVerifier) {
+  @Bean
+  fun filterChain(http: HttpSecurity): SecurityFilterChain = http
+    .sessionManagement()
+    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+    .and().csrf().disable()
+    .authorizeHttpRequests { auth ->
+      auth.requestMatchers(
+        "/health/**",
+        "/prometheus/**",
+        "/info",
+        "/v3/api-docs/**",
+        "/swagger-ui/**",
+        "/swagger-ui.html",
+      )
+        .permitAll()
+        .anyRequest().authenticated()
+    }.also {
+      it.oauth2ResourceServer().jwt().jwtAuthenticationConverter(jwtAuthenticationConverter())
     }
-  }
+    .build()
 
   @Bean
   fun jwtAuthenticationConverter(): JwtAuthenticationConverter {
@@ -84,7 +83,7 @@ internal class TestJwtDecoder : JwtDecoder {
     // extract headers and claims, but do not attempt to verify signature
     val jwt = JWTParser.parse(token)
     val headers = LinkedHashMap<String, Any>(jwt.header.toJSONObject())
-    val claims = claimSetConverter.convert(jwt.getJWTClaimsSet().claims)
+    val claims = claimSetConverter.convert(jwt.jwtClaimsSet.claims)
 
     return Jwt.withTokenValue(token)
       .headers { it.putAll(headers) }

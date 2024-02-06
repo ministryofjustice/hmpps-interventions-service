@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller
 
+import jakarta.persistence.EntityNotFoundException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -24,7 +25,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.CaseNoteFacto
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import java.util.UUID
-import javax.persistence.EntityNotFoundException
 
 class CaseNoteControllerTest {
   private val caseNoteFactory = CaseNoteFactory()
@@ -67,7 +67,7 @@ class CaseNoteControllerTest {
       val e = assertThrows<ResponseStatusException> {
         caseNoteController.createCaseNote(createCaseNoteDTO, userToken)
       }
-      assertThat(e.status).isEqualTo(HttpStatus.BAD_REQUEST)
+      assertThat(e.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
       assertThat(e.message).contains("sent referral not found")
     }
   }
@@ -105,7 +105,7 @@ class CaseNoteControllerTest {
       val e = assertThrows<ResponseStatusException> {
         caseNoteController.getCaseNotes(Pageable.ofSize(1), referralId = referralId, authentication = userToken)
       }
-      assertThat(e.status).isEqualTo(HttpStatus.NOT_FOUND)
+      assertThat(e.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
       assertThat(e.message).contains("sent referral not found")
     }
   }

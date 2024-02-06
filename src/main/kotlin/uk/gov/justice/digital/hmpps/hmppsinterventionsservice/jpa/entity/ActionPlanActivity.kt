@@ -1,10 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
+import jakarta.persistence.Embeddable
+import jakarta.validation.constraints.NotNull
 import java.time.OffsetDateTime
 import java.util.UUID
 import java.util.UUID.randomUUID
-import javax.persistence.Embeddable
-import javax.validation.constraints.NotNull
 
 @Embeddable
 data class ActionPlanActivity(

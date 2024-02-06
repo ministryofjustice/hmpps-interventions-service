@@ -7,7 +7,8 @@ import java.time.ZoneOffset
 
 class ReportingContracts(private val setupAssistant: SetupAssistant) {
   @State("there are referrals available for the reporting period of 1 June 2021 to 10 June 2021")
-  fun `create referral with specified sentAt date`() {
+  fun createReferralWithSentAtDate() {
+    // create referral with specified sentAt date
     setupAssistant.createSentReferral(sentAt = OffsetDateTime.of(2021, 6, 5, 12, 30, 0, 0, ZoneOffset.UTC))
   }
 }

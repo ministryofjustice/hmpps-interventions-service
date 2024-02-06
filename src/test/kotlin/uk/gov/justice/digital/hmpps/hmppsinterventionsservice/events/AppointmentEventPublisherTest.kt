@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyArray
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -48,7 +49,7 @@ class AppointmentEventPublisherTest {
 
   @Test
   fun `builds a delivery session appointment attendance recorded event and publishes it`() {
-    whenever(locationMapper.expandPathToCurrentContextPathUrl(any(), any()))
+    whenever(locationMapper.expandPathToCurrentContextPathUrl(any(), anyArray<Object>()))
       .thenReturn(URI.create("http://localhost/referral/123/sessions/1"))
 
     val appointment = appointmentFactory.create()
@@ -88,7 +89,7 @@ class AppointmentEventPublisherTest {
 
   @Test
   fun `builds a delivery session appointment session feedback recorded event and publishes it`() {
-    whenever(locationMapper.expandPathToCurrentContextPathUrl(any(), any()))
+    whenever(locationMapper.expandPathToCurrentContextPathUrl(any(), anyArray<Object>()))
       .thenReturn(URI.create("http://localhost/referral/123/sessions/1"))
 
     val appointment = appointmentFactory.create()
@@ -129,7 +130,7 @@ class AppointmentEventPublisherTest {
 
   @Test
   fun `builds a delivery session appointment feedback event and publishes it`() {
-    whenever(locationMapper.expandPathToCurrentContextPathUrl(any(), any()))
+    whenever(locationMapper.expandPathToCurrentContextPathUrl(any(), anyArray<Object>()))
       .thenReturn(URI.create("http://localhost/referral/123/sessions/1"))
 
     val appointment = appointmentFactory.create()

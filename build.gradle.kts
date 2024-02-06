@@ -1,13 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.14.0"
   kotlin("plugin.spring") version "1.9.22"
   id("org.jetbrains.kotlin.plugin.jpa") version "1.9.22"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.14.1"
   id("jacoco")
-}
-
-repositories {
-  mavenCentral()
 }
 
 configurations {
@@ -21,7 +17,6 @@ jacoco {
 }
 
 tasks {
-
   withType<KotlinCompile> {
     kotlinOptions {
       jvmTarget = JavaVersion.VERSION_17.toString()
@@ -74,6 +69,10 @@ dependencyManagement {
   }
 }
 
+repositories {
+  maven { url = uri("https://repo.spring.io/milestone") }
+  mavenCentral()
+}
 dependencies {
   // batch processing
   implementation("org.springframework.boot:spring-boot-starter-batch")
@@ -89,8 +88,8 @@ dependencies {
   runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.1") // needed for OffsetDateTime for AppInsights
 
   // openapi
-  implementation("org.springdoc:springdoc-openapi-ui:1.7.0")
-
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+  implementation("javax.xml.bind:jaxb-api:2.3.1")
   // notifications
   implementation("uk.gov.service.notify:notifications-java-client:5.0.0-RELEASE")
   implementation("org.json:json") {
@@ -117,11 +116,12 @@ dependencies {
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
-  implementation("org.hibernate:hibernate-core:5.6.15.Final")
-  implementation("com.vladmihalcea:hibernate-types-55:2.21.1")
   implementation("com.h2database:h2:2.2.224")
-  runtimeOnly("org.flywaydb:flyway-core")
-  runtimeOnly("org.postgresql:postgresql:42.7.1")
+  implementation("org.hibernate:hibernate-core:6.3.0.Final")
+  implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.0")
+
+  runtimeOnly("org.flywaydb:flyway-core:9.22.3")
+  runtimeOnly("org.postgresql:postgresql")
 
   // json and csv
   implementation("com.github.java-json-tools:json-patch:1.13")

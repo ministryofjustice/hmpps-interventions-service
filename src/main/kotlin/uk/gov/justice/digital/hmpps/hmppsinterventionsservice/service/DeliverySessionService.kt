@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
+import jakarta.persistence.EntityExistsException
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -24,8 +26,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Ref
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
 import java.util.UUID
-import javax.persistence.EntityExistsException
-import javax.persistence.EntityNotFoundException
 
 @Service
 @Transactional
@@ -231,7 +231,7 @@ class DeliverySessionService(
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
     attended: Attended? = null,
-    didSessionHappen: Boolean ? = null,
+    didSessionHappen: Boolean? = null,
     notifyProbationPractitioner: Boolean? = null,
     late: Boolean?,
     lateReason: String?,
@@ -501,7 +501,9 @@ class DeliverySessionService(
   }
   private fun setSuperseded(attended: Attended, appointment: Appointment) {
     when (attended) {
-      Attended.LATE, Attended.YES -> { appointment.superseded = false }
+      Attended.LATE, Attended.YES -> {
+        appointment.superseded = false
+      }
       else -> return
     }
   }

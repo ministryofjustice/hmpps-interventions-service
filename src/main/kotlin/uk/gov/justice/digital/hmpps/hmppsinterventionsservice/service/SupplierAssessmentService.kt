@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
+import jakarta.persistence.EntityExistsException
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -18,8 +20,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Ref
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SupplierAssessmentRepository
 import java.time.OffsetDateTime
 import java.util.UUID
-import javax.persistence.EntityExistsException
-import javax.persistence.EntityNotFoundException
 
 @Service
 @Transactional
@@ -112,8 +112,7 @@ class SupplierAssessmentService(
         referral = sentReferral,
       )
     }
-    supplierAssessment.currentAppointment?.let {
-        latestAppointment ->
+    supplierAssessment.currentAppointment?.let { latestAppointment ->
       if (latestAppointment.appointmentTime.isAfter(appointmentTime)) {
         throw EntityExistsException("can't schedule new supplier assessment appointment; new appointment occurs before previously scheduled appointment [referralId=$referralId]")
       }
@@ -152,8 +151,7 @@ class SupplierAssessmentService(
     }
     val referral = referralRepository.findByIdAndSentAtIsNotNull(referralId) ?: throw EntityNotFoundException("Sent Referral not found [referralId=$referralId]")
     val supplierAssessment = referral.supplierAssessment ?: throw EntityNotFoundException("Supplier Assessment not found for referral [referralId=$referralId]")
-    supplierAssessment.currentAppointment?.let {
-        latestAppointment ->
+    supplierAssessment.currentAppointment?.let { latestAppointment ->
       if (latestAppointment.id != appointmentId) throw ValidationError("Supplier Assessment Appointment is not the latest [appointmentId=$appointmentId]", listOf())
       latestAppointment
     } ?: throw EntityNotFoundException("Supplier Assessment Appointment not found [appointmentId=$appointmentId]")

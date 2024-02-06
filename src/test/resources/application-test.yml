@@ -19,3 +19,8 @@ spring:
     jobs:
       mark-stale-appointments:
         appointments: 82e2fbbe-1bb4-4967-8ee6-81aa072fd44b
+
+  flyway:
+    postgresql:
+      transactional:
+        lock: false

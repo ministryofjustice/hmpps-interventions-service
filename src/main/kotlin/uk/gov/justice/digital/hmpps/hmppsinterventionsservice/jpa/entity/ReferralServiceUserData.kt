@@ -14,7 +14,7 @@ import java.util.UUID
 
 @Entity
 @Table(name = "referral_service_user_data")
-data class ServiceUserData(
+data class ReferralServiceUserData(
   var title: String? = null,
   var firstName: String? = null,
   var lastName: String? = null,
@@ -31,7 +31,7 @@ data class ServiceUserData(
   @OneToOne
   @MapsId
   @JoinColumn(name = "referral_id")
-  var draftReferral: DraftReferral? = null,
+  var referral: Referral? = null,
   @Id
   @Column(name = "referral_id")
   var referralID: UUID? = null,

@@ -1,26 +1,29 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance
 
+import jakarta.persistence.EntityManagerFactory
 import mu.KLogging
-import org.hibernate.SessionFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.StepContribution
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.JobScope
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.core.job.DefaultJobParametersValidator
+import org.springframework.batch.core.job.builder.JobBuilder
+import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.scope.context.ChunkContext
-import org.springframework.batch.item.database.HibernateCursorItemReader
-import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder
+import org.springframework.batch.core.step.builder.StepBuilder
+import org.springframework.batch.item.database.JpaCursorItemReader
+import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
 import org.springframework.batch.repeat.RepeatStatus
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.FileSystemResource
+import org.springframework.transaction.PlatformTransactionManager
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.S3Bucket
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.OnStartupJobLauncherFactory
@@ -35,8 +38,9 @@ import java.nio.file.Path
 @Configuration
 @EnableBatchProcessing
 class NdmisPerformanceReportJobConfiguration(
-  private val jobBuilderFactory: JobBuilderFactory,
-  private val stepBuilderFactory: StepBuilderFactory,
+  private val transactionManager: PlatformTransactionManager,
+  private val entityManagerFactory: EntityManagerFactory,
+  @Qualifier("jobRepository") private val jobRepository: JobRepository,
   private val batchUtils: BatchUtils,
   private val s3Service: S3Service,
   private val ndmisS3Bucket: S3Bucket,
@@ -57,17 +61,17 @@ class NdmisPerformanceReportJobConfiguration(
     return onStartupJobLauncherFactory.makeBatchLauncher(ndmisPerformanceReportJob)
   }
 
-  @Bean
   @JobScope
-  fun ndmisReader(
-    sessionFactory: SessionFactory,
-  ): HibernateCursorItemReader<Referral> {
-    // this reader returns referral entities which need processing for the report.
-    return HibernateCursorItemReaderBuilder<Referral>()
+  @Bean
+  fun ndmisReader(): JpaCursorItemReader<Referral> {
+    val reader = JpaCursorItemReaderBuilder<Referral>()
       .name("ndmisPerformanceReportReader")
-      .sessionFactory(sessionFactory)
-      .queryString("from Referral")
+      .queryString("select r from Referral r")
+      // do we need .maxItemCount(pageSize)?
+      .entityManagerFactory(entityManagerFactory)
+      .saveState(true)
       .build()
+    return reader
   }
 
   @Bean
@@ -81,8 +85,8 @@ class NdmisPerformanceReportJobConfiguration(
     )
   }
 
-  @Bean
   @StepScope
+  @Bean
   fun ndmisComplexityWriter(@Value("#{jobParameters['outputPath']}") outputPath: String): FlatFileItemWriter<Collection<ComplexityData>> {
     return batchUtils.recursiveCollectionCsvFileWriter(
       "ndmisComplexityPerformanceReportWriter",
@@ -92,8 +96,8 @@ class NdmisPerformanceReportJobConfiguration(
     )
   }
 
-  @Bean
   @StepScope
+  @Bean
   fun ndmisAppointmentWriter(@Value("#{jobParameters['outputPath']}") outputPath: String): FlatFileItemWriter<Collection<AppointmentData>> {
     return batchUtils.recursiveCollectionCsvFileWriter(
       "ndmisAppointmentPerformanceReportWriter",
@@ -124,8 +128,7 @@ class NdmisPerformanceReportJobConfiguration(
   ): Job {
     val validator = DefaultJobParametersValidator()
     validator.setRequiredKeys(arrayOf("timestamp", "outputPath"))
-
-    return jobBuilderFactory["ndmisPerformanceReportJob"]
+    return JobBuilder("ndmisPerformanceReportJob", jobRepository)
       .incrementer { parameters -> OutputPathIncrementer().getNext(TimestampIncrementer().getNext(parameters)) }
       .validator(validator)
       .start(ndmisWriteReferralToCsvStep)
@@ -138,72 +141,76 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun ndmisWriteReferralToCsvStep(
-    ndmisReader: HibernateCursorItemReader<Referral>,
+    ndmisReader: JpaCursorItemReader<Referral>,
     processor: ReferralsProcessor,
     writer: FlatFileItemWriter<ReferralsData>,
   ): Step {
-    return stepBuilderFactory.get("ndmisWriteReferralToCsvStep")
-      .chunk<Referral, ReferralsData>(chunkSize)
+    return StepBuilder("ndmisWriteReferralToCsvStep", jobRepository)
+      .chunk<Referral, ReferralsData>(chunkSize, transactionManager)
       .reader(ndmisReader)
       .processor(processor)
       .writer(writer)
       .faultTolerant()
       .skipPolicy(skipPolicy)
+      .transactionManager(transactionManager)
       .build()
   }
 
   @Bean
   fun ndmisWriteComplexityToCsvStep(
-    ndmisReader: HibernateCursorItemReader<Referral>,
+    ndmisReader: JpaCursorItemReader<Referral>,
     processor: ComplexityProcessor,
     writer: FlatFileItemWriter<Collection<ComplexityData>>,
   ): Step {
-    return stepBuilderFactory.get("ndmisWriteComplexityToCsvStep")
-      .chunk<Referral, List<ComplexityData>>(chunkSize)
+    return StepBuilder("ndmisWriteComplexityToCsvStep", jobRepository)
+      .chunk<Referral, List<ComplexityData>>(chunkSize, transactionManager)
       .reader(ndmisReader)
       .processor(processor)
       .writer(writer)
       .faultTolerant()
       .skipPolicy(skipPolicy)
+      .transactionManager(transactionManager)
       .build()
   }
 
   @Bean
   fun ndmisWriteAppointmentToCsvStep(
-    ndmisReader: HibernateCursorItemReader<Referral>,
+    ndmisReader: JpaCursorItemReader<Referral>,
     processor: AppointmentProcessor,
     writer: FlatFileItemWriter<Collection<AppointmentData>>,
   ): Step {
-    return stepBuilderFactory.get("ndmisWriteAppointmentToCsvStep")
-      .chunk<Referral, List<AppointmentData>>(chunkSize)
+    return StepBuilder("ndmisWriteAppointmentToCsvStep", jobRepository)
+      .chunk<Referral, List<AppointmentData>>(chunkSize, transactionManager)
       .reader(ndmisReader)
       .processor(processor)
       .writer(writer)
       .faultTolerant()
       .skipPolicy(skipPolicy)
+      .transactionManager(transactionManager)
       .build()
   }
 
   @Bean
   fun ndmisWriteOutcomeToCsvStep(
-    ndmisReader: HibernateCursorItemReader<Referral>,
+    ndmisReader: JpaCursorItemReader<Referral>,
     processor: OutcomeProcessor,
     writer: FlatFileItemWriter<Collection<OutcomeData>>,
   ): Step {
-    return stepBuilderFactory.get("ndmisWriteOutcomeToCsvStep")
-      .chunk<Referral, List<OutcomeData>>(chunkSize)
+    return StepBuilder("ndmisWriteOutcomeToCsvStep", jobRepository)
+      .chunk<Referral, List<OutcomeData>>(chunkSize, transactionManager)
       .reader(ndmisReader)
       .processor(processor)
       .writer(writer)
       .faultTolerant()
       .skipPolicy(skipPolicy)
+      .transactionManager(transactionManager)
       .build()
   }
 
-  @Bean
   @JobScope
+  @Bean
   fun pushToS3Step(@Value("#{jobParameters['outputPath']}") outputPath: String): Step =
-    stepBuilderFactory["pushToS3Step"].tasklet(pushFilesToS3(outputPath)).build()
+    StepBuilder("pushToS3Step", jobRepository).tasklet(pushFilesToS3(outputPath), transactionManager).build()
 
   private fun pushFilesToS3(outputPath: String) = { _: StepContribution, _: ChunkContext ->
     listOf(referralReportFilename, complexityReportFilename, appointmentReportFilename, outcomeReportFilename).forEach { file ->

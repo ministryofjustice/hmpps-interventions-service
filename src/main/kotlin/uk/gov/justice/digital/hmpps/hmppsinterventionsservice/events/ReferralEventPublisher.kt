@@ -13,7 +13,12 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState
 
 enum class ReferralEventType {
-  SENT, ASSIGNED, DETAILS_AMENDED, COMPLEXITY_LEVEL_AMENDED, DESIRED_OUTCOMES_AMENDED, NEEDS_AND_REQUIREMENTS_AMENDED
+  SENT,
+  ASSIGNED,
+  DETAILS_AMENDED,
+  COMPLEXITY_LEVEL_AMENDED,
+  DESIRED_OUTCOMES_AMENDED,
+  NEEDS_AND_REQUIREMENTS_AMENDED,
 }
 
 class ReferralEvent(

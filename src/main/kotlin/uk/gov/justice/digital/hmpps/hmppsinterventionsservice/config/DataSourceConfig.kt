@@ -14,7 +14,7 @@ class DataSourceConfig(
   @Value("\${spring.datasource.password}") private val dataSourcePassword: String,
 ) {
 
-  @Bean("mainDataSource")
+  @Bean(name = ["mainDataSource", "dataSource"])
   @Primary
   fun dataSource(): DataSource {
     return DataSourceBuilder.create()

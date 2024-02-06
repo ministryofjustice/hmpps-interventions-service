@@ -761,11 +761,11 @@ class DraftReferralServiceTest @Autowired constructor(
 
   private fun setDraftReferralRequiredFields(
     draftReferral: DraftReferral,
-    additionalRiskInformation: String ? = "risk",
-    additionalRiskInformationUpdatedAt: OffsetDateTime ? = OffsetDateTime.now(),
-    personCurrentLocationType: PersonCurrentLocationType ? = PersonCurrentLocationType.CUSTODY,
-    personCustodyPrisonId: String ? = "ABC",
-    expectedReleaseDate: LocalDate ? = LocalDate.of(2050, 11, 1),
+    additionalRiskInformation: String? = "risk",
+    additionalRiskInformationUpdatedAt: OffsetDateTime? = OffsetDateTime.now(),
+    personCurrentLocationType: PersonCurrentLocationType? = PersonCurrentLocationType.CUSTODY,
+    personCustodyPrisonId: String? = "ABC",
+    expectedReleaseDate: LocalDate? = LocalDate.of(2050, 11, 1),
     probationOffice: String? = "probation-office1",
     hasValidDeliusPPDetails: Boolean = false,
     isReferralReleasingWithIn12Weeks: Boolean = false,

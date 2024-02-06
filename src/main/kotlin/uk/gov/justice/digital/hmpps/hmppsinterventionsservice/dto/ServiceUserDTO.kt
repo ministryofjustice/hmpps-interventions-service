@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto
 
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import java.time.LocalDate
 
@@ -17,6 +18,26 @@ data class ServiceUserDTO(
 ) {
   companion object {
     fun from(crn: String, serviceUserData: ServiceUserData?): ServiceUserDTO {
+      val dto = ServiceUserDTO(crn = crn)
+      serviceUserData?.let {
+        dto.crn = crn
+        dto.title = serviceUserData.title
+        dto.firstName = serviceUserData.firstName
+        dto.lastName = serviceUserData.lastName
+        dto.dateOfBirth = serviceUserData.dateOfBirth
+        dto.gender = serviceUserData.gender
+        dto.ethnicity = serviceUserData.ethnicity
+        dto.preferredLanguage = serviceUserData.preferredLanguage
+        dto.religionOrBelief = serviceUserData.religionOrBelief
+        dto.disabilities = serviceUserData.disabilities
+      }
+      return dto
+    }
+
+    fun from(crn: String, serviceUserFirstName: String?, serviceUserLastName: String?): ServiceUserDTO {
+      return ServiceUserDTO(crn = crn, firstName = serviceUserFirstName, lastName = serviceUserLastName)
+    }
+    fun from(crn: String, serviceUserData: ReferralServiceUserData?): ServiceUserDTO {
       val dto = ServiceUserDTO(crn = crn)
       serviceUserData?.let {
         dto.crn = crn

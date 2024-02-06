@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Probati
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
@@ -110,7 +111,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     additionalRiskInformationUpdatedAt: OffsetDateTime? = null,
     assignments: List<ReferralAssignment> = emptyList(),
     supplierAssessment: SupplierAssessment? = null,
-    serviceUserData: ServiceUserData? = null,
+    serviceUserData: ReferralServiceUserData? = null,
     complexityLevelIds: MutableMap<UUID, UUID>? = null,
     createDraft: Boolean = true,
     accessibilityNeeds: String? = null,
@@ -177,18 +178,15 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     selectedServiceCategories: MutableSet<ServiceCategory>? = null,
     desiredOutcomes: List<DesiredOutcome> = emptyList(),
     actionPlans: MutableList<ActionPlan>? = mutableListOf(),
-
     sentAt: OffsetDateTime = OffsetDateTime.now(),
     sentBy: AuthUser = authUserFactory.create(),
     referenceNumber: String? = "JS18726AC",
     supplementaryRiskId: UUID = UUID.randomUUID(),
-
     assignments: List<ReferralAssignment> = listOf(
       ReferralAssignment(OffsetDateTime.now(), authUserFactory.createSP(), authUserFactory.createSP()),
     ),
-
     supplierAssessment: SupplierAssessment? = null,
-    serviceUserData: ServiceUserData? = null,
+    serviceUserData: ReferralServiceUserData? = null,
   ): Referral {
     createDraft(
       id = id,
@@ -239,16 +237,12 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     actionPlans: MutableList<ActionPlan>? = mutableListOf(),
     supplierAssessment: SupplierAssessment? = null,
     desiredOutcomes: List<DesiredOutcome> = emptyList(),
-
     assignments: List<ReferralAssignment> = emptyList(),
-
     endRequestedAt: OffsetDateTime? = OffsetDateTime.now(),
     endRequestedBy: AuthUser? = authUserFactory.create(),
     endRequestedReason: CancellationReason? = cancellationReasonFactory.create(),
     endRequestedComments: String? = null,
-
     concludedAt: OffsetDateTime? = null,
-
     endOfServiceReport: EndOfServiceReport? = null,
     ndeliusPPName: String? = "Bob",
     ndeliusPPEmailAddress: String? = "bob@example.com",

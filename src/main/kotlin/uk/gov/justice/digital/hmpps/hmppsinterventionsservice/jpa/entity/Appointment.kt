@@ -1,31 +1,31 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
 import com.fasterxml.jackson.annotation.JsonValue
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType
+import jakarta.persistence.CascadeType
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
+import jakarta.persistence.Id
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToOne
+import jakarta.persistence.PrimaryKeyJoinColumn
+import jakarta.validation.constraints.NotNull
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
-import org.hibernate.annotations.Type
-import org.hibernate.annotations.TypeDef
+import org.hibernate.annotations.JdbcType
+import org.hibernate.dialect.PostgreSQLEnumJdbcType
 import java.time.OffsetDateTime
 import java.util.UUID
-import javax.persistence.CascadeType
-import javax.persistence.Entity
-import javax.persistence.EnumType
-import javax.persistence.Enumerated
-import javax.persistence.FetchType
-import javax.persistence.Id
-import javax.persistence.ManyToOne
-import javax.persistence.OneToOne
-import javax.persistence.PrimaryKeyJoinColumn
-import javax.validation.constraints.NotNull
 
 @Entity
-@TypeDef(name = "attended", typeClass = PostgreSQLEnumType::class)
-@TypeDef(name = "no_session_reason_type", typeClass = PostgreSQLEnumType::class)
 data class Appointment(
-  @Type(type = "attended")
   @Enumerated(EnumType.STRING)
+  @Column(columnDefinition = "attended")
+  @JdbcType(PostgreSQLEnumJdbcType::class)
   var attended: Attended? = null,
+
   var additionalAttendanceInformation: String? = null,
   var attendanceFailureInformation: String? = null,
   var attendanceSubmittedAt: OffsetDateTime? = null,
@@ -50,8 +50,9 @@ data class Appointment(
   var futureSessionPlans: String? = null,
   var noAttendanceInformation: String? = null,
 
-  @Type(type = "no_session_reason_type")
   @Enumerated(EnumType.STRING)
+  @Column(columnDefinition = "no_session_reason_type")
+  @JdbcType(PostgreSQLEnumJdbcType::class)
   var noSessionReasonType: NoSessionReasonType? = null,
   var noSessionReasonPopAcceptable: String? = null,
   var noSessionReasonPopUnacceptable: String? = null,
@@ -117,7 +118,6 @@ enum class NoSessionReasonType {
   POP_ACCEPTABLE,
   POP_UNACCEPTABLE,
   LOGISTICS,
-  ;
 }
 
 enum class AppointmentType {

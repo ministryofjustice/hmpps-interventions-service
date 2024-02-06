@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
+import jakarta.persistence.EntityNotFoundException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -34,7 +35,6 @@ import java.time.OffsetDateTime
 import java.util.Optional.empty
 import java.util.Optional.of
 import java.util.UUID
-import javax.persistence.EntityNotFoundException
 
 internal class ActionPlanServiceTest {
 
@@ -131,9 +131,7 @@ internal class ActionPlanServiceTest {
     val updatedDraftActionPlan = draftActionPlan.copy(numberOfSessions = 5)
     whenever(
       actionPlanRepository.save(
-        ArgumentMatchers.argThat { (
-          numberOfSessionsArg, activitiesArg, _, _, _, _, _, _,
-        ), ->
+        ArgumentMatchers.argThat { (numberOfSessionsArg, activitiesArg, _, _, _, _, _, _) ->
           (
             numberOfSessionsArg == 5 && activitiesArg.size == draftActionPlan.activities.size
             )
@@ -158,9 +156,7 @@ internal class ActionPlanServiceTest {
 
     whenever(
       actionPlanRepository.save(
-        ArgumentMatchers.argThat { (
-          numberOfSessionsArg, activitiesArg, _, _, _, _, _, _,
-        ), ->
+        ArgumentMatchers.argThat { (numberOfSessionsArg, activitiesArg, _, _, _, _, _, _) ->
           (
             numberOfSessionsArg == 9 && activitiesArg.size == 1
             )

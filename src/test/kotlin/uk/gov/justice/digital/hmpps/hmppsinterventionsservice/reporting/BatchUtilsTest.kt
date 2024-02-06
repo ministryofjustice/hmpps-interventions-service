@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
-import org.springframework.batch.item.ExecutionContext
+import org.springframework.batch.item.Chunk
 import org.springframework.core.io.FileSystemResource
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance.NdmisDateTime
 import java.io.File
@@ -22,7 +22,7 @@ internal class BatchUtilsTest {
 
   @Test
   fun `parseLocalDateToDate converts LocalDate objects to Date at start of day`() {
-    var localDate = LocalDate.of(2024, Month.FEBRUARY, 29)
+    val localDate = LocalDate.of(2024, Month.FEBRUARY, 29)
     val date = batchUtils.parseLocalDateToDate(localDate)
 
     assertThat(date.toInstant()).isEqualTo(Instant.parse("2024-02-29T00:00:00.00Z"))
@@ -57,9 +57,9 @@ internal class BatchUtilsTest {
         fields = listOf("stringVal", "uuidVal"),
       )
 
-      writer.open(mock<ExecutionContext>())
+      writer.open(mock())
       writer.write(
-        listOf(
+        Chunk.of(
           Data("tom", UUID.fromString("5863b32b-bb60-4bad-aeee-a15ff61abf3a")),
           Data("andrew", UUID.fromString("cec6b55f-b32f-43af-828b-c72a4c1aade7")),
         ),

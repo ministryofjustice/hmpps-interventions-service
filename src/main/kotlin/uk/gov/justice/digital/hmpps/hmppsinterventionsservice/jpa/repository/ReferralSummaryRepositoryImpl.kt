@@ -1,12 +1,12 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository
 
+import jakarta.persistence.EntityManager
+import jakarta.persistence.PersistenceContext
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DashboardType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceProviderSentReferralSummary
-import java.sql.Timestamp
+import java.time.Instant
 import java.util.UUID
-import javax.persistence.EntityManager
-import javax.persistence.PersistenceContext
 
 class ReferralSummaryRepositoryImpl : ReferralSummaryRepository {
 
@@ -73,7 +73,7 @@ class ReferralSummaryRepositoryImpl : ReferralSummaryRepository {
     val summaries: MutableList<ServiceProviderSentReferralSummary> = mutableListOf()
     result.forEach { row ->
       val referralId = row[0] as String
-      val sentAt = (row[1] as Timestamp).toInstant()
+      val sentAt = row[1] as Instant
       val referenceNumber = row[2] as String
       val interventionTitle = row[3] as String
       val dynamicFrameWorkContractId = row[4] as String
@@ -81,7 +81,7 @@ class ReferralSummaryRepositoryImpl : ReferralSummaryRepository {
       val serviceUserFirstName = row[6] as String?
       val serviceUserLastName = row[7] as String?
       val endOfServiceReportId = (row[8] as String?)?.let { UUID.fromString(it) }
-      val endOfServiceReportSubmittedAt = (row[9] as Timestamp?)?.toInstant()
+      val endOfServiceReportSubmittedAt = row[9] as Instant?
       summaries.add(ServiceProviderSentReferralSummary(referralId, sentAt, referenceNumber, interventionTitle, dynamicFrameWorkContractId, assignedToUserName, serviceUserFirstName, serviceUserLastName, endOfServiceReportId, endOfServiceReportSubmittedAt))
     }
     return summaries

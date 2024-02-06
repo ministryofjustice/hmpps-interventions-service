@@ -11,8 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Des
 class EndOfServiceReportOutcomeMapper(
   private val desiredOutcomeRepository: DesiredOutcomeRepository,
 ) {
-  fun mapCreateEndOfServiceReportOutcomeDtoToEndOfServiceReportOutcome(outcome: CreateEndOfServiceReportOutcomeDTO):
-    EndOfServiceReportOutcome {
+  fun mapCreateEndOfServiceReportOutcomeDtoToEndOfServiceReportOutcome(outcome: CreateEndOfServiceReportOutcomeDTO): EndOfServiceReportOutcome {
     return EndOfServiceReportOutcome(
       desiredOutcome = desiredOutcomeRepository.findById(outcome.desiredOutcomeId).orElseThrow {
         throw ResponseStatusException(HttpStatus.NOT_FOUND, "desired outcome not found [id=${outcome.desiredOutcomeId}]")

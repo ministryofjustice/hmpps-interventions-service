@@ -3,12 +3,15 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.trans
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.job.DefaultJobParametersValidator
+import org.springframework.batch.core.job.builder.JobBuilder
+import org.springframework.batch.core.repository.JobRepository
+import org.springframework.batch.core.step.builder.StepBuilder
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.transaction.PlatformTransactionManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.OnStartupJobLauncherFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
@@ -16,8 +19,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.Timestam
 @Configuration
 @EnableBatchProcessing
 class TransferReferralsJobConfiguration(
-  private val jobBuilderFactory: JobBuilderFactory,
-  private val stepBuilderFactory: StepBuilderFactory,
+  @Qualifier("jobRepository") private val jobRepository: JobRepository,
+  private val transactionManager: PlatformTransactionManager,
   private val listener: TransferReferralsJobListener,
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
 ) {
@@ -37,7 +40,7 @@ class TransferReferralsJobConfiguration(
       ),
     )
 
-    return jobBuilderFactory["transferReferralsJob"]
+    return JobBuilder("transferReferralsJob", jobRepository)
       .incrementer(TimestampIncrementer())
       .validator(validator)
       .listener(listener)
@@ -51,8 +54,8 @@ class TransferReferralsJobConfiguration(
     processor: TransferReferralsProcessor,
     writer: TransferReferralsWriter,
   ): Step {
-    return stepBuilderFactory.get("transferReferralToInterventionStep")
-      .chunk<Referral, Referral>(10)
+    return StepBuilder("transferReferralToInterventionStep", jobRepository)
+      .chunk<Referral, Referral>(10, transactionManager)
       .reader(reader)
       .processor(processor)
       .writer(writer)

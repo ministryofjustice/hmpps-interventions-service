@@ -29,7 +29,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SentReferralS
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAssessmentFactory
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
-
 @RepositoryTest
 class ReferralSpecificationsTest @Autowired constructor(
   val entityManager: TestEntityManager,
@@ -74,14 +73,16 @@ class ReferralSpecificationsTest @Autowired constructor(
     val truncateSeconds: Comparator<OffsetDateTime> = Comparator { a, exp ->
       if (exp != null && a != null) {
         if (a
-          .truncatedTo(ChronoUnit.SECONDS)
-          .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
+            .truncatedTo(ChronoUnit.SECONDS)
+            .isEqual(exp.truncatedTo(ChronoUnit.SECONDS))
         ) {
           0
         } else {
           1
         }
-      } else { 0 }
+      } else {
+        0
+      }
     }
     recursiveComparisonConfiguration = recursiveComparisonConfigurationBuilder
       .withComparatorForType(truncateSeconds, OffsetDateTime::class.java)
@@ -89,7 +90,7 @@ class ReferralSpecificationsTest @Autowired constructor(
   }
 
   @Nested
-  inner class sent {
+  inner class Sent {
     @Test
     fun `only sent referrals are returned`() {
       val sent = referralFactory.createSent()
@@ -101,8 +102,7 @@ class ReferralSpecificationsTest @Autowired constructor(
     }
   }
 
-  @Nested
-  inner class concluded {
+  inner class Concluded {
     @Test
     fun `only concluded referrals are returned`() {
       val sent = referralFactory.createSent()
@@ -131,7 +131,7 @@ class ReferralSpecificationsTest @Autowired constructor(
   }
 
   @Nested
-  inner class cancelled {
+  inner class Cancelled {
     @Test
     fun `only cancelled referrals are returned`() {
       val cancelled = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now(), concludedAt = OffsetDateTime.now(), endOfServiceReport = null)
@@ -148,7 +148,7 @@ class ReferralSpecificationsTest @Autowired constructor(
   }
 
   @Nested
-  inner class withSPAccess {
+  inner class WithSPAccess {
     @Test
     fun `sp with no contracts should never return a referral`() {
       referralFactory.createSent()
@@ -181,7 +181,7 @@ class ReferralSpecificationsTest @Autowired constructor(
   }
 
   @Nested
-  inner class assignedTo {
+  inner class AssignedTo {
     @Test
     fun `returns referral if user is currently assigned`() {
       val user = authUserFactory.create(id = "loggedInUser")

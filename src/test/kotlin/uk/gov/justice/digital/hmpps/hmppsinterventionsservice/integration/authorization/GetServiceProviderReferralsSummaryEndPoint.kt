@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.authorization
 
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.whenever
@@ -13,6 +14,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthS
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFactory
 
 class GetServiceProviderReferralsSummaryEndPoint : IntegrationTestBase() {
+
   @MockBean
   lateinit var mockHmppsAuthService: HMPPSAuthService
 
@@ -203,5 +205,10 @@ class GetServiceProviderReferralsSummaryEndPoint : IntegrationTestBase() {
       ]}
       """.trimIndent(),
     )
+  }
+
+  @AfterEach
+  fun `clear referrals`() {
+    setupAssistant.cleanAll()
   }
 }
