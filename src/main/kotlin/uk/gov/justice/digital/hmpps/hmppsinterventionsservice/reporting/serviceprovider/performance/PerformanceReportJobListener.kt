@@ -29,8 +29,10 @@ class PerformanceReportJobListener(
 
   override fun beforeJob(jobExecution: JobExecution) {
     // create a temp file for the job to write to and store the path in the execution context
-    val params = jobExecution.jobParameters.parameters
-    val path = createTempDirectory().resolve("${params["user.id"]}_${params["timestamp"]}.csv")
+    val params = jobExecution.jobParameters
+    val id = params.getString("user.id")
+    val timestamp = params.getString("timestamp")
+    val path = createTempDirectory().resolve(id + "_" + timestamp + ".csv")
 
     logger.debug("creating csv file for service provider performance report {}", kv("path", path))
 
@@ -44,15 +46,17 @@ class PerformanceReportJobListener(
       BatchStatus.COMPLETED -> {
         s3Service.publishFileToS3(storageS3Bucket, path, "reports/service-provider/performance/")
 
+        val reportURL = UriComponentsBuilder.fromHttpUrl(interventionsUiBaseUrl)
+          .path(downloadLocation)
+          .buildAndExpand(path.fileName)
+          .toString()
+
         emailSender.sendEmail(
           successNotifyTemplateId,
           jobExecution.jobParameters.getString("user.email"),
           mapOf(
             "serviceProviderFirstName" to jobExecution.jobParameters.getString("user.firstName"),
-            "reportUrl" to UriComponentsBuilder.fromHttpUrl(interventionsUiBaseUrl)
-              .path(downloadLocation)
-              .buildAndExpand(path.fileName)
-              .toString(),
+            "reportUrl" to reportURL,
           ),
         )
       }
