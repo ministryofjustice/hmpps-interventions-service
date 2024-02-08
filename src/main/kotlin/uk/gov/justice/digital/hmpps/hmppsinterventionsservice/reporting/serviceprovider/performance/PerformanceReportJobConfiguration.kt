@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance
 
-import jakarta.persistence.EntityManagerFactory
+import org.hibernate.SessionFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
@@ -10,8 +10,8 @@ import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.step.builder.StepBuilder
 import org.springframework.batch.item.ItemProcessor
-import org.springframework.batch.item.database.JpaCursorItemReader
-import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder
+import org.springframework.batch.item.database.HibernateCursorItemReader
+import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -30,7 +30,6 @@ class PerformanceReportJobConfiguration(
   private val transactionManager: PlatformTransactionManager,
   private val batchUtils: BatchUtils,
   private val listener: PerformanceReportJobListener,
-  private val entityManagerFactory: EntityManagerFactory,
   @Value("\${spring.batch.jobs.service-provider.performance-report.chunk-size}") private val chunkSize: Int,
 ) {
   @Bean
@@ -39,11 +38,12 @@ class PerformanceReportJobConfiguration(
     @Value("#{jobParameters['contractReferences']}") contractReferences: String,
     @Value("#{jobParameters['from']}") from: Date,
     @Value("#{jobParameters['to']}") to: Date,
-  ): JpaCursorItemReader<Referral> {
+    sessionFactory: SessionFactory,
+  ): HibernateCursorItemReader<Referral> {
     // this reader returns referral entities which need processing for the report.
-    return JpaCursorItemReaderBuilder<Referral>()
+    return HibernateCursorItemReaderBuilder<Referral>()
       .name("performanceReportReader")
-      .entityManagerFactory(entityManagerFactory)
+      .sessionFactory(sessionFactory)
       .queryString("select r from Referral r where r.sentAt > :from and r.sentAt < :to and r.intervention.dynamicFrameworkContract.contractReference in :contractReferences")
       .parameterValues(
         mapOf(
@@ -90,7 +90,7 @@ class PerformanceReportJobConfiguration(
 
   @Bean
   fun writeToCsvStep(
-    reader: JpaCursorItemReader<Referral>,
+    reader: HibernateCursorItemReader<Referral>,
     processor: ItemProcessor<Referral, PerformanceReportData>,
     writer: FlatFileItemWriter<PerformanceReportData>,
   ): Step {
