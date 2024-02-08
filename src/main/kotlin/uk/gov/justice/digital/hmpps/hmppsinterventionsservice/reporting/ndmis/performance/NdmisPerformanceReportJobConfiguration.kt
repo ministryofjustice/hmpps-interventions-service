@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance
 
-import jakarta.persistence.EntityManagerFactory
 import mu.KLogging
+import org.hibernate.SessionFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.StepContribution
@@ -13,8 +13,8 @@ import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.scope.context.ChunkContext
 import org.springframework.batch.core.step.builder.StepBuilder
-import org.springframework.batch.item.database.JpaCursorItemReader
-import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder
+import org.springframework.batch.item.database.HibernateCursorItemReader
+import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
 import org.springframework.batch.repeat.RepeatStatus
 import org.springframework.beans.factory.annotation.Qualifier
@@ -38,9 +38,8 @@ import java.nio.file.Path
 @Configuration
 @EnableBatchProcessing
 class NdmisPerformanceReportJobConfiguration(
-  private val transactionManager: PlatformTransactionManager,
-  private val entityManagerFactory: EntityManagerFactory,
   @Qualifier("jobRepository") private val jobRepository: JobRepository,
+  private val transactionManager: PlatformTransactionManager,
   private val batchUtils: BatchUtils,
   private val s3Service: S3Service,
   private val ndmisS3Bucket: S3Bucket,
@@ -61,17 +60,17 @@ class NdmisPerformanceReportJobConfiguration(
     return onStartupJobLauncherFactory.makeBatchLauncher(ndmisPerformanceReportJob)
   }
 
-  @JobScope
   @Bean
-  fun ndmisReader(): JpaCursorItemReader<Referral> {
-    val reader = JpaCursorItemReaderBuilder<Referral>()
+  @JobScope
+  fun ndmisReader(
+    sessionFactory: SessionFactory,
+  ): HibernateCursorItemReader<Referral> {
+    // this reader returns referral entities which need processing for the report.
+    return HibernateCursorItemReaderBuilder<Referral>()
       .name("ndmisPerformanceReportReader")
-      .queryString("select r from Referral r")
-      // do we need .maxItemCount(pageSize)?
-      .entityManagerFactory(entityManagerFactory)
-      .saveState(true)
+      .sessionFactory(sessionFactory)
+      .queryString("from Referral")
       .build()
-    return reader
   }
 
   @Bean
@@ -85,8 +84,8 @@ class NdmisPerformanceReportJobConfiguration(
     )
   }
 
-  @StepScope
   @Bean
+  @StepScope
   fun ndmisComplexityWriter(@Value("#{jobParameters['outputPath']}") outputPath: String): FlatFileItemWriter<Collection<ComplexityData>> {
     return batchUtils.recursiveCollectionCsvFileWriter(
       "ndmisComplexityPerformanceReportWriter",
@@ -96,8 +95,8 @@ class NdmisPerformanceReportJobConfiguration(
     )
   }
 
-  @StepScope
   @Bean
+  @StepScope
   fun ndmisAppointmentWriter(@Value("#{jobParameters['outputPath']}") outputPath: String): FlatFileItemWriter<Collection<AppointmentData>> {
     return batchUtils.recursiveCollectionCsvFileWriter(
       "ndmisAppointmentPerformanceReportWriter",
@@ -141,7 +140,7 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun ndmisWriteReferralToCsvStep(
-    ndmisReader: JpaCursorItemReader<Referral>,
+    ndmisReader: HibernateCursorItemReader<Referral>,
     processor: ReferralsProcessor,
     writer: FlatFileItemWriter<ReferralsData>,
   ): Step {
@@ -152,13 +151,12 @@ class NdmisPerformanceReportJobConfiguration(
       .writer(writer)
       .faultTolerant()
       .skipPolicy(skipPolicy)
-      .transactionManager(transactionManager)
       .build()
   }
 
   @Bean
   fun ndmisWriteComplexityToCsvStep(
-    ndmisReader: JpaCursorItemReader<Referral>,
+    ndmisReader: HibernateCursorItemReader<Referral>,
     processor: ComplexityProcessor,
     writer: FlatFileItemWriter<Collection<ComplexityData>>,
   ): Step {
@@ -169,13 +167,12 @@ class NdmisPerformanceReportJobConfiguration(
       .writer(writer)
       .faultTolerant()
       .skipPolicy(skipPolicy)
-      .transactionManager(transactionManager)
       .build()
   }
 
   @Bean
   fun ndmisWriteAppointmentToCsvStep(
-    ndmisReader: JpaCursorItemReader<Referral>,
+    ndmisReader: HibernateCursorItemReader<Referral>,
     processor: AppointmentProcessor,
     writer: FlatFileItemWriter<Collection<AppointmentData>>,
   ): Step {
@@ -186,13 +183,12 @@ class NdmisPerformanceReportJobConfiguration(
       .writer(writer)
       .faultTolerant()
       .skipPolicy(skipPolicy)
-      .transactionManager(transactionManager)
       .build()
   }
 
   @Bean
   fun ndmisWriteOutcomeToCsvStep(
-    ndmisReader: JpaCursorItemReader<Referral>,
+    ndmisReader: HibernateCursorItemReader<Referral>,
     processor: OutcomeProcessor,
     writer: FlatFileItemWriter<Collection<OutcomeData>>,
   ): Step {
@@ -203,7 +199,6 @@ class NdmisPerformanceReportJobConfiguration(
       .writer(writer)
       .faultTolerant()
       .skipPolicy(skipPolicy)
-      .transactionManager(transactionManager)
       .build()
   }
 
