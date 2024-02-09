@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.FileSystemResource
 import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.annotation.Transactional
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.S3Bucket
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.OnStartupJobLauncherFactory
@@ -117,6 +118,7 @@ class NdmisPerformanceReportJobConfiguration(
   }
 
   @Bean
+  @Transactional
   fun ndmisPerformanceReportJob(
     ndmisWriteReferralToCsvStep: Step,
     ndmisWriteComplexityToCsvStep: Step,
