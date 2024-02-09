@@ -17,7 +17,6 @@ import org.springframework.batch.item.database.HibernateCursorItemReader
 import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
 import org.springframework.batch.repeat.RepeatStatus
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
@@ -38,7 +37,7 @@ import java.nio.file.Path
 @Configuration
 @EnableBatchProcessing
 class NdmisPerformanceReportJobConfiguration(
-  @Qualifier("jobRepository") private val jobRepository: JobRepository,
+  private val jobRepository: JobRepository,
   private val transactionManager: PlatformTransactionManager,
   private val batchUtils: BatchUtils,
   private val s3Service: S3Service,
