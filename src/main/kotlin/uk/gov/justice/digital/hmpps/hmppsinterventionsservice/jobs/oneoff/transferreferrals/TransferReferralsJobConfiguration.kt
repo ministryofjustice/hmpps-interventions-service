@@ -10,7 +10,7 @@ import org.springframework.batch.core.step.builder.StepBuilder
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.OnStartupJobLauncherFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
@@ -20,7 +20,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.Timestam
 @EnableBatchProcessing
 class TransferReferralsJobConfiguration(
   private val jobRepository: JobRepository,
-  private val transactionManager: PlatformTransactionManager,
+  private val transactionManager: JpaTransactionManager,
   private val listener: TransferReferralsJobListener,
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
 ) {

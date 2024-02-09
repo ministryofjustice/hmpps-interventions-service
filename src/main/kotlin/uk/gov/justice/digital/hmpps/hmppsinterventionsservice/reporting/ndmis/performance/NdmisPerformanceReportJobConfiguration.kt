@@ -22,7 +22,7 @@ import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.FileSystemResource
-import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.transaction.annotation.Transactional
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.S3Bucket
@@ -39,7 +39,7 @@ import java.nio.file.Path
 @EnableBatchProcessing
 class NdmisPerformanceReportJobConfiguration(
   private val jobRepository: JobRepository,
-  private val transactionManager: PlatformTransactionManager,
+  private val transactionManager: JpaTransactionManager,
   private val batchUtils: BatchUtils,
   private val s3Service: S3Service,
   private val ndmisS3Bucket: S3Bucket,
