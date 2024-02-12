@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
-import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.OnStartupJobLauncherFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
@@ -32,7 +31,6 @@ class TransferReferralsJobConfiguration(
   }
 
   @Bean
-  @Transactional
   fun transferReferralsJob(transferReferralToInterventionStep: Step): Job {
     val validator = DefaultJobParametersValidator()
     validator.setRequiredKeys(
