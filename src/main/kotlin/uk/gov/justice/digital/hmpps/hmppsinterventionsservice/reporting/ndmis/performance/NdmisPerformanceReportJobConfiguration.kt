@@ -37,7 +37,6 @@ import java.nio.file.Path
 @Configuration
 @EnableBatchProcessing
 class NdmisPerformanceReportJobConfiguration(
-  /*@Qualifier("batchJobRepository") */
   private val jobRepository: JobRepository,
   private val transactionManager: PlatformTransactionManager,
   private val batchUtils: BatchUtils,
@@ -60,19 +59,6 @@ class NdmisPerformanceReportJobConfiguration(
     return onStartupJobLauncherFactory.makeBatchLauncher(ndmisPerformanceReportJob)
   }
 
-/*  @Bean
-  @JobScope
-  fun ndmisReader(
-    sessionFactory: SessionFactory,
-  ): JpaPagingItemReader<Referral> {
-    // this reader returns referral entities which need processing for the report.
-    return JpaPagingItemReaderBuilder<Referral>()
-      .name("ndmisPerformanceReportReader")
-      .sessionFactory(sessionFactory)
-      .queryString("from Referral")
-      .build()
-  }
-*/
   @Bean
   @JobScope
   fun ndmisReader(entityManagerFactory: EntityManagerFactory): JpaPagingItemReader<Referral> {
