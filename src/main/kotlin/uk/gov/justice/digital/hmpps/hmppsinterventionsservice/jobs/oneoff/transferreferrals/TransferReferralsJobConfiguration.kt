@@ -18,7 +18,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.Timestam
 
 @Configuration
 @EnableBatchProcessing
-@EnableTransactionManagement
 class TransferReferralsJobConfiguration(
   private val jobRepository: JobRepository,
   private val transactionManager: JpaTransactionManager,
