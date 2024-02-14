@@ -145,7 +145,7 @@ internal class CommunityAPIBookingServiceTest {
       assertThat(appointmentMerge.notes).isEqualTo(notes)
       assertThat(appointmentMerge.outcome).isNotNull
       assertThat(appointmentMerge.outcome!!.attended).isEqualTo(AppointmentMerge.Outcome.Attended.YES)
-      assertThat(appointmentMerge.outcome!!.notify).isTrue()
+      assertThat(appointmentMerge.outcome!!.notifyProbationPractitionerOfBehaviour).isTrue()
     }
 
     @Test
@@ -172,7 +172,7 @@ internal class CommunityAPIBookingServiceTest {
       assertThat(appointmentMerge.notes).isEqualTo(notes)
       assertThat(appointmentMerge.outcome).isNotNull
       assertThat(appointmentMerge.outcome!!.attended).isEqualTo(AppointmentMerge.Outcome.Attended.NO)
-      assertThat(appointmentMerge.outcome!!.notify).isTrue()
+      assertThat(appointmentMerge.outcome!!.notifyProbationPractitionerOfBehaviour).isFalse()
     }
 
     @Test

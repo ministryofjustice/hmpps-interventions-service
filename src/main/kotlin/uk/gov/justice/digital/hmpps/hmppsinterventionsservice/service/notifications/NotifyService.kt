@@ -105,7 +105,8 @@ class NotifyEndOfServiceReportService(
 @Service
 class NotifyAppointmentService(
   @Value("\${notify.templates.appointment-not-attended}") private val appointmentNotAttendedTemplateID: String,
-  @Value("\${notify.templates.concerning-behaviour}") private val concerningBehaviourTemplateID: String,
+  @Value("\${notify.templates.session-poor-behaviour}") private val sessionPoorBehaviourTemplateID: String,
+  @Value("\${notify.templates.session-concerns}") private val sessionConcernsBehaviourTemplateID: String,
   @Value("\${notify.templates.initial-assessment-scheduled}") private val initialAssessmentScheduledTemplateID: String,
   @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
   @Value("\${interventions-ui.locations.probation-practitioner.intervention-progress}") private val ppInterventionProgressUrl: String,
@@ -158,7 +159,7 @@ class NotifyAppointmentService(
         AppointmentEventType.SESSION_FEEDBACK_RECORDED -> {
           if (event.notifyProbationPractitionerOfBehaviour == true) {
             emailSender.sendEmail(
-              concerningBehaviourTemplateID,
+              sessionPoorBehaviourTemplateID,
               recipient.email,
               mapOf(
                 "ppFirstName" to recipient.firstName,
@@ -169,7 +170,7 @@ class NotifyAppointmentService(
           }
           if (event.notifyProbationPractitionerOfConcerns == true) {
             emailSender.sendEmail(
-              concerningBehaviourTemplateID,
+              sessionConcernsBehaviourTemplateID,
               recipient.email,
               mapOf(
                 "ppFirstName" to recipient.firstName,

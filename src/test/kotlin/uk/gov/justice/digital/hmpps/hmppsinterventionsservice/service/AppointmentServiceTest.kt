@@ -137,7 +137,7 @@ class AppointmentServiceTest {
     val referral = referralFactory.createSent()
     val deliusAppointmentId = 99L
 
-    whenever(communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null, YES, false, false, NoSessionReasonType.LOGISTICS))
+    whenever(communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null, YES, notifyProbationPractitionerOfBehaviour = false, notifyProbationPractitionerOfConcerns = false, false, NoSessionReasonType.LOGISTICS))
       .thenReturn(Pair(deliusAppointmentId, UUID.randomUUID()))
     whenever(appointmentRepository.save(any())).thenAnswer { it.arguments[0] }
 
@@ -154,7 +154,8 @@ class AppointmentServiceTest {
       null,
       null,
       attended = YES,
-      notifyProbationPractitioner = false,
+      notifyProbationPractitionerOfBehaviour = false,
+      notifyProbationPractitionerOfConcerns= false,
       didSessionHappen = false,
       late = false,
       sessionSummary = "session summary",
@@ -174,13 +175,13 @@ class AppointmentServiceTest {
     )
     verifySavedAppointment(appointmentTime, durationInMinutes, deliusAppointmentId, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
     verify(appointmentEventPublisher).attendanceRecordedEvent(newAppointment, false, AppointmentType.SUPPLIER_ASSESSMENT)
-    verify(appointmentEventPublisher).sessionFeedbackRecordedEvent(newAppointment, false, AppointmentType.SUPPLIER_ASSESSMENT)
-    verify(appointmentEventPublisher).appointmentFeedbackRecordedEvent(newAppointment, false, AppointmentType.SUPPLIER_ASSESSMENT)
+    verify(appointmentEventPublisher).sessionFeedbackRecordedEvent(newAppointment, notifyProbationPractitionerOfBehaviour = false, notifyProbationPractitionerOfConcerns = false, AppointmentType.SUPPLIER_ASSESSMENT)
+    verify(appointmentEventPublisher).appointmentFeedbackRecordedEvent(newAppointment, notifyProbationPractitionerOfBehaviour = false, notifyProbationPractitionerOfConcerns = false, AppointmentType.SUPPLIER_ASSESSMENT)
     assertThat(newAppointment.attended).isEqualTo(YES)
     assertThat(newAppointment.noAttendanceInformation).isEqualTo(null)
     assertThat(newAppointment.sessionSummary).isEqualTo("session summary")
     assertThat(newAppointment.sessionResponse).isEqualTo("session response")
-    assertThat(newAppointment.notifyPPOfAttendanceBehaviour).isEqualTo(false)
+    assertThat(newAppointment.notifyProbationPractitionerOfBehaviour).isEqualTo(false)
     assertThat(newAppointment.attendanceSubmittedAt).isNotNull
     assertThat(newAppointment.attendanceSubmittedBy).isEqualTo(createdByUser)
     assertThat(newAppointment.sessionFeedbackSubmittedAt).isNotNull
@@ -281,7 +282,7 @@ class AppointmentServiceTest {
     val referral = referralFactory.createSent()
     val rescheduledDeliusAppointmentId = 99L
 
-    whenever(communityAPIBookingService.book(referral, existingAppointment, pastAppointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null, NO, false, false, NoSessionReasonType.POP_ACCEPTABLE))
+    whenever(communityAPIBookingService.book(referral, existingAppointment, pastAppointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null, NO, notifyProbationPractitionerOfBehaviour = false, notifyProbationPractitionerOfConcerns = false,false, NoSessionReasonType.POP_ACCEPTABLE))
       .thenReturn(Pair(rescheduledDeliusAppointmentId, UUID.randomUUID()))
     whenever(appointmentRepository.save(any())).thenAnswer { it.arguments[0] }
 
@@ -296,7 +297,8 @@ class AppointmentServiceTest {
       AppointmentDeliveryType.PHONE_CALL,
       AppointmentSessionType.ONE_TO_ONE,
       attended = NO,
-      notifyProbationPractitioner = false,
+      notifyProbationPractitionerOfBehaviour = false,
+      notifyProbationPractitionerOfConcerns = false,
       didSessionHappen = false,
       noSessionReasonType = NoSessionReasonType.POP_ACCEPTABLE,
       late = false,
@@ -317,7 +319,7 @@ class AppointmentServiceTest {
     assertThat(updatedAppointment.didSessionHappen).isEqualTo(false)
     assertThat(updatedAppointment.noAttendanceInformation).isEqualTo(null)
     assertThat(updatedAppointment.attendanceBehaviour).isNull()
-    assertThat(updatedAppointment.notifyPPOfAttendanceBehaviour).isFalse
+    assertThat(updatedAppointment.notifyProbationPractitionerOfBehaviour).isFalse
   }
 
   @Test
@@ -420,7 +422,8 @@ class AppointmentServiceTest {
       val appointmentId = UUID.randomUUID()
       val sessionSummary = "summary"
       val sessionResponse = "response"
-      val notifyProbationPractitioner = true
+      val notifyProbationPractitionerOfBehaviour = true
+      val notifyProbationPractitionerOfConcerns = false
       val appointment = appointmentFactory.create(id = appointmentId)
       val submittedBy = authUserFactory.create()
 
@@ -440,7 +443,9 @@ class AppointmentServiceTest {
         sessionSummary,
         sessionResponse,
         null,
-        notifyProbationPractitioner,
+        null,
+        notifyProbationPractitionerOfBehaviour,
+        notifyProbationPractitionerOfConcerns,
         submittedBy,
       )
 
@@ -450,7 +455,8 @@ class AppointmentServiceTest {
 
       assertThat(arguments.id).isEqualTo(appointmentId)
       assertThat(arguments.sessionSummary).isEqualTo(sessionSummary)
-      assertThat(arguments.notifyPPOfAttendanceBehaviour).isEqualTo(notifyProbationPractitioner)
+      assertThat(arguments.notifyProbationPractitionerOfBehaviour).isEqualTo(notifyProbationPractitionerOfBehaviour)
+      assertThat(arguments.notifyProbationPractitionerOfConcerns).isEqualTo(notifyProbationPractitionerOfConcerns)
       assertThat(arguments.sessionFeedbackSubmittedAt).isNotNull
       assertThat(arguments.sessionFeedbackSubmittedBy).isEqualTo(submittedBy)
     }
@@ -460,7 +466,8 @@ class AppointmentServiceTest {
       val appointmentId = UUID.randomUUID()
       val sessionSummary = "summary"
       val sessionResponse = "response"
-      val notifyProbationPractitioner = true
+      val notifyProbationPractitionerOfBehaviour = true
+      val notifyProbationPractitionerOfConcerns = true
       val submittedBy = authUserFactory.create()
       val feedbackSubmittedAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
       val appointment = appointmentFactory.create(id = appointmentId, appointmentFeedbackSubmittedAt = feedbackSubmittedAt)
@@ -479,7 +486,9 @@ class AppointmentServiceTest {
           sessionSummary,
           sessionResponse,
           null,
-          notifyProbationPractitioner,
+          null,
+          notifyProbationPractitionerOfBehaviour,
+          notifyProbationPractitionerOfConcerns,
           submittedBy,
         )
       }
@@ -649,7 +658,7 @@ class AppointmentServiceTest {
       assertThat(arguments.appointmentFeedbackSubmittedAt).isNotNull
       assertThat(arguments.appointmentFeedbackSubmittedBy).isEqualTo(submittedBy)
 
-      verify(appointmentEventPublisher).appointmentFeedbackRecordedEvent(appointment, false, SUPPLIER_ASSESSMENT)
+      verify(appointmentEventPublisher).appointmentFeedbackRecordedEvent(appointment, notifyProbationPractitionerOfBehaviour = false, notifyProbationPractitionerOfConcerns = false, SUPPLIER_ASSESSMENT)
     }
 
     @Test
@@ -687,7 +696,8 @@ class AppointmentServiceTest {
       appointment.attendanceSubmittedAt = OffsetDateTime.now()
       appointment.attended = NO
       appointment.sessionFeedbackSubmittedAt = OffsetDateTime.now()
-      appointment.notifyPPOfAttendanceBehaviour = true
+      appointment.notifyProbationPractitionerOfBehaviour = true
+      appointment.notifyProbationPractitionerOfConcerns = true
 
       whenever(appointmentRepository.save(any())).thenReturn(appointment)
       whenever(authUserRepository.save(any())).thenReturn(submittedBy)
@@ -695,7 +705,7 @@ class AppointmentServiceTest {
       appointmentService.submitAppointmentFeedback(appointment, submittedBy, SUPPLIER_ASSESSMENT)
 
       verify(appointmentEventPublisher).attendanceRecordedEvent(appointment, true, SUPPLIER_ASSESSMENT)
-      verify(appointmentEventPublisher).sessionFeedbackRecordedEvent(appointment, true, SUPPLIER_ASSESSMENT)
+      verify(appointmentEventPublisher).sessionFeedbackRecordedEvent(appointment, notifyProbationPractitionerOfBehaviour = true, notifyProbationPractitionerOfConcerns = true, SUPPLIER_ASSESSMENT)
     }
   }
 }

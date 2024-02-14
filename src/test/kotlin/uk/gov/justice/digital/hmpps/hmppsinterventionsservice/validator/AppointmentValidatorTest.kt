@@ -258,7 +258,9 @@ internal class AppointmentValidatorTest {
             null,
             "sessionResponse",
             null,
-            false,
+            null,
+            notifyProbationPractitionerOfBehaviour = false,
+            notifyProbationPractitionerOfConcerns = false,
           ),
         )
         val exception = assertThrows<ValidationError> {
@@ -290,7 +292,9 @@ internal class AppointmentValidatorTest {
             "sessionSummary",
             "sessionResponse",
             null,
-            false,
+            null,
+            notifyProbationPractitionerOfBehaviour = false,
+            notifyProbationPractitionerOfConcerns = false,
           ),
         )
         val exception = assertThrows<ValidationError> {
