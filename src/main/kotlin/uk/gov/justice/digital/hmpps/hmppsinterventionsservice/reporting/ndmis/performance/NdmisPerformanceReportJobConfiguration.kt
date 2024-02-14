@@ -103,10 +103,10 @@ class NdmisPerformanceReportJobConfiguration(
   @Bean
   fun ndmisPerformanceReportJob(
     ndmisWriteReferralToCsvStep: Step,
-    ndmisWriteComplexityToCsvStep: Step,
-    ndmisWriteAppointmentToCsvStep: Step,
-    ndmisWriteOutcomeToCsvStep: Step,
-    pushToS3Step: Step,
+    // ndmisWriteComplexityToCsvStep: Step,
+    // ndmisWriteAppointmentToCsvStep: Step,
+    // ndmisWriteOutcomeToCsvStep: Step,
+    // pushToS3Step: Step,
   ): Job {
     val validator = DefaultJobParametersValidator()
     validator.setRequiredKeys(arrayOf("timestamp", "outputPath"))
@@ -114,10 +114,10 @@ class NdmisPerformanceReportJobConfiguration(
       .incrementer { parameters -> OutputPathIncrementer().getNext(TimestampIncrementer().getNext(parameters)) }
       .validator(validator)
       .start(ndmisWriteReferralToCsvStep)
-      .next(ndmisWriteComplexityToCsvStep)
-      .next(ndmisWriteAppointmentToCsvStep)
-      .next(ndmisWriteOutcomeToCsvStep)
-      .next(pushToS3Step)
+      // .next(ndmisWriteComplexityToCsvStep)
+      // .next(ndmisWriteAppointmentToCsvStep)
+      // .next(ndmisWriteOutcomeToCsvStep)
+      // .next(pushToS3Step)
       .build()
   }
 
