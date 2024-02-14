@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance
 
-import jakarta.persistence.EntityManagerFactory
 import mu.KLogging
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
@@ -13,8 +12,6 @@ import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.scope.context.ChunkContext
 import org.springframework.batch.core.step.builder.StepBuilder
-import org.springframework.batch.item.database.JpaPagingItemReader
-import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
 import org.springframework.batch.repeat.RepeatStatus
 import org.springframework.beans.factory.annotation.Value
@@ -57,18 +54,6 @@ class NdmisPerformanceReportJobConfiguration(
   @Bean
   fun ndmisPerformanceReportJobLauncher(ndmisPerformanceReportJob: Job): ApplicationRunner {
     return onStartupJobLauncherFactory.makeBatchLauncher(ndmisPerformanceReportJob)
-  }
-
-  @Bean
-  @JobScope
-  fun ndmisReader(entityManagerFactory: EntityManagerFactory): JpaPagingItemReader<Referral> {
-    // this reader returns referral entities which need processing for the report.
-    return JpaPagingItemReaderBuilder<Referral>()
-      .entityManagerFactory(entityManagerFactory)
-      .queryString("from Referral")
-      .pageSize(20)
-      .name("ndmisReader")
-      .build()
   }
 
   @Bean
@@ -138,7 +123,7 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun ndmisWriteReferralToCsvStep(
-    ndmisReader: JpaPagingItemReader<Referral>,
+    ndmisReader: NdmisReader,
     processor: ReferralsProcessor,
     writer: FlatFileItemWriter<ReferralsData>,
   ): Step {
@@ -154,7 +139,7 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun ndmisWriteComplexityToCsvStep(
-    ndmisReader: JpaPagingItemReader<Referral>,
+    ndmisReader: NdmisReader,
     processor: ComplexityProcessor,
     writer: FlatFileItemWriter<Collection<ComplexityData>>,
   ): Step {
@@ -170,7 +155,7 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun ndmisWriteAppointmentToCsvStep(
-    ndmisReader: JpaPagingItemReader<Referral>,
+    ndmisReader: NdmisReader,
     processor: AppointmentProcessor,
     writer: FlatFileItemWriter<Collection<AppointmentData>>,
   ): Step {
@@ -186,7 +171,7 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun ndmisWriteOutcomeToCsvStep(
-    ndmisReader: JpaPagingItemReader<Referral>,
+    ndmisReader: NdmisReader,
     processor: OutcomeProcessor,
     writer: FlatFileItemWriter<Collection<OutcomeData>>,
   ): Step {
