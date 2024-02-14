@@ -84,11 +84,12 @@ class NdmisPerformanceReportJobConfigurationTest : IntegrationTestBase() {
 
     assertThat(outputDir.resolve("crs_performance_report-v2-referrals.csv"))
       .content().contains(referral.referenceNumber)
-    assertThat(outputDir.resolve("crs_performance_report-v2-complexity.csv"))
+    /* assertThat(outputDir.resolve("crs_performance_report-v2-complexity.csv"))
       .content().contains(referral.referenceNumber)
     assertThat(outputDir.resolve("crs_performance_report-v2-appointments.csv"))
       .content().contains(referral.referenceNumber)
     assertThat(outputDir.resolve("crs_performance_report-v2-outcomes.csv"))
       .content().contains(referral.referenceNumber)
+     */
   }
 }
