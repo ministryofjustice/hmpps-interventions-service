@@ -1,11 +1,13 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config
 
+import jakarta.persistence.EntityManagerFactory
 import org.springframework.batch.core.launch.JobLauncher
-import org.springframework.batch.core.launch.support.SimpleJobLauncher
+import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 
 @Configuration
@@ -21,10 +23,15 @@ class BatchConfiguration(
     taskExecutor.queueCapacity = queueSize
     taskExecutor.afterPropertiesSet()
 
-    val launcher = SimpleJobLauncher()
+    val launcher = TaskExecutorJobLauncher()
     launcher.setJobRepository(jobRepository)
     launcher.setTaskExecutor(taskExecutor)
     launcher.afterPropertiesSet()
     return launcher
+  }
+
+  @Bean
+  fun transactionManager(entityManagerFactory: EntityManagerFactory): JpaTransactionManager {
+    return JpaTransactionManager(entityManagerFactory)
   }
 }
