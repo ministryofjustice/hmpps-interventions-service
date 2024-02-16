@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance
 
-import jakarta.persistence.EntityManagerFactory
 import mu.KLogging
 import org.hibernate.SessionFactory
 import org.springframework.batch.core.Job
