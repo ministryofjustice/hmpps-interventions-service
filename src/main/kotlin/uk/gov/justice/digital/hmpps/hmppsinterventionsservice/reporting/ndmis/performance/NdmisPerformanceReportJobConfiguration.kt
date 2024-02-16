@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance
 
+import jakarta.persistence.EntityManagerFactory
 import mu.KLogging
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
@@ -12,6 +13,8 @@ import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.scope.context.ChunkContext
 import org.springframework.batch.core.step.builder.StepBuilder
+import org.springframework.batch.item.database.JpaPagingItemReader
+import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
 import org.springframework.batch.repeat.RepeatStatus
 import org.springframework.beans.factory.annotation.Value
@@ -32,10 +35,10 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.S3Service
 import java.nio.file.Path
 
 @Configuration
-@EnableBatchProcessing(isolationLevelForCreate = "ISOLATION_DEFAULT", transactionManagerRef = "transactionManager")
+@EnableBatchProcessing(isolationLevelForCreate = "ISOLATION_DEFAULT", transactionManagerRef = "jpaTransactionManager")
 class NdmisPerformanceReportJobConfiguration(
   private val jobRepository: JobRepository,
-  private val transactionManager: JpaTransactionManager,
+  private val jpaTransactionManager: JpaTransactionManager,
   private val batchUtils: BatchUtils,
   private val s3Service: S3Service,
   private val ndmisS3Bucket: S3Bucket,
@@ -54,6 +57,17 @@ class NdmisPerformanceReportJobConfiguration(
   @Bean
   fun ndmisPerformanceReportJobLauncher(ndmisPerformanceReportJob: Job): ApplicationRunner {
     return onStartupJobLauncherFactory.makeBatchLauncher(ndmisPerformanceReportJob)
+  }
+
+  @Bean
+  fun ndmisReader(entityManagerFactory: EntityManagerFactory): JpaPagingItemReader<Referral> {
+    // this reader returns referral entities which need processing for the report.
+    return JpaPagingItemReaderBuilder<Referral>()
+      .entityManagerFactory(entityManagerFactory)
+      .queryString("select r from Referral r")
+      .pageSize(20)
+      .name("ndmisReader")
+      .build()
   }
 
   @Bean
@@ -123,12 +137,12 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun ndmisWriteReferralToCsvStep(
-    ndmisReader: NdmisReader,
+    ndmisReader: JpaPagingItemReader<Referral>,
     processor: ReferralsProcessor,
     writer: FlatFileItemWriter<ReferralsData>,
   ): Step {
     return StepBuilder("ndmisWriteReferralToCsvStep", jobRepository)
-      .chunk<Referral, ReferralsData>(chunkSize, transactionManager)
+      .chunk<Referral, ReferralsData>(chunkSize, jpaTransactionManager)
       .reader(ndmisReader)
       .processor(processor)
       .writer(writer)
@@ -139,12 +153,12 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun ndmisWriteComplexityToCsvStep(
-    ndmisReader: NdmisReader,
+    ndmisReader: JpaPagingItemReader<Referral>,
     processor: ComplexityProcessor,
     writer: FlatFileItemWriter<Collection<ComplexityData>>,
   ): Step {
     return StepBuilder("ndmisWriteComplexityToCsvStep", jobRepository)
-      .chunk<Referral, List<ComplexityData>>(chunkSize, transactionManager)
+      .chunk<Referral, List<ComplexityData>>(chunkSize, jpaTransactionManager)
       .reader(ndmisReader)
       .processor(processor)
       .writer(writer)
@@ -155,12 +169,12 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun ndmisWriteAppointmentToCsvStep(
-    ndmisReader: NdmisReader,
+    ndmisReader: JpaPagingItemReader<Referral>,
     processor: AppointmentProcessor,
     writer: FlatFileItemWriter<Collection<AppointmentData>>,
   ): Step {
     return StepBuilder("ndmisWriteAppointmentToCsvStep", jobRepository)
-      .chunk<Referral, List<AppointmentData>>(chunkSize, transactionManager)
+      .chunk<Referral, List<AppointmentData>>(chunkSize, jpaTransactionManager)
       .reader(ndmisReader)
       .processor(processor)
       .writer(writer)
@@ -171,12 +185,12 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun ndmisWriteOutcomeToCsvStep(
-    ndmisReader: NdmisReader,
+    ndmisReader: JpaPagingItemReader<Referral>,
     processor: OutcomeProcessor,
     writer: FlatFileItemWriter<Collection<OutcomeData>>,
   ): Step {
     return StepBuilder("ndmisWriteOutcomeToCsvStep", jobRepository)
-      .chunk<Referral, List<OutcomeData>>(chunkSize, transactionManager)
+      .chunk<Referral, List<OutcomeData>>(chunkSize, jpaTransactionManager)
       .reader(ndmisReader)
       .processor(processor)
       .writer(writer)
@@ -188,7 +202,7 @@ class NdmisPerformanceReportJobConfiguration(
   @JobScope
   @Bean
   fun pushToS3Step(@Value("#{jobParameters['outputPath']}") outputPath: String): Step =
-    StepBuilder("pushToS3Step", jobRepository).tasklet(pushFilesToS3(outputPath), transactionManager).build()
+    StepBuilder("pushToS3Step", jobRepository).tasklet(pushFilesToS3(outputPath), jpaTransactionManager).build()
 
   private fun pushFilesToS3(outputPath: String) = { _: StepContribution, _: ChunkContext ->
     listOf(referralReportFilename, complexityReportFilename, appointmentReportFilename, outcomeReportFilename).forEach { file ->
