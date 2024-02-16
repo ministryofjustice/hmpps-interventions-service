@@ -7,6 +7,7 @@ import org.springframework.batch.core.ExitStatus
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobParametersBuilder
+import org.springframework.batch.core.launch.support.SimpleJobLauncher
 import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.test.JobLauncherTestUtils
@@ -70,8 +71,6 @@ class NdmisPerformanceReportJobConfigurationTest : IntegrationTestBase() {
       attended = Attended.YES,
       referral = referral,
     )
-
-    logger.info { "We are setup" }
 
     val parameters = JobParametersBuilder()
       .addString("outputPath", outputDir.pathString)
