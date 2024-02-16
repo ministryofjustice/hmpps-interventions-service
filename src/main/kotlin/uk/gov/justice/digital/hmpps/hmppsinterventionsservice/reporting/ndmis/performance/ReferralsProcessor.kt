@@ -13,7 +13,7 @@ class ReferralsProcessor(
   companion object : KLogging()
 
   override fun processSentReferral(referral: Referral): ReferralsData {
-    logger().debug("Processing the referral data")
+    logger.info("Processing the referral data")
     try {
       return ReferralsData(
         referralReference = referral.referenceNumber!!,
@@ -41,7 +41,7 @@ class ReferralsProcessor(
         concludedAt = referral.concludedAt?.let { t -> NdmisDateTime(t) },
       )
     } catch (e: Exception) {
-      logger().debug("The exception while processing referral data is ${e.message}")
+      logger.info("The exception while processing referral data is ${e.message}")
       throw e
     }
   }
