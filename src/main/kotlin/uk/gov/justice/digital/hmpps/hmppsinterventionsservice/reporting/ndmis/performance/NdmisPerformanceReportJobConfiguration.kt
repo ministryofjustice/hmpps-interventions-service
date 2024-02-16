@@ -35,10 +35,10 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.S3Service
 import java.nio.file.Path
 
 @Configuration
-@EnableBatchProcessing(isolationLevelForCreate = "ISOLATION_DEFAULT", transactionManagerRef = "jpaTransactionManager")
+@EnableBatchProcessing
 class NdmisPerformanceReportJobConfiguration(
   private val jobRepository: JobRepository,
-  private val jpaTransactionManager: JpaTransactionManager,
+  private val transactionManager: JpaTransactionManager,
   private val batchUtils: BatchUtils,
   private val s3Service: S3Service,
   private val ndmisS3Bucket: S3Bucket,
@@ -142,7 +142,7 @@ class NdmisPerformanceReportJobConfiguration(
     writer: FlatFileItemWriter<ReferralsData>,
   ): Step {
     return StepBuilder("ndmisWriteReferralToCsvStep", jobRepository)
-      .chunk<Referral, ReferralsData>(chunkSize, jpaTransactionManager)
+      .chunk<Referral, ReferralsData>(chunkSize, transactionManager)
       .reader(ndmisReader)
       .processor(processor)
       .writer(writer)
@@ -158,7 +158,7 @@ class NdmisPerformanceReportJobConfiguration(
     writer: FlatFileItemWriter<Collection<ComplexityData>>,
   ): Step {
     return StepBuilder("ndmisWriteComplexityToCsvStep", jobRepository)
-      .chunk<Referral, List<ComplexityData>>(chunkSize, jpaTransactionManager)
+      .chunk<Referral, List<ComplexityData>>(chunkSize, transactionManager)
       .reader(ndmisReader)
       .processor(processor)
       .writer(writer)
@@ -174,7 +174,7 @@ class NdmisPerformanceReportJobConfiguration(
     writer: FlatFileItemWriter<Collection<AppointmentData>>,
   ): Step {
     return StepBuilder("ndmisWriteAppointmentToCsvStep", jobRepository)
-      .chunk<Referral, List<AppointmentData>>(chunkSize, jpaTransactionManager)
+      .chunk<Referral, List<AppointmentData>>(chunkSize, transactionManager)
       .reader(ndmisReader)
       .processor(processor)
       .writer(writer)
@@ -190,7 +190,7 @@ class NdmisPerformanceReportJobConfiguration(
     writer: FlatFileItemWriter<Collection<OutcomeData>>,
   ): Step {
     return StepBuilder("ndmisWriteOutcomeToCsvStep", jobRepository)
-      .chunk<Referral, List<OutcomeData>>(chunkSize, jpaTransactionManager)
+      .chunk<Referral, List<OutcomeData>>(chunkSize, transactionManager)
       .reader(ndmisReader)
       .processor(processor)
       .writer(writer)
@@ -202,7 +202,7 @@ class NdmisPerformanceReportJobConfiguration(
   @JobScope
   @Bean
   fun pushToS3Step(@Value("#{jobParameters['outputPath']}") outputPath: String): Step =
-    StepBuilder("pushToS3Step", jobRepository).tasklet(pushFilesToS3(outputPath), jpaTransactionManager).build()
+    StepBuilder("pushToS3Step", jobRepository).tasklet(pushFilesToS3(outputPath), transactionManager).build()
 
   private fun pushFilesToS3(outputPath: String) = { _: StepContribution, _: ChunkContext ->
     listOf(referralReportFilename, complexityReportFilename, appointmentReportFilename, outcomeReportFilename).forEach { file ->
