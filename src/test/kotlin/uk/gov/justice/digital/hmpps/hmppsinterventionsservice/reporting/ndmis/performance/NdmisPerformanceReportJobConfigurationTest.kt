@@ -71,8 +71,6 @@ class NdmisPerformanceReportJobConfigurationTest : IntegrationTestBase() {
       referral = referral,
     )
 
-    logger.info { "We are setup" }
-
     val parameters = JobParametersBuilder()
       .addString("outputPath", outputDir.pathString)
       .toJobParameters()
