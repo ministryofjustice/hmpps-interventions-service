@@ -77,7 +77,7 @@ class AppointmentEventPublisher(
         appointmentType,
         deliverySession,
         notifyProbationPractitionerOfBehaviour,
-        notifyProbationPractitionerOfConcerns
+        notifyProbationPractitionerOfConcerns,
       ),
     )
   }

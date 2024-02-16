@@ -161,19 +161,21 @@ internal class DeliverySessionsServiceTest {
     val durationInMinutes = 200
     val appointment = session.currentAppointment
 
-    whenever(communityAPIBookingService.book(
-      session.referral,
-      appointment,
-      appointmentTime,
-      durationInMinutes,
-      SERVICE_DELIVERY,
-      null,
-      Attended.YES,
-      notifyProbationPractitionerOfBehaviour = false,
-      notifyProbationPractitionerOfConcerns = false,
-      true,
-      null
-    ))
+    whenever(
+      communityAPIBookingService.book(
+        session.referral,
+        appointment,
+        appointmentTime,
+        durationInMinutes,
+        SERVICE_DELIVERY,
+        null,
+        Attended.YES,
+        notifyProbationPractitionerOfBehaviour = false,
+        notifyProbationPractitionerOfConcerns = false,
+        true,
+        null,
+      ),
+    )
       .thenReturn(Pair(929478456763L, UUID.randomUUID()))
 
     val updatedSession = deliverySessionsService.updateSessionAppointment(

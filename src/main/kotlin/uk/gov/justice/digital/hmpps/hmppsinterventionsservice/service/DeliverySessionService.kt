@@ -239,7 +239,7 @@ class DeliverySessionService(
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
     attended: Attended? = null,
-    didSessionHappen: Boolean ? = null,
+    didSessionHappen: Boolean? = null,
     notifyProbationPractitionerOfBehaviour: Boolean? = null,
     notifyProbationPractitionerOfConcerns: Boolean? = null,
     late: Boolean?,

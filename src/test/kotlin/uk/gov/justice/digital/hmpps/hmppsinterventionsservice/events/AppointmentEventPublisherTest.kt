@@ -136,7 +136,7 @@ class AppointmentEventPublisherTest {
     val appointment = appointmentFactory.create()
     val deliverySession = DeliverySessionFactory().createScheduled()
 
-    publisher.appointmentFeedbackRecordedEvent(appointment, notifyProbationPractitionerOfBehaviour = true, notifyProbationPractitionerOfConcerns = true,   AppointmentType.SERVICE_DELIVERY, deliverySession)
+    publisher.appointmentFeedbackRecordedEvent(appointment, notifyProbationPractitionerOfBehaviour = true, notifyProbationPractitionerOfConcerns = true, AppointmentType.SERVICE_DELIVERY, deliverySession)
 
     val eventCaptor = argumentCaptor<AppointmentEvent>()
     verify(eventPublisher).publishEvent(eventCaptor.capture())

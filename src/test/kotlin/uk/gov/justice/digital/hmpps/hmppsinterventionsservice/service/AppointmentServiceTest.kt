@@ -155,7 +155,7 @@ class AppointmentServiceTest {
       null,
       attended = YES,
       notifyProbationPractitionerOfBehaviour = false,
-      notifyProbationPractitionerOfConcerns= false,
+      notifyProbationPractitionerOfConcerns = false,
       didSessionHappen = false,
       late = false,
       sessionSummary = "session summary",
@@ -282,7 +282,7 @@ class AppointmentServiceTest {
     val referral = referralFactory.createSent()
     val rescheduledDeliusAppointmentId = 99L
 
-    whenever(communityAPIBookingService.book(referral, existingAppointment, pastAppointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null, NO, notifyProbationPractitionerOfBehaviour = false, notifyProbationPractitionerOfConcerns = false,false, NoSessionReasonType.POP_ACCEPTABLE))
+    whenever(communityAPIBookingService.book(referral, existingAppointment, pastAppointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null, NO, notifyProbationPractitionerOfBehaviour = false, notifyProbationPractitionerOfConcerns = false, false, NoSessionReasonType.POP_ACCEPTABLE))
       .thenReturn(Pair(rescheduledDeliusAppointmentId, UUID.randomUUID()))
     whenever(appointmentRepository.save(any())).thenAnswer { it.arguments[0] }
 

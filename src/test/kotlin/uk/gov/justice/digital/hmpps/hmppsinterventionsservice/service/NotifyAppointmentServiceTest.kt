@@ -39,7 +39,7 @@ class NotifyAppointmentServiceTest {
     appointmentType: AppointmentType = AppointmentType.SUPPLIER_ASSESSMENT,
     deliverySession: DeliverySession? = null,
     notifyProbationPractitionerOfBehaviour: Boolean? = null,
-    notifyProbationPractitionerOfConcerns: Boolean? = null
+    notifyProbationPractitionerOfConcerns: Boolean? = null,
   ): AppointmentEvent {
     return AppointmentEvent(
       "source",
@@ -48,15 +48,15 @@ class NotifyAppointmentServiceTest {
         id = deliverySession?.currentAppointment?.id ?: UUID.randomUUID(),
         referral = referralFactory.createSent(
           id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
-          serviceUserData = ReferralServiceUserData(firstName = "Bob", lastName = "Green")
-        )
+          serviceUserData = ReferralServiceUserData(firstName = "Bob", lastName = "Green"),
+        ),
       ),
       "http://localhost:8080/appointment/42c7d267-0776-4272-a8e8-a673bfe30d0d",
       notifyPP,
       appointmentType,
       deliverySession,
       notifyProbationPractitionerOfBehaviour,
-      notifyProbationPractitionerOfConcerns
+      notifyProbationPractitionerOfConcerns,
     )
   }
 
@@ -191,8 +191,8 @@ class NotifyAppointmentServiceTest {
         AppointmentEventType.SESSION_FEEDBACK_RECORDED,
         true,
         notifyProbationPractitionerOfBehaviour = false,
-        notifyProbationPractitionerOfConcerns = true
-      )
+        notifyProbationPractitionerOfConcerns = true,
+      ),
     )
     val personalisationCaptor = argumentCaptor<Map<String, String>>()
     verify(emailSender).sendEmail(eq("concerningBehaviourTemplate"), eq("abc@abc.com"), personalisationCaptor.capture())
@@ -211,8 +211,8 @@ class NotifyAppointmentServiceTest {
         AppointmentEventType.SESSION_FEEDBACK_RECORDED,
         true,
         notifyProbationPractitionerOfBehaviour = true,
-        notifyProbationPractitionerOfConcerns = false
-      )
+        notifyProbationPractitionerOfConcerns = false,
+      ),
     )
     val personalisationCaptor = argumentCaptor<Map<String, String>>()
     verify(emailSender).sendEmail(eq("poorBehaviourTemplate"), eq("abc@abc.com"), personalisationCaptor.capture())
@@ -231,8 +231,8 @@ class NotifyAppointmentServiceTest {
         AppointmentEventType.SESSION_FEEDBACK_RECORDED,
         true,
         notifyProbationPractitionerOfBehaviour = true,
-        notifyProbationPractitionerOfConcerns = true
-      )
+        notifyProbationPractitionerOfConcerns = true,
+      ),
     )
     val personalisationCaptor = argumentCaptor<Map<String, String>>()
     verify(emailSender).sendEmail(eq("poorBehaviourTemplate"), eq("abc@abc.com"), personalisationCaptor.capture())
@@ -255,8 +255,8 @@ class NotifyAppointmentServiceTest {
         AppointmentType.SERVICE_DELIVERY,
         deliverySession,
         notifyProbationPractitionerOfBehaviour = false,
-        notifyProbationPractitionerOfConcerns = true
-      )
+        notifyProbationPractitionerOfConcerns = true,
+      ),
     )
     val personalisationCaptor = argumentCaptor<Map<String, String>>()
     verify(emailSender).sendEmail(eq("concerningBehaviourTemplate"), eq("abc@abc.com"), personalisationCaptor.capture())
