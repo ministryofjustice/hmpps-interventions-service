@@ -3,10 +3,11 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.trans
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
+import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.job.DefaultJobParametersValidator
-import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
-import org.springframework.batch.core.step.builder.StepBuilder
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -22,6 +23,8 @@ class TransferReferralsJobConfiguration(
   private val transactionManager: JpaTransactionManager,
   private val listener: TransferReferralsJobListener,
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
+  @Qualifier("batchJobBuilderFactory") private val jobBuilderFactory: JobBuilderFactory,
+  @Qualifier("batchStepBuilderFactory") private val stepBuilderFactory: StepBuilderFactory,
 ) {
   @Bean
   fun transferReferralsJobLauncher(transferReferralsJob: Job): ApplicationRunner {
@@ -39,7 +42,7 @@ class TransferReferralsJobConfiguration(
       ),
     )
 
-    return JobBuilder("transferReferralsJob", jobRepository)
+    return jobBuilderFactory.get("transferReferralsJob")
       .incrementer(TimestampIncrementer())
       .validator(validator)
       .listener(listener)
@@ -53,7 +56,7 @@ class TransferReferralsJobConfiguration(
     processor: TransferReferralsProcessor,
     writer: TransferReferralsWriter,
   ): Step {
-    return StepBuilder("transferReferralToInterventionStep", jobRepository)
+    return stepBuilderFactory.get("transferReferralToInterventionStep")
       .chunk<Referral, Referral>(10, transactionManager)
       .reader(reader)
       .processor(processor)
