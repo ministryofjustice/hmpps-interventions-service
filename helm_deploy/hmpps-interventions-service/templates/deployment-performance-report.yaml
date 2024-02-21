@@ -59,7 +59,7 @@ spec:
             initialDelaySeconds: 60
             timeoutSeconds: 5
             failureThreshold: 10
-  {{- include "deployment.envs" . | nindent 10 }}
+  {{- include "deployment-reporting.envs" . | nindent 10 }}
       volumes:
         - name: heap-dumps
           emptyDir: {}
