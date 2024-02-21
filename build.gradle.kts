@@ -121,7 +121,7 @@ dependencies {
   implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.0")
 
   runtimeOnly("org.flywaydb:flyway-core:9.22.3")
-  runtimeOnly("org.postgresql:postgresql")
+  runtimeOnly("org.postgresql:postgresql:42.7.2")
 
   // json and csv
   implementation("com.github.java-json-tools:json-patch:1.13")
