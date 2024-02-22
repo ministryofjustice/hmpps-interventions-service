@@ -49,6 +49,10 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     ndeliusPPName: String? = "Bob",
     ndeliusPPEmailAddress: String? = "bob@example.com",
     ndeliusPDU: String? = "Hackney and City",
+    ndeliusPhoneNumber: String? = "073232324232",
+    ndeliusTeamPhoneNumber: String? = "020-32352323213",
+    ppPhoneNumber: String? = "073232324233",
+    ppTeamTelephoneNumber: String? = "020-32352323212",
     ppName: String? = "Alice",
     ppEmailAddress: String? = "alice@example.com",
     ppProbationOffice: String? = "London",
@@ -58,7 +62,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     hasMainPointOfContactDetails: Boolean = false,
     roleOrJobTitle: String? = "Probation Practitioner",
     ppEstablishment: String? = "aaa",
-    allocatedCommunityPP: Boolean? = null,
+    allocatedCommunityPP: Boolean? = true,
   ): DraftReferral {
     return createDraftReferral(
       id = id,
@@ -89,6 +93,10 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       roleOrJobTitle = roleOrJobTitle,
       ppEstablishment = ppEstablishment,
       allocatedCommunityPP = allocatedCommunityPP,
+      ndeliusPhoneNumber = ndeliusPhoneNumber,
+      ndeliusTeamPhoneNumber = ndeliusTeamPhoneNumber,
+      ppPhoneNumber = ppPhoneNumber,
+      ppTeamTelephoneNumber = ppTeamTelephoneNumber,
     )
   }
 

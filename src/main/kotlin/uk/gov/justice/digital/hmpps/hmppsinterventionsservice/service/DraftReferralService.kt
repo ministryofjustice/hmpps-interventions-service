@@ -286,6 +286,9 @@ class DraftReferralService(
         update.isReferralReleasingIn12Weeks?.let {
           draftReferral.isReferralReleasingIn12Weeks = it
         }
+        if (draftReferral.allocatedCommunityPP!!) {
+          draftReferral.isReferralReleasingIn12Weeks = null
+        }
       }
     }
     update.personCustodyPrisonId?.let {

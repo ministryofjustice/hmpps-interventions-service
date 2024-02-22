@@ -128,6 +128,7 @@ class SampleData {
         intervention = intervention,
         selectedServiceCategories = intervention.dynamicFrameworkContract.contractType.serviceCategories.toMutableSet(),
         relevantSentenceId = relevantSentenceId,
+        allocatedCommunityPP = true,
       )
     }
 

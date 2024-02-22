@@ -795,7 +795,7 @@ class DraftReferralServiceUnitTest {
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
     fun `can set whether a person is released from prison within 12 weeks`(data: Boolean) {
-      val referral = referralFactory.createDraft()
+      val referral = referralFactory.createDraft(allocatedCommunityPP = false)
       val update = DraftReferralDTO(isReferralReleasingIn12Weeks = data, personCurrentLocationType = PersonCurrentLocationType.CUSTODY)
 
       whenever(draftReferralRepository.save(any())).thenReturn(referral)
