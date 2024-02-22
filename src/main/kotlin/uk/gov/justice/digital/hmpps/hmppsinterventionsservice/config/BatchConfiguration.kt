@@ -16,6 +16,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.annotation.Isolation
 import javax.sql.DataSource
 
 @Configuration
@@ -47,6 +48,7 @@ class BatchConfiguration(
     factory.setDataSource(dataSource)
     factory.setDatabaseType("H2")
     factory.transactionManager = transactionManager
+    factory.setIsolationLevelForCreateEnum(Isolation.REPEATABLE_READ)
     factory.afterPropertiesSet()
     return factory.`object`
   }
