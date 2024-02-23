@@ -823,6 +823,7 @@ class SetupAssistant(
     ppEmailAddress: String? = "alice@example.com",
     ppProbationOffice: String? = "London",
     ppPdu: String? = "East Sussex",
+    allocatedCommunityPP: Boolean? = true,
     referralLocation: ReferralLocation = ReferralLocation(
       UUID.randomUUID(),
       referral = referral,
@@ -853,6 +854,7 @@ class SetupAssistant(
     draftReferral.personCustodyPrisonId = referralLocation.prisonId
     draftReferral.expectedReleaseDate = referralLocation.expectedReleaseDate
     draftReferral.ppProbationOffice = probationPractitionerDetails.probationOffice
+    draftReferral.allocatedCommunityPP = allocatedCommunityPP
     draftReferralRepository.save(draftReferral)
     referralRepository.saveAndFlush(referral)
 
