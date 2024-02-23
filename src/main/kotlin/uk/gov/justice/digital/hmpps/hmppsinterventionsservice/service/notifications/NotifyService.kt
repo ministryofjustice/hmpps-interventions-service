@@ -46,6 +46,9 @@ class NotifyActionPlanService(
       ActionPlanEventType.SUBMITTED -> {
         val recipient = referralService.getResponsibleProbationPractitioner(event.actionPlan.referral)
         val location = generateResourceUrl(interventionsUIBaseURL, ppActionPlanLocation, event.actionPlan.referral.id)
+        val popFirstName = event.actionPlan.referral.serviceUserData!!.firstName?.lowercase()?.replaceFirstChar { it.uppercase() }
+        val popLastName = event.actionPlan.referral.serviceUserData!!.lastName?.lowercase()?.replaceFirstChar { it.uppercase() }
+
         emailSender.sendEmail(
           actionPlanSubmittedTemplateID,
           recipient.email,
@@ -53,6 +56,8 @@ class NotifyActionPlanService(
             "submitterFirstName" to recipient.firstName,
             "referenceNumber" to event.actionPlan.referral.referenceNumber!!,
             "actionPlanUrl" to location.toString(),
+            "popFullName" to "$popFirstName $popLastName",
+            "crn" to event.actionPlan.referral.serviceUserCRN,
           ),
         )
       }
@@ -88,6 +93,9 @@ class NotifyEndOfServiceReportService(
       EndOfServiceReportEventType.SUBMITTED -> {
         val recipient = referralService.getResponsibleProbationPractitioner(event.endOfServiceReport.referral)
         val location = generateResourceUrl(interventionsUIBaseURL, ppEndOfServiceReportLocation, event.endOfServiceReport.id)
+        val popFirstName = event.endOfServiceReport.referral.serviceUserData!!.firstName?.lowercase()?.replaceFirstChar { it.uppercase() }
+        val popLastName = event.endOfServiceReport.referral.serviceUserData!!.lastName?.lowercase()?.replaceFirstChar { it.uppercase() }
+
         emailSender.sendEmail(
           endOfServiceReportSubmittedTemplateID,
           recipient.email,
@@ -95,6 +103,8 @@ class NotifyEndOfServiceReportService(
             "ppFirstName" to recipient.firstName,
             "referralReference" to event.endOfServiceReport.referral.referenceNumber!!,
             "endOfServiceReportLink" to location.toString(),
+            "popFullName" to "$popFirstName $popLastName",
+            "crn" to event.endOfServiceReport.referral.serviceUserCRN,
           ),
         )
       }
@@ -153,6 +163,7 @@ class NotifyAppointmentService(
               "ppFirstName" to recipient.firstName,
               "popfullname" to popFullName,
               "attendanceUrl" to sessionFeedbackLocation.toString(),
+              "crn" to referral.serviceUserCRN,
             ),
           )
         }
@@ -176,6 +187,7 @@ class NotifyAppointmentService(
                 "ppFirstName" to recipient.firstName,
                 "popfullname" to popFullName,
                 "sessionUrl" to sessionFeedbackLocation.toString(),
+                "crn" to referral.serviceUserCRN,
               ),
             )
           }
@@ -188,6 +200,8 @@ class NotifyAppointmentService(
               "ppFirstName" to recipient.firstName,
               "referenceNumber" to referral.referenceNumber!!,
               "referralUrl" to generateResourceUrl(interventionsUIBaseURL, ppInterventionProgressUrl, referral.id).toString(),
+              "popFullName" to popFullName,
+              "crn" to referral.serviceUserCRN,
             ),
           )
         }

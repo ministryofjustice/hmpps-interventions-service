@@ -7,7 +7,7 @@ import org.springframework.batch.core.ExitStatus
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobParametersBuilder
-import org.springframework.batch.core.launch.support.SimpleJobLauncher
+import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.test.JobLauncherTestUtils
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,7 +28,7 @@ class NdmisPerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
 
   @Autowired
   fun testJobLauncher(jobRepository: JobRepository) {
-    val testJobLauncher = SimpleJobLauncher()
+    val testJobLauncher = TaskExecutorJobLauncher()
     testJobLauncher.setJobRepository(jobRepository)
     testJobLauncher.afterPropertiesSet()
     super.setJobLauncher(testJobLauncher)
@@ -71,8 +71,6 @@ class NdmisPerformanceReportJobConfigurationTest : IntegrationTestBase() {
       referral = referral,
     )
 
-    logger.info { "We are setup" }
-
     val parameters = JobParametersBuilder()
       .addString("outputPath", outputDir.pathString)
       .toJobParameters()
@@ -84,12 +82,11 @@ class NdmisPerformanceReportJobConfigurationTest : IntegrationTestBase() {
 
     assertThat(outputDir.resolve("crs_performance_report-v2-referrals.csv"))
       .content().contains(referral.referenceNumber)
-    /* assertThat(outputDir.resolve("crs_performance_report-v2-complexity.csv"))
+    assertThat(outputDir.resolve("crs_performance_report-v2-complexity.csv"))
       .content().contains(referral.referenceNumber)
     assertThat(outputDir.resolve("crs_performance_report-v2-appointments.csv"))
       .content().contains(referral.referenceNumber)
     assertThat(outputDir.resolve("crs_performance_report-v2-outcomes.csv"))
       .content().contains(referral.referenceNumber)
-     */
   }
 }
