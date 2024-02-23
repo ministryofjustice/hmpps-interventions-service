@@ -23,8 +23,6 @@ import kotlin.io.path.pathString
 @Component
 class NdmisPerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
 
-  override fun setJob(@Qualifier("ndmisPerformanceReportJob") job: Job) = super.setJob(job)
-
   @Autowired
   override fun setJobRepository(@Qualifier("batchJobRepository") jobRepository: JobRepository) = super.setJobRepository(jobRepository)
 
@@ -34,6 +32,11 @@ class NdmisPerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
     testJobLauncher.setJobRepository(jobRepository)
     testJobLauncher.afterPropertiesSet()
     super.setJobLauncher(testJobLauncher)
+  }
+
+  @Autowired
+  override fun setJob(@Qualifier("ndmisPerformanceReportJob") job: Job) {
+    super.setJob(job)
   }
 }
 
