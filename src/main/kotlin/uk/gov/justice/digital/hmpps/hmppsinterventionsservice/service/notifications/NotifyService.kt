@@ -115,7 +115,8 @@ class NotifyEndOfServiceReportService(
 @Service
 class NotifyAppointmentService(
   @Value("\${notify.templates.appointment-not-attended}") private val appointmentNotAttendedTemplateID: String,
-  @Value("\${notify.templates.concerning-behaviour}") private val concerningBehaviourTemplateID: String,
+  @Value("\${notify.templates.session-poor-behaviour}") private val sessionPoorBehaviourTemplateID: String,
+  @Value("\${notify.templates.session-concerns}") private val sessionConcernsBehaviourTemplateID: String,
   @Value("\${notify.templates.initial-assessment-scheduled}") private val initialAssessmentScheduledTemplateID: String,
   @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
   @Value("\${interventions-ui.locations.probation-practitioner.intervention-progress}") private val ppInterventionProgressUrl: String,
@@ -167,16 +168,29 @@ class NotifyAppointmentService(
           )
         }
         AppointmentEventType.SESSION_FEEDBACK_RECORDED -> {
-          emailSender.sendEmail(
-            concerningBehaviourTemplateID,
-            recipient.email,
-            mapOf(
-              "ppFirstName" to recipient.firstName,
-              "popfullname" to popFullName,
-              "sessionUrl" to sessionFeedbackLocation.toString(),
-              "crn" to referral.serviceUserCRN,
-            ),
-          )
+          if (event.notifyProbationPractitionerOfBehaviour == true) {
+            emailSender.sendEmail(
+              sessionPoorBehaviourTemplateID,
+              recipient.email,
+              mapOf(
+                "ppFirstName" to recipient.firstName,
+                "popfullname" to popFullName,
+                "sessionUrl" to sessionFeedbackLocation.toString(),
+              ),
+            )
+          }
+          if (event.notifyProbationPractitionerOfConcerns == true) {
+            emailSender.sendEmail(
+              sessionConcernsBehaviourTemplateID,
+              recipient.email,
+              mapOf(
+                "ppFirstName" to recipient.firstName,
+                "popfullname" to popFullName,
+                "sessionUrl" to sessionFeedbackLocation.toString(),
+                "crn" to referral.serviceUserCRN,
+              ),
+            )
+          }
         }
         AppointmentEventType.SCHEDULED -> {
           emailSender.sendEmail(

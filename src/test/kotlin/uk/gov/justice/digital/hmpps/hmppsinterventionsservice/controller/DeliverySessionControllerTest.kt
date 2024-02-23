@@ -105,7 +105,8 @@ internal class DeliverySessionControllerTest {
         late = false,
         sessionSummary = "summary",
         sessionResponse = "response",
-        notifyProbationPractitioner = false,
+        notifyProbationPractitionerOfBehaviour = false,
+        notifyProbationPractitionerOfConcerns = false,
       )
       val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, attendanceFeedbackRequestDTO, sessionFeedbackRequestDTO)
 
@@ -128,7 +129,8 @@ internal class DeliverySessionControllerTest {
           AppointmentSessionType.ONE_TO_ONE,
           attended = YES,
           didSessionHappen = true,
-          notifyProbationPractitioner = false,
+          notifyProbationPractitionerOfBehaviour = false,
+          notifyProbationPractitionerOfConcerns = false,
           late = false,
           sessionSummary = "summary",
           sessionResponse = "response",
@@ -153,7 +155,8 @@ internal class DeliverySessionControllerTest {
         late = false,
         sessionSummary = "summary",
         sessionResponse = "response",
-        notifyProbationPractitioner = false,
+        notifyProbationPractitionerOfBehaviour = false,
+        notifyProbationPractitionerOfConcerns = false,
       )
       val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, attendanceFeedbackRequestDTO, sessionFeedbackRequestDTO)
       val newAppointment = Appointment(
@@ -179,7 +182,8 @@ internal class DeliverySessionControllerTest {
           AppointmentSessionType.ONE_TO_ONE,
           attended = NO,
           didSessionHappen = true,
-          notifyProbationPractitioner = false,
+          notifyProbationPractitionerOfBehaviour = false,
+          notifyProbationPractitionerOfConcerns = false,
           late = false,
           sessionSummary = "summary",
           sessionResponse = "response",

@@ -7,6 +7,8 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -31,15 +33,30 @@ class NotifyAppointmentServiceTest {
   private val deliverySessionFactory = DeliverySessionFactory()
   private val referralFactory = ReferralFactory()
 
-  private fun appointmentEvent(type: AppointmentEventType, notifyPP: Boolean, appointmentType: AppointmentType = AppointmentType.SUPPLIER_ASSESSMENT, deliverySession: DeliverySession? = null): AppointmentEvent {
+  private fun appointmentEvent(
+    type: AppointmentEventType,
+    notifyPP: Boolean,
+    appointmentType: AppointmentType = AppointmentType.SUPPLIER_ASSESSMENT,
+    deliverySession: DeliverySession? = null,
+    notifyProbationPractitionerOfBehaviour: Boolean? = null,
+    notifyProbationPractitionerOfConcerns: Boolean? = null,
+  ): AppointmentEvent {
     return AppointmentEvent(
       "source",
       type,
-      appointmentFactory.create(id = deliverySession?.currentAppointment?.id ?: UUID.randomUUID(), referral = referralFactory.createSent(id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"), serviceUserData = ReferralServiceUserData(firstName = "Bob", lastName = "Green"))),
+      appointmentFactory.create(
+        id = deliverySession?.currentAppointment?.id ?: UUID.randomUUID(),
+        referral = referralFactory.createSent(
+          id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
+          serviceUserData = ReferralServiceUserData(firstName = "Bob", lastName = "Green"),
+        ),
+      ),
       "http://localhost:8080/appointment/42c7d267-0776-4272-a8e8-a673bfe30d0d",
       notifyPP,
       appointmentType,
       deliverySession,
+      notifyProbationPractitionerOfBehaviour,
+      notifyProbationPractitionerOfConcerns,
     )
   }
 
@@ -66,6 +83,7 @@ class NotifyAppointmentServiceTest {
   private fun notifyService(): NotifyAppointmentService {
     return NotifyAppointmentService(
       "appointmentNotAttendedTemplate",
+      "poorBehaviourTemplate",
       "concerningBehaviourTemplate",
       "initialAssessmentScheduledTemplate",
       "http://example.com",
@@ -165,11 +183,59 @@ class NotifyAppointmentServiceTest {
   }
 
   @Test
-  fun `supplier assessment appointment session feedback recorded event calls email client`() {
+  fun `supplier assessment appointment session feedback recorded event calls email client with concerningBehaviourTemplate when notifyProbationPractitionerOfConcerns is true`() {
     whenever(referralService.getResponsibleProbationPractitioner(any())).thenReturn(ResponsibleProbationPractitioner("abc", "abc@abc.com", null, null, "def"))
 
-    notifyService().onApplicationEvent(appointmentEvent(AppointmentEventType.SESSION_FEEDBACK_RECORDED, true))
+    notifyService().onApplicationEvent(
+      appointmentEvent(
+        AppointmentEventType.SESSION_FEEDBACK_RECORDED,
+        true,
+        notifyProbationPractitionerOfBehaviour = false,
+        notifyProbationPractitionerOfConcerns = true,
+      ),
+    )
     val personalisationCaptor = argumentCaptor<Map<String, String>>()
+    verify(emailSender).sendEmail(eq("concerningBehaviourTemplate"), eq("abc@abc.com"), personalisationCaptor.capture())
+    verify(emailSender, never()).sendEmail(eq("poorBehaviourTemplate"), eq("abc@abc.com"), personalisationCaptor.capture())
+    Assertions.assertThat(personalisationCaptor.firstValue["ppFirstName"]).isEqualTo("abc")
+    Assertions.assertThat(personalisationCaptor.firstValue["popfullname"]).isEqualTo("Bob Green")
+    Assertions.assertThat(personalisationCaptor.firstValue["sessionUrl"]).isEqualTo("http://example.com/probation-practitioner/referrals/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080/supplier-assessment/post-session-feedback")
+  }
+
+  @Test
+  fun `supplier assessment appointment session feedback recorded event calls email client with poorBehaviourTemplate when notifyProbationPractitionerOfBehaviour is true`() {
+    whenever(referralService.getResponsibleProbationPractitioner(any())).thenReturn(ResponsibleProbationPractitioner("abc", "abc@abc.com", null, null, "def"))
+
+    notifyService().onApplicationEvent(
+      appointmentEvent(
+        AppointmentEventType.SESSION_FEEDBACK_RECORDED,
+        true,
+        notifyProbationPractitionerOfBehaviour = true,
+        notifyProbationPractitionerOfConcerns = false,
+      ),
+    )
+    val personalisationCaptor = argumentCaptor<Map<String, String>>()
+    verify(emailSender).sendEmail(eq("poorBehaviourTemplate"), eq("abc@abc.com"), personalisationCaptor.capture())
+    verify(emailSender, never()).sendEmail(eq("concerningBehaviourTemplate"), eq("abc@abc.com"), personalisationCaptor.capture())
+    Assertions.assertThat(personalisationCaptor.firstValue["ppFirstName"]).isEqualTo("abc")
+    Assertions.assertThat(personalisationCaptor.firstValue["popfullname"]).isEqualTo("Bob Green")
+    Assertions.assertThat(personalisationCaptor.firstValue["sessionUrl"]).isEqualTo("http://example.com/probation-practitioner/referrals/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080/supplier-assessment/post-session-feedback")
+  }
+
+  @Test
+  fun `supplier assessment appointment session feedback recorded event calls email client and sends both poorBehaviourTemplate and concerningBehaviourTemplate emails when notifyProbationPractitionerOfBehaviour and notifyProbationPractitionerOfConcerns is true`() {
+    whenever(referralService.getResponsibleProbationPractitioner(any())).thenReturn(ResponsibleProbationPractitioner("abc", "abc@abc.com", null, null, "def"))
+
+    notifyService().onApplicationEvent(
+      appointmentEvent(
+        AppointmentEventType.SESSION_FEEDBACK_RECORDED,
+        true,
+        notifyProbationPractitionerOfBehaviour = true,
+        notifyProbationPractitionerOfConcerns = true,
+      ),
+    )
+    val personalisationCaptor = argumentCaptor<Map<String, String>>()
+    verify(emailSender).sendEmail(eq("poorBehaviourTemplate"), eq("abc@abc.com"), personalisationCaptor.capture())
     verify(emailSender).sendEmail(eq("concerningBehaviourTemplate"), eq("abc@abc.com"), personalisationCaptor.capture())
     Assertions.assertThat(personalisationCaptor.firstValue["ppFirstName"]).isEqualTo("abc")
     Assertions.assertThat(personalisationCaptor.firstValue["popfullname"]).isEqualTo("Bob Green")
@@ -182,7 +248,16 @@ class NotifyAppointmentServiceTest {
     val deliverySession = createDeliverySession(Attended.NO, true)
     val appointmentId = deliverySession.currentAppointment?.id
 
-    notifyService().onApplicationEvent(appointmentEvent(AppointmentEventType.SESSION_FEEDBACK_RECORDED, true, AppointmentType.SERVICE_DELIVERY, deliverySession))
+    notifyService().onApplicationEvent(
+      appointmentEvent(
+        AppointmentEventType.SESSION_FEEDBACK_RECORDED,
+        true,
+        AppointmentType.SERVICE_DELIVERY,
+        deliverySession,
+        notifyProbationPractitionerOfBehaviour = false,
+        notifyProbationPractitionerOfConcerns = true,
+      ),
+    )
     val personalisationCaptor = argumentCaptor<Map<String, String>>()
     verify(emailSender).sendEmail(eq("concerningBehaviourTemplate"), eq("abc@abc.com"), personalisationCaptor.capture())
     Assertions.assertThat(personalisationCaptor.firstValue["ppFirstName"]).isEqualTo("abc")

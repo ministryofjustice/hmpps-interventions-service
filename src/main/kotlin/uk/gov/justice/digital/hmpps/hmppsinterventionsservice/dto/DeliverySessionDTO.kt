@@ -68,7 +68,9 @@ data class SessionFeedbackRequestDTO(
   val sessionSummary: String? = null,
   val sessionResponse: String? = null,
   val sessionConcerns: String? = null,
-  val notifyProbationPractitioner: Boolean,
+  val sessionBehaviour: String? = null,
+  val notifyProbationPractitionerOfBehaviour: Boolean,
+  val notifyProbationPractitionerOfConcerns: Boolean,
 )
 
 data class DeliverySessionDTO(
@@ -189,8 +191,11 @@ data class SessionFeedbackDTO(
   val behaviourDescription: String? = null,
   val sessionSummary: String? = null,
   val sessionResponse: String? = null,
+  val sessionBehaviour: String? = null,
   val sessionConcerns: String? = null,
   val notifyProbationPractitioner: Boolean? = null,
+  val notifyProbationPractitionerOfBehaviour: Boolean? = null,
+  val notifyProbationPractitionerOfConcerns: Boolean? = null,
 ) {
   companion object {
     fun from(appointment: Appointment): SessionFeedbackDTO {
@@ -206,8 +211,11 @@ data class SessionFeedbackDTO(
         appointment.attendanceBehaviour,
         appointment.sessionSummary,
         appointment.sessionResponse,
+        appointment.sessionBehaviour,
         appointment.sessionConcerns,
         appointment.notifyPPOfAttendanceBehaviour,
+        appointment.notifyProbationPractitionerOfBehaviour,
+        appointment.notifyProbationPractitionerOfConcerns,
       )
     }
   }

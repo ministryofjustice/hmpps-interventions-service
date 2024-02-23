@@ -50,7 +50,8 @@ class AppointmentService(
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
     attended: Attended? = null,
-    notifyProbationPractitioner: Boolean? = null,
+    notifyProbationPractitionerOfBehaviour: Boolean? = null,
+    notifyProbationPractitionerOfConcerns: Boolean? = null,
     didSessionHappen: Boolean? = null,
     late: Boolean? = null,
     lateReason: String? = null,
@@ -62,13 +63,14 @@ class AppointmentService(
     noSessionReasonLogistics: String? = null,
     sessionSummary: String? = null,
     sessionResponse: String? = null,
+    sessionBehaviour: String? = null,
     sessionConcerns: String? = null,
   ): Appointment {
     val appointment = when {
       // an initial appointment is required or an additional appointment is required
       existingAppointment == null || (existingAppointment.attended == Attended.NO && existingAppointment.didSessionHappen == null) || existingAppointment.didSessionHappen == false -> {
         val (deliusAppointmentId, appointmentId) =
-          communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode, attended, notifyProbationPractitioner, didSessionHappen, noSessionReasonType)
+          communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode, attended, notifyProbationPractitionerOfBehaviour, notifyProbationPractitionerOfConcerns, didSessionHappen, noSessionReasonType)
         createAppointment(
           durationInMinutes,
           appointmentTime,
@@ -81,7 +83,8 @@ class AppointmentService(
           npsOfficeCode,
           attended,
           noAttendanceInformation,
-          notifyProbationPractitioner,
+          notifyProbationPractitionerOfBehaviour,
+          notifyProbationPractitionerOfConcerns,
           didSessionHappen,
           late,
           lateReason,
@@ -92,6 +95,7 @@ class AppointmentService(
           noSessionReasonLogistics,
           sessionSummary,
           sessionResponse,
+          sessionBehaviour,
           sessionConcerns,
           appointmentType,
           appointmentId,
@@ -100,7 +104,7 @@ class AppointmentService(
       // the current appointment needs to be updated
       existingAppointment.didSessionHappen == null -> {
         val (deliusAppointmentId, appointmentId) =
-          communityAPIBookingService.book(referral, existingAppointment, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode, attended, notifyProbationPractitioner, didSessionHappen, noSessionReasonType)
+          communityAPIBookingService.book(referral, existingAppointment, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode, attended, notifyProbationPractitionerOfBehaviour, notifyProbationPractitionerOfConcerns, didSessionHappen, noSessionReasonType)
         updateAppointment(
           durationInMinutes,
           existingAppointment,
@@ -114,7 +118,8 @@ class AppointmentService(
           attended,
           referral,
           noAttendanceInformation,
-          notifyProbationPractitioner,
+          notifyProbationPractitionerOfBehaviour,
+          notifyProbationPractitionerOfConcerns,
           didSessionHappen,
           late,
           lateReason,
@@ -125,6 +130,7 @@ class AppointmentService(
           noSessionReasonLogistics,
           sessionSummary,
           sessionResponse,
+          sessionBehaviour,
           sessionConcerns,
           appointmentType,
           appointmentId,
@@ -175,8 +181,10 @@ class AppointmentService(
     noSessionReasonLogistics: String?,
     sessionSummary: String?,
     sessionResponse: String?,
+    sessionBehaviour: String?,
     sessionConcerns: String?,
-    notifyProbationPractitioner: Boolean,
+    notifyProbationPractitionerOfBehaviour: Boolean,
+    notifyProbationPractitionerOfConcerns: Boolean,
     submittedBy: AuthUser,
   ): Appointment {
     if (appointment.appointmentFeedbackSubmittedAt != null) {
@@ -197,8 +205,10 @@ class AppointmentService(
       noSessionReasonLogistics,
       sessionSummary,
       sessionResponse,
+      sessionBehaviour,
       sessionConcerns,
-      notifyProbationPractitioner,
+      notifyProbationPractitionerOfBehaviour,
+      notifyProbationPractitionerOfConcerns,
       submittedBy,
     )
     return appointmentRepository.save(appointment)
@@ -292,14 +302,16 @@ class AppointmentService(
 
     appointmentEventPublisher.sessionFeedbackRecordedEvent(
       appointment,
-      appointment.notifyPPOfAttendanceBehaviour ?: false,
+      appointment.notifyProbationPractitionerOfBehaviour ?: false,
+      appointment.notifyProbationPractitionerOfConcerns ?: false,
       appointmentType,
       deliverySession,
     )
 
     appointmentEventPublisher.appointmentFeedbackRecordedEvent(
       appointment,
-      appointment.notifyPPOfAttendanceBehaviour ?: false,
+      appointment.notifyProbationPractitionerOfBehaviour ?: false,
+      appointment.notifyProbationPractitionerOfConcerns ?: false,
       appointmentType,
       deliverySession,
     )
@@ -331,8 +343,10 @@ class AppointmentService(
     noSessionReasonLogistics: String?,
     sessionSummary: String?,
     sessionResponse: String?,
+    sessionBehaviour: String?,
     sessionConcerns: String?,
-    notifyProbationPractitioner: Boolean?,
+    notifyProbationPractitionerOfBehaviour: Boolean?,
+    notifyProbationPractitionerOfConcerns: Boolean?,
     submittedBy: AuthUser,
   ) {
     appointment.late = late
@@ -345,9 +359,11 @@ class AppointmentService(
     appointment.noSessionReasonLogistics = noSessionReasonLogistics
     appointment.sessionSummary = sessionSummary
     appointment.sessionResponse = sessionResponse
+    appointment.sessionBehaviour = sessionBehaviour
     appointment.sessionConcerns = sessionConcerns
     appointment.sessionFeedbackSubmittedAt = OffsetDateTime.now()
-    appointment.notifyPPOfAttendanceBehaviour = notifyProbationPractitioner
+    appointment.notifyProbationPractitionerOfBehaviour = notifyProbationPractitionerOfBehaviour
+    appointment.notifyProbationPractitionerOfConcerns = notifyProbationPractitionerOfConcerns
     appointment.sessionFeedbackSubmittedBy = authUserRepository.save(submittedBy)
   }
 
@@ -363,7 +379,8 @@ class AppointmentService(
     npsOfficeCode: String?,
     attended: Attended?,
     noAttendanceInformation: String?,
-    notifyProbationPractitioner: Boolean?,
+    notifyProbationPractitionerOfBehaviour: Boolean?,
+    notifyProbationPractitionerOfConcerns: Boolean?,
     didSessionHappen: Boolean?,
     late: Boolean?,
     lateReason: String?,
@@ -374,6 +391,7 @@ class AppointmentService(
     noSessionReasonLogistics: String?,
     sessionSummary: String?,
     sessionResponse: String?,
+    sessionBehaviour: String?,
     sessionConcerns: String?,
     appointmentType: AppointmentType,
     uuid: UUID? = null,
@@ -401,8 +419,10 @@ class AppointmentService(
       noSessionReasonLogistics,
       sessionSummary,
       sessionResponse,
+      sessionBehaviour,
       sessionConcerns,
-      notifyProbationPractitioner,
+      notifyProbationPractitionerOfBehaviour,
+      notifyProbationPractitionerOfConcerns,
       createdByUser,
       appointmentType,
     )
@@ -424,7 +444,8 @@ class AppointmentService(
     attended: Attended?,
     referral: Referral,
     noAttendanceInformation: String?,
-    notifyProbationPractitioner: Boolean?,
+    notifyProbationPractitionerOfBehaviour: Boolean?,
+    notifyProbationPractitionerOfConcerns: Boolean?,
     didSessionHappen: Boolean?,
     late: Boolean?,
     lateReason: String?,
@@ -435,6 +456,7 @@ class AppointmentService(
     noSessionReasonLogistics: String?,
     sessionSummary: String?,
     sessionResponse: String?,
+    sessionBehaviour: String?,
     sessionConcerns: String?,
     appointmentType: AppointmentType,
     uuid: UUID?,
@@ -451,7 +473,8 @@ class AppointmentService(
       npsOfficeCode,
       attended,
       noAttendanceInformation,
-      notifyProbationPractitioner,
+      notifyProbationPractitionerOfBehaviour,
+      notifyProbationPractitionerOfConcerns,
       didSessionHappen,
       late,
       lateReason,
@@ -462,6 +485,7 @@ class AppointmentService(
       noSessionReasonLogistics,
       sessionSummary,
       sessionResponse,
+      sessionBehaviour,
       sessionConcerns,
       appointmentType,
       uuid,
@@ -567,8 +591,10 @@ class AppointmentService(
     noSessionReasonLogistics: String?,
     sessionSummary: String?,
     sessionResponse: String?,
+    sessionBehaviour: String?,
     sessionConcerns: String?,
-    notifyProbationPractitioner: Boolean?,
+    notifyProbationPractitionerOfBehaviour: Boolean?,
+    notifyProbationPractitionerOfConcerns: Boolean?,
     updatedBy: AuthUser,
     appointmentType: AppointmentType,
   ) {
@@ -586,8 +612,10 @@ class AppointmentService(
         noSessionReasonLogistics,
         sessionSummary,
         sessionResponse,
+        sessionBehaviour,
         sessionConcerns,
-        notifyProbationPractitioner,
+        notifyProbationPractitionerOfBehaviour,
+        notifyProbationPractitionerOfConcerns,
         updatedBy,
       )
       this.submitAppointmentFeedback(appointment, updatedBy, appointmentType)

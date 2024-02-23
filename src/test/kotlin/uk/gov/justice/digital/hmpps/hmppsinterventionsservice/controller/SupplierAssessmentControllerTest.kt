@@ -95,7 +95,8 @@ class SupplierAssessmentControllerTest {
         lateReason = "missed bus",
         sessionSummary = "summary",
         sessionResponse = "response",
-        notifyProbationPractitioner = true,
+        notifyProbationPractitionerOfBehaviour = true,
+        notifyProbationPractitionerOfConcerns = false,
       )
       val update = UpdateAppointmentDTO(appointmentTime, durationInMinutes, appointmentDeliveryType, appointmentSessionType, addressDTO, npsOfficeCode, attendanceFeedbackRequestDTO, sessionFeedbackRequestDTO)
       val user = authUserFactory.create()
@@ -117,7 +118,8 @@ class SupplierAssessmentControllerTest {
           npsOfficeCode,
           attended = LATE,
           didSessionHappen = true,
-          notifyProbationPractitioner = true,
+          notifyProbationPractitionerOfBehaviour = true,
+          notifyProbationPractitionerOfConcerns = false,
           late = true,
           lateReason = "missed bus",
           sessionSummary = "summary",
@@ -138,8 +140,10 @@ class SupplierAssessmentControllerTest {
       val referralId = UUID.randomUUID()
       val sessionSummary = "summary"
       val sessionResponse = "response"
+      val sessionBehaviour = "behaviour"
       val sessionConcerns = "concerns"
-      val notifyProbationPractitioner = true
+      val notifyProbationPractitionerOfBehaviour = true
+      val notifyProbationPractitionerOfConcerns = true
       val submittedBy = authUserFactory.createSP()
       val token = tokenFactory.create()
 
@@ -162,8 +166,10 @@ class SupplierAssessmentControllerTest {
           eq(null),
           eq(sessionSummary),
           eq(sessionResponse),
+          eq(sessionBehaviour),
           eq(sessionConcerns),
-          eq(notifyProbationPractitioner),
+          eq(notifyProbationPractitionerOfBehaviour),
+          eq(notifyProbationPractitionerOfConcerns),
           eq(submittedBy),
         ),
       ).thenReturn(appointmentFactory.create())
@@ -172,8 +178,10 @@ class SupplierAssessmentControllerTest {
         late = false,
         sessionSummary = sessionSummary,
         sessionResponse = sessionResponse,
+        sessionBehaviour = sessionBehaviour,
         sessionConcerns = sessionConcerns,
-        notifyProbationPractitioner = notifyProbationPractitioner,
+        notifyProbationPractitionerOfBehaviour = notifyProbationPractitionerOfBehaviour,
+        notifyProbationPractitionerOfConcerns = notifyProbationPractitionerOfConcerns,
       )
       val result = supplierAssessmentController.recordSessionFeedback(referralId, request, token)
       assertThat(result).isNotNull
@@ -184,7 +192,8 @@ class SupplierAssessmentControllerTest {
       val referralId = UUID.randomUUID()
       val sessionSummary = "summary"
       val sessionResponse = "response"
-      val notifyProbationPractitioner = true
+      val notifyProbationPractitionerOfBehaviour = true
+      val notifyProbationPractitionerOfConcerns = true
       val submittedBy = authUserFactory.createSP()
       val token = tokenFactory.create()
 
@@ -195,7 +204,8 @@ class SupplierAssessmentControllerTest {
         late = false,
         sessionSummary = sessionSummary,
         sessionResponse = sessionResponse,
-        notifyProbationPractitioner = notifyProbationPractitioner,
+        notifyProbationPractitionerOfBehaviour = notifyProbationPractitionerOfBehaviour,
+        notifyProbationPractitionerOfConcerns = notifyProbationPractitionerOfConcerns,
       )
       val exception = assertThrows<ResponseStatusException> {
         supplierAssessmentController.recordSessionFeedback(referralId, request, token)
@@ -209,7 +219,8 @@ class SupplierAssessmentControllerTest {
       val referralId = UUID.randomUUID()
       val sessionSummary = "summary"
       val sessionResponse = "response"
-      val notifyProbationPractitioner = true
+      val notifyProbationPractitionerOfBehaviour = true
+      val notifyProbationPractitionerOfConcerns = true
       val submittedBy = authUserFactory.createSP()
       val token = tokenFactory.create()
 
@@ -221,7 +232,8 @@ class SupplierAssessmentControllerTest {
         late = false,
         sessionSummary = sessionSummary,
         sessionResponse = sessionResponse,
-        notifyProbationPractitioner = notifyProbationPractitioner,
+        notifyProbationPractitionerOfBehaviour = notifyProbationPractitionerOfBehaviour,
+        notifyProbationPractitionerOfConcerns = notifyProbationPractitionerOfConcerns,
       )
       val exception = assertThrows<ResponseStatusException> {
         supplierAssessmentController.recordSessionFeedback(referralId, request, token)
@@ -235,7 +247,8 @@ class SupplierAssessmentControllerTest {
       val referralId = UUID.randomUUID()
       val sessionSummary = "summary"
       val sessionResponse = "response"
-      val notifyProbationPractitioner = true
+      val notifyProbationPractitionerOfBehaviour = true
+      val notifyProbationPractitionerOfConcerns = true
       val submittedBy = authUserFactory.createSP()
       val token = tokenFactory.create()
 
@@ -249,7 +262,8 @@ class SupplierAssessmentControllerTest {
         late = false,
         sessionSummary = sessionSummary,
         sessionResponse = sessionResponse,
-        notifyProbationPractitioner = notifyProbationPractitioner,
+        notifyProbationPractitionerOfBehaviour = notifyProbationPractitionerOfBehaviour,
+        notifyProbationPractitionerOfConcerns = notifyProbationPractitionerOfConcerns,
       )
       val exception = assertThrows<ResponseStatusException> {
         supplierAssessmentController.recordSessionFeedback(referralId, request, token)

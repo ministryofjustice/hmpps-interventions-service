@@ -26,6 +26,8 @@ AppointmentEvent(
   val notifyPP: Boolean,
   val appointmentType: AppointmentType,
   val deliverySession: DeliverySession? = null,
+  val notifyProbationPractitionerOfBehaviour: Boolean? = null,
+  val notifyProbationPractitionerOfConcerns: Boolean? = null,
 ) : ApplicationEvent(source) {
   override fun toString(): String {
     return "AppointmentEvent(type=$type, appointmentId=${appointment.id}, detailUrl='$detailUrl', source=$source)"
@@ -64,30 +66,34 @@ class AppointmentEventPublisher(
     )
   }
 
-  fun sessionFeedbackRecordedEvent(appointment: Appointment, notifyPP: Boolean, appointmentType: AppointmentType, deliverySession: DeliverySession? = null) {
+  fun sessionFeedbackRecordedEvent(appointment: Appointment, notifyProbationPractitionerOfBehaviour: Boolean, notifyProbationPractitionerOfConcerns: Boolean, appointmentType: AppointmentType, deliverySession: DeliverySession? = null) {
     applicationEventPublisher.publishEvent(
       AppointmentEvent(
         this,
         AppointmentEventType.SESSION_FEEDBACK_RECORDED,
         appointment,
         getAppointmentURL(appointment, appointmentType, deliverySession),
-        notifyPP,
+        notifyProbationPractitionerOfBehaviour || notifyProbationPractitionerOfConcerns,
         appointmentType,
         deliverySession,
+        notifyProbationPractitionerOfBehaviour,
+        notifyProbationPractitionerOfConcerns,
       ),
     )
   }
 
-  fun appointmentFeedbackRecordedEvent(appointment: Appointment, notifyPP: Boolean, appointmentType: AppointmentType, deliverySession: DeliverySession? = null) {
+  fun appointmentFeedbackRecordedEvent(appointment: Appointment, notifyProbationPractitionerOfBehaviour: Boolean, notifyProbationPractitionerOfConcerns: Boolean, appointmentType: AppointmentType, deliverySession: DeliverySession? = null) {
     applicationEventPublisher.publishEvent(
       AppointmentEvent(
         this,
         AppointmentEventType.APPOINTMENT_FEEDBACK_RECORDED,
         appointment,
         getAppointmentURL(appointment, appointmentType, deliverySession),
-        notifyPP,
+        notifyProbationPractitionerOfBehaviour || notifyProbationPractitionerOfConcerns,
         appointmentType,
         deliverySession,
+        notifyProbationPractitionerOfBehaviour,
+        notifyProbationPractitionerOfConcerns,
       ),
     )
   }

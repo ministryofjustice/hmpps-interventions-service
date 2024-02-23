@@ -41,6 +41,7 @@ data class Appointment(
 
   var sessionSummary: String? = null,
   var sessionResponse: String? = null,
+  var sessionBehaviour: String? = null,
   var sessionConcerns: String? = null,
   var sessionFeedbackSubmittedAt: OffsetDateTime? = null,
 
@@ -63,6 +64,9 @@ data class Appointment(
   var sessionFeedbackSubmittedBy: AuthUser? = null,
 
   var notifyPPOfAttendanceBehaviour: Boolean? = null,
+
+  var notifyProbationPractitionerOfBehaviour: Boolean? = null,
+  var notifyProbationPractitionerOfConcerns: Boolean? = null,
 
   var appointmentFeedbackSubmittedAt: OffsetDateTime? = null,
   @ManyToOne

@@ -77,7 +77,8 @@ class DeliverySessionService(
     npsOfficeCode: String? = null,
     attended: Attended? = null,
     didSessionHappen: Boolean? = null,
-    notifyProbationPractitioner: Boolean? = null,
+    notifyProbationPractitionerOfBehaviour: Boolean? = null,
+    notifyProbationPractitionerOfConcerns: Boolean? = null,
     late: Boolean? = null,
     lateReason: String? = null,
     futureSessionPlans: String? = null,
@@ -88,6 +89,7 @@ class DeliverySessionService(
     noSessionReasonLogistics: String? = null,
     sessionSummary: String? = null,
     sessionResponse: String? = null,
+    sessionBehaviour: String? = null,
     sessionConcerns: String? = null,
   ): DeliverySession {
     val session = getDeliverySession(referralId, sessionNumber) ?: throw EntityNotFoundException("Session not found for referral [referralId=$referralId, sessionNumber=$sessionNumber]")
@@ -136,7 +138,8 @@ class DeliverySessionService(
       npsOfficeCode,
       attended,
       didSessionHappen,
-      notifyProbationPractitioner,
+      notifyProbationPractitionerOfBehaviour,
+      notifyProbationPractitionerOfConcerns,
       late,
       lateReason,
       futureSessionPlans,
@@ -147,6 +150,7 @@ class DeliverySessionService(
       noSessionReasonLogistics,
       sessionSummary,
       sessionResponse,
+      sessionBehaviour,
       sessionConcerns,
     )
   }
@@ -164,7 +168,8 @@ class DeliverySessionService(
     npsOfficeCode: String? = null,
     attended: Attended? = null,
     didSessionHappen: Boolean? = null,
-    notifyProbationPractitioner: Boolean? = null,
+    notifyProbationPractitionerOfBehaviour: Boolean? = null,
+    notifyProbationPractitionerOfConcerns: Boolean? = null,
     late: Boolean? = null,
     lateReason: String? = null,
     futureSessionPlans: String? = null,
@@ -175,6 +180,7 @@ class DeliverySessionService(
     noSessionReasonLogistics: String? = null,
     sessionSummary: String? = null,
     sessionResponse: String? = null,
+    sessionBehaviour: String? = null,
     sessionConcerns: String? = null,
   ): DeliverySession {
     val session = getDeliverySession(referralId, sessionNumber) ?: throw EntityNotFoundException("Session not found for referral [referralId=$referralId, sessionNumber=$sessionNumber]")
@@ -204,7 +210,8 @@ class DeliverySessionService(
       npsOfficeCode,
       attended,
       didSessionHappen,
-      notifyProbationPractitioner,
+      notifyProbationPractitionerOfBehaviour,
+      notifyProbationPractitionerOfConcerns,
       late,
       lateReason,
       futureSessionPlans,
@@ -215,6 +222,7 @@ class DeliverySessionService(
       noSessionReasonLogistics,
       sessionSummary,
       sessionResponse,
+      sessionBehaviour,
       sessionConcerns,
     )
   }
@@ -232,7 +240,8 @@ class DeliverySessionService(
     npsOfficeCode: String? = null,
     attended: Attended? = null,
     didSessionHappen: Boolean? = null,
-    notifyProbationPractitioner: Boolean? = null,
+    notifyProbationPractitionerOfBehaviour: Boolean? = null,
+    notifyProbationPractitionerOfConcerns: Boolean? = null,
     late: Boolean?,
     lateReason: String?,
     futureSessionPlans: String?,
@@ -243,6 +252,7 @@ class DeliverySessionService(
     noSessionReasonLogistics: String?,
     sessionSummary: String? = null,
     sessionResponse: String? = null,
+    sessionBehaviour: String? = null,
     sessionConcerns: String? = null,
   ): DeliverySession {
     if (appointmentTime.isBefore(OffsetDateTime.now()) && attended == null) {
@@ -287,8 +297,10 @@ class DeliverySessionService(
         noSessionReasonLogistics,
         sessionSummary,
         sessionResponse,
+        sessionBehaviour,
         sessionConcerns,
-        notifyProbationPractitioner,
+        notifyProbationPractitionerOfBehaviour,
+        notifyProbationPractitionerOfConcerns,
         scheduledBy,
       )
     }
@@ -307,7 +319,8 @@ class DeliverySessionService(
     npsOfficeCode: String? = null,
     attended: Attended? = null,
     didSessionHappen: Boolean? = null,
-    notifyProbationPractitioner: Boolean? = null,
+    notifyProbationPractitionerOfBehaviour: Boolean? = null,
+    notifyProbationPractitionerOfConcerns: Boolean? = null,
     late: Boolean? = null,
     lateReason: String? = null,
     futureSessionPlans: String? = null,
@@ -318,6 +331,7 @@ class DeliverySessionService(
     noSessionReasonLogistics: String? = null,
     sessionSummary: String? = null,
     sessionResponse: String? = null,
+    sessionBehaviour: String? = null,
     sessionConcerns: String? = null,
   ): DeliverySession {
     val session = getDeliverySessionByActionPlanIdOrThrowException(actionPlanId, sessionNumber)
@@ -332,7 +346,8 @@ class DeliverySessionService(
       SERVICE_DELIVERY,
       npsOfficeCode,
       attended,
-      notifyProbationPractitioner,
+      notifyProbationPractitionerOfBehaviour,
+      notifyProbationPractitionerOfConcerns,
       didSessionHappen,
       noSessionReasonType,
     )
@@ -380,8 +395,10 @@ class DeliverySessionService(
         noSessionReasonLogistics,
         sessionSummary,
         sessionResponse,
+        sessionBehaviour,
         sessionConcerns,
-        notifyProbationPractitioner,
+        notifyProbationPractitionerOfBehaviour,
+        notifyProbationPractitionerOfConcerns,
         updatedBy,
       )
     }
@@ -417,8 +434,10 @@ class DeliverySessionService(
     noSessionReasonLogistics: String?,
     sessionSummary: String?,
     sessionResponse: String?,
+    sessionBehaviour: String?,
     sessionConcerns: String?,
-    notifyProbationPractitioner: Boolean,
+    notifyProbationPractitionerOfBehaviour: Boolean,
+    notifyProbationPractitionerOfConcerns: Boolean,
   ): Pair<DeliverySession, Appointment> {
     val sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
     val updatedAppointment = appointmentService.recordSessionFeedback(
@@ -433,8 +452,10 @@ class DeliverySessionService(
       noSessionReasonLogistics,
       sessionSummary,
       sessionResponse,
+      sessionBehaviour,
       sessionConcerns,
-      notifyProbationPractitioner,
+      notifyProbationPractitionerOfBehaviour,
+      notifyProbationPractitionerOfConcerns,
       actor,
     )
     return Pair(sessionAndAppointment.first, updatedAppointment)
@@ -474,8 +495,10 @@ class DeliverySessionService(
     noSessionReasonLogistics: String?,
     sessionSummary: String?,
     sessionResponse: String?,
+    sessionBehaviour: String?,
     sessionConcerns: String?,
-    notifyProbationPractitioner: Boolean?,
+    notifyProbationPractitionerOfBehaviour: Boolean?,
+    notifyProbationPractitionerOfConcerns: Boolean?,
     updatedBy: AuthUser,
   ) {
     attended?.let {
@@ -492,8 +515,10 @@ class DeliverySessionService(
         noSessionReasonLogistics,
         sessionSummary,
         sessionResponse,
+        sessionBehaviour,
         sessionConcerns,
-        notifyProbationPractitioner!!,
+        notifyProbationPractitionerOfBehaviour!!,
+        notifyProbationPractitionerOfConcerns!!,
         updatedBy,
       )
       appointmentService.submitAppointmentFeedback(appointment, updatedBy, SERVICE_DELIVERY, session)
@@ -532,8 +557,10 @@ class DeliverySessionService(
     noSessionReasonLogistics: String?,
     sessionSummary: String?,
     sessionResponse: String?,
+    sessionBehaviour: String?,
     sessionConcerns: String?,
-    notifyProbationPractitioner: Boolean,
+    notifyProbationPractitionerOfBehaviour: Boolean,
+    notifyProbationPractitionerOfConcerns: Boolean,
     actor: AuthUser,
   ) {
     appointment.late = late
@@ -547,9 +574,11 @@ class DeliverySessionService(
     appointment.sessionSummary = sessionSummary
     appointment.sessionResponse = sessionResponse
     appointment.sessionConcerns = sessionConcerns
+    appointment.sessionBehaviour = sessionBehaviour
     appointment.sessionFeedbackSubmittedAt = OffsetDateTime.now()
     appointment.sessionFeedbackSubmittedBy = authUserRepository.save(actor)
-    appointment.notifyPPOfAttendanceBehaviour = notifyProbationPractitioner
+    appointment.notifyProbationPractitionerOfBehaviour = notifyProbationPractitionerOfBehaviour
+    appointment.notifyProbationPractitionerOfConcerns = notifyProbationPractitionerOfConcerns
   }
 
   private fun checkSessionIsNotDuplicate(actionPlanId: UUID, sessionNumber: Int) {

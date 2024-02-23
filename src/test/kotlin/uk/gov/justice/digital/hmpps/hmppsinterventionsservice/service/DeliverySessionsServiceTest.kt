@@ -161,7 +161,21 @@ internal class DeliverySessionsServiceTest {
     val durationInMinutes = 200
     val appointment = session.currentAppointment
 
-    whenever(communityAPIBookingService.book(session.referral, appointment, appointmentTime, durationInMinutes, SERVICE_DELIVERY, null, Attended.YES, false, true, null))
+    whenever(
+      communityAPIBookingService.book(
+        session.referral,
+        appointment,
+        appointmentTime,
+        durationInMinutes,
+        SERVICE_DELIVERY,
+        null,
+        Attended.YES,
+        notifyProbationPractitionerOfBehaviour = false,
+        notifyProbationPractitionerOfConcerns = false,
+        true,
+        null,
+      ),
+    )
       .thenReturn(Pair(929478456763L, UUID.randomUUID()))
 
     val updatedSession = deliverySessionsService.updateSessionAppointment(
@@ -174,7 +188,8 @@ internal class DeliverySessionsServiceTest {
       AppointmentSessionType.ONE_TO_ONE,
       attended = Attended.YES,
       didSessionHappen = true,
-      notifyProbationPractitioner = false,
+      notifyProbationPractitionerOfBehaviour = false,
+      notifyProbationPractitionerOfConcerns = false,
       late = false,
       sessionSummary = "summary",
       sessionResponse = "response",
@@ -187,7 +202,8 @@ internal class DeliverySessionsServiceTest {
     assertThat(updatedSession.currentAppointment?.createdBy?.userName).isEqualTo("scheduler")
     assertThat(updatedSession.currentAppointment?.attended).isEqualTo(Attended.YES)
     assertThat(updatedSession.currentAppointment?.didSessionHappen).isEqualTo(true)
-    assertThat(updatedSession.currentAppointment?.notifyPPOfAttendanceBehaviour).isEqualTo(false)
+    assertThat(updatedSession.currentAppointment?.notifyProbationPractitionerOfBehaviour).isEqualTo(false)
+    assertThat(updatedSession.currentAppointment?.notifyProbationPractitionerOfConcerns).isEqualTo(false)
     assertThat(updatedSession.currentAppointment?.sessionSummary).isEqualTo("summary")
     assertThat(updatedSession.currentAppointment?.sessionResponse).isEqualTo("response")
     assertThat(updatedSession.currentAppointment?.attendanceSubmittedAt).isNotNull
@@ -209,7 +225,7 @@ internal class DeliverySessionsServiceTest {
     val appointmentTime = OffsetDateTime.now()
     val durationInMinutes = 200
 
-    whenever(communityAPIBookingService.book(any(), isNull(), any(), any(), eq(SERVICE_DELIVERY), isNull(), eq(Attended.NO), eq(false), eq(true), isNull()))
+    whenever(communityAPIBookingService.book(any(), isNull(), any(), any(), eq(SERVICE_DELIVERY), isNull(), eq(Attended.NO), eq(false), eq(false), eq(true), isNull()))
       .thenReturn(Pair(46298523523L, UUID.randomUUID()))
 
     val updatedSession = deliverySessionsService.updateSessionAppointment(
@@ -222,7 +238,8 @@ internal class DeliverySessionsServiceTest {
       AppointmentSessionType.ONE_TO_ONE,
       attended = Attended.NO,
       didSessionHappen = true,
-      notifyProbationPractitioner = false,
+      notifyProbationPractitionerOfBehaviour = false,
+      notifyProbationPractitionerOfConcerns = false,
     )
 
     verify(appointmentService, times(1)).createOrUpdateAppointmentDeliveryDetails(any(), eq(AppointmentDeliveryType.PHONE_CALL), eq(AppointmentSessionType.ONE_TO_ONE), isNull(), isNull())
@@ -231,7 +248,8 @@ internal class DeliverySessionsServiceTest {
     assertThat(updatedSession.currentAppointment?.createdBy?.userName).isEqualTo("scheduler")
     assertThat(updatedSession.currentAppointment?.attended).isEqualTo(Attended.NO)
     assertThat(updatedSession.currentAppointment?.didSessionHappen).isEqualTo(true)
-    assertThat(updatedSession.currentAppointment?.notifyPPOfAttendanceBehaviour).isFalse()
+    assertThat(updatedSession.currentAppointment?.notifyProbationPractitionerOfBehaviour).isFalse()
+    assertThat(updatedSession.currentAppointment?.notifyProbationPractitionerOfConcerns).isFalse()
     assertThat(updatedSession.currentAppointment?.sessionSummary).isNull()
     assertThat(updatedSession.currentAppointment?.sessionResponse).isNull()
     assertThat(updatedSession.currentAppointment?.attendanceSubmittedAt).isNotNull
@@ -250,7 +268,7 @@ internal class DeliverySessionsServiceTest {
     val newTime = OffsetDateTime.now()
     val newDuration = 200
 
-    whenever(communityAPIBookingService.book(any(), isNotNull(), eq(newTime), eq(newDuration), eq(SERVICE_DELIVERY), isNull(), isNull(), isNull(), isNull(), isNull()))
+    whenever(communityAPIBookingService.book(any(), isNotNull(), eq(newTime), eq(newDuration), eq(SERVICE_DELIVERY), isNull(), isNull(), isNull(), isNull(), isNull(), isNull()))
       .thenReturn(Pair(23523541087L, UUID.randomUUID()))
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(session)
     whenever(deliverySessionRepository.saveAndFlush(any())).thenAnswer { it.arguments[0] }
@@ -272,7 +290,8 @@ internal class DeliverySessionsServiceTest {
     assertThat(updatedSession.currentAppointment?.createdBy?.userName).isNotEqualTo("re-scheduler")
     assertThat(updatedSession.currentAppointment?.attended).isNull()
     assertThat(updatedSession.currentAppointment?.additionalAttendanceInformation).isNull()
-    assertThat(updatedSession.currentAppointment?.notifyPPOfAttendanceBehaviour).isNull()
+    assertThat(updatedSession.currentAppointment?.notifyProbationPractitionerOfBehaviour).isNull()
+    assertThat(updatedSession.currentAppointment?.notifyProbationPractitionerOfBehaviour).isNull()
     assertThat(updatedSession.currentAppointment?.sessionSummary).isNull()
     assertThat(updatedSession.currentAppointment?.sessionResponse).isNull()
     assertThat(updatedSession.currentAppointment?.attendanceSubmittedAt).isNull()
@@ -503,8 +522,10 @@ internal class DeliverySessionsServiceTest {
         null,
         "activities",
         "not good",
+        "behaviour",
         "concerns",
-        false,
+        notifyProbationPractitionerOfBehaviour = false,
+        notifyProbationPractitionerOfConcerns = false,
         actor,
       ),
     ).thenReturn(appointment.copy(sessionSummary = "activities", sessionResponse = "not good", sessionConcerns = "concerns", notifyPPOfAttendanceBehaviour = false, sessionFeedbackSubmittedAt = OffsetDateTime.now(), sessionFeedbackSubmittedBy = actor))
@@ -523,8 +544,10 @@ internal class DeliverySessionsServiceTest {
       null,
       "activities",
       "not good",
+      "behaviour",
       "concerns",
-      false,
+      notifyProbationPractitionerOfBehaviour = false,
+      notifyProbationPractitionerOfConcerns = false,
     )
 
     verify(appointmentService).recordSessionFeedback(
@@ -539,8 +562,10 @@ internal class DeliverySessionsServiceTest {
       null,
       "activities",
       "not good",
+      "behaviour",
       "concerns",
-      false,
+      notifyProbationPractitionerOfBehaviour = false,
+      notifyProbationPractitionerOfConcerns = false,
       actor,
     )
     assertThat(sessionAndAppointment.first).isSameAs(session)
@@ -571,8 +596,10 @@ internal class DeliverySessionsServiceTest {
         null,
         "activities",
         "not good",
-        null,
-        false,
+        "behaviour",
+        "concerns",
+        notifyProbationPractitionerOfBehaviour = false,
+        notifyProbationPractitionerOfConcerns = false,
       )
     }
   }
@@ -603,8 +630,10 @@ internal class DeliverySessionsServiceTest {
       null,
       "activities",
       "bad",
-      null,
-      false,
+      "behaviour",
+      "concerns",
+      notifyProbationPractitionerOfBehaviour = false,
+      notifyProbationPractitionerOfConcerns = false,
     )
 
     val exception = assertThrows(ResponseStatusException::class.java) {
@@ -643,8 +672,10 @@ internal class DeliverySessionsServiceTest {
       null,
       "activities",
       "bad",
-      null,
-      false,
+      "behaviour",
+      "concerns",
+      notifyProbationPractitionerOfBehaviour = false,
+      notifyProbationPractitionerOfConcerns = false,
     )
 
     val exception = assertThrows(ResponseStatusException::class.java) {
@@ -677,8 +708,10 @@ internal class DeliverySessionsServiceTest {
       null,
       "activities",
       "bad",
-      null,
-      false,
+      "behaviour",
+      "concerns",
+      notifyProbationPractitionerOfBehaviour = false,
+      notifyProbationPractitionerOfConcerns = false,
     )
 
     val submitter = createActor("test-submitter")
@@ -723,8 +756,10 @@ internal class DeliverySessionsServiceTest {
       null,
       "activities",
       "bad",
-      null,
-      false,
+      "behaviour",
+      "concerns",
+      notifyProbationPractitionerOfBehaviour = false,
+      notifyProbationPractitionerOfConcerns = false,
     )
     deliverySessionsService.submitAppointmentFeedback(referral.id, appointment.id, actor)
 
@@ -740,8 +775,10 @@ internal class DeliverySessionsServiceTest {
       null,
       "activities",
       "bad",
-      null,
-      false,
+      "behaviour",
+      "concerns",
+      notifyProbationPractitionerOfBehaviour = false,
+      notifyProbationPractitionerOfConcerns = false,
       actor,
     )
     verify(appointmentService).submitAppointmentFeedback(appointment, actor, SERVICE_DELIVERY, session)
@@ -781,8 +818,10 @@ internal class DeliverySessionsServiceTest {
         null,
         "activities",
         "bad",
-        null,
-        false,
+        "behaviour",
+        "concerns",
+        notifyProbationPractitionerOfBehaviour = false,
+        notifyProbationPractitionerOfConcerns = false,
         actor,
       ),
     ).thenThrow(ResponseStatusException::class.java)
@@ -801,8 +840,10 @@ internal class DeliverySessionsServiceTest {
         null,
         "activities",
         "bad",
-        null,
-        false,
+        "behaviour",
+        "concerns",
+        notifyProbationPractitionerOfBehaviour = false,
+        notifyProbationPractitionerOfConcerns = false,
       )
     }
   }

@@ -271,6 +271,10 @@ class SetupAssistant(
     ndeliusPPName: String? = "Bob",
     ndeliusPPEmailAddress: String? = "bob@example.com",
     ndeliusPDU: String? = "Hackney and City",
+    ndeliusPhoneNumber: String? = "073232324232",
+    ndeliusTeamPhoneNumber: String? = "020-32352323213",
+    ppPhoneNumber: String? = "073232324233",
+    ppTeamTelephoneNumber: String? = "020-32352323212",
     ppName: String? = "Alice",
     ppEmailAddress: String? = "alice@example.com",
     ppProbationOffice: String? = "London",
@@ -335,6 +339,10 @@ class SetupAssistant(
     ppEmailAddress: String? = "alice@example.com",
     ppProbationOffice: String? = "London",
     ppPdu: String? = "East Sussex",
+    ndeliusPhoneNumber: String? = "073232324232",
+    ndeliusTeamPhoneNumber: String? = "020-32352323213",
+    ppPhoneNumber: String? = "073232324233",
+    ppTeamTelephoneNumber: String? = "020-32352323212",
     hasValidDeliusPPDetails: Boolean = false,
     isReferralReleasingIn12Weeks: Boolean = false,
     hasMainPointOfContactDetails: Boolean = false,
@@ -363,6 +371,10 @@ class SetupAssistant(
         hasMainPointOfContactDetails = hasMainPointOfContactDetails,
         roleOrJobTitle = roleOrJobTitle,
         ppEstablishment = ppEstablishment,
+        ndeliusPhoneNumber = ndeliusPhoneNumber,
+        ndeliusTeamPhoneNumber = ndeliusTeamPhoneNumber,
+        ppPhoneNumber = ppPhoneNumber,
+        ppTeamTelephoneNumber = ppTeamTelephoneNumber,
       ),
     )
 
@@ -811,6 +823,7 @@ class SetupAssistant(
     ppEmailAddress: String? = "alice@example.com",
     ppProbationOffice: String? = "London",
     ppPdu: String? = "East Sussex",
+    allocatedCommunityPP: Boolean? = true,
     referralLocation: ReferralLocation = ReferralLocation(
       UUID.randomUUID(),
       referral = referral,
@@ -841,6 +854,7 @@ class SetupAssistant(
     draftReferral.personCustodyPrisonId = referralLocation.prisonId
     draftReferral.expectedReleaseDate = referralLocation.expectedReleaseDate
     draftReferral.ppProbationOffice = probationPractitionerDetails.probationOffice
+    draftReferral.allocatedCommunityPP = allocatedCommunityPP
     draftReferralRepository.save(draftReferral)
     referralRepository.saveAndFlush(referral)
 
