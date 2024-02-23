@@ -19,6 +19,10 @@ class ProbationPractitionerDetailsFactory(em: TestEntityManager? = null) : Entit
     probationOffice: String? = "probation-office",
     roleOrJobTitle: String? = "Probabation Practitioner",
     ppEstablishment: String? = "aaa",
+    ndeliusPhoneNumber: String? = "073232324232",
+    ndeliusTeamPhoneNumber: String? = "020-32352323213",
+    ppPhoneNumber: String? = "073232324233",
+    ppTeamTelephoneNumber: String? = "020-32352323212",
   ): ProbationPractitionerDetails {
     return save(
       ProbationPractitionerDetails(
@@ -33,6 +37,10 @@ class ProbationPractitionerDetailsFactory(em: TestEntityManager? = null) : Entit
         probationOffice = probationOffice,
         roleOrJobTitle = roleOrJobTitle,
         establishment = ppEstablishment,
+        nDeliusPPTelephoneNumber = ndeliusPhoneNumber,
+        nDeliusPPTeamTelephoneNumber = ndeliusTeamPhoneNumber,
+        ppPhoneNumber = ppPhoneNumber,
+        ppTeamTelephoneNumber = ppTeamTelephoneNumber,
       ),
     )
   }
