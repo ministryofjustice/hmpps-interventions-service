@@ -6,6 +6,7 @@ import org.springframework.batch.core.Job
 import org.springframework.batch.core.converter.DefaultJobParametersConverter
 import org.springframework.batch.core.launch.JobLauncher
 import org.springframework.batch.core.launch.support.SimpleJvmExitCodeMapper
+import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.stereotype.Component
@@ -41,6 +42,22 @@ class OnStartupJobLauncherFactory(
       } ?: rawParams
 
       val execution = jobLauncher.run(job, nextParams)
+      return exitCodeMapper.intValue(execution.exitStatus.exitCode)
+    }
+
+    return makeLauncher(job.name, entryPoint)
+  }
+  fun makeReadOnlyBatchLauncher(job: Job, readOnlyJobLauncher: TaskExecutorJobLauncher): ApplicationRunner {
+    val entryPoint = fun(args: ApplicationArguments): Int {
+      val rawParams = jobParametersConverter.getJobParameters(
+        StringUtils.splitArrayElementsIntoProperties(args.nonOptionArgs.toTypedArray(), "="),
+      )
+
+      val nextParams = job.jobParametersIncrementer?.let {
+        it.getNext(rawParams)
+      } ?: rawParams
+
+      val execution = readOnlyJobLauncher.run(job, nextParams)
       return exitCodeMapper.intValue(execution.exitStatus.exitCode)
     }
 

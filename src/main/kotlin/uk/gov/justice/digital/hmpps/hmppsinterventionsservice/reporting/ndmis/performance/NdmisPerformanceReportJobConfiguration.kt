@@ -11,6 +11,7 @@ import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.core.job.DefaultJobParametersValidator
+import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher
 import org.springframework.batch.core.scope.context.ChunkContext
 import org.springframework.batch.item.database.HibernateCursorItemReader
 import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder
@@ -44,6 +45,7 @@ class NdmisPerformanceReportJobConfiguration(
   private val ndmisS3Bucket: S3Bucket,
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
   private val transactionManager: PlatformTransactionManager,
+  private val readOnlyJobLauncher: TaskExecutorJobLauncher,
   @Value("\${spring.batch.jobs.ndmis.performance-report.chunk-size}") private val chunkSize: Int,
 ) {
   companion object : KLogging()
@@ -57,7 +59,7 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun ndmisPerformanceReportJobLauncher(ndmisPerformanceReportJob: Job): ApplicationRunner {
-    return onStartupJobLauncherFactory.makeBatchLauncher(ndmisPerformanceReportJob)
+    return onStartupJobLauncherFactory.makeReadOnlyBatchLauncher(ndmisPerformanceReportJob, readOnlyJobLauncher)
   }
 
   @Bean
