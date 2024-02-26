@@ -48,7 +48,7 @@ class BatchConfiguration(
     factory.setDataSource(dataSource)
     factory.setDatabaseType("H2")
     factory.transactionManager = transactionManager
-    factory.setIsolationLevelForCreateEnum(Isolation.REPEATABLE_READ)
+    factory.setIsolationLevelForCreateEnum(Isolation.READ_COMMITTED)
     factory.afterPropertiesSet()
     return factory.`object`
   }
