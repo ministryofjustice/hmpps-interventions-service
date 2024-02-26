@@ -24,10 +24,10 @@ import kotlin.io.path.pathString
 class NdmisPerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
 
   @Autowired
-  override fun setJobRepository(@Qualifier("batchJobRepository") jobRepository: JobRepository) = super.setJobRepository(jobRepository)
+  override fun setJobRepository(jobRepository: JobRepository) = super.setJobRepository(jobRepository)
 
   @Autowired
-  fun testJobLauncher(@Qualifier("batchJobRepository") jobRepository: JobRepository) {
+  fun testJobLauncher(jobRepository: JobRepository) {
     val testJobLauncher = TaskExecutorJobLauncher()
     testJobLauncher.setJobRepository(jobRepository)
     testJobLauncher.afterPropertiesSet()
