@@ -117,7 +117,7 @@ class NdmisPerformanceReportJobConfiguration(
     )
   }
 
-  @Bean
+  @Bean(name = ["ndmisPerformanceReportJob"])
   fun ndmisPerformanceReportJob(
     ndmisWriteReferralToCsvStep: Step,
     ndmisWriteComplexityToCsvStep: Step,
