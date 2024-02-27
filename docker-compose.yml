@@ -70,7 +70,7 @@ services:
       - OAUTH_ENDPOINT_URL=http://hmpps-auth:8090/auth
 
   postgres:
-    image: postgres:14.10-alpine
+    image: postgres:14.11-alpine
     container_name: postgres
     ports:
       - "5432:5432"
