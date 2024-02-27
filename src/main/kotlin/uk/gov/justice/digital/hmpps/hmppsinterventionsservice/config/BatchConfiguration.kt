@@ -40,7 +40,7 @@ class BatchConfiguration(
   }
 
   @Bean("readOnlyJobLauncher")
-  fun readOnlyJobLauncher(@Qualifier("batchJobRepository") jobRepository: JobRepository): TaskExecutorJobLauncher {
+  fun readOnlyJobLauncher(@Qualifier("batchJobRepository") jobRepository: JobRepository): JobLauncher {
     val taskExecutor = ThreadPoolTaskExecutor()
     taskExecutor.corePoolSize = poolSize
     taskExecutor.queueCapacity = queueSize
