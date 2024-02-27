@@ -71,6 +71,7 @@ data class DraftReferralDTO(
   val roleOrJobTitle: String? = null,
   val ppLocationType: String? = null,
   val allocatedCommunityPP: Boolean? = null,
+  val reasonForReferral: String? = null,
 ) {
   companion object {
     fun from(referral: DraftReferral): DraftReferralDTO {
@@ -129,6 +130,7 @@ data class DraftReferralDTO(
         hasMainPointOfContactDetails = referral.hasMainPointOfContactDetails,
         roleOrJobTitle = referral.roleOrJobTitle,
         allocatedCommunityPP = referral.allocatedCommunityPP,
+        reasonForReferral = referral.referralDetails?.reasonForReferral,
       )
     }
 
@@ -139,6 +141,7 @@ data class DraftReferralDTO(
         id = referral.id,
         createdAt = referral.createdAt,
         completionDeadline = referral.referralDetails?.completionDeadline,
+        reasonForReferral = referral.referralDetails?.reasonForReferral,
         complexityLevels = referral.complexityLevelIds?.ifEmpty { null }
           ?.map { ReferralComplexityLevel(it.key, it.value) }
           ?.sortedBy { it.serviceCategoryId },

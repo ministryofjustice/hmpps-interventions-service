@@ -112,6 +112,7 @@ class DraftReferralService(
         update.expectedReleaseDate,
         update.expectedReleaseDateMissingReason,
         "initial referral details",
+        update.reasonForReferral,
       ),
       referral.createdBy,
     )
@@ -243,6 +244,7 @@ class DraftReferralService(
     if (!update.isValidUpdate) {
       return null
     }
+    logger.debug("the reason for referral value is ====> ${update.reasonForReferral}")
 
     val existingDetails = referralDetailsRepository.findLatestByReferralId(referral.id)
 
@@ -270,7 +272,13 @@ class DraftReferralService(
       newDetails.maximumEnforceableDays = it
     }
 
+    update.reasonForReferral?.let {
+      newDetails.reasonForReferral = it
+    }
+
     referralDetailsRepository.saveAndFlush(newDetails)
+
+    logger.debug("the reason for referral value is ====> ${newDetails.reasonForReferral}")
 
     return newDetails
   }

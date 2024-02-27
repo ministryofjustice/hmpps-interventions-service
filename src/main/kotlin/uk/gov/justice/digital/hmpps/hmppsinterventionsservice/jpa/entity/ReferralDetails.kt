@@ -20,4 +20,5 @@ data class ReferralDetails(
   var completionDeadline: LocalDate? = null,
   var furtherInformation: String? = null,
   var maximumEnforceableDays: Int? = null,
+  @Column(name = "reason_for_referral") var reasonForReferral: String? = null,
 )
