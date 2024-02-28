@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config
 
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.explore.JobExplorer
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Isolation
 import javax.sql.DataSource
 
 @Configuration
+@EnableBatchProcessing(dataSourceRef = "batchDataSource", databaseType = "H2")
 class BatchConfiguration(
   @Value("\${spring.batch.concurrency.pool-size}") private val poolSize: Int,
   @Value("\${spring.batch.concurrency.queue-size}") private val queueSize: Int,
@@ -54,12 +56,12 @@ class BatchConfiguration(
   }
 
   @Bean("batchJobRepository")
-  fun jobRepository(
-    @Qualifier("batchDataSource") dataSource: DataSource,
+  fun batchJobRepository(
+    @Qualifier("batchDataSource") batchDataSource: DataSource,
     transactionManager: PlatformTransactionManager,
   ): JobRepository {
     val factory = JobRepositoryFactoryBean()
-    factory.setDataSource(dataSource)
+    factory.setDataSource(batchDataSource)
     factory.setDatabaseType("H2")
     factory.transactionManager = transactionManager
     factory.setIsolationLevelForCreateEnum(Isolation.READ_COMMITTED)
@@ -77,19 +79,19 @@ class BatchConfiguration(
   }
 
   @Bean("batchJobBuilderFactory")
-  fun jobBuilderFactory(jobRepository: JobRepository): JobBuilderFactory {
-    return JobBuilderFactory(jobRepository)
+  fun jobBuilderFactory(@Qualifier("batchJobRepository") batchJobRepository: JobRepository): JobBuilderFactory {
+    return JobBuilderFactory(batchJobRepository)
   }
 
   @Bean("batchStepBuilderFactory")
-  fun stepBuilderFactory(jobRepository: JobRepository, transactionManager: PlatformTransactionManager): StepBuilderFactory {
-    return StepBuilderFactory(jobRepository)
+  fun stepBuilderFactory(@Qualifier("batchJobRepository") batchJobRepository: JobRepository): StepBuilderFactory {
+    return StepBuilderFactory(batchJobRepository)
   }
 
   @Bean("batchJobExplorer")
-  fun jobExplorer(@Qualifier("batchDataSource") dataSource: DataSource, transactionManager: PlatformTransactionManager): JobExplorer {
+  fun jobExplorer(@Qualifier("batchDataSource") batchDataSource: DataSource, transactionManager: PlatformTransactionManager): JobExplorer {
     val factory = JobExplorerFactoryBean()
-    factory.setDataSource(dataSource)
+    factory.setDataSource(batchDataSource)
     factory.transactionManager = transactionManager
     factory.afterPropertiesSet()
     return factory.getObject()

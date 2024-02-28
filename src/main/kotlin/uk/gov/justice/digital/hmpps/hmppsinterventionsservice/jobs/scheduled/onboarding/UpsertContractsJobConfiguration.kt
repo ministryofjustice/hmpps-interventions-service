@@ -2,11 +2,9 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.on
 
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.step.builder.StepBuilder
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -16,11 +14,10 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Interve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
 
 @Configuration
-@EnableBatchProcessing
 class UpsertContractsJobConfiguration(
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
-  @Qualifier("jobRepository") private val jobRepository: JobRepository,
-  private val platformTransactionManager: PlatformTransactionManager,
+  private val batchJobRepository: JobRepository,
+  private val transactionManager: PlatformTransactionManager,
 ) {
 
   @Bean
@@ -30,7 +27,7 @@ class UpsertContractsJobConfiguration(
 
   @Bean
   fun upsertContractsJob(upsertProvidersStep: Step, upsertContractStep: Step, upsertContractDetailsStep: Step): Job {
-    return JobBuilder("upsertContractsJob", jobRepository)
+    return JobBuilder("upsertContractsJob", batchJobRepository)
       .incrementer(TimestampIncrementer())
       .start(upsertProvidersStep)
       .next(upsertContractDetailsStep)
@@ -42,8 +39,8 @@ class UpsertContractsJobConfiguration(
   fun upsertProvidersStep(
     providerSetup: ProviderSetupTasklet,
   ): Step {
-    return StepBuilder("upsertProvidersStep", jobRepository)
-      .tasklet(providerSetup, platformTransactionManager)
+    return StepBuilder("upsertProvidersStep", batchJobRepository)
+      .tasklet(providerSetup, transactionManager)
       .build()
   }
 
@@ -51,8 +48,8 @@ class UpsertContractsJobConfiguration(
   fun upsertContractDetailsStep(
     contractDetailsSetupTasklet: ContractDetailsSetupTasklet,
   ): Step {
-    return StepBuilder("upsertContractDetailsStep", jobRepository)
-      .tasklet(contractDetailsSetupTasklet, platformTransactionManager)
+    return StepBuilder("upsertContractDetailsStep", batchJobRepository)
+      .tasklet(contractDetailsSetupTasklet, transactionManager)
       .build()
   }
 
@@ -61,12 +58,12 @@ class UpsertContractsJobConfiguration(
     reader: ContractDefinitionReader,
     processor: UpsertContractProcessor,
   ): Step {
-    return StepBuilder("upsertContractStep", jobRepository)
+    return StepBuilder("upsertContractStep", batchJobRepository)
       .chunk<ContractDefinition, Intervention>(10)
       .reader(reader)
       .processor(processor)
       .writer {}
-      .transactionManager(platformTransactionManager)
+      .transactionManager(transactionManager)
       .build()
   }
 }
