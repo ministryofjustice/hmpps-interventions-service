@@ -16,7 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Interve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
 
 @Configuration
-@EnableBatchProcessing(dataSourceRef = "dataSource", transactionManagerRef = "transactionManager")
+@EnableBatchProcessing(dataSourceRef = "dataSource", transactionManagerRef = "transactionManager", databaseType = "POSTGRES")
 class UpsertContractsJobConfiguration(
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
   @Qualifier("jobRepository") private val jobRepository: JobRepository,
