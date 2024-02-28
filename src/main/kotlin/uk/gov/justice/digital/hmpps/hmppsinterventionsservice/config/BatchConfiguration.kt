@@ -36,13 +36,13 @@ class BatchConfiguration(
   }
 
   @Bean("batchJobBuilderFactory")
-  fun jobBuilderFactory(batchJobRepository: JobRepository): JobBuilderFactory {
-    return JobBuilderFactory(batchJobRepository)
+  fun jobBuilderFactory(jobRepository: JobRepository): JobBuilderFactory {
+    return JobBuilderFactory(jobRepository)
   }
 
   @Bean("batchStepBuilderFactory")
-  fun stepBuilderFactory(batchJobRepository: JobRepository): StepBuilderFactory {
-    return StepBuilderFactory(batchJobRepository)
+  fun stepBuilderFactory(jobRepository: JobRepository): StepBuilderFactory {
+    return StepBuilderFactory(jobRepository)
   }
 
   @Bean("batchJobExplorer")
