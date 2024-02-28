@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType
+import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.Isolation
@@ -25,15 +26,15 @@ class BatchConfiguration(
   @Value("\${spring.batch.concurrency.queue-size}") private val queueSize: Int,
 ) {
 
-  @Bean("asyncJobLauncher")
-  fun asyncJobLauncher(jobRepository: JobRepository): JobLauncher {
+  @Bean(name = ["asyncJobLauncher"])
+  fun asyncJobLauncher(batchJobRepository: JobRepository): JobLauncher {
     val taskExecutor = ThreadPoolTaskExecutor()
     taskExecutor.corePoolSize = poolSize
     taskExecutor.queueCapacity = queueSize
     taskExecutor.afterPropertiesSet()
 
     val launcher = TaskExecutorJobLauncher()
-    launcher.setJobRepository(jobRepository)
+    launcher.setJobRepository(batchJobRepository)
     launcher.setTaskExecutor(taskExecutor)
     launcher.afterPropertiesSet()
     return launcher
@@ -55,13 +56,13 @@ class BatchConfiguration(
 
   @Bean("batchJobRepository")
   fun jobRepository(
-    @Qualifier("batchDataSource") dataSource: DataSource,
+    @Qualifier("batchDataSource") batchDataSource: DataSource,
     transactionManager: PlatformTransactionManager,
   ): JobRepository {
     val factory = JobRepositoryFactoryBean()
-    factory.setDataSource(dataSource)
+    factory.setDataSource(batchDataSource)
     factory.setDatabaseType("H2")
-    factory.transactionManager = transactionManager
+    factory.transactionManager = batchTransactionManager()
     factory.setIsolationLevelForCreateEnum(Isolation.READ_COMMITTED)
     factory.afterPropertiesSet()
     return factory.`object`
@@ -76,21 +77,26 @@ class BatchConfiguration(
       .build()
   }
 
+  @Bean("batchTransactionManager")
+  fun batchTransactionManager(): PlatformTransactionManager {
+    return JpaTransactionManager()
+  }
+
   @Bean("batchJobBuilderFactory")
-  fun jobBuilderFactory(jobRepository: JobRepository): JobBuilderFactory {
-    return JobBuilderFactory(jobRepository)
+  fun jobBuilderFactory(batchJobRepository: JobRepository): JobBuilderFactory {
+    return JobBuilderFactory(batchJobRepository)
   }
 
   @Bean("batchStepBuilderFactory")
-  fun stepBuilderFactory(jobRepository: JobRepository, transactionManager: PlatformTransactionManager): StepBuilderFactory {
-    return StepBuilderFactory(jobRepository)
+  fun stepBuilderFactory(batchJobRepository: JobRepository, transactionManager: PlatformTransactionManager): StepBuilderFactory {
+    return StepBuilderFactory(batchJobRepository)
   }
 
   @Bean("batchJobExplorer")
   fun jobExplorer(@Qualifier("batchDataSource") dataSource: DataSource, transactionManager: PlatformTransactionManager): JobExplorer {
     val factory = JobExplorerFactoryBean()
     factory.setDataSource(dataSource)
-    factory.transactionManager = transactionManager
+    factory.transactionManager = batchTransactionManager()
     factory.afterPropertiesSet()
     return factory.getObject()
   }

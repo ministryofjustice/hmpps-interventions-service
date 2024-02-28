@@ -24,7 +24,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUti
 import java.util.Date
 
 @Configuration
-@EnableBatchProcessing
+@EnableBatchProcessing(dataSourceRef = "batchDataSource", transactionManagerRef = "batchTransactionManager")
 class PerformanceReportJobConfiguration(
   @Qualifier("batchJobRepository")
   private val jobRepository: JobRepository,
