@@ -17,7 +17,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
 
 @Configuration
-@EnableBatchProcessing
+@EnableBatchProcessing(dataSourceRef = "dataSource", transactionManagerRef = "transactionManager")
 class TransferReferralsJobConfiguration(
   private val jobRepository: JobRepository,
   private val transactionManager: JpaTransactionManager,

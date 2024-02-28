@@ -35,7 +35,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.S3Service
 import java.nio.file.Path
 
 @Configuration
-@EnableBatchProcessing
+@EnableBatchProcessing(dataSourceRef = "batchDataSource", transactionManagerRef = "batchTransactionManager")
 class NdmisPerformanceReportJobConfiguration(
   @Qualifier("batchJobBuilderFactory") private val jobBuilderFactory: JobBuilderFactory,
   @Qualifier("batchStepBuilderFactory") private val stepBuilderFactory: StepBuilderFactory,
