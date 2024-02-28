@@ -5,6 +5,8 @@ import org.springframework.boot.jdbc.DataSourceBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType
 import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.transaction.PlatformTransactionManager
 import javax.sql.DataSource
@@ -25,6 +27,20 @@ class DataSourceConfig(
       .username(dataSourceUserName)
       .password(dataSourcePassword)
       .build()
+  }
+
+  @Bean("memoryDataSource")
+  fun memoryDataSource(): DataSource {
+    return EmbeddedDatabaseBuilder()
+      .setType(EmbeddedDatabaseType.H2)
+      .addScript("/org/springframework/batch/core/schema-drop-h2.sql")
+      .addScript("/org/springframework/batch/core/schema-h2.sql")
+      .build()
+  }
+
+  @Bean("batchTransactionManager")
+  fun batchTransactionManager(): PlatformTransactionManager {
+    return JpaTransactionManager()
   }
 
   @Bean("transactionManager")
