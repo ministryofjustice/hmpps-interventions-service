@@ -15,7 +15,6 @@ import kotlin.system.exitProcess
 @Component
 class OnStartupJobLauncherFactory(
   private val jobLauncher: JobLauncher,
-  private val readOnlyJobLauncher: JobLauncher,
 ) {
   companion object : KLogging()
 
@@ -34,10 +33,6 @@ class OnStartupJobLauncherFactory(
   fun makeBatchLauncher(job: Job): ApplicationRunner {
     return makeLauncher(job.name, buildEntryPoint(job, jobLauncher))
   }
-  fun makeReadOnlyBatchLauncher(job: Job): ApplicationRunner {
-    return makeLauncher(job.name, buildEntryPoint(job, readOnlyJobLauncher))
-  }
-
   private fun buildEntryPoint(job: Job, jobLauncher: JobLauncher): (args: ApplicationArguments) -> Int {
     val entryPoint = fun(args: ApplicationArguments): Int {
       val rawParams = jobParametersConverter.getJobParameters(

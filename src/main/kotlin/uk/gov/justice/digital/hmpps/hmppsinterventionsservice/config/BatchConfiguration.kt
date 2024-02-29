@@ -21,7 +21,7 @@ class BatchConfiguration(
   @Value("\${spring.batch.concurrency.queue-size}") private val queueSize: Int,
 ) {
 
-  @Bean(name = ["jobLauncher", "asyncJobLauncher"])
+  @Bean("asyncJobLauncher")
   fun asyncJobLauncher(jobRepository: JobRepository): JobLauncher {
     val taskExecutor = ThreadPoolTaskExecutor()
     taskExecutor.corePoolSize = poolSize

@@ -62,7 +62,7 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun ndmisPerformanceReportJobLauncher(ndmisPerformanceReportJob: Job): ApplicationRunner {
-    return onStartupJobLauncherFactory.makeReadOnlyBatchLauncher(ndmisPerformanceReportJob)
+    return onStartupJobLauncherFactory.makeBatchLauncher(ndmisPerformanceReportJob)
   }
 
   @Bean
