@@ -39,6 +39,7 @@ import java.nio.file.Path
   dataSourceRef = "memoryDataSource",
   transactionManagerRef = "batchTransactionManager",
   databaseType = "H2",
+  isolationLevelForCreate = "ISOLATION_REPEATABLE_READ"
 )
 class NdmisPerformanceReportJobConfiguration(
   @Qualifier("batchJobBuilderFactory") private val jobBuilderFactory: JobBuilderFactory,
@@ -47,7 +48,7 @@ class NdmisPerformanceReportJobConfiguration(
   private val s3Service: S3Service,
   private val ndmisS3Bucket: S3Bucket,
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
-  private val transactionManager: PlatformTransactionManager,
+  @Qualifier("transactionManager") private val transactionManager: PlatformTransactionManager,
   @Value("\${spring.batch.jobs.ndmis.performance-report.chunk-size}") private val chunkSize: Int,
 ) {
   companion object : KLogging()
