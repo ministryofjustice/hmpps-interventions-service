@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config
 
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.explore.JobExplorer
@@ -16,6 +17,12 @@ import org.springframework.transaction.PlatformTransactionManager
 import javax.sql.DataSource
 
 @Configuration
+@EnableBatchProcessing(
+  dataSourceRef = "memoryDataSource",
+  transactionManagerRef = "batchTransactionManager",
+  databaseType = "H2",
+  isolationLevelForCreate = "ISOLATION_READ_COMMITTED",
+)
 class BatchConfiguration(
   @Value("\${spring.batch.concurrency.pool-size}") private val poolSize: Int,
   @Value("\${spring.batch.concurrency.queue-size}") private val queueSize: Int,
