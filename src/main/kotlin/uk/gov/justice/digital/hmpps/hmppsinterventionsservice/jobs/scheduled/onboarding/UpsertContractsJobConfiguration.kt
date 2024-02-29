@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.on
 
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.step.builder.StepBuilder
@@ -16,7 +15,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Interve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
 
 @Configuration
-@EnableBatchProcessing(dataSourceRef = "dataSource", transactionManagerRef = "transactionManager", databaseType = "POSTGRES")
 class UpsertContractsJobConfiguration(
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
   @Qualifier("jobRepository") private val jobRepository: JobRepository,

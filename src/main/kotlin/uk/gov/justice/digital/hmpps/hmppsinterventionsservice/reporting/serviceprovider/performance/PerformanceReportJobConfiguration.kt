@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.service
 import org.hibernate.SessionFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
 import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.job.DefaultJobParametersValidator
 import org.springframework.batch.core.job.builder.JobBuilder
@@ -23,12 +22,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUti
 import java.util.Date
 
 @Configuration
-@EnableBatchProcessing(
-  dataSourceRef = "memoryDataSource",
-  transactionManagerRef = "batchTransactionManager",
-  databaseType = "H2",
-  isolationLevelForCreate = "ISOLATION_READ_COMMITTED",
-)
 class PerformanceReportJobConfiguration(
   private val jobRepository: JobRepository,
   private val transactionManager: PlatformTransactionManager,

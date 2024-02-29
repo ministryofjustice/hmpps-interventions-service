@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.trans
 
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.job.DefaultJobParametersValidator
@@ -17,7 +16,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
 
 @Configuration
-@EnableBatchProcessing(dataSourceRef = "dataSource", transactionManagerRef = "transactionManager", databaseType = "POSTGRES")
 class TransferReferralsJobConfiguration(
   private val jobRepository: JobRepository,
   private val transactionManager: JpaTransactionManager,
