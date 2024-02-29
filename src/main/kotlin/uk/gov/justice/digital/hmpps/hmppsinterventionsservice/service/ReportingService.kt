@@ -15,7 +15,6 @@ import kotlin.io.path.pathString
 @Service
 class ReportingService(
   private val asyncJobLauncher: JobLauncher,
-  private val readOnlyJobLauncher: JobLauncher,
   private val performanceReportJob: Job,
   private val ndmisPerformanceReportJob: Job,
   private val serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper,
@@ -42,7 +41,7 @@ class ReportingService(
 
   fun generateNdmisPerformanceReport() {
     val outputDir = createTempDirectory("test")
-    readOnlyJobLauncher.run(
+    asyncJobLauncher.run(
       ndmisPerformanceReportJob,
       JobParametersBuilder()
         .addString("outputPath", outputDir.pathString)

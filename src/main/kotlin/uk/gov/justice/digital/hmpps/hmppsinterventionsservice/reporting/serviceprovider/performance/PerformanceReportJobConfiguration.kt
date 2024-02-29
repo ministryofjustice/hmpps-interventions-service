@@ -13,7 +13,6 @@ import org.springframework.batch.item.ItemProcessor
 import org.springframework.batch.item.database.HibernateCursorItemReader
 import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -24,9 +23,13 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUti
 import java.util.Date
 
 @Configuration
-@EnableBatchProcessing
+@EnableBatchProcessing(
+  dataSourceRef = "memoryDataSource",
+  transactionManagerRef = "batchTransactionManager",
+  databaseType = "H2",
+  isolationLevelForCreate = "ISOLATION_READ_COMMITTED",
+)
 class PerformanceReportJobConfiguration(
-  @Qualifier("batchJobRepository")
   private val jobRepository: JobRepository,
   private val transactionManager: PlatformTransactionManager,
   private val batchUtils: BatchUtils,
