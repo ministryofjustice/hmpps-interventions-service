@@ -27,7 +27,7 @@ import java.util.Date
   dataSourceRef = "memoryDataSource",
   transactionManagerRef = "batchTransactionManager",
   databaseType = "H2",
-  isolationLevelForCreate = "ISOLATION_REPEATABLE_READ",
+  isolationLevelForCreate = "ISOLATION_READ_COMMITTED",
 )
 class PerformanceReportJobConfiguration(
   private val jobRepository: JobRepository,

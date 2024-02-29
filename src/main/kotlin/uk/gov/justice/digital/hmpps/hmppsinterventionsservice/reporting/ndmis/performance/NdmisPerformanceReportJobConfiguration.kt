@@ -39,7 +39,7 @@ import java.nio.file.Path
   dataSourceRef = "memoryDataSource",
   transactionManagerRef = "batchTransactionManager",
   databaseType = "H2",
-  isolationLevelForCreate = "ISOLATION_REPEATABLE_READ",
+  isolationLevelForCreate = "ISOLATION_READ_COMMITTED",
 )
 class NdmisPerformanceReportJobConfiguration(
   @Qualifier("batchJobBuilderFactory") private val jobBuilderFactory: JobBuilderFactory,
