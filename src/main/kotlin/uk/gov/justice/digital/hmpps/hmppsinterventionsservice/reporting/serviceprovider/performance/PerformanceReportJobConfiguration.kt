@@ -23,12 +23,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUti
 import java.util.Date
 
 @Configuration
-@EnableBatchProcessing(
-  dataSourceRef = "memoryDataSource",
-  transactionManagerRef = "batchTransactionManager",
-  databaseType = "H2",
-  isolationLevelForCreate = "ISOLATION_READ_COMMITTED",
-)
 class PerformanceReportJobConfiguration(
   private val jobRepository: JobRepository,
   private val transactionManager: PlatformTransactionManager,

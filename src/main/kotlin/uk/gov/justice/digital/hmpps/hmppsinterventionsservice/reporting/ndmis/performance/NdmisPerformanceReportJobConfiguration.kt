@@ -35,12 +35,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.S3Service
 import java.nio.file.Path
 
 @Configuration
-@EnableBatchProcessing(
-  dataSourceRef = "memoryDataSource",
-  transactionManagerRef = "batchTransactionManager",
-  databaseType = "H2",
-  isolationLevelForCreate = "ISOLATION_READ_COMMITTED",
-)
 class NdmisPerformanceReportJobConfiguration(
   @Qualifier("batchJobBuilderFactory") private val jobBuilderFactory: JobBuilderFactory,
   @Qualifier("batchStepBuilderFactory") private val stepBuilderFactory: StepBuilderFactory,
