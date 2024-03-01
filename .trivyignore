@@ -16,3 +16,5 @@ CVE-2023-6378
 # Temporary supressions for hotfix due to earlier spring version
 CVE-2024-22234
 CVE-2024-22243
+# Temporary supressions for hotfix due to earlier postgres driver
+CVE-2024-1597
