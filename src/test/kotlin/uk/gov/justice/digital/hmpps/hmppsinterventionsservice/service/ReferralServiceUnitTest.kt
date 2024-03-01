@@ -216,7 +216,7 @@ class ReferralServiceUnitTest {
     @Test
     fun `a new version is not created if the update contains no data`() {
       val referral = referralFactory.createSent()
-      val update = UpdateReferralDetailsDTO(null, null, null, null, null, reasonForChange = "blah blah")
+      val update = UpdateReferralDetailsDTO(null, null, null, null, null, reasonForChange = "blah blah", null)
       val returnedValue = referralService.updateReferralDetails(referral, update, referral.createdBy)
 
       verify(referralDetailsRepository, times(0)).save(any())
@@ -243,7 +243,7 @@ class ReferralServiceUnitTest {
 
       val returnedValue = referralService.updateReferralDetails(
         referral,
-        UpdateReferralDetailsDTO(20, null, "new information", null, null, "we decided 10 days wasn't enough"),
+        UpdateReferralDetailsDTO(20, null, "new information", null, null, "we decided 10 days wasn't enough", "some reason for making a referral"),
         referral.createdBy,
       )
 
