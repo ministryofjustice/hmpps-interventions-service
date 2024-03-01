@@ -271,10 +271,6 @@ class SetupAssistant(
     ndeliusPPName: String? = "Bob",
     ndeliusPPEmailAddress: String? = "bob@example.com",
     ndeliusPDU: String? = "Hackney and City",
-    ndeliusPhoneNumber: String? = "073232324232",
-    ndeliusTeamPhoneNumber: String? = "020-32352323213",
-    ppPhoneNumber: String? = "073232324233",
-    ppTeamTelephoneNumber: String? = "020-32352323212",
     ppName: String? = "Alice",
     ppEmailAddress: String? = "alice@example.com",
     ppProbationOffice: String? = "London",
@@ -810,6 +806,7 @@ class SetupAssistant(
     additionalRiskInformation: String = "A danger to the elderly",
     completionDeadline: LocalDate = LocalDate.of(2021, 4, 1),
     furtherInformation: String = "Some information about the service user",
+    reasonForReferral: String = "For crs",
     hasAdditionalResponsibilities: Boolean = true,
     interpreterLanguage: String = "Spanish",
     maximumEnforceableDays: Int = 10,
@@ -884,6 +881,7 @@ class SetupAssistant(
           completionDeadline,
           furtherInformation,
           maximumEnforceableDays,
+          reasonForReferral,
         ),
       )
       it.referralDetails?.let { existingDetails ->
@@ -918,6 +916,7 @@ class SetupAssistant(
     completionDeadline: LocalDate = LocalDate.of(2021, 4, 1),
     furtherInformation: String = "Some information about the service user",
     hasAdditionalResponsibilities: Boolean = true,
+    reasonForReferral: String = "for crs",
     interpreterLanguage: String = "Spanish",
     maximumEnforceableDays: Int = 10,
     needsInterpreter: Boolean = true,
@@ -961,6 +960,7 @@ class SetupAssistant(
           completionDeadline,
           furtherInformation,
           maximumEnforceableDays,
+          reasonForReferral,
         ),
       )
       it.referralDetails?.let { existingDetails ->
