@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
-import io.hypersistence.utils.hibernate.type.array.ListArrayType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
@@ -8,7 +7,6 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.MapsId
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
-import org.hibernate.annotations.Type
 import java.time.LocalDate
 import java.util.UUID
 
@@ -24,7 +22,6 @@ data class ReferralServiceUserData(
   var preferredLanguage: String? = null,
   var religionOrBelief: String? = null,
 
-  @Type(ListArrayType::class)
   @Column(name = "disabilities", columnDefinition = "text[]")
   var disabilities: List<String>? = null,
 
