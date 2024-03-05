@@ -10,6 +10,9 @@ import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.core.job.DefaultJobParametersValidator
+import org.springframework.batch.core.job.builder.FlowBuilder
+import org.springframework.batch.core.job.flow.Flow
+import org.springframework.batch.core.job.flow.support.SimpleFlow
 import org.springframework.batch.core.scope.context.ChunkContext
 import org.springframework.batch.item.database.HibernateCursorItemReader
 import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder
@@ -21,6 +24,8 @@ import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.FileSystemResource
+import org.springframework.core.task.SimpleAsyncTaskExecutor
+import org.springframework.core.task.TaskExecutor
 import org.springframework.transaction.PlatformTransactionManager
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.S3Bucket
@@ -59,7 +64,12 @@ class NdmisPerformanceReportJobConfiguration(
   }
 
   @Bean
-  @JobScope
+  fun taskExecutor(): TaskExecutor? {
+    return SimpleAsyncTaskExecutor("spring_batch_ndmis_report")
+  }
+
+  @Bean
+  @StepScope
   fun ndmisReader(
     sessionFactory: SessionFactory,
   ): HibernateCursorItemReader<Referral> {
@@ -70,7 +80,6 @@ class NdmisPerformanceReportJobConfiguration(
       .queryString("select r from Referral r where sentAt is not null")
       .build()
   }
-
   @Bean
   @StepScope
   fun ndmisReferralsWriter(@Value("#{jobParameters['outputPath']}") outputPath: String): FlatFileItemWriter<ReferralsData> {
@@ -117,10 +126,10 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean(name = ["ndmisPerformanceReportJob"])
   fun ndmisPerformanceReportJob(
-    ndmisWriteReferralToCsvStep: Step,
-    ndmisWriteComplexityToCsvStep: Step,
-    ndmisWriteAppointmentToCsvStep: Step,
-    ndmisWriteOutcomeToCsvStep: Step,
+    writeReferralFlow: SimpleFlow,
+    writeComplexityFlow: SimpleFlow,
+    writeAppointmentFlow: SimpleFlow,
+    writeOutcomeFlow: SimpleFlow,
     pushToS3Step: Step,
   ): Job {
     val validator = DefaultJobParametersValidator()
@@ -129,11 +138,71 @@ class NdmisPerformanceReportJobConfiguration(
     return jobBuilderFactory["ndmisPerformanceReportJob"]
       .incrementer { parameters -> OutputPathIncrementer().getNext(TimestampIncrementer().getNext(parameters)) }
       .validator(validator)
-      .start(ndmisWriteReferralToCsvStep)
-      .next(ndmisWriteComplexityToCsvStep)
-      .next(ndmisWriteAppointmentToCsvStep)
-      .next(ndmisWriteOutcomeToCsvStep)
+      .start(
+        mainFlow(
+          writeReferralFlow,
+          writeComplexityFlow,
+          writeAppointmentFlow,
+          writeOutcomeFlow,
+        ),
+      )
       .next(pushToS3Step)
+      .build()
+      .build()
+  }
+
+  @Bean
+  fun writeReferralFlow(
+    ndmisReader: HibernateCursorItemReader<Referral>,
+    referralsProcessor: ReferralsProcessor,
+    referralWriter: FlatFileItemWriter<ReferralsData>,
+  ): SimpleFlow? {
+    return FlowBuilder<SimpleFlow>("writeReferralFlow")
+      .start(ndmisWriteReferralToCsvStep(ndmisReader, referralsProcessor, referralWriter))
+      .build()
+  }
+
+  @Bean
+  fun writeComplexityFlow(
+    ndmisReader: HibernateCursorItemReader<Referral>,
+    complexityProcessor: ComplexityProcessor,
+    ndmisComplexityWriter: FlatFileItemWriter<Collection<ComplexityData>>,
+  ): SimpleFlow? {
+    return FlowBuilder<SimpleFlow>("writeComplexityFlow")
+      .start(ndmisWriteComplexityToCsvStep(ndmisReader, complexityProcessor, ndmisComplexityWriter))
+      .build()
+  }
+
+  @Bean
+  fun writeAppointmentFlow(
+    ndmisReader: HibernateCursorItemReader<Referral>,
+    appointmentProcessor: AppointmentProcessor,
+    ndmisAppointmentWriter: FlatFileItemWriter<Collection<AppointmentData>>,
+  ): SimpleFlow? {
+    return FlowBuilder<SimpleFlow>("writeAppointmentFlow")
+      .start(ndmisWriteAppointmentToCsvStep(ndmisReader, appointmentProcessor, ndmisAppointmentWriter))
+      .build()
+  }
+
+  @Bean
+  fun writeOutcomeFlow(
+    ndmisReader: HibernateCursorItemReader<Referral>,
+    outcomeProcessor: OutcomeProcessor,
+    ndmisOutcomeWriter: FlatFileItemWriter<Collection<OutcomeData>>,
+  ): SimpleFlow? {
+    return FlowBuilder<SimpleFlow>("writeOutcomeFlow")
+      .start(ndmisWriteOutcomeToCsvStep(ndmisReader, outcomeProcessor, ndmisOutcomeWriter))
+      .build()
+  }
+  private fun mainFlow(
+    writeReferralFlow: SimpleFlow,
+    writeComplexityFlow: SimpleFlow,
+    writeAppointmentFlow: SimpleFlow,
+    writeOutcomeFlow: SimpleFlow,
+  ): SimpleFlow? {
+    return FlowBuilder<SimpleFlow>("mainFlow")
+      .split(taskExecutor())
+      .add(writeReferralFlow, writeComplexityFlow, writeAppointmentFlow, writeOutcomeFlow)
       .build()
   }
 
