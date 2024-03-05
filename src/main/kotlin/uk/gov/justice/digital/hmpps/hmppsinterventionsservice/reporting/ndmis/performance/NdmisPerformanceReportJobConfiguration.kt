@@ -11,7 +11,6 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.core.job.DefaultJobParametersValidator
 import org.springframework.batch.core.job.builder.FlowBuilder
-import org.springframework.batch.core.job.flow.Flow
 import org.springframework.batch.core.job.flow.support.SimpleFlow
 import org.springframework.batch.core.scope.context.ChunkContext
 import org.springframework.batch.item.database.HibernateCursorItemReader
@@ -80,6 +79,7 @@ class NdmisPerformanceReportJobConfiguration(
       .queryString("select r from Referral r where sentAt is not null")
       .build()
   }
+
   @Bean
   @StepScope
   fun ndmisReferralsWriter(@Value("#{jobParameters['outputPath']}") outputPath: String): FlatFileItemWriter<ReferralsData> {
