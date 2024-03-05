@@ -65,7 +65,7 @@ class DeliverySessionController(
       updateAppointmentDTO.attendanceFeedback?.attended,
       updateAppointmentDTO.attendanceFeedback?.didSessionHappen,
       updateAppointmentDTO.sessionFeedback?.notifyProbationPractitionerOfBehaviour,
-      updateAppointmentDTO.sessionFeedback?.notifyProbationPractitionerOfConcerns,
+      updateAppointmentDTO.sessionFeedback?.notifyProbationPractitionerOfConcerns ?: updateAppointmentDTO.sessionFeedback?.notifyProbationPractitioner,
       updateAppointmentDTO.sessionFeedback?.late,
       updateAppointmentDTO.sessionFeedback?.lateReason,
       updateAppointmentDTO.sessionFeedback?.futureSessionPlans,
@@ -172,7 +172,7 @@ class DeliverySessionController(
       request.attendanceFeedback?.attended,
       request.attendanceFeedback?.didSessionHappen,
       request.sessionFeedback?.notifyProbationPractitionerOfBehaviour,
-      request.sessionFeedback?.notifyProbationPractitionerOfConcerns,
+      request.sessionFeedback?.notifyProbationPractitionerOfConcerns ?: request.sessionFeedback?.notifyProbationPractitioner,
       request.sessionFeedback?.late,
       request.sessionFeedback?.lateReason,
       request.sessionFeedback?.futureSessionPlans,
@@ -216,7 +216,7 @@ class DeliverySessionController(
       request.attendanceFeedback?.attended,
       request.attendanceFeedback?.didSessionHappen,
       request.sessionFeedback?.notifyProbationPractitionerOfBehaviour,
-      request.sessionFeedback?.notifyProbationPractitionerOfConcerns,
+      request.sessionFeedback?.notifyProbationPractitionerOfConcerns ?: request.sessionFeedback?.notifyProbationPractitioner,
       request.sessionFeedback?.late,
       request.sessionFeedback?.lateReason,
       request.sessionFeedback?.futureSessionPlans,
@@ -286,7 +286,7 @@ class DeliverySessionController(
       request.sessionBehaviour,
       request.sessionConcerns,
       request.notifyProbationPractitionerOfBehaviour,
-      request.notifyProbationPractitionerOfConcerns,
+      request.notifyProbationPractitionerOfConcerns ?: request.notifyProbationPractitioner,
     )
     return DeliverySessionAppointmentDTO.from(updatedSessionAppointment.first.sessionNumber, updatedSessionAppointment.second)
   }

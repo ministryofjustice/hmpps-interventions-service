@@ -69,8 +69,9 @@ data class SessionFeedbackRequestDTO(
   val sessionResponse: String? = null,
   val sessionConcerns: String? = null,
   val sessionBehaviour: String? = null,
-  val notifyProbationPractitionerOfBehaviour: Boolean,
-  val notifyProbationPractitionerOfConcerns: Boolean,
+  val notifyProbationPractitioner: Boolean? = null,
+  val notifyProbationPractitionerOfBehaviour: Boolean? = null,
+  val notifyProbationPractitionerOfConcerns: Boolean? = null,
 )
 
 data class DeliverySessionDTO(
