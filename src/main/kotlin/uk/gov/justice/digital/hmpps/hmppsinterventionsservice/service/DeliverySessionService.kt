@@ -436,8 +436,8 @@ class DeliverySessionService(
     sessionResponse: String?,
     sessionBehaviour: String?,
     sessionConcerns: String?,
-    notifyProbationPractitionerOfBehaviour: Boolean,
-    notifyProbationPractitionerOfConcerns: Boolean,
+    notifyProbationPractitionerOfBehaviour: Boolean?,
+    notifyProbationPractitionerOfConcerns: Boolean?,
   ): Pair<DeliverySession, Appointment> {
     val sessionAndAppointment = getDeliverySessionAppointmentOrThrowException(referralId, appointmentId)
     val updatedAppointment = appointmentService.recordSessionFeedback(
@@ -517,8 +517,8 @@ class DeliverySessionService(
         sessionResponse,
         sessionBehaviour,
         sessionConcerns,
-        notifyProbationPractitionerOfBehaviour!!,
-        notifyProbationPractitionerOfConcerns!!,
+        notifyProbationPractitionerOfBehaviour,
+        notifyProbationPractitionerOfConcerns,
         updatedBy,
       )
       appointmentService.submitAppointmentFeedback(appointment, updatedBy, SERVICE_DELIVERY, session)
@@ -559,8 +559,8 @@ class DeliverySessionService(
     sessionResponse: String?,
     sessionBehaviour: String?,
     sessionConcerns: String?,
-    notifyProbationPractitionerOfBehaviour: Boolean,
-    notifyProbationPractitionerOfConcerns: Boolean,
+    notifyProbationPractitionerOfBehaviour: Boolean?,
+    notifyProbationPractitionerOfConcerns: Boolean?,
     actor: AuthUser,
   ) {
     appointment.late = late
