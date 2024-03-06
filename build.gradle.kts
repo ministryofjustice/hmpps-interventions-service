@@ -80,8 +80,8 @@ dependencies {
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
-  implementation("io.sentry:sentry-spring-boot-starter:7.4.0")
-  implementation("io.sentry:sentry-logback:7.4.0")
+  implementation("io.sentry:sentry-spring-boot-starter:7.5.0")
+  implementation("io.sentry:sentry-logback:7.5.0")
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
   implementation("net.logstash.logback:logstash-logback-encoder:7.4")
 
@@ -99,9 +99,9 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.25.0")
-  implementation("software.amazon.awssdk:s3:2.25.0")
-  implementation("software.amazon.awssdk:sts:2.25.0")
+  implementation("software.amazon.awssdk:sns:2.25.3")
+  implementation("software.amazon.awssdk:s3:2.25.3")
+  implementation("software.amazon.awssdk:sts:2.25.3")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.3")
