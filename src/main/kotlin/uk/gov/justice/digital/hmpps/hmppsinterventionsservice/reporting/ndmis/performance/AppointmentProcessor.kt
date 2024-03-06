@@ -13,23 +13,29 @@ class AppointmentProcessor(
   companion object : KLogging()
 
   override fun processSentReferral(referral: Referral): List<AppointmentData>? {
-    val deliveryAppointments = deliverySessionService.getSessions(referral.id).flatMap { it.appointments }
-    val saaAppointments = referral.supplierAssessment?.appointments ?: emptySet()
+    logger.info("Processing the appointment data")
+    try {
+      val deliveryAppointments = deliverySessionService.getSessions(referral.id).flatMap { it.appointments }
+      val saaAppointments = referral.supplierAssessment?.appointments ?: emptySet()
 
-    return (deliveryAppointments + saaAppointments).map {
-      AppointmentData(
-        referralReference = referral.referenceNumber!!,
-        referralId = referral.id,
-        appointmentId = it.id,
-        appointmentTime = NdmisDateTime(it.appointmentTime),
-        durationInMinutes = it.durationInMinutes,
-        bookedAt = NdmisDateTime(it.createdAt),
-        attended = it.attended,
-        attendanceSubmittedAt = it.attendanceSubmittedAt?.let { t -> NdmisDateTime(t) },
-        notifyPPOfAttendanceBehaviour = it.notifyPPOfAttendanceBehaviour,
-        deliusAppointmentId = it.deliusAppointmentId.toString(),
-        reasonForAppointment = if (saaAppointments.contains(it)) AppointmentReason.SAA else AppointmentReason.DELIVERY,
-      )
-    }.ifEmpty { null }
+      return (deliveryAppointments + saaAppointments).map {
+        AppointmentData(
+          referralReference = referral.referenceNumber!!,
+          referralId = referral.id,
+          appointmentId = it.id,
+          appointmentTime = NdmisDateTime(it.appointmentTime),
+          durationInMinutes = it.durationInMinutes,
+          bookedAt = NdmisDateTime(it.createdAt),
+          attended = it.attended,
+          attendanceSubmittedAt = it.attendanceSubmittedAt?.let { t -> NdmisDateTime(t) },
+          notifyPPOfAttendanceBehaviour = it.notifyPPOfAttendanceBehaviour,
+          deliusAppointmentId = it.deliusAppointmentId.toString(),
+          reasonForAppointment = if (saaAppointments.contains(it)) AppointmentReason.SAA else AppointmentReason.DELIVERY,
+        )
+      }.ifEmpty { null }
+    } catch (e: Exception) {
+      logger.info("The exception while processing complexity data is ${e.message}")
+      throw e
+    }
   }
 }
