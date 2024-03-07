@@ -46,6 +46,7 @@ class DataSourceConfig(
   }
 
   @Bean("transactionManager")
+  @Scope("prototype")
   @Primary
   fun transactionManager(): PlatformTransactionManager {
     return JpaTransactionManager()
