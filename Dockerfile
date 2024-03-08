@@ -19,7 +19,7 @@ RUN ./gradlew classes --exclude-task=generateGitProperties
 ARG BUILD_NUMBER
 ENV BUILD_NUMBER ${BUILD_NUMBER:-1_0_0}
 COPY . .
-RUN ./gradlew assemble
+RUN ./gradlew --no-daemon assemble
 
 
 # ---
