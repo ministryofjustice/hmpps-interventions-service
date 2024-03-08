@@ -19,7 +19,7 @@ jacoco {
 tasks {
   withType<KotlinCompile> {
     kotlinOptions {
-      jvmTarget = JavaVersion.VERSION_17.toString()
+      jvmTarget = JavaVersion.VERSION_21.toString()
     }
   }
   test {
