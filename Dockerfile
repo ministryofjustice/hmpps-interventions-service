@@ -18,10 +18,9 @@ RUN ./gradlew classes --exclude-task=generateGitProperties
 # assemble extracts information from .git and BUILD_NUMBER env var, these layers change for all commits
 ARG BUILD_NUMBER
 ENV BUILD_NUMBER ${BUILD_NUMBER:-1_0_0}
-WORKDIR /app
 COPY . .
-RUN ./gradlew assemble -s
-
+RUN ./gradlew assemble
+WORKDIR /app
 
 # ---
 FROM --platform=${BUILDPLATFORM:-linux/amd64} eclipse-temurin:17.0.10_7-jre-focal AS final
