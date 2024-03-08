@@ -20,7 +20,7 @@ ARG BUILD_NUMBER
 ENV BUILD_NUMBER ${BUILD_NUMBER:-1_0_0}
 WORKDIR /app
 COPY . .
-RUN ./gradlew assemble
+RUN ./gradlew assemble -s
 
 
 # ---
