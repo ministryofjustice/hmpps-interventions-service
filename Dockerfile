@@ -45,8 +45,8 @@ RUN addgroup --gid 2000 --system appgroup && \
     adduser appuser appgroup
 
 WORKDIR /app
-COPY --from=builder --chown=appuser:appgroup ./build/libs/hmpps-interventions-service*.jar /app/app.jar
-COPY --from=builder --chown=appuser:appgroup ./build/libs/applicationinsights-agent*.jar /app/agent.jar
+COPY --from=builder --chown=appuser:appgroup /app/build/libs/hmpps-interventions-service*.jar /app/app.jar
+COPY --from=builder --chown=appuser:appgroup /app/build/libs/applicationinsights-agent*.jar /app/agent.jar
 COPY --chown=appuser:appgroup applicationinsights.json .
 
 USER 2000
