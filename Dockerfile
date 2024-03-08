@@ -1,4 +1,4 @@
-FROM --platform=${BUILDPLATFORM:-linux/amd64} eclipse-temurin:17.0.10_7-jre-focal AS builder
+FROM --platform=${BUILDPLATFORM:-linux/amd64} eclipse-temurin:21-jre-jammy AS builder
 
 WORKDIR /app
 
