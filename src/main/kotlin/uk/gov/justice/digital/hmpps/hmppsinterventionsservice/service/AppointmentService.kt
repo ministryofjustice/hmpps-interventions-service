@@ -183,8 +183,8 @@ class AppointmentService(
     sessionResponse: String?,
     sessionBehaviour: String?,
     sessionConcerns: String?,
-    notifyProbationPractitionerOfBehaviour: Boolean,
-    notifyProbationPractitionerOfConcerns: Boolean,
+    notifyProbationPractitionerOfBehaviour: Boolean?,
+    notifyProbationPractitionerOfConcerns: Boolean?,
     submittedBy: AuthUser,
   ): Appointment {
     if (appointment.appointmentFeedbackSubmittedAt != null) {

@@ -55,7 +55,7 @@ class SupplierAssessmentController(
         updateAppointmentDTO.attendanceFeedback?.attended,
         updateAppointmentDTO.attendanceFeedback?.didSessionHappen,
         updateAppointmentDTO.sessionFeedback?.notifyProbationPractitionerOfBehaviour,
-        updateAppointmentDTO.sessionFeedback?.notifyProbationPractitionerOfConcerns,
+        updateAppointmentDTO.sessionFeedback?.notifyProbationPractitionerOfConcerns ?: updateAppointmentDTO.sessionFeedback?.notifyProbationPractitioner,
         updateAppointmentDTO.sessionFeedback?.late,
         updateAppointmentDTO.sessionFeedback?.lateReason,
         updateAppointmentDTO.sessionFeedback?.futureSessionPlans,
@@ -140,7 +140,7 @@ class SupplierAssessmentController(
         request.sessionBehaviour,
         request.sessionConcerns,
         request.notifyProbationPractitionerOfBehaviour,
-        request.notifyProbationPractitionerOfConcerns,
+        request.notifyProbationPractitionerOfConcerns ?: request.notifyProbationPractitioner,
         user,
       ),
     )
