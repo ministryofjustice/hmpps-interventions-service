@@ -18,7 +18,8 @@ RUN ./gradlew classes --exclude-task=generateGitProperties
 # assemble extracts information from .git and BUILD_NUMBER env var, these layers change for all commits
 ARG BUILD_NUMBER
 ENV BUILD_NUMBER ${BUILD_NUMBER:-1_0_0}
-COPY . /app
+WORKDIR /app
+COPY . .
 RUN ./gradlew assemble
 
 
