@@ -61,6 +61,7 @@ internal class CaseNotesNotificationsServiceTest {
       caseNote.sentBy,
       "detailUrl",
       referral.id,
+      true,
     )
 
     caseNotesNotificationsService.onApplicationEvent(eventRequiringSPNotification)
@@ -108,6 +109,7 @@ internal class CaseNotesNotificationsServiceTest {
       caseNote.sentBy,
       "detailUrl",
       referral.id,
+      true,
     )
 
     caseNotesNotificationsService.onApplicationEvent(eventRequiringSPNotification)
@@ -147,6 +149,7 @@ internal class CaseNotesNotificationsServiceTest {
       caseNote.sentBy,
       "detailUrl",
       referral.id,
+      true,
     )
 
     caseNotesNotificationsService.onApplicationEvent(eventRequiringSPNotification)
@@ -185,6 +188,7 @@ internal class CaseNotesNotificationsServiceTest {
       caseNote.sentBy,
       "detailUrl",
       referral.id,
+      true,
     )
 
     caseNotesNotificationsService.onApplicationEvent(eventRequiringSPNotification)
@@ -230,6 +234,7 @@ internal class CaseNotesNotificationsServiceTest {
       caseNote.sentBy,
       "detailUrl",
       referral.id,
+      true,
     )
 
     caseNotesNotificationsService.onApplicationEvent(eventRequiringSPNotification)
@@ -269,6 +274,7 @@ internal class CaseNotesNotificationsServiceTest {
       caseNote.sentBy,
       "detailUrl",
       caseNote.referral.id,
+      true,
     )
 
     caseNotesNotificationsService.onApplicationEvent(event)
@@ -300,6 +306,7 @@ internal class CaseNotesNotificationsServiceTest {
       caseNote.sentBy,
       "detailUrl",
       UUID.fromString("e5274827-fcbc-4891-a68b-d9b4d3b59dab"),
+      true,
     )
     var e = assertThrows<RuntimeException> { caseNotesNotificationsService.onApplicationEvent(event) }
     Assertions.assertThat(e.message).contains("Unable to retrieve referral for id e5274827-fcbc-4891-a68b-d9b4d3b59dab")
