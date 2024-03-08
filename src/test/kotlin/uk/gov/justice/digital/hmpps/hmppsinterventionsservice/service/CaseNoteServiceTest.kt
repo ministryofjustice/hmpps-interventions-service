@@ -50,7 +50,8 @@ class CaseNoteServiceTest @Autowired constructor(
     fun `can create case note`() {
       val referral = referralFactory.createSent()
       val user = userFactory.create()
-      val caseNote = caseNoteService.createCaseNote(referral.id, subject = "subject", body = "body", user)
+      val sendEmail = false
+      val caseNote = caseNoteService.createCaseNote(referral.id, subject = "subject", body = "body", sendEmail = sendEmail, user)
       val savedCaseNote = caseNoteRepository.findById(caseNote.id).get()
       assertThat(caseNote).isEqualTo(savedCaseNote)
       assertThat(caseNote.referral.id).isEqualTo(referral.id)
@@ -59,7 +60,7 @@ class CaseNoteServiceTest @Autowired constructor(
       assertThat(caseNote.sentAt).isNotNull()
       assertThat(caseNote.sentBy).isEqualTo(user)
 
-      verify(caseNoteEventPublisher).caseNoteSentEvent(caseNote)
+      verify(caseNoteEventPublisher).caseNoteSentEvent(caseNote, sendEmail)
     }
   }
 
@@ -159,7 +160,7 @@ class CaseNoteServiceTest @Autowired constructor(
     fun `can get case note by id`() {
       val referral = referralFactory.createSent()
       val caseNote =
-        caseNoteService.createCaseNote(referral.id, subject = "subject", body = "body", sentByUser = referral.sentBy!!)
+        caseNoteService.createCaseNote(referral.id, subject = "subject", body = "body", sendEmail = false, sentByUser = referral.sentBy!!)
 
       val retrievedCaseNote = caseNoteService.getCaseNoteForUser(caseNote.id, referral.sentBy!!)
       assertThat(retrievedCaseNote).isEqualTo(caseNote)
@@ -169,7 +170,7 @@ class CaseNoteServiceTest @Autowired constructor(
     fun `user can't get case note without access to referral`() {
       val referral = referralFactory.createSent()
       val caseNote =
-        caseNoteService.createCaseNote(referral.id, subject = "subject", body = "body", sentByUser = referral.sentBy!!)
+        caseNoteService.createCaseNote(referral.id, subject = "subject", body = "body", sendEmail = false, sentByUser = referral.sentBy!!)
       whenever(
         referralService.getSentReferralForUser(
           caseNote.id,
