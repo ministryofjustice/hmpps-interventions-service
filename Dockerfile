@@ -1,4 +1,4 @@
-FROM --platform=${BUILDPLATFORM:-linux/amd64} eclipse-temurin:21-jre-jammy AS builder
+FROM --platform=${BUILDPLATFORM:-linux/amd64} eclipse-temurin:21.0.2_13-jdk-jammy AS builder
 
 WORKDIR /app
 
@@ -21,9 +21,7 @@ ENV BUILD_NUMBER ${BUILD_NUMBER:-1_0_0}
 COPY . .
 RUN ./gradlew --no-daemon assemble
 
-
-# ---
-FROM --platform=${BUILDPLATFORM:-linux/amd64} eclipse-temurin:21-jre-jammy AS final
+FROM --platform=${BUILDPLATFORM:-linux/amd64} eclipse-temurin:21.0.2_13-jdk-jammy AS final
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
 # force a rebuild of `apk upgrade` below by invalidating the BUILD_NUMBER env variable on every commit
