@@ -32,7 +32,7 @@ jobs:
   validate:
     executor:
       name: hmpps/java
-      tag: "21"
+      tag: "17"
     docker: *db_docker_config
     environment:
       _JAVA_OPTIONS: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=true -Dkotlin.compiler.execution.strategy=in-process
@@ -64,7 +64,7 @@ jobs:
   validate_db:
     executor:
       name: hmpps/java
-      tag: "21"
+      tag: "17"
     docker: *db_docker_config
     steps:
       - checkout
@@ -96,7 +96,7 @@ jobs:
   publish_data:
     executor:
       name: hmpps/java
-      tag: "21"
+      tag: "17"
     docker: *db_docker_config
     steps:
       - checkout
