@@ -1,7 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller
 
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.Prisoner
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.PrisonerDetailsService
@@ -13,7 +15,10 @@ class PrisonerDetailsController(
 ) {
 
   @GetMapping("/prisoner/details/{crn}")
-  fun prisonerDetails(crn: String): Prisoner? {
+  fun prisonerDetails(
+    @PathVariable crn: String,
+    authentication: JwtAuthenticationToken,
+  ): Prisoner? {
     return prisonerDetailsService.details(crn)
   }
 }
