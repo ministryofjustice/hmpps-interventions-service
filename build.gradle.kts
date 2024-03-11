@@ -6,6 +6,11 @@ plugins {
   id("jacoco")
 }
 
+java {
+  sourceCompatibility = JavaVersion.VERSION_21
+  targetCompatibility = JavaVersion.VERSION_21
+}
+
 configurations {
   testImplementation {
     exclude(group = "org.junit.vintage")
@@ -19,7 +24,7 @@ jacoco {
 tasks {
   withType<KotlinCompile> {
     kotlinOptions {
-      jvmTarget = JavaVersion.VERSION_17.toString()
+      jvmTarget = JavaVersion.VERSION_21.toString()
     }
   }
   test {
