@@ -46,7 +46,6 @@ class NdmisPerformanceReportJobConfiguration(
   private val s3Service: S3Service,
   private val ndmisS3Bucket: S3Bucket,
   @Lazy private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
-  @Qualifier("transactionManager") private val transactionManager: PlatformTransactionManager,
   @Value("\${spring.batch.jobs.ndmis.performance-report.chunk-size}") private val chunkSize: Int,
 ) {
   companion object : KLogging()
@@ -157,9 +156,10 @@ class NdmisPerformanceReportJobConfiguration(
     ndmisReader: HibernateCursorItemReader<Referral>,
     referralsProcessor: ReferralsProcessor,
     referralWriter: FlatFileItemWriter<ReferralsData>,
+    @Qualifier("transactionManager") transactionManager: PlatformTransactionManager,
   ): SimpleFlow? {
     return FlowBuilder<SimpleFlow>("writeReferralFlow")
-      .start(ndmisWriteReferralToCsvStep(ndmisReader, referralsProcessor, referralWriter))
+      .start(ndmisWriteReferralToCsvStep(ndmisReader, referralsProcessor, referralWriter, transactionManager))
       .build()
   }
 
@@ -168,9 +168,10 @@ class NdmisPerformanceReportJobConfiguration(
     ndmisReader: HibernateCursorItemReader<Referral>,
     complexityProcessor: ComplexityProcessor,
     ndmisComplexityWriter: FlatFileItemWriter<Collection<ComplexityData>>,
+    @Qualifier("transactionManager") transactionManager: PlatformTransactionManager,
   ): SimpleFlow? {
     return FlowBuilder<SimpleFlow>("writeComplexityFlow")
-      .start(ndmisWriteComplexityToCsvStep(ndmisReader, complexityProcessor, ndmisComplexityWriter))
+      .start(ndmisWriteComplexityToCsvStep(ndmisReader, complexityProcessor, ndmisComplexityWriter, transactionManager))
       .build()
   }
 
@@ -179,9 +180,10 @@ class NdmisPerformanceReportJobConfiguration(
     ndmisReader: HibernateCursorItemReader<Referral>,
     appointmentProcessor: AppointmentProcessor,
     ndmisAppointmentWriter: FlatFileItemWriter<Collection<AppointmentData>>,
+    @Qualifier("transactionManager") transactionManager: PlatformTransactionManager,
   ): SimpleFlow? {
     return FlowBuilder<SimpleFlow>("writeAppointmentFlow")
-      .start(ndmisWriteAppointmentToCsvStep(ndmisReader, appointmentProcessor, ndmisAppointmentWriter))
+      .start(ndmisWriteAppointmentToCsvStep(ndmisReader, appointmentProcessor, ndmisAppointmentWriter, transactionManager))
       .build()
   }
 
@@ -190,9 +192,10 @@ class NdmisPerformanceReportJobConfiguration(
     ndmisReader: HibernateCursorItemReader<Referral>,
     outcomeProcessor: OutcomeProcessor,
     ndmisOutcomeWriter: FlatFileItemWriter<Collection<OutcomeData>>,
+    @Qualifier("transactionManager") transactionManager: PlatformTransactionManager,
   ): SimpleFlow? {
     return FlowBuilder<SimpleFlow>("writeOutcomeFlow")
-      .start(ndmisWriteOutcomeToCsvStep(ndmisReader, outcomeProcessor, ndmisOutcomeWriter))
+      .start(ndmisWriteOutcomeToCsvStep(ndmisReader, outcomeProcessor, ndmisOutcomeWriter, transactionManager))
       .build()
   }
   private fun mainFlow(
@@ -212,6 +215,7 @@ class NdmisPerformanceReportJobConfiguration(
     ndmisReader: HibernateCursorItemReader<Referral>,
     processor: ReferralsProcessor,
     writer: FlatFileItemWriter<ReferralsData>,
+    transactionManager: PlatformTransactionManager,
   ): Step {
     return stepBuilderFactory.get("ndmisWriteReferralToCsvStep")
       .chunk<Referral, ReferralsData>(chunkSize, transactionManager)
@@ -229,6 +233,7 @@ class NdmisPerformanceReportJobConfiguration(
     ndmisReader: HibernateCursorItemReader<Referral>,
     processor: ComplexityProcessor,
     writer: FlatFileItemWriter<Collection<ComplexityData>>,
+    transactionManager: PlatformTransactionManager,
   ): Step {
     return stepBuilderFactory.get("ndmisWriteComplexityToCsvStep")
       .chunk<Referral, List<ComplexityData>>(chunkSize, transactionManager)
@@ -246,6 +251,7 @@ class NdmisPerformanceReportJobConfiguration(
     ndmisReader: HibernateCursorItemReader<Referral>,
     processor: AppointmentProcessor,
     writer: FlatFileItemWriter<Collection<AppointmentData>>,
+    transactionManager: PlatformTransactionManager,
   ): Step {
     return stepBuilderFactory.get("ndmisWriteAppointmentToCsvStep")
       .chunk<Referral, List<AppointmentData>>(chunkSize, transactionManager)
@@ -263,6 +269,7 @@ class NdmisPerformanceReportJobConfiguration(
     ndmisReader: HibernateCursorItemReader<Referral>,
     processor: OutcomeProcessor,
     writer: FlatFileItemWriter<Collection<OutcomeData>>,
+    transactionManager: PlatformTransactionManager,
   ): Step {
     return stepBuilderFactory.get("ndmisWriteOutcomeToCsvStep")
       .chunk<Referral, List<OutcomeData>>(chunkSize, transactionManager)
@@ -277,7 +284,10 @@ class NdmisPerformanceReportJobConfiguration(
 
   @JobScope
   @Bean
-  fun pushToS3Step(@Value("#{jobParameters['outputPath']}") outputPath: String): Step =
+  fun pushToS3Step(
+    @Value("#{jobParameters['outputPath']}") outputPath: String,
+    transactionManager: PlatformTransactionManager,
+  ): Step =
     stepBuilderFactory["pushToS3Step"].tasklet(pushFilesToS3(outputPath), transactionManager).build()
 
   private fun pushFilesToS3(outputPath: String) = { _: StepContribution, _: ChunkContext ->
