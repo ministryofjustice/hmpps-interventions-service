@@ -16,11 +16,6 @@ jacoco {
   toolVersion = "0.8.11"
 }
 
-java {
-  sourceCompatibility = JavaVersion.VERSION_21
-  targetCompatibility = JavaVersion.VERSION_21
-}
-
 tasks {
   withType<KotlinCompile> {
     kotlinOptions {
