@@ -46,9 +46,33 @@ class DataSourceConfig(
   }
 
   @Bean("transactionManager")
-  @Scope("prototype")
   @Primary
   fun transactionManager(): PlatformTransactionManager {
+    return JpaTransactionManager()
+  }
+
+  @Bean("transactionManagerReferral")
+  fun transactionManager1(): PlatformTransactionManager {
+    return JpaTransactionManager()
+  }
+
+  @Bean("transactionManagerAppointment")
+  fun transactionManager2(): PlatformTransactionManager {
+    return JpaTransactionManager()
+  }
+
+  @Bean("transactionManagerComplexity")
+  fun transactionManager3(): PlatformTransactionManager {
+    return JpaTransactionManager()
+  }
+
+  @Bean("transactionManagerOutcome")
+  fun transactionManager4(): PlatformTransactionManager {
+    return JpaTransactionManager()
+  }
+
+  @Bean("transactionManagerS3")
+  fun transactionManager5(): PlatformTransactionManager {
     return JpaTransactionManager()
   }
 }

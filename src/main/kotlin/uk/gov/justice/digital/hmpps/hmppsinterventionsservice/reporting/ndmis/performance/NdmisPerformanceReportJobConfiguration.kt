@@ -159,7 +159,7 @@ class NdmisPerformanceReportJobConfiguration(
     ndmisReader: HibernateCursorItemReader<Referral>,
     referralsProcessor: ReferralsProcessor,
     referralWriter: FlatFileItemWriter<ReferralsData>,
-    @Qualifier("transactionManager") transactionManager: PlatformTransactionManager,
+    @Qualifier("transactionManagerReferral") transactionManager: PlatformTransactionManager,
   ): SimpleFlow? {
     return FlowBuilder<SimpleFlow>("writeReferralFlow")
       .start(ndmisWriteReferralToCsvStep(ndmisReader, referralsProcessor, referralWriter, transactionManager))
@@ -171,7 +171,7 @@ class NdmisPerformanceReportJobConfiguration(
     ndmisReader: HibernateCursorItemReader<Referral>,
     complexityProcessor: ComplexityProcessor,
     ndmisComplexityWriter: FlatFileItemWriter<Collection<ComplexityData>>,
-    @Qualifier("transactionManager") transactionManager: PlatformTransactionManager,
+    @Qualifier("transactionManagerComplexity") transactionManager: PlatformTransactionManager,
   ): SimpleFlow? {
     return FlowBuilder<SimpleFlow>("writeComplexityFlow")
       .start(ndmisWriteComplexityToCsvStep(ndmisReader, complexityProcessor, ndmisComplexityWriter, transactionManager))
@@ -183,7 +183,7 @@ class NdmisPerformanceReportJobConfiguration(
     ndmisReader: HibernateCursorItemReader<Referral>,
     appointmentProcessor: AppointmentProcessor,
     ndmisAppointmentWriter: FlatFileItemWriter<Collection<AppointmentData>>,
-    @Qualifier("transactionManager") transactionManager: PlatformTransactionManager,
+    @Qualifier("transactionManagerAppointment") transactionManager: PlatformTransactionManager,
   ): SimpleFlow? {
     return FlowBuilder<SimpleFlow>("writeAppointmentFlow")
       .start(ndmisWriteAppointmentToCsvStep(ndmisReader, appointmentProcessor, ndmisAppointmentWriter, transactionManager))
@@ -195,7 +195,7 @@ class NdmisPerformanceReportJobConfiguration(
     ndmisReader: HibernateCursorItemReader<Referral>,
     outcomeProcessor: OutcomeProcessor,
     ndmisOutcomeWriter: FlatFileItemWriter<Collection<OutcomeData>>,
-    @Qualifier("transactionManager") transactionManager: PlatformTransactionManager,
+    @Qualifier("transactionManagerOutcome") transactionManager: PlatformTransactionManager,
   ): SimpleFlow? {
     return FlowBuilder<SimpleFlow>("writeOutcomeFlow")
       .start(ndmisWriteOutcomeToCsvStep(ndmisReader, outcomeProcessor, ndmisOutcomeWriter, transactionManager))
@@ -289,7 +289,7 @@ class NdmisPerformanceReportJobConfiguration(
   @Bean
   fun pushToS3Step(
     @Value("#{jobParameters['outputPath']}") outputPath: String,
-    transactionManager: PlatformTransactionManager,
+    @Qualifier("transactionManagerS3") transactionManager: PlatformTransactionManager,
   ): Step =
     stepBuilderFactory["pushToS3Step"].tasklet(pushFilesToS3(outputPath), transactionManager).build()
 
