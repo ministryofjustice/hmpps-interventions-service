@@ -75,6 +75,4 @@ class DataSourceConfig(
   fun transactionManager5(): PlatformTransactionManager {
     return JpaTransactionManager()
   }
-
-
 }
