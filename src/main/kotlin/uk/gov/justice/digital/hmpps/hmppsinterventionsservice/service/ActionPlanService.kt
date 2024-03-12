@@ -137,9 +137,11 @@ class ActionPlanService(
   fun getAllCompletedAppointments(actionPlan: ActionPlan): List<Appointment> {
     val appointments: List<Appointment> = deliverySessionRepository.findAllByReferralId(actionPlan.referral.id)
       .flatMap { it.appointments }
-      .filter { it.appointmentFeedbackSubmittedAt != null &&
-        (it.didSessionHappen == null && listOf(Attended.LATE, Attended.YES).contains(it.attended)) ||
-        (it.didSessionHappen == true && it.attended == Attended.YES)}
+      .filter {
+        it.appointmentFeedbackSubmittedAt != null &&
+          (it.didSessionHappen == null && listOf(Attended.LATE, Attended.YES).contains(it.attended)) ||
+          (it.didSessionHappen == true && it.attended == Attended.YES)
+      }
 
     return appointments
   }
