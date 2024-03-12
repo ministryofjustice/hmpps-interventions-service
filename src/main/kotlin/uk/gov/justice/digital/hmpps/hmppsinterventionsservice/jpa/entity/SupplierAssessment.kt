@@ -42,4 +42,8 @@ data class SupplierAssessment(
 
   val firstAttendedAppointment: Appointment?
     get() = appointments.filter { listOf(Attended.YES, Attended.LATE).contains(it.attended) }.minByOrNull { it.appointmentTime }
+
+  val firstCompletedAppointment: Appointment?
+    get() = appointments.filter { (it.didSessionHappen == null && listOf(Attended.LATE, Attended.YES).contains(it.attended)) ||
+      (it.didSessionHappen == true && it.attended == Attended.YES)}.minByOrNull { it.appointmentTime }
 }

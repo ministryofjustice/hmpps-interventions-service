@@ -81,6 +81,7 @@ class PerformanceReportJobListener(
 
     // delete the temporary csv file regardless of the job status
     logger.debug("deleting csv file for service provider report {}", kv("path", path))
+    // comment the below line, then get file location from logs to test locally.
     File(path.toString()).delete()
   }
 }
