@@ -29,7 +29,7 @@ internal class PerformanceReportDataProcessorTest {
   fun `will process sent referrals`() {
     val supplierAssessmentFirstAppointment = appointmentFactory.create(attended = Attended.NO, createdAt = OffsetDateTime.parse("2022-07-01T10:42:43+00:00"))
     val supplierAssessmentNewAppointment = appointmentFactory.create(attended = Attended.YES, createdAt = OffsetDateTime.parse("2022-07-02T10:42:43+00:00"))
-    val approvedActionPlanAppointment = appointmentFactory.create()
+    val approvedActionPlanAppointment = appointmentFactory.create(attended = Attended.YES, appointmentFeedbackSubmittedAt = OffsetDateTime.parse("2022-07-02T10:42:43+00:00"))
     val unApprovedAppointment = appointmentFactory.create()
     val supplierAssessment = supplierAssessmentFactory.create(appointment = supplierAssessmentFirstAppointment)
     supplierAssessment.appointments.add(supplierAssessmentNewAppointment)
@@ -38,7 +38,7 @@ internal class PerformanceReportDataProcessorTest {
 
     whenever(appointmentRepository.findAllByReferralId(referral.id)).thenReturn(listOf(supplierAssessmentFirstAppointment, supplierAssessmentNewAppointment))
     whenever(actionPlanService.getFirstAttendedAppointment(actionPlan)).thenReturn(approvedActionPlanAppointment)
-    whenever(actionPlanService.getAllAttendedAppointments(actionPlan)).thenReturn(listOf(unApprovedAppointment, approvedActionPlanAppointment))
+    whenever(actionPlanService.getAllCompletedAppointments(actionPlan)).thenReturn(listOf(approvedActionPlanAppointment))
 
     val performanceReportData = processor.process(referral)
 
@@ -51,7 +51,7 @@ internal class PerformanceReportDataProcessorTest {
     assertThat(performanceReportData.dateSupplierAssessmentFirstScheduledFor).isEqualTo(supplierAssessmentFirstAppointment.appointmentTime)
     assertThat(performanceReportData.dateSupplierAssessmentFirstAttended).isEqualTo(supplierAssessmentNewAppointment.appointmentTime)
     assertThat(performanceReportData.firstSessionAttendedAt).isEqualTo(approvedActionPlanAppointment.appointmentTime)
-    assertThat(performanceReportData.numberOfSessionsAttended).isEqualTo(2)
+    assertThat(performanceReportData.numberOfSessionsAttended).isEqualTo(1)
     assertThat(performanceReportData.supplierAssessmentAttendedOnTime).isEqualTo(true)
   }
 }
