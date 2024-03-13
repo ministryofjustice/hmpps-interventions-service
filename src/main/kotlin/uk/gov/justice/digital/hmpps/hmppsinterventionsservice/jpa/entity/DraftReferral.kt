@@ -56,6 +56,8 @@ class DraftReferral(
   var personCurrentLocationType: PersonCurrentLocationType? = null,
 
   var personCustodyPrisonId: String? = null,
+  @Column(name = "already_know_prison_name")
+  var alreadyKnowPrisonName: Boolean? = null,
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
