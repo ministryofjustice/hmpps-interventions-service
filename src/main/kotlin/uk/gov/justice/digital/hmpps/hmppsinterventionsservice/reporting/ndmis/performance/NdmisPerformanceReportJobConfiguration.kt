@@ -79,7 +79,6 @@ class NdmisPerformanceReportJobConfiguration(
       .name("ndmisPerformanceReportReader")
       .sessionFactory(sessionFactory)
       .queryString("select r from Referral r where sentAt is not null")
-      .saveState(false)
       .fetchSize(0)
       .build()
   }
