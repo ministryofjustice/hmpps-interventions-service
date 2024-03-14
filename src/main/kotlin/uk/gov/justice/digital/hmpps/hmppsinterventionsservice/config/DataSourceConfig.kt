@@ -10,9 +10,11 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType
 import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.annotation.EnableTransactionManagement
 import javax.sql.DataSource
 
 @Configuration
+@EnableTransactionManagement
 class DataSourceConfig(
   @Value("\${spring.datasource.url}") private val dataSourceUrl: String,
   @Value("\${spring.datasource.username}") private val dataSourceUserName: String,
