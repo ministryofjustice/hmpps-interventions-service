@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance
 
+import jakarta.persistence.EntityManagerFactory
 import mu.KLogging
-import org.hibernate.SessionFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.StepContribution
@@ -13,8 +13,8 @@ import org.springframework.batch.core.job.DefaultJobParametersValidator
 import org.springframework.batch.core.job.builder.FlowBuilder
 import org.springframework.batch.core.job.flow.support.SimpleFlow
 import org.springframework.batch.core.scope.context.ChunkContext
-import org.springframework.batch.item.database.HibernateCursorItemReader
-import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder
+import org.springframework.batch.item.database.JpaCursorItemReader
+import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
 import org.springframework.batch.repeat.RepeatStatus
 import org.springframework.beans.factory.annotation.Qualifier
@@ -72,15 +72,15 @@ class NdmisPerformanceReportJobConfiguration(
   @StepScope
   @Scope("prototype")
   fun ndmisReader(
-    sessionFactory: SessionFactory,
-  ): HibernateCursorItemReader<Referral> {
+    entityManagerFactory: EntityManagerFactory,
+  ): JpaCursorItemReader<Referral> {
     // this reader returns referral entities which need processing for the report.
-    return HibernateCursorItemReaderBuilder<Referral>()
+    val result = JpaCursorItemReaderBuilder<Referral>()
       .name("ndmisPerformanceReportReader")
-      .sessionFactory(sessionFactory)
       .queryString("select r from Referral r where sentAt is not null")
-      .fetchSize(0)
+      .entityManagerFactory(entityManagerFactory)
       .build()
+    return result
   }
 
   @Bean
@@ -156,7 +156,7 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun writeReferralFlow(
-    ndmisReader: HibernateCursorItemReader<Referral>,
+    ndmisReader: JpaCursorItemReader<Referral>,
     referralsProcessor: ReferralsProcessor,
     referralWriter: FlatFileItemWriter<ReferralsData>,
     @Qualifier("transactionManagerReferral") transactionManager: PlatformTransactionManager,
@@ -168,7 +168,7 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun writeComplexityFlow(
-    ndmisReader: HibernateCursorItemReader<Referral>,
+    ndmisReader: JpaCursorItemReader<Referral>,
     complexityProcessor: ComplexityProcessor,
     ndmisComplexityWriter: FlatFileItemWriter<Collection<ComplexityData>>,
     @Qualifier("transactionManagerComplexity") transactionManager: PlatformTransactionManager,
@@ -180,7 +180,7 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun writeAppointmentFlow(
-    ndmisReader: HibernateCursorItemReader<Referral>,
+    ndmisReader: JpaCursorItemReader<Referral>,
     appointmentProcessor: AppointmentProcessor,
     ndmisAppointmentWriter: FlatFileItemWriter<Collection<AppointmentData>>,
     @Qualifier("transactionManagerAppointment") transactionManager: PlatformTransactionManager,
@@ -192,7 +192,7 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun writeOutcomeFlow(
-    ndmisReader: HibernateCursorItemReader<Referral>,
+    ndmisReader: JpaCursorItemReader<Referral>,
     outcomeProcessor: OutcomeProcessor,
     ndmisOutcomeWriter: FlatFileItemWriter<Collection<OutcomeData>>,
     @Qualifier("transactionManagerOutcome") transactionManager: PlatformTransactionManager,
@@ -215,7 +215,7 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun ndmisWriteReferralToCsvStep(
-    ndmisReader: HibernateCursorItemReader<Referral>,
+    ndmisReader: JpaCursorItemReader<Referral>,
     processor: ReferralsProcessor,
     writer: FlatFileItemWriter<ReferralsData>,
     transactionManager: PlatformTransactionManager,
@@ -233,7 +233,7 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun ndmisWriteComplexityToCsvStep(
-    ndmisReader: HibernateCursorItemReader<Referral>,
+    ndmisReader: JpaCursorItemReader<Referral>,
     processor: ComplexityProcessor,
     writer: FlatFileItemWriter<Collection<ComplexityData>>,
     transactionManager: PlatformTransactionManager,
@@ -251,7 +251,7 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun ndmisWriteAppointmentToCsvStep(
-    ndmisReader: HibernateCursorItemReader<Referral>,
+    ndmisReader: JpaCursorItemReader<Referral>,
     processor: AppointmentProcessor,
     writer: FlatFileItemWriter<Collection<AppointmentData>>,
     transactionManager: PlatformTransactionManager,
@@ -269,7 +269,7 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun ndmisWriteOutcomeToCsvStep(
-    ndmisReader: HibernateCursorItemReader<Referral>,
+    ndmisReader: JpaCursorItemReader<Referral>,
     processor: OutcomeProcessor,
     writer: FlatFileItemWriter<Collection<OutcomeData>>,
     transactionManager: PlatformTransactionManager,
