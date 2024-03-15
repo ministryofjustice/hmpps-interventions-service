@@ -42,7 +42,7 @@ internal class ReferralsProcessorTest {
       actionPlans = mutableListOf(actionPlanFirst, actionPlanSecond),
     )
 
-    whenever(actionPlanService.getAllAttendedAppointments(anyOrNull())).thenReturn(listOf(appointmentFactory.create()))
+    whenever(actionPlanService.getAllCompletedAppointments(anyOrNull())).thenReturn(listOf(appointmentFactory.create()))
 
     val result = processor.process(referral)!!
 
