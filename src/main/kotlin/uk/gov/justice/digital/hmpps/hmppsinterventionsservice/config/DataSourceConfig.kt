@@ -1,11 +1,11 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config
 
+import jakarta.persistence.EntityManagerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.jdbc.DataSourceBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
-import org.springframework.context.annotation.Scope
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType
 import org.springframework.orm.jpa.JpaTransactionManager
@@ -42,39 +42,13 @@ class DataSourceConfig(
   }
 
   @Bean("batchTransactionManager")
-  @Scope("prototype")
   fun batchTransactionManager(): PlatformTransactionManager {
     return JpaTransactionManager()
   }
 
   @Bean("transactionManager")
   @Primary
-  fun transactionManager(): PlatformTransactionManager {
-    return JpaTransactionManager()
-  }
-
-  @Bean("transactionManagerReferral")
-  fun transactionManager1(): PlatformTransactionManager {
-    return JpaTransactionManager()
-  }
-
-  @Bean("transactionManagerAppointment")
-  fun transactionManager2(): PlatformTransactionManager {
-    return JpaTransactionManager()
-  }
-
-  @Bean("transactionManagerComplexity")
-  fun transactionManager3(): PlatformTransactionManager {
-    return JpaTransactionManager()
-  }
-
-  @Bean("transactionManagerOutcome")
-  fun transactionManager4(): PlatformTransactionManager {
-    return JpaTransactionManager()
-  }
-
-  @Bean("transactionManagerS3")
-  fun transactionManager5(): PlatformTransactionManager {
-    return JpaTransactionManager()
+  fun transactionManager(entityManagerFactory: EntityManagerFactory): PlatformTransactionManager {
+    return JpaTransactionManager(entityManagerFactory)
   }
 }
