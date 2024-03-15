@@ -43,7 +43,6 @@ class DataSourceConfig(
   }
 
   @Bean("batchTransactionManager")
-  @Scope("prototype")
   fun batchTransactionManager(): PlatformTransactionManager {
     return JpaTransactionManager()
   }
