@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.transaction.annotation.EnableTransactionManagement
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentDeliveryAddressRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentDeliveryRepository
@@ -35,6 +36,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Sup
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("test", "local")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@EnableTransactionManagement
 abstract class IntegrationTestBase {
 
   @Suppress("SpringJavaInjectionPointsAutowiringInspection")

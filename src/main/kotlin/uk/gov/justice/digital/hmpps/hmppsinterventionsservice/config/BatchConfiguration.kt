@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.annotation.EnableTransactionManagement
 import javax.sql.DataSource
 
 @Configuration
@@ -23,6 +24,7 @@ import javax.sql.DataSource
   databaseType = "H2",
   isolationLevelForCreate = "ISOLATION_READ_COMMITTED",
 )
+@EnableTransactionManagement
 class BatchConfiguration(
   @Value("\${spring.batch.concurrency.pool-size}") private val poolSize: Int,
   @Value("\${spring.batch.concurrency.queue-size}") private val queueSize: Int,

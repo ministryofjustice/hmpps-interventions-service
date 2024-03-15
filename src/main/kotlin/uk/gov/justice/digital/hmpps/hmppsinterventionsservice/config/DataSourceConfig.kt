@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config
 
 import jakarta.persistence.EntityManagerFactory
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.jdbc.DataSourceBuilder
 import org.springframework.context.annotation.Bean
@@ -42,7 +43,7 @@ class DataSourceConfig(
   }
 
   @Bean("batchTransactionManager")
-  fun batchTransactionManager(): PlatformTransactionManager {
+  fun batchTransactionManager(@Qualifier("memoryDataSource") dataSource: DataSource): PlatformTransactionManager {
     return JpaTransactionManager()
   }
 

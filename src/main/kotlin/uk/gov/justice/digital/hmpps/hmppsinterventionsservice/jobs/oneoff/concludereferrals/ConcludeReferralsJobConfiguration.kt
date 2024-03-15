@@ -9,15 +9,16 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.orm.jpa.JpaTransactionManager
+import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.annotation.EnableTransactionManagement
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.OnStartupJobLauncherFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
 
 @Configuration
+@EnableTransactionManagement
 class ConcludeReferralsJobConfiguration(
   private val jobRepository: JobRepository,
-  private val transactionManager: JpaTransactionManager,
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
   @Qualifier("batchJobBuilderFactory") private val jobBuilderFactory: JobBuilderFactory,
   @Qualifier("batchStepBuilderFactory") private val stepBuilderFactory: StepBuilderFactory,
@@ -40,6 +41,7 @@ class ConcludeReferralsJobConfiguration(
     reader: ConcludeReferralsReader,
     processor: ConcludeReferralsProcessor,
     writer: ConcludeReferralsWriter,
+    transactionManager: PlatformTransactionManager,
   ): Step {
     return stepBuilderFactory.get("concludeReferralToInterventionStep")
       .chunk<Referral, Referral>(10, transactionManager)
