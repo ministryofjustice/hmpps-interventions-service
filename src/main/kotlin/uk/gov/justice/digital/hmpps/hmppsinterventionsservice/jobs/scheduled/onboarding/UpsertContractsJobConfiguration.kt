@@ -10,15 +10,16 @@ import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.annotation.EnableTransactionManagement
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.OnStartupJobLauncherFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
 
 @Configuration
+@EnableTransactionManagement
 class UpsertContractsJobConfiguration(
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
   @Qualifier("jobRepository") private val jobRepository: JobRepository,
-  private val platformTransactionManager: PlatformTransactionManager,
 ) {
 
   @Bean
@@ -39,6 +40,7 @@ class UpsertContractsJobConfiguration(
   @Bean
   fun upsertProvidersStep(
     providerSetup: ProviderSetupTasklet,
+    platformTransactionManager: PlatformTransactionManager,
   ): Step {
     return StepBuilder("upsertProvidersStep", jobRepository)
       .tasklet(providerSetup, platformTransactionManager)
@@ -48,6 +50,7 @@ class UpsertContractsJobConfiguration(
   @Bean
   fun upsertContractDetailsStep(
     contractDetailsSetupTasklet: ContractDetailsSetupTasklet,
+    platformTransactionManager: PlatformTransactionManager,
   ): Step {
     return StepBuilder("upsertContractDetailsStep", jobRepository)
       .tasklet(contractDetailsSetupTasklet, platformTransactionManager)
@@ -58,6 +61,7 @@ class UpsertContractsJobConfiguration(
   fun upsertContractStep(
     reader: ContractDefinitionReader,
     processor: UpsertContractProcessor,
+    platformTransactionManager: PlatformTransactionManager,
   ): Step {
     return StepBuilder("upsertContractStep", jobRepository)
       .chunk<ContractDefinition, Intervention>(10)
