@@ -26,6 +26,7 @@ class AppointmentProcessor(
           appointmentTime = NdmisDateTime(it.appointmentTime),
           durationInMinutes = it.durationInMinutes,
           bookedAt = NdmisDateTime(it.createdAt),
+          didSessionHappen = it.didSessionHappen,
           attended = it.attended,
           attendanceSubmittedAt = it.attendanceSubmittedAt?.let { t -> NdmisDateTime(t) },
           notifyPPOfAttendanceBehaviour = it.notifyPPOfAttendanceBehaviour,
