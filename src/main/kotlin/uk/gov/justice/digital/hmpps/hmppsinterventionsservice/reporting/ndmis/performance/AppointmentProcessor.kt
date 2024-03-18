@@ -13,10 +13,8 @@ class AppointmentProcessor(
   companion object : KLogging()
 
   override fun processSentReferral(referral: Referral): List<AppointmentData>? {
-    logger.info("Processing the appointment data")
-    try {
-      val deliveryAppointments = deliverySessionService.getSessions(referral.id).flatMap { it.appointments }
-      val saaAppointments = referral.supplierAssessment?.appointments ?: emptySet()
+    val deliveryAppointments = deliverySessionService.getSessions(referral.id).flatMap { it.appointments }
+    val saaAppointments = referral.supplierAssessment?.appointments ?: emptySet()
 
       return (deliveryAppointments + saaAppointments).map {
         AppointmentData(
@@ -33,10 +31,5 @@ class AppointmentProcessor(
           deliusAppointmentId = it.deliusAppointmentId.toString(),
           reasonForAppointment = if (saaAppointments.contains(it)) AppointmentReason.SAA else AppointmentReason.DELIVERY,
         )
-      }.ifEmpty { null }
-    } catch (e: Exception) {
-      logger.info("The exception while processing complexity data is ${e.message}")
-      throw e
-    }
   }
 }
