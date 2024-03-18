@@ -155,7 +155,7 @@ class UpsertContractProcessor(
       id = item.internalInterventionId,
       title = item.interventionTitle,
       description = description,
-      incomingReferralDistributionEmail = DEFAULT_REFERRAL_EMAIL,
+      incomingReferralDistributionEmail = item.incomingDistributionEmail ?: DEFAULT_REFERRAL_EMAIL,
       dynamicFrameworkContract = contract,
       createdAt = OffsetDateTime.now(),
     )

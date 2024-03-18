@@ -1,0 +1,66 @@
+{
+  "internal_contract_id": "188e5c4a-404d-4b33-afa5-dd3407f9628f",
+  "contract_reference": "PRJ_12437",
+  "contract_type_id": "DNR-SW",
+  "incoming_distribution_email": "cornwall.CJITreferrals@wearewithyou.cjsm.net",
+  "region": {
+    "nps_region_code": "G",
+    "pcc_region_code": null
+  },
+  "eligibility": {
+    "allows_female": false,
+    "allows_male": true,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2024-03-31",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "WE_ARE_WITH_YOU",
+    "subcontractor_codes": [
+    ]
+  },
+  "internal_intervention_id": "4d95585c-13f8-4e74-b4ae-927fb7b914b2",
+  "intervention_title": "Dependency and Recovery Services in South West",
+  "short_description": "Services are available for all adult males on probation, who are not subject to an Alcohol  Community Treatment Requirement and/or a Drug Community Treatment Requirement and are either:\n\n- on a Community Sentence or Suspended Sentence Order and subject to a Rehabilitation Activity Requirement (RAR) whereby a specified number of RAR Activity Days will be allocated.\n\n- pre-release to people who are convicted. For most cases a pre-release referral will be beneficial to support the person prior to release, by building and maintaining relationships to maximise engagement once released, develop close working relationships with treatment providers and support post release appointments with local substance misuse teams.\n\n- released on licence and post-sentence supervision.\n\nAny Sessions delivered as part of a RAR Activity Day or as a mandated Licence or Post Sentence Supervision appointment will be Enforceable. \n\nServices are offered as either Low, Medium or High complexity.\n\nA range of delivery methods need to be used including skills-building, support and advocacy and advice/, guidance/information. \n\nInterventions must be tailored to meet the specific needs of each Person(s) on Probation to enable them to make progress towards their agreed outcomes, as identified in the Person(s) on Probations Action Plan and aim to secure one or more of the following outcomes: \n\n•\tPerson on probation achieves abstinence or controlled/ non-dependent or non-problematic substance misuse.\n\n•\tPerson on probation improves their physical health and mental resilience.\n\n•\tPerson on probation enhances their skills to manage risky situations which may pose a trigger or relapse.\n\n•\tPerson on probation enhances their belief in ability to manage/ desist from addiction(s).\n\n•\tPerson on probation increases understanding of addictive behaviours and triggers and options to reduce dependency.\n\n•\tPerson on probation establishes Dependency Pathways to manage a range of addictive behaviours, including supporting access into other treatment providers and detox programmes.\n\n•\tPerson on probation has continuity of care from prison into the community where there is no other available resource or commissioned service.\n\n•\tPerson on probation has a minimised risk of overdose following release from prison.",
+  "activities": [
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Peer Mentoring and Advocacy",
+      "delivery_method": "Delivery method -2-8 one to one sessions and Group Sessions",
+      "delivery_location": "Truro, Penzance, Liskeard, Falmouth, Redruth, St Austell"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Brief Alcohol advice",
+      "delivery_method": "Delivery method -3 one to one sessions and Group Sessions",
+      "delivery_location": "Truro, Penzance, Liskeard, Falmouth, Redruth, St Austell"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Brief Non Opiate Advice",
+      "delivery_method": "Delivery method -3 one to one sessions and Group Sessions",
+      "delivery_location": "Truro, Penzance, Liskeard, Falmouth, Redruth, St Austell"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Brief Mental Health Advice",
+      "delivery_method": "Delivery method -1-12 one to one sessions and group sessions",
+      "delivery_location": "Truro, Penzance, Liskeard, Falmouth, Redruth, St Austell"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Healthy Relationships",
+      "delivery_method": "Delivery method -one to one or group sessions",
+      "delivery_location": "Truro, Penzance, Liskeard, Falmouth, Redruth, St Austell"
+    },
+    {
+      "need_area": "Dependency & Recovery",
+      "activity": "Lapse Management",
+      "delivery_method": "Delivery method -one to one or group sessions",
+      "delivery_location": "Truro, Penzance, Liskeard, Falmouth, Redruth, St Austell"
+    }
+  ]
+}

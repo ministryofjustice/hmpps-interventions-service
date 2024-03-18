@@ -38,6 +38,7 @@ data class ContractDefinition(
   @JsonProperty("internal_contract_id") val internalContractId: UUID,
   @JsonProperty("contract_reference") val contractReference: String,
   @JsonProperty("contract_type_id") val contractTypeCode: String,
+  @JsonProperty("incoming_distribution_email") val incomingDistributionEmail: String?,
   @JsonProperty("region") val region: RegionDefinition,
   @JsonProperty("eligibility") val eligibility: EligibilityDefinition,
   @JsonProperty("scheduling") val scheduling: SchedulingDefinition,

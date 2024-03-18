@@ -111,7 +111,7 @@ class ContractDetailsSetupTasklet @Autowired constructor(
     val newComplexityLevels = mutableListOf<ComplexityLevel>()
     val existingComplexityLevels = complexityLevelRepository.findByServiceCategoryId(serviceCategoryId)
     if (existingComplexityLevels.isEmpty()) {
-      logger.info("Creating missing desired outcome for the service category $serviceCategoryId")
+      logger.info("Creating missing complexity levels for the service category $serviceCategoryId")
       complexities.forEach {
         newComplexityLevels.add(
           complexityLevelRepository.save(
