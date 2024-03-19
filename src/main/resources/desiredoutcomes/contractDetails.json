@@ -1,28 +1,28 @@
 [
   {
-    "contract_type": "Finance, Benefit and Debt (South West)",
-    "contract_code": "FBD-SW",
-    "service_category": "Finance, Benefit and Debt (South West)",
+    "contract_type": "Dependency and Recovery (South West)",
+    "contract_code": "DNR-SW",
+    "service_category": "Dependency and Recovery (South West)",
     "desired_outcomes": [
-      "Person(s) on Probation’s financial management skills are developed and/or enhanced, including online banking skills.",
-      "Person(s) on Probation can successfully navigate the benefits system.",
-      "Pathways are established to help Person(s) on Probation maintain and sustain an income, safely manage money and reduce debt.",
-      "Person(s) on Probation has access to appropriate financial products, advice and/or services.",
-      "Person(s) on Probation/Person(s) in Prison gains quick access to universal credit, including pre-release referrals.",
-      "Person(s) in Prison is supported to complete tasks that they would not otherwise be able to do whilst being in custody e.g.support with banking or debt management."
+      "Person(s) on Probation achieves abstinence or controlled/non-dependent or non-problematic substance misuse.",
+      "Person(s) on Probation increases their understanding of addictive behaviours and triggers and options to reduce dependency.",
+      "Person(s) on Probation improves their physical health and mental resilience.",
+      "Person(s) on Probation enhances their skills to manage risky situations which may pose a trigger or relapse.",
+      "Person(s) on Probation enhances their belief in their ability to manage/ desist from addiction(s).",
+      "Person(s) on Probation establishes Dependency Pathways to manage a range of addictive behaviours, including supporting access into other treatment providers and detox programmes."
     ],
     "complexity_levels": [
       {
         "severity": "LOW",
-        "description": "Service user has prior experience of successfully dealing with their own finance, benefit and debt needs. Service users circumstances may be currently leading to significant financial pressure. Service user will require some advice, guidance and/or support across some specific but limited finance, benefit and debt needs, but will be able to support themselves with other aspects."
+        "description": "Person(s) on Probation who is highly motivated and has had sustained period of abstinence. Person(s) on Probation has successfully engaged in a period of treatment but requires support to sustain recovery."
       },
       {
         "severity": "MEDIUM",
-        "description": "Service user has limited prior experience of successfully dealing with their own finance, benefit and debt needs. Service users circumstances are currently leading to significant financial pressure and they require support to address these needs. Service user will need either significant support to meet a limited number of needs – for instance the Service user may have additional needs (i.e. learning difficulties) or other challenges which impact on their ability to fully manage – or they will need limited support to meet a wider range of finance, benefit and debt - related needs."
+        "description": "Person(s) on Probations who has had lapses/crises that may lead to relapse and/or is at a transition point, e.g. from prison into community. Person(s) on Probation has a moderate level of motivation but requires a high level of support for dependencies linked to re-offending. Person(s) on Probations who are subject to a Community Sentence Treatment Requirement and need wraparound support to aid engagement. Person(s) on Probation does not meet the threshold for secondary provision treatment services and/or are deemed unsuitable following assessment for treatment as part of a Community Sentence Treatment Requirement."
       },
       {
         "severity":"HIGH",
-        "description": "Service user has minimal or no prior experience of successfully dealing with their own finance, benefit and debt needs and does not have necessary identification documents or bank account. Service users circumstances are currently leading to extreme financial pressure and/or they have complex finance, benefit and debt-related needs which require a range of Activities to address these needs. Service user may have a poor finance history and wider complex needs, such as mental health issues, substance misuse and/or addiction issues."
+        "description": "Person(s) on Probations may include those with chronic substance misuse issues, those with additional needs which might include dual diagnosis and/or a chaotic lifestyle linked to their dependency. Person(s) on Probation does not meet the threshold for secondary provision treatment services and/or are deemed unsuitable following assessment for treatment as part of a Community Sentence Treatment Requirement. However, Person(s) on Probation has identifiable substance misuse, alcohol misuse, prescription medication misuse, or other dependencies linked to re-offending. Person(s) on Probation has a history of poor engagement with treatment services and requires a high level of motivation and support to engage with treatment."
       }
     ]
   }

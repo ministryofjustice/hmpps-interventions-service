@@ -6,6 +6,8 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.validation.constraints.NotNull
+import org.hibernate.annotations.JdbcType
+import org.hibernate.dialect.PostgreSQLEnumJdbcType
 import java.util.UUID
 
 @Entity
@@ -14,7 +16,8 @@ data class ComplexityLevel(
   val title: String,
   val description: String,
   @Enumerated(EnumType.STRING)
-  @Column(name = "complexity")
+  @Column(name = "complexity", columnDefinition = "complexities")
+  @JdbcType(PostgreSQLEnumJdbcType::class)
   val complexity: Complexity,
   @NotNull
   @Column(name = "service_category_id")
