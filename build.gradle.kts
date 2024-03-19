@@ -76,7 +76,7 @@ repositories {
 dependencies {
   // batch processing
   implementation("org.springframework.boot:spring-boot-starter-batch")
-  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.2") // also needed runtime for AppInsights
+  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.0") // also needed runtime for AppInsights
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
@@ -85,10 +85,10 @@ dependencies {
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
   implementation("net.logstash.logback:logstash-logback-encoder:7.4")
 
-  runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.2") // needed for OffsetDateTime for AppInsights
+  runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.0") // needed for OffsetDateTime for AppInsights
 
   // openapi
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0")
   implementation("javax.xml.bind:jaxb-api:2.3.1")
   // notifications
   implementation("uk.gov.service.notify:notifications-java-client:5.0.0-RELEASE")
@@ -99,9 +99,9 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.25.7")
-  implementation("software.amazon.awssdk:s3:2.25.7")
-  implementation("software.amazon.awssdk:sts:2.25.7")
+  implementation("software.amazon.awssdk:sns:2.25.12")
+  implementation("software.amazon.awssdk:s3:2.25.12")
+  implementation("software.amazon.awssdk:sts:2.25.12")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.3")
@@ -117,7 +117,7 @@ dependencies {
   implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.3")
 
   runtimeOnly("org.flywaydb:flyway-core:9.22.3")
-  runtimeOnly("org.postgresql:postgresql:42.7.2")
+  runtimeOnly("org.postgresql:postgresql:42.7.3")
 
   // json and csv
   implementation("com.github.java-json-tools:json-patch:1.13")
