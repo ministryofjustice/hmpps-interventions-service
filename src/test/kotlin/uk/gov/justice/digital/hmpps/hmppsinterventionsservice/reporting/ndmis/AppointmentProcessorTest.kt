@@ -4,7 +4,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance.AppointmentData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance.AppointmentProcessor
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance.AppointmentReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DeliverySessionService
@@ -69,10 +68,7 @@ internal class AppointmentProcessorTest {
     whenever(deliverySessionService.getSessions(referral.id)).thenReturn(emptyList())
 
     val result = processor.process(referral)
-
-    val expected: List<AppointmentData> = emptyList()
-
-    assertThat(result).isEqualTo(expected)
+    assertThat(result).isNull()
   }
 
   @Test
