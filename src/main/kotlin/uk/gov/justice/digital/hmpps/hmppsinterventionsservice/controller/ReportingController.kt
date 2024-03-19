@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller
 
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -30,10 +29,10 @@ class ReportingController(
     return ResponseEntity.accepted().build()
   }
 
-  @PreAuthorize("hasRole('ROLE_NDMIS_REPORTING')")
+  /*@PreAuthorize("hasRole('ROLE_NDMIS_REPORTING')")
   @PostMapping("/reports/ndmis/performance")
   fun createNdmisPerformanceReport(): ResponseEntity<Any> {
     reportingService.generateNdmisPerformanceReport()
     return ResponseEntity.accepted().build()
-  }
+  }*/
 }

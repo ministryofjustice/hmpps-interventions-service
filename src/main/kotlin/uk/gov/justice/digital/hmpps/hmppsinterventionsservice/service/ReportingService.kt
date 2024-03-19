@@ -16,7 +16,7 @@ import kotlin.io.path.pathString
 class ReportingService(
   private val asyncJobLauncher: JobLauncher,
   private val performanceReportJob: Job,
-  private val ndmisPerformanceReportJob: Job,
+  // private val ndmisPerformanceReportJob: Job,
   private val serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper,
   private val batchUtils: BatchUtils,
   private val hmppsAuthService: HMPPSAuthService,
@@ -38,7 +38,7 @@ class ReportingService(
         .toJobParameters(),
     )
   }
-
+/*
   fun generateNdmisPerformanceReport() {
     val outputDir = createTempDirectory("test")
     asyncJobLauncher.run(
@@ -49,4 +49,5 @@ class ReportingService(
         .toJobParameters(),
     )
   }
+ */
 }

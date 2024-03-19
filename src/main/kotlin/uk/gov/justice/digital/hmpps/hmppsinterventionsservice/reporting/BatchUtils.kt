@@ -17,7 +17,7 @@ import org.springframework.batch.item.file.transform.RecursiveCollectionLineAggr
 import org.springframework.core.io.WritableResource
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance.NdmisPerformanceReportJobConfiguration
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance.NdmisReferralPerformanceReportJobConfiguration
 import java.io.Writer
 import java.time.Instant
 import java.time.LocalDate
@@ -128,7 +128,7 @@ class NPESkipPolicy : SkipPolicy {
   override fun shouldSkip(t: Throwable, skipCount: Long): Boolean {
     return when (t) {
       is NullPointerException -> {
-        NdmisPerformanceReportJobConfiguration.logger.warn("skipping row with unexpected state", t)
+        NdmisReferralPerformanceReportJobConfiguration.logger.warn("skipping row with unexpected state", t)
         true
       }
       else -> false

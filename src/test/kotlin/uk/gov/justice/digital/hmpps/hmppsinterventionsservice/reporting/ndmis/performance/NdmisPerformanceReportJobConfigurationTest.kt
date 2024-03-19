@@ -21,7 +21,7 @@ import kotlin.io.path.createTempDirectory
 import kotlin.io.path.pathString
 
 @Component
-class NdmisPerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
+class NdmisAppointmentPerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
 
   @Autowired
   override fun setJobRepository(jobRepository: JobRepository) = super.setJobRepository(jobRepository)
@@ -35,7 +35,64 @@ class NdmisPerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
   }
 
   @Autowired
-  override fun setJob(@Qualifier("ndmisPerformanceReportJob") job: Job) {
+  override fun setJob(@Qualifier("ndmisAppointmentPerformanceReportJob") job: Job) {
+    super.setJob(job)
+  }
+}
+@Component
+class NdmisReferralPerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
+
+  @Autowired
+  override fun setJobRepository(jobRepository: JobRepository) = super.setJobRepository(jobRepository)
+
+  @Autowired
+  fun testJobLauncher(jobRepository: JobRepository) {
+    val testJobLauncher = TaskExecutorJobLauncher()
+    testJobLauncher.setJobRepository(jobRepository)
+    testJobLauncher.afterPropertiesSet()
+    super.setJobLauncher(testJobLauncher)
+  }
+
+  @Autowired
+  override fun setJob(@Qualifier("ndmisReferralPerformanceReportJob") job: Job) {
+    super.setJob(job)
+  }
+}
+@Component
+class NdmisComplexityPerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
+
+  @Autowired
+  override fun setJobRepository(jobRepository: JobRepository) = super.setJobRepository(jobRepository)
+
+  @Autowired
+  fun testJobLauncher(jobRepository: JobRepository) {
+    val testJobLauncher = TaskExecutorJobLauncher()
+    testJobLauncher.setJobRepository(jobRepository)
+    testJobLauncher.afterPropertiesSet()
+    super.setJobLauncher(testJobLauncher)
+  }
+
+  @Autowired
+  override fun setJob(@Qualifier("ndmisComplexityPerformanceReportJob") job: Job) {
+    super.setJob(job)
+  }
+}
+@Component
+class NdmisOutcomePerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
+
+  @Autowired
+  override fun setJobRepository(jobRepository: JobRepository) = super.setJobRepository(jobRepository)
+
+  @Autowired
+  fun testJobLauncher(jobRepository: JobRepository) {
+    val testJobLauncher = TaskExecutorJobLauncher()
+    testJobLauncher.setJobRepository(jobRepository)
+    testJobLauncher.afterPropertiesSet()
+    super.setJobLauncher(testJobLauncher)
+  }
+
+  @Autowired
+  override fun setJob(@Qualifier("ndmisOutcomePerformanceReportJob") job: Job) {
     super.setJob(job)
   }
 }
@@ -45,11 +102,20 @@ class NdmisPerformanceReportJobConfigurationTest : IntegrationTestBase() {
   companion object : KLogging()
 
   @Autowired
-  lateinit var jobLauncher: NdmisPerformanceJobLauncherTestUtils
+  lateinit var referralJobLauncher: NdmisReferralPerformanceJobLauncherTestUtils
+
+  @Autowired
+  lateinit var appointmentJobLauncher: NdmisAppointmentPerformanceJobLauncherTestUtils
+
+  @Autowired
+  lateinit var complexityJobLauncher: NdmisComplexityPerformanceJobLauncherTestUtils
+
+  @Autowired
+  lateinit var outcomeJobLauncher: NdmisOutcomePerformanceJobLauncherTestUtils
 
   private val outputDir = createTempDirectory("test")
 
-  fun executeJob(): JobExecution {
+  fun executeJob(jobLauncher: JobLauncherTestUtils): JobExecution {
     val parameters = JobParametersBuilder()
       .addString("outputPath", outputDir.pathString)
       .toJobParameters()
@@ -58,8 +124,8 @@ class NdmisPerformanceReportJobConfigurationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun jobWritesNonEmptyCsvExportFiles() {
-    // job writes non-empty CSV export files
+  fun jobsWriteNonEmptyCsvExportFiles() {
+    // jobs write non-empty CSV export files
     val referral = setupAssistant.createSentReferral()
       .also { setupAssistant.fillReferralFields(it) }
       .also { setupAssistant.addEndOfServiceReportWithOutcome(referral = it) }
@@ -76,9 +142,15 @@ class NdmisPerformanceReportJobConfigurationTest : IntegrationTestBase() {
       .toJobParameters()
     val parametersWithTimestamp = TimestampIncrementer().getNext(parameters)
 
-    val execution = executeJob()
+    val execution1 = executeJob(referralJobLauncher)
+    val execution2 = executeJob(appointmentJobLauncher)
+    val execution3 = executeJob(complexityJobLauncher)
+    val execution4 = executeJob(outcomeJobLauncher)
 
-    assertThat(execution.exitStatus).isEqualTo(ExitStatus.COMPLETED)
+    assertThat(execution1.exitStatus).isEqualTo(ExitStatus.COMPLETED)
+    assertThat(execution2.exitStatus).isEqualTo(ExitStatus.COMPLETED)
+    assertThat(execution3.exitStatus).isEqualTo(ExitStatus.COMPLETED)
+    assertThat(execution4.exitStatus).isEqualTo(ExitStatus.COMPLETED)
 
     assertThat(outputDir.resolve("crs_performance_report-v2-referrals.csv"))
       .content().contains(referral.referenceNumber)

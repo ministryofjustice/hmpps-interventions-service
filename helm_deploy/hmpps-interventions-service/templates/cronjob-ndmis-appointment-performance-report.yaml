@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: generate-ndmis-appointment-performance-report
+spec:
+  schedule: "5 18 * * SAT"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          {{- if .Values.serviceAccountNameForNdmisReporting }}
+          serviceAccountName: {{ .Values.serviceAccountNameForNdmisReporting }}
+          {{- end }}
+          restartPolicy: "Never"
+          containers:
+            - name: ndmis-appointment-performance-report
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              imagePullPolicy: Always
+              args: ["--jobName=ndmisAppointmentPerformanceReportJob"]
+              volumeMounts:
+                - name: heap-dumps
+                  mountPath: /dumps
+  {{- include "deployment-reporting.envs" . | nindent 14 }}
+          volumes:
+            - name: heap-dumps
+              emptyDir: {}
