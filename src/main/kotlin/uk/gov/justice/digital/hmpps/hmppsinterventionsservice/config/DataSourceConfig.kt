@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config
 
-import jakarta.persistence.EntityManagerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.jdbc.DataSourceBuilder
@@ -11,11 +10,9 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType
 import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.transaction.PlatformTransactionManager
-import org.springframework.transaction.annotation.EnableTransactionManagement
 import javax.sql.DataSource
 
 @Configuration
-@EnableTransactionManagement
 class DataSourceConfig(
   @Value("\${spring.datasource.url}") private val dataSourceUrl: String,
   @Value("\${spring.datasource.username}") private val dataSourceUserName: String,
@@ -49,7 +46,7 @@ class DataSourceConfig(
 
   @Bean("transactionManager")
   @Primary
-  fun transactionManager(entityManagerFactory: EntityManagerFactory): PlatformTransactionManager {
-    return JpaTransactionManager(entityManagerFactory)
+  fun transactionManager(): PlatformTransactionManager {
+    return JpaTransactionManager()
   }
 }

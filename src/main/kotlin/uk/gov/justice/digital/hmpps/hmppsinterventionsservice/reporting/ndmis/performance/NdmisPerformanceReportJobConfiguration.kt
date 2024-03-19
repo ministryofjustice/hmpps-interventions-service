@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance
 
 import mu.KLogging
+import org.hibernate.SessionFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.StepContribution
@@ -9,11 +10,9 @@ import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.core.job.DefaultJobParametersValidator
-import org.springframework.batch.core.job.builder.FlowBuilder
-import org.springframework.batch.core.job.flow.support.SimpleFlow
 import org.springframework.batch.core.scope.context.ChunkContext
-import org.springframework.batch.item.data.RepositoryItemReader
-import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder
+import org.springframework.batch.item.database.HibernateCursorItemReader
+import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
 import org.springframework.batch.repeat.RepeatStatus
 import org.springframework.beans.factory.annotation.Qualifier
@@ -21,19 +20,13 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Lazy
-import org.springframework.context.annotation.Scope
 import org.springframework.core.io.FileSystemResource
-import org.springframework.core.task.SimpleAsyncTaskExecutor
-import org.springframework.core.task.TaskExecutor
-import org.springframework.data.domain.Sort
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.S3Bucket
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.OnStartupJobLauncherFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUtils
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.NPESkipPolicy
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.OutputPathIncrementer
@@ -49,7 +42,8 @@ class NdmisPerformanceReportJobConfiguration(
   private val batchUtils: BatchUtils,
   private val s3Service: S3Service,
   private val ndmisS3Bucket: S3Bucket,
-  @Lazy private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
+  private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
+  @Qualifier("transactionManager") private val transactionManager: PlatformTransactionManager,
   @Value("\${spring.batch.jobs.ndmis.performance-report.chunk-size}") private val chunkSize: Int,
 ) {
   companion object : KLogging()
@@ -67,25 +61,16 @@ class NdmisPerformanceReportJobConfiguration(
   }
 
   @Bean
-  fun taskExecutor(): TaskExecutor? {
-    return SimpleAsyncTaskExecutor("spring_batch_ndmis_report")
-  }
-
-  @Bean
-  @StepScope
-  @Scope("prototype")
+  @JobScope
   fun ndmisReader(
-    referralRepository: ReferralRepository,
-  ): RepositoryItemReader<Referral> {
+    sessionFactory: SessionFactory,
+  ): HibernateCursorItemReader<Referral> {
     // this reader returns referral entities which need processing for the report.
-    val result = RepositoryItemReaderBuilder<Referral>()
-      .repository(referralRepository)
-      .name("ndmisRepositoryReader")
-      .pageSize(100)
-      .sorts(mapOf(Pair("sentAt", Sort.DEFAULT_DIRECTION)))
-      .methodName("ndmisReportReferrals")
+    return HibernateCursorItemReaderBuilder<Referral>()
+      .name("ndmisPerformanceReportReader")
+      .sessionFactory(sessionFactory)
+      .queryString("select r from Referral r where sentAt is not null")
       .build()
-    return result
   }
 
   @Bean
@@ -134,10 +119,10 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean(name = ["ndmisPerformanceReportJob"])
   fun ndmisPerformanceReportJob(
-    writeReferralFlow: SimpleFlow,
-    writeComplexityFlow: SimpleFlow,
-    writeAppointmentFlow: SimpleFlow,
-    writeOutcomeFlow: SimpleFlow,
+    ndmisWriteReferralToCsvStep: Step,
+    ndmisWriteComplexityToCsvStep: Step,
+    ndmisWriteAppointmentToCsvStep: Step,
+    ndmisWriteOutcomeToCsvStep: Step,
     pushToS3Step: Step,
   ): Job {
     val validator = DefaultJobParametersValidator()
@@ -146,84 +131,19 @@ class NdmisPerformanceReportJobConfiguration(
     return jobBuilderFactory["ndmisPerformanceReportJob"]
       .incrementer { parameters -> OutputPathIncrementer().getNext(TimestampIncrementer().getNext(parameters)) }
       .validator(validator)
-      .start(
-        mainFlow(
-          writeReferralFlow,
-          writeComplexityFlow,
-          writeAppointmentFlow,
-          writeOutcomeFlow,
-        ),
-      )
+      .start(ndmisWriteReferralToCsvStep)
+      .next(ndmisWriteComplexityToCsvStep)
+      .next(ndmisWriteAppointmentToCsvStep)
+      .next(ndmisWriteOutcomeToCsvStep)
       .next(pushToS3Step)
-      .end()
-      .build()
-  }
-
-  @Bean
-  fun writeReferralFlow(
-    ndmisReader: RepositoryItemReader<Referral>,
-    referralsProcessor: ReferralsProcessor,
-    referralWriter: FlatFileItemWriter<ReferralsData>,
-    transactionManager: PlatformTransactionManager,
-  ): SimpleFlow? {
-    return FlowBuilder<SimpleFlow>("writeReferralFlow")
-      .start(ndmisWriteReferralToCsvStep(ndmisReader, referralsProcessor, referralWriter, transactionManager))
-      .build()
-  }
-
-  @Bean
-  fun writeComplexityFlow(
-    ndmisReader: RepositoryItemReader<Referral>,
-    complexityProcessor: ComplexityProcessor,
-    ndmisComplexityWriter: FlatFileItemWriter<Collection<ComplexityData>>,
-    transactionManager: PlatformTransactionManager,
-  ): SimpleFlow? {
-    return FlowBuilder<SimpleFlow>("writeComplexityFlow")
-      .start(ndmisWriteComplexityToCsvStep(ndmisReader, complexityProcessor, ndmisComplexityWriter, transactionManager))
-      .build()
-  }
-
-  @Bean
-  fun writeAppointmentFlow(
-    ndmisReader: RepositoryItemReader<Referral>,
-    appointmentProcessor: AppointmentProcessor,
-    ndmisAppointmentWriter: FlatFileItemWriter<Collection<AppointmentData>>,
-    transactionManager: PlatformTransactionManager,
-  ): SimpleFlow? {
-    return FlowBuilder<SimpleFlow>("writeAppointmentFlow")
-      .start(ndmisWriteAppointmentToCsvStep(ndmisReader, appointmentProcessor, ndmisAppointmentWriter, transactionManager))
-      .build()
-  }
-
-  @Bean
-  fun writeOutcomeFlow(
-    ndmisReader: RepositoryItemReader<Referral>,
-    outcomeProcessor: OutcomeProcessor,
-    ndmisOutcomeWriter: FlatFileItemWriter<Collection<OutcomeData>>,
-    transactionManager: PlatformTransactionManager,
-  ): SimpleFlow? {
-    return FlowBuilder<SimpleFlow>("writeOutcomeFlow")
-      .start(ndmisWriteOutcomeToCsvStep(ndmisReader, outcomeProcessor, ndmisOutcomeWriter, transactionManager))
-      .build()
-  }
-  private fun mainFlow(
-    writeReferralFlow: SimpleFlow,
-    writeComplexityFlow: SimpleFlow,
-    writeAppointmentFlow: SimpleFlow,
-    writeOutcomeFlow: SimpleFlow,
-  ): SimpleFlow? {
-    return FlowBuilder<SimpleFlow>("mainFlow")
-      .split(taskExecutor())
-      .add(writeReferralFlow, writeComplexityFlow, writeAppointmentFlow, writeOutcomeFlow)
       .build()
   }
 
   @Bean
   fun ndmisWriteReferralToCsvStep(
-    ndmisReader: RepositoryItemReader<Referral>,
+    ndmisReader: HibernateCursorItemReader<Referral>,
     processor: ReferralsProcessor,
     writer: FlatFileItemWriter<ReferralsData>,
-    transactionManager: PlatformTransactionManager,
   ): Step {
     return stepBuilderFactory.get("ndmisWriteReferralToCsvStep")
       .chunk<Referral, ReferralsData>(chunkSize, transactionManager)
@@ -238,10 +158,9 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun ndmisWriteComplexityToCsvStep(
-    ndmisReader: RepositoryItemReader<Referral>,
+    ndmisReader: HibernateCursorItemReader<Referral>,
     processor: ComplexityProcessor,
     writer: FlatFileItemWriter<Collection<ComplexityData>>,
-    transactionManager: PlatformTransactionManager,
   ): Step {
     return stepBuilderFactory.get("ndmisWriteComplexityToCsvStep")
       .chunk<Referral, List<ComplexityData>>(chunkSize, transactionManager)
@@ -256,10 +175,9 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun ndmisWriteAppointmentToCsvStep(
-    ndmisReader: RepositoryItemReader<Referral>,
+    ndmisReader: HibernateCursorItemReader<Referral>,
     processor: AppointmentProcessor,
     writer: FlatFileItemWriter<Collection<AppointmentData>>,
-    transactionManager: PlatformTransactionManager,
   ): Step {
     return stepBuilderFactory.get("ndmisWriteAppointmentToCsvStep")
       .chunk<Referral, List<AppointmentData>>(chunkSize, transactionManager)
@@ -274,10 +192,9 @@ class NdmisPerformanceReportJobConfiguration(
 
   @Bean
   fun ndmisWriteOutcomeToCsvStep(
-    ndmisReader: RepositoryItemReader<Referral>,
+    ndmisReader: HibernateCursorItemReader<Referral>,
     processor: OutcomeProcessor,
     writer: FlatFileItemWriter<Collection<OutcomeData>>,
-    transactionManager: PlatformTransactionManager,
   ): Step {
     return stepBuilderFactory.get("ndmisWriteOutcomeToCsvStep")
       .chunk<Referral, List<OutcomeData>>(chunkSize, transactionManager)
@@ -292,10 +209,7 @@ class NdmisPerformanceReportJobConfiguration(
 
   @JobScope
   @Bean
-  fun pushToS3Step(
-    @Value("#{jobParameters['outputPath']}") outputPath: String,
-    transactionManager: PlatformTransactionManager,
-  ): Step =
+  fun pushToS3Step(@Value("#{jobParameters['outputPath']}") outputPath: String): Step =
     stepBuilderFactory["pushToS3Step"].tasklet(pushFilesToS3(outputPath), transactionManager).build()
 
   private fun pushFilesToS3(outputPath: String) = { _: StepContribution, _: ChunkContext ->
