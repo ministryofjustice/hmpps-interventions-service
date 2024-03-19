@@ -71,7 +71,7 @@ internal class AppointmentProcessorTest {
     val result = processor.process(referral)
 
     val expected: List<AppointmentData> = emptyList()
-    
+
     assertThat(result).isEqualTo(expected)
   }
 
