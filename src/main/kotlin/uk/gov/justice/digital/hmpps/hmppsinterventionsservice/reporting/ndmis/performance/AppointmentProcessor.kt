@@ -24,13 +24,13 @@ class AppointmentProcessor(
         appointmentTime = NdmisDateTime(it.appointmentTime),
         durationInMinutes = it.durationInMinutes,
         bookedAt = NdmisDateTime(it.createdAt),
-        didSessionHappen = it.didSessionHappen,
         attended = it.attended,
+        didSessionHappen = it.didSessionHappen,
         attendanceSubmittedAt = it.attendanceSubmittedAt?.let { t -> NdmisDateTime(t) },
         notifyPPOfAttendanceBehaviour = it.notifyPPOfAttendanceBehaviour,
         deliusAppointmentId = it.deliusAppointmentId.toString(),
         reasonForAppointment = if (saaAppointments.contains(it)) AppointmentReason.SAA else AppointmentReason.DELIVERY,
       )
-    }
+    }.ifEmpty { null }
   }
 }
