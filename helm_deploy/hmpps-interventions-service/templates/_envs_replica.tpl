@@ -2,7 +2,7 @@
 {{/*
 Environment variables for reporting containers
 */}}
-{{- define "deployment-reporting.envs" }}
+{{- define "deployment-replica.envs" }}
 env:
   - name: SERVER_PORT
     value: "{{ .Values.image.ports.app }}"
