@@ -7,10 +7,8 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceProviderAccessScopeMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUtils
-import java.nio.file.Files.createTempDirectory
 import java.time.Instant
 import java.time.LocalDate
-import kotlin.io.path.pathString
 
 @Service
 class ReportingService(

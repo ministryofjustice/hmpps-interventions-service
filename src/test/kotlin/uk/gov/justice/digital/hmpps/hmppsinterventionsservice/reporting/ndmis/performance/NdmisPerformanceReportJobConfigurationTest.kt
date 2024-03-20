@@ -39,6 +39,7 @@ class NdmisAppointmentPerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
     super.setJob(job)
   }
 }
+
 @Component
 class NdmisReferralPerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
 
@@ -58,6 +59,7 @@ class NdmisReferralPerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
     super.setJob(job)
   }
 }
+
 @Component
 class NdmisComplexityPerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
 
@@ -77,6 +79,7 @@ class NdmisComplexityPerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
     super.setJob(job)
   }
 }
+
 @Component
 class NdmisOutcomePerformanceJobLauncherTestUtils : JobLauncherTestUtils() {
 
