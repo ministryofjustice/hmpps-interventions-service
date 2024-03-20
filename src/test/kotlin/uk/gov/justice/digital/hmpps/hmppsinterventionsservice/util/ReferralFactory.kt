@@ -63,7 +63,6 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     roleOrJobTitle: String? = "Probation Practitioner",
     ppEstablishment: String? = "aaa",
     allocatedCommunityPP: Boolean? = true,
-    alreadyKnowPrisonName: Boolean? = false,
   ): DraftReferral {
     return createDraftReferral(
       id = id,
@@ -98,7 +97,6 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       ndeliusTeamPhoneNumber = ndeliusTeamPhoneNumber,
       ppPhoneNumber = ppPhoneNumber,
       ppTeamTelephoneNumber = ppTeamTelephoneNumber,
-      alreadyKnowPrisonName = alreadyKnowPrisonName,
     )
   }
 

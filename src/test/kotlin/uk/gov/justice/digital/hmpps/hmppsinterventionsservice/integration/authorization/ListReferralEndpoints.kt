@@ -191,8 +191,8 @@ class ListReferralEndpoints : IntegrationTestBase() {
   fun `pp users can only see draft referrals they created`() {
     val user1 = setupAssistant.createPPUser("762143487465")
     val user2 = setupAssistant.createPPUser("651287231123")
-    setupAssistant.createDraftReferral(createdBy = user1, alreadyKnowPrisonName = null)
-    setupAssistant.createDraftReferral(createdBy = user2, alreadyKnowPrisonName = null)
+    setupAssistant.createDraftReferral(createdBy = user1)
+    setupAssistant.createDraftReferral(createdBy = user2)
 
     val token = createEncodedTokenForUser(user1)
     val response = requestFactory.create(Request.GetDraftReferrals, token).exchange()
@@ -204,7 +204,7 @@ class ListReferralEndpoints : IntegrationTestBase() {
   fun `sp users can't access draft referrals`() {
     val user = setupAssistant.createSPUser()
 
-    val referral = setupAssistant.createDraftReferral(alreadyKnowPrisonName = null)
+    val referral = setupAssistant.createDraftReferral()
     val token = createEncodedTokenForUser(user)
 
     val response = requestFactory.create(Request.GetDraftReferrals, token).exchange()

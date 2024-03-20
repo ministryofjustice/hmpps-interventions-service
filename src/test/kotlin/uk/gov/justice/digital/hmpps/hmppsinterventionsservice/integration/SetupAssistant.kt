@@ -280,7 +280,6 @@ class SetupAssistant(
     hasMainPointOfContactDetails: Boolean = false,
     roleOrJobTitle: String? = "Probation Practitioner",
     ppEstablishment: String? = "aaa",
-    alreadyKnowPrisonName: Boolean? = null,
   ): DraftReferral {
     return draftReferralRepository.save(
       referralFactory.createDraft(
@@ -306,7 +305,6 @@ class SetupAssistant(
         roleOrJobTitle = roleOrJobTitle,
         isReferralReleasingIn12Weeks = isReferralReleasingIn12Weeks,
         ppEstablishment = ppEstablishment,
-        alreadyKnowPrisonName = alreadyKnowPrisonName,
       ),
     )
   }
@@ -461,7 +459,6 @@ class SetupAssistant(
       personCurrentLocationType = personCurrentLocationType,
       personCustodyPrisonId = personCustodyPrisonId,
       expectedReleaseDate = expectedReleaseDate,
-      alreadyKnowPrisonName = null,
     )
     var referral = referralFactory.createSent(
       id = id,
@@ -586,7 +583,6 @@ class SetupAssistant(
       id = id,
       intervention = updatedIntervention,
       createdBy = ppUser,
-      alreadyKnowPrisonName = null,
     )
     val referral = referralRepository.save(
       referralFactory.createSent(
@@ -633,7 +629,6 @@ class SetupAssistant(
       id = id,
       intervention = intervention,
       createdBy = ppUser,
-      alreadyKnowPrisonName = null,
     )
 
     val referral = referralRepository.save(
@@ -826,7 +821,6 @@ class SetupAssistant(
     ppProbationOffice: String? = "London",
     ppPdu: String? = "East Sussex",
     allocatedCommunityPP: Boolean? = true,
-    alreadyKnowPrisonName: Boolean? = false,
     referralLocation: ReferralLocation = ReferralLocation(
       UUID.randomUUID(),
       referral = referral,
@@ -858,7 +852,6 @@ class SetupAssistant(
     draftReferral.expectedReleaseDate = referralLocation.expectedReleaseDate
     draftReferral.ppProbationOffice = probationPractitionerDetails.probationOffice
     draftReferral.allocatedCommunityPP = allocatedCommunityPP
-    draftReferral.alreadyKnowPrisonName = alreadyKnowPrisonName
     draftReferralRepository.save(draftReferral)
     referralRepository.saveAndFlush(referral)
 
