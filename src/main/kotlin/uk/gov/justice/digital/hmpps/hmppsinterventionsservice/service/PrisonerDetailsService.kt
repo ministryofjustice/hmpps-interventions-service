@@ -19,14 +19,14 @@ class PrisonerDetailsService(
         Mono.empty()
       }
       .block()?.primaryIdentifiers?.nomsNumber ?: return null
-    logger.info("The nomis Id returned for crn {} is {} ", serviceUserCRN, offenderNomsId)
+    logger.info("The nomis Id returned for crn = $serviceUserCRN is $offenderNomsId")
 
     val prisonDetails = prisonerOffenderSearchService.getPrisonerById(offenderNomsId)
       .onErrorResume {
         Mono.empty()
       }
       .block()
-    logger.info("The prison Id returned for nomis Id {} is {} ", offenderNomsId, prisonDetails?.prisonId)
+    logger.info("The prison Id returned for nomis Id = $offenderNomsId is ${prisonDetails?.prisonId}")
     return prisonDetails
   }
 }
