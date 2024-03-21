@@ -36,16 +36,4 @@ class ReportingService(
         .toJobParameters(),
     )
   }
-/*
-  fun generateNdmisPerformanceReport() {
-    val outputDir = createTempDirectory("test")
-    asyncJobLauncher.run(
-      ndmisPerformanceReportJob,
-      JobParametersBuilder()
-        .addString("outputPath", outputDir.pathString)
-        .addString("timestamp", Instant.now().toEpochMilli().toString())
-        .toJobParameters(),
-    )
-  }
- */
 }
