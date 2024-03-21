@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: generate-ndmis-complexity-performance-report
+spec:
+  schedule: "10 18 * * SAT"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          {{- if .Values.serviceAccountNameForNdmisReporting }}
+          serviceAccountName: {{ .Values.serviceAccountNameForNdmisReporting }}
+          {{- end }}
+          restartPolicy: "Never"
+          containers:
+            - name: ndmis-complexity-performance-report
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              imagePullPolicy: Always
+              args: ["--jobName=ndmisComplexityPerformanceReportJob"]
+              volumeMounts:
+                - name: heap-dumps
+                  mountPath: /dumps
+  {{- include "deployment-replica.envs" . | nindent 14 }}
+          volumes:
+            - name: heap-dumps
+              emptyDir: {}

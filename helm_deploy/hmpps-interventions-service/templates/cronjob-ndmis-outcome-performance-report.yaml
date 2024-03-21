@@ -1,9 +1,9 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: generate-ndmis-performance-report
+  name: generate-ndmis-outcome-performance-report
 spec:
-  schedule: "0 18 * * SAT"
+  schedule: "15 18 * * SAT"
   jobTemplate:
     spec:
       template:
@@ -13,10 +13,10 @@ spec:
           {{- end }}
           restartPolicy: "Never"
           containers:
-            - name: ndmis-performance-report
+            - name: ndmis-outcome-performance-report
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
               imagePullPolicy: Always
-              args: ["--jobName=ndmisPerformanceReportJob"]
+              args: ["--jobName=ndmisOutcomePerformanceReportJob"]
               volumeMounts:
                 - name: heap-dumps
                   mountPath: /dumps
