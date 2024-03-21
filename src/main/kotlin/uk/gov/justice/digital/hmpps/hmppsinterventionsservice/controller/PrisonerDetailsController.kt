@@ -14,7 +14,7 @@ class PrisonerDetailsController(
   val prisonerDetailsService: PrisonerDetailsService,
 ) {
 
-  @GetMapping("/prisoner/details/{crn}")
+  @GetMapping("/intervention/prisoner/details/{crn}")
   fun prisonerDetails(
     @PathVariable crn: String,
     authentication: JwtAuthenticationToken,
