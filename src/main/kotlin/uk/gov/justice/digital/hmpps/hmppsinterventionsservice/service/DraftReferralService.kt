@@ -286,6 +286,7 @@ class DraftReferralService(
         draftReferral.personCustodyPrisonId = null
         draftReferral.expectedReleaseDate = null
         draftReferral.expectedReleaseDateMissingReason = null
+        draftReferral.alreadyKnowPrisonName = null
       } else {
         update.isReferralReleasingIn12Weeks?.let {
           draftReferral.isReferralReleasingIn12Weeks = it
@@ -297,6 +298,9 @@ class DraftReferralService(
     }
     update.personCustodyPrisonId?.let {
       draftReferral.personCustodyPrisonId = update.personCustodyPrisonId
+    }
+    update.alreadyKnowPrisonName?.let {
+      draftReferral.alreadyKnowPrisonName = update.alreadyKnowPrisonName
     }
     update.allocatedCommunityPP?.let {
       draftReferral.allocatedCommunityPP = update.allocatedCommunityPP
