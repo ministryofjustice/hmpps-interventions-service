@@ -82,14 +82,14 @@ class NdmisComplexityPerformanceReportJobConfiguration(
   }
 
   @Bean(name = ["ndmisComplexityPerformanceReportJob"])
-  fun ndmisPerformanceReportJob(
+  fun ndmisComplexityPerformanceReportJob(
     ndmisWriteComplexityToCsvStep: Step,
     pushComplexityToS3Step: Step,
   ): Job {
     val validator = DefaultJobParametersValidator()
     validator.setRequiredKeys(arrayOf("timestamp", "outputPath"))
 
-    return jobBuilderFactory["ndmisPerformanceReportJob"]
+    return jobBuilderFactory["ndmisComplexityPerformanceReportJob"]
       .incrementer { parameters -> OutputPathIncrementer().getNext(TimestampIncrementer().getNext(parameters)) }
       .validator(validator)
       .start(ndmisWriteComplexityToCsvStep)
