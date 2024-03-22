@@ -109,7 +109,10 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
   @State("There is an existing draft referral with ID of ac386c25-52c8-41fa-9213-fcf42e24b0b5")
   fun createReferralWithRequiredId() {
     // create referral with the required id
-    setupAssistant.createDraftReferral(id = UUID.fromString("ac386c25-52c8-41fa-9213-fcf42e24b0b5"))
+    setupAssistant.createDraftReferral(
+      id = UUID.fromString("ac386c25-52c8-41fa-9213-fcf42e24b0b5"),
+      alreadyKnowPrisonName = null,
+    )
   }
 
   @State(
@@ -122,6 +125,7 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
       id = UUID.fromString("dfb64747-f658-40e0-a827-87b4b0bdcfed"),
       createdAt = OffsetDateTime.parse("2020-12-07T20:45:21.986389+00:00"),
       serviceUserCRN = "X862134",
+      alreadyKnowPrisonName = null,
     )
   }
 
@@ -139,6 +143,7 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
       id = UUID.fromString("d496e4a7-7cc1-44ea-ba67-c295084f1962"),
       intervention = intervention,
       selectedServiceCategories = mutableSetOf(setupAssistant.serviceCategory(UUID.fromString("428ee70f-3001-4399-95a6-ad25eaaede16"))),
+      alreadyKnowPrisonName = null,
     )
   }
 
@@ -148,14 +153,20 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
   )
   fun createNewDraftWithOutcomesAndComplexityLevel() {
     // create a new draft referral and with desired outcomes and complexity level
-    val referral = setupAssistant.createDraftReferral(id = UUID.fromString("037cc90b-beaa-4a32-9ab7-7f79136e1d27"))
+    val referral = setupAssistant.createDraftReferral(
+      id = UUID.fromString("037cc90b-beaa-4a32-9ab7-7f79136e1d27"),
+      alreadyKnowPrisonName = null,
+    )
     setupAssistant.fillDraftReferralFields(referral)
   }
 
   @State("There is an existing draft referral with ID of 1219a064-709b-4b6c-a11e-10b8cb3966f6, and it has had a service user selected")
   fun createNewDraftReferralWithServiceUserExpected() {
     // create a new draft referral with the service user data expected
-    val referral = setupAssistant.createDraftReferral(id = UUID.fromString("1219a064-709b-4b6c-a11e-10b8cb3966f6"))
+    val referral = setupAssistant.createDraftReferral(
+      id = UUID.fromString("1219a064-709b-4b6c-a11e-10b8cb3966f6"),
+      alreadyKnowPrisonName = null,
+    )
     setupAssistant.fillDraftReferralFields(referral)
   }
 
@@ -185,6 +196,7 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
       personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
       personCustodyPrisonId = "test",
       expectedReleaseDate = LocalDate.now().plusDays(1),
+      alreadyKnowPrisonName = null,
     )
     setupAssistant.fillDraftReferralFields(referral)
   }
@@ -204,7 +216,11 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
     // create a draft referral with ID 06716f8e with desired outcomes and service categories
     val contract = setupAssistant.createDynamicFrameworkContract(contractType = setupAssistant.contractTypes["WOS"]!!, primeProviderId = "HARMONY_LIVING")
     val intervention = setupAssistant.createIntervention(dynamicFrameworkContract = contract)
-    val referral = setupAssistant.createDraftReferral(id = UUID.fromString("06716f8e-f507-42d4-bdcc-44c90e18dbd7"), intervention = intervention)
+    val referral = setupAssistant.createDraftReferral(
+      id = UUID.fromString("06716f8e-f507-42d4-bdcc-44c90e18dbd7"),
+      intervention = intervention,
+      alreadyKnowPrisonName = null,
+    )
     setupAssistant.fillDraftReferralFields(referral)
   }
 }
