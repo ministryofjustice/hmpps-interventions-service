@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   kotlin("plugin.spring") version "1.9.23"
   id("org.jetbrains.kotlin.plugin.jpa") version "1.9.23"
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.3"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.4"
   id("jacoco")
 }
 
@@ -65,7 +65,7 @@ tasks {
 
 dependencyManagement {
   dependencies {
-    dependency("net.minidev:json-smart:2.5.0")
+    dependency("net.minidev:json-smart:2.5.1")
   }
 }
 
@@ -99,14 +99,14 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.25.12")
-  implementation("software.amazon.awssdk:s3:2.25.12")
-  implementation("software.amazon.awssdk:sts:2.25.12")
+  implementation("software.amazon.awssdk:sns:2.25.15")
+  implementation("software.amazon.awssdk:s3:2.25.15")
+  implementation("software.amazon.awssdk:sts:2.25.15")
 
   // security
-  implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.3")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.2.3")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.2.3")
+  implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.4")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.2.4")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.2.4")
   implementation("com.nimbusds:oauth2-oidc-sdk:11.10.1")
 
   // database
