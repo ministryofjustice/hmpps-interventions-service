@@ -51,7 +51,7 @@ spring:
     jdbc:
       initialize-schema: never # we manage the spring batch schema with our own migrations
     concurrency:
-      pool-size: 1 # run one job at a time...
+      pool-size: 4 # run up to 4 jobs at a time...
       queue-size: 10000 # unless the number of queued jobs exceeds this number
     table-prefix: new_schema.BATCH_
     jobs:
