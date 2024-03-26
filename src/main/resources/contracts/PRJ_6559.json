@@ -14,7 +14,7 @@
   },
   "scheduling": {
     "hide_before": "2021-01-01",
-    "hide_after": null
+    "hide_after": "2024-03-28T23:59:00+00"
   },
   "providers": {
     "prime_provider_code": "PSS_UK",

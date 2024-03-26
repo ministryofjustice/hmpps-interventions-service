@@ -1,28 +1,215 @@
 [
   {
-    "contract_type": "Dependency and Recovery (South West)",
-    "contract_code": "DNR-SW",
-    "service_category": "Dependency and Recovery (South West)",
+    "contract_type": "Women's Services",
+    "contract_code": "WOS",
+    "service_category": "Accommodation",
     "desired_outcomes": [
-      "Person(s) on Probation achieves abstinence or controlled/non-dependent or non-problematic substance misuse.",
-      "Person(s) on Probation increases their understanding of addictive behaviours and triggers and options to reduce dependency.",
-      "Person(s) on Probation improves their physical health and mental resilience.",
-      "Person(s) on Probation enhances their skills to manage risky situations which may pose a trigger or relapse.",
-      "Person(s) on Probation enhances their belief in their ability to manage/ desist from addiction(s).",
-      "Person(s) on Probation establishes Dependency Pathways to manage a range of addictive behaviours, including supporting access into other treatment providers and detox programmes."
+      "All barriers as identified in the Service user action plan, for example financial, behavioural, physical, mental or offence-type related), to obtaining or sustaining accommodation, are successfully removed.",
+      "Service user makes progress in obtaining accommodation.",
+      "Service user is helped to secure social or supported housing.",
+      "Service user is helped to secure a tenancy in the private rented sector (PRS).",
+      "Service user is helped to sustain existing accommodation.",
+      "Service user is prevented from becoming homeless.",
+      "Service user at risk of losing their tenancy are successfully helped to retain it.",
+      "Intervention ends before the Service user has sustained accommodation for three months, but s/he has a strong prospect of sustaining it for at least three months (including for those serving custodial sentences of less than 6 months)."
     ],
     "complexity_levels": [
       {
         "severity": "LOW",
-        "description": "Person(s) on Probation who is highly motivated and has had sustained period of abstinence. Person(s) on Probation has successfully engaged in a period of treatment but requires support to sustain recovery."
+        "description": "Service user has some capacity and means to secure and/or maintain suitable accommodation but requires some support and guidance to do so."
       },
       {
         "severity": "MEDIUM",
-        "description": "Person(s) on Probations who has had lapses/crises that may lead to relapse and/or is at a transition point, e.g. from prison into community. Person(s) on Probation has a moderate level of motivation but requires a high level of support for dependencies linked to re-offending. Person(s) on Probations who are subject to a Community Sentence Treatment Requirement and need wraparound support to aid engagement. Person(s) on Probation does not meet the threshold for secondary provision treatment services and/or are deemed unsuitable following assessment for treatment as part of a Community Sentence Treatment Requirement."
+        "description": "Service user is at risk of homelessness/is homeless, or will be on release from prison. Service user has had some success in maintaining a tenancy but may have additional needs e.g. Learning Difficulties and/or Learning Disabilities or other challenges currently."
       },
       {
         "severity":"HIGH",
-        "description": "Person(s) on Probations may include those with chronic substance misuse issues, those with additional needs which might include dual diagnosis and/or a chaotic lifestyle linked to their dependency. Person(s) on Probation does not meet the threshold for secondary provision treatment services and/or are deemed unsuitable following assessment for treatment as part of a Community Sentence Treatment Requirement. However, Person(s) on Probation has identifiable substance misuse, alcohol misuse, prescription medication misuse, or other dependencies linked to re-offending. Person(s) on Probation has a history of poor engagement with treatment services and requires a high level of motivation and support to engage with treatment."
+        "description": "Service user is homeless or in temporary/unstable accommodation, or will be on release from prison. Service user has poor accommodation history, complex needs and limited skills to secure or sustain a tenancy."
+      }
+    ]
+  },
+  {
+    "contract_type": "Women's Services",
+    "contract_code": "WOS",
+    "service_category": "Education, Training and Employment (ETE)",
+    "desired_outcomes": [
+      "Service users obtain suitable training, education and employment.",
+      "Service users maintain suitable training, education and employment.",
+      "Service users demonstrate improvement in the skills and attitude which enable self-development and increase employability.",
+      "Service user overcomes barriers to obtaining/maintaining suitable training, education and employment."
+    ],
+    "complexity_levels": [
+      {
+        "severity": "LOW",
+        "description": "Service user has satisfactory basic numeracy & literacy skills. The Service user has previously been employed though there may be gaps with periods of inactivity due to redundancy/periods of imprisonment. There has been no critical development need to find a new job in their previous field of competence. The Service user values benefits of working but needs guidance to re-enter the workforce, change jobs or career path."
+      },
+      {
+        "severity": "MEDIUM",
+        "description": "Service user has gaps in basic numeracy and literacy skills. The Service user has no or limited working experience. The Service user has partially completed vocational training but requires support with building confidence and motivation to develop training and/or employability skills, and also require support and coaching to develop or enhance skills to obtain and sustain employment."
+      },
+      {
+        "severity":"HIGH",
+        "description": "Service user lacks basic literacy & numeracy skills and/or may have Learning Difficulties and/or Learning Disabilities. The Service user has no or limited working experience and/or have no qualifications or current qualifications and/or may have many barriers and restrictions to employment due to the nature of their offences (e.g. sex offender or violence). The Service user requires significant support and coaching to build motivation, confidence and basic skills to enter employment / training."
+      }
+    ]
+  },
+  {
+    "contract_type": "Women's Services",
+    "contract_code": "WOS",
+    "service_category": "Finance, Benefits and Debt (FBD)",
+    "desired_outcomes": [
+      "Service user's financial management skills are developed and/or enhanced.",
+      "Service user can successfully navigate the benefits system, including online banking skills.",
+      "Pathways are established to help Service user maintain and sustain an income, safely manage money and reduce debt.",
+      "Service user has access to appropriate financial products, advice and/or services.",
+      "Service user gains quick access to universal credit, including pre-release referrals."
+    ],
+    "complexity_levels": [
+      {
+        "severity": "LOW",
+        "description": "Service user is not overly reliant on friends /family or others to supplement daily living expenses or regular outgoings. Service user's circumstances may be currently leading to significant financial pressure but they are able to support themselves through legitimate means."
+      },
+      {
+        "severity": "MEDIUM",
+        "description": "Service user may commit crimes 'on the side' to supplement legal income or may rely on others for what they consider to be necessities. Service user may be unable to pay debts because of other 'demands'."
+      },
+      {
+        "severity":"HIGH",
+        "description": "Service user income comes from the proceeds of crime, e.g. dealing drugs, robbery or stolen goods.  Service user relies on others for necessities and luxuries and servicing debts to illegitimate external sources. Service user may be unable to meet household and essential bills."
+      }
+    ]
+  },
+  {
+    "contract_type": "Women's Services",
+    "contract_code": "WOS",
+    "service_category": "Dependency and Recovery (D&R)",
+    "desired_outcomes": [
+      "Service user improves their physical health and mental resilience.",
+      "Service user achieves abstinence or controlled/ non-dependent or non-problematic substance misuse.",
+      "Service user increases their understanding of addictive behaviours and triggers and option to reduce dependency.",
+      "Service user enhances their skills to manage risky situations which may pose a trigger or relapse.",
+      "Service user enhances their belief in ability to manage/ desist from addiction(s).",
+      "Service user increases understanding of addictive behaviours and triggers and options to reduce dependency.",
+      "Service user improves physical health and mental resilience.",
+      "Service user establishes Dependency Pathways to manage a range of addictive behaviours, including supporting access into other treatment providers and detox programmes.",
+      "Service user has continuity of care from prison into the community where there is no other available resource or commissioned service.",
+      "Service user has a minimised risk of overdose following release from prison."
+    ],
+    "complexity_levels": [
+      {
+        "severity": "LOW",
+        "description": "Service user who is highly motivated and have had sustained period of abstinence. Service user has successfully engaged in a period of treatment but requires support to sustain recovery."
+      },
+      {
+        "severity": "MEDIUM",
+        "description": "Service user who has had lapses/crises that may lead to relapse and/or is at a transition point, e.g. from prison into community. Service user has a moderate level of motivation but requires a high level of support."
+      },
+      {
+        "severity":"HIGH",
+        "description": "Service user who is sentenced to Community Sentence where there is a Dual Diagnosis and substance misuse treatment. Service user does not meet the threshold for secondary provision and/or are deemed unsuitable following assessment for treatment as part of a Community Sentence Treatment Requirement.  However, Service user has identifiable substance misuse, alcohol misuse, prescription, gambling or other dependencies linked to re-offending. Service user has a history of poor engagement with treatment services and requires a high level of motivation and support to engage with treatment."
+      }
+    ]
+  },
+  {
+    "contract_type": "Women's Services",
+    "contract_code": "WOS",
+    "service_category": "Lifestyle and Associates",
+    "desired_outcomes": [
+      "Service user has improved pro-social self-identity and ability to access community-based support networks.",
+      "Service user sustains engagement in pro-social leisure interests and purposeful activities.",
+      "Service user reduces engagement with pro-criminal associates and activities.",
+      "Service user has a decreased reliance on negative peer relationships or networks, such as organised crime groups or extremism groups.",
+      "Service users are engaged in their community and able to make a positive contribution."
+    ],
+    "complexity_levels": [
+      {
+        "severity": "LOW",
+        "description": "Service user lacks confidence to engage in community activities and/or spend a significant amount of time alone.  Service user recognises the value of strong pro-social support groups but is struggling to develop these fully. Service user has got one or more close friends not involved in criminal activity and/or spends limited time each week with non-offending peers or some affiliation to non-offending groups and activities, but does not have a central role. Service user may recognise that some lifestyle choices and associations have affected their behaviour and may trigger re-offending, such as illegal drug use, alcohol, gambling, peer choice, limited medium and long-term goals."
+      },
+      {
+        "severity": "MEDIUM",
+        "description": "Service user recognises the value of strong pro-social support groups but does not belong to any and shows limited interest in doing so. Service user spends the majority of their time alone or using social networking sites or web based sites but with limited face-to-face social interaction. Service user is aware of the value of positive attachments but does not have any at present and/or spends a significant amount of time with pro-criminal social groups. Service user engages in anti-social behaviours including (non-addiction) drug use, regular alcohol use, problematic gambling, poor behaviour that impact negatively on the wider community and/or displays impulsiveness in risk taking activities, e.g. putting themselves or others at risk of harm."
+      },
+      {
+        "severity":"HIGH",
+        "description": "Service user has limited or no attachments/associations that are unrelated to offending behaviour. Service user does not belong to community groups or pro-social organised activities and does not place value on being part of them. Service user has no strong relationships outside of immediate family with people who don't offend and/or spends the majority of their time alone using social networking sites or web based sites but with no face-to-face social interaction. Service user has strong links to county lines, gang affiliations, exposure to extremism, at risk of radicalisation, certain online offences."
+      }
+    ]
+  },
+  {
+    "contract_type": "Women's Services",
+    "contract_code": "WOS",
+    "service_category": "Family and Significant Others",
+    "desired_outcomes": [
+      "Service user develops or maintains positive family relationships and avoids harmful relationships.",
+      "Service user demonstrates confident and responsible parenting behaviours (where applicable).",
+      "Service user improves ability to develop positive intimate relationships including communication, resilience, negotiation and assertiveness skills.",
+      "Service user demonstrates positive coping strategies in the event of temporary or irretrievable breakdown of familial or other relationships.",
+      "Service user complies with any voluntary or mandatory family or relationship-focussed therapeutic/behavioural change programmes."
+    ],
+    "complexity_levels": [
+      {
+        "severity": "LOW",
+        "description": "Service user has positive contact with some family or some significant others and may have positive support of family members. Service user has previously lost contact with family and recently renewed contacts but there remain some difficulties."
+      },
+      {
+        "severity": "MEDIUM",
+        "description": "Service user describes more difficulties in relationships with family and significant others or is in the process of resolving difficulties. Service user has a mix of good and difficult relationships with family and significant others."
+      },
+      {
+        "severity":"HIGH",
+        "description": "Service user has little or no contact with family and does not care about what family thinks feel or expects. Service user describes hostile, indifferent uncaring relationships with family and significant others. Service user's relationship has recently ended or is likely to do so."
+      }
+    ]
+  },
+  {
+    "contract_type": "Women's Services",
+    "contract_code": "WOS",
+    "service_category": "Emotional Wellbeing",
+    "desired_outcomes": [
+      "Service user's development of coping skills and strategies to regulate mood and demonstrate perspective-taking and self-care by avoiding risky situations.",
+      "Service user's development of levels of self-efficacy, resilience and confidence.",
+      "Service user's development of ability to access and engage with mental health services.",
+      "Service user's development of ability to recognise and manage triggers to worsening wellbeing.",
+      "Service user's development of ability to build and maintain appropriate social interactions.",
+      "Service user complies with any medication/treatment/therapy programmes."
+    ],
+    "complexity_levels": [
+      {
+        "severity": "LOW",
+        "description": "Service user has worries or issues and feels unable to cope but is not socially isolated and interacts with others. Service user has no known psychological issues or history of depression and mental health."
+      },
+      {
+        "severity": "MEDIUM",
+        "description": "Service user has diagnosed documented psychological problems that are being managed well but requires support to maintain engagement. Service user has coping strategies but needs assistance. Service user shows signs of stress in meetings and requires support to effectively engage."
+      },
+      {
+        "severity":"HIGH",
+        "description": "Service user has suffered psychological and mental health problems over a period of time which is documented, and needs significant level of support to engage with service provision. Service user is socially isolated and struggles with numerous aspects of daily life."
+      }
+    ]
+  },
+  {
+    "contract_type": "Women's Services",
+    "contract_code": "WOS",
+    "service_category": "Social Inclusion",
+    "desired_outcomes": [
+      "Service user develops and sustains social networks to reduce initial social isolation.",
+      "Service user secures early post-release engagement with community based services.",
+      "Service user develops resilience and perseverance to cope with challenges and barriers on return to the community."
+    ],
+    "complexity_levels": [
+      {
+        "severity": "LOW",
+        "description": "[up to 4 Sessions (pre-release virtual contact)] Service user has a low risk of reoffending. Service user has limited family support or engagement with community services and there may be barriers to achieving community integration."
+      },
+      {
+        "severity": "MEDIUM",
+        "description": "[up to 8 sessions (Including up to 2 pre-release face-to-face contacts)] Service user has medium risk of reoffending.  Service user has limited family support or engagement with community services and there may be barriers to achieving community integration. Service user has additional vulnerabilities requiring support through release and may have a pattern of non-compliance, e.g. recalls or failure to attend appointments."
+      },
+      {
+        "severity":"HIGH",
+        "description": "[up to 12 sessions (including up to 3 pre-release face-to-face contacts)] Service user has high risk of reoffending. Service user has limited family support, a lack of social networks or minimal engagement with community services and there may be barriers to achieving community integration. Service user has additional vulnerabilities requiring support throughout release with a pattern of non-compliance and a high likelihood of non-compliance in early weeks of release, e.g. recalls or failure to attend appointments."
       }
     ]
   }

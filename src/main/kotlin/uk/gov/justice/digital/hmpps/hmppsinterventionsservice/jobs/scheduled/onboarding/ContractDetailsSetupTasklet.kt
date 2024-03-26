@@ -36,57 +36,81 @@ class ContractDetailsSetupTasklet @Autowired constructor(
     val contractDetailsDefinitions =
       ObjectMapper().readValue(contractDetails, object : TypeReference<List<ContractDetailsDefinition>>() {})
     contractDetailsDefinitions.forEach {
-      val contractType = upsertContractType(it)
-      val upsertServiceCategory = upsertServiceCategory(it)
-      val upsertDesiredOutcomes = upsertDesiredOutcomes(it.desiredOutcomes, upsertServiceCategory.id)
-      val upsertComplexityLevels = upsertComplexityLevels(it.complexity, upsertServiceCategory.id)
-      val serviceCategory = serviceCategoryRepository.save(
-        ServiceCategory(
-          id = upsertServiceCategory.id,
-          created = upsertServiceCategory.created,
-          name = upsertServiceCategory.name,
-          complexityLevels = upsertComplexityLevels,
-          desiredOutcomes = upsertDesiredOutcomes,
-        ),
-      )
-      contractTypeRepository.save(
-        ContractType(id = contractType.id, name = contractType.name, code = contractType.code, serviceCategories = setOf(serviceCategory)),
-      )
+      val contractTypePair = upsertContractType(it)
+      val upsertServiceCategoryPair = upsertServiceCategory(it)
+      val upsertDesiredOutcomes = upsertDesiredOutcomes(it.desiredOutcomes, upsertServiceCategoryPair.second.id)
+      val upsertComplexityLevels = upsertComplexityLevels(it.complexity, upsertServiceCategoryPair.second.id)
+      val newContractType = contractTypePair.first
+      val newServiceCategory = upsertServiceCategoryPair.first
+      if (newContractType || newServiceCategory) {
+        if (newServiceCategory) {
+          val upsertServiceCategory = upsertServiceCategoryPair.second
+          val serviceCategory = serviceCategoryRepository.save(
+            ServiceCategory(
+              id = upsertServiceCategory.id,
+              created = upsertServiceCategory.created,
+              name = upsertServiceCategory.name,
+              complexityLevels = upsertComplexityLevels,
+              desiredOutcomes = upsertDesiredOutcomes,
+            ),
+          )
+          val contractType = contractTypePair.second
+          contractTypeRepository.save(
+            ContractType(
+              id = contractType.id,
+              name = contractType.name,
+              code = contractType.code,
+              serviceCategories = setOf(serviceCategory),
+            ),
+          )
+        }
+      } else {
+        logger.info("No need to be done, all data is already intact")
+      }
     }
-
     return RepeatStatus.FINISHED
   }
 
-  private fun upsertContractType(contractDefinition: ContractDetailsDefinition): ContractType {
+  private fun upsertContractType(contractDefinition: ContractDetailsDefinition): Pair<Boolean, ContractType> {
     val contractType = contractTypeRepository.findByCode(contractDefinition.contractCode)
     if (contractType == null) {
       logger.info("Creating missing contract type ${contractDefinition.contractCode}")
-      return contractTypeRepository.save(
-        ContractType(
-          id = UUID.randomUUID(),
-          name = contractDefinition.contractType,
-          code = contractDefinition.contractCode,
+      return Pair(
+        true,
+        contractTypeRepository.save(
+          ContractType(
+            id = UUID.randomUUID(),
+            name = contractDefinition.contractType,
+            code = contractDefinition.contractCode,
+          ),
         ),
       )
+    } else {
+      logger.info("contract type present is   ${contractType.code}")
     }
-    return contractType
+    return Pair(false, contractType)
   }
 
-  private fun upsertServiceCategory(contractDefinition: ContractDetailsDefinition): ServiceCategory {
+  private fun upsertServiceCategory(contractDefinition: ContractDetailsDefinition): Pair<Boolean, ServiceCategory> {
     val serviceCategory = serviceCategoryRepository.findByName(contractDefinition.serviceCategory)
     if (serviceCategory == null) {
       logger.info("Creating missing service category ${contractDefinition.serviceCategory}")
-      return serviceCategoryRepository.save(
-        ServiceCategory(
-          id = UUID.randomUUID(),
-          created = OffsetDateTime.now(),
-          name = contractDefinition.serviceCategory,
-          emptyList(),
-          emptyList(),
+      return Pair(
+        true,
+        serviceCategoryRepository.save(
+          ServiceCategory(
+            id = UUID.randomUUID(),
+            created = OffsetDateTime.now(),
+            name = contractDefinition.serviceCategory,
+            emptyList(),
+            emptyList(),
+          ),
         ),
       )
+    } else {
+      logger.info("service category present is   ${serviceCategory.name}")
     }
-    return serviceCategory
+    return Pair(false, serviceCategory)
   }
 
   private fun upsertDesiredOutcomes(desiredOutComes: List<String>, serviceCategoryId: UUID): List<DesiredOutcome> {

@@ -135,6 +135,7 @@ class UpsertContractProcessor(
       logger.info("Creating missing contract ${item.contractReference} with ID ${item.internalContractId}")
       return dynamicFrameworkContractRepository.save(definedContract)
     } else {
+      logger.info("Updating found contract ${foundContract.id} which has ${foundContract.contractReference}")
       // allowable overrides
       foundContract.referralEndAt = item.scheduling.hideAfter
       foundContract.referralStartDate = item.scheduling.hideBefore
