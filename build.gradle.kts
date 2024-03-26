@@ -99,9 +99,9 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.25.16")
-  implementation("software.amazon.awssdk:s3:2.25.16")
-  implementation("software.amazon.awssdk:sts:2.25.16")
+  implementation("software.amazon.awssdk:sns:2.25.17")
+  implementation("software.amazon.awssdk:s3:2.25.17")
+  implementation("software.amazon.awssdk:sts:2.25.17")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.4")
