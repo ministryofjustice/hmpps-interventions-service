@@ -20,7 +20,7 @@ spec:
               volumeMounts:
                 - name: heap-dumps
                   mountPath: /dumps
-  {{- include "deployment-replica.envs" . | nindent 14 }}
+  {{- include "deployment.envs" . | nindent 14 }}
           volumes:
             - name: heap-dumps
               emptyDir: {}
