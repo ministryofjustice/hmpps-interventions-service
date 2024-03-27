@@ -100,8 +100,8 @@ dependencies {
 
   // aws
   implementation("software.amazon.awssdk:sns:2.25.17")
-  implementation("software.amazon.awssdk:s3:2.25.17")
-  implementation("software.amazon.awssdk:sts:2.25.17")
+  implementation("software.amazon.awssdk:s3:2.25.18")
+  implementation("software.amazon.awssdk:sts:2.25.18")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.4")
@@ -123,7 +123,7 @@ dependencies {
   implementation("com.github.java-json-tools:json-patch:1.13")
   implementation("org.apache.commons:commons-csv:1.10.0")
 
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.7")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.8")
   testImplementation("com.squareup.okhttp3:okhttp:4.12.0")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
   testImplementation("org.mockito:mockito-inline:5.2.0")
