@@ -158,7 +158,6 @@ class AppointmentValidator {
             POP_UNACCEPTABLE -> checkValueSupplied(noSessionReasonPopUnacceptable, "sessionFeedback.noSessionReasonPopUnacceptable", Code.CANNOT_BE_EMPTY, errors)
             LOGISTICS -> checkValueSupplied(noSessionReasonLogistics, "sessionFeedback.noSessionReasonLogistics", Code.CANNOT_BE_EMPTY, errors)
           }
-          checkValueSupplied(notifyProbationPractitionerOfBehaviour, "sessionFeedback.notifyProbationPractitionerOfBehaviour", Code.CANNOT_BE_EMPTY, errors)
           checkValueSupplied(notifyProbationPractitionerOfConcerns, "sessionFeedback.notifyProbationPractitionerOfConcerns", Code.CANNOT_BE_EMPTY, errors)
           if (notifyProbationPractitionerOfBehaviour == true) {
             checkValueSupplied(sessionBehaviour, "sessionFeedback.sessionBehaviour", Code.CANNOT_BE_EMPTY, errors)
@@ -169,7 +168,6 @@ class AppointmentValidator {
         }
         NO -> {
           checkValueSupplied(noAttendanceInformation, "sessionFeedback.noAttendanceInformation", Code.CANNOT_BE_EMPTY, errors)
-          checkValueSupplied(notifyProbationPractitionerOfBehaviour, "sessionFeedback.notifyProbationPractitionerOfBehaviour", Code.CANNOT_BE_EMPTY, errors)
           checkValueSupplied(notifyProbationPractitionerOfConcerns, "sessionFeedback.notifyProbationPractitionerOfConcerns", Code.CANNOT_BE_EMPTY, errors)
           if (notifyProbationPractitionerOfBehaviour == true) {
             checkValueSupplied(sessionBehaviour, "sessionFeedback.sessionBehaviour", Code.CANNOT_BE_EMPTY, errors)
