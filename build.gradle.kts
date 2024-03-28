@@ -99,7 +99,7 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.25.18")
+  implementation("software.amazon.awssdk:sns:2.25.19")
   implementation("software.amazon.awssdk:s3:2.25.19")
   implementation("software.amazon.awssdk:sts:2.25.19")
 
