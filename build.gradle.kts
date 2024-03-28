@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   kotlin("plugin.spring") version "1.9.23"
   id("org.jetbrains.kotlin.plugin.jpa") version "1.9.23"
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.4"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.5"
   id("jacoco")
 }
 
@@ -99,9 +99,9 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.25.17")
-  implementation("software.amazon.awssdk:s3:2.25.18")
-  implementation("software.amazon.awssdk:sts:2.25.18")
+  implementation("software.amazon.awssdk:sns:2.25.18")
+  implementation("software.amazon.awssdk:s3:2.25.19")
+  implementation("software.amazon.awssdk:sts:2.25.19")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.4")
