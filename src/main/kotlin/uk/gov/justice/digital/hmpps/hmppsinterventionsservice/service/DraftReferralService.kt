@@ -228,6 +228,7 @@ class DraftReferralService(
       referral.ppName = update.ppName
       referral.roleOrJobTitle = update.roleOrJobTitle
       referral.ppEmailAddress = update.ppEmailAddress
+      referral.ppPhoneNumber = update.ppPhoneNumber
       referral.hasMainPointOfContactDetails = update.hasMainPointOfContactDetails
       if (update.ppLocationType == "establishment") {
         referral.ppEstablishment = update.ppEstablishment
