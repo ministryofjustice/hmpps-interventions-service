@@ -1,0 +1,1 @@
+update contract_type set name = 'Finance, Benefit and Debt in the North East' where name = 'Finance, Benefit and Debt in Custody (North East)';
