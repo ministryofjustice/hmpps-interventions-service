@@ -2,14 +2,12 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.specification
 
 import jakarta.persistence.criteria.JoinType
 import org.springframework.data.jpa.domain.Specification
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DynamicFrameworkContract
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
 import java.time.OffsetDateTime
 import java.util.UUID
 class ReferralSpecifications {
@@ -21,21 +19,9 @@ class ReferralSpecifications {
       }
     }
 
-    fun <T> concluded(concluded: Boolean?): Specification<T> {
-      return if (concluded == true) {
-        Specification<T> { root, _, cb ->
-          val supplierAssessmentJoin = root.join<T, SupplierAssessment>("supplierAssessment", JoinType.LEFT)
-          cb.and(
-            cb.isNotNull(root.get<OffsetDateTime>("concludedAt")),
-            cb.isNotEmpty(supplierAssessmentJoin.get<MutableSet<Appointment>>("appointments")),
-          )
-        }
-      } else {
-        Specification<T> { root, _, cb ->
-          cb.and(
-            cb.isNotNull(root.get<OffsetDateTime>("concludedAt")),
-          )
-        }
+    fun <T> concluded(): Specification<T> {
+      return Specification<T> { root, _, cb ->
+        cb.isNotNull(root.get<OffsetDateTime>("concludedAt"))
       }
     }
 

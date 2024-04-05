@@ -880,7 +880,7 @@ class ReferralServiceTest @Autowired constructor(
       val result = referralService.getSentReferralSummaryForUser(user, true, null, null, null, pageRequest)
       assertThat(result)
         .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
-        .containsExactlyInAnyOrder(completedSentReferralSummary)
+        .containsExactlyInAnyOrder(completedSentReferralSummary, cancelledSentReferralSummary)
       assertThat(result).doesNotContain(liveSentReferralSummary, selfAssignedSentReferralSummary, otherAssignedSentReferralSummary)
     }
 
@@ -980,7 +980,7 @@ class ReferralServiceTest @Autowired constructor(
       entityManager.refresh(completedReferral)
       completedSentReferralSummary = sentReferralSummariesFactory.getReferralSummary(completedReferral)
       val result = referralService.getSentReferralSummaryForUser(user, true, true, true, null, pageRequest)
-      assertThat(result).isEmpty()
+      assertThat(result).isNotEmpty
     }
 
     @Test

@@ -120,7 +120,7 @@ class ReferralSpecificationsTest @Autowired constructor(
       val sentReferralSummary = referralSumariesFactory.getReferralSummary(sent)
       val cancelledReferralSummary = referralSumariesFactory.getReferralSummary(cancelled)
       val completedReferralSummary = referralSumariesFactory.getReferralSummary(completed, endOfServiceReport)
-      val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.concluded(true))
+      val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.concluded())
       assertThat(result)
         .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
         .contains(completedReferralSummary)
