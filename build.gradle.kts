@@ -80,8 +80,8 @@ dependencies {
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
-  implementation("io.sentry:sentry-spring-boot-starter:7.7.0")
-  implementation("io.sentry:sentry-logback:7.7.0")
+  implementation("io.sentry:sentry-spring-boot-starter:7.8.0")
+  implementation("io.sentry:sentry-logback:7.8.0")
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
   implementation("net.logstash.logback:logstash-logback-encoder:7.4")
 
@@ -91,7 +91,7 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
   implementation("javax.xml.bind:jaxb-api:2.3.1")
   // notifications
-  implementation("uk.gov.service.notify:notifications-java-client:5.0.0-RELEASE")
+  implementation("uk.gov.service.notify:notifications-java-client:5.0.1-RELEASE")
   implementation("org.json:json") {
     version {
       strictly("20231013")
@@ -99,9 +99,9 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.25.26")
-  implementation("software.amazon.awssdk:s3:2.25.26")
-  implementation("software.amazon.awssdk:sts:2.25.26")
+  implementation("software.amazon.awssdk:sns:2.25.28")
+  implementation("software.amazon.awssdk:s3:2.25.28")
+  implementation("software.amazon.awssdk:sts:2.25.28")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.4")
