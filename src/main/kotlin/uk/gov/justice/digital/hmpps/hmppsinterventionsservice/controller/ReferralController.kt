@@ -37,6 +37,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Cancell
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SentReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.WithdrawalReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcluder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
@@ -160,6 +161,11 @@ class ReferralController(
   @GetMapping("/referral-cancellation-reasons")
   fun getCancellationReasons(): List<CancellationReason> {
     return referralService.getCancellationReasons()
+  }
+
+  @GetMapping("/referral-withdrawal-reasons")
+  fun getWithdrawalReasons(): List<WithdrawalReason> {
+    return referralService.getWithdrawalReasons()
   }
 
   @GetMapping("sent-referral/{id}/supplier-assessment")
