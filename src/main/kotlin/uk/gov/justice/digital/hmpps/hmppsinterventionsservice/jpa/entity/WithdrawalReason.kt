@@ -7,4 +7,5 @@ import jakarta.persistence.Id
 data class WithdrawalReason(
   @Id val code: String,
   val description: String,
+  val grouping: String,
 )
