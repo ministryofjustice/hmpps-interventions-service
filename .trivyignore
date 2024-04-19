@@ -16,3 +16,6 @@ CVE-2023-6378
 # Supression for spring security / spring web while we await new DPS spring version
 CVE-2024-22257
 CVE-2024-22259
+# Suppression for spring vulnerability which hasn't yet been patched in DPS project,
+# remove once upgraded and don't apply to PROD
+CVE-2024-22262
