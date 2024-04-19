@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   kotlin("plugin.spring") version "1.9.23"
   id("org.jetbrains.kotlin.plugin.jpa") version "1.9.23"
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.5"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.6"
   id("jacoco")
 }
 
