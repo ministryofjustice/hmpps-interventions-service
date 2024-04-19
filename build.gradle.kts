@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   kotlin("plugin.spring") version "1.9.23"
   id("org.jetbrains.kotlin.plugin.jpa") version "1.9.23"
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.5"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.6"
   id("jacoco")
 }
 
@@ -99,14 +99,14 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.25.31")
-  implementation("software.amazon.awssdk:s3:2.25.31")
-  implementation("software.amazon.awssdk:sts:2.25.31")
+  implementation("software.amazon.awssdk:sns:2.25.34")
+  implementation("software.amazon.awssdk:s3:2.25.33")
+  implementation("software.amazon.awssdk:sts:2.25.34")
 
   // security
-  implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.4")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.2.4")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.2.4")
+  implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.5")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.2.5")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.2.5")
   implementation("com.nimbusds:oauth2-oidc-sdk:11.10.1")
 
   // database
@@ -114,7 +114,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("com.h2database:h2:2.2.224")
   implementation("org.hibernate:hibernate-core:6.4.4.Final")
-  implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.3")
+  implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.4")
 
   runtimeOnly("org.flywaydb:flyway-core:9.22.3")
   runtimeOnly("org.postgresql:postgresql:42.7.3")
@@ -123,7 +123,7 @@ dependencies {
   implementation("com.github.java-json-tools:json-patch:1.13")
   implementation("org.apache.commons:commons-csv:1.10.0")
 
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.8")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.9")
   testImplementation("com.squareup.okhttp3:okhttp:4.12.0")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
   testImplementation("org.mockito:mockito-inline:5.2.0")
