@@ -3,8 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 import jakarta.persistence.CascadeType
 import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column
-import jakarta.persistence.ColumnResult
-import jakarta.persistence.ConstructorResult
 import jakarta.persistence.ElementCollection
 import jakarta.persistence.Embeddable
 import jakarta.persistence.Entity
@@ -15,13 +13,11 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.JoinTable
 import jakarta.persistence.ManyToMany
 import jakarta.persistence.ManyToOne
-import jakarta.persistence.NamedNativeQuery
 import jakarta.persistence.OneToMany
 import jakarta.persistence.OneToOne
 import jakarta.persistence.OrderBy
 import jakarta.persistence.PrePersist
 import jakarta.persistence.PrimaryKeyJoinColumn
-import jakarta.persistence.SqlResultSetMapping
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import org.hibernate.annotations.Fetch

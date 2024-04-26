@@ -9,15 +9,15 @@ import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.step.builder.StepBuilder
 import org.springframework.batch.item.ItemProcessor
-import org.springframework.batch.item.data.RepositoryItemReader
-import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
+import org.springframework.batch.item.support.ListItemReader
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.FileSystemResource
-import org.springframework.data.domain.Sort
 import org.springframework.transaction.PlatformTransactionManager
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.OnStartupJobLauncherFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralPerformanceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUtils
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model.ReferralPerformanceReport
@@ -29,10 +29,17 @@ class PerformanceReportJobConfiguration(
   private val transactionManager: PlatformTransactionManager,
   private val batchUtils: BatchUtils,
   private val listener: PerformanceReportJobListener,
+  private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
   private val referralPerformanceReportRepository: ReferralPerformanceReportRepository,
   @Value("\${spring.batch.jobs.service-provider.performance-report.chunk-size}") private val chunkSize: Int,
   @Value("\${spring.batch.jobs.service-provider.performance-report.page-size}") private val pageSize: Int,
 ) {
+
+  @Bean
+  fun performanceReportJobLauncher(performanceReportJob: Job): ApplicationRunner {
+    return onStartupJobLauncherFactory.makeBatchLauncher(performanceReportJob)
+  }
+
   @Bean
   @JobScope
   fun reader(
@@ -40,10 +47,18 @@ class PerformanceReportJobConfiguration(
     @Value("#{jobParameters['from']}") from: Date,
     @Value("#{jobParameters['to']}") to: Date,
     sessionFactory: SessionFactory,
-  ): RepositoryItemReader<ReferralPerformanceReport> {
+  ): ListItemReader<ReferralPerformanceReport> {
+    // var referralPerformanceReportRepositoryImpl: ReferralPerformanceReportRepository? = null
+
     // this reader returns referral entities which need processing for the report.
-    return RepositoryItemReaderBuilder<ReferralPerformanceReport>()
-      .repository(referralPerformanceReportRepository)
+    return ListItemReader<ReferralPerformanceReport>(
+      referralPerformanceReportRepository.serviceProviderReportReferrals(
+        batchUtils.parseDateToOffsetDateTime(from),
+        batchUtils.parseDateToOffsetDateTime(to),
+        contractReferences.split(","),
+      ),
+    )
+      /* .repository(referralPerformanceReportRepository)
       .methodName("serviceProviderReportReferrals")
       .arguments(
         listOf(
@@ -55,7 +70,7 @@ class PerformanceReportJobConfiguration(
       .pageSize(pageSize)
       .sorts(mapOf("dateReferralReceived" to Sort.Direction.ASC))
       .saveState(false)
-      .build()
+      .build()*/
   }
 
   @Bean
@@ -74,6 +89,7 @@ class PerformanceReportJobConfiguration(
     val validator = DefaultJobParametersValidator()
     validator.setRequiredKeys(
       arrayOf(
+    /*
         "contractReferences",
         "user.id",
         "user.firstName",
@@ -81,6 +97,7 @@ class PerformanceReportJobConfiguration(
         "from",
         "to",
         "timestamp",
+     */
       ),
     )
 
@@ -93,7 +110,7 @@ class PerformanceReportJobConfiguration(
 
   @Bean
   fun writeToCsvStep(
-    reader: RepositoryItemReader<ReferralPerformanceReport>,
+    reader: ListItemReader<ReferralPerformanceReport>,
     processor: ItemProcessor<ReferralPerformanceReport, PerformanceReportData>,
     writer: FlatFileItemWriter<PerformanceReportData>,
   ): Step {

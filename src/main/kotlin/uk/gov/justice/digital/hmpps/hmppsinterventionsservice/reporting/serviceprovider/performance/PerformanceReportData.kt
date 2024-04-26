@@ -5,7 +5,7 @@ import java.util.UUID
 
 data class PerformanceReportData(
   val referralReference: String,
-  val referralId: UUID,
+  val referralId: UUID?,
   val contractReference: String,
   val organisationId: String,
   val currentAssigneeEmail: String?,

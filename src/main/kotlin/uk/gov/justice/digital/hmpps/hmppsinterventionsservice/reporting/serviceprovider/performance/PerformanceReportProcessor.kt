@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model.ReferralPerformanceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
+import java.util.*
 
 @Component
 class PerformanceReportProcessor(
@@ -34,14 +35,14 @@ class PerformanceReportProcessor(
       supplierAssessmentAttendedOnTime = referral.supplierAssessmentAttendedOnTime,
       firstActionPlanSubmittedAt = referral.firstActionPlanSubmittedAt,
       firstActionPlanApprovedAt = referral.firstActionPlanApprovedAt,
-      firstSessionAttendedAt = referral.approvedActionPlanId?.let { actionPlanService.getFirstAttendedAppointment(referral.referralId)?.appointmentTime },
+      firstSessionAttendedAt = referral.approvedActionPlanId?.let { referral.referralId?.let { it1 -> actionPlanService.getFirstAttendedAppointment(it1)?.appointmentTime } },
       numberOfOutcomes = referral.numberOfOutcomes?.toInt(),
-      achievementScore = referral.endOfServiceReportId?.let { eosr ->
+      achievementScore = 0F, /*referral.endOfServiceReportId?.let { eosr ->
         endOfServiceReportRepository.findById(eosr).map { it.achievementScore }
           .get()
-      },
+      }, requires attetion */
       numberOfSessions = referral.numberOfSessions,
-      numberOfSessionsAttended = referral.approvedActionPlanId?.let { actionPlanService.getAllAttendedAppointments(referral.referralId).size },
+      numberOfSessionsAttended = referral.approvedActionPlanId?.let { referral.referralId?.let { it1 -> actionPlanService.getAllAttendedAppointments(it1).size } },
       endRequestedAt = referral.endRequestedAt,
       endRequestedReason = referral.endRequestedReason,
       eosrSubmittedAt = referral.eosrSubmittedAt,

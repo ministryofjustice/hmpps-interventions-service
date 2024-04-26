@@ -1,15 +1,15 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model
 
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 import java.time.OffsetDateTime
 import java.util.UUID
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.Table
 
 @Entity
 @Table(name = "referral_performance_report")
 data class ReferralPerformanceReport(
-  @Id val referralId: UUID,
+  @Id val referralId: UUID?,
   val referralReference: String,
   val contractReference: String,
   val organisationId: String,
