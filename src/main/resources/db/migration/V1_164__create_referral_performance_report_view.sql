@@ -172,6 +172,7 @@ INSERT INTO metadata (table_name, column_name, sensitive, domain_data) VALUES ('
 INSERT INTO metadata (table_name, column_name, sensitive, domain_data) VALUES ('referral_performance_report','date_supplier_assessment_first_scheduled_for', TRUE, TRUE);
 INSERT INTO metadata (table_name, column_name, sensitive, domain_data) VALUES ('referral_performance_report','date_supplier_assessment_first_not_attended', TRUE, TRUE);
 INSERT INTO metadata (table_name, column_name, sensitive, domain_data) VALUES ('referral_performance_report','date_supplier_assessment_first_attended', TRUE, TRUE);
+INSERT INTO metadata (table_name, column_name, sensitive, domain_data) VALUES ('referral_performance_report','date_supplier_assessment_first_completed', TRUE, TRUE);
 INSERT INTO metadata (table_name, column_name, sensitive, domain_data) VALUES ('referral_performance_report','supplier_assessment_attended_on_time', TRUE, TRUE);
 INSERT INTO metadata (table_name, column_name, sensitive, domain_data) VALUES ('referral_performance_report','first_action_plan_submitted_at', TRUE, TRUE);
 INSERT INTO metadata (table_name, column_name, sensitive, domain_data) VALUES ('referral_performance_report','first_action_plan_approved_at', TRUE, TRUE);
