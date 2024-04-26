@@ -207,4 +207,29 @@ COMMENT ON COLUMN referral_summary.end_requested_at IS 'referral end requested a
 COMMENT ON COLUMN referral_summary.eosr_id IS 'referral end of service id';
 COMMENT ON COLUMN referral_summary.appointment_id IS 'supplier assessment appointment id';
 
+COMMENT ON VIEW referral_performance_report IS 'referral_performance_report for performance report view - not actively used, just for profiling';
+COMMENT ON COLUMN referral_performance_report.referral_id IS 'referral unique identifier';
+COMMENT ON COLUMN referral_performance_report.referral_reference IS 'user friendly referral reference';
+COMMENT ON COLUMN referral_performance_report.contract_reference IS 'contract PRJ code';
+COMMENT ON COLUMN referral_performance_report.organisation_id IS 'organisation idetifier';
+COMMENT ON COLUMN referral_performance_report.current_assignee_email IS 'current assignee email address';
+COMMENT ON COLUMN referral_performance_report.crn IS 'case reference number';
+COMMENT ON COLUMN referral_performance_report.date_referral_received IS 'date the referral was received by the SP';
+COMMENT ON COLUMN referral_performance_report.date_supplier_assessment_first_arranged IS 'date the supplier assessment was first arranged';
+COMMENT ON COLUMN referral_performance_report.date_supplier_assessment_first_scheduled_for IS 'date the supplier assessment was first scheduled to be held';
+COMMENT ON COLUMN referral_performance_report.date_supplier_assessment_first_not_attended IS 'date the supplier assessment was first non attended';
+COMMENT ON COLUMN referral_performance_report.date_supplier_assessment_first_attended IS 'date the supplier assessment was first attended';
+COMMENT ON COLUMN referral_performance_report.date_supplier_assessment_first_completed IS 'date the supplier assessment was first completed';
+COMMENT ON COLUMN referral_performance_report.supplier_assessment_attended_on_time IS 'indicator if the sipplier assessment was completed on time';
+COMMENT ON COLUMN referral_performance_report.first_action_plan_submitted_at IS 'date first action plan submitted';
+COMMENT ON COLUMN referral_performance_report.first_action_plan_approved_at IS 'date first action plan approved';
+COMMENT ON COLUMN referral_performance_report.approved_action_plan_id IS 'idetifier for the approved action plan';
+COMMENT ON COLUMN referral_performance_report.number_of_outcomes IS 'count of outcomes';
+COMMENT ON COLUMN referral_performance_report.end_of_service_report_id IS 'end of service report identifer';
+COMMENT ON COLUMN referral_performance_report.number_of_sessions IS 'count of sessions';
+COMMENT ON COLUMN referral_performance_report.end_requested_at IS 'date end of intervention requested';
+COMMENT ON COLUMN referral_performance_report.end_requested_reason IS 'reason for end of intervention';
+COMMENT ON COLUMN referral_performance_report.eosr_submitted_at IS 'date end of service report submitted';
+COMMENT ON COLUMN referral_performance_report.concluded_at IS 'date intervention concluded';
+
 -- some definitions are in V1_34__document_contract_table.sql; needs lifting
