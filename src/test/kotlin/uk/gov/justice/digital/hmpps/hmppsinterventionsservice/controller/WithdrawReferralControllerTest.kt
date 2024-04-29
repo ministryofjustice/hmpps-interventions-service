@@ -93,5 +93,6 @@ class WithdrawReferralControllerTest {
     whenever(authUserRepository.save(any())).thenReturn(user)
 
     val response = withdrawReferralController.submitWithdrawalReasons(referral.id, withdrawReferralRequestDTO, token)
+    assertThat(response.endOfServiceReportCreationRequired).isTrue
   }
 }
