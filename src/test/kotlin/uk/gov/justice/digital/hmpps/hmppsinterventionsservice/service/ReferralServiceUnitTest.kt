@@ -4,6 +4,7 @@ import io.netty.handler.timeout.ReadTimeoutException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.mockito.AdditionalAnswers
 import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.any
@@ -13,17 +14,20 @@ import org.mockito.kotlin.secondValue
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessFilter
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceProviderAccessScopeMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserTypeChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.WithdrawReferralRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.WithdrawalReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
@@ -34,10 +38,12 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Ref
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSummariesRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.WithdrawalReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.CancellationReasonFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ChangeLogFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.WithdrawReasonFactory
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -65,10 +71,12 @@ class ReferralServiceUnitTest {
   private val telemetryService: TelemetryService = mock()
   private val referralDetailsRepository: ReferralDetailsRepository = mock()
   private val changeLogRepository: ChangelogRepository = mock()
+  private val withdrawalReasonRepository: WithdrawalReasonRepository = mock()
 
   private val referralFactory = ReferralFactory()
   private val authUserFactory = AuthUserFactory()
   private val cancellationReasonFactory = CancellationReasonFactory()
+  private val withdrawReasonFactory = WithdrawReasonFactory()
   private val changeLogFactory = ChangeLogFactory()
 
   private val referralService = ReferralService(
@@ -79,6 +87,7 @@ class ReferralServiceUnitTest {
     referralConcluder,
     referralEventPublisher,
     cancellationReasonRepository,
+    withdrawalReasonRepository,
     deliverySessionRepository,
     serviceCategoryRepository,
     referralAccessChecker,
@@ -97,32 +106,57 @@ class ReferralServiceUnitTest {
   fun `set ended fields on a sent referral`() {
     val referral = referralFactory.createSent()
     val authUser = authUserFactory.create()
-    val cancellationReason = cancellationReasonFactory.create()
+    val withdrawalReason = withdrawReasonFactory.create()
+    val withdrawReferralRequestDTO = WithdrawReferralRequestDTO(withdrawalReason.code, withdrawalReason.description)
     val cancellationComments = "comment"
 
     whenever(authUserRepository.save(authUser)).thenReturn(authUser)
-    whenever(referralRepository.save(any())).thenReturn(referralFactory.createEnded(endRequestedComments = cancellationComments))
+    whenever(withdrawalReasonRepository.findByCode("MIS")).thenReturn(withdrawalReason)
+    whenever(referralRepository.save(any())).thenReturn(referralFactory.createEnded(endRequestedComments = cancellationComments, withdrawalReason = withdrawalReason))
 
-    val endedReferral = referralService.requestReferralEnd(referral, authUser, cancellationReason, cancellationComments)
+    val endedReferral = referralService.requestReferralEnd(referral, authUser, withdrawReferralRequestDTO)
     assertThat(endedReferral.endRequestedAt).isNotNull
     assertThat(endedReferral.endRequestedBy).isEqualTo(authUser)
-    assertThat(endedReferral.endRequestedReason).isEqualTo(cancellationReason)
-    assertThat(endedReferral.endRequestedComments).isEqualTo(cancellationComments)
+    assertThat(endedReferral.withdrawalReasonCode).isEqualTo(withdrawReferralRequestDTO.code)
+    assertThat(endedReferral.withdrawalComments).isEqualTo(withdrawReferralRequestDTO.comments)
   }
 
   @Test
   fun `referral is concluded if eligible on a sent referral`() {
     val referral = referralFactory.createSent()
     val authUser = authUserFactory.create()
-    val cancellationReason = cancellationReasonFactory.create()
+    val withdrawalReason = withdrawReasonFactory.create()
+    val withdrawReferralRequestDTO = WithdrawReferralRequestDTO(withdrawalReason.code, withdrawalReason.description)
     val cancellationComments = "comment"
+    val endedReferral = referralFactory.createEnded(endRequestedComments = cancellationComments, withdrawalReason = withdrawalReason)
 
     whenever(authUserRepository.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg<AuthUser>())
     whenever(referralRepository.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg<Referral>())
+    whenever(withdrawalReasonRepository.findByCode("MIS")).thenReturn(withdrawalReason)
+    whenever(referralRepository.save(any())).thenReturn(endedReferral)
 
-    referralService.requestReferralEnd(referral, authUser, cancellationReason, cancellationComments)
+    referralService.requestReferralEnd(referral, authUser, withdrawReferralRequestDTO)
 
-    verify(referralConcluder).concludeIfEligible(referral)
+    verify(referralConcluder).concludeIfEligible(endedReferral)
+  }
+
+  @Test
+  fun `referral is not concluded when the withdrawal reason code sent is wrong`() {
+    val referral = referralFactory.createSent()
+    val authUser = authUserFactory.create()
+    val withdrawalReason = withdrawReasonFactory.create()
+    val withdrawReferralRequestDTO = WithdrawReferralRequestDTO(withdrawalReason.code, withdrawalReason.description)
+
+    whenever(withdrawalReasonRepository.findByCode("MIS")).thenReturn(null)
+    whenever(authUserRepository.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg<AuthUser>())
+    whenever(referralRepository.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg<Referral>())
+
+    val exception = assertThrows<ResponseStatusException> {
+      referralService.requestReferralEnd(referral, authUser, withdrawReferralRequestDTO)
+    }
+    verify(withdrawalReasonRepository, times(1)).findByCode("MIS")
+    assertThat(exception.statusCode.value()).isEqualTo(400)
+    assertThat(exception.reason).isEqualTo("Invalid withdrawal code. [code=MIS]")
   }
 
   @Test
@@ -133,6 +167,18 @@ class ReferralServiceUnitTest {
     )
     whenever(cancellationReasonRepository.findAll()).thenReturn(cancellationReasons)
     val result = referralService.getCancellationReasons()
+    assertThat(result).isNotNull
+  }
+
+  @Test
+  fun `get all withdrawal reasons`() {
+    val withdrawalReasons = listOf(
+      WithdrawalReason(code = "aaa", description = "reason 1", grouping = "group1"),
+      WithdrawalReason(code = "aaa", description = "reason 1", grouping = "group1"),
+    )
+
+    whenever(withdrawalReasonRepository.findAll()).thenReturn(withdrawalReasons)
+    val result = referralService.getWithdrawalReasons()
     assertThat(result).isNotNull
   }
 

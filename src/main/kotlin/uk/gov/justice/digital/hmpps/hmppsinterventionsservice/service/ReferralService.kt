@@ -8,9 +8,11 @@ import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.domain.Specification.not
 import org.springframework.data.jpa.domain.Specification.where
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessFilter
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceProviderAccessScopeMapper
@@ -18,6 +20,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.User
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.AccessError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DashboardType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.WithdrawReferralRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
@@ -203,15 +206,24 @@ class ReferralService(
     return referralAccessFilter.probationPractitionerReferrals(referralSpecification, user)
   }
 
-  fun requestReferralEnd(referral: Referral, user: AuthUser, reason: CancellationReason, comments: String?): Referral {
+  fun requestReferralEnd(referral: Referral, user: AuthUser, withdrawReferralRequestDTO: WithdrawReferralRequestDTO): Referral {
     val now = OffsetDateTime.now()
     referral.endRequestedAt = now
     referral.endRequestedBy = authUserRepository.save(user)
-    referral.endRequestedReason = reason
-    comments?.let { referral.endRequestedComments = it }
-
+    updateWithdrawalInformation(referral, withdrawReferralRequestDTO)
     return referralRepository.save(referral)
       .also { referralConcluder.concludeIfEligible(it) }
+  }
+
+  private fun updateWithdrawalInformation(referral: Referral, withdrawReferralRequestDTO: WithdrawReferralRequestDTO) {
+    validateWithdrawalReasonCode(withdrawReferralRequestDTO.code)
+    referral.withdrawalReasonCode = withdrawReferralRequestDTO.code
+    referral.withdrawalComments = withdrawReferralRequestDTO.comments
+  }
+
+  private fun validateWithdrawalReasonCode(withdrawalReasonCode: String) {
+    withdrawalReasonRepository.findByCode(withdrawalReasonCode)
+      ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid withdrawal code. [code=$withdrawalReasonCode]")
   }
 
   fun updateReferralDetails(referral: Referral, update: UpdateReferralDetailsDTO, actor: AuthUser): ReferralDetails? {

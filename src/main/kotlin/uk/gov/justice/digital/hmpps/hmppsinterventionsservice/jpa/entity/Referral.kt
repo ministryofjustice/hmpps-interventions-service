@@ -120,6 +120,9 @@ class Referral(
   @OneToOne(mappedBy = "referral")
   @Fetch(JOIN)
   var probationPractitionerDetails: ProbationPractitionerDetails? = null,
+
+  @Column(name = "withdrawal_reason_code") var withdrawalReasonCode: String? = null,
+  @Column(name = "withdrawal_comments") var withdrawalComments: String? = null,
 ) {
   val urn: String
     get() = "urn:hmpps:interventions-referral:$id"

@@ -5,8 +5,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AuthUserDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.CreateCaseNoteDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.CreateReferralRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DraftReferralDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EndReferralRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAssignmentDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.WithdrawReferralRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.SetupAssistant
 import java.util.UUID
 
@@ -41,8 +41,8 @@ class RequestFactory(private val webTestClient: WebTestClient, private val setup
       Request.AssignSentReferral -> webTestClient.post().uri("/sent-referral/${urlParams[0]}/assign").bodyValue(
         if (body != null) body as ReferralAssignmentDTO else ReferralAssignmentDTO(AuthUserDTO.from(setupAssistant.createSPUser())),
       )
-      Request.EndSentReferral -> webTestClient.post().uri("/sent-referral/${urlParams[0]}/end").bodyValue(
-        if (body != null) body as EndReferralRequestDTO else EndReferralRequestDTO(setupAssistant.randomCancellationReason().code, "comments"),
+      Request.EndSentReferral -> webTestClient.post().uri("/sent-referral/${urlParams[0]}/withdraw-referral").bodyValue(
+        if (body != null) body as WithdrawReferralRequestDTO else WithdrawReferralRequestDTO(setupAssistant.randomWithDrawReason().code, "comments"),
       )
 
       Request.GetDraftReferrals -> webTestClient.get().uri("/draft-referrals")

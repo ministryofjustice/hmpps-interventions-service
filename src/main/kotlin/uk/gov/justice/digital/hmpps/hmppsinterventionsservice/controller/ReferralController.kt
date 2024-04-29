@@ -23,7 +23,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.User
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller.mappers.CancellationReasonMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ActionPlanSummaryDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DashboardType
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EndReferralRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAssignmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SentReferralDTO
@@ -37,7 +36,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Cancell
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SentReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.WithdrawalReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcluder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
@@ -137,20 +135,6 @@ class ReferralController(
       }
   }
 
-  @JsonView(Views.SentReferral::class)
-  @PostMapping("/sent-referral/{id}/end")
-  fun endSentReferral(@PathVariable id: UUID, @RequestBody endReferralRequest: EndReferralRequestDTO, authentication: JwtAuthenticationToken): SentReferralDTO {
-    val sentReferral = getSentReferralForAuthenticatedUser(authentication, id)
-
-    val cancellationReason = cancellationReasonMapper.mapCancellationReasonIdToCancellationReason(endReferralRequest.reasonCode)
-
-    val user = userMapper.fromToken(authentication)
-    return SentReferralDTO.from(
-      referralService.requestReferralEnd(sentReferral, user, cancellationReason, endReferralRequest.comments),
-      referralConcluder.requiresEndOfServiceReportCreation(sentReferral),
-    )
-  }
-
   @GetMapping("/service-category/{id}")
   fun getServiceCategoryByID(@PathVariable id: UUID): ServiceCategoryFullDTO {
     return serviceCategoryService.getServiceCategoryByID(id)
@@ -161,11 +145,6 @@ class ReferralController(
   @GetMapping("/referral-cancellation-reasons")
   fun getCancellationReasons(): List<CancellationReason> {
     return referralService.getCancellationReasons()
-  }
-
-  @GetMapping("/referral-withdrawal-reasons")
-  fun getWithdrawalReasons(): List<WithdrawalReason> {
-    return referralService.getWithdrawalReasons()
   }
 
   @GetMapping("sent-referral/{id}/supplier-assessment")

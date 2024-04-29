@@ -9,7 +9,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Interve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import java.time.OffsetDateTime
-import java.util.UUID
 class ReferralSpecifications {
   companion object {
 
@@ -85,12 +84,6 @@ class ReferralSpecifications {
         val latestAssignment = cb.equal(referralAssignmentJoin.get<Boolean>("superseded"), false)
         val sameUser = cb.equal(authUserJoin.get<String>("id"), authUserId)
         cb.and(latestAssignment, sameUser)
-      }
-    }
-
-    fun <T> idIn(uuids: Set<UUID>): Specification<T> {
-      return Specification<T> { root, _, _ ->
-        root.get<T>("id").`in`(uuids)
       }
     }
   }
