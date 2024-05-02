@@ -212,7 +212,7 @@ class ReferralService(
     referral.endRequestedBy = authUserRepository.save(user)
     updateWithdrawalInformation(referral, withdrawReferralRequestDTO)
     return referralRepository.save(referral)
-      .also { referralConcluder.concludeIfEligible(it) }
+      .also { referralConcluder.withdrawReferral(it, ReferralWithdrawalState.valueOf(withdrawReferralRequestDTO.withdrawalState)) }
   }
 
   private fun updateWithdrawalInformation(referral: Referral, withdrawReferralRequestDTO: WithdrawReferralRequestDTO) {

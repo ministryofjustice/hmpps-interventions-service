@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
@@ -14,12 +15,16 @@ enum class DeliveryState(
   val requiresEndOfServiceReport: Boolean,
   val inProgress: Boolean,
   val concludedState: ReferralConcludedState,
-  val referralWithdrawalState: ReferralWithdrawalState,
 ) {
-  NOT_DELIVERING_YET(false, true, ReferralConcludedState.CANCELLED, ReferralWithdrawalState.PRE_ICA_WITHDRAWAL),
-  MISSING_FIRST_SUBSTANTIVE_APPOINTMENT(false, true, ReferralConcludedState.CANCELLED, ReferralWithdrawalState.PRE_ICA_WITHDRAWAL),
-  IN_PROGRESS(true, true, ReferralConcludedState.PREMATURELY_ENDED, ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY),
-  COMPLETED(true, false, ReferralConcludedState.COMPLETED, ReferralWithdrawalState.POST_ICA_WITHDRAWAL),
+  NOT_DELIVERING_YET(false, true, ReferralConcludedState.CANCELLED),
+  MISSING_FIRST_SUBSTANTIVE_APPOINTMENT(false, true, ReferralConcludedState.CANCELLED),
+  IN_PROGRESS(true, true, ReferralConcludedState.PREMATURELY_ENDED),
+  COMPLETED(true, false, ReferralConcludedState.COMPLETED),
+}
+
+enum class ReferralEndState {
+  AWAITING_END_OF_SERVICE_REPORT,
+  CAN_CONCLUDE,
 }
 
 enum class ReferralConcludedState {
@@ -46,8 +51,16 @@ class ReferralConcluder(
     val deliveryState = deliveryState(referral)
     signalEnding(referral, deliveryState.concludedState)
 
-    val referralWithdrawalState = withdrawalState(referral)
-    conclude(referral, deliveryState.concludedState, referralWithdrawalState)
+    val endState = endState(deliveryState, referral.endOfServiceReport)
+    if (endState == ReferralEndState.CAN_CONCLUDE) {
+      conclude(referral, deliveryState.concludedState)
+    }
+  }
+
+  fun withdrawReferral(referral: Referral, withdrawalState: ReferralWithdrawalState) {
+    val deliveryState = deliveryState(referral)
+    signalEnding(referral, deliveryState.concludedState)
+    conclude(referral, deliveryState.concludedState, withdrawalState)
   }
 
   private fun signalEnding(referral: Referral, concludedState: ReferralConcludedState) {
@@ -57,11 +70,11 @@ class ReferralConcluder(
   private fun conclude(
     referral: Referral,
     concludedState: ReferralConcludedState,
-    referralWithdrawalState: ReferralWithdrawalState,
+    withdrawalState: ReferralWithdrawalState? = null,
   ) {
     referral.concludedAt = OffsetDateTime.now()
     referralRepository.save(referral)
-    referralEventPublisher.referralConcludedEvent(referral, concludedState, referralWithdrawalState)
+    referralEventPublisher.referralConcludedEvent(referral, concludedState, withdrawalState)
   }
 
   private fun deliveryState(referral: Referral): DeliveryState {
@@ -75,6 +88,14 @@ class ReferralConcluder(
       DeliveryState.COMPLETED
     } else {
       DeliveryState.IN_PROGRESS
+    }
+  }
+
+  private fun endState(deliveryState: DeliveryState, endOfServiceReport: EndOfServiceReport?): ReferralEndState {
+    return if (deliveryState.requiresEndOfServiceReport && endOfServiceReport?.submittedAt == null) {
+      ReferralEndState.AWAITING_END_OF_SERVICE_REPORT
+    } else {
+      ReferralEndState.CAN_CONCLUDE
     }
   }
 

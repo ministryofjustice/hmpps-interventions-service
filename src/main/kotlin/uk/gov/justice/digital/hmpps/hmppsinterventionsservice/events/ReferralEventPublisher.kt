@@ -50,7 +50,7 @@ class ReferralConcludedEvent(
   val type: ReferralConcludedState,
   val referral: Referral,
   val detailUrl: String,
-  val referralWithdrawalState: ReferralWithdrawalState,
+  val referralWithdrawalState: ReferralWithdrawalState? = null,
 ) : ApplicationEvent(source) {
   override fun toString(): String {
     return "ReferralConcludedEvent(type=$type, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
@@ -91,7 +91,7 @@ class ReferralEventPublisher(
   fun referralConcludedEvent(
     referral: Referral,
     eventType: ReferralConcludedState,
-    referralWithdrawalState: ReferralWithdrawalState,
+    referralWithdrawalState: ReferralWithdrawalState? = null,
   ) {
     applicationEventPublisher.publishEvent(ReferralConcludedEvent(this, eventType, referral, getSentReferralURL(referral), referralWithdrawalState))
   }

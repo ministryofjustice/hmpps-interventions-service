@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DraftReferralD
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAssignmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.WithdrawReferralRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.SetupAssistant
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralWithdrawalState
 import java.util.UUID
 
 enum class Request {
@@ -42,7 +43,7 @@ class RequestFactory(private val webTestClient: WebTestClient, private val setup
         if (body != null) body as ReferralAssignmentDTO else ReferralAssignmentDTO(AuthUserDTO.from(setupAssistant.createSPUser())),
       )
       Request.EndSentReferral -> webTestClient.post().uri("/sent-referral/${urlParams[0]}/withdraw-referral").bodyValue(
-        if (body != null) body as WithdrawReferralRequestDTO else WithdrawReferralRequestDTO(setupAssistant.randomWithDrawReason().code, "comments"),
+        if (body != null) body as WithdrawReferralRequestDTO else WithdrawReferralRequestDTO(setupAssistant.randomWithDrawReason().code, "comments", ReferralWithdrawalState.PRE_ICA_WITHDRAWAL.name),
       )
 
       Request.GetDraftReferrals -> webTestClient.get().uri("/draft-referrals")

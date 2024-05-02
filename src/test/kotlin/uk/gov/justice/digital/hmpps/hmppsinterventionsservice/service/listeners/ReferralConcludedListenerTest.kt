@@ -116,9 +116,13 @@ internal class ReferralConcludedNotificationListenerTest {
     @JvmStatic
     fun withdrawStateSource(): Stream<Arguments> {
       return Stream.of(
-        arguments(ReferralWithdrawalState.PRE_ICA_WITHDRAWAL, "withDrawnReferralPreIcaTemplateId"),
-        arguments(ReferralWithdrawalState.POST_ICA_WITHDRAWAL, "withDrawnReferralPostIcaTemplateId"),
-        arguments(ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY, "withDrawnReferralWithdrawnEarlyTemplateId"),
+        arguments(ReferralConcludedState.CANCELLED, ReferralWithdrawalState.PRE_ICA_WITHDRAWAL, "withDrawnReferralPreIcaTemplateId"),
+        arguments(ReferralConcludedState.CANCELLED, ReferralWithdrawalState.POST_ICA_WITHDRAWAL, "withDrawnReferralPostIcaTemplateId"),
+        arguments(ReferralConcludedState.CANCELLED, ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY, "withDrawnReferralWithdrawnEarlyTemplateId"),
+        arguments(ReferralConcludedState.PREMATURELY_ENDED, ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY, "withDrawnReferralWithdrawnEarlyTemplateId"),
+        arguments(ReferralConcludedState.PREMATURELY_ENDED, ReferralWithdrawalState.POST_ICA_WITHDRAWAL, "withDrawnReferralPostIcaTemplateId"),
+        arguments(ReferralConcludedState.COMPLETED, ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY, "withDrawnReferralWithdrawnEarlyTemplateId"),
+        arguments(ReferralConcludedState.COMPLETED, ReferralWithdrawalState.POST_ICA_WITHDRAWAL, "withDrawnReferralPostIcaTemplateId"),
       )
     }
   }
@@ -136,10 +140,10 @@ internal class ReferralConcludedNotificationListenerTest {
 
   @ParameterizedTest
   @MethodSource("withdrawStateSource")
-  fun `referral sent event generates valid url and sends an email`(referralWithdrawalState: ReferralWithdrawalState, templateId: String) {
+  fun `referral sent event generates valid url and sends an email`(referralConcludedState: ReferralConcludedState, referralWithdrawalState: ReferralWithdrawalState, templateId: String) {
     val referralCancelledEvent = ReferralConcludedEvent(
       "source",
-      ReferralConcludedState.CANCELLED,
+      referralConcludedState,
       sentReferral,
       "http://localhost:8080/sent-referral/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
       referralWithdrawalState,

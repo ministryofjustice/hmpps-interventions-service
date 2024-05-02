@@ -80,7 +80,7 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
       SentReferralDTO.from(
         referral,
         false,
-        withdrawalState = ReferralWithdrawalState.PRE_ICA_WITHDRAWAL,
+        withdrawalState = ReferralWithdrawalState.PRE_ICA_WITHDRAWAL.name,
       ),
     )
     Assertions.assertThat(out).isEqualToJson(
@@ -138,7 +138,7 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
       SentReferralDTO.from(
         referral,
         false,
-        withdrawalState = ReferralWithdrawalState.POST_ICA_WITHDRAWAL,
+        withdrawalState = ReferralWithdrawalState.POST_ICA_WITHDRAWAL.name,
       ),
     )
     Assertions.assertThat(out).isEqualToJson(
@@ -199,7 +199,7 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
       SentReferralDTO.from(
         referral,
         true,
-        withdrawalState = ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY,
+        withdrawalState = ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY.name,
 
       ),
     )

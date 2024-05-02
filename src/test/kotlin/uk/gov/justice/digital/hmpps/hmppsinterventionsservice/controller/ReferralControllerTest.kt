@@ -28,6 +28,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DraftOasys
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DraftReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcluder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralWithdrawalState
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ServiceCategoryService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
@@ -90,6 +91,7 @@ internal class ReferralControllerTest {
     @Test
     fun `getSentReferral returns a sent referral if it exists`() {
       whenever(referralService.getSentReferralForUser(eq(referral.id), any())).thenReturn(referral)
+      whenever(referralConcluder.withdrawalState(referral)).thenReturn(ReferralWithdrawalState.PRE_ICA_WITHDRAWAL)
       whenever(authUserRepository.save(any())).thenReturn(user)
       val sentReferral = referralController.getSentReferral(
         referral.id,
@@ -106,6 +108,7 @@ internal class ReferralControllerTest {
     @Test
     fun `getSentReferral returns a sent referral to a client api request`() {
       whenever(referralService.getSentReferral(eq(referral.id))).thenReturn(referral)
+      whenever(referralConcluder.withdrawalState(referral)).thenReturn(ReferralWithdrawalState.PRE_ICA_WITHDRAWAL)
       val sentReferral = referralController.getSentReferral(
         referral.id,
         tokenFactory.create(
@@ -120,6 +123,7 @@ internal class ReferralControllerTest {
     @Test
     fun `getSentReferral does not return a sent referral to a client api request when client id and subject do not match`() {
       whenever(referralService.getSentReferral(eq(referral.id))).thenReturn(referral)
+      whenever(referralConcluder.withdrawalState(referral)).thenReturn(ReferralWithdrawalState.PRE_ICA_WITHDRAWAL)
       val e = assertThrows<AccessDeniedException> {
         referralController.getSentReferral(
           referral.id,
@@ -136,6 +140,7 @@ internal class ReferralControllerTest {
     @Test
     fun `getSentReferral does not return a sent referral to a client api request without the required authority`() {
       whenever(referralService.getSentReferral(eq(referral.id))).thenReturn(referral)
+      whenever(referralConcluder.withdrawalState(referral)).thenReturn(ReferralWithdrawalState.PRE_ICA_WITHDRAWAL)
       val e = assertThrows<AccessDeniedException> {
         referralController.getSentReferral(
           referral.id,
@@ -376,6 +381,7 @@ internal class ReferralControllerTest {
       val referral = referralFactory.createSent()
       whenever(referralService.getSentReferralForUser(eq(referral.id), any())).thenReturn(referral)
       whenever(referralConcluder.requiresEndOfServiceReportCreation(referral)).thenReturn(false)
+      whenever(referralConcluder.withdrawalState(referral)).thenReturn(ReferralWithdrawalState.PRE_ICA_WITHDRAWAL)
       whenever(authUserRepository.save(any())).thenReturn(user)
 
       val sentReferral = referralController.getSentReferral(

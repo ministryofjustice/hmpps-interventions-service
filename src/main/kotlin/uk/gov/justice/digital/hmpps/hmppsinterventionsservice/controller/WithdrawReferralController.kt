@@ -41,8 +41,7 @@ class WithdrawReferralController(
     val sentReferral = getSentReferralForAuthenticatedUser(authentication, referralId)
     return SentReferralDTO.from(
       referralService.requestReferralEnd(sentReferral, user, withdrawReferralRequestDTO),
-      referralConcluder.requiresEndOfServiceReportCreation(sentReferral),
-      withdrawalState = referralConcluder.withdrawalState(sentReferral),
+      withdrawalState = withdrawReferralRequestDTO.withdrawalState,
     )
   }
 

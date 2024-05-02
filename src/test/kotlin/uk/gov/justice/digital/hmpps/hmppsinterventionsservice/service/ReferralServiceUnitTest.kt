@@ -8,6 +8,7 @@ import org.junit.jupiter.api.assertThrows
 import org.mockito.AdditionalAnswers
 import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.firstValue
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.secondValue
@@ -107,7 +108,7 @@ class ReferralServiceUnitTest {
     val referral = referralFactory.createSent()
     val authUser = authUserFactory.create()
     val withdrawalReason = withdrawReasonFactory.create()
-    val withdrawReferralRequestDTO = WithdrawReferralRequestDTO(withdrawalReason.code, withdrawalReason.description)
+    val withdrawReferralRequestDTO = WithdrawReferralRequestDTO(withdrawalReason.code, withdrawalReason.description, ReferralWithdrawalState.PRE_ICA_WITHDRAWAL.name)
     val cancellationComments = "comment"
 
     whenever(authUserRepository.save(authUser)).thenReturn(authUser)
@@ -126,7 +127,7 @@ class ReferralServiceUnitTest {
     val referral = referralFactory.createSent()
     val authUser = authUserFactory.create()
     val withdrawalReason = withdrawReasonFactory.create()
-    val withdrawReferralRequestDTO = WithdrawReferralRequestDTO(withdrawalReason.code, withdrawalReason.description)
+    val withdrawReferralRequestDTO = WithdrawReferralRequestDTO(withdrawalReason.code, withdrawalReason.description, ReferralWithdrawalState.PRE_ICA_WITHDRAWAL.name)
     val cancellationComments = "comment"
     val endedReferral = referralFactory.createEnded(endRequestedComments = cancellationComments, withdrawalReason = withdrawalReason)
 
@@ -137,7 +138,7 @@ class ReferralServiceUnitTest {
 
     referralService.requestReferralEnd(referral, authUser, withdrawReferralRequestDTO)
 
-    verify(referralConcluder).concludeIfEligible(endedReferral)
+    verify(referralConcluder).withdrawReferral(eq(endedReferral), eq(ReferralWithdrawalState.PRE_ICA_WITHDRAWAL))
   }
 
   @Test
@@ -145,7 +146,7 @@ class ReferralServiceUnitTest {
     val referral = referralFactory.createSent()
     val authUser = authUserFactory.create()
     val withdrawalReason = withdrawReasonFactory.create()
-    val withdrawReferralRequestDTO = WithdrawReferralRequestDTO(withdrawalReason.code, withdrawalReason.description)
+    val withdrawReferralRequestDTO = WithdrawReferralRequestDTO(withdrawalReason.code, withdrawalReason.description, ReferralWithdrawalState.PRE_ICA_WITHDRAWAL.name)
 
     whenever(withdrawalReasonRepository.findByCode("MIS")).thenReturn(null)
     whenever(authUserRepository.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg<AuthUser>())

@@ -84,7 +84,7 @@ class ReferralController(
     return SentReferralDTO.from(
       referral,
       referralConcluder.requiresEndOfServiceReportCreation(referral),
-      withdrawalState = referralConcluder.withdrawalState(referral),
+      withdrawalState = referralConcluder.withdrawalState(referral).name,
     )
   }
 

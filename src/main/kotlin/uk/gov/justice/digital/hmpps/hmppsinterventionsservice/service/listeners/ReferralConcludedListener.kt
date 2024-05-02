@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUse
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.WithdrawalReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.NotifyService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralWithdrawalState
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.SNSService
 
@@ -51,7 +52,8 @@ class ReferralConcludedNotificationListener(
     val popFirstName = event.referral.serviceUserData!!.firstName?.lowercase()?.replaceFirstChar { it.uppercase() }
     val popLastName = event.referral.serviceUserData!!.lastName?.lowercase()?.replaceFirstChar { it.uppercase() }
     val withdrawalReason = withdrawalReasonRepository.findByCode(event.referral.withdrawalReasonCode!!)
-    val userDetails = event.referral.currentAssignee?.let { hmppsAuthService.getUserDetail(event.referral.currentAssignee!!) }
+    val userDetails =
+      event.referral.currentAssignee?.let { hmppsAuthService.getUserDetail(event.referral.currentAssignee!!) }
     val withdrawnUserDetails = hmppsAuthService.getUserDetail(event.referral.endRequestedBy!!)
     val parameters = mapOf(
       "caseworkerFirstName" to (userDetails?.firstName ?: ""),
@@ -60,32 +62,60 @@ class ReferralConcludedNotificationListener(
       "changedByName" to withdrawnUserDetails.firstName,
       "reasonForWithdrawal" to withdrawalReason!!.description,
     )
-    when (event.referralWithdrawalState) {
-      ReferralWithdrawalState.PRE_ICA_WITHDRAWAL -> {
-        event.referral.currentAssignee?.let {
-          emailSender.sendEmail(
-            withDrawnReferralPreIcaTemplateId,
-            userDetails!!.email,
-            parameters,
-          )
+    when (event.type) {
+      ReferralConcludedState.CANCELLED -> {
+        when (event.referralWithdrawalState) {
+          ReferralWithdrawalState.PRE_ICA_WITHDRAWAL -> {
+            event.referral.currentAssignee?.let {
+              emailSender.sendEmail(
+                withDrawnReferralPreIcaTemplateId,
+                userDetails!!.email,
+                parameters,
+              )
+            }
+          }
+          ReferralWithdrawalState.POST_ICA_WITHDRAWAL -> {
+            event.referral.currentAssignee?.let {
+              emailSender.sendEmail(
+                withDrawnReferralPostIcaTemplateId,
+                userDetails!!.email,
+                parameters,
+              )
+            }
+          }
+          ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY -> {
+            event.referral.currentAssignee?.let {
+              emailSender.sendEmail(
+                withDrawnReferralWithdrawnEarlyTemplateId,
+                userDetails!!.email,
+                parameters,
+              )
+            }
+          }
+          else -> {}
         }
       }
-      ReferralWithdrawalState.POST_ICA_WITHDRAWAL -> {
-        event.referral.currentAssignee?.let {
-          emailSender.sendEmail(
-            withDrawnReferralPostIcaTemplateId,
-            userDetails!!.email,
-            parameters,
-          )
-        }
-      }
-      ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY -> {
-        event.referral.currentAssignee?.let {
-          emailSender.sendEmail(
-            withDrawnReferralWithdrawnEarlyTemplateId,
-            userDetails!!.email,
-            parameters,
-          )
+      ReferralConcludedState.PREMATURELY_ENDED, ReferralConcludedState.COMPLETED -> {
+        when (event.referralWithdrawalState) {
+          ReferralWithdrawalState.POST_ICA_WITHDRAWAL -> {
+            event.referral.currentAssignee?.let {
+              emailSender.sendEmail(
+                withDrawnReferralPostIcaTemplateId,
+                userDetails!!.email,
+                parameters,
+              )
+            }
+          }
+          ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY -> {
+            event.referral.currentAssignee?.let {
+              emailSender.sendEmail(
+                withDrawnReferralWithdrawnEarlyTemplateId,
+                userDetails!!.email,
+                parameters,
+              )
+            }
+          }
+          else -> {}
         }
       }
     }

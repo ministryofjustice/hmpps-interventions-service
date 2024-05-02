@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Withdra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcluder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralWithdrawalState
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
@@ -48,7 +49,7 @@ class WithdrawReferralControllerTest {
   @Test
   fun `successfully call withdraw referral`() {
     val referral = referralFactory.createSent()
-    val withdrawReferralRequestDTO = WithdrawReferralRequestDTO("AAA", "comment")
+    val withdrawReferralRequestDTO = WithdrawReferralRequestDTO("AAA", "comment", ReferralWithdrawalState.PRE_ICA_WITHDRAWAL.name)
 
     whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
 
@@ -65,7 +66,7 @@ class WithdrawReferralControllerTest {
 
   @Test
   fun `end referral endpoint does not find referral`() {
-    val withdrawReferralRequestDTO = WithdrawReferralRequestDTO("AAA", "comment")
+    val withdrawReferralRequestDTO = WithdrawReferralRequestDTO("AAA", "comment", ReferralWithdrawalState.PRE_ICA_WITHDRAWAL.name)
 
     whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(null)
     whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
@@ -80,7 +81,7 @@ class WithdrawReferralControllerTest {
   @Test
   fun `is set after ending a referral`() {
     val referral = referralFactory.createSent()
-    val withdrawReferralRequestDTO = WithdrawReferralRequestDTO("AAA", "comment")
+    val withdrawReferralRequestDTO = WithdrawReferralRequestDTO("AAA", "comment", ReferralWithdrawalState.PRE_ICA_WITHDRAWAL.name)
 
     whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
 
@@ -92,6 +93,5 @@ class WithdrawReferralControllerTest {
     whenever(authUserRepository.save(any())).thenReturn(user)
 
     val response = withdrawReferralController.submitWithdrawalReasons(referral.id, withdrawReferralRequestDTO, token)
-    assertThat(response.endOfServiceReportCreationRequired).isTrue
   }
 }
