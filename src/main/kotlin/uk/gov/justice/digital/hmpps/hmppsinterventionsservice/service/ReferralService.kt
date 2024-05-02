@@ -226,17 +226,6 @@ class ReferralService(
       ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid withdrawal code. [code=$withdrawalReasonCode]")
   }
 
-  private fun updateWithdrawalInformation(referral: Referral, withdrawReferralRequestDTO: WithdrawReferralRequestDTO) {
-    validateWithdrawalReasonCode(withdrawReferralRequestDTO.code)
-    referral.withdrawalReasonCode = withdrawReferralRequestDTO.code
-    referral.withdrawalComments = withdrawReferralRequestDTO.comments
-  }
-
-  private fun validateWithdrawalReasonCode(withdrawalReasonCode: String) {
-    withdrawalReasonRepository.findByCode(withdrawalReasonCode)
-      ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid withdrawal code. [code=$withdrawalReasonCode]")
-  }
-
   fun updateReferralDetails(referral: Referral, update: UpdateReferralDetailsDTO, actor: AuthUser): ReferralDetails? {
     if (!update.isValidUpdate) {
       return null
