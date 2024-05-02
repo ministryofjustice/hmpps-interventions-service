@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
@@ -15,22 +14,24 @@ enum class DeliveryState(
   val requiresEndOfServiceReport: Boolean,
   val inProgress: Boolean,
   val concludedState: ReferralConcludedState,
+  val referralWithdrawalState: ReferralWithdrawalState,
 ) {
-  NOT_DELIVERING_YET(false, true, ReferralConcludedState.CANCELLED),
-  MISSING_FIRST_SUBSTANTIVE_APPOINTMENT(false, true, ReferralConcludedState.CANCELLED),
-  IN_PROGRESS(true, true, ReferralConcludedState.PREMATURELY_ENDED),
-  COMPLETED(true, false, ReferralConcludedState.COMPLETED),
-}
-
-enum class ReferralEndState {
-  AWAITING_END_OF_SERVICE_REPORT,
-  CAN_CONCLUDE,
+  NOT_DELIVERING_YET(false, true, ReferralConcludedState.CANCELLED, ReferralWithdrawalState.PRE_ICA_WITHDRAWAL),
+  MISSING_FIRST_SUBSTANTIVE_APPOINTMENT(false, true, ReferralConcludedState.CANCELLED, ReferralWithdrawalState.PRE_ICA_WITHDRAWAL),
+  IN_PROGRESS(true, true, ReferralConcludedState.PREMATURELY_ENDED, ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY),
+  COMPLETED(true, false, ReferralConcludedState.COMPLETED, ReferralWithdrawalState.POST_ICA_WITHDRAWAL),
 }
 
 enum class ReferralConcludedState {
   CANCELLED,
   PREMATURELY_ENDED,
   COMPLETED,
+}
+
+enum class ReferralWithdrawalState {
+  PRE_ICA_WITHDRAWAL,
+  POST_ICA_WITHDRAWAL,
+  POST_ICA_CLOSE_REFERRAL_EARLY,
 }
 
 @Service
@@ -45,20 +46,22 @@ class ReferralConcluder(
     val deliveryState = deliveryState(referral)
     signalEnding(referral, deliveryState.concludedState)
 
-    val endState = endState(deliveryState, referral.endOfServiceReport)
-    if (endState == ReferralEndState.CAN_CONCLUDE) {
-      conclude(referral, deliveryState.concludedState)
-    }
+    val referralWithdrawalState = withdrawalState(referral)
+    conclude(referral, deliveryState.concludedState, referralWithdrawalState)
   }
 
   private fun signalEnding(referral: Referral, concludedState: ReferralConcludedState) {
     referralEventPublisher.referralEndingEvent(referral, concludedState)
   }
 
-  private fun conclude(referral: Referral, concludedState: ReferralConcludedState) {
+  private fun conclude(
+    referral: Referral,
+    concludedState: ReferralConcludedState,
+    referralWithdrawalState: ReferralWithdrawalState,
+  ) {
     referral.concludedAt = OffsetDateTime.now()
     referralRepository.save(referral)
-    referralEventPublisher.referralConcludedEvent(referral, concludedState)
+    referralEventPublisher.referralConcludedEvent(referral, concludedState, referralWithdrawalState)
   }
 
   private fun deliveryState(referral: Referral): DeliveryState {
@@ -86,11 +89,14 @@ class ReferralConcluder(
     return state.requiresEndOfServiceReport
   }
 
-  private fun endState(deliveryState: DeliveryState, endOfServiceReport: EndOfServiceReport?): ReferralEndState {
-    return if (deliveryState.requiresEndOfServiceReport && endOfServiceReport?.submittedAt == null) {
-      ReferralEndState.AWAITING_END_OF_SERVICE_REPORT
+  fun withdrawalState(referral: Referral): ReferralWithdrawalState {
+    val endOfServiceReportRequired = requiresEndOfServiceReportCreation(referral)
+    return if (deliverySessionRepository.countNumberOfAttendedSessions(referral.id) == 0) {
+      ReferralWithdrawalState.PRE_ICA_WITHDRAWAL
+    } else if (deliverySessionRepository.countNumberOfAttendedSessions(referral.id) == 1 && endOfServiceReportRequired) {
+      ReferralWithdrawalState.POST_ICA_WITHDRAWAL
     } else {
-      ReferralEndState.CAN_CONCLUDE
+      ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY
     }
   }
 

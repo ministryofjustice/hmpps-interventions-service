@@ -10,6 +10,7 @@ import org.springframework.boot.test.json.JacksonTester
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralWithdrawalState
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import java.time.OffsetDateTime
@@ -45,7 +46,12 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
     }
 
     referral.supplementaryRiskId = UUID.randomUUID()
-    assertDoesNotThrow { SentReferralDTO.from(referral, false) }
+    assertDoesNotThrow {
+      SentReferralDTO.from(
+        referral,
+        false,
+      )
+    }
   }
 
   @Test
@@ -70,7 +76,13 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
     referral.sentAt = sentAt
     referral.sentBy = sentBy
 
-    val out = json.write(SentReferralDTO.from(referral, false))
+    val out = json.write(
+      SentReferralDTO.from(
+        referral,
+        false,
+        withdrawalState = ReferralWithdrawalState.PRE_ICA_WITHDRAWAL,
+      ),
+    )
     Assertions.assertThat(out).isEqualToJson(
       """
       {
@@ -91,7 +103,8 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
           "serviceProvider": {"name": "Provider"}
         },
         "actionPlanId": null,
-        "endOfServiceReportCreationRequired": false
+        "endOfServiceReportCreationRequired": false,
+        "withdrawalState" : "PRE_ICA_WITHDRAWAL"
       }
     """,
     )
@@ -121,7 +134,13 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
     referral.sentAt = sentAt
     referral.sentBy = sentBy
 
-    val out = json.write(SentReferralDTO.from(referral, false))
+    val out = json.write(
+      SentReferralDTO.from(
+        referral,
+        false,
+        withdrawalState = ReferralWithdrawalState.POST_ICA_WITHDRAWAL,
+      ),
+    )
     Assertions.assertThat(out).isEqualToJson(
       """
       {
@@ -142,7 +161,8 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
           "serviceProvider": {"name": "Provider"}
         },
         "actionPlanId": "${actionPlan.id}",
-        "endOfServiceReportCreationRequired": false
+        "endOfServiceReportCreationRequired": false,
+        "withdrawalState" : "POST_ICA_WITHDRAWAL"
       }
     """,
     )
@@ -175,7 +195,14 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
     referral.sentAt = sentAt
     referral.sentBy = sentBy
 
-    val out = json.write(SentReferralDTO.from(referral, true))
+    val out = json.write(
+      SentReferralDTO.from(
+        referral,
+        true,
+        withdrawalState = ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY,
+
+      ),
+    )
     Assertions.assertThat(out).isEqualToJson(
       """
       {
@@ -194,6 +221,7 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
           "serviceUser": {"crn": "X123456"},
           "serviceProvider": {"name": "Harmony Living"}
         },
+        "withdrawalState" : "POST_ICA_CLOSE_REFERRAL_EARLY",
         "endOfServiceReportCreationRequired": true,
         "endOfServiceReport": {
         "id" : "3b9ed289-8412-41a9-8291-45e33e60276c",
@@ -229,7 +257,12 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
     referral.endRequestedReason = CancellationReason("TOM", "service user turned into a tomato")
     referral.concludedAt = OffsetDateTime.parse("2021-01-13T21:57:13+00:00")
 
-    val out = json.write(SentReferralDTO.from(referral, false))
+    val out = json.write(
+      SentReferralDTO.from(
+        referral,
+        false,
+      ),
+    )
     Assertions.assertThat(out).isEqualToJson(
       """
       {

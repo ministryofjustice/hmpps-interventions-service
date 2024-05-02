@@ -56,6 +56,7 @@ internal class ReferralConcluderTest {
     val canStartEoSR: Boolean,
     val endingWith: ReferralConcludedState? = null,
     val concludesWith: ReferralConcludedState? = null,
+    val referralWithdrawalStateWith: ReferralWithdrawalState = ReferralWithdrawalState.PRE_ICA_WITHDRAWAL,
   )
 
   companion object {
@@ -96,30 +97,43 @@ internal class ReferralConcluderTest {
 
     @JvmStatic
     fun afterCancelExamples(): Stream<Arguments> = Stream.of(
-      arguments(notStarted, ExpectThat(canStartEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED)),
+      arguments(
+        notStarted,
+        ExpectThat(
+          canStartEoSR = false,
+          endingWith = CANCELLED,
+          concludesWith = CANCELLED,
+          referralWithdrawalStateWith = ReferralWithdrawalState.PRE_ICA_WITHDRAWAL,
+        ),
+      ),
       arguments(
         allSessionsHaveOutcomeNoFSA,
-        ExpectThat(canStartEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED),
+        ExpectThat(
+          canStartEoSR = false,
+          endingWith = CANCELLED,
+          concludesWith = CANCELLED,
+          referralWithdrawalStateWith = ReferralWithdrawalState.PRE_ICA_WITHDRAWAL,
+        ),
       ),
-      arguments(inProgressNoFSA, ExpectThat(canStartEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED)),
-      arguments(inProgressWithFSA, ExpectThat(canStartEoSR = true, endingWith = PREMATURELY_ENDED)),
-      arguments(allSessionsHaveOutcomeSomeDNAWithFSA, ExpectThat(canStartEoSR = true, endingWith = COMPLETED)),
-      arguments(allSessionsHaveOutcomeAllAttendedWithFSA, ExpectThat(canStartEoSR = true, endingWith = COMPLETED)),
+      arguments(inProgressNoFSA, ExpectThat(canStartEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED, referralWithdrawalStateWith = ReferralWithdrawalState.PRE_ICA_WITHDRAWAL)),
+      arguments(inProgressWithFSA, ExpectThat(canStartEoSR = true, endingWith = PREMATURELY_ENDED, referralWithdrawalStateWith = ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY)),
+      arguments(allSessionsHaveOutcomeSomeDNAWithFSA, ExpectThat(canStartEoSR = true, endingWith = COMPLETED, referralWithdrawalStateWith = ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY)),
+      arguments(allSessionsHaveOutcomeAllAttendedWithFSA, ExpectThat(canStartEoSR = true, endingWith = COMPLETED, referralWithdrawalStateWith = ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY)),
     )
 
     @JvmStatic
     fun afterEoSRSubmittedExamples(): Stream<Arguments> = Stream.of(
       arguments(
         inProgressWithFSA,
-        ExpectThat(canStartEoSR = false, endingWith = PREMATURELY_ENDED, concludesWith = PREMATURELY_ENDED),
+        ExpectThat(canStartEoSR = false, endingWith = PREMATURELY_ENDED, concludesWith = PREMATURELY_ENDED, referralWithdrawalStateWith = ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY),
       ),
       arguments(
         allSessionsHaveOutcomeSomeDNAWithFSA,
-        ExpectThat(canStartEoSR = false, endingWith = COMPLETED, concludesWith = COMPLETED),
+        ExpectThat(canStartEoSR = false, endingWith = COMPLETED, concludesWith = COMPLETED, referralWithdrawalStateWith = ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY),
       ),
       arguments(
         allSessionsHaveOutcomeAllAttendedWithFSA,
-        ExpectThat(canStartEoSR = false, endingWith = COMPLETED, concludesWith = COMPLETED),
+        ExpectThat(canStartEoSR = false, endingWith = COMPLETED, concludesWith = COMPLETED, referralWithdrawalStateWith = ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY),
       ),
     )
   }
@@ -175,7 +189,7 @@ internal class ReferralConcluderTest {
 
     concluder.concludeIfEligible(referral)
     verifyEndingWith(referral, expectation.endingWith)
-    verifyConcludesWith(referral, expectation.concludesWith)
+    verifyConcludesWith(referral, expectation.concludesWith, expectation.referralWithdrawalStateWith)
   }
 
   @ParameterizedTest
@@ -191,7 +205,7 @@ internal class ReferralConcluderTest {
 
     concluder.concludeIfEligible(referral)
     verifyEndingWith(referral, expectation.endingWith)
-    verifyConcludesWith(referral, expectation.concludesWith)
+    verifyConcludesWith(referral, expectation.concludesWith, expectation.referralWithdrawalStateWith)
   }
 
   private fun verifyEndingWith(referral: Referral, endingWith: ReferralConcludedState?) {
@@ -202,12 +216,10 @@ internal class ReferralConcluderTest {
     }
   }
 
-  private fun verifyConcludesWith(referral: Referral, concludesWith: ReferralConcludedState?) {
+  private fun verifyConcludesWith(referral: Referral, concludesWith: ReferralConcludedState?, referralWithdrawalStateWith: ReferralWithdrawalState) {
     if (concludesWith != null) {
       verifySaveWithConcludedAtSet(referral)
-      verify(referralEventPublisher).referralConcludedEvent(same(referral), eq(concludesWith))
-    } else {
-      verify(referralEventPublisher, never()).referralConcludedEvent(same(referral), any())
+      verify(referralEventPublisher).referralConcludedEvent(same(referral), eq(concludesWith), eq(referralWithdrawalStateWith))
     }
   }
 

@@ -125,6 +125,8 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     supplierAssessment: SupplierAssessment? = null,
     serviceUserData: ReferralServiceUserData? = null,
     complexityLevelIds: MutableMap<UUID, UUID>? = null,
+    withdrawReasonCode: String? = null,
+    withdrawReasonComments: String? = null,
     createDraft: Boolean = true,
     accessibilityNeeds: String? = null,
     additionalNeedsInformation: String? = null,
@@ -135,6 +137,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     interpreterLanguage: String? = null,
     probationPractitionerDetails: ProbationPractitionerDetails? = null,
     ppEstablishment: String? = null,
+    endRequestedBy: AuthUser? = null,
   ): Referral {
     if (createDraft) {
       createDraft(
@@ -167,12 +170,15 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       supplierAssessment = supplierAssessment,
       additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt,
       serviceUserData = serviceUserData,
+      endRequestedBy = endRequestedBy,
       complexityLevelIds = complexityLevelIds,
       accessibilityNeeds = accessibilityNeeds,
       additionalNeedsInformation = additionalNeedsInformation,
       needsInterpreter = needsInterpreter,
       interpreterLanguage = interpreterLanguage,
       probationPractitionerDetails = probationPractitionerDetails,
+      withdrawalReasonCode = withdrawReasonCode,
+      withdrawalReasonComments = withdrawReasonComments,
     )
     val probationPractitionerDetails = probationPractitionerDetailsFactory.create(referral = referral)
     referral.probationPractitionerDetails = probationPractitionerDetails
@@ -296,8 +302,8 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       endRequestedBy = endRequestedBy,
       endRequestedReason = endRequestedReason,
       endRequestedComments = endRequestedComments,
-      withdrawReasonCode = withdrawalReason?.code,
-      withdrawReasonComments = withdrawalReason?.description,
+      withdrawalReasonCode = withdrawalReason?.code,
+      withdrawalReasonComments = withdrawalReason?.description,
       concludedAt = concludedAt,
       endOfServiceReport = endOfServiceReport,
     )

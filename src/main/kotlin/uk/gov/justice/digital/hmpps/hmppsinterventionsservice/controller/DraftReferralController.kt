@@ -57,7 +57,13 @@ class DraftReferralController(
 
     return ResponseEntity
       .created(location)
-      .body(SentReferralDTO.from(sentReferral, referralConcluder.requiresEndOfServiceReportCreation(sentReferral), draftReferral))
+      .body(
+        SentReferralDTO.from(
+          sentReferral,
+          referralConcluder.requiresEndOfServiceReportCreation(sentReferral),
+          draftReferral,
+        ),
+      )
   }
 
   @PostMapping("/draft-referral")

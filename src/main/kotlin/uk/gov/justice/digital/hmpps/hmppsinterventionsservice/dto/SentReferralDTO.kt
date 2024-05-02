@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto
 
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralWithdrawalState
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -26,9 +27,15 @@ class SentReferralDTO(
   val supplementaryRiskId: UUID,
   val endOfServiceReportCreationRequired: Boolean,
   val createdBy: AuthUserDTO,
+  val withdrawalState: String?,
 ) {
   companion object {
-    fun from(referral: Referral, endOfServiceReportRequired: Boolean, draftReferral: DraftReferral? = null): SentReferralDTO {
+    fun from(
+      referral: Referral,
+      endOfServiceReportRequired: Boolean,
+      draftReferral: DraftReferral? = null,
+      withdrawalState: ReferralWithdrawalState? = null,
+    ): SentReferralDTO {
       return SentReferralDTO(
         id = referral.id,
         sentAt = referral.sentAt!!,
@@ -50,6 +57,7 @@ class SentReferralDTO(
         supplementaryRiskId = referral.supplementaryRiskId!!,
         endOfServiceReportCreationRequired = endOfServiceReportRequired,
         createdBy = AuthUserDTO.from(referral.createdBy),
+        withdrawalState = withdrawalState?.name,
       )
     }
   }

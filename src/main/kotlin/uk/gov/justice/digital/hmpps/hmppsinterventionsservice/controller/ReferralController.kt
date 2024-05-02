@@ -81,7 +81,11 @@ class ReferralController(
   @GetMapping("/sent-referral/{id}")
   fun getSentReferral(@PathVariable id: UUID, authentication: JwtAuthenticationToken): SentReferralDTO {
     val referral = getSentReferralAuthenticatedRequest(authentication, id)
-    return SentReferralDTO.from(referral, referralConcluder.requiresEndOfServiceReportCreation(referral))
+    return SentReferralDTO.from(
+      referral,
+      referralConcluder.requiresEndOfServiceReportCreation(referral),
+      withdrawalState = referralConcluder.withdrawalState(referral),
+    )
   }
 
   @GetMapping("/sent-referrals/summaries")
