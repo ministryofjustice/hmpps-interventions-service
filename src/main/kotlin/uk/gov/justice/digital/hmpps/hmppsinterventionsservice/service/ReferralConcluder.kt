@@ -15,11 +15,12 @@ enum class DeliveryState(
   val requiresEndOfServiceReport: Boolean,
   val inProgress: Boolean,
   val concludedState: ReferralConcludedState,
+  val referralWithdrawalState: ReferralWithdrawalState,
 ) {
-  NOT_DELIVERING_YET(false, true, ReferralConcludedState.CANCELLED),
-  MISSING_FIRST_SUBSTANTIVE_APPOINTMENT(false, true, ReferralConcludedState.CANCELLED),
-  IN_PROGRESS(true, true, ReferralConcludedState.PREMATURELY_ENDED),
-  COMPLETED(true, false, ReferralConcludedState.COMPLETED),
+  NOT_DELIVERING_YET(false, true, ReferralConcludedState.CANCELLED, ReferralWithdrawalState.PRE_ICA_WITHDRAWAL),
+  MISSING_FIRST_SUBSTANTIVE_APPOINTMENT(false, true, ReferralConcludedState.CANCELLED, ReferralWithdrawalState.PRE_ICA_WITHDRAWAL),
+  IN_PROGRESS(true, true, ReferralConcludedState.PREMATURELY_ENDED, ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY),
+  COMPLETED(true, false, ReferralConcludedState.COMPLETED, ReferralWithdrawalState.POST_ICA_WITHDRAWAL),
 }
 
 enum class ReferralEndState {
