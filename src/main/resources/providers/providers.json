@@ -52,6 +52,10 @@
     "name": "Bedford Women's Centre"
   },
   {
+    "code": "BIG_LIFE_GROUP",
+    "name": "Big Life Group"
+  },
+  {
     "code": "BIRMINGHAM_SETTLEMENT",
     "name": "Birmingham Settlement"
   },
@@ -118,6 +122,10 @@
   {
     "code": "FOUNDATION",
     "name": "Foundation"
+  },
+  {
+    "code": "FOUNDATION_92",
+    "name": "Foundation 92"
   },
   {
     "code": "GANGSLINE",
