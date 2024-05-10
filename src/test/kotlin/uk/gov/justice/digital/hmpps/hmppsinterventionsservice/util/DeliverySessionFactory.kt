@@ -76,6 +76,11 @@ class DeliverySessionFactory(em: TestEntityManager? = null) : EntityFactory(em) 
     notifyPPOfAttendanceBehaviour: Boolean? = false,
     appointmentFeedbackSubmittedAt: OffsetDateTime? = attendanceSubmittedAt,
     appointmentFeedbackSubmittedBy: AuthUser? = createdBy,
+    sessionSummary: String? = null,
+    sessionResponse: String? = null,
+    sessionConcerns: String? = null,
+    lateReason: String? = null,
+    futureSessionPlan: String? = null,
   ): DeliverySession {
     val appointment = appointmentFactory.create(
       createdBy = createdBy,
@@ -90,6 +95,11 @@ class DeliverySessionFactory(em: TestEntityManager? = null) : EntityFactory(em) 
       notifyPPOfAttendanceBehaviour = notifyPPOfAttendanceBehaviour,
       appointmentFeedbackSubmittedAt = appointmentFeedbackSubmittedAt,
       appointmentFeedbackSubmittedBy = appointmentFeedbackSubmittedBy,
+      sessionSummary = sessionSummary,
+      sessionResponse = sessionResponse,
+      sessionConcerns = sessionConcerns,
+      lateReason = lateReason,
+      futureSessionPlans = futureSessionPlan,
     )
 
     return save(

@@ -19,5 +19,8 @@ interface ReferralRepository : JpaRepository<Referral, UUID>, JpaSpecificationEx
   @Query("select r from Referral r where r.sentAt > :from and r.sentAt < :to and r.intervention.dynamicFrameworkContract in :contracts")
   fun serviceProviderReportReferrals(from: OffsetDateTime, to: OffsetDateTime, contracts: Set<DynamicFrameworkContract>, pageable: Pageable): Page<Referral>
 
+  @Query("select r from Referral r where r.serviceUserCRN = :serviceUserCRN and r.createdAt >= :from and r.createdAt <= :to")
+  fun referralForSar(serviceUserCRN: String, from: OffsetDateTime, to: OffsetDateTime): List<Referral>
+
   fun findByServiceUserCRN(crn: String): List<Referral>
 }

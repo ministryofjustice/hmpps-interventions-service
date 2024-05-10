@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlanActivity
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import java.time.OffsetDateTime
@@ -41,6 +42,7 @@ class ActionPlanFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     submittedBy: AuthUser? = createdBy,
     approvedAt: OffsetDateTime? = submittedAt,
     approvedBy: AuthUser? = authUserFactory.create(authSource = "delius"),
+    activities: MutableList<ActionPlanActivity> = mutableListOf(),
   ): ActionPlan {
     return create(
       id = id,
@@ -52,6 +54,7 @@ class ActionPlanFactory(em: TestEntityManager? = null) : EntityFactory(em) {
       submittedBy = submittedBy,
       approvedAt = approvedAt,
       approvedBy = approvedBy,
+      activities = activities,
     )
   }
 
@@ -65,6 +68,7 @@ class ActionPlanFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     submittedBy: AuthUser? = null,
     approvedAt: OffsetDateTime? = null,
     approvedBy: AuthUser? = null,
+    activities: MutableList<ActionPlanActivity> = mutableListOf(),
   ): ActionPlan {
     return save(
       ActionPlan(
@@ -77,7 +81,7 @@ class ActionPlanFactory(em: TestEntityManager? = null) : EntityFactory(em) {
         submittedBy = submittedBy,
         approvedAt = approvedAt,
         approvedBy = approvedBy,
-        activities = mutableListOf(),
+        activities = activities,
       ),
     )
   }
