@@ -11,7 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SarDataDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.SarsDataService
 
 @RestController
-@PreAuthorize("hasRole('SAR_DATA_ACCESS')")
+@PreAuthorize("hasRole('ROLE_SAR_DATA_ACCESS')")
 class SarsDataController(
   val sarsDataService: SarsDataService,
 ) {
