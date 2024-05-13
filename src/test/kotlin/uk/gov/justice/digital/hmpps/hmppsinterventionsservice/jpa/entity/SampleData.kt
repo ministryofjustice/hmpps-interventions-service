@@ -65,6 +65,10 @@ class SampleData {
       actionPlans: MutableList<ActionPlan>? = null,
       endOfServiceReport: EndOfServiceReport? = null,
       concludedAt: OffsetDateTime? = null,
+      accessibilityNeeds: String? = null,
+      additionalNeedsInformation: String? = null,
+      whenUnavailable: String? = null,
+      endRequestedComments: String? = null,
       intervention: Intervention = sampleIntervention(
         dynamicFrameworkContract = sampleContract(
           primeProvider = sampleServiceProvider(id = serviceProviderName, name = serviceProviderName),
@@ -89,6 +93,10 @@ class SampleData {
         concludedAt = concludedAt,
         supplementaryRiskId = supplementaryRiskId,
         serviceUserData = serviceUserData,
+        accessibilityNeeds = accessibilityNeeds,
+        additionalNeedsInformation = additionalNeedsInformation,
+        whenUnavailable = whenUnavailable,
+        endRequestedComments = endRequestedComments,
       )
 
       val probationPractitionerDetails = ProbationPractitionerDetails(
