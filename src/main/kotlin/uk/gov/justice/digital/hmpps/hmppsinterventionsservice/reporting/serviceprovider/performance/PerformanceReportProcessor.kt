@@ -50,6 +50,7 @@ class PerformanceReportProcessor(
       eosrSubmittedAt = referral.endOfServiceReport?.submittedAt,
       concludedAt = referral.concludedAt,
       referralEndState = referral.endState,
+      dateInterventionToBeCompletedBy = referral.referralDetails?.completionDeadline,
     )
   }
 }

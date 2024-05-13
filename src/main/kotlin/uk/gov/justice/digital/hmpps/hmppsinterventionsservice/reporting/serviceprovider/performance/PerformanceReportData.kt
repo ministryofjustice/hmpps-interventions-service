@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance
 
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -29,6 +30,7 @@ data class PerformanceReportData(
   val eosrSubmittedAt: OffsetDateTime?,
   val concludedAt: OffsetDateTime?,
   val referralEndState: String?,
+  val dateInterventionToBeCompletedBy: LocalDate?,
 ) {
   companion object {
     // it would be neater to use reflection to get the fields, but we cannot guarantee the order
@@ -58,6 +60,7 @@ data class PerformanceReportData(
       "eosrSubmittedAt",
       "concludedAt",
       "referralEndState",
+      "dateInterventionToBeCompletedBy",
     )
     val headers = listOf(
       "referral_ref",
@@ -85,6 +88,7 @@ data class PerformanceReportData(
       "date_eosr_submitted",
       "concluded_at",
       "referral_end_state",
+      "date_intervention_to_be_completed_by",
     )
   }
 }
