@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFac
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAssessmentFactory
+import java.time.LocalDate
 import java.time.OffsetDateTime
 
 internal class PerformanceReportDataProcessorTest {
@@ -30,11 +31,10 @@ internal class PerformanceReportDataProcessorTest {
     val supplierAssessmentFirstAppointment = appointmentFactory.create(attended = Attended.NO, createdAt = OffsetDateTime.parse("2022-07-01T10:42:43+00:00"))
     val supplierAssessmentNewAppointment = appointmentFactory.create(attended = Attended.YES, createdAt = OffsetDateTime.parse("2022-07-02T10:42:43+00:00"))
     val approvedActionPlanAppointment = appointmentFactory.create(attended = Attended.YES, appointmentFeedbackSubmittedAt = OffsetDateTime.parse("2022-07-02T10:42:43+00:00"))
-    val unApprovedAppointment = appointmentFactory.create()
     val supplierAssessment = supplierAssessmentFactory.create(appointment = supplierAssessmentFirstAppointment)
     supplierAssessment.appointments.add(supplierAssessmentNewAppointment)
     val actionPlan = actionPlanFactory.createApproved()
-    val referral = referralFactory.createSent(actionPlans = mutableListOf(actionPlan), supplierAssessment = supplierAssessment)
+    val referral = referralFactory.createSent(actionPlans = mutableListOf(actionPlan), supplierAssessment = supplierAssessment, completionDeadline = LocalDate.of(2024, 5, 20))
 
     whenever(appointmentRepository.findAllByReferralId(referral.id)).thenReturn(listOf(supplierAssessmentFirstAppointment, supplierAssessmentNewAppointment))
     whenever(actionPlanService.getFirstAttendedAppointment(actionPlan)).thenReturn(approvedActionPlanAppointment)
@@ -53,5 +53,6 @@ internal class PerformanceReportDataProcessorTest {
     assertThat(performanceReportData.firstSessionAttendedAt).isEqualTo(approvedActionPlanAppointment.appointmentTime)
     assertThat(performanceReportData.numberOfSessionsAttended).isEqualTo(1)
     assertThat(performanceReportData.supplierAssessmentAttendedOnTime).isEqualTo(true)
+    assertThat(performanceReportData.dateInterventionToBeCompletedBy).isEqualTo(referral.referralDetails?.completionDeadline)
   }
 }
