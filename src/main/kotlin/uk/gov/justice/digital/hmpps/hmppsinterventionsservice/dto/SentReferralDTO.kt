@@ -27,6 +27,7 @@ class SentReferralDTO(
   val endOfServiceReportCreationRequired: Boolean,
   val createdBy: AuthUserDTO,
   val withdrawalState: String?,
+  val withdrawalCode: String?,
 ) {
   companion object {
     fun from(
@@ -57,6 +58,7 @@ class SentReferralDTO(
         endOfServiceReportCreationRequired = endOfServiceReportRequired,
         createdBy = AuthUserDTO.from(referral.createdBy),
         withdrawalState = withdrawalState,
+        withdrawalCode = referral.withdrawalReasonCode,
       )
     }
   }

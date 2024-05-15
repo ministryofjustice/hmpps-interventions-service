@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.listeners
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -155,12 +154,15 @@ internal class ReferralConcludedNotificationListenerTest {
     notifyService().onApplicationEvent(referralCancelledEvent)
     val personalisationCaptor = argumentCaptor<Map<String, String>>()
     verify(emailSender).sendEmail(
-      eq("cancelledTemplateID"),
+      eq(templateId),
       eq("tom@tom.tom"),
       personalisationCaptor.capture(),
     )
-    assertThat(personalisationCaptor.firstValue["sp_first_name"]).isEqualTo("tom")
-    assertThat(personalisationCaptor.firstValue["referral_number"]).isEqualTo("JS8762AC")
+    assertThat(personalisationCaptor.firstValue["caseworkerFirstName"]).isEqualTo("tom")
+    assertThat(personalisationCaptor.firstValue["referralNumber"]).isEqualTo("JS8762AC")
+    assertThat(personalisationCaptor.firstValue["popFullName"]).isEqualTo("Alex River")
+    assertThat(personalisationCaptor.firstValue["changedByName"]).isEqualTo("bernard")
+    assertThat(personalisationCaptor.firstValue["reasonForWithdrawal"]).isEqualTo("some comments")
   }
 
   @Test

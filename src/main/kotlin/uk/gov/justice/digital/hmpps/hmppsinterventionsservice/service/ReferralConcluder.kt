@@ -27,11 +27,6 @@ enum class ReferralEndState {
   CAN_CONCLUDE,
 }
 
-enum class ReferralEndState {
-  AWAITING_END_OF_SERVICE_REPORT,
-  CAN_CONCLUDE,
-}
-
 enum class ReferralConcludedState {
   CANCELLED,
   PREMATURELY_ENDED,

@@ -75,6 +75,7 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
     referral.relevantSentenceId = 123456L
     referral.sentAt = sentAt
     referral.sentBy = sentBy
+    referral.withdrawalReasonCode = "NEE"
 
     val out = json.write(
       SentReferralDTO.from(
@@ -104,7 +105,8 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
         },
         "actionPlanId": null,
         "endOfServiceReportCreationRequired": false,
-        "withdrawalState" : "PRE_ICA_WITHDRAWAL"
+        "withdrawalState" : "PRE_ICA_WITHDRAWAL",
+        "withdrawalCode": "NEE"
       }
     """,
     )
@@ -133,6 +135,7 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
     referral.relevantSentenceId = 123456L
     referral.sentAt = sentAt
     referral.sentBy = sentBy
+    referral.withdrawalReasonCode = "NEE"
 
     val out = json.write(
       SentReferralDTO.from(
@@ -162,7 +165,8 @@ class SentReferralDTOTest(@Autowired private val json: JacksonTester<SentReferra
         },
         "actionPlanId": "${actionPlan.id}",
         "endOfServiceReportCreationRequired": false,
-        "withdrawalState" : "POST_ICA_WITHDRAWAL"
+        "withdrawalState" : "POST_ICA_WITHDRAWAL",
+        "withdrawalCode": "NEE"
       }
     """,
     )
