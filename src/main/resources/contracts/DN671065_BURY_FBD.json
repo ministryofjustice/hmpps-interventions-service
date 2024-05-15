@@ -20,12 +20,12 @@
   "providers": {
     "prime_provider_code": "BIG_LIFE_GROUP",
     "subcontractor_codes": [
-      "STEPPINGSTONES_BURY"
+      "STEPPINGSTONE_BURY"
     ]
   },
   "internal_intervention_id": "21f18844-344f-4663-bbce-b974362732f2",
   "intervention_title": "Big Life Group - Finance, Benefit and Debt Services in Bury",
-  "short_description": "This is a Big Life Group service delivered by Stepping Stones in Bury.\n\nServices are available for all adult male and female People on Probation, irrespective of risk level or complexity level, on a Community/Suspended Sentence Order with a RAR or on Licence/Post-Sentence Supervison. Any Sessions delivered as part of a RAR Activity Day or as a mandated Licence or Post Sentence Supervision appointment will be Enforceable.\n\nA range of delivery methods will be used including: Support, advocacy, guidance and information. \nInterventions will be tailored to meet the specific needs of each Person(s) on Probation to enable them to make progress towards their agreed outcomes, as identified in the Person(s) on Probations Action Plan and aim to secure one or more of the following outcomes: \n•\tPerson(s) on probation has access to appropriate financial products, advice and/or services.\n•\tPathways are established to help person(s) on probation maintain and sustain an income, safely manage money and reduce debt.\n•\tPerson(s) on probation financial management skills are developed and/or enhanced.\n•\tPerson(s) on probation can successfully navigate the benefits system, including online banking skills.\n",
+  "short_description": "This is a Big Life Group service delivered by Stepping Stone in Bury.\n\nServices are available for all adult male and female People on Probation, irrespective of risk level or complexity level, on a Community/Suspended Sentence Order with a RAR or on Licence/Post-Sentence Supervison. Any Sessions delivered as part of a RAR Activity Day or as a mandated Licence or Post Sentence Supervision appointment will be Enforceable.\n\nA range of delivery methods will be used including: Support, advocacy, guidance and information. \nInterventions will be tailored to meet the specific needs of each Person(s) on Probation to enable them to make progress towards their agreed outcomes, as identified in the Person(s) on Probations Action Plan and aim to secure one or more of the following outcomes: \n•\tPerson(s) on probation has access to appropriate financial products, advice and/or services.\n•\tPathways are established to help person(s) on probation maintain and sustain an income, safely manage money and reduce debt.\n•\tPerson(s) on probation financial management skills are developed and/or enhanced.\n•\tPerson(s) on probation can successfully navigate the benefits system, including online banking skills.\n",
   "activities": [
     {
       "need_area": "Finance Benefits & Debt",
