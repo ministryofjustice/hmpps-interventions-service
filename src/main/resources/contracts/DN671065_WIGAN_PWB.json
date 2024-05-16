@@ -2,7 +2,7 @@
   "internal_contract_id": "5ecb9522-8b8c-4150-a547-2910554cda61",
   "contract_reference": "DN671065_WIGAN_PWB",
   "contract_type_id": "PWB",
-  "incoming_distribution_email": "kerry.kelly@blg.cjsm.net\n",
+  "incoming_distribution_email": "kerry.kelly@blg.cjsm.net",
   "region": {
     "nps_region_code": "L",
     "pcc_region_code": null
