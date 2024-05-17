@@ -23,7 +23,6 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
     from: OffsetDateTime,
     to: OffsetDateTime,
     contractReferences: List<String>,
-    /*pageable: Pageable*/
   ): List<ReferralPerformanceReport> {
     val query = entityManager.createNativeQuery(reportQuery())
     query.setParameter("contractReferences", contractReferences)
@@ -38,7 +37,7 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
       val organisationId = row[3] as String
       val currentAssigneeEmail = row[4] as String?
       val crn = row[5] as String
-      val dateReferralReceived = timestampToOffset(row[6] as Timestamp?) as OffsetDateTime
+      val dateReferralReceived = timestampToOffset(row[6] as Timestamp?)
       val dateSupplierAssessmentFirstArranged = timestampToOffset(row[7] as Timestamp?) as OffsetDateTime?
       val dateSupplierAssessmentFirstScheduledFor = timestampToOffset(row[8] as Timestamp?) as OffsetDateTime?
       val dateSupplierAssessmentFirstNotAttended = timestampToOffset(row[9] as Timestamp?) as OffsetDateTime?
