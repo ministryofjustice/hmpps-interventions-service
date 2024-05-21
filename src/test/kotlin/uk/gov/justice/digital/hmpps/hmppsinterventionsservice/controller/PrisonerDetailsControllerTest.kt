@@ -19,8 +19,9 @@ internal class PrisonerDetailsControllerTest {
   fun `extract the prison details for the given crn`() {
     val serviceUserCRN = "X123456"
     val personCustodyPrisonId = "ABC"
+    val prisonerNumber = "A6838DA"
     val expectedReleaseDate = LocalDate.of(2050, 11, 1)
-    val prisoner = mockPrisoner(personCustodyPrisonId, expectedReleaseDate)
+    val prisoner = mockPrisoner(personCustodyPrisonId, prisonerNumber, expectedReleaseDate)
     val jwtAuthenticationToken = JwtAuthenticationToken(mock())
 
     whenever(prisonerDetailsService.details(serviceUserCRN)).thenReturn(prisoner)
@@ -38,9 +39,10 @@ internal class PrisonerDetailsControllerTest {
     assertNull(prisonerDetailsController.prisonerDetails(serviceUserCRN, jwtAuthenticationToken))
   }
 
-  private fun mockPrisoner(prisonId: String, expectedReleaseDate: LocalDate) =
+  private fun mockPrisoner(prisonId: String, prisonerNumber: String, expectedReleaseDate: LocalDate) =
     Prisoner(
       prisonId,
+      prisonerNumber,
       expectedReleaseDate,
       expectedReleaseDate,
       expectedReleaseDate,
