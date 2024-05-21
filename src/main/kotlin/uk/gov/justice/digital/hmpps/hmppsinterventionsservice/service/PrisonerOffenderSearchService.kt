@@ -9,6 +9,7 @@ import java.time.LocalDate
 
 data class Prisoner(
   val prisonId: String,
+  val prisonerNumber: String?,
   val releaseDate: LocalDate?,
   val confirmedReleaseDate: LocalDate?,
   val nonDtoReleaseDate: LocalDate?,

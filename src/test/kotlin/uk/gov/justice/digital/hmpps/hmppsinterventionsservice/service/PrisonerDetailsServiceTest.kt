@@ -19,13 +19,14 @@ internal class PrisonerDetailsServiceTest {
   fun `extract prisoner details for the given crn`() {
     val serviceUserCRN = "X123456"
     val personCustodyPrisonId = "ABC"
+    val prisonerNumber = "A6838DA"
     val expectedReleaseDate = LocalDate.of(2050, 11, 1)
     val nomsNumber = "N123"
 
     whenever(communityAPIOffenderService.getOffenderIdentifiers(serviceUserCRN))
       .thenReturn(Mono.just(OffenderIdentifiersResponse(PrimaryIdentifiersResponse(nomsNumber))))
     whenever(prisonerOffenderSearchService.getPrisonerById(nomsNumber))
-      .thenReturn(Mono.just(mockPrisoner(personCustodyPrisonId, expectedReleaseDate)))
+      .thenReturn(Mono.just(mockPrisoner(personCustodyPrisonId, prisonerNumber, expectedReleaseDate)))
 
     val prisonerDetails = this.prisonerDetailsService.details(serviceUserCRN)
 
@@ -59,9 +60,10 @@ internal class PrisonerDetailsServiceTest {
     assertNull(prisonerDetails)
   }
 
-  private fun mockPrisoner(prisonId: String, expectedReleaseDate: LocalDate) =
+  private fun mockPrisoner(prisonId: String, prisonerNumber: String, expectedReleaseDate: LocalDate) =
     Prisoner(
       prisonId,
+      prisonerNumber,
       expectedReleaseDate,
       expectedReleaseDate,
       expectedReleaseDate,

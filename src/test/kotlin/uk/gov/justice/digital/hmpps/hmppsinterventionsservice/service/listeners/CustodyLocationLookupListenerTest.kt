@@ -76,13 +76,14 @@ internal class CustodyLocationLookupListenerTest {
     val referralId = UUID.randomUUID()
     val serviceUserCRN = "X123456"
     val personCustodyPrisonId = "ABC"
+    val prisonerNumber = "A6838DA"
     val expectedReleaseDate = LocalDate.of(2050, 11, 1)
     val nomsNumber = "N123"
 
     whenever(communityAPIOffenderService.getOffenderIdentifiers(serviceUserCRN))
       .thenReturn(Mono.just(OffenderIdentifiersResponse(PrimaryIdentifiersResponse(nomsNumber))))
     whenever(prisonerOffenderSearchService.getPrisonerById(nomsNumber))
-      .thenReturn(Mono.just(mockPrisoner(personCustodyPrisonId, expectedReleaseDate)))
+      .thenReturn(Mono.just(mockPrisoner(personCustodyPrisonId, prisonerNumber, expectedReleaseDate)))
     whenever(referralLocationRepository.findByReferralId(referralId))
       .thenReturn(mockReferralLocation(personCustodyPrisonId, expectedReleaseDate, PersonCurrentLocationType.CUSTODY))
 
@@ -110,6 +111,7 @@ internal class CustodyLocationLookupListenerTest {
     val referralId = UUID.randomUUID()
     val serviceUserCRN = "X123456"
     val personCustodyPrisonId = "ABC"
+    val prisonerNumber = "A6838DA"
     val expectedReleaseDate = LocalDate.of(2050, 11, 1)
     val differentPrisonId = "AAA"
     val nomsNumber = "N123"
@@ -117,7 +119,7 @@ internal class CustodyLocationLookupListenerTest {
     whenever(communityAPIOffenderService.getOffenderIdentifiers(serviceUserCRN))
       .thenReturn(Mono.just(OffenderIdentifiersResponse(PrimaryIdentifiersResponse(nomsNumber))))
     whenever(prisonerOffenderSearchService.getPrisonerById(nomsNumber))
-      .thenReturn(Mono.just(mockPrisoner(personCustodyPrisonId, expectedReleaseDate)))
+      .thenReturn(Mono.just(mockPrisoner(personCustodyPrisonId, prisonerNumber, expectedReleaseDate)))
     whenever(referralLocationRepository.findByReferralId(referralId))
       .thenReturn(mockReferralLocation(differentPrisonId, expectedReleaseDate, PersonCurrentLocationType.CUSTODY))
 
@@ -206,9 +208,10 @@ internal class CustodyLocationLookupListenerTest {
     )
   }
 
-  private fun mockPrisoner(prisonId: String, expectedReleaseDate: LocalDate) =
+  private fun mockPrisoner(prisonId: String, prisonerNumber: String, expectedReleaseDate: LocalDate) =
     Prisoner(
       prisonId,
+      prisonerNumber,
       expectedReleaseDate,
       expectedReleaseDate,
       expectedReleaseDate,
