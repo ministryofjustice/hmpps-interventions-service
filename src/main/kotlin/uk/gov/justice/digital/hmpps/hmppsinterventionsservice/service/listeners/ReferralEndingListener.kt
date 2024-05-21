@@ -34,6 +34,7 @@ class ReferralEndingListener(
         "referralId" to event.referral.id.toString(),
         "referralURN" to event.referral.urn,
         "referralProbationUserURL" to referralDetailsUrl(event.referral.id),
+        "withdrawalCode" to if (event.referral.withdrawalReasonCode != null) event.referral.withdrawalReasonCode!! else "",
       ),
       personReference = PersonReference.crn(event.referral.serviceUserCRN),
     )

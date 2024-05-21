@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.PersonReferenc
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEndingEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.WithdrawalReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
@@ -42,6 +43,7 @@ private fun referralEndingEvent(state: ReferralConcludedState): ReferralEndingEv
           authUserFactory.createSP("abc123"),
         ),
       ),
+      withdrawalReason = WithdrawalReason("NIS", "duplicate", "first"),
     ),
     "http://localhost:8080/sent-referral/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
   )
@@ -71,6 +73,7 @@ internal class ReferralEndingListenerTest {
         "referralId" to "68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
         "referralURN" to "urn:hmpps:interventions-referral:68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
         "referralProbationUserURL" to "http://testUrl/pp/referral/68df9f6c-3fcb-4ec6-8fcf-96551cd9b080",
+        "withdrawalCode" to "NIS",
       ),
       personReference = PersonReference(
         identifiers = listOf(
