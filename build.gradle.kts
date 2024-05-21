@@ -91,7 +91,7 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
   implementation("javax.xml.bind:jaxb-api:2.3.1")
   // notifications
-  implementation("uk.gov.service.notify:notifications-java-client:5.0.1-RELEASE")
+  implementation("uk.gov.service.notify:notifications-java-client:5.1.0-RELEASE")
   implementation("org.json:json") {
     version {
       strictly("20231013")
@@ -99,21 +99,21 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.25.50")
-  implementation("software.amazon.awssdk:s3:2.25.50")
-  implementation("software.amazon.awssdk:sts:2.25.50")
+  implementation("software.amazon.awssdk:sns:2.25.56")
+  implementation("software.amazon.awssdk:s3:2.25.56")
+  implementation("software.amazon.awssdk:sts:2.25.56")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.5")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.2.5")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.2.5")
-  implementation("com.nimbusds:oauth2-oidc-sdk:11.10.1")
+  implementation("com.nimbusds:oauth2-oidc-sdk:11.12")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("com.h2database:h2:2.2.224")
-  implementation("org.hibernate:hibernate-core:6.5.0.Final")
+  implementation("org.hibernate:hibernate-core:6.5.2.Final")
   implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.5")
 
   runtimeOnly("org.flywaydb:flyway-core:9.22.3")
