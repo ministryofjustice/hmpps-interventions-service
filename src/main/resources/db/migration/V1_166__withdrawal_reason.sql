@@ -20,7 +20,7 @@ insert into withdrawal_reason (code, description, grouping) values
                                                       ('RET','Returned to custody', 'sentence'),
                                                       ('SER','Sentence revoked', 'sentence'),
                                                       ('SEE','Sentence expired', 'sentence'),
-                                                      ('EAR','Intervention has been completed', 'early')
+                                                      ('EAR','Intervention has been completed', 'early'),
                                                       ('ANO','Another reason', 'other')
 ;
 
