@@ -1,0 +1,55 @@
+{
+  "internal_contract_id": "1c04580a-004b-4868-9e2d-2c1c47c7c963",
+  "contract_reference": "DN671065_TRAFFORD_PWB",
+  "contract_type_id": "PWB",
+  "incoming_distribution_email": "kerry.kelly@blg.cjsm.net",
+  "region": {
+    "nps_region_code": "L",
+    "pcc_region_code": null
+  },
+  "eligibility": {
+    "allows_female": true,
+    "allows_male": true,
+    "minimum_age": 18,
+    "maximum_age": null
+  },
+  "scheduling": {
+    "hide_before": "2024-06-02",
+    "hide_after": null
+  },
+  "providers": {
+    "prime_provider_code": "BIG_LIFE_GROUP",
+    "subcontractor_codes": [
+      "OUT_THERE_IN_TRAFFORD"
+    ]
+  },
+  "internal_intervention_id": "38ee64ab-3bf2-4f05-81ff-ce1ca01adeeb",
+  "intervention_title": "Big Life Group - Personal Wellbeing Services In Trafford",
+  "short_description": "This is a Big Life Group service delivered by Out There in Trafford.\n\nThe personal wellbeing service is a holistic service which addresses the following rehabilitative needs: Emotional Wellbeing, Family and Significant Others, Lifestyle and Associates, Social Inclusion, low level accommodation, support with addressing trauma and support for veterans.\n\nServices are available for all adult male and female People on Probation, irrespective of risk level or complexity level, on a Community/Suspended Sentence Order with a RAR or on Licence/Post-Sentence Supervision. Any Sessions delivered as part of a RAR Activity Day or as a mandated Licence or Post Sentence Supervision appointment will be Enforceable.\nInterventions will be tailored to reflect the complexity of needs and should aim to secure one or more of the following outcomes for People on Probation:\n\n• Sustained engagement in pro-social leisure interests and purposeful activities\n• Reduced engagement with pro-criminal associates and activities\n• Support to develop or maintain positive family relationships\n• Development of coping skills and strategies to regulate mood and demonstrate perspective-taking and self-care by avoiding risky situations.\n• Develop the ability to access and engage with mental health and or drug and alcohol services\n• Develop ability to recognise and manage triggers to worsening wellbeing.\n• Develop ability to build and maintain appropriate social interactions.\n•  Support to comply with/access any medication/treatment/therapy programmes that will enhance general health and wellbeing\n• Support with low complexity accommodation issues (not at immediate risk of homelessness such as applying for social or private rental housing, possession proceedings, disrepair options, general tenant rights and section 21 notices to quit\n",
+  "activities": [
+    {
+      "need_area": "Emotional Wellbeing",
+      "activity": "Group and 1:1 trauma informed sessions for emotional regulation and decision making. Group sessions are delivered on an evolving timetable and include activities such as art therapy and outdoor activities.\n",
+      "delivery_method": "1:1 and group sessions",
+      "delivery_location": "Trafford"
+    },
+    {
+      "need_area": "Lifestyle & Associates",
+      "activity": "1:1 and group sessions delivered on evolving timetables. Activities include household management, low level employment advice and guidance, signposting to relevant agencies and applicable courses.\n",
+      "delivery_method": "1:1 and group sessions",
+      "delivery_location": "Trafford"
+    },
+    {
+      "need_area": "Social Inclusion",
+      "activity": "Social groups and activities run on a changing timetable to include art groups, nature walks, games leagues, drop in sessions to access food banks and digital exclusion groups.\n",
+      "delivery_method": "1:1 and group sessions",
+      "delivery_location": "Trafford"
+    },
+    {
+      "need_area": "Family & Significant Others",
+      "activity": "Provide information to educate families about probation order/license conditions.\n– Offer basic mediation to address familial and relationship issues.\n– Facilitate referrals to mediation services for complex family situations.\n– Offer guidance to people on probation wishing to maintain contact with their children.\n– Facilitate communication with statutory services (such as Children Services).\n",
+      "delivery_method": "1:1 and group sessions",
+      "delivery_location": "Trafford"
+    }
+  ]
+}
