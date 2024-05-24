@@ -1,0 +1,1 @@
+drop function if exists performance_report(text[],timestamp without time zone,timestamp without time zone);
