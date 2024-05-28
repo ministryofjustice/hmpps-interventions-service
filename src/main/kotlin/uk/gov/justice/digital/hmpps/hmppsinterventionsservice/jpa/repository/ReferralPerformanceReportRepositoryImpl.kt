@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model.ReferralPerformanceReport
 import java.math.BigDecimal
 import java.sql.Timestamp
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.util.*
@@ -67,6 +68,7 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
       val endRequestedReason = row[20] as String?
       val eosrSubmittedAt = timestampToOffset(row[21] as Timestamp?) as OffsetDateTime?
       val concludedAt = timestampToOffset(row[22] as Timestamp?) as OffsetDateTime?
+      val completionDeadline = row[23] as LocalDate
       records.add(
         ReferralPerformanceReport(
           referralId = referralId,
@@ -92,6 +94,7 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
           endRequestedReason = endRequestedReason,
           eosrSubmittedAt = eosrSubmittedAt,
           concludedAt = concludedAt,
+          completionDeadline = completionDeadline,
         ),
       )
     }

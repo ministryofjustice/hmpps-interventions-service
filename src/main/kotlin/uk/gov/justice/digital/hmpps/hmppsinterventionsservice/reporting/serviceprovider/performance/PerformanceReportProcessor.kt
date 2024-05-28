@@ -43,8 +43,8 @@ class PerformanceReportProcessor(
       endRequestedReason = referral.endRequestedReason,
       eosrSubmittedAt = referral.eosrSubmittedAt,
       concludedAt = referral.concludedAt,
-      // referralEndState = referral.endState,
-      // dateInterventionToBeCompletedBy = referral.referralDetails?.completionDeadline,
+      referralEndState = endState(referral),
+      dateInterventionToBeCompletedBy = referral.completionDeadline,
     )
   }
 

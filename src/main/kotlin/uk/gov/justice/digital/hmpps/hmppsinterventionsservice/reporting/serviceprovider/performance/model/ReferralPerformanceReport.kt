@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model
 
 import jakarta.persistence.Id
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -28,4 +29,5 @@ data class ReferralPerformanceReport(
   val endRequestedReason: String?,
   val eosrSubmittedAt: OffsetDateTime?,
   val concludedAt: OffsetDateTime?,
+  val completionDeadline: LocalDate,
 )

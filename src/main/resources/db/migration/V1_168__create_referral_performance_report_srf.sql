@@ -21,7 +21,8 @@ create or replace function performance_report(contract_references text[], sent_f
                           end_requested_at timestamp,
                           end_requested_reason text,
                           eosr_submitted_at timestamp,
-                          concluded_at timestamp)
+                          concluded_at timestamp,
+                          completion_deadline date)
 as
 $body$
 WITH cte
@@ -146,7 +147,8 @@ AS (SELECT DISTINCT referral_id,
          r.end_requested_at                               AS end_requested_at,
          cr.description                                   AS end_requested_reason,
          es.submitted_at                                  AS eosr_submitted_at,
-         r.concluded_at                                   AS concluded_at
+         r.concluded_at                                   AS concluded_at,
+         rde.completion_deadline                          AS completion_deadline
   FROM   referral r
   LEFT OUTER JOIN intervention i
   ON r.intervention_id = i.id
@@ -184,6 +186,8 @@ AS (SELECT DISTINCT referral_id,
   ON es.referral_id = r.id
   LEFT OUTER JOIN cancellation_reason cr
   ON cr.code = r.end_requested_reason_code
+  LEFT OUTER JOIN referral_details rde
+  ON rde.referral_id = r.id
   WHERE d.contract_reference = ANY ($1)
   AND r.sent_at > ($2)
   AND r.sent_at < ($3);
