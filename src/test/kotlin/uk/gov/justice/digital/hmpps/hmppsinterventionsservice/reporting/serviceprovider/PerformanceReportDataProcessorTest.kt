@@ -7,7 +7,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralPerformanceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.PerformanceReportProcessor
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model.ReferralPerformanceReport
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
@@ -16,20 +16,20 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFa
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAssessmentFactory
-import java.time.LocalDate
+import java.math.BigDecimal
 import java.time.OffsetDateTime
-import java.util.Optional
+import java.util.*
 
 internal class PerformanceReportDataProcessorTest {
   private val actionPlanService = mock<ActionPlanService>()
   private val appointmentFactory = AppointmentFactory()
   private val supplierAssessmentFactory = SupplierAssessmentFactory()
   private val appointmentRepository: AppointmentRepository = mock()
-  private val endOfServiceReportRepository: EndOfServiceReportRepository = mock()
+  private val referralPerformanceReportRepository: ReferralPerformanceReportRepository = mock()
   private val actionPlanFactory = ActionPlanFactory()
   private val endOfServiceReportFactory = EndOfServiceReportFactory()
 
-  private val processor = PerformanceReportProcessor(actionPlanService, endOfServiceReportRepository)
+  private val processor = PerformanceReportProcessor(referralPerformanceReportRepository)
 
   private val referralFactory = ReferralFactory()
 
@@ -41,12 +41,8 @@ internal class PerformanceReportDataProcessorTest {
     val supplierAssessment = supplierAssessmentFactory.create(appointment = supplierAssessmentFirstAppointment)
     supplierAssessment.appointments.add(supplierAssessmentNewAppointment)
     val actionPlan = actionPlanFactory.createApproved()
-<<<<<<< HEAD
-    val referral = referralFactory.createSent(actionPlans = mutableListOf(actionPlan), supplierAssessment = supplierAssessment, completionDeadline = LocalDate.of(2024, 5, 20))
-=======
     val endOfServiceReport = endOfServiceReportFactory.create()
     val referral = referralFactory.createSent(actionPlans = mutableListOf(actionPlan), supplierAssessment = supplierAssessment)
->>>>>>> 67ee2944 (Revert "Revert "using native queries to retrieve data for performance reporting."")
 
     val referralPerformanceReport = ReferralPerformanceReport(
       referralReference = referral.referenceNumber!!,
@@ -76,7 +72,9 @@ internal class PerformanceReportDataProcessorTest {
     )
 
     whenever(appointmentRepository.findAllByReferralId(referral.id)).thenReturn(listOf(supplierAssessmentFirstAppointment, supplierAssessmentNewAppointment))
-    whenever(endOfServiceReportRepository.findById(anyOrNull())).thenReturn(Optional.of(endOfServiceReport))
+    whenever(referralPerformanceReportRepository.eosrAchievementScore(anyOrNull())).thenReturn(BigDecimal.valueOf(1L))
+    whenever(referralPerformanceReportRepository.firstAttendanceDate(anyOrNull())).thenReturn(approvedActionPlanAppointment.appointmentTime)
+    whenever(referralPerformanceReportRepository.attendanceCount(anyOrNull())).thenReturn(Integer(2))
     whenever(actionPlanService.getFirstAttendedAppointment(referral.id)).thenReturn(approvedActionPlanAppointment)
     whenever(actionPlanService.getAllAttendedAppointments(referral.id)).thenReturn(listOf(unApprovedAppointment, approvedActionPlanAppointment))
 

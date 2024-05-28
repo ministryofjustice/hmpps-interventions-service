@@ -4,10 +4,11 @@ import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
 import org.springframework.stereotype.Repository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model.ReferralPerformanceReport
+import java.math.BigDecimal
 import java.sql.Timestamp
 import java.time.OffsetDateTime
 import java.time.ZoneId
-import java.util.UUID
+import java.util.*
 
 @Repository
 class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportRepository {
@@ -17,6 +18,18 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
 
   private fun reportQuery(): String {
     return "select * from performance_report(array[:contractReferences],:from, :to)"
+  }
+
+  private fun eosrScoreQuery(): String {
+    return "select * from performance_report_eosr_outcome_score(:eosrId)"
+  }
+
+  private fun attendedAppointmentCountQuery(): String {
+    return "select * from performance_report_attendances_count(:referralId)"
+  }
+
+  private fun firstAttendanceDateQuery(): String {
+    return "select * from performance_report_first_attendance(:referralId)"
   }
 
   override fun serviceProviderReportReferrals(
@@ -31,7 +44,7 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
     val result = query.resultList as List<Array<Any>>
     val records: MutableList<ReferralPerformanceReport> = mutableListOf()
     result.forEach { row ->
-      val referralId = row[0] as String
+      val referralId = row[0] as UUID
       val referralReference = row[1] as String
       val contractReference = row[2] as String
       val organisationId = row[3] as String
@@ -46,9 +59,9 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
       val supplierAssessmentAttendedOnTime = stringToBoolean(row[12] as String?)
       val firstActionPlanSubmittedAt = timestampToOffset(row[13] as Timestamp?) as OffsetDateTime?
       val firstActionPlanApprovedAt = timestampToOffset(row[14] as Timestamp?) as OffsetDateTime?
-      val approvedActionPlanId = row[15] as String?
+      val approvedActionPlanId = row[15] as UUID?
       val numberOfOutcomes = (row[16] as Int).toLong()
-      val endOfServiceReportId = row[17] as String?
+      val endOfServiceReportId = row[17] as UUID?
       val numberOfSessions = row[18] as Int?
       val endRequestedAt = timestampToOffset(row[19] as Timestamp?) as OffsetDateTime?
       val endRequestedReason = row[20] as String?
@@ -56,7 +69,7 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
       val concludedAt = timestampToOffset(row[22] as Timestamp?) as OffsetDateTime?
       records.add(
         ReferralPerformanceReport(
-          referralId = stringToUUID(referralId),
+          referralId = referralId,
           referralReference = referralReference,
           contractReference = contractReference,
           organisationId = organisationId,
@@ -71,9 +84,9 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
           supplierAssessmentAttendedOnTime = supplierAssessmentAttendedOnTime,
           firstActionPlanSubmittedAt = firstActionPlanSubmittedAt,
           firstActionPlanApprovedAt = firstActionPlanApprovedAt,
-          approvedActionPlanId = stringToUUID(approvedActionPlanId),
+          approvedActionPlanId = approvedActionPlanId,
           numberOfOutcomes = numberOfOutcomes,
-          endOfServiceReportId = stringToUUID(endOfServiceReportId),
+          endOfServiceReportId = endOfServiceReportId,
           numberOfSessions = numberOfSessions,
           endRequestedAt = endRequestedAt,
           endRequestedReason = endRequestedReason,
@@ -84,16 +97,31 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
     }
     return records
   }
+  override fun eosrAchievementScore(eosrId: UUID): BigDecimal {
+    val query = entityManager.createNativeQuery(eosrScoreQuery())
+    query.setParameter("eosrId", eosrId)
+    val result = query.resultList as BigDecimal
+    return result
+  }
+
+  override fun firstAttendanceDate(referralId: UUID): OffsetDateTime {
+    val query = entityManager.createNativeQuery(firstAttendanceDateQuery())
+    query.setParameter("referralId", referralId)
+    val result = query.resultList as Timestamp?
+    return timestampToOffset(result)
+  }
+
+  override fun attendanceCount(referralId: UUID): Integer {
+    val query = entityManager.createNativeQuery(attendedAppointmentCountQuery())
+    query.setParameter("referralId", referralId)
+    val result = query.resultList as Integer
+    return result
+  }
 
   fun timestampToOffset(timestamp: Timestamp?): OffsetDateTime {
     val currentTimeMillis = System.currentTimeMillis()
     val resolved = timestamp ?: Timestamp(currentTimeMillis)
     return OffsetDateTime.ofInstant(resolved.toInstant(), ZoneId.of("UTC"))
-  }
-
-  fun stringToUUID(inStr: String?): UUID? {
-    val resolved = inStr ?: UUID.randomUUID().toString()
-    return UUID.fromString(resolved)
   }
 
   fun stringToBoolean(inStr: String?): Boolean {

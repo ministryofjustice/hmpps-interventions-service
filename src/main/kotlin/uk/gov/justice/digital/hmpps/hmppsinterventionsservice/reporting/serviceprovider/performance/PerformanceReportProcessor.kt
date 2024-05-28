@@ -4,15 +4,12 @@ import mu.KLogging
 import net.logstash.logback.argument.StructuredArguments.kv
 import org.springframework.batch.item.ItemProcessor
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralPerformanceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model.ReferralPerformanceReport
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
-import java.util.*
 
 @Component
 class PerformanceReportProcessor(
-  private val actionPlanService: ActionPlanService,
-  private val endOfServiceReportRepository: EndOfServiceReportRepository,
+  private val referralPerformanceReportRepository: ReferralPerformanceReportRepository,
 ) : ItemProcessor<ReferralPerformanceReport, PerformanceReportData> {
   companion object : KLogging()
 
@@ -35,14 +32,13 @@ class PerformanceReportProcessor(
       supplierAssessmentAttendedOnTime = referral.supplierAssessmentAttendedOnTime,
       firstActionPlanSubmittedAt = referral.firstActionPlanSubmittedAt,
       firstActionPlanApprovedAt = referral.firstActionPlanApprovedAt,
-      firstSessionAttendedAt = referral.approvedActionPlanId?.let { referral.referralId?.let { it1 -> actionPlanService.getFirstAttendedAppointment(it1)?.appointmentTime } },
+      firstSessionAttendedAt = referral.approvedActionPlanId?.let { referral.referralId?.let { it1 -> referralPerformanceReportRepository.firstAttendanceDate(it1) } },
       numberOfOutcomes = referral.numberOfOutcomes?.toInt(),
-      achievementScore = 0F, /*referral.endOfServiceReportId?.let { eosr ->
-        endOfServiceReportRepository.findById(eosr).map { it.achievementScore }
-          .get()
-      }, requires attetion */
+      achievementScore = referral.endOfServiceReportId?.let { eosr ->
+        referralPerformanceReportRepository.eosrAchievementScore(eosr).toFloat()
+      },
       numberOfSessions = referral.numberOfSessions,
-      numberOfSessionsAttended = referral.approvedActionPlanId?.let { referral.referralId?.let { it1 -> actionPlanService.getAllAttendedAppointments(it1).size } },
+      numberOfSessionsAttended = referral.approvedActionPlanId?.let { referral.referralId?.let { it1 -> referralPerformanceReportRepository.attendanceCount(it1).toInt() } },
       endRequestedAt = referral.endRequestedAt,
       endRequestedReason = referral.endRequestedReason,
       eosrSubmittedAt = referral.eosrSubmittedAt,
