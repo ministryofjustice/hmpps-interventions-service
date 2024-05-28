@@ -44,6 +44,8 @@ internal class PerformanceReportDataProcessorTest {
     val endOfServiceReport = endOfServiceReportFactory.create()
     val referral = referralFactory.createSent(actionPlans = mutableListOf(actionPlan), supplierAssessment = supplierAssessment)
 
+    val today = OffsetDateTime.now().toLocalDate()
+
     val referralPerformanceReport = ReferralPerformanceReport(
       referralReference = referral.referenceNumber!!,
       referralId = referral.id,
@@ -58,7 +60,7 @@ internal class PerformanceReportDataProcessorTest {
       dateSupplierAssessmentFirstAttended = supplierAssessmentNewAppointment.appointmentTime,
       dateSupplierAssessmentFirstCompleted = supplierAssessmentNewAppointment.appointmentTime,
       supplierAssessmentAttendedOnTime = true,
-      firstActionPlanSubmittedAt = unApprovedAppointment.attendanceSubmittedAt,
+      firstActionPlanSubmittedAt = actionPlan.submittedAt,
       firstActionPlanApprovedAt = actionPlan.approvedAt,
       approvedActionPlanId = actionPlan.id,
       numberOfOutcomes = 2,
@@ -68,7 +70,7 @@ internal class PerformanceReportDataProcessorTest {
       endRequestedReason = "reason",
       eosrSubmittedAt = OffsetDateTime.now(),
       concludedAt = referral.concludedAt,
-
+      completionDeadline = today,
     )
 
     whenever(appointmentRepository.findAllByReferralId(referral.id)).thenReturn(listOf(supplierAssessmentFirstAppointment, supplierAssessmentNewAppointment))
@@ -76,7 +78,6 @@ internal class PerformanceReportDataProcessorTest {
     whenever(referralPerformanceReportRepository.firstAttendanceDate(anyOrNull())).thenReturn(approvedActionPlanAppointment.appointmentTime)
     whenever(referralPerformanceReportRepository.attendanceCount(anyOrNull())).thenReturn(Integer(2))
     whenever(actionPlanService.getFirstAttendedAppointment(referral.id)).thenReturn(approvedActionPlanAppointment)
-    whenever(actionPlanService.getAllAttendedAppointments(referral.id)).thenReturn(listOf(unApprovedAppointment, approvedActionPlanAppointment))
 
     val performanceReportData = processor.process(referralPerformanceReport)
 
@@ -91,6 +92,6 @@ internal class PerformanceReportDataProcessorTest {
     assertThat(performanceReportData.firstSessionAttendedAt).isEqualTo(approvedActionPlanAppointment.appointmentTime)
     assertThat(performanceReportData.numberOfSessionsAttended).isEqualTo(2)
     assertThat(performanceReportData.supplierAssessmentAttendedOnTime).isEqualTo(true)
-    assertThat(performanceReportData.dateInterventionToBeCompletedBy).isEqualTo(referral.referralDetails?.completionDeadline)
+    assertThat(performanceReportData.dateInterventionToBeCompletedBy).isEqualTo(today)
   }
 }
