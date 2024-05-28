@@ -298,13 +298,19 @@ class DraftReferralService(
       }
     }
     update.personCustodyPrisonId?.let {
-      draftReferral.personCustodyPrisonId = update.personCustodyPrisonId
+      draftReferral.personCustodyPrisonId = it
     }
     update.alreadyKnowPrisonName?.let {
-      draftReferral.alreadyKnowPrisonName = update.alreadyKnowPrisonName
+      draftReferral.alreadyKnowPrisonName = it
     }
     update.allocatedCommunityPP?.let {
-      draftReferral.allocatedCommunityPP = update.allocatedCommunityPP
+      draftReferral.allocatedCommunityPP = it
+    }
+    update.expectedProbationOffice?.let {
+      draftReferral.expectedProbationOffice = it
+    }
+    update.expectedProbationOfficeUnKnownReason?.let {
+      draftReferral.expectedProbationOfficeUnknownReason = it
     }
   }
 
@@ -565,6 +571,8 @@ class DraftReferralService(
         expectedReleaseDate = draftReferral.expectedReleaseDate,
         expectedReleaseDateMissingReason = draftReferral.expectedReleaseDateMissingReason,
         isReferralReleasingIn12Weeks = draftReferral.isReferralReleasingIn12Weeks,
+        expectedProbationOffice = draftReferral.expectedProbationOffice,
+        expectedProbationOfficeUnknownReason = draftReferral.expectedProbationOfficeUnknownReason,
       ),
     )
     referralRepository.save(referral)

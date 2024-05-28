@@ -234,6 +234,8 @@ internal class CustodyLocationLookupListenerTest {
       prisonId = prisonId,
       expectedReleaseDate = expectedReleaseDate,
       expectedReleaseDateMissingReason = null,
+      expectedProbationOffice = "London",
+      expectedProbationOfficeUnknownReason = null,
     )
 
   private fun referralEvent(

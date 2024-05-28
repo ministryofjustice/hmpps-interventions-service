@@ -28,6 +28,8 @@ data class ReferralLocation(
   @Column(name = "prison_id") val prisonId: String?,
   @Column(name = "expected_release_date") val expectedReleaseDate: LocalDate?,
   @Column(name = "expected_release_date_missing_reason") val expectedReleaseDateMissingReason: String?,
+  @Column(name = "expected_probation_office") val expectedProbationOffice: String?,
+  @Column(name = "expected_probation_office_unknown_reason") val expectedProbationOfficeUnknownReason: String?,
   @Column(name = "nomis_prison_id") var nomisPrisonId: String? = null,
   @Column(name = "nomis_release_date") var nomisReleaseDate: LocalDate? = null,
   @Column(name = "nomis_confirmed_release_date") var nomisConfirmedReleaseDate: LocalDate? = null,

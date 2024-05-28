@@ -111,6 +111,8 @@ class DraftReferral(
   @Column(name = "has_main_point_of_contact_details") var hasMainPointOfContactDetails: Boolean? = null,
   @Column(name = "pp_establishment") var ppEstablishment: String? = null,
   @Column(name = "allocated_community_pp") var allocatedCommunityPP: Boolean? = null,
+  @Column(name = "expected_probation_office") var expectedProbationOffice: String? = null,
+  @Column(name = "expected_probation_office_unknown_reason") var expectedProbationOfficeUnknownReason: String? = null,
 ) {
   val referralDetails: ReferralDetails? get() {
     return referralDetailsHistory?.firstOrNull { it.supersededById == null }
