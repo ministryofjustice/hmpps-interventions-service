@@ -219,6 +219,7 @@ class ReferralService(
     validateWithdrawalReasonCode(withdrawReferralRequestDTO.code)
     referral.withdrawalReasonCode = withdrawReferralRequestDTO.code
     referral.withdrawalComments = withdrawReferralRequestDTO.comments
+    telemetryService.reportWithdrawalInformation(referral, withdrawReferralRequestDTO)
   }
 
   private fun validateWithdrawalReasonCode(withdrawalReasonCode: String) {

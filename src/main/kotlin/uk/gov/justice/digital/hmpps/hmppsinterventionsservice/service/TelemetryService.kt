@@ -3,6 +3,8 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 import com.microsoft.applicationinsights.TelemetryClient
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.WithdrawReferralRequestDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 
 @Service
 class TelemetryService(
@@ -21,5 +23,18 @@ class TelemetryService(
     if (!recoverable) {
       logger.warn("assumption proved invalid: $assumption")
     }
+  }
+
+  fun reportWithdrawalInformation(referral: Referral, withdrawReferralRequestDTO: WithdrawReferralRequestDTO) {
+    telemetryClient.trackEvent(
+      "ReferralWithdrawalInformation",
+      mapOf(
+        "referralId" to referral.id.toString(),
+        "referral" to referral.referenceNumber!!,
+        "withdrawalReasonCode" to if (referral.withdrawalReasonCode != null) referral.withdrawalReasonCode!! else "",
+        "withdrawalComments" to if (referral.withdrawalComments != null) referral.withdrawalComments!! else "",
+      ),
+      null,
+    )
   }
 }
