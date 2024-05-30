@@ -7,13 +7,17 @@ import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ProbationCaseReferralDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DeliverySessionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
+import java.time.OffsetDateTime
 
 internal class ProbationCaseServiceTest {
   private val referralRepository: ReferralRepository = mock()
   private val draftReferralRepository: DraftReferralRepository = mock()
   private val referralService: ReferralService = mock()
   private val hmppsAuthService: HMPPSAuthService = mock()
+  private val deliverySessionService: DeliverySessionService = mock()
+  private val deliverySessionFactory = DeliverySessionFactory()
 
   private val referralFactory = ReferralFactory()
 
@@ -22,6 +26,7 @@ internal class ProbationCaseServiceTest {
     draftReferralRepository,
     referralService,
     hmppsAuthService,
+    deliverySessionService,
   )
 
   @Test
@@ -105,6 +110,64 @@ internal class ProbationCaseServiceTest {
 
     assertThat(result).isNotNull
     assertThat(result).size().isEqualTo(1)
+    assertThat(result).isEqualTo(expectedResult)
+  }
+
+  @Test
+  fun `returns referral with all its appointment location information`() {
+    val crn = "X123456"
+    val time = OffsetDateTime.now()
+    val duration = 500
+    val referral = referralFactory.createAssigned(serviceUserCRN = crn)
+    val referral2 = referralFactory.createAssigned(serviceUserCRN = crn)
+    val sentReferrals = listOf(referral, referral2)
+    val referral1Session1 = deliverySessionFactory.createScheduled(sessionNumber = 1, appointmentTime = time, durationInMinutes = duration, referral = referral)
+    val referral2Session1 = deliverySessionFactory.createScheduled(sessionNumber = 1, appointmentTime = time, durationInMinutes = duration, referral = referral2)
+
+    whenever(referralRepository.findByServiceUserCRN(crn)).thenReturn(sentReferrals)
+    whenever(deliverySessionService.getSessions(referral.id)).thenReturn(listOf(referral1Session1))
+    whenever(deliverySessionService.getSessions(referral2.id)).thenReturn(listOf(referral2Session1))
+    val expectedResult = listOf(
+      ReferralAppointmentLocationDetails(referral, listOf(referral1Session1.currentAppointment!!)),
+      ReferralAppointmentLocationDetails(referral2, listOf(referral2Session1.currentAppointment!!)),
+    )
+
+    val result = probationCaseService.getAppointmentLocationDetails(crn)
+
+    assertThat(result).isNotNull
+    assertThat(result).size().isEqualTo(2)
+    assertThat(result[0].appointments).size().isEqualTo(1)
+    assertThat(result[1].appointments).size().isEqualTo(1)
+    assertThat(result).isEqualTo(expectedResult)
+  }
+
+  @Test
+  fun `returns referral with multiple appointments location information`() {
+    val crn = "X123456"
+    val time = OffsetDateTime.now()
+    val duration = 500
+    val referral = referralFactory.createAssigned(serviceUserCRN = crn)
+    val referral2 = referralFactory.createAssigned(serviceUserCRN = crn)
+    val sentReferrals = listOf(referral, referral2)
+    val referral1Session1 = deliverySessionFactory.createScheduled(sessionNumber = 1, appointmentTime = time, durationInMinutes = duration, referral = referral)
+    val referral1Session2 = deliverySessionFactory.createScheduled(sessionNumber = 2, appointmentTime = time, durationInMinutes = duration, referral = referral)
+    val referral2Session1 = deliverySessionFactory.createScheduled(sessionNumber = 1, appointmentTime = time, durationInMinutes = duration, referral = referral2)
+    val referral2Session2 = deliverySessionFactory.createScheduled(sessionNumber = 2, appointmentTime = time, durationInMinutes = duration, referral = referral2)
+
+    whenever(referralRepository.findByServiceUserCRN(crn)).thenReturn(sentReferrals)
+    whenever(deliverySessionService.getSessions(referral.id)).thenReturn(listOf(referral1Session1, referral1Session2))
+    whenever(deliverySessionService.getSessions(referral2.id)).thenReturn(listOf(referral2Session1, referral2Session2))
+    val expectedResult = listOf(
+      ReferralAppointmentLocationDetails(referral, listOf(referral1Session1.currentAppointment!!, referral1Session2.currentAppointment!!)),
+      ReferralAppointmentLocationDetails(referral2, listOf(referral2Session1.currentAppointment!!, referral2Session2.currentAppointment!!)),
+    )
+
+    val result = probationCaseService.getAppointmentLocationDetails(crn)
+
+    assertThat(result).isNotNull
+    assertThat(result).size().isEqualTo(2)
+    assertThat(result[0].appointments).size().isEqualTo(2)
+    assertThat(result[1].appointments).size().isEqualTo(2)
     assertThat(result).isEqualTo(expectedResult)
   }
 }
