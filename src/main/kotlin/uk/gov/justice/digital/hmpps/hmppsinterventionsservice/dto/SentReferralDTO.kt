@@ -34,7 +34,7 @@ class SentReferralDTO(
       referral: Referral,
       endOfServiceReportRequired: Boolean = false,
       draftReferral: DraftReferral? = null,
-      withdrawalState: String? = null,
+      withdrawalState: String? = "PRE_ICA_WITHDRAWAL",
     ): SentReferralDTO {
       return SentReferralDTO(
         id = referral.id,
