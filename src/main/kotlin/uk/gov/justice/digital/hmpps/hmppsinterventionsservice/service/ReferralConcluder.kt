@@ -33,6 +33,12 @@ enum class ReferralConcludedState {
   COMPLETED,
 }
 
+enum class ReferralWithdrawalState {
+  PRE_ICA_WITHDRAWAL,
+  POST_ICA_WITHDRAWAL,
+  POST_ICA_CLOSE_REFERRAL_EARLY,
+}
+
 @Service
 @Transactional
 class ReferralConcluder(
@@ -51,14 +57,24 @@ class ReferralConcluder(
     }
   }
 
+  fun withdrawReferral(referral: Referral, withdrawalState: ReferralWithdrawalState) {
+    val deliveryState = deliveryState(referral)
+    signalEnding(referral, deliveryState.concludedState)
+    conclude(referral, deliveryState.concludedState, withdrawalState)
+  }
+
   private fun signalEnding(referral: Referral, concludedState: ReferralConcludedState) {
     referralEventPublisher.referralEndingEvent(referral, concludedState)
   }
 
-  private fun conclude(referral: Referral, concludedState: ReferralConcludedState) {
+  private fun conclude(
+    referral: Referral,
+    concludedState: ReferralConcludedState,
+    withdrawalState: ReferralWithdrawalState? = null,
+  ) {
     referral.concludedAt = OffsetDateTime.now()
     referralRepository.save(referral)
-    referralEventPublisher.referralConcludedEvent(referral, concludedState)
+    referralEventPublisher.referralConcludedEvent(referral, concludedState, withdrawalState)
   }
 
   private fun deliveryState(referral: Referral): DeliveryState {
@@ -75,6 +91,14 @@ class ReferralConcluder(
     }
   }
 
+  private fun endState(deliveryState: DeliveryState, endOfServiceReport: EndOfServiceReport?): ReferralEndState {
+    return if (deliveryState.requiresEndOfServiceReport && endOfServiceReport?.submittedAt == null) {
+      ReferralEndState.AWAITING_END_OF_SERVICE_REPORT
+    } else {
+      ReferralEndState.CAN_CONCLUDE
+    }
+  }
+
   fun requiresEndOfServiceReportCreation(referral: Referral): Boolean {
     // integration smell: we disable 'creation' for the UI if there is a started end-of-service report
     if (referral.endOfServiceReport != null) return false
@@ -86,11 +110,14 @@ class ReferralConcluder(
     return state.requiresEndOfServiceReport
   }
 
-  private fun endState(deliveryState: DeliveryState, endOfServiceReport: EndOfServiceReport?): ReferralEndState {
-    return if (deliveryState.requiresEndOfServiceReport && endOfServiceReport?.submittedAt == null) {
-      ReferralEndState.AWAITING_END_OF_SERVICE_REPORT
+  fun withdrawalState(referral: Referral): ReferralWithdrawalState {
+    val endOfServiceReportRequired = requiresEndOfServiceReportCreation(referral)
+    return if (deliverySessionRepository.countNumberOfAttendedSessions(referral.id) == 0) {
+      ReferralWithdrawalState.PRE_ICA_WITHDRAWAL
+    } else if (deliverySessionRepository.countNumberOfAttendedSessions(referral.id) == 1 && endOfServiceReportRequired) {
+      ReferralWithdrawalState.POST_ICA_WITHDRAWAL
     } else {
-      ReferralEndState.CAN_CONCLUDE
+      ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY
     }
   }
 

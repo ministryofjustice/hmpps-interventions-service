@@ -33,14 +33,14 @@ interface DeliverySessionRepository : JpaRepository<DeliverySession, UUID> {
   @Query(
     "select count(sesh) from DeliverySession sesh join sesh.appointments appt " +
       "where sesh.referral.id = :referralId and appt.attended in ('YES', 'LATE') " +
-      "and appt.appointmentFeedbackSubmittedAt is not null and appt.stale = false",
+      "and appt.appointmentFeedbackSubmittedAt is not null and appt.superseded = false and appt.stale = false",
   )
   fun countNumberOfAttendedSessions(referralId: UUID): Int
 
   @Query(
     "select count(sesh) from DeliverySession sesh join sesh.appointments appt " +
       "where sesh.referral.id = :referralId and appt.attended in ('NO') " +
-      "and appt.appointmentFeedbackSubmittedAt is not null and appt.stale = false",
+      "and appt.appointmentFeedbackSubmittedAt is not null and appt.superseded = false and appt.stale = false",
   )
   fun countNumberOfNotAttendedSessions(referralId: UUID): Int
 }

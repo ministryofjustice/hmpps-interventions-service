@@ -51,7 +51,7 @@ internal class ReferralConcluderTest {
     referralEventPublisher,
   )
 
-  data class WhenInState(val attendedOrLate: Int, val notAttended: Int, val withoutOutcome: Int)
+  data class WhenInState(val attendedOrLate: Int, val notAttended: Int, val withoutOutcome: Int, val referralWithdrawalStateWith: ReferralWithdrawalState = ReferralWithdrawalState.PRE_ICA_WITHDRAWAL)
   data class ExpectThat(
     val canStartEoSR: Boolean,
     val endingWith: ReferralConcludedState? = null,
@@ -61,27 +61,27 @@ internal class ReferralConcluderTest {
   companion object {
     private val notStarted = named(
       "no sessions have any attendance",
-      WhenInState(attendedOrLate = 0, notAttended = 0, withoutOutcome = 1),
+      WhenInState(attendedOrLate = 0, notAttended = 0, withoutOutcome = 1, referralWithdrawalStateWith = ReferralWithdrawalState.PRE_ICA_WITHDRAWAL),
     )
     private val allSessionsHaveOutcomeNoFSA = named(
       "finished delivery, without first substantive appointment (FSA)",
-      WhenInState(attendedOrLate = 0, notAttended = 1, withoutOutcome = 0),
+      WhenInState(attendedOrLate = 0, notAttended = 1, withoutOutcome = 0, referralWithdrawalStateWith = ReferralWithdrawalState.PRE_ICA_WITHDRAWAL),
     )
     private val inProgressNoFSA = named(
       "in-progress delivery, without first substantive appointment (FSA)",
-      WhenInState(attendedOrLate = 0, notAttended = 1, withoutOutcome = 1),
+      WhenInState(attendedOrLate = 0, notAttended = 1, withoutOutcome = 1, referralWithdrawalStateWith = ReferralWithdrawalState.PRE_ICA_WITHDRAWAL),
     )
     private val inProgressWithFSA = named(
       "in-progress delivery, with first substantive appointment (FSA)",
-      WhenInState(attendedOrLate = 1, notAttended = 0, withoutOutcome = 1),
+      WhenInState(attendedOrLate = 1, notAttended = 0, withoutOutcome = 1, referralWithdrawalStateWith = ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY),
     )
     private val allSessionsHaveOutcomeSomeDNAWithFSA = named(
       "finished delivery, some missed/did not attend (DNA) sessions, with first substantive appointment (FSA)",
-      WhenInState(attendedOrLate = 1, notAttended = 1, withoutOutcome = 0),
+      WhenInState(attendedOrLate = 1, notAttended = 1, withoutOutcome = 0, referralWithdrawalStateWith = ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY),
     )
     private val allSessionsHaveOutcomeAllAttendedWithFSA = named(
       "finished delivery, fully attended delivery",
-      WhenInState(attendedOrLate = 2, notAttended = 0, withoutOutcome = 0),
+      WhenInState(attendedOrLate = 2, notAttended = 0, withoutOutcome = 0, referralWithdrawalStateWith = ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY),
     )
 
     @JvmStatic
@@ -96,10 +96,21 @@ internal class ReferralConcluderTest {
 
     @JvmStatic
     fun afterCancelExamples(): Stream<Arguments> = Stream.of(
-      arguments(notStarted, ExpectThat(canStartEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED)),
+      arguments(
+        notStarted,
+        ExpectThat(
+          canStartEoSR = false,
+          endingWith = CANCELLED,
+          concludesWith = CANCELLED,
+        ),
+      ),
       arguments(
         allSessionsHaveOutcomeNoFSA,
-        ExpectThat(canStartEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED),
+        ExpectThat(
+          canStartEoSR = false,
+          endingWith = CANCELLED,
+          concludesWith = CANCELLED,
+        ),
       ),
       arguments(inProgressNoFSA, ExpectThat(canStartEoSR = false, endingWith = CANCELLED, concludesWith = CANCELLED)),
       arguments(inProgressWithFSA, ExpectThat(canStartEoSR = true, endingWith = PREMATURELY_ENDED)),
@@ -194,6 +205,20 @@ internal class ReferralConcluderTest {
     verifyConcludesWith(referral, expectation.concludesWith)
   }
 
+  @ParameterizedTest
+  @MethodSource("afterCancelExamples")
+  fun `withdraw referrals event check`(state: WhenInState, expectation: ExpectThat) {
+    val referral = createReferralWithSessions(state)
+    // not great -- this should be a service for atomic operation
+    referral.endRequestedAt = OffsetDateTime.now()
+    referral.endRequestedBy = AuthUser.interventionsServiceUser
+    referral.endRequestedReason = CancellationReason("TST", "Test")
+
+    concluder.withdrawReferral(referral, state.referralWithdrawalStateWith)
+    verifyEndingWith(referral, expectation.endingWith)
+    verifyConcludesWith(referral, expectation.concludesWith, state.referralWithdrawalStateWith)
+  }
+
   private fun verifyEndingWith(referral: Referral, endingWith: ReferralConcludedState?) {
     if (endingWith != null) {
       verify(referralEventPublisher).referralEndingEvent(same(referral), eq(endingWith))
@@ -202,12 +227,10 @@ internal class ReferralConcluderTest {
     }
   }
 
-  private fun verifyConcludesWith(referral: Referral, concludesWith: ReferralConcludedState?) {
+  private fun verifyConcludesWith(referral: Referral, concludesWith: ReferralConcludedState?, referralWithdrawalStateWith: ReferralWithdrawalState? = null) {
     if (concludesWith != null) {
       verifySaveWithConcludedAtSet(referral)
-      verify(referralEventPublisher).referralConcludedEvent(same(referral), eq(concludesWith))
-    } else {
-      verify(referralEventPublisher, never()).referralConcludedEvent(same(referral), any())
+      verify(referralEventPublisher).referralConcludedEvent(same(referral), eq(concludesWith), eq(referralWithdrawalStateWith))
     }
   }
 

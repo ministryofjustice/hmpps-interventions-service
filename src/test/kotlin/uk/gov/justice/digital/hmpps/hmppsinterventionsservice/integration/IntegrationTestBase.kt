@@ -32,6 +32,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Ref
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceProviderRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SupplierAssessmentRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.WithdrawalReasonRepository
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("test", "local")
@@ -68,6 +69,8 @@ abstract class IntegrationTestBase {
   @Autowired protected lateinit var endOfServiceReportRepository: EndOfServiceReportRepository
 
   @Autowired protected lateinit var cancellationReasonRepository: CancellationReasonRepository
+
+  @Autowired protected lateinit var withdrawalReasonRepository: WithdrawalReasonRepository
 
   @Autowired protected lateinit var contractTypeRepository: ContractTypeRepository
 
@@ -107,6 +110,7 @@ abstract class IntegrationTestBase {
       desiredOutcomeRepository,
       endOfServiceReportRepository,
       cancellationReasonRepository,
+      withdrawalReasonRepository,
       contractTypeRepository,
       appointmentRepository,
       supplierAssessmentRepository,

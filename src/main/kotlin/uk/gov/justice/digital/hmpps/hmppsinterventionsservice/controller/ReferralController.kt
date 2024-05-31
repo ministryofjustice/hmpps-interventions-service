@@ -23,7 +23,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.User
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller.mappers.CancellationReasonMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ActionPlanSummaryDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DashboardType
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EndReferralRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAssignmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SentReferralDTO
@@ -82,7 +81,11 @@ class ReferralController(
   @GetMapping("/sent-referral/{id}")
   fun getSentReferral(@PathVariable id: UUID, authentication: JwtAuthenticationToken): SentReferralDTO {
     val referral = getSentReferralAuthenticatedRequest(authentication, id)
-    return SentReferralDTO.from(referral, referralConcluder.requiresEndOfServiceReportCreation(referral))
+    return SentReferralDTO.from(
+      referral,
+      referralConcluder.requiresEndOfServiceReportCreation(referral),
+      withdrawalState = referralConcluder.withdrawalState(referral).name,
+    )
   }
 
   @GetMapping("/sent-referrals/summaries")
@@ -134,20 +137,6 @@ class ReferralController(
           mutableMapOf("totalNumberOfReferrals" to it.size.toDouble()),
         )
       }
-  }
-
-  @JsonView(Views.SentReferral::class)
-  @PostMapping("/sent-referral/{id}/end")
-  fun endSentReferral(@PathVariable id: UUID, @RequestBody endReferralRequest: EndReferralRequestDTO, authentication: JwtAuthenticationToken): SentReferralDTO {
-    val sentReferral = getSentReferralForAuthenticatedUser(authentication, id)
-
-    val cancellationReason = cancellationReasonMapper.mapCancellationReasonIdToCancellationReason(endReferralRequest.reasonCode)
-
-    val user = userMapper.fromToken(authentication)
-    return SentReferralDTO.from(
-      referralService.requestReferralEnd(sentReferral, user, cancellationReason, endReferralRequest.comments),
-      referralConcluder.requiresEndOfServiceReportCreation(sentReferral),
-    )
   }
 
   @GetMapping("/service-category/{id}")

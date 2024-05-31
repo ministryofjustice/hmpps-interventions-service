@@ -48,6 +48,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Ref
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSummariesRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.WithdrawalReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
@@ -83,6 +84,7 @@ class ReferralServiceTest @Autowired constructor(
   val serviceCategoryRepository: ServiceCategoryRepository,
   val referralDetailsRepository: ReferralDetailsRepository,
   val changelogRepository: ChangelogRepository,
+  val withdrawalReasonRepository: WithdrawalReasonRepository,
 ) {
   private val userFactory = AuthUserFactory(entityManager)
   private val interventionFactory = InterventionFactory(entityManager)
@@ -124,6 +126,7 @@ class ReferralServiceTest @Autowired constructor(
     referralConcluder,
     referralEventPublisher,
     cancellationReasonRepository,
+    withdrawalReasonRepository,
     deliverySessionRepository,
     serviceCategoryRepository,
     referralAccessChecker,

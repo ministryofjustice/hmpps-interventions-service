@@ -26,9 +26,16 @@ class SentReferralDTO(
   val supplementaryRiskId: UUID,
   val endOfServiceReportCreationRequired: Boolean,
   val createdBy: AuthUserDTO,
+  val withdrawalState: String?,
+  val withdrawalCode: String?,
 ) {
   companion object {
-    fun from(referral: Referral, endOfServiceReportRequired: Boolean, draftReferral: DraftReferral? = null): SentReferralDTO {
+    fun from(
+      referral: Referral,
+      endOfServiceReportRequired: Boolean = false,
+      draftReferral: DraftReferral? = null,
+      withdrawalState: String? = "PRE_ICA_WITHDRAWAL",
+    ): SentReferralDTO {
       return SentReferralDTO(
         id = referral.id,
         sentAt = referral.sentAt!!,
@@ -50,6 +57,8 @@ class SentReferralDTO(
         supplementaryRiskId = referral.supplementaryRiskId!!,
         endOfServiceReportCreationRequired = endOfServiceReportRequired,
         createdBy = AuthUserDTO.from(referral.createdBy),
+        withdrawalState = withdrawalState,
+        withdrawalCode = referral.withdrawalReasonCode,
       )
     }
   }

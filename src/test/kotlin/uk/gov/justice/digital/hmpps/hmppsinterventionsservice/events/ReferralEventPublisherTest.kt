@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType.SENT
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralWithdrawalState
 import java.net.URI
 
 class ReferralEventPublisherTest {
@@ -67,7 +68,7 @@ class ReferralEventPublisherTest {
     whenever(locationMapper.getPathFromControllerMethod(ReferralController::getSentReferral)).thenReturn("/sent-referral/{id}")
     val publisher = ReferralEventPublisher(eventPublisher, locationMapper)
 
-    publisher.referralConcludedEvent(referral, ReferralConcludedState.COMPLETED)
+    publisher.referralConcludedEvent(referral, ReferralConcludedState.COMPLETED, ReferralWithdrawalState.PRE_ICA_WITHDRAWAL)
 
     val eventCaptor = argumentCaptor<ReferralConcludedEvent>()
     verify(eventPublisher).publishEvent(eventCaptor.capture())
@@ -75,6 +76,7 @@ class ReferralEventPublisherTest {
 
     assertThat(event.source).isSameAs(publisher)
     assertThat(event.type).isEqualTo(ReferralConcludedState.COMPLETED)
+    assertThat(event.referralWithdrawalState).isEqualTo(ReferralWithdrawalState.PRE_ICA_WITHDRAWAL)
     assertThat(event.referral).isSameAs(referral)
     assertThat(event.detailUrl).isEqualTo(uri.toString())
   }

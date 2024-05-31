@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralDetail
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralWithdrawalState
 
 enum class ReferralEventType {
   SENT,
@@ -49,6 +50,7 @@ class ReferralConcludedEvent(
   val type: ReferralConcludedState,
   val referral: Referral,
   val detailUrl: String,
+  val referralWithdrawalState: ReferralWithdrawalState? = null,
 ) : ApplicationEvent(source) {
   override fun toString(): String {
     return "ReferralConcludedEvent(type=$type, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
@@ -86,8 +88,12 @@ class ReferralEventPublisher(
     applicationEventPublisher.publishEvent(ReferralEndingEvent(this, eventType, referral, getSentReferralURL(referral)))
   }
 
-  fun referralConcludedEvent(referral: Referral, eventType: ReferralConcludedState) {
-    applicationEventPublisher.publishEvent(ReferralConcludedEvent(this, eventType, referral, getSentReferralURL(referral)))
+  fun referralConcludedEvent(
+    referral: Referral,
+    eventType: ReferralConcludedState,
+    referralWithdrawalState: ReferralWithdrawalState? = null,
+  ) {
+    applicationEventPublisher.publishEvent(ReferralConcludedEvent(this, eventType, referral, getSentReferralURL(referral), referralWithdrawalState))
   }
 
   fun referralDetailsChangedEvent(referral: Referral, newDetails: ReferralDetails, previousDetails: ReferralDetails) {

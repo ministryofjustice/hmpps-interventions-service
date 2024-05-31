@@ -36,6 +36,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Selecte
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.WithdrawalReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentDeliveryAddressRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentDeliveryRepository
@@ -59,6 +60,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Ref
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceProviderRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SupplierAssessmentRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.WithdrawalReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentDeliveryAddressFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentDeliveryFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
@@ -98,6 +100,7 @@ class SetupAssistant(
   private val desiredOutcomeRepository: DesiredOutcomeRepository,
   private val endOfServiceReportRepository: EndOfServiceReportRepository,
   private val cancellationReasonRepository: CancellationReasonRepository,
+  private val withdrawalReasonRepository: WithdrawalReasonRepository,
   private val contractTypeRepository: ContractTypeRepository,
   private val appointmentRepository: AppointmentRepository,
   private val supplierAssessmentRepository: SupplierAssessmentRepository,
@@ -128,6 +131,7 @@ class SetupAssistant(
   val serviceCategories = serviceCategoryRepository.findAll().associateBy { it.name }
   val npsRegions = npsRegionRepository.findAll().associateBy { it.id }
   val cancellationReasons = cancellationReasonRepository.findAll().associateBy { it.code }
+  val withdrawalReasons = withdrawalReasonRepository.findAll().associateBy { it.code }
   val contractTypes = contractTypeRepository.findAll().associateBy { it.code }
 
   fun cleanAll() {
@@ -172,6 +176,10 @@ class SetupAssistant(
   }
   fun randomCancellationReason(): CancellationReason {
     return cancellationReasons.random().value
+  }
+
+  fun randomWithDrawReason(): WithdrawalReason {
+    return withdrawalReasons.random().value
   }
 
   fun randomDesiredOutcome(): DesiredOutcome {

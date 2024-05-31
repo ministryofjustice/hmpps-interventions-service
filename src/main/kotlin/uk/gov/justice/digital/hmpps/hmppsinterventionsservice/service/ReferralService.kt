@@ -8,9 +8,11 @@ import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.domain.Specification.not
 import org.springframework.data.jpa.domain.Specification.where
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessFilter
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceProviderAccessScopeMapper
@@ -18,6 +20,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.User
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.AccessError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DashboardType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.WithdrawReferralRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
@@ -26,6 +29,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SentReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceProviderSentReferralSummary
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.WithdrawalReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
@@ -34,6 +38,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Ref
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSummariesRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.WithdrawalReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.specification.ReferralSpecifications
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -56,6 +61,7 @@ class ReferralService(
   val referralConcluder: ReferralConcluder,
   val eventPublisher: ReferralEventPublisher,
   val cancellationReasonRepository: CancellationReasonRepository,
+  val withdrawalReasonRepository: WithdrawalReasonRepository,
   val deliverySessionRepository: DeliverySessionRepository,
   val serviceCategoryRepository: ServiceCategoryRepository,
   val referralAccessChecker: ReferralAccessChecker,
@@ -200,15 +206,25 @@ class ReferralService(
     return referralAccessFilter.probationPractitionerReferrals(referralSpecification, user)
   }
 
-  fun requestReferralEnd(referral: Referral, user: AuthUser, reason: CancellationReason, comments: String?): Referral {
+  fun requestReferralEnd(referral: Referral, user: AuthUser, withdrawReferralRequestDTO: WithdrawReferralRequestDTO): Referral {
     val now = OffsetDateTime.now()
     referral.endRequestedAt = now
     referral.endRequestedBy = authUserRepository.save(user)
-    referral.endRequestedReason = reason
-    comments?.let { referral.endRequestedComments = it }
-
+    updateWithdrawalInformation(referral, withdrawReferralRequestDTO)
     return referralRepository.save(referral)
-      .also { referralConcluder.concludeIfEligible(it) }
+      .also { referralConcluder.withdrawReferral(it, ReferralWithdrawalState.valueOf(withdrawReferralRequestDTO.withdrawalState)) }
+  }
+
+  private fun updateWithdrawalInformation(referral: Referral, withdrawReferralRequestDTO: WithdrawReferralRequestDTO) {
+    validateWithdrawalReasonCode(withdrawReferralRequestDTO.code)
+    referral.withdrawalReasonCode = withdrawReferralRequestDTO.code
+    referral.withdrawalComments = withdrawReferralRequestDTO.comments
+    telemetryService.reportWithdrawalInformation(referral, withdrawReferralRequestDTO)
+  }
+
+  private fun validateWithdrawalReasonCode(withdrawalReasonCode: String) {
+    withdrawalReasonRepository.findByCode(withdrawalReasonCode)
+      ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid withdrawal code. [code=$withdrawalReasonCode]")
   }
 
   fun updateReferralDetails(referral: Referral, update: UpdateReferralDetailsDTO, actor: AuthUser): ReferralDetails? {
@@ -262,6 +278,10 @@ class ReferralService(
 
   fun getCancellationReasons(): List<CancellationReason> {
     return cancellationReasonRepository.findAll()
+  }
+
+  fun getWithdrawalReasons(): List<WithdrawalReason> {
+    return withdrawalReasonRepository.findAll()
   }
 
   fun getResponsibleProbationPractitioner(referral: Referral): ResponsibleProbationPractitioner {

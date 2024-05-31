@@ -19,7 +19,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.Clie
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller.mappers.CancellationReasonMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AuthUserDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EndReferralRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAssignmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
@@ -29,6 +28,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DraftOasys
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DraftReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcluder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralWithdrawalState
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ServiceCategoryService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
@@ -91,6 +91,7 @@ internal class ReferralControllerTest {
     @Test
     fun `getSentReferral returns a sent referral if it exists`() {
       whenever(referralService.getSentReferralForUser(eq(referral.id), any())).thenReturn(referral)
+      whenever(referralConcluder.withdrawalState(referral)).thenReturn(ReferralWithdrawalState.PRE_ICA_WITHDRAWAL)
       whenever(authUserRepository.save(any())).thenReturn(user)
       val sentReferral = referralController.getSentReferral(
         referral.id,
@@ -107,6 +108,7 @@ internal class ReferralControllerTest {
     @Test
     fun `getSentReferral returns a sent referral to a client api request`() {
       whenever(referralService.getSentReferral(eq(referral.id))).thenReturn(referral)
+      whenever(referralConcluder.withdrawalState(referral)).thenReturn(ReferralWithdrawalState.PRE_ICA_WITHDRAWAL)
       val sentReferral = referralController.getSentReferral(
         referral.id,
         tokenFactory.create(
@@ -121,6 +123,7 @@ internal class ReferralControllerTest {
     @Test
     fun `getSentReferral does not return a sent referral to a client api request when client id and subject do not match`() {
       whenever(referralService.getSentReferral(eq(referral.id))).thenReturn(referral)
+      whenever(referralConcluder.withdrawalState(referral)).thenReturn(ReferralWithdrawalState.PRE_ICA_WITHDRAWAL)
       val e = assertThrows<AccessDeniedException> {
         referralController.getSentReferral(
           referral.id,
@@ -137,6 +140,7 @@ internal class ReferralControllerTest {
     @Test
     fun `getSentReferral does not return a sent referral to a client api request without the required authority`() {
       whenever(referralService.getSentReferral(eq(referral.id))).thenReturn(referral)
+      whenever(referralConcluder.withdrawalState(referral)).thenReturn(ReferralWithdrawalState.PRE_ICA_WITHDRAWAL)
       val e = assertThrows<AccessDeniedException> {
         referralController.getSentReferral(
           referral.id,
@@ -328,42 +332,6 @@ internal class ReferralControllerTest {
   }
 
   @Test
-  fun `successfully call end referral endpoint`() {
-    val referral = referralFactory.createSent()
-    val endReferralDTO = EndReferralRequestDTO("AAA", "comment")
-    val cancellationReason = CancellationReason("AAA", "description")
-
-    whenever(cancellationReasonMapper.mapCancellationReasonIdToCancellationReason(any())).thenReturn(cancellationReason)
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
-
-    val user = AuthUser("CRN123", "auth", "user")
-    val token = tokenFactory.create(user.id, user.authSource, user.userName)
-    val endedReferral = referralFactory.createEnded(endRequestedComments = "comment")
-    whenever(referralService.requestReferralEnd(any(), any(), any(), any())).thenReturn(endedReferral)
-    whenever(referralConcluder.requiresEndOfServiceReportCreation(endedReferral)).thenReturn(true)
-    whenever(authUserRepository.save(any())).thenReturn(user)
-
-    referralController.endSentReferral(referral.id, endReferralDTO, token)
-    verify(referralService).requestReferralEnd(referral, user, cancellationReason, "comment")
-  }
-
-  @Test
-  fun `end referral endpoint does not find referral`() {
-    val endReferralDTO = EndReferralRequestDTO("AAA", "comment")
-    val cancellationReason = CancellationReason("AAA", "description")
-
-    whenever(cancellationReasonMapper.mapCancellationReasonIdToCancellationReason(any())).thenReturn(cancellationReason)
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(null)
-    whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
-
-    val token = tokenFactory.create()
-    val e = assertThrows<ResponseStatusException> {
-      referralController.endSentReferral(UUID.randomUUID(), endReferralDTO, token)
-    }
-    assertThat(e.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
-  }
-
-  @Test
   fun `get all cancellation reasons`() {
     val cancellationReasons = listOf(
       CancellationReason(code = "aaa", description = "reason 1"),
@@ -413,6 +381,7 @@ internal class ReferralControllerTest {
       val referral = referralFactory.createSent()
       whenever(referralService.getSentReferralForUser(eq(referral.id), any())).thenReturn(referral)
       whenever(referralConcluder.requiresEndOfServiceReportCreation(referral)).thenReturn(false)
+      whenever(referralConcluder.withdrawalState(referral)).thenReturn(ReferralWithdrawalState.PRE_ICA_WITHDRAWAL)
       whenever(authUserRepository.save(any())).thenReturn(user)
 
       val sentReferral = referralController.getSentReferral(
@@ -439,26 +408,6 @@ internal class ReferralControllerTest {
       )
       assertThat(assignedReferral.id).isEqualTo(referral.id)
       assertThat(assignedReferral.endOfServiceReportCreationRequired).isFalse
-    }
-
-    @Test
-    fun `is set after ending a referral`() {
-      val referral = referralFactory.createSent()
-      val endReferralDTO = EndReferralRequestDTO("AAA", "comment")
-      val cancellationReason = CancellationReason("AAA", "description")
-
-      whenever(cancellationReasonMapper.mapCancellationReasonIdToCancellationReason(any())).thenReturn(cancellationReason)
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
-      whenever(authUserRepository.save(any())).thenReturn(user)
-
-      val user = AuthUser("CRN123", "auth", "user")
-      val token = tokenFactory.create(user.id, user.authSource, user.userName)
-      val endedReferral = referralFactory.createEnded(endRequestedComments = "comment")
-      whenever(referralService.requestReferralEnd(any(), any(), any(), any())).thenReturn(endedReferral)
-      whenever(referralConcluder.requiresEndOfServiceReportCreation(referral)).thenReturn(true)
-
-      val response = referralController.endSentReferral(referral.id, endReferralDTO, token)
-      assertThat(response.endOfServiceReportCreationRequired).isTrue
     }
   }
 

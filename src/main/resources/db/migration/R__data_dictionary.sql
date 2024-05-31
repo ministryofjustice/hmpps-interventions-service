@@ -232,4 +232,10 @@ COMMENT ON COLUMN referral_performance_report.end_requested_reason IS 'reason fo
 COMMENT ON COLUMN referral_performance_report.eosr_submitted_at IS 'date end of service report submitted';
 COMMENT ON COLUMN referral_performance_report.concluded_at IS 'date intervention concluded';
 
+COMMENT ON TABLE withdrawal_reason IS 'details about different withdrawal reason codes, description and grouping';
+COMMENT ON COLUMN withdrawal_reason.code IS 'withdrawal reasons code';
+COMMENT ON COLUMN withdrawal_reason.description IS 'withdrawal reasons codes description';
+COMMENT ON COLUMN withdrawal_reason.grouping IS 'withdrawal reasons codes grouping';
+COMMENT ON COLUMN referral.withdrawal_reason_code IS 'withdrawal reasons code for the referral';
+COMMENT ON COLUMN referral.withdrawal_comments IS 'withdrawal reason comments';
 -- some definitions are in V1_34__document_contract_table.sql; needs lifting

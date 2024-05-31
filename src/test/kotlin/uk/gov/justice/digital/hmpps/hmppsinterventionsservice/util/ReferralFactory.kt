@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.WithdrawalReason
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -25,6 +26,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
   private val authUserFactory = AuthUserFactory(em)
   private val interventionFactory = InterventionFactory(em)
   private val cancellationReasonFactory = CancellationReasonFactory(em)
+  private val withdrawReasonFactory = WithdrawReasonFactory(em)
   private val referalDetailsFactory = ReferralDetailsFactory(em)
   private val probationPractitionerDetailsFactory = ProbationPractitionerDetailsFactory(em)
 
@@ -123,6 +125,8 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     supplierAssessment: SupplierAssessment? = null,
     serviceUserData: ReferralServiceUserData? = null,
     complexityLevelIds: MutableMap<UUID, UUID>? = null,
+    withdrawReasonCode: String? = null,
+    withdrawReasonComments: String? = null,
     createDraft: Boolean = true,
     accessibilityNeeds: String? = null,
     additionalNeedsInformation: String? = null,
@@ -133,6 +137,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     interpreterLanguage: String? = null,
     probationPractitionerDetails: ProbationPractitionerDetails? = null,
     ppEstablishment: String? = null,
+    endRequestedBy: AuthUser? = null,
   ): Referral {
     if (createDraft) {
       createDraft(
@@ -165,12 +170,15 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       supplierAssessment = supplierAssessment,
       additionalRiskInformationUpdatedAt = additionalRiskInformationUpdatedAt,
       serviceUserData = serviceUserData,
+      endRequestedBy = endRequestedBy,
       complexityLevelIds = complexityLevelIds,
       accessibilityNeeds = accessibilityNeeds,
       additionalNeedsInformation = additionalNeedsInformation,
       needsInterpreter = needsInterpreter,
       interpreterLanguage = interpreterLanguage,
       probationPractitionerDetails = probationPractitionerDetails,
+      withdrawalReasonCode = withdrawReasonCode,
+      withdrawalReasonComments = withdrawReasonComments,
     )
     val probationPractitionerDetails = probationPractitionerDetailsFactory.create(referral = referral)
     referral.probationPractitionerDetails = probationPractitionerDetails
@@ -251,6 +259,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     endRequestedAt: OffsetDateTime? = OffsetDateTime.now(),
     endRequestedBy: AuthUser? = authUserFactory.create(),
     endRequestedReason: CancellationReason? = cancellationReasonFactory.create(),
+    withdrawalReason: WithdrawalReason? = withdrawReasonFactory.create(),
     endRequestedComments: String? = null,
     concludedAt: OffsetDateTime? = null,
     endOfServiceReport: EndOfServiceReport? = null,
@@ -293,9 +302,9 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       endRequestedBy = endRequestedBy,
       endRequestedReason = endRequestedReason,
       endRequestedComments = endRequestedComments,
-
+      withdrawalReasonCode = withdrawalReason?.code,
+      withdrawalReasonComments = withdrawalReason?.description,
       concludedAt = concludedAt,
-
       endOfServiceReport = endOfServiceReport,
     )
     val probationPractitionerDetails = probationPractitionerDetailsFactory.create(
