@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.LocationMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ProbationCaseReferralDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAppointmentDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ProbationCaseService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
 
@@ -27,5 +28,14 @@ class ProbationCaseController(
     val location = locationMapper.expandPathToCurrentRequestUrl("/probation-case/{crn}/referral", crn)
 
     return ResponseEntity.created(location).body(probationCaseDetails)
+  }
+
+  @PreAuthorize("hasRole('ROLE_INTERVENTIONS_REFER_AND_MONITOR')")
+  @GetMapping("/appointments-location/{crn}")
+  fun getAppointmentLocationByCrn(
+    @PathVariable crn: String,
+    authentication: JwtAuthenticationToken,
+  ): ReferralAppointmentDetailsDTO {
+    return ReferralAppointmentDetailsDTO.from(crn, probationCaseService.getAppointmentLocationDetails(crn))
   }
 }
