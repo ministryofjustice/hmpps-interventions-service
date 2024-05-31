@@ -241,5 +241,32 @@
         "description": "Service user has minimal or no prior experience of successfully dealing with their own finance, benefit and debt needs and does not have necessary identification documents or bank account. Service users circumstances are currently leading to extreme financial pressure and/or they have complex finance, benefit and debt-related needs which require a range of Activities to address these needs. Service user may have a poor finance history and wider complex needs, such as mental health issues, substance misuse and/or addiction issues."
       }
     ]
+  },
+  {
+    "contract_type": "Finance, Benefit and Debt (Oldham)",
+    "contract_code": "FBD-O",
+    "service_category": "Finance, Benefit and Debt (Oldham)",
+    "desired_outcomes": [
+      "Service user has access to appropriate financial products, advice and/or services.",
+      "Pathways are established to help service user maintain and sustain an income, safely manage money and reduce debt.",
+      "Service user on probation financial management skills are developed and/or enhanced including online banking.",
+      "Service user can successfully navigate the benefits system.",
+      "Service user gains quick access to universal credit.",
+      "Service user has access to appropriate financial products, advice and/or services."
+    ],
+    "complexity_levels": [
+      {
+        "severity": "LOW",
+        "description": "Service user has prior experience of successfully dealing with their own finance, benefit and debt needs. Service users circumstances may be currently leading to significant financial pressure. Service user will require some advice, guidance and/or support across some specific but limited finance, benefit and debt needs, but will be able to support themselves with other aspects."
+      },
+      {
+        "severity": "MEDIUM",
+        "description": "Service user has limited prior experience of successfully dealing with their own finance, benefit and debt needs. Service users circumstances are currently leading to significant financial pressure and they require support to address these needs. Service user will need either significant support to meet a limited number of needs – for instance the Service user may have additional needs (i.e. learning difficulties) or other challenges which impact on their ability to fully manage – or they will need limited support to meet a wider range of finance, benefit and debt - related needs."
+      },
+      {
+        "severity":"HIGH",
+        "description": "Service user has minimal or no prior experience of successfully dealing with their own finance, benefit and debt needs and does not have necessary identification documents or bank account. Service users circumstances are currently leading to extreme financial pressure and/or they have complex finance, benefit and debt-related needs which require a range of Activities to address these needs. Service user may have a poor finance history and wider complex needs, such as mental health issues, substance misuse and/or addiction issues."
+      }
+    ]
   }
 ]
