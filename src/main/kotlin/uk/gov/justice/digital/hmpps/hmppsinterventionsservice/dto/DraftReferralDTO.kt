@@ -73,6 +73,8 @@ data class DraftReferralDTO(
   val ppLocationType: String? = null,
   val allocatedCommunityPP: Boolean? = null,
   val reasonForReferral: String? = null,
+  val expectedProbationOffice: String? = null,
+  val expectedProbationOfficeUnKnownReason: String? = null,
 ) {
   companion object {
     fun from(referral: DraftReferral): DraftReferralDTO {
@@ -133,6 +135,8 @@ data class DraftReferralDTO(
         roleOrJobTitle = referral.roleOrJobTitle,
         allocatedCommunityPP = referral.allocatedCommunityPP,
         reasonForReferral = referral.referralDetails?.reasonForReferral,
+        expectedProbationOffice = referral.expectedProbationOffice,
+        expectedProbationOfficeUnKnownReason = referral.expectedProbationOfficeUnknownReason,
       )
     }
 
@@ -177,6 +181,7 @@ data class DraftReferralDTO(
         personCustodyPrisonId = referral.referralLocation?.prisonId,
         expectedReleaseDate = referral.referralLocation?.expectedReleaseDate,
         expectedReleaseDateMissingReason = referral.referralLocation?.expectedReleaseDateMissingReason,
+        expectedProbationOffice = referral.referralLocation?.expectedProbationOffice,
         isReferralReleasingIn12Weeks = referral.referralLocation?.isReferralReleasingIn12Weeks,
         allocatedCommunityPP = referral.referralLocation?.isReferralReleasingIn12Weeks == false,
         ndeliusPPName = referral.probationPractitionerDetails?.nDeliusName,

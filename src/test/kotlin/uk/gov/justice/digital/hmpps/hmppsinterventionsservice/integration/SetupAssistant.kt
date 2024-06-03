@@ -843,6 +843,8 @@ class SetupAssistant(
       expectedReleaseDate = LocalDate.now().plusDays(1),
       expectedReleaseDateMissingReason = null,
       isReferralReleasingIn12Weeks = false,
+      expectedProbationOffice = "London",
+      expectedProbationOfficeUnknownReason = null,
     ),
     probationPractitionerDetails: ProbationPractitionerDetails = referral.probationPractitionerDetails ?: ProbationPractitionerDetails(
       id = UUID.randomUUID(),

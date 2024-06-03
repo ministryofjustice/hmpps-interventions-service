@@ -211,6 +211,8 @@ class SentReferralSummariesDTOTest(@Autowired private val json: JacksonTester<Se
         expectedReleaseDate = null,
         expectedReleaseDateMissingReason = null,
         referral = sentReferralSummary.second,
+        expectedProbationOffice = null,
+        expectedProbationOfficeUnknownReason = null,
       )
     }
     sentReferralSummary.first.probationPractitionerDetails = ProbationPractitionerDetails(
