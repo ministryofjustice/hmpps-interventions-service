@@ -58,19 +58,6 @@ class PerformanceReportJobConfiguration(
         contractReferences.split(","),
       ),
     )
-      /* .repository(referralPerformanceReportRepository)
-      .methodName("serviceProviderReportReferrals")
-      .arguments(
-        listOf(
-          batchUtils.parseDateToOffsetDateTime(from),
-          batchUtils.parseDateToOffsetDateTime(to),
-          contractReferences.split(","),
-        ),
-      )
-      .pageSize(pageSize)
-      .sorts(mapOf("dateReferralReceived" to Sort.Direction.ASC))
-      .saveState(false)
-      .build()*/
   }
 
   @Bean
@@ -89,7 +76,6 @@ class PerformanceReportJobConfiguration(
     val validator = DefaultJobParametersValidator()
     validator.setRequiredKeys(
       arrayOf(
-    /*
         "contractReferences",
         "user.id",
         "user.firstName",
@@ -97,7 +83,6 @@ class PerformanceReportJobConfiguration(
         "from",
         "to",
         "timestamp",
-     */
       ),
     )
 
