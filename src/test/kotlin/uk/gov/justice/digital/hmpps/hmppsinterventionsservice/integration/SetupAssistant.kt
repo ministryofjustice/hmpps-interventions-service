@@ -289,6 +289,7 @@ class SetupAssistant(
     roleOrJobTitle: String? = "Probation Practitioner",
     ppEstablishment: String? = "aaa",
     alreadyKnowPrisonName: Boolean? = null,
+    expectedProbationOffice: String? = "London",
   ): DraftReferral {
     return draftReferralRepository.save(
       referralFactory.createDraft(
@@ -315,6 +316,7 @@ class SetupAssistant(
         isReferralReleasingIn12Weeks = isReferralReleasingIn12Weeks,
         ppEstablishment = ppEstablishment,
         alreadyKnowPrisonName = alreadyKnowPrisonName,
+        expectedProbationOffice = expectedProbationOffice,
       ),
     )
   }

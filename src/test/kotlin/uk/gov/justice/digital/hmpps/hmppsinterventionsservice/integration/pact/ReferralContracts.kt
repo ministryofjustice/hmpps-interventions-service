@@ -197,6 +197,7 @@ class ReferralContracts(private val setupAssistant: SetupAssistant) {
       personCustodyPrisonId = "test",
       expectedReleaseDate = LocalDate.now().plusDays(1),
       alreadyKnowPrisonName = null,
+      expectedProbationOffice = "London",
     )
     setupAssistant.fillDraftReferralFields(referral)
   }
