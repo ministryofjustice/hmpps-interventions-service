@@ -94,6 +94,7 @@ class ReferralAppointmentDetailsDTOTest(@Autowired private val json: JacksonTest
           "referrals": [
             {
               "referral_number": "something",
+              "intervention_title": "Accommodation Service",
               "appointments": [
                 {
                   "appointment_id": ${appointment1.id},
@@ -159,6 +160,7 @@ class ReferralAppointmentDetailsDTOTest(@Autowired private val json: JacksonTest
           "referrals": [
             {
               "referral_number": "something",
+              "intervention_title": "Accommodation Service",
               "appointments": []
             }
           ]
@@ -254,6 +256,7 @@ class ReferralAppointmentDetailsDTOTest(@Autowired private val json: JacksonTest
           "referrals": [
             {
               "referral_number": "something",
+              "intervention_title": "Accommodation Service",
               "appointments": [
                 {
                   "appointment_id": ${appointment1.id},
