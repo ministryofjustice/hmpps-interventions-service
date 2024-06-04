@@ -21,7 +21,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.OnStar
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralPerformanceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUtils
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model.ReferralPerformanceReport
-import java.util.Date
+import java.util.*
 
 @Configuration
 class PerformanceReportJobConfiguration(
@@ -48,14 +48,12 @@ class PerformanceReportJobConfiguration(
     @Value("#{jobParameters['to']}") to: Date,
     sessionFactory: SessionFactory,
   ): ListItemReader<ReferralPerformanceReport> {
-    // var referralPerformanceReportRepositoryImpl: ReferralPerformanceReportRepository? = null
-
     // this reader returns referral entities which need processing for the report.
     return ListItemReader<ReferralPerformanceReport>(
       referralPerformanceReportRepository.serviceProviderReportReferrals(
         batchUtils.parseDateToOffsetDateTime(from),
         batchUtils.parseDateToOffsetDateTime(to),
-        contractReferences.split(","),
+        contractReferences,
       ),
     )
   }

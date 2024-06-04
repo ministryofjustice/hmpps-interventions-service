@@ -26,7 +26,7 @@ class ReportingService(
     asyncJobLauncher.run(
       performanceReportJob,
       JobParametersBuilder()
-        .addString("contractReferences", contracts.joinToString(",") { it.contractReference })
+        .addString("contractReferences", contracts.joinToString(" ") { it.contractReference })
         .addString("user.id", user.id)
         .addString("user.firstName", userDetail.firstName)
         .addString("user.email", userDetail.email)

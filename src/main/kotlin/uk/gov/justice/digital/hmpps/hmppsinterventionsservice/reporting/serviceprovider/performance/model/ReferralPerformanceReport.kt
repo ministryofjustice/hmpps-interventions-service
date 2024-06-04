@@ -29,5 +29,5 @@ data class ReferralPerformanceReport(
   val endRequestedReason: String?,
   val eosrSubmittedAt: OffsetDateTime?,
   val concludedAt: OffsetDateTime?,
-  val completionDeadline: LocalDate,
+  val completionDeadline: LocalDate?,
 )
