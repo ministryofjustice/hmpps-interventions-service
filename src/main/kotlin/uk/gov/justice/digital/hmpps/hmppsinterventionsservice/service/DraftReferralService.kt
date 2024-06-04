@@ -308,9 +308,11 @@ class DraftReferralService(
     }
     update.expectedProbationOffice?.let {
       draftReferral.expectedProbationOffice = it
+      draftReferral.expectedProbationOfficeUnknownReason = null
     }
     update.expectedProbationOfficeUnKnownReason?.let {
       draftReferral.expectedProbationOfficeUnknownReason = it
+      draftReferral.expectedProbationOffice = null
     }
   }
 

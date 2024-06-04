@@ -182,6 +182,7 @@ data class DraftReferralDTO(
         expectedReleaseDate = referral.referralLocation?.expectedReleaseDate,
         expectedReleaseDateMissingReason = referral.referralLocation?.expectedReleaseDateMissingReason,
         expectedProbationOffice = referral.referralLocation?.expectedProbationOffice,
+        expectedProbationOfficeUnKnownReason = referral.referralLocation?.expectedProbationOfficeUnknownReason,
         isReferralReleasingIn12Weeks = referral.referralLocation?.isReferralReleasingIn12Weeks,
         allocatedCommunityPP = referral.referralLocation?.isReferralReleasingIn12Weeks == false,
         ndeliusPPName = referral.probationPractitionerDetails?.nDeliusName,
