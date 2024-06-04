@@ -22,12 +22,14 @@ class ReferralAppointmentDetailsDTO(
 
 class ReferralDetailDTO(
   val referral_number: String?,
+  val intervention_title: String?,
   val appointments: List<AppointmentDetailsDTO>,
 ) {
   companion object {
     fun from(referralAppointmentDetails: ReferralAppointmentLocationDetails): ReferralDetailDTO {
       return ReferralDetailDTO(
         referral_number = referralAppointmentDetails.referral.referenceNumber,
+        intervention_title = referralAppointmentDetails.referral.intervention.title,
         appointments = AppointmentDetailsDTO.from(referralAppointmentDetails.appointments),
       )
     }
