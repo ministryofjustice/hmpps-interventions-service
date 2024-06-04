@@ -190,6 +190,7 @@ AS (SELECT DISTINCT referral_id,
   ON rde.referral_id = r.id
   WHERE d.contract_reference = ANY ($1)
   AND r.sent_at > ($2)
-  AND r.sent_at < ($3);
+  AND r.sent_at < ($3)
+  ORDER BY r.sent_at ASC;
 $body$
 language sql;
