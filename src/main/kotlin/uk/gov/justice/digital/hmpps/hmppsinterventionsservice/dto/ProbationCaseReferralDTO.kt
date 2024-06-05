@@ -7,6 +7,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.UserDetail
 import java.time.OffsetDateTime
 
 data class ProbationCaseReferralDTO(
+  val id: String,
+  val referenceNumber: String?,
   val serviceCategories: List<String>?,
   val contractType: String,
   val referralCreatedAt: OffsetDateTime?,
@@ -22,6 +24,8 @@ data class ProbationCaseReferralDTO(
   companion object {
     fun from(referral: Referral, responsibleOfficer: ResponsibleProbationPractitioner, serviceProviderUser: UserDetail?, referringOfficer: UserDetail): ProbationCaseReferralDTO {
       return ProbationCaseReferralDTO(
+        id = referral.id.toString(),
+        referenceNumber = referral.referenceNumber,
         serviceCategories = referral.selectedServiceCategories?.map { it.name },
         contractType = referral.intervention.dynamicFrameworkContract.contractType.name,
         referralCreatedAt = referral.createdAt,
@@ -42,6 +46,8 @@ data class ProbationCaseReferralDTO(
 
     fun from(referral: DraftReferral, referringOfficer: UserDetail): ProbationCaseReferralDTO {
       return ProbationCaseReferralDTO(
+        id = referral.id.toString(),
+        referenceNumber = null,
         serviceCategories = referral.selectedServiceCategories?.map { it.name },
         contractType = referral.intervention.dynamicFrameworkContract.contractType.name,
         referralCreatedAt = referral.createdAt,
