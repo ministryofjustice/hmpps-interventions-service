@@ -6,7 +6,7 @@ import java.util.UUID
 
 data class PerformanceReportData(
   val referralReference: String,
-  val referralId: UUID,
+  val referralId: UUID?,
   val contractReference: String,
   val organisationId: String,
   val currentAssigneeEmail: String?,
@@ -21,9 +21,9 @@ data class PerformanceReportData(
   val firstActionPlanSubmittedAt: OffsetDateTime?,
   val firstActionPlanApprovedAt: OffsetDateTime?,
   val firstSessionAttendedAt: OffsetDateTime?,
-  val numberOfOutcomes: Int?,
+  val numberOfOutcomes: Int? = 0,
   val achievementScore: Float?,
-  val numberOfSessions: Int?,
+  val numberOfSessions: Int? = 0,
   val numberOfSessionsAttended: Int?,
   val endRequestedAt: OffsetDateTime?,
   val endRequestedReason: String?,

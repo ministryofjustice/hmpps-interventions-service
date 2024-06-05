@@ -61,6 +61,10 @@ class PerformanceReportJobListener(
         )
       }
       BatchStatus.FAILED -> {
+        logger.error(
+          "status FAILED for performance report {}",
+          kv("exitDescription", jobExecution.exitStatus.exitDescription),
+        )
         emailSender.sendEmail(
           failureNotifyTemplateId,
           jobExecution.jobParameters.getString("user.email"),

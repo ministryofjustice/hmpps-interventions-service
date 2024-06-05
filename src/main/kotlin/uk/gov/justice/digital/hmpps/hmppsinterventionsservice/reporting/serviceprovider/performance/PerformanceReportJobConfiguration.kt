@@ -9,17 +9,19 @@ import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.step.builder.StepBuilder
 import org.springframework.batch.item.ItemProcessor
-import org.springframework.batch.item.database.HibernateCursorItemReader
-import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
+import org.springframework.batch.item.support.ListItemReader
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.FileSystemResource
 import org.springframework.transaction.PlatformTransactionManager
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.OnStartupJobLauncherFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralPerformanceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUtils
-import java.util.Date
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model.ReferralPerformanceReport
+import java.util.*
 
 @Configuration
 class PerformanceReportJobConfiguration(
@@ -27,8 +29,17 @@ class PerformanceReportJobConfiguration(
   private val transactionManager: PlatformTransactionManager,
   private val batchUtils: BatchUtils,
   private val listener: PerformanceReportJobListener,
+  private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
+  private val referralPerformanceReportRepository: ReferralPerformanceReportRepository,
   @Value("\${spring.batch.jobs.service-provider.performance-report.chunk-size}") private val chunkSize: Int,
+  @Value("\${spring.batch.jobs.service-provider.performance-report.page-size}") private val pageSize: Int,
 ) {
+
+  @Bean
+  fun performanceReportJobLauncher(performanceReportJob: Job): ApplicationRunner {
+    return onStartupJobLauncherFactory.makeBatchLauncher(performanceReportJob)
+  }
+
   @Bean
   @JobScope
   fun reader(
@@ -36,20 +47,15 @@ class PerformanceReportJobConfiguration(
     @Value("#{jobParameters['from']}") from: Date,
     @Value("#{jobParameters['to']}") to: Date,
     sessionFactory: SessionFactory,
-  ): HibernateCursorItemReader<Referral> {
+  ): ListItemReader<ReferralPerformanceReport> {
     // this reader returns referral entities which need processing for the report.
-    return HibernateCursorItemReaderBuilder<Referral>()
-      .name("performanceReportReader")
-      .sessionFactory(sessionFactory)
-      .queryString("select r from Referral r where r.sentAt > :from and r.sentAt < :to and r.intervention.dynamicFrameworkContract.contractReference in :contractReferences")
-      .parameterValues(
-        mapOf(
-          "from" to batchUtils.parseDateToOffsetDateTime(from),
-          "to" to batchUtils.parseDateToOffsetDateTime(to),
-          "contractReferences" to contractReferences.split(","),
-        ),
-      )
-      .build()
+    return ListItemReader<ReferralPerformanceReport>(
+      referralPerformanceReportRepository.serviceProviderReportReferrals(
+        batchUtils.parseDateToOffsetDateTime(from),
+        batchUtils.parseDateToOffsetDateTime(to),
+        contractReferences,
+      ),
+    )
   }
 
   @Bean
@@ -87,12 +93,12 @@ class PerformanceReportJobConfiguration(
 
   @Bean
   fun writeToCsvStep(
-    reader: HibernateCursorItemReader<Referral>,
-    processor: ItemProcessor<Referral, PerformanceReportData>,
+    reader: ListItemReader<ReferralPerformanceReport>,
+    processor: ItemProcessor<ReferralPerformanceReport, PerformanceReportData>,
     writer: FlatFileItemWriter<PerformanceReportData>,
   ): Step {
     return StepBuilder("writeToCsvStep", jobRepository)
-      .chunk<Referral, PerformanceReportData>(chunkSize, transactionManager)
+      .chunk<ReferralPerformanceReport, PerformanceReportData>(chunkSize, transactionManager)
       .reader(reader)
       .processor(processor)
       .writer(writer)
