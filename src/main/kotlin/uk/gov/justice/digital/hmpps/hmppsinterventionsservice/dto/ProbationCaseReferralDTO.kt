@@ -53,6 +53,7 @@ data class ProbationCaseReferralDTO(
         serviceCategories = referral.selectedServiceCategories?.map { it.name },
         contractType = referral.intervention.dynamicFrameworkContract.contractType.name,
         referralCreatedAt = referral.createdAt,
+        referralConcludedAt = null,
         referralSentAt = null,
         interventionTitle = referral.intervention.title,
         referringOfficer = "${referringOfficer.firstName} ${referringOfficer.lastName}",
