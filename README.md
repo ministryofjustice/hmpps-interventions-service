@@ -30,3 +30,5 @@ Run `./gradlew ktlintFormat` to fix formatting errors in your code before commit
 - **API**: OpenAPI documentation is auto-generated. To view it start the application and visit `/swagger-ui.html` in your browser.
 - **Data**: Data documentation is auto-generated. To view it, visit [https://{dev}/meta/schema](https://hmpps-interventions-service-dev.apps.live-1.cloud-platform.service.justice.gov.uk/meta/schema/).
   It also generates an ERD at [here](https://hmpps-interventions-service-dev.apps.live-1.cloud-platform.service.justice.gov.uk/meta/schema/relationships.html).
+
+##
