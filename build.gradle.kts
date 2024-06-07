@@ -85,8 +85,8 @@ dependencies {
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
-  implementation("io.sentry:sentry-spring-boot-starter:7.9.0")
-  implementation("io.sentry:sentry-logback:7.9.0")
+  implementation("io.sentry:sentry-spring-boot-starter:7.10.0")
+  implementation("io.sentry:sentry-logback:7.10.0")
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
   implementation("net.logstash.logback:logstash-logback-encoder:7.4")
 
@@ -104,14 +104,14 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.25.57")
-  implementation("software.amazon.awssdk:s3:2.25.57")
-  implementation("software.amazon.awssdk:sts:2.25.57")
+  implementation("software.amazon.awssdk:sns:2.25.68")
+  implementation("software.amazon.awssdk:s3:2.25.67")
+  implementation("software.amazon.awssdk:sts:2.25.67")
 
   // security
-  implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.5")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.2.5")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.2.5")
+  implementation("org.springframework.boot:spring-boot-starter-webflux:3.3.0")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.3.0")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.3.0")
   implementation("com.nimbusds:oauth2-oidc-sdk:11.12")
 
   // database
@@ -119,7 +119,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("com.h2database:h2:2.2.224")
   implementation("org.hibernate:hibernate-core:6.5.2.Final")
-  implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.5")
+  implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.6")
 
   runtimeOnly("org.flywaydb:flyway-core:9.22.3")
   runtimeOnly("org.postgresql:postgresql:42.7.3")
@@ -128,7 +128,7 @@ dependencies {
   implementation("com.github.java-json-tools:json-patch:1.13")
   implementation("org.apache.commons:commons-csv:1.11.0")
 
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.9")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.10")
   testImplementation("com.squareup.okhttp3:okhttp:4.12.0")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
   testImplementation("org.mockito:mockito-inline:5.2.0")
