@@ -207,6 +207,7 @@ COMMENT ON COLUMN referral_summary.end_requested_at IS 'referral end requested a
 COMMENT ON COLUMN referral_summary.eosr_id IS 'referral end of service id';
 COMMENT ON COLUMN referral_summary.appointment_id IS 'supplier assessment appointment id';
 
+-- comment to change checksum; content below remains
 COMMENT ON VIEW referral_performance_report IS 'referral_performance_report for performance report view - not actively used, just for profiling';
 COMMENT ON COLUMN referral_performance_report.referral_id IS 'referral unique identifier';
 COMMENT ON COLUMN referral_performance_report.referral_reference IS 'user friendly referral reference';
