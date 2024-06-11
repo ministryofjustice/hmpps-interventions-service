@@ -1069,7 +1069,7 @@ class ReferralServiceTest @Autowired constructor(
     )
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
 
-    val referralToUpdate = UpdateReferralDetailsDTO(20, completionDateToChange, "new information", expectedreleaseDate, null, "we decided 10 days wasn't enough", "some reason for making a referral")
+    val referralToUpdate = UpdateReferralDetailsDTO(20, completionDateToChange, "new information", expectedreleaseDate, null, "we decided 10 days wasn't enough", "some reason for making a referral", null)
     val referralDetailsReturned = referralService.updateReferralDetails(referral, referralToUpdate, user)
     val referralDetailsValue = referralService.getReferralDetailsById(referralDetailsReturned?.id)
 
@@ -1104,7 +1104,7 @@ class ReferralServiceTest @Autowired constructor(
 
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
 
-    val referralToUpdate = UpdateReferralDetailsDTO(20, null, "new information", null, null, "we decided 10 days wasn't enough", "some reason for making a referral")
+    val referralToUpdate = UpdateReferralDetailsDTO(20, null, "new information", null, null, "we decided 10 days wasn't enough", "some reason for making a referral", null)
     val referralDetailsReturned = referralService.updateReferralDetails(referral, referralToUpdate, user)
     val referralDetailsValue = referralService.getReferralDetailsById(referralDetailsReturned?.id)
 
