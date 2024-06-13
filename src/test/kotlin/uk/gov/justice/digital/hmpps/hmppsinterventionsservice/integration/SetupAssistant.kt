@@ -290,6 +290,7 @@ class SetupAssistant(
     ppEstablishment: String? = "aaa",
     alreadyKnowPrisonName: Boolean? = null,
     expectedProbationOffice: String? = "London",
+    reasonForReferralCreationBeforeAllocation: String? = "for quick assessment",
   ): DraftReferral {
     return draftReferralRepository.save(
       referralFactory.createDraft(
@@ -317,6 +318,7 @@ class SetupAssistant(
         ppEstablishment = ppEstablishment,
         alreadyKnowPrisonName = alreadyKnowPrisonName,
         expectedProbationOffice = expectedProbationOffice,
+        reasonForReferralCreationBeforeAllocation = reasonForReferralCreationBeforeAllocation,
       ),
     )
   }
@@ -822,6 +824,7 @@ class SetupAssistant(
     completionDeadline: LocalDate = LocalDate.of(2021, 4, 1),
     furtherInformation: String = "Some information about the service user",
     reasonForReferral: String = "For crs",
+    reasonForReferralCreationBeforeAllocation: String = "for quick assessment",
     hasAdditionalResponsibilities: Boolean = true,
     interpreterLanguage: String = "Spanish",
     maximumEnforceableDays: Int = 10,
@@ -901,6 +904,7 @@ class SetupAssistant(
           furtherInformation,
           maximumEnforceableDays,
           reasonForReferral,
+          reasonForReferralCreationBeforeAllocation,
         ),
       )
       it.referralDetails?.let { existingDetails ->
@@ -936,6 +940,7 @@ class SetupAssistant(
     furtherInformation: String = "Some information about the service user",
     hasAdditionalResponsibilities: Boolean = true,
     reasonForReferral: String = "for crs",
+    reasonForReferralCreationBeforeAllocation: String? = "for quick assessment",
     interpreterLanguage: String = "Spanish",
     maximumEnforceableDays: Int = 10,
     needsInterpreter: Boolean = true,
@@ -980,6 +985,7 @@ class SetupAssistant(
           furtherInformation,
           maximumEnforceableDays,
           reasonForReferral,
+          reasonForReferralCreationBeforeAllocation,
         ),
       )
       it.referralDetails?.let { existingDetails ->
