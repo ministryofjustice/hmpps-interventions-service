@@ -159,6 +159,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     allocatedCommunityPP: Boolean? = null,
     alreadyKnowPrisonName: Boolean? = false,
     expectedProbationOffice: String? = "London",
+    reasonForReferralCreationBeforeAllocation: String? = "for quick assessment",
   ): DraftReferral {
     val draftReferral = DraftReferral(
       id = id,
@@ -200,13 +201,15 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
             ReferralDetails(
               UUID.randomUUID(),
               null,
-              it!!.referralId,
+              it.referralId,
               createdAt,
               createdBy.id,
               "initial referral details",
               it.completionDeadline,
               it.furtherInformation,
               it.maximumEnforceableDays,
+              null,
+              reasonForReferralCreationBeforeAllocation,
             )
           },
         )
