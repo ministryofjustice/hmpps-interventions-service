@@ -21,7 +21,7 @@ class ReferralSummaryRepositoryImpl : ReferralSummaryRepository {
 	    referenceNumber,
 	    interventionTitle,
       dynamicFrameworkContractId,
-	    :username as assignedToUserName,
+	    assignedToUserName,
 	    serviceUserFirstName,
 	    serviceUserLastName,
       endOfServiceReportId,
@@ -32,7 +32,7 @@ class ReferralSummaryRepositoryImpl : ReferralSummaryRepository {
 			cast(r.sent_at as TIMESTAMP WITH TIME ZONE) as sentAt,
 			r.reference_number as referenceNumber,
       cast(dfc.id as varchar) as dynamicFrameworkContractId,
-			-- au.user_name now passed as a param IPB-1200
+			au.user_name as assignedToUserName,
       ra.assigned_to_id as assignedToId,
 			i.title as interventionTitle,
 			rsud.first_name as serviceUserFirstName,
@@ -48,13 +48,14 @@ class ReferralSummaryRepositoryImpl : ReferralSummaryRepository {
 			 left outer join action_plan ap on ap.referral_id = r.id
 			 left join referral_service_user_data rsud on rsud.referral_id = r.id
 			 left join referral_assignments ra on ra.referral_id = r.id
+       left join auth_user au on au.id = ra.assigned_to_id
 			 inner join dynamic_framework_contract dfc on i.dynamic_framework_contract_id = dfc.id 
 			 left join dynamic_framework_contract_sub_contractor dfcsc on dfcsc.dynamic_framework_contract_id = dfc.id
 	 	 	 left outer join appointment app on app.referral_id = r.id
-	 	 	 --saa and auth_user joins removed IPB-1200
+	 	 	 --saa join removed IPB-1200
 	where
 		  r.sent_at is not null
-		  and ( dfc.prime_provider_id = any (:serviceProviders) or dfcsc.subcontractor_provider_id = any (:serviceProviders) )
+		  and ( dfc.prime_provider_id in (:serviceProviders) or dfcsc.subcontractor_provider_id in (:serviceProviders) )
       and not (
 		  	    (r.concluded_At is not null and r.end_Requested_At is not null and eosr.id is null) -- cancelled
 	 	        and app.attendance_submitted_at is null -- supplier assessment feedback not submitted
@@ -67,7 +68,6 @@ class ReferralSummaryRepositoryImpl : ReferralSummaryRepository {
     val query = entityManager.createNativeQuery(summariesQuery(constructCustomCriteria(dashboardType)))
     query.setParameter("serviceProviders", serviceProviders)
     if (dashboardType == DashboardType.MyCases) {
-      query.setParameter("username", authUser.userName)
       query.setParameter("userid", authUser.id)
     }
     val result = query.resultList as List<Array<Any>>
