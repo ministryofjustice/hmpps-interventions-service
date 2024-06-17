@@ -127,7 +127,10 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
   }
 
   fun timestampToOffset(timestamp: Timestamp?): OffsetDateTime? {
-    return OffsetDateTime.ofInstant(timestamp?.toInstant(), ZoneId.of("UTC"))
+    if (timestamp != null) {
+      return OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.of("UTC"))
+    }
+    return null
   }
 
   fun timestampToOffsetNotNull(timestamp: Timestamp?): OffsetDateTime {
