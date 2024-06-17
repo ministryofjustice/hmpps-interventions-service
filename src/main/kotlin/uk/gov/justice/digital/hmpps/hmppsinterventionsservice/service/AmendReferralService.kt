@@ -269,7 +269,7 @@ class AmendReferralService(
       val oldValue = ReferralAmendmentDetails(listOf(referralDetails.completionDeadline.toString()))
       val newValue = ReferralAmendmentDetails(listOf(update.completionDeadline.toString()))
       processChangeLog(AmendTopic.COMPLETION_DATETIME, oldValue, newValue, referralDetails.referralId, actor, update)
-    } else {
+    } else if (update.maximumEnforceableDays != null) {
       val oldValue = ReferralAmendmentDetails(listOf(referralDetails.maximumEnforceableDays.toString()))
       val newValue = ReferralAmendmentDetails(listOf(update.maximumEnforceableDays.toString()))
       processChangeLog(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS, oldValue, newValue, referralDetails.referralId, actor, update)

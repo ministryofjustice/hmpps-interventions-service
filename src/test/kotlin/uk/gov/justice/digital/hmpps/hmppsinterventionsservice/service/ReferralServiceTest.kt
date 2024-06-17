@@ -10,7 +10,9 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
@@ -147,6 +149,26 @@ class ReferralServiceTest @Autowired constructor(
       return listOf(
         Arguments.of("bob-smith", "smith", "bob-smith smith"),
         Arguments.of("john", "blue-red", "john blue-red"),
+      )
+    }
+
+    @JvmStatic
+    fun referralDetailsFieldToUpdate(): List<Arguments> {
+      val completionDateToChange = LocalDate.of(2022, 10, 30)
+      val expectedReleaseDate = LocalDate.of(2023, 12, 31)
+      return listOf(
+        Arguments.of(
+          UpdateReferralDetailsDTO(20, completionDateToChange, "new information", expectedReleaseDate, null, "we decided 10 days wasn't enough", "some reason for making a referral", null),
+          "completion-deadline",
+        ),
+        Arguments.of(
+          UpdateReferralDetailsDTO(20, null, "new information", null, null, "we decided 10 days wasn't enough", "some reason for making a referral", null),
+          "maximum-enforceable",
+        ),
+        Arguments.of(
+          UpdateReferralDetailsDTO(20, null, "new information", null, null, "we decided 10 days wasn't enough", "some changes to the referral", null),
+          "reason-for-referral",
+        ),
       )
     }
   }
@@ -1041,50 +1063,16 @@ class ReferralServiceTest @Autowired constructor(
     assertFalse(isUserTheResponsibleOfficer)
   }
 
-  @Test
-  fun `updateReferralDetails updates completion deadline`() {
+  @ParameterizedTest
+  @MethodSource("referralDetailsFieldToUpdate")
+  fun `updateReferralDetails updates its values`(updateReferralDetailsDTO: UpdateReferralDetailsDTO, referralDetailFields: String) {
     val authUser = AuthUser("123457", "delius", "bernard.beaks")
     val user = userFactory.create("pp_user_1", "delius")
     val description = ""
     val id = UUID.randomUUID()
+    val intervention = interventionFactory.create(description = description)
     val existingCompletionDate = LocalDate.of(2022, 10, 21)
-    val completionDateToChange = LocalDate.of(2022, 10, 30)
-    val expectedreleaseDate = LocalDate.of(2023, 12, 31)
-    val intervention = interventionFactory.create(description = description)
-    val referral = referralFactory.createSent(
-      createdAt = OffsetDateTime.now(),
-      createdBy = user,
-      id = id,
-      sentAt = OffsetDateTime.now(),
-      serviceUserCRN = "crn",
-      intervention = intervention,
-    )
-    val referralDetails = referralDetailsFactory.create(
-      referralId = id,
-      createdAt = OffsetDateTime.now(),
-      createdBy = authUser,
-      id = UUID.randomUUID(),
-      completionDeadline = existingCompletionDate,
-      saved = true,
-    )
-    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
 
-    val referralToUpdate = UpdateReferralDetailsDTO(20, completionDateToChange, "new information", expectedreleaseDate, null, "we decided 10 days wasn't enough", "some reason for making a referral", null)
-    val referralDetailsReturned = referralService.updateReferralDetails(referral, referralToUpdate, user)
-    val referralDetailsValue = referralService.getReferralDetailsById(referralDetailsReturned?.id)
-
-    assertThat(referralDetailsValue?.referralId).isEqualTo(referral.id)
-    assertThat(referralToUpdate.furtherInformation).isEqualTo(referralDetailsValue?.furtherInformation)
-    assertThat(referralToUpdate.completionDeadline).isEqualTo(referralDetailsValue?.completionDeadline)
-  }
-
-  @Test
-  fun `updateReferralDetails updates maximum enforceable days`() {
-    val authUser = AuthUser("123457", "delius", "bernard.beaks")
-    val user = userFactory.create("pp_user_1", "delius")
-    val description = ""
-    val id = UUID.randomUUID()
-    val intervention = interventionFactory.create(description = description)
     val referral = referralFactory.createSent(
       createdAt = OffsetDateTime.now(),
       createdBy = user,
@@ -1099,17 +1087,26 @@ class ReferralServiceTest @Autowired constructor(
       createdBy = authUser,
       id = UUID.randomUUID(),
       maximumNumberOfEnforceableDays = 15,
+      completionDeadline = existingCompletionDate,
+      reasonForReferral = "some reason",
       saved = true,
     )
 
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
 
-    val referralToUpdate = UpdateReferralDetailsDTO(20, null, "new information", null, null, "we decided 10 days wasn't enough", "some reason for making a referral", null)
-    val referralDetailsReturned = referralService.updateReferralDetails(referral, referralToUpdate, user)
+    val referralDetailsReturned = referralService.updateReferralDetails(referral, updateReferralDetailsDTO, user)
     val referralDetailsValue = referralService.getReferralDetailsById(referralDetailsReturned?.id)
 
     assertThat(referralDetailsValue?.referralId).isEqualTo(referral.id)
-    assertThat(referralToUpdate.furtherInformation).isEqualTo(referralDetailsValue?.furtherInformation)
-    assertThat(referralToUpdate.maximumEnforceableDays).isEqualTo(referralDetailsValue?.maximumEnforceableDays)
+    assertThat(updateReferralDetailsDTO.furtherInformation).isEqualTo(referralDetailsValue?.furtherInformation)
+    if (referralDetailFields == "completion-deadline") {
+      assertThat(updateReferralDetailsDTO.completionDeadline).isEqualTo(referralDetailsValue?.completionDeadline)
+    }
+    if (referralDetailFields == "maximum-enforceable") {
+      assertThat(updateReferralDetailsDTO.maximumEnforceableDays).isEqualTo(referralDetailsValue?.maximumEnforceableDays)
+    }
+    if (referralDetailFields == "reason-for-referral") {
+      assertThat(updateReferralDetailsDTO.reasonForReferral).isEqualTo(referralDetailsValue?.reasonForReferral)
+    }
   }
 }

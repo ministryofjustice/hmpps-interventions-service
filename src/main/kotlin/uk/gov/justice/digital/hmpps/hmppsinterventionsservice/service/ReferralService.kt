@@ -244,6 +244,7 @@ class ReferralService(
       existingDetails?.completionDeadline,
       existingDetails?.furtherInformation,
       existingDetails?.maximumEnforceableDays,
+      existingDetails?.reasonForReferral,
     )
 
     amendReferralService.logChanges(
@@ -262,6 +263,10 @@ class ReferralService(
 
     update.maximumEnforceableDays?.let {
       newDetails.maximumEnforceableDays = it
+    }
+
+    update.reasonForReferral?.let {
+      newDetails.reasonForReferral = it
     }
 
     referralDetailsRepository.save(newDetails)

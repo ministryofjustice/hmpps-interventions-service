@@ -26,6 +26,7 @@ data class ReferralDetailsDTO(
   val reasonForChange: String,
   val createdById: String,
   val createdAt: OffsetDateTime,
+  val reasonForReferral: String? = null,
 ) {
   companion object {
     fun from(referralDetails: ReferralDetails): ReferralDetailsDTO {
@@ -37,6 +38,7 @@ data class ReferralDetailsDTO(
         reasonForChange = referralDetails.reasonForChange,
         createdById = referralDetails.createdByUserId,
         createdAt = referralDetails.createdAt,
+        reasonForReferral = referralDetails.reasonForReferral,
       )
     }
   }
