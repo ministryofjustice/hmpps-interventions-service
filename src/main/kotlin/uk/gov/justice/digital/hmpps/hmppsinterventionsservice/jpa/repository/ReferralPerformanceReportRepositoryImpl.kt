@@ -127,8 +127,7 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
   }
 
   fun timestampToOffset(timestamp: Timestamp?): OffsetDateTime? {
-    val resolved = timestamp
-    return OffsetDateTime.ofInstant(resolved?.toInstant(), ZoneId.of("UTC"))
+    return OffsetDateTime.ofInstant(timestamp?.toInstant(), ZoneId.of("UTC"))
   }
 
   fun timestampToOffsetNotNull(timestamp: Timestamp?): OffsetDateTime {
