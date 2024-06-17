@@ -17,6 +17,7 @@ class ReferralDetailsFactory(em: TestEntityManager? = null) : EntityFactory(em) 
     reasonForChange: String = "initial referral details",
     completionDeadline: LocalDate? = LocalDate.now(),
     maximumNumberOfEnforceableDays: Int? = 10,
+    reasonForReferral: String? = "some reason",
     furtherInformation: String? = "further information",
     saved: Boolean = false,
   ): ReferralDetails {
@@ -29,6 +30,7 @@ class ReferralDetailsFactory(em: TestEntityManager? = null) : EntityFactory(em) 
       reasonForChange = reasonForChange,
       completionDeadline = completionDeadline,
       maximumEnforceableDays = maximumNumberOfEnforceableDays,
+      reasonForReferral = reasonForReferral,
       furtherInformation = furtherInformation,
     )
     if (saved) {
