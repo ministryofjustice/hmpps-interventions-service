@@ -112,11 +112,11 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
     }
   }
 
-  override fun firstAttendanceDate(referralId: UUID): OffsetDateTime {
+  override fun firstAttendanceDate(referralId: UUID): OffsetDateTime? {
     val query = entityManager.createNativeQuery(firstAttendanceDateQuery())
     query.setParameter("referralId", referralId)
     val result = query.resultList as ArrayList<Timestamp?>
-    return timestampToOffsetNotNull(result.get(0))
+    return timestampToOffset(result.get(0))
   }
 
   override fun attendanceCount(referralId: UUID): Integer {
