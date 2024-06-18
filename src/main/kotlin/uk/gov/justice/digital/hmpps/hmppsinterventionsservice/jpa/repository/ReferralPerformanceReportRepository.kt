@@ -9,6 +9,6 @@ interface ReferralPerformanceReportRepository {
   // queries for reporting
   fun serviceProviderReportReferrals(from: OffsetDateTime, to: OffsetDateTime, contractReferences: String): List<ReferralPerformanceReport>
   fun eosrAchievementScore(eosrId: UUID): BigDecimal
-  fun firstAttendanceDate(referralId: UUID): OffsetDateTime
+  fun firstAttendanceDate(referralId: UUID): OffsetDateTime?
   fun attendanceCount(referralId: UUID): Integer
 }
