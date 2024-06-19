@@ -39,6 +39,7 @@ enum class AmendTopic {
   NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS,
   NEEDS_AND_REQUIREMENTS_ADDITIONAL_INFORMATION,
   NEEDS_AND_REQUIREMENTS_INTERPRETER_REQUIRED,
+  REASON_FOR_REFERRAL,
 }
 
 @Service
@@ -237,6 +238,13 @@ class AmendReferralService(
           newValue = formattedNewCompletionDate,
         )
       }
+      AmendTopic.REASON_FOR_REFERRAL -> {
+        return ChangelogUpdateDTO(
+          changelog = changelog,
+          oldValue = changelog.oldVal.values[0],
+          newValue = changelog.newVal.values[0],
+        )
+      }
       else -> {}
     }
     return ChangelogUpdateDTO(changelog)
@@ -273,6 +281,10 @@ class AmendReferralService(
       val oldValue = ReferralAmendmentDetails(listOf(referralDetails.maximumEnforceableDays.toString()))
       val newValue = ReferralAmendmentDetails(listOf(update.maximumEnforceableDays.toString()))
       processChangeLog(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS, oldValue, newValue, referralDetails.referralId, actor, update)
+    } else if (update.reasonForReferral != null) {
+      val oldValue = ReferralAmendmentDetails(listOf(referralDetails.reasonForReferral!!))
+      val newValue = ReferralAmendmentDetails(listOf(update.reasonForReferral))
+      processChangeLog(AmendTopic.REASON_FOR_REFERRAL, oldValue, newValue, referralDetails.referralId, actor, update)
     }
   }
   private fun generateDescription(values: List<String>): String {
