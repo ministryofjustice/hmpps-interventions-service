@@ -35,7 +35,6 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
     referenceNumber: String = "JS18726AC",
     supplementaryRiskId: UUID = UUID.randomUUID(),
     assignments: List<ReferralAssignment> = emptyList(),
-    supplierAssessment: SupplierAssessment? = null,
     serviceUserData: ReferralServiceUserData? = null,
   ): SentReferralSummary {
     createReferral(
@@ -55,7 +54,6 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
       supplementaryRiskId = supplementaryRiskId,
       assignments = assignments,
       concludedAt = concludedAt,
-      supplierAssessment = supplierAssessment,
     )
 
     return SentReferralSummary(
@@ -70,7 +68,6 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
       assignments = assignments.toMutableList(),
       serviceUserData = serviceUserData,
       actionPlans = actionPlans,
-      supplierAssessment = supplierAssessment,
     )
   }
 
@@ -110,7 +107,6 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
       supplementaryRiskId = supplementaryRiskId,
       assignments = assignments,
       concludedAt = concludedAt,
-      supplierAssessment = supplierAssessment,
     )
 
     val sentReferralSummary = SentReferralSummary(
@@ -125,7 +121,6 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
       assignments = assignments.toMutableList(),
       serviceUserData = serviceUserData,
       actionPlans = actionPlans,
-      supplierAssessment = supplierAssessment,
     )
 
     return sentReferralSummary to referral
@@ -149,7 +144,6 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
       endOfServiceReport = referral.endOfServiceReport ?: endOfServiceReport,
       serviceUserData = referral.serviceUserData,
       actionPlans = referral.actionPlans,
-      supplierAssessment = referral.supplierAssessment,
       referralLocation = referral.referralLocation,
       probationPractitionerDetails = referral.probationPractitionerDetails,
     )

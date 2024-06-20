@@ -30,7 +30,6 @@ import java.util.UUID
     NamedAttributeNode(value = "serviceUserData", subgraph = "serviceUserData"),
     NamedAttributeNode(value = "intervention", subgraph = "interventions"),
     NamedAttributeNode(value = "endOfServiceReport", subgraph = "endOfServiceReport"),
-    NamedAttributeNode(value = "supplierAssessment", subgraph = "supplierAssessmentData"),
   ],
   subgraphs = [
     NamedSubgraph(
@@ -52,13 +51,6 @@ import java.util.UUID
       attributeNodes = [
         NamedAttributeNode("disabilities"),
         NamedAttributeNode("referral"),
-      ],
-    ),
-    NamedSubgraph(
-      name = "supplierAssessmentData",
-      attributeNodes = [
-        NamedAttributeNode("referral"),
-        NamedAttributeNode("appointments"),
       ],
     ),
   ],
@@ -91,9 +83,6 @@ class SentReferralSummary(
   @OneToOne(mappedBy = "referral")
   @Fetch(FetchMode.JOIN)
   var endOfServiceReport: EndOfServiceReport? = null,
-  @OneToOne(mappedBy = "referral")
-  @Fetch(FetchMode.JOIN)
-  var supplierAssessment: SupplierAssessment? = null,
   @OneToOne(mappedBy = "referral")
   @Fetch(FetchMode.JOIN)
   var referralLocation: ReferralLocation? = null,
