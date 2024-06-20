@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ProbationCaseReferralDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DeliverySessionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
@@ -13,7 +12,6 @@ import java.time.OffsetDateTime
 
 internal class ProbationCaseServiceTest {
   private val referralRepository: ReferralRepository = mock()
-  private val draftReferralRepository: DraftReferralRepository = mock()
   private val referralService: ReferralService = mock()
   private val hmppsAuthService: HMPPSAuthService = mock()
   private val deliverySessionService: DeliverySessionService = mock()
@@ -23,7 +21,6 @@ internal class ProbationCaseServiceTest {
 
   private val probationCaseService = ProbationCaseService(
     referralRepository,
-    draftReferralRepository,
     referralService,
     hmppsAuthService,
     deliverySessionService,
@@ -40,7 +37,6 @@ internal class ProbationCaseServiceTest {
     val serviceProviderUser = UserDetail(firstName = "service", lastName = "provider", email = "aaa")
 
     whenever(referralRepository.findByServiceUserCRN(crn)).thenReturn(listOf(referral))
-    whenever(draftReferralRepository.findByServiceUserCRN(crn)).thenReturn(emptyList())
     whenever(referralService.getResponsibleProbationPractitioner(referral)).thenReturn(responsibleOfficer)
     whenever(hmppsAuthService.getUserDetail(referral.createdBy)).thenReturn(referringOfficerDetails)
     whenever(hmppsAuthService.getUserDetail(referral.currentAssignee!!)).thenReturn(serviceProviderUser)
@@ -75,19 +71,15 @@ internal class ProbationCaseServiceTest {
     whenever(hmppsAuthService.getUserDetail(referral2.createdBy)).thenReturn(referringOfficerDetails)
     whenever(hmppsAuthService.getUserDetail(referral2.currentAssignee!!)).thenReturn(serviceProviderUser)
 
-    whenever(draftReferralRepository.findByServiceUserCRN(crn)).thenReturn(listOf(draftReferral))
-    whenever(hmppsAuthService.getUserDetail(draftReferral.createdBy)).thenReturn(referringOfficerDetails)
-
     val expectedResult = listOf(
       ProbationCaseReferralDTO.from(referral, responsibleOfficer, serviceProviderUser, referringOfficerDetails),
       ProbationCaseReferralDTO.from(referral2, responsibleOfficer, serviceProviderUser, referringOfficerDetails),
-      ProbationCaseReferralDTO.Companion.from(draftReferral, referringOfficerDetails),
     )
 
     val result = probationCaseService.getProbationCaseDetails(crn)
 
     assertThat(result).isNotNull
-    assertThat(result).size().isEqualTo(3)
+    assertThat(result).size().isEqualTo(2)
     assertThat(result).isEqualTo(expectedResult)
   }
 
@@ -100,7 +92,6 @@ internal class ProbationCaseServiceTest {
     val referringOfficerDetails = UserDetail(firstName = "referring", lastName = "officer", email = "aaa")
 
     whenever(referralRepository.findByServiceUserCRN(crn)).thenReturn(listOf(referral))
-    whenever(draftReferralRepository.findByServiceUserCRN(crn)).thenReturn(emptyList())
     whenever(referralService.getResponsibleProbationPractitioner(referral)).thenReturn(responsibleOfficer)
     whenever(hmppsAuthService.getUserDetail(referral.createdBy)).thenReturn(referringOfficerDetails)
 
