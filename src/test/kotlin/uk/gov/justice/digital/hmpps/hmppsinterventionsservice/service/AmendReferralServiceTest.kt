@@ -445,6 +445,38 @@ class AmendReferralServiceTest @Autowired constructor(
   }
 
   @Test
+  fun `find changelog by changelogId for reason for referral`() {
+    val someoneElse = userFactory.create("helper_pp_user", "delius")
+    val user = userFactory.create("pp_user_1", "delius")
+
+    val referral = referralFactory.createSent(
+      needsInterpreter = true,
+      interpreterLanguage = "french",
+      createdBy = someoneElse,
+    )
+
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
+
+    val uuid1 = UUID.randomUUID()
+
+    val changelog1 = changeLogFactory.create(
+      id = uuid1,
+      referralId = referral.id,
+      topic = AmendTopic.REASON_FOR_REFERRAL,
+      oldVal = ReferralAmendmentDetails(listOf("old reason")),
+      newVal = ReferralAmendmentDetails(listOf("new reason")),
+      changedBy = someoneElse,
+      reasonForChange = "",
+    )
+
+    val changelog = amendReferralService.getChangeLogById(changelog1.id, jwtAuthenticationToken)
+
+    assertThat(changelog.changelog).isEqualTo(changelog1)
+    assertThat(changelog.oldValue).contains("old reason")
+    assertThat(changelog.newValue).contains("new reason")
+  }
+
+  @Test
   fun `find changelog throws 404 when changelog is not found`() {
     val someoneElse = userFactory.create("helper_pp_user", "delius")
     val user = userFactory.create("pp_user_1", "delius")
