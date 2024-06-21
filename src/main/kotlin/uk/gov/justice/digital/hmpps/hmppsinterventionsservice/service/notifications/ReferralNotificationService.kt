@@ -34,6 +34,7 @@ class ReferralNotificationService(
   @Value("\${notify.templates.referral-assigned}") private val referralAssignedTemplateID: String,
   @Value("\${notify.templates.completion-deadline-updated}") private val completionDeadlineUpdatedTemplateID: String,
   @Value("\${notify.templates.enforceable-days-updated}") private val enforceableDaysUpdatedTemplateID: String,
+  @Value("\${notify.templates.reason-for-referral-updated}") private val reasonForReferralUpdatedTemplateID: String,
   @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
   @Value("\${interventions-ui.locations.service-provider.referral-details}") private val spReferralDetailsLocation: String,
   private val emailSender: EmailSender,
@@ -160,6 +161,19 @@ class ReferralNotificationService(
           "previousMaximumEnforceableDays" to previousDetails.maximumEnforceableDays!!.toString(),
           "changedByName" to "${updater.firstName} ${updater.lastName}",
           "referralDetailsUrl" to frontendUrl.toString(),
+        ),
+      )
+    }
+    if (newDetails.reasonForReferral != previousDetails.reasonForReferral) {
+      emailSender.sendEmail(
+        reasonForReferralUpdatedTemplateID,
+        recipient.email,
+        mapOf(
+          "caseWorkerFirstName" to recipient.firstName,
+          "changedByName" to "${updater.firstName} ${updater.lastName}",
+          "referralDetailsURL" to frontendUrl.toString(),
+          "referralNumber" to event.referral.referenceNumber!!,
+          "popFullName" to "${event.referral.serviceUserData?.firstName} ${event.referral.serviceUserData?.lastName}",
         ),
       )
     }

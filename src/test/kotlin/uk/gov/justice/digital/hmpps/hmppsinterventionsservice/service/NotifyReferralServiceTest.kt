@@ -66,6 +66,7 @@ class NotifyReferralServiceTest {
       "referralAssignedTemplateID",
       "completionDeadlineUpdatedTemplateID",
       "enforceableDaysUpdatedTemplateID",
+      "reasonForReferralUpdatedTemplateID",
       "http://interventions-ui.example.com",
       "/referral/{id}",
       emailSender,
@@ -172,6 +173,37 @@ class NotifyReferralServiceTest {
               referral.createdAt,
               referral.createdBy,
               maximumNumberOfEnforceableDays = 3,
+            ),
+          ),
+          "currentAssignee" to if (assigned) AuthUserDTO.from(referral.currentAssignee!!) else null,
+          "crn" to referral.serviceUserCRN,
+          "sentBy" to referral.sentBy,
+          "createdBy" to referral.createdBy,
+        ),
+      )
+    }
+
+    private val makeReferralDetailsReasonForReferralUpdatedEvent = { assigned: Boolean ->
+      ReferralEvent(
+        "source",
+        ReferralEventType.DETAILS_AMENDED,
+        referral,
+        "http://localhost:8080/sent-referral/${referral.id}",
+        data = mapOf(
+          "newDetails" to ReferralDetailsDTO.from(
+            referralDetailsFactory.create(
+              referral.id,
+              referral.createdAt,
+              referral.createdBy,
+              reasonForReferral = "old reason",
+            ),
+          ),
+          "previousDetails" to ReferralDetailsDTO.from(
+            referralDetailsFactory.create(
+              referral.id,
+              referral.createdAt,
+              referral.createdBy,
+              reasonForReferral = "new reason",
             ),
           ),
           "currentAssignee" to if (assigned) AuthUserDTO.from(referral.currentAssignee!!) else null,
@@ -309,6 +341,47 @@ class NotifyReferralServiceTest {
     @Test
     fun `amending 'enforceable days' does not send email for unassigned referrals`() {
       notifyService().onApplicationEvent(makeReferralDetailsEnforceableDaysChangedEvent(false))
+      verifyNoInteractions(emailSender)
+    }
+
+    @Test
+    fun `amending 'reason for referral' notifies the assigned caseworker via email`() {
+      whenever(authUserRepository.findById(referral.createdBy.id)).thenReturn(Optional.of(referral.createdBy))
+      whenever(hmppsAuthService.getUserDetail(referral.createdBy)).thenReturn(
+        UserDetail(
+          "sally",
+          "sally@tom.com",
+          "smith",
+        ),
+      )
+      whenever(hmppsAuthService.getUserDetail(AuthUserDTO.from(referral.currentAssignee!!))).thenReturn(
+        UserDetail(
+          "tom",
+          "tom@tom.tom",
+          "jones",
+        ),
+      )
+
+      notifyService().onApplicationEvent(makeReferralDetailsReasonForReferralUpdatedEvent(true))
+      val personalisationCaptor = argumentCaptor<Map<String, String>>()
+      verify(emailSender).sendEmail(
+        eq("reasonForReferralUpdatedTemplateID"),
+        eq("tom@tom.tom"),
+        personalisationCaptor.capture(),
+      )
+      assertThat(personalisationCaptor.firstValue["caseWorkerFirstName"]).isEqualTo("tom")
+      assertThat(personalisationCaptor.firstValue["changedByName"]).isEqualTo("sally smith")
+      assertThat(personalisationCaptor.firstValue["referralDetailsURL"]).isEqualTo("http://interventions-ui.example.com/referral/${referral.id}")
+      assertThat(personalisationCaptor.firstValue["referralNumber"]).isEqualTo(referral.referenceNumber)
+      assertThat(personalisationCaptor.firstValue["popFullName"]).isEqualTo("${referral.serviceUserData?.firstName} ${referral.serviceUserData?.lastName}")
+
+      // reason for change contains sensitive information
+      assertThat(personalisationCaptor.firstValue["reasonForChange"]).isNull()
+    }
+
+    @Test
+    fun `amending 'reason for referral' does not send email for unassigned referrals`() {
+      notifyService().onApplicationEvent(makeReferralDetailsReasonForReferralUpdatedEvent(false))
       verifyNoInteractions(emailSender)
     }
 
