@@ -40,6 +40,8 @@ spring:
     url: jdbc:postgresql://${postgres.uri}/${postgres.db}
     username: ${postgres.username}
     password: ${postgres.password}
+    hikari:
+      maximum-pool-size: 20
   jpa:
     hibernate:
       ddl-auto: validate
