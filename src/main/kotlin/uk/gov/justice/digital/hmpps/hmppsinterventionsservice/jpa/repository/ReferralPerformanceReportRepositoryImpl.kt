@@ -62,7 +62,7 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
       val firstActionPlanSubmittedAt = timestampToOffset(row[13] as Timestamp?) as OffsetDateTime?
       val firstActionPlanApprovedAt = timestampToOffset(row[14] as Timestamp?) as OffsetDateTime?
       val approvedActionPlanId = row[15] as UUID?
-      val numberOfOutcomes = (row[16] as Int).toLong()
+      val numberOfOutcomes = (row[16] as Int?)?.toLong()
       val endOfServiceReportId = row[17] as UUID?
       val numberOfSessions = row[18] as Int?
       val endRequestedAt = timestampToOffset(row[19] as Timestamp?) as OffsetDateTime?
