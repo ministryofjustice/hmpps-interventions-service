@@ -94,4 +94,54 @@ internal class PerformanceReportDataProcessorTest {
     assertThat(performanceReportData.supplierAssessmentAttendedOnTime).isEqualTo(true)
     assertThat(performanceReportData.dateInterventionToBeCompletedBy).isEqualTo(today)
   }
+
+  @Test
+  fun `will process sent referrals where numberOfOutcomes is null`() {
+    val supplierAssessmentFirstAppointment = appointmentFactory.create(attended = Attended.NO, createdAt = OffsetDateTime.parse("2022-07-01T10:42:43+00:00"))
+    val supplierAssessmentNewAppointment = appointmentFactory.create(attended = Attended.YES, createdAt = OffsetDateTime.parse("2022-07-02T10:42:43+00:00"))
+    val approvedActionPlanAppointment = appointmentFactory.create(attended = Attended.YES, appointmentFeedbackSubmittedAt = OffsetDateTime.parse("2022-07-02T10:42:43+00:00"))
+    val supplierAssessment = supplierAssessmentFactory.create(appointment = supplierAssessmentFirstAppointment)
+    supplierAssessment.appointments.add(supplierAssessmentNewAppointment)
+    val actionPlan = actionPlanFactory.createApproved()
+    val referral = referralFactory.createSent(actionPlans = mutableListOf(actionPlan), supplierAssessment = supplierAssessment)
+
+    val today = OffsetDateTime.now().toLocalDate()
+
+    val referralPerformanceReport = ReferralPerformanceReport(
+      referralReference = referral.referenceNumber!!,
+      referralId = referral.id,
+      contractReference = referral.intervention.dynamicFrameworkContract.contractReference,
+      organisationId = referral.intervention.dynamicFrameworkContract.primeProvider.id,
+      currentAssigneeEmail = "a.b@xyz.com",
+      crn = referral.serviceUserCRN,
+      dateReferralReceived = referral.sentAt!!,
+      dateSupplierAssessmentFirstArranged = supplierAssessmentFirstAppointment.createdAt,
+      dateSupplierAssessmentFirstScheduledFor = supplierAssessmentFirstAppointment.appointmentTime,
+      dateSupplierAssessmentFirstNotAttended = supplierAssessmentFirstAppointment.appointmentTime,
+      dateSupplierAssessmentFirstAttended = supplierAssessmentNewAppointment.appointmentTime,
+      dateSupplierAssessmentFirstCompleted = supplierAssessmentNewAppointment.appointmentTime,
+      supplierAssessmentAttendedOnTime = true,
+      firstActionPlanSubmittedAt = actionPlan.submittedAt,
+      firstActionPlanApprovedAt = actionPlan.approvedAt,
+      approvedActionPlanId = actionPlan.id,
+      numberOfOutcomes = null,
+      endOfServiceReportId = null,
+      numberOfSessions = 2,
+      endRequestedAt = OffsetDateTime.now(),
+      endRequestedReason = "reason",
+      eosrSubmittedAt = OffsetDateTime.now(),
+      concludedAt = referral.concludedAt,
+      completionDeadline = today,
+    )
+
+    whenever(appointmentRepository.findAllByReferralId(referral.id)).thenReturn(listOf(supplierAssessmentFirstAppointment, supplierAssessmentNewAppointment))
+    whenever(referralPerformanceReportRepository.eosrAchievementScore(anyOrNull())).thenReturn(BigDecimal.valueOf(1L))
+    whenever(referralPerformanceReportRepository.firstAttendanceDate(anyOrNull())).thenReturn(approvedActionPlanAppointment.appointmentTime)
+    whenever(referralPerformanceReportRepository.attendanceCount(anyOrNull())).thenReturn(Integer(2))
+    whenever(actionPlanService.getFirstAttendedAppointment(referral.id)).thenReturn(approvedActionPlanAppointment)
+
+    val performanceReportData = processor.process(referralPerformanceReport)
+
+    assertThat(performanceReportData.numberOfOutcomes).isNull()
+  }
 }
