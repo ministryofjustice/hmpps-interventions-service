@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.User
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOutcomesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendPrisonEstablishmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogUpdateDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
@@ -24,6 +25,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Selecte
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ComplexityLevelRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DesiredOutcomeRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralLocationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import java.time.OffsetDateTime
@@ -40,6 +42,7 @@ enum class AmendTopic {
   NEEDS_AND_REQUIREMENTS_ADDITIONAL_INFORMATION,
   NEEDS_AND_REQUIREMENTS_INTERPRETER_REQUIRED,
   REASON_FOR_REFERRAL,
+  PRISON_ESTABLISHMENT,
 }
 
 @Service
@@ -51,6 +54,7 @@ class AmendReferralService(
   private val serviceCategoryRepository: ServiceCategoryRepository,
   private val complexityLevelRepository: ComplexityLevelRepository,
   private val desiredOutcomeRepository: DesiredOutcomeRepository,
+  private val referralLocationRepository: ReferralLocationRepository,
   private val userMapper: UserMapper,
   @Lazy private val referralService: ReferralService,
 ) {
@@ -178,6 +182,36 @@ class AmendReferralService(
     changelogRepository.save(changelog)
     val savedReferral = referralRepository.save(referral)
     referralEventPublisher.referralNeedsAndRequirementsChangedEvent(savedReferral)
+  }
+
+  fun amendPrisonEstablishment(
+    referralId: UUID,
+    amendPrisonEstablishmentDTO: AmendPrisonEstablishmentDTO,
+    authentication: JwtAuthenticationToken,
+  ) {
+    val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
+
+    val oldValues = mutableListOf<String>()
+    referral.referralLocation?.prisonId?.let { oldValues.add(referral.referralLocation?.prisonId!!) }
+
+    val newValues = mutableListOf<String>()
+    newValues.add(amendPrisonEstablishmentDTO.personCustodyPrisonId)
+
+    val referralLocation = referral.referralLocation
+    referralLocation?.prisonId = amendPrisonEstablishmentDTO.personCustodyPrisonId
+
+    val changelog = Changelog(
+      referral.id,
+      UUID.randomUUID(),
+      AmendTopic.PRISON_ESTABLISHMENT,
+      ReferralAmendmentDetails(values = oldValues),
+      ReferralAmendmentDetails(values = newValues),
+      amendPrisonEstablishmentDTO.reasonForChange,
+      OffsetDateTime.now(),
+      userMapper.fromToken(authentication),
+    )
+    changelogRepository.save(changelog)
+    referralLocation?.let { referralLocationRepository.save(it) }
   }
 
   fun getSentReferralForAuthenticatedUser(referralId: UUID, authentication: JwtAuthenticationToken): Referral {

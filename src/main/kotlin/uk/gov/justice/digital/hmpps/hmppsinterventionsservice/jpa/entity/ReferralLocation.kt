@@ -25,7 +25,7 @@ data class ReferralLocation(
   @NotNull
   val type: PersonCurrentLocationType,
 
-  @Column(name = "prison_id") val prisonId: String?,
+  @Column(name = "prison_id") var prisonId: String?,
   @Column(name = "expected_release_date") val expectedReleaseDate: LocalDate?,
   @Column(name = "expected_release_date_missing_reason") val expectedReleaseDateMissingReason: String?,
   @Column(name = "expected_probation_office") val expectedProbationOffice: String?,

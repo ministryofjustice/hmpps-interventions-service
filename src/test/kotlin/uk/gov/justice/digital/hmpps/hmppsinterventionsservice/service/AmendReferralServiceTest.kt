@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOutcomesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendPrisonEstablishmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
@@ -22,6 +23,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Complexity
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralLocation
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
@@ -30,6 +33,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Del
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DesiredOutcomeRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralLocationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
@@ -39,6 +43,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralDetai
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.Optional
 import java.util.UUID
@@ -55,6 +60,7 @@ class AmendReferralServiceTest @Autowired constructor(
   val serviceCategoryRepository: ServiceCategoryRepository,
   val desiredOutcomeRepository: DesiredOutcomeRepository,
   val changelogRepository: ChangelogRepository,
+  val referralLocationRepository: ReferralLocationRepository,
 ) {
 
   private val referralEventPublisher: ReferralEventPublisher = mock()
@@ -76,6 +82,7 @@ class AmendReferralServiceTest @Autowired constructor(
     serviceCategoryRepository,
     complexityLevelRepository,
     desiredOutcomeRepository,
+    referralLocationRepository,
     userMapper,
     referralService,
   )
@@ -83,6 +90,7 @@ class AmendReferralServiceTest @Autowired constructor(
   @AfterEach
   fun `clear referrals`() {
     referralRepository.deleteAll()
+    referralLocationRepository.deleteAll()
     changelogRepository.deleteAll()
     complexityLevelRepository.deleteAll()
     desiredOutcomeRepository.deleteAll()
@@ -249,6 +257,51 @@ class AmendReferralServiceTest @Autowired constructor(
 
     assertThat(newReferral.needsInterpreter).isTrue
     assertThat(newReferral.interpreterLanguage).isEqualTo("Yoruba")
+  }
+
+  @Test
+  fun `amend prison establishment`() {
+    val someoneElse = userFactory.create("helper_pp_user", "delius")
+    val user = userFactory.create("pp_user_1", "delius")
+
+    val referral = referralFactory.createSent(createdBy = someoneElse)
+    val referralLocation = ReferralLocation(
+      id = UUID.randomUUID(),
+      prisonId = "aaa",
+      type = PersonCurrentLocationType.CUSTODY,
+      expectedReleaseDate = LocalDate.now(),
+      expectedProbationOffice = "aaa",
+      expectedReleaseDateMissingReason = null,
+      expectedProbationOfficeUnknownReason = null,
+      referral = referral,
+    )
+    referralLocationRepository.saveAndFlush(referralLocation)
+    referral.referralLocation = referralLocation
+    referralRepository.saveAndFlush(referral)
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
+    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+
+    amendReferralService.amendPrisonEstablishment(
+      referral.id,
+      AmendPrisonEstablishmentDTO(
+        personCustodyPrisonId = "London",
+        reasonForChange = "some reason",
+      ),
+      jwtAuthenticationToken,
+    )
+    val changelog = entityManager.entityManager.createQuery("FROM Changelog u WHERE u.referralId = :referralId")
+      .setParameter("referralId", referral.id)
+      .singleResult as Changelog
+
+    assertThat(changelog.newVal.values.size).isEqualTo(1)
+    assertThat(changelog.newVal.values).contains("London")
+    assertThat(changelog.oldVal.values).contains("aaa")
+
+    assertThat(changelog.reasonForChange).isEqualTo("some reason")
+
+    val newReferral = referralRepository.findById(referral.id).get()
+
+    assertThat(newReferral.referralLocation?.prisonId).isEqualTo("London")
   }
 
   @Test
