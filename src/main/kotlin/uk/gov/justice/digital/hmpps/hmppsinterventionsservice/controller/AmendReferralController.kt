@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOutcomesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendPrisonEstablishmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogValuesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendReferralService
@@ -64,6 +65,16 @@ class AmendReferralController(
       "interpreter-required" -> amendReferralService.amendInterpreterRequired(referralId, request, authentication)
       else -> return ResponseEntity("No accepted needs and requirements type", BAD_REQUEST)
     }
+    return ResponseEntity(NO_CONTENT)
+  }
+
+  @PostMapping("/sent-referral/{referralId}/amend-prison-establishment")
+  fun amendPrisonEstablishment(
+    authentication: JwtAuthenticationToken,
+    @PathVariable referralId: UUID,
+    @RequestBody request: AmendPrisonEstablishmentDTO,
+  ): ResponseEntity<Any> {
+    amendReferralService.amendPrisonEstablishment(referralId, request, authentication)
     return ResponseEntity(NO_CONTENT)
   }
 

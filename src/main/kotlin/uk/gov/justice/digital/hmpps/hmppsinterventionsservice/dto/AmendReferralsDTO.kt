@@ -39,3 +39,8 @@ data class AmendNeedsAndRequirementsDTO(
   var interpreterLanguage: String? = null,
   val reasonForChange: String,
 )
+
+data class AmendPrisonEstablishmentDTO(
+  val personCustodyPrisonId: String,
+  val reasonForChange: String,
+)
