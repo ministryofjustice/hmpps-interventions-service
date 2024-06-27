@@ -104,8 +104,8 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.26.9")
-  implementation("software.amazon.awssdk:s3:2.26.9")
+  implementation("software.amazon.awssdk:sns:2.26.10")
+  implementation("software.amazon.awssdk:s3:2.26.10")
   implementation("software.amazon.awssdk:sts:2.26.9")
 
   // security
@@ -119,7 +119,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("com.h2database:h2:2.2.224")
   implementation("org.hibernate:hibernate-core:6.5.2.Final")
-  implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.7")
+  implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.8.0")
 
   runtimeOnly("org.flywaydb:flyway-core:9.22.3")
   runtimeOnly("org.postgresql:postgresql:42.7.3")
