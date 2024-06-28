@@ -5,6 +5,7 @@ import jakarta.persistence.PersistenceContext
 import org.springframework.stereotype.Repository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model.ReferralPerformanceReport
 import java.math.BigDecimal
+import java.sql.Date
 import java.sql.Timestamp
 import java.time.OffsetDateTime
 import java.time.ZoneId
@@ -69,7 +70,7 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
       val endRequestedReason = row[20] as String?
       val eosrSubmittedAt = timestampToOffset(row[21] as Timestamp?) as OffsetDateTime?
       val concludedAt = timestampToOffset(row[22] as Timestamp?) as OffsetDateTime?
-      val completionDeadline = timestampToOffset(row[23] as Timestamp?)?.toLocalDateTime()?.toLocalDate()
+      val completionDeadline = (row[23] as Date?)?.toLocalDate()
       records.add(
         ReferralPerformanceReport(
           referralId = referralId,
