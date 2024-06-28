@@ -5,9 +5,8 @@ import jakarta.persistence.PersistenceContext
 import org.springframework.stereotype.Repository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model.ReferralPerformanceReport
 import java.math.BigDecimal
-import java.sql.Timestamp
 import java.sql.Date
-import java.time.LocalDate
+import java.sql.Timestamp
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
