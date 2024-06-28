@@ -4,7 +4,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendTopic
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.UserDetail
 import java.time.format.DateTimeFormatter
-import java.util.Map
 import java.util.UUID
 
 data class ChangelogValuesDTO(
@@ -18,16 +17,17 @@ data class ChangelogValuesDTO(
 ) {
 
   companion object {
-    private var amendTopicDescription: MutableMap<AmendTopic, String> = Map.of(
-      AmendTopic.COMPLEXITY_LEVEL, "Complexity level was changed",
-      AmendTopic.DESIRED_OUTCOMES, "Desired outcome was changed",
-      AmendTopic.COMPLETION_DATETIME, "Completion date time was changed",
-      AmendTopic.MAXIMUM_ENFORCEABLE_DAYS, "Maximum enforceable days was changed",
-      AmendTopic.NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS, "Accessibility needs was changed",
-      AmendTopic.NEEDS_AND_REQUIREMENTS_ADDITIONAL_INFORMATION, "Additional information was changed",
-      AmendTopic.NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES, "Additional responsibilities was changed",
-      AmendTopic.NEEDS_AND_REQUIREMENTS_INTERPRETER_REQUIRED, "Interpreter required was changed",
-      AmendTopic.REASON_FOR_REFERRAL, "Reason for this referral and further information has changed",
+    private val amendTopicDescription: Map<AmendTopic, String> = mapOf(
+      AmendTopic.COMPLEXITY_LEVEL to "Complexity level was changed",
+      AmendTopic.DESIRED_OUTCOMES to "Desired outcome was changed",
+      AmendTopic.COMPLETION_DATETIME to "Completion date time was changed",
+      AmendTopic.MAXIMUM_ENFORCEABLE_DAYS to "Maximum enforceable days was changed",
+      AmendTopic.NEEDS_AND_REQUIREMENTS_ACCESSIBILITY_NEEDS to "Accessibility needs was changed",
+      AmendTopic.NEEDS_AND_REQUIREMENTS_ADDITIONAL_INFORMATION to "Additional information was changed",
+      AmendTopic.NEEDS_AND_REQUIREMENTS_HAS_ADDITIONAL_RESPONSIBILITIES to "Additional responsibilities was changed",
+      AmendTopic.NEEDS_AND_REQUIREMENTS_INTERPRETER_REQUIRED to "Interpreter required was changed",
+      AmendTopic.REASON_FOR_REFERRAL to "Reason for this referral and further information has changed",
+      AmendTopic.PRISON_ESTABLISHMENT to "Prison establishment has changed",
     )
     fun from(changelog: Changelog, userDetail: UserDetail): ChangelogValuesDTO {
       val dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy 'at' h.mma")
