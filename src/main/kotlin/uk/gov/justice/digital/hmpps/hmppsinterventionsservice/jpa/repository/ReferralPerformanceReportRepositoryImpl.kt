@@ -19,7 +19,7 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
   private lateinit var entityManager: EntityManager
 
   private fun reportQuery(): String {
-    return "select * from performance_report(string_to_array(cast(:contractReferences as text), ' '), cast(:sent_from as timestamp), cast(:sent_to as timestamp))"
+    return "select distinct * from performance_report(string_to_array(cast(:contractReferences as text), ' '), cast(:sent_from as timestamp), cast(:sent_to as timestamp))"
   }
 
   private fun eosrScoreQuery(): String {
@@ -69,7 +69,7 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
       val endRequestedReason = row[20] as String?
       val eosrSubmittedAt = timestampToOffset(row[21] as Timestamp?) as OffsetDateTime?
       val concludedAt = timestampToOffset(row[22] as Timestamp?) as OffsetDateTime?
-      val completionDeadline = timestampToOffset(row[22] as Timestamp?)?.toLocalDateTime()?.toLocalDate()
+      val completionDeadline = timestampToOffset(row[23] as Timestamp?)?.toLocalDateTime()?.toLocalDate()
       records.add(
         ReferralPerformanceReport(
           referralId = referralId,
