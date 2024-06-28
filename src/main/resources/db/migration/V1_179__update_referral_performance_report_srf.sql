@@ -87,7 +87,7 @@ AS (SELECT a.referral_id,
              ROW_NUMBER ()
              OVER (
              partition BY a.referral_id
-             ORDER BY a.appointment_time ASC ) saa_attended_late_rank
+             ORDER BY a.appointment_time ASC ) saa_completed_rank
     FROM   appointment a
     JOIN supplier_assessment_appointment saa
     ON a.id = saa.appointment_id
@@ -181,6 +181,9 @@ AS (SELECT DISTINCT referral_id,
   LEFT OUTER JOIN saa_attended_late
   ON saa_attended_late.referral_id = r.id
   AND saa_attended_late.saa_attended_late_rank = 1
+  LEFT OUTER join saa_completed
+  ON saa_completed.referral_id = r.id
+  AND saa_completed.saa_completed_rank = 1
   LEFT OUTER JOIN action_plan_first_submitted_at
   ON action_plan_first_submitted_at.referral_id = r.id
   AND
