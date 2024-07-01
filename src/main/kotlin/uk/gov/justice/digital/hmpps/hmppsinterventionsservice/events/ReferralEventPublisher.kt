@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.Location
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller.ReferralController
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AuthUserDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralDetailsDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState
@@ -20,6 +21,7 @@ enum class ReferralEventType {
   COMPLEXITY_LEVEL_AMENDED,
   DESIRED_OUTCOMES_AMENDED,
   NEEDS_AND_REQUIREMENTS_AMENDED,
+  PRISON_ESTABLISHMENT_AMENDED,
 }
 
 class ReferralEvent(
@@ -82,6 +84,31 @@ class ReferralEventPublisher(
 
   fun referralNeedsAndRequirementsChangedEvent(referral: Referral) {
     applicationEventPublisher.publishEvent(ReferralEvent(this, ReferralEventType.NEEDS_AND_REQUIREMENTS_AMENDED, referral, getSentReferralURL(referral)))
+  }
+
+  fun referralPrisonEstablishmentChangedEvent(
+    referral: Referral,
+    oldPrisonEstablishment: String,
+    newPrisonEstablishment: String,
+    user: AuthUser,
+  ) {
+    applicationEventPublisher.publishEvent(
+      ReferralEvent(
+        this,
+        ReferralEventType.PRISON_ESTABLISHMENT_AMENDED,
+        referral,
+        getSentReferralURL(referral),
+        mapOf(
+          "oldPrisonEstablishment" to oldPrisonEstablishment,
+          "newPrisonEstablishment" to newPrisonEstablishment,
+          "currentAssignee" to referral.currentAssignee?.let { AuthUserDTO.from(it) },
+          "crn" to referral.serviceUserCRN,
+          "sentBy" to referral.sentBy,
+          "createdBy" to referral.createdBy,
+          "updater" to user,
+        ),
+      ),
+    )
   }
 
   fun referralEndingEvent(referral: Referral, eventType: ReferralConcludedState) {

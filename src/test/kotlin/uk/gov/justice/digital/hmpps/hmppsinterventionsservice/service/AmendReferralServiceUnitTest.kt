@@ -621,7 +621,7 @@ class AmendReferralServiceUnitTest {
         reasonForChange = "some reason",
       )
 
-      amendReferralService.amendPrisonEstablishment(referral.id, updateToReferral, jwtAuthenticationToken)
+      amendReferralService.amendPrisonEstablishment(referral.id, updateToReferral, jwtAuthenticationToken, authUser)
 
       val argumentCaptorReferral = argumentCaptor<ReferralLocation>()
       verify(referralLocationRepository, atLeast(1)).save(argumentCaptorReferral.capture())

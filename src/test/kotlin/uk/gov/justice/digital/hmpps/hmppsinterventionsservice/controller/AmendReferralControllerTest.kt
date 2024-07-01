@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.User
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOutcomesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendPrisonEstablishmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogUpdateDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendReferralService
@@ -32,9 +33,11 @@ import java.util.UUID
 internal class AmendReferralControllerTest {
   private val amendReferralService = mock<AmendReferralService>()
   private val hmppsAuthService = mock<HMPPSAuthService>()
+  private val userMapper = mock<UserMapper>()
   private val amendReferralController = AmendReferralController(
     amendReferralService,
     hmppsAuthService,
+    userMapper,
   )
   private val tokenFactory = JwtTokenFactory()
   private val referralFactory = ReferralFactory()
@@ -169,6 +172,23 @@ internal class AmendReferralControllerTest {
         .amendInterpreterRequired(eq(referral.id), eq(amendNeedsAndRequirementsDTO), eq(token))
       val returnedValue =
         amendReferralController.amendNeedsAndRequirements(token, referral.id, "interpreter-required", amendNeedsAndRequirementsDTO)
+      assertThat(returnedValue.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
+    }
+  }
+
+  @Nested
+  inner class AmendPrisonEstablishment {
+    private val referral = referralFactory.createSent()
+    private val user = authUserFactory.create()
+    private val token = tokenFactory.create(userID = user.id, userName = user.userName, authSource = user.authSource)
+
+    @Test
+    fun `amendPrisonEstablishment updates details in referral for the correct type`() {
+      val amendPrisonEstablishmentDTO = AmendPrisonEstablishmentDTO(personCustodyPrisonId = "aaa", reasonForChange = "some reason")
+      doNothing().whenever(amendReferralService)
+        .amendPrisonEstablishment(eq(referral.id), eq(amendPrisonEstablishmentDTO), eq(token), eq(user))
+      val returnedValue =
+        amendReferralController.amendPrisonEstablishment(token, referral.id, amendPrisonEstablishmentDTO)
       assertThat(returnedValue.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
     }
   }

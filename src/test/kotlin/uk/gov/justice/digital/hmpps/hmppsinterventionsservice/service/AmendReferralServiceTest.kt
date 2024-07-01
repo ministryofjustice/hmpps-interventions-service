@@ -288,6 +288,7 @@ class AmendReferralServiceTest @Autowired constructor(
         reasonForChange = "some reason",
       ),
       jwtAuthenticationToken,
+      user,
     )
     val changelog = entityManager.entityManager.createQuery("FROM Changelog u WHERE u.referralId = :referralId")
       .setParameter("referralId", referral.id)

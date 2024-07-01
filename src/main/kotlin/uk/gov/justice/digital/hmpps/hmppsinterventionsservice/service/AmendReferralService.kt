@@ -188,6 +188,7 @@ class AmendReferralService(
     referralId: UUID,
     amendPrisonEstablishmentDTO: AmendPrisonEstablishmentDTO,
     authentication: JwtAuthenticationToken,
+    user: AuthUser,
   ) {
     val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
 
@@ -212,6 +213,7 @@ class AmendReferralService(
     )
     changelogRepository.save(changelog)
     referralLocation?.let { referralLocationRepository.save(it) }
+    referralEventPublisher.referralPrisonEstablishmentChangedEvent(referral, oldValues[0], newValues[0], user)
   }
 
   fun getSentReferralForAuthenticatedUser(referralId: UUID, authentication: JwtAuthenticationToken): Referral {

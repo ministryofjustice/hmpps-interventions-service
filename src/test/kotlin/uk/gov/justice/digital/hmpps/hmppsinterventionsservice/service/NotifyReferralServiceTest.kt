@@ -67,6 +67,7 @@ class NotifyReferralServiceTest {
       "completionDeadlineUpdatedTemplateID",
       "enforceableDaysUpdatedTemplateID",
       "reasonForReferralUpdatedTemplateID",
+      "prisonEstablishmentUpdatedTemplateID",
       "http://interventions-ui.example.com",
       "/referral/{id}",
       emailSender,
@@ -210,6 +211,24 @@ class NotifyReferralServiceTest {
           "crn" to referral.serviceUserCRN,
           "sentBy" to referral.sentBy,
           "createdBy" to referral.createdBy,
+        ),
+      )
+    }
+
+    private val makePrisonEstablishmentUpdatedEvent = { assigned: Boolean ->
+      ReferralEvent(
+        "source",
+        ReferralEventType.PRISON_ESTABLISHMENT_AMENDED,
+        referral,
+        "http://localhost:8080/sent-referral/${referral.id}",
+        data = mapOf(
+          "oldPrisonEstablishment" to "London",
+          "newPrisonEstablishment" to "Sheffield",
+          "currentAssignee" to if (assigned) AuthUserDTO.from(referral.currentAssignee!!) else null,
+          "crn" to referral.serviceUserCRN,
+          "sentBy" to referral.sentBy,
+          "createdBy" to referral.createdBy,
+          "updater" to referral.createdBy,
         ),
       )
     }
@@ -400,6 +419,40 @@ class NotifyReferralServiceTest {
         referral,
         "http://localhost:8080/sent-referral/${referral.id}",
       )
+    }
+
+    @Test
+    fun `amending 'prison establishment' notifies the assigned caseworker via email`() {
+      whenever(authUserRepository.findById(referral.createdBy.id)).thenReturn(Optional.of(referral.createdBy))
+      whenever(hmppsAuthService.getUserDetail(referral.createdBy)).thenReturn(
+        UserDetail(
+          "sally",
+          "sally@tom.com",
+          "smith",
+        ),
+      )
+      whenever(hmppsAuthService.getUserDetail(AuthUserDTO.from(referral.currentAssignee!!))).thenReturn(
+        UserDetail(
+          "tom",
+          "tom@tom.tom",
+          "jones",
+        ),
+      )
+
+      notifyService().onApplicationEvent(makePrisonEstablishmentUpdatedEvent(true))
+      val personalisationCaptor = argumentCaptor<Map<String, String>>()
+      verify(emailSender).sendEmail(
+        eq("prisonEstablishmentUpdatedTemplateID"),
+        eq("tom@tom.tom"),
+        personalisationCaptor.capture(),
+      )
+      assertThat(personalisationCaptor.firstValue["oldPrisonEstablishment"]).isEqualTo("London")
+      assertThat(personalisationCaptor.firstValue["newPrisonEstablishment"]).isEqualTo("Sheffield")
+      assertThat(personalisationCaptor.firstValue["caseWorkerFirstName"]).isEqualTo("tom")
+      assertThat(personalisationCaptor.firstValue["changedByName"]).isEqualTo("sally smith")
+      assertThat(personalisationCaptor.firstValue["referralDetailsURL"]).isEqualTo("http://interventions-ui.example.com/referral/${referral.id}")
+      assertThat(personalisationCaptor.firstValue["referralNumber"]).isEqualTo(referral.referenceNumber)
+      assertThat(personalisationCaptor.firstValue["popFullName"]).isEqualTo("${referral.serviceUserData?.firstName} ${referral.serviceUserData?.lastName}")
     }
 
     @Test
