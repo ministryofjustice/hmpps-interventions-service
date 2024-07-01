@@ -93,7 +93,7 @@ dependencies {
   runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.1") // needed for OffsetDateTime for AppInsights
 
   // openapi
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
   implementation("javax.xml.bind:jaxb-api:2.3.1")
   // notifications
   implementation("uk.gov.service.notify:notifications-java-client:5.1.0-RELEASE")
@@ -104,9 +104,9 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.26.11")
-  implementation("software.amazon.awssdk:s3:2.26.11")
-  implementation("software.amazon.awssdk:sts:2.26.11")
+  implementation("software.amazon.awssdk:sns:2.26.12")
+  implementation("software.amazon.awssdk:s3:2.26.12")
+  implementation("software.amazon.awssdk:sts:2.26.12")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux:3.3.1")
