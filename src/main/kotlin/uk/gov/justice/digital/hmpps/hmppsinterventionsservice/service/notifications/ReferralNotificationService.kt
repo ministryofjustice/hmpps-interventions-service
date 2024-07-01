@@ -35,6 +35,7 @@ class ReferralNotificationService(
   @Value("\${notify.templates.completion-deadline-updated}") private val completionDeadlineUpdatedTemplateID: String,
   @Value("\${notify.templates.enforceable-days-updated}") private val enforceableDaysUpdatedTemplateID: String,
   @Value("\${notify.templates.reason-for-referral-updated}") private val reasonForReferralUpdatedTemplateID: String,
+  @Value("\${notify.templates.prison-establishment-updated}") private val prisonEstablishmentUpdatedTemplateID: String,
   @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
   @Value("\${interventions-ui.locations.service-provider.referral-details}") private val spReferralDetailsLocation: String,
   private val emailSender: EmailSender,
@@ -93,6 +94,37 @@ class ReferralNotificationService(
       ReferralEventType.DETAILS_AMENDED -> {
         handleDetailsChangedEvent(event)
       }
+
+      ReferralEventType.PRISON_ESTABLISHMENT_AMENDED -> {
+        notifyCaseWorkerThatPrisonEstablishmentChanged(event)
+      }
+    }
+  }
+
+  private fun notifyCaseWorkerThatPrisonEstablishmentChanged(event: ReferralEvent) {
+    val oldPrisonEstablishment = event.data["oldPrisonEstablishment"] as String
+    val newPrisonEstablishment = event.data["newPrisonEstablishment"] as String
+    val updater = event.data["updater"] as AuthUser
+
+    val currentAssignee = event.data["currentAssignee"] as AuthUserDTO? ?: return
+    val updaterUserDetails = hmppsAuthService.getUserDetail(updater)
+    val recipient = hmppsAuthService.getUserDetail(currentAssignee)
+    val frontendUrl = generateResourceUrl(interventionsUIBaseURL, spReferralDetailsLocation, event.referral.id)
+
+    if (oldPrisonEstablishment != newPrisonEstablishment) {
+      emailSender.sendEmail(
+        prisonEstablishmentUpdatedTemplateID,
+        recipient.email,
+        mapOf(
+          "caseWorkerFirstName" to recipient.firstName,
+          "oldPrisonEstablishment" to oldPrisonEstablishment,
+          "newPrisonEstablishment" to newPrisonEstablishment,
+          "changedByName" to "${updaterUserDetails.firstName} ${updaterUserDetails.lastName}",
+          "referralDetailsURL" to frontendUrl.toString(),
+          "referralNumber" to event.referral.referenceNumber!!,
+          "popFullName" to "${event.referral.serviceUserData?.firstName} ${event.referral.serviceUserData?.lastName}",
+        ),
+      )
     }
   }
 

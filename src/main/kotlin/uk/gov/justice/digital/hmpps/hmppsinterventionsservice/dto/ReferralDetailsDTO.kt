@@ -27,6 +27,7 @@ data class ReferralDetailsDTO(
   val createdById: String,
   val createdAt: OffsetDateTime,
   val reasonForReferral: String? = null,
+  val prisonEstablishment: String? = null,
 ) {
   companion object {
     fun from(referralDetails: ReferralDetails): ReferralDetailsDTO {
