@@ -8,20 +8,24 @@ import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance.NdmisDateTime
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance.ReferralsProcessor
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.WithdrawReasonFactory
 import java.time.OffsetDateTime
 
 internal class ReferralsProcessorTest {
   private val actionPlanService = mock<ActionPlanService>()
-  private val processor = ReferralsProcessor(actionPlanService)
+  private val referralService = mock<ReferralService>()
+  private val processor = ReferralsProcessor(actionPlanService, referralService)
 
   private val referralFactory = ReferralFactory()
   private val eosrFactory = EndOfServiceReportFactory()
   private val appointmentFactory = AppointmentFactory()
   private val actionPlanFactory = ActionPlanFactory()
+  private val withdrawalReasonFactory = WithdrawReasonFactory()
 
   @Test
   fun `referral correctly returns a referralData object`() {
@@ -44,6 +48,7 @@ internal class ReferralsProcessorTest {
     )
 
     whenever(actionPlanService.getAllCompletedAppointments(anyOrNull())).thenReturn(listOf(appointmentFactory.create()))
+    whenever(referralService.getWithdrawalReason(anyOrNull())).thenReturn(withdrawalReasonFactory.create())
     val result = processor.process(referral)!!
 
     assertThat(result.referralReference).isEqualTo(referral.referenceNumber)
@@ -63,8 +68,8 @@ internal class ReferralsProcessorTest {
     assertThat(result.endRequestedAt).isEqualTo(NdmisDateTime(endRequestedAt))
     assertThat(result.interventionEndReason).isEqualTo(referral.endState)
     assertThat(result.eosrSubmittedAt).isEqualTo(NdmisDateTime(eosrSubmittedAt))
-    assertThat(result.endReasonCode).isEqualTo(referral.endRequestedReason?.code)
-    assertThat(result.endReasonDescription).isEqualTo(referral.endRequestedReason?.description)
+    assertThat(result.endReasonCode).isEqualTo(referral.withdrawalReasonCode)
+    assertThat(result.endReasonDescription).isEqualTo("Referral was made by mistake")
     assertThat(result.concludedAt).isEqualTo(NdmisDateTime(concludedAt))
   }
 }
