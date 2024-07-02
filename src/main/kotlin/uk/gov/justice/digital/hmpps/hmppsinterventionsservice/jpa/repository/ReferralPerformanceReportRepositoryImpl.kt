@@ -21,7 +21,7 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
 
   private fun reportQuery(): String {
     return "select distinct * from performance_report(string_to_array(cast(:contractReferences as text), ' '), cast(:sent_from as timestamp), cast(:sent_to as timestamp))"
-  }
+  } // now filtering for unique rows
 
   private fun eosrScoreQuery(): String {
     return "select * from performance_report_eosr_outcome_score(:eosrId)"
