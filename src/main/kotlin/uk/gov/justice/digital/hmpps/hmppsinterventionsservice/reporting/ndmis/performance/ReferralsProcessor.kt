@@ -5,10 +5,12 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.SentReferralProcessor
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralService
 
 @Component
 class ReferralsProcessor(
   private val actionPlanService: ActionPlanService,
+  private val referralService: ReferralService,
 ) : SentReferralProcessor<ReferralsData> {
   companion object : KLogging()
 
@@ -36,8 +38,8 @@ class ReferralsProcessor(
         endRequestedAt = referral.endRequestedAt?.let { t -> NdmisDateTime(t) },
         interventionEndReason = referral.endState,
         eosrSubmittedAt = referral.endOfServiceReport?.submittedAt?.let { t -> NdmisDateTime(t) },
-        endReasonCode = referral.endRequestedReason?.code,
-        endReasonDescription = referral.endRequestedReason?.description,
+        endReasonCode = referral.withdrawalReasonCode,
+        endReasonDescription = referral.withdrawalReasonCode?.let { referralService.getWithdrawalReason(it)?.description },
         concludedAt = referral.concludedAt?.let { t -> NdmisDateTime(t) },
       )
     } catch (e: Exception) {

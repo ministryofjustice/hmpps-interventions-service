@@ -289,6 +289,10 @@ class ReferralService(
     return withdrawalReasonRepository.findAll()
   }
 
+  fun getWithdrawalReason(code: String): WithdrawalReason? {
+    return withdrawalReasonRepository.findByCode(code)
+  }
+
   fun getResponsibleProbationPractitioner(referral: Referral): ResponsibleProbationPractitioner {
     return getResponsibleProbationPractitioner(referral.serviceUserCRN, referral.sentBy, referral.createdBy)
   }
