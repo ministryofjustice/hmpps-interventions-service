@@ -105,7 +105,7 @@ dependencies {
 
   // aws
   implementation("software.amazon.awssdk:sns:2.26.13")
-  implementation("software.amazon.awssdk:s3:2.26.12")
+  implementation("software.amazon.awssdk:s3:2.26.13")
   implementation("software.amazon.awssdk:sts:2.26.13")
 
   // security
