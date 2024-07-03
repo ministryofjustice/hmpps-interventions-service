@@ -184,7 +184,12 @@ internal class AmendReferralControllerTest {
 
     @Test
     fun `amendPrisonEstablishment updates details in referral for the correct type`() {
-      val amendPrisonEstablishmentDTO = AmendPrisonEstablishmentDTO(personCustodyPrisonId = "aaa", reasonForChange = "some reason")
+      val amendPrisonEstablishmentDTO = AmendPrisonEstablishmentDTO(
+        personCustodyPrisonId = "aaa",
+        reasonForChange = "some reason",
+        oldPrisonEstablishment = "Peterborough (HMP & YOI)",
+        newPrisonEstablishment = "Cookham Wood (HMYOI)",
+      )
       doNothing().whenever(amendReferralService)
         .amendPrisonEstablishment(eq(referral.id), eq(amendPrisonEstablishmentDTO), eq(token), eq(user))
       val returnedValue =

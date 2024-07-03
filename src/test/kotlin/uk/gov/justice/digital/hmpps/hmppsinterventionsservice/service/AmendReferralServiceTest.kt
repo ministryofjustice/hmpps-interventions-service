@@ -286,6 +286,8 @@ class AmendReferralServiceTest @Autowired constructor(
       AmendPrisonEstablishmentDTO(
         personCustodyPrisonId = "London",
         reasonForChange = "some reason",
+        oldPrisonEstablishment = "Peterborough (HMP & YOI)",
+        newPrisonEstablishment = "Cookham Wood (HMYOI)",
       ),
       jwtAuthenticationToken,
       user,
