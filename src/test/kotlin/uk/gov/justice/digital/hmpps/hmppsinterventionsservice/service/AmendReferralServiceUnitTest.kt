@@ -9,6 +9,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeast
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -604,7 +605,7 @@ class AmendReferralServiceUnitTest {
       )
       val referralLocation = ReferralLocation(
         id = UUID.randomUUID(),
-        prisonId = "aaa",
+        prisonId = "PWI",
         type = PersonCurrentLocationType.CUSTODY,
         expectedReleaseDate = LocalDate.now(),
         expectedProbationOffice = "aaa",
@@ -617,8 +618,10 @@ class AmendReferralServiceUnitTest {
       whenever(referralLocationRepository.save(any())).thenReturn(referralLocation)
 
       val updateToReferral = AmendPrisonEstablishmentDTO(
-        personCustodyPrisonId = "London",
+        personCustodyPrisonId = "COW",
         reasonForChange = "some reason",
+        oldPrisonEstablishment = "Peterborough (HMP & YOI)",
+        newPrisonEstablishment = "Cookham Wood (HMYOI)",
       )
 
       amendReferralService.amendPrisonEstablishment(referral.id, updateToReferral, jwtAuthenticationToken, authUser)
@@ -627,15 +630,25 @@ class AmendReferralServiceUnitTest {
       verify(referralLocationRepository, atLeast(1)).save(argumentCaptorReferral.capture())
 
       val referralValues = argumentCaptorReferral.firstValue
-      assertThat(referralValues.prisonId).isEqualTo("London")
+      assertThat(referralValues.prisonId).isEqualTo("COW")
 
       val argumentCaptorChangelog = argumentCaptor<Changelog>()
       verify(changelogRepository, atLeast(1)).save(argumentCaptorChangelog.capture())
 
+      val argumentCaptorOldPrisonEstablishment = argumentCaptor<String>()
+      val argumentCaptorNewPrisonEstablishment = argumentCaptor<String>()
+      verify(referralEventPublisher, atLeast(1)).referralPrisonEstablishmentChangedEvent(eq(referral), argumentCaptorOldPrisonEstablishment.capture(), argumentCaptorNewPrisonEstablishment.capture(), eq(authUser))
+
       val changeLogValues = argumentCaptorChangelog.firstValue
       assertThat(changeLogValues.id).isNotNull
-      assertThat(changeLogValues.newVal.values).contains("London")
-      assertThat(changeLogValues.oldVal.values).contains("aaa")
+      assertThat(changeLogValues.newVal.values).contains("COW")
+      assertThat(changeLogValues.oldVal.values).contains("PWI")
+
+      val oldPrisonEstablishment = argumentCaptorOldPrisonEstablishment.firstValue
+      assertThat(oldPrisonEstablishment).isEqualTo("Peterborough (HMP & YOI)")
+
+      val newPrisonEstablishment = argumentCaptorNewPrisonEstablishment.firstValue
+      assertThat(newPrisonEstablishment).isEqualTo("Cookham Wood (HMYOI)")
     }
   }
 }

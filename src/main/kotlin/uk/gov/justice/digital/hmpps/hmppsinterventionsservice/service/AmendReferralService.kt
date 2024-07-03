@@ -213,7 +213,7 @@ class AmendReferralService(
     )
     changelogRepository.save(changelog)
     referralLocation?.let { referralLocationRepository.save(it) }
-    referralEventPublisher.referralPrisonEstablishmentChangedEvent(referral, oldValues[0], newValues[0], user)
+    referralEventPublisher.referralPrisonEstablishmentChangedEvent(referral, amendPrisonEstablishmentDTO.oldPrisonEstablishment, amendPrisonEstablishmentDTO.newPrisonEstablishment, user)
   }
 
   fun getSentReferralForAuthenticatedUser(referralId: UUID, authentication: JwtAuthenticationToken): Referral {

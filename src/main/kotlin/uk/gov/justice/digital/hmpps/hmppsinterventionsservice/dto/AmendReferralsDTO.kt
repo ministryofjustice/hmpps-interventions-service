@@ -43,4 +43,6 @@ data class AmendNeedsAndRequirementsDTO(
 data class AmendPrisonEstablishmentDTO(
   val personCustodyPrisonId: String,
   val reasonForChange: String,
+  val oldPrisonEstablishment: String,
+  val newPrisonEstablishment: String,
 )
