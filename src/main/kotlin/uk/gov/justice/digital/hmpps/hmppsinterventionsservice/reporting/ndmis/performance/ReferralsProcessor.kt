@@ -38,8 +38,8 @@ class ReferralsProcessor(
         endRequestedAt = referral.endRequestedAt?.let { t -> NdmisDateTime(t) },
         interventionEndReason = referral.endState,
         eosrSubmittedAt = referral.endOfServiceReport?.submittedAt?.let { t -> NdmisDateTime(t) },
-        endReasonCode = referral.withdrawalReasonCode,
-        endReasonDescription = referral.withdrawalReasonCode?.let { referralService.getWithdrawalReason(it)?.description },
+        endReasonCode = referral.withdrawalReasonCode ?: referral.endRequestedReason?.code,
+        endReasonDescription = referral.withdrawalReasonCode?.let { referralService.getWithdrawalReason(it)?.description } ?: referral.endRequestedReason?.description,
         concludedAt = referral.concludedAt?.let { t -> NdmisDateTime(t) },
       )
     } catch (e: Exception) {
