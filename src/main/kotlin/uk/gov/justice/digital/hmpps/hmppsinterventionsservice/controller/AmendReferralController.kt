@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOutcomesDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendExpectedReleaseDateDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendPrisonEstablishmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogDetailsDTO
@@ -78,6 +79,17 @@ class AmendReferralController(
   ): ResponseEntity<Any> {
     val user = userMapper.fromToken(authentication)
     amendReferralService.amendPrisonEstablishment(referralId, request, authentication, user)
+    return ResponseEntity(NO_CONTENT)
+  }
+
+  @PostMapping("/sent-referral/{referralId}/amend-expected-release-date")
+  fun amendExpectedReleaseDate(
+    authentication: JwtAuthenticationToken,
+    @PathVariable referralId: UUID,
+    @RequestBody request: AmendExpectedReleaseDateDTO,
+  ): ResponseEntity<Any> {
+    val user = userMapper.fromToken(authentication)
+    amendReferralService.amendExpectedReleaseDate(referralId, request, authentication, user)
     return ResponseEntity(NO_CONTENT)
   }
 
