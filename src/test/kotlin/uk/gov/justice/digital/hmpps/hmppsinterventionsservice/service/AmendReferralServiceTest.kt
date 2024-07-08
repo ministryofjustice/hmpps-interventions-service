@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOutcomesDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendExpectedReleaseDateDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendPrisonEstablishmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
@@ -45,6 +46,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTes
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
 import java.time.LocalDate
 import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Optional
 import java.util.UUID
 
@@ -305,6 +307,97 @@ class AmendReferralServiceTest @Autowired constructor(
     val newReferral = referralRepository.findById(referral.id).get()
 
     assertThat(newReferral.referralLocation?.prisonId).isEqualTo("London")
+  }
+
+  @Test
+  fun `amend expected release date`() {
+    val someoneElse = userFactory.create("helper_pp_user", "delius")
+    val user = userFactory.create("pp_user_1", "delius")
+
+    val referral = referralFactory.createSent(createdBy = someoneElse)
+    val expectedReleaseDate = LocalDate.now()
+    val newExpectedReleaseDate = expectedReleaseDate.plusDays(3)
+    val referralLocation = ReferralLocation(
+      id = UUID.randomUUID(),
+      prisonId = "aaa",
+      type = PersonCurrentLocationType.CUSTODY,
+      expectedReleaseDate = expectedReleaseDate,
+      expectedProbationOffice = "aaa",
+      expectedReleaseDateMissingReason = null,
+      expectedProbationOfficeUnknownReason = null,
+      referral = referral,
+    )
+    referralLocationRepository.saveAndFlush(referralLocation)
+    referral.referralLocation = referralLocation
+    referralRepository.saveAndFlush(referral)
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
+    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+
+    amendReferralService.amendExpectedReleaseDate(
+      referral.id,
+      AmendExpectedReleaseDateDTO(
+        expectedReleaseDate = newExpectedReleaseDate,
+        expectedReleaseDateMissingReason = null,
+      ),
+      jwtAuthenticationToken,
+      user,
+    )
+    val changelog = entityManager.entityManager.createQuery("FROM Changelog u WHERE u.referralId = :referralId")
+      .setParameter("referralId", referral.id)
+      .singleResult as Changelog
+
+    val formatter = DateTimeFormatter.ofPattern("dd-MMM-yyyy")
+    assertThat(changelog.newVal.values.size).isEqualTo(1)
+    assertThat(changelog.newVal.values).contains(formatter.format(newExpectedReleaseDate))
+    assertThat(changelog.oldVal.values).contains(formatter.format(expectedReleaseDate))
+
+    val newReferral = referralRepository.findById(referral.id).get()
+
+    assertThat(newReferral.referralLocation?.expectedReleaseDate).isEqualTo(newExpectedReleaseDate)
+  }
+
+  @Test
+  fun `amend expected release date not known reason`() {
+    val someoneElse = userFactory.create("helper_pp_user", "delius")
+    val user = userFactory.create("pp_user_1", "delius")
+
+    val referral = referralFactory.createSent(createdBy = someoneElse)
+    val referralLocation = ReferralLocation(
+      id = UUID.randomUUID(),
+      prisonId = "aaa",
+      type = PersonCurrentLocationType.CUSTODY,
+      expectedReleaseDate = null,
+      expectedProbationOffice = "aaa",
+      expectedReleaseDateMissingReason = "some reason",
+      expectedProbationOfficeUnknownReason = null,
+      referral = referral,
+    )
+    referralLocationRepository.saveAndFlush(referralLocation)
+    referral.referralLocation = referralLocation
+    referralRepository.saveAndFlush(referral)
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
+    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+
+    amendReferralService.amendExpectedReleaseDate(
+      referral.id,
+      AmendExpectedReleaseDateDTO(
+        expectedReleaseDate = null,
+        expectedReleaseDateMissingReason = "new reason",
+      ),
+      jwtAuthenticationToken,
+      user,
+    )
+    val changelog = entityManager.entityManager.createQuery("FROM Changelog u WHERE u.referralId = :referralId")
+      .setParameter("referralId", referral.id)
+      .singleResult as Changelog
+
+    assertThat(changelog.newVal.values.size).isEqualTo(1)
+    assertThat(changelog.newVal.values).contains("new reason")
+    assertThat(changelog.oldVal.values).contains("some reason")
+
+    val newReferral = referralRepository.findById(referral.id).get()
+
+    assertThat(newReferral.referralLocation?.expectedReleaseDateMissingReason).isEqualTo("new reason")
   }
 
   @Test

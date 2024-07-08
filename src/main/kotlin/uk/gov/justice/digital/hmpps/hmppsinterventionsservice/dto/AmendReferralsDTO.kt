@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto
 
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendTopic
+import java.time.LocalDate
 import java.util.UUID
 
 data class AmendReferralsDTO(
@@ -45,4 +46,9 @@ data class AmendPrisonEstablishmentDTO(
   val reasonForChange: String,
   val oldPrisonEstablishment: String,
   val newPrisonEstablishment: String,
+)
+
+data class AmendExpectedReleaseDateDTO(
+  val expectedReleaseDate: LocalDate?,
+  val expectedReleaseDateMissingReason: String?,
 )

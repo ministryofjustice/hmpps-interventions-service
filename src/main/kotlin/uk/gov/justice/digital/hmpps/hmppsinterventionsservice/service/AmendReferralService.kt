@@ -11,6 +11,7 @@ import org.springframework.web.server.ServerWebInputException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOutcomesDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendExpectedReleaseDateDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendPrisonEstablishmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogUpdateDTO
@@ -43,6 +44,7 @@ enum class AmendTopic {
   NEEDS_AND_REQUIREMENTS_INTERPRETER_REQUIRED,
   REASON_FOR_REFERRAL,
   PRISON_ESTABLISHMENT,
+  EXPECTED_RELEASE_DATE,
 }
 
 @Service
@@ -214,6 +216,54 @@ class AmendReferralService(
     changelogRepository.save(changelog)
     referralLocation?.let { referralLocationRepository.save(it) }
     referralEventPublisher.referralPrisonEstablishmentChangedEvent(referral, amendPrisonEstablishmentDTO.oldPrisonEstablishment, amendPrisonEstablishmentDTO.newPrisonEstablishment, user)
+  }
+
+  fun amendExpectedReleaseDate(
+    referralId: UUID,
+    amendExpectedReleaseDateDTO: AmendExpectedReleaseDateDTO,
+    authentication: JwtAuthenticationToken,
+    user: AuthUser,
+  ) {
+    val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
+
+    val oldValues = mutableListOf<String>()
+    val newValues = mutableListOf<String>()
+    val formatter = DateTimeFormatter.ofPattern("dd-MMM-yyyy")
+    val referralLocation = referral.referralLocation
+    amendExpectedReleaseDateDTO.expectedReleaseDate?.let {
+      if (referral.referralLocation?.expectedReleaseDate !== null) {
+        oldValues.add(formatter.format(referral.referralLocation?.expectedReleaseDate!!))
+      } else if (referral.referralLocation?.expectedReleaseDateMissingReason != null) {
+        oldValues.add(referral.referralLocation?.expectedReleaseDateMissingReason!!)
+      }
+      newValues.add(formatter.format(amendExpectedReleaseDateDTO.expectedReleaseDate))
+      referralLocation?.expectedReleaseDate = amendExpectedReleaseDateDTO.expectedReleaseDate
+      referralLocation?.expectedReleaseDateMissingReason = null
+    }
+
+    amendExpectedReleaseDateDTO.expectedReleaseDateMissingReason?.let {
+      if (referral.referralLocation?.expectedReleaseDateMissingReason != null) {
+        oldValues.add(referral.referralLocation?.expectedReleaseDateMissingReason!!)
+      } else if (referral.referralLocation?.expectedReleaseDate !== null) {
+        oldValues.add(formatter.format(referral.referralLocation?.expectedReleaseDate!!))
+      }
+      newValues.add(amendExpectedReleaseDateDTO.expectedReleaseDateMissingReason)
+      referralLocation?.expectedReleaseDateMissingReason = amendExpectedReleaseDateDTO.expectedReleaseDateMissingReason
+      referralLocation?.expectedReleaseDate = null
+    }
+
+    val changelog = Changelog(
+      referral.id,
+      UUID.randomUUID(),
+      AmendTopic.EXPECTED_RELEASE_DATE,
+      ReferralAmendmentDetails(values = oldValues),
+      ReferralAmendmentDetails(values = newValues),
+      "",
+      OffsetDateTime.now(),
+      userMapper.fromToken(authentication),
+    )
+    changelogRepository.save(changelog)
+    referralLocation?.let { referralLocationRepository.save(it) }
   }
 
   fun getSentReferralForAuthenticatedUser(referralId: UUID, authentication: JwtAuthenticationToken): Referral {
