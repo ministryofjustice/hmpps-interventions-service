@@ -28,6 +28,7 @@ class SentReferralDTO(
   val createdBy: AuthUserDTO,
   val withdrawalState: String?,
   val withdrawalCode: String?,
+  val withdrawalComments: String?,
 ) {
   companion object {
     fun from(
@@ -59,6 +60,7 @@ class SentReferralDTO(
         createdBy = AuthUserDTO.from(referral.createdBy),
         withdrawalState = withdrawalState,
         withdrawalCode = referral.withdrawalReasonCode,
+        withdrawalComments = referral.withdrawalComments,
       )
     }
   }
