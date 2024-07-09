@@ -81,7 +81,7 @@ repositories {
 dependencies {
   // batch processing
   implementation("org.springframework.boot:spring-boot-starter-batch")
-  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.1") // also needed runtime for AppInsights
+  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.2") // also needed runtime for AppInsights
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
@@ -90,7 +90,7 @@ dependencies {
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
   implementation("net.logstash.logback:logstash-logback-encoder:7.4")
 
-  runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.1") // needed for OffsetDateTime for AppInsights
+  runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.2") // needed for OffsetDateTime for AppInsights
 
   // openapi
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
@@ -104,9 +104,9 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.26.15")
-  implementation("software.amazon.awssdk:s3:2.26.15")
-  implementation("software.amazon.awssdk:sts:2.26.15")
+  implementation("software.amazon.awssdk:sns:2.26.17")
+  implementation("software.amazon.awssdk:s3:2.26.17")
+  implementation("software.amazon.awssdk:sts:2.26.17")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux:3.3.1")
@@ -128,7 +128,7 @@ dependencies {
   implementation("com.github.java-json-tools:json-patch:1.13")
   implementation("org.apache.commons:commons-csv:1.11.0")
 
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.10")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.11")
   testImplementation("com.squareup.okhttp3:okhttp:4.12.0")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
   testImplementation("org.mockito:mockito-inline:5.2.0")
