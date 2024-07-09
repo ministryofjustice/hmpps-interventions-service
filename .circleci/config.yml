@@ -49,7 +49,7 @@ jobs:
           name: Run migrations and local seeds
           command: |
             flyway -cleanDisabled="false" clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration,src/main/resources/db/local"
+            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration,src/main/resources/db/local" -postgresql.transactional.lock=false
       - gradle/with_cache:
           deps_checksum_file: "build.gradle.kts"
           cache_key: v2
@@ -80,14 +80,14 @@ jobs:
           command: |
             flyway -cleanDisabled="false" clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
             git reset --hard origin/main
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
+            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration" -postgresql.transactional.lock=false
             git reset --hard "$CIRCLE_SHA1"
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
+            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration" -postgresql.transactional.lock=false
       - run:
           name: Run migrations and local seeds
           command: |
             flyway -cleanDisabled="false" clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration,src/main/resources/db/local"
+            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration,src/main/resources/db/local" -postgresql.transactional.lock=false
       - run:
           name: Validate metadata
           command: |
@@ -107,7 +107,7 @@ jobs:
           command: |
             wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.2/flyway-commandline-10.15.2-linux-x64.tar.gz | \
               tar xvz && sudo ln -s `pwd`/flyway-10.15.2/flyway /usr/local/bin
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
+            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration" -postgresql.transactional.lock=false
       - setup_remote_docker
       - run:
           name: Build data dictionary
@@ -157,7 +157,7 @@ jobs:
           name: Run migrations and local seeds
           command: |
             flyway -cleanDisabled="false" clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" 
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration,src/main/resources/db/local"
+            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration,src/main/resources/db/local" -postgresql.transactional.lock=false
       - gradle/with_cache:
           deps_checksum_file: "build.gradle.kts"
           cache_key: v2
