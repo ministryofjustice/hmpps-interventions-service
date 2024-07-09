@@ -20,10 +20,10 @@ orbs:
   mem: circleci/rememborb@0.0.2
 
 _db_docker_config: &db_docker_config
-  - image: cimg/openjdk:17.0.11
+  - image: cimg/openjdk:21.0.2
     environment:
       POSTGRES_DB: interventions_ci
-  - image: cimg/postgres:14.12
+  - image: cimg/postgres:15.0
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: interventions_ci
@@ -32,7 +32,7 @@ jobs:
   validate:
     executor:
       name: hmpps/java
-      tag: "17"
+      tag: "21"
     docker: *db_docker_config
     environment:
       _JAVA_OPTIONS: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=true -Dkotlin.compiler.execution.strategy=in-process
@@ -41,15 +41,15 @@ jobs:
       - run:
           name: Setup flyway and psql
           command: |
-            wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/8.5.13/flyway-commandline-8.5.13-linux-x64.tar.gz | \
-              tar xvz && sudo ln -s `pwd`/flyway-8.5.13/flyway /usr/local/bin
+            wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.2/flyway-commandline-10.15.2-linux-x64.tar.gz | \
+              tar xvz && sudo ln -s `pwd`/flyway-10.15.2/flyway /usr/local/bin
             sudo apt update
             sudo apt install postgresql-client
       - run:
           name: Run migrations and local seeds
           command: |
-            flyway clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration,src/main/resources/db/local"
+            flyway -cleanDisabled="false" clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
+            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration,src/main/resources/db/local" -postgresql.transactional.lock=false
       - gradle/with_cache:
           deps_checksum_file: "build.gradle.kts"
           cache_key: v2
@@ -64,30 +64,30 @@ jobs:
   validate_db:
     executor:
       name: hmpps/java
-      tag: "17"
+      tag: "21"
     docker: *db_docker_config
     steps:
       - checkout
       - run:
           name: Setup flyway and psql
           command: |
-            wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/8.5.13/flyway-commandline-8.5.13-linux-x64.tar.gz | \
-              tar xvz && sudo ln -s `pwd`/flyway-8.5.13/flyway /usr/local/bin
+            wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.2/flyway-commandline-10.15.2-linux-x64.tar.gz | \
+              tar xvz && sudo ln -s `pwd`/flyway-10.15.2/flyway /usr/local/bin
             sudo apt update
             sudo apt install postgresql-client
       - run:
           name: Run main migrations then branch migrations to detect clashes
           command: |
-            flyway clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
+            flyway -cleanDisabled="false" clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
             git reset --hard origin/main
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
+            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration" -postgresql.transactional.lock=false
             git reset --hard "$CIRCLE_SHA1"
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
+            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration" -postgresql.transactional.lock=false
       - run:
           name: Run migrations and local seeds
           command: |
-            flyway clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration,src/main/resources/db/local"
+            flyway -cleanDisabled="false" clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
+            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration,src/main/resources/db/local" -postgresql.transactional.lock=false
       - run:
           name: Validate metadata
           command: |
@@ -96,7 +96,7 @@ jobs:
   publish_data:
     executor:
       name: hmpps/java
-      tag: "17"
+      tag: "21"
     docker: *db_docker_config
     steps:
       - checkout
@@ -105,9 +105,9 @@ jobs:
       - run:
           name: Migrate the database
           command: |
-            wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/8.5.13/flyway-commandline-8.5.13-linux-x64.tar.gz | \
-              tar xvz && sudo ln -s `pwd`/flyway-8.5.13/flyway /usr/local/bin
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration"
+            wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.2/flyway-commandline-10.15.2-linux-x64.tar.gz | \
+              tar xvz && sudo ln -s `pwd`/flyway-10.15.2/flyway /usr/local/bin
+            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration" -postgresql.transactional.lock=false
       - setup_remote_docker
       - run:
           name: Build data dictionary
@@ -142,22 +142,22 @@ jobs:
       _JAVA_OPTIONS: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false -Dkotlin.compiler.execution.strategy=in-process
     executor:
       name: hmpps/java
-      tag: "17"
+      tag: "21"
     docker: *db_docker_config
     steps:
       - checkout
       - run:
           name: Setup flyway and psql
           command: |
-            wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/8.5.13/flyway-commandline-8.5.13-linux-x64.tar.gz | \
-              tar xvz && sudo ln -s `pwd`/flyway-8.5.13/flyway /usr/local/bin
+            wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.2/flyway-commandline-10.15.2-linux-x64.tar.gz | \
+              tar xvz && sudo ln -s `pwd`/flyway-10.15.2/flyway /usr/local/bin
             sudo apt update
             sudo apt install postgresql-client
       - run:
           name: Run migrations and local seeds
           command: |
-            flyway clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
-            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration,src/main/resources/db/local"
+            flyway -cleanDisabled="false" clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" 
+            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration,src/main/resources/db/local" -postgresql.transactional.lock=false
       - gradle/with_cache:
           deps_checksum_file: "build.gradle.kts"
           cache_key: v2

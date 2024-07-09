@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   kotlin("plugin.spring") version "2.0.0"
   id("org.jetbrains.kotlin.plugin.jpa") version "2.0.0"
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.6"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.1"
   id("jacoco")
 }
 
@@ -121,8 +121,8 @@ dependencies {
   implementation("org.hibernate:hibernate-core:6.5.2.Final")
   implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.8.1")
 
-  runtimeOnly("org.flywaydb:flyway-core:9.22.3")
   runtimeOnly("org.postgresql:postgresql:42.7.3")
+  runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
   // json and csv
   implementation("com.github.java-json-tools:json-patch:1.13")
