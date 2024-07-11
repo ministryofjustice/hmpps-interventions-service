@@ -109,7 +109,7 @@ internal class ReferralConcludedNotificationListenerTest {
     assignments = assignmentsFactory.create(1),
     serviceUserData = referralServiceUserFactory.create("Alex", "River"),
     withdrawReasonCode = "MIS",
-    withdrawReasonComments = "some comments",
+    withdrawalComments = "some comments",
     endRequestedBy = authUserFactory.create(),
   )
   companion object {
@@ -176,7 +176,7 @@ internal class ReferralConcludedNotificationListenerTest {
       assignments = emptyList(),
       serviceUserData = referralServiceUserFactory.create("Alex", "River"),
       withdrawReasonCode = "MIS",
-      withdrawReasonComments = "some comments",
+      withdrawalComments = "some comments",
       endRequestedBy = authUserFactory.create(),
     )
 

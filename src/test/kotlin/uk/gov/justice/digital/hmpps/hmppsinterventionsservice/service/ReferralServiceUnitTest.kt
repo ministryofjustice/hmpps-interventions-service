@@ -108,12 +108,12 @@ class ReferralServiceUnitTest {
     val referral = referralFactory.createSent()
     val authUser = authUserFactory.create()
     val withdrawalReason = withdrawReasonFactory.create()
-    val withdrawReferralRequestDTO = WithdrawReferralRequestDTO(withdrawalReason.code, withdrawalReason.description, ReferralWithdrawalState.PRE_ICA_WITHDRAWAL.name)
-    val cancellationComments = "comment"
+    val withdrawalComments = "some comments"
+    val withdrawReferralRequestDTO = WithdrawReferralRequestDTO(withdrawalReason.code, withdrawalComments, ReferralWithdrawalState.PRE_ICA_WITHDRAWAL.name)
 
     whenever(authUserRepository.save(authUser)).thenReturn(authUser)
     whenever(withdrawalReasonRepository.findByCode("MIS")).thenReturn(withdrawalReason)
-    whenever(referralRepository.save(any())).thenReturn(referralFactory.createEnded(endRequestedComments = cancellationComments, withdrawalReason = withdrawalReason))
+    whenever(referralRepository.save(any())).thenReturn(referralFactory.createEnded(endRequestedComments = withdrawalComments, withdrawalReason = withdrawalReason))
 
     val endedReferral = referralService.requestReferralEnd(referral, authUser, withdrawReferralRequestDTO)
     assertThat(endedReferral.endRequestedAt).isNotNull
