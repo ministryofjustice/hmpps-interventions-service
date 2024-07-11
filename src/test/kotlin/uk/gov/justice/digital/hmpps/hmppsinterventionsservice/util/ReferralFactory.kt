@@ -130,7 +130,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     serviceUserData: ReferralServiceUserData? = null,
     complexityLevelIds: MutableMap<UUID, UUID>? = null,
     withdrawReasonCode: String? = null,
-    withdrawReasonComments: String? = null,
+    withdrawalComments: String? = null,
     createDraft: Boolean = true,
     accessibilityNeeds: String? = null,
     additionalNeedsInformation: String? = null,
@@ -182,7 +182,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       interpreterLanguage = interpreterLanguage,
       probationPractitionerDetails = probationPractitionerDetails,
       withdrawalReasonCode = withdrawReasonCode,
-      withdrawalReasonComments = withdrawReasonComments,
+      withdrawalComments = withdrawalComments,
     )
     val probationPractitionerDetails = probationPractitionerDetailsFactory.create(referral = referral)
     referral.probationPractitionerDetails = probationPractitionerDetails
@@ -264,6 +264,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     endRequestedBy: AuthUser? = authUserFactory.create(),
     endRequestedReason: CancellationReason? = cancellationReasonFactory.create(),
     withdrawalReason: WithdrawalReason? = withdrawReasonFactory.create(),
+    withdrawalComments: String? = "some comments",
     endRequestedComments: String? = null,
     concludedAt: OffsetDateTime? = null,
     endOfServiceReport: EndOfServiceReport? = null,
@@ -307,7 +308,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       endRequestedReason = endRequestedReason,
       endRequestedComments = endRequestedComments,
       withdrawalReasonCode = withdrawalReason?.code,
-      withdrawalReasonComments = withdrawalReason?.description,
+      withdrawalComments = withdrawalComments,
       concludedAt = concludedAt,
       endOfServiceReport = endOfServiceReport,
     )
