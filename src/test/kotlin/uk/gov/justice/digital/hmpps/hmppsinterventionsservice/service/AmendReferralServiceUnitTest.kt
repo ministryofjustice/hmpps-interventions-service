@@ -12,6 +12,7 @@ import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.springframework.http.HttpStatus
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
@@ -602,9 +603,7 @@ class AmendReferralServiceUnitTest {
     fun `update prison establishment for the referral`() {
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
 
-      val referral = referralFactory.createSent(
-        needsInterpreter = false,
-      )
+      val referral = referralFactory.createSent()
       val referralLocation = ReferralLocation(
         id = UUID.randomUUID(),
         prisonId = "PWI",
@@ -663,9 +662,7 @@ class AmendReferralServiceUnitTest {
     fun `update expected release date for the referral`() {
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
 
-      val referral = referralFactory.createSent(
-        needsInterpreter = false,
-      )
+      val referral = referralFactory.createSent()
       val existingExpectedReleaseDate = LocalDate.now()
       val referralLocation = ReferralLocation(
         id = UUID.randomUUID(),
@@ -697,9 +694,9 @@ class AmendReferralServiceUnitTest {
       val argumentCaptorChangelog = argumentCaptor<Changelog>()
       verify(changelogRepository, atLeast(1)).save(argumentCaptorChangelog.capture())
 
-      // val argumentCaptorOldExpectedReleaseDate = argumentCaptor<String>()
-      // val argumentCaptorNewExpectedReleaseDate = argumentCaptor<String>()
-      // verify(referralEventPublisher, atLeast(1)).referralPrisonEstablishmentChangedEvent(eq(referral), argumentCaptorOldExpectedReleaseDate.capture(), argumentCaptorNewExpectedReleaseDate.capture(), eq(authUser))
+      val argumentCaptorOldExpectedReleaseDate = argumentCaptor<String>()
+      val argumentCaptorNewExpectedReleaseDate = argumentCaptor<String>()
+      verify(referralEventPublisher, atLeast(1)).referralExpectedReleaseDateChangedEvent(eq(referral), argumentCaptorOldExpectedReleaseDate.capture(), argumentCaptorNewExpectedReleaseDate.capture(), eq(authUser))
 
       val formatter = DateTimeFormatter.ofPattern("dd-MMM-yyyy")
       val changeLogValues = argumentCaptorChangelog.firstValue
@@ -707,21 +704,18 @@ class AmendReferralServiceUnitTest {
       assertThat(changeLogValues.newVal.values).contains(formatter.format(updateToReferral.expectedReleaseDate))
       assertThat(changeLogValues.oldVal.values).contains(formatter.format(existingExpectedReleaseDate))
 
-//      val oldExpectedReleaseDate = argumentCaptorOldExpectedReleaseDate.firstValue
-//      assertThat(oldExpectedReleaseDate).isEqualTo("Peterborough (HMP & YOI)")
-//
-//      val newExpectedReleaseDate = argumentCaptorNewExpectedReleaseDate.firstValue
-//      assertThat(newExpectedReleaseDate).isEqualTo("Cookham Wood (HMYOI)")
+      val oldExpectedReleaseDate = argumentCaptorOldExpectedReleaseDate.firstValue
+      assertThat(oldExpectedReleaseDate).isEqualTo(formatter.format(existingExpectedReleaseDate))
+
+      val newExpectedReleaseDate = argumentCaptorNewExpectedReleaseDate.firstValue
+      assertThat(newExpectedReleaseDate).isEqualTo(formatter.format(updateToReferral.expectedReleaseDate))
     }
 
     @Test
     fun `update expected release date not known reason for the referral`() {
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
 
-      val referral = referralFactory.createSent(
-        needsInterpreter = false,
-      )
-      val existingExpectedReleaseDate = LocalDate.now()
+      val referral = referralFactory.createSent()
       val referralLocation = ReferralLocation(
         id = UUID.randomUUID(),
         prisonId = "PWI",
@@ -752,20 +746,83 @@ class AmendReferralServiceUnitTest {
       val argumentCaptorChangelog = argumentCaptor<Changelog>()
       verify(changelogRepository, atLeast(1)).save(argumentCaptorChangelog.capture())
 
-      // val argumentCaptorOldExpectedReleaseDate = argumentCaptor<String>()
-      // val argumentCaptorNewExpectedReleaseDate = argumentCaptor<String>()
-      // verify(referralEventPublisher, atLeast(1)).referralPrisonEstablishmentChangedEvent(eq(referral), argumentCaptorOldExpectedReleaseDate.capture(), argumentCaptorNewExpectedReleaseDate.capture(), eq(authUser))
+      val argumentCaptorOldExpectedReleaseDate = argumentCaptor<String>()
+      val argumentCaptorNewExpectedReleaseDate = argumentCaptor<String>()
+      verify(referralEventPublisher, atLeast(1)).referralExpectedReleaseDateChangedEvent(eq(referral), argumentCaptorOldExpectedReleaseDate.capture(), argumentCaptorNewExpectedReleaseDate.capture(), eq(authUser))
 
       val changeLogValues = argumentCaptorChangelog.firstValue
       assertThat(changeLogValues.id).isNotNull
       assertThat(changeLogValues.newVal.values).contains("new reason")
       assertThat(changeLogValues.oldVal.values).contains("some reason")
 
-//      val oldExpectedReleaseDate = argumentCaptorOldExpectedReleaseDate.firstValue
-//      assertThat(oldExpectedReleaseDate).isEqualTo("Peterborough (HMP & YOI)")
-//
-//      val newExpectedReleaseDate = argumentCaptorNewExpectedReleaseDate.firstValue
-//      assertThat(newExpectedReleaseDate).isEqualTo("Cookham Wood (HMYOI)")
+      val oldExpectedReleaseDate = argumentCaptorOldExpectedReleaseDate.firstValue
+      assertThat(oldExpectedReleaseDate).isEqualTo("some reason")
+
+      val newExpectedReleaseDate = argumentCaptorNewExpectedReleaseDate.firstValue
+      assertThat(newExpectedReleaseDate).isEqualTo("new reason")
+    }
+
+    @Test
+    fun `do not update expected release date for the referral when the existing and update values are same`() {
+      whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
+
+      val referral = referralFactory.createSent()
+      val existingExpectedReleaseDate = LocalDate.now()
+      val referralLocation = ReferralLocation(
+        id = UUID.randomUUID(),
+        prisonId = "PWI",
+        type = PersonCurrentLocationType.CUSTODY,
+        expectedReleaseDate = existingExpectedReleaseDate,
+        expectedProbationOffice = "aaa",
+        expectedReleaseDateMissingReason = null,
+        expectedProbationOfficeUnknownReason = null,
+        referral = referral,
+      )
+      referral.referralLocation = referralLocation
+      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+      whenever(referralLocationRepository.save(any())).thenReturn(referralLocation)
+
+      val updateToReferral = AmendExpectedReleaseDateDTO(
+        expectedReleaseDate = existingExpectedReleaseDate,
+        expectedReleaseDateMissingReason = null,
+      )
+
+      amendReferralService.amendExpectedReleaseDate(referral.id, updateToReferral, jwtAuthenticationToken, authUser)
+
+      verifyNoInteractions(referralLocationRepository)
+      verifyNoInteractions(changelogRepository)
+      verifyNoInteractions(referralEventPublisher)
+    }
+
+    @Test
+    fun `do not update expected release date unknow reason for the referral when the existing and update values are same`() {
+      whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
+
+      val referral = referralFactory.createSent()
+      val referralLocation = ReferralLocation(
+        id = UUID.randomUUID(),
+        prisonId = "PWI",
+        type = PersonCurrentLocationType.CUSTODY,
+        expectedReleaseDate = null,
+        expectedProbationOffice = "aaa",
+        expectedReleaseDateMissingReason = "some reason",
+        expectedProbationOfficeUnknownReason = null,
+        referral = referral,
+      )
+      referral.referralLocation = referralLocation
+      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+      whenever(referralLocationRepository.save(any())).thenReturn(referralLocation)
+
+      val updateToReferral = AmendExpectedReleaseDateDTO(
+        expectedReleaseDate = null,
+        expectedReleaseDateMissingReason = "some reason",
+      )
+
+      amendReferralService.amendExpectedReleaseDate(referral.id, updateToReferral, jwtAuthenticationToken, authUser)
+
+      verifyNoInteractions(referralLocationRepository)
+      verifyNoInteractions(changelogRepository)
+      verifyNoInteractions(referralEventPublisher)
     }
 
     @Test
@@ -806,9 +863,9 @@ class AmendReferralServiceUnitTest {
       val argumentCaptorChangelog = argumentCaptor<Changelog>()
       verify(changelogRepository, atLeast(1)).save(argumentCaptorChangelog.capture())
 
-      // val argumentCaptorOldExpectedReleaseDate = argumentCaptor<String>()
-      // val argumentCaptorNewExpectedReleaseDate = argumentCaptor<String>()
-      // verify(referralEventPublisher, atLeast(1)).referralPrisonEstablishmentChangedEvent(eq(referral), argumentCaptorOldExpectedReleaseDate.capture(), argumentCaptorNewExpectedReleaseDate.capture(), eq(authUser))
+      val argumentCaptorOldExpectedReleaseDate = argumentCaptor<String>()
+      val argumentCaptorNewExpectedReleaseDate = argumentCaptor<String>()
+      verify(referralEventPublisher, atLeast(1)).referralExpectedReleaseDateChangedEvent(eq(referral), argumentCaptorOldExpectedReleaseDate.capture(), argumentCaptorNewExpectedReleaseDate.capture(), eq(authUser))
 
       val formatter = DateTimeFormatter.ofPattern("dd-MMM-yyyy")
       val changeLogValues = argumentCaptorChangelog.firstValue
@@ -816,11 +873,11 @@ class AmendReferralServiceUnitTest {
       assertThat(changeLogValues.newVal.values).contains(formatter.format(updateToReferral.expectedReleaseDate))
       assertThat(changeLogValues.oldVal.values).contains("some reason")
 
-//      val oldExpectedReleaseDate = argumentCaptorOldExpectedReleaseDate.firstValue
-//      assertThat(oldExpectedReleaseDate).isEqualTo("Peterborough (HMP & YOI)")
-//
-//      val newExpectedReleaseDate = argumentCaptorNewExpectedReleaseDate.firstValue
-//      assertThat(newExpectedReleaseDate).isEqualTo("Cookham Wood (HMYOI)")
+      val oldExpectedReleaseDate = argumentCaptorOldExpectedReleaseDate.firstValue
+      assertThat(oldExpectedReleaseDate).isEqualTo("some reason")
+
+      val newExpectedReleaseDate = argumentCaptorNewExpectedReleaseDate.firstValue
+      assertThat(newExpectedReleaseDate).isEqualTo(formatter.format(updateToReferral.expectedReleaseDate))
     }
 
     @Test
@@ -861,9 +918,9 @@ class AmendReferralServiceUnitTest {
       val argumentCaptorChangelog = argumentCaptor<Changelog>()
       verify(changelogRepository, atLeast(1)).save(argumentCaptorChangelog.capture())
 
-      // val argumentCaptorOldExpectedReleaseDate = argumentCaptor<String>()
-      // val argumentCaptorNewExpectedReleaseDate = argumentCaptor<String>()
-      // verify(referralEventPublisher, atLeast(1)).referralPrisonEstablishmentChangedEvent(eq(referral), argumentCaptorOldExpectedReleaseDate.capture(), argumentCaptorNewExpectedReleaseDate.capture(), eq(authUser))
+      val argumentCaptorOldExpectedReleaseDate = argumentCaptor<String>()
+      val argumentCaptorNewExpectedReleaseDate = argumentCaptor<String>()
+      verify(referralEventPublisher, atLeast(1)).referralExpectedReleaseDateChangedEvent(eq(referral), argumentCaptorOldExpectedReleaseDate.capture(), argumentCaptorNewExpectedReleaseDate.capture(), eq(authUser))
 
       val formatter = DateTimeFormatter.ofPattern("dd-MMM-yyyy")
       val changeLogValues = argumentCaptorChangelog.firstValue
@@ -871,11 +928,11 @@ class AmendReferralServiceUnitTest {
       assertThat(changeLogValues.newVal.values).contains("some reason")
       assertThat(changeLogValues.oldVal.values).contains(formatter.format(expectedReleaseDate))
 
-//      val oldExpectedReleaseDate = argumentCaptorOldExpectedReleaseDate.firstValue
-//      assertThat(oldExpectedReleaseDate).isEqualTo("Peterborough (HMP & YOI)")
-//
-//      val newExpectedReleaseDate = argumentCaptorNewExpectedReleaseDate.firstValue
-//      assertThat(newExpectedReleaseDate).isEqualTo("Cookham Wood (HMYOI)")
+      val oldExpectedReleaseDate = argumentCaptorOldExpectedReleaseDate.firstValue
+      assertThat(oldExpectedReleaseDate).isEqualTo(formatter.format(expectedReleaseDate))
+
+      val newExpectedReleaseDate = argumentCaptorNewExpectedReleaseDate.firstValue
+      assertThat(newExpectedReleaseDate).isEqualTo("some reason")
     }
   }
 }

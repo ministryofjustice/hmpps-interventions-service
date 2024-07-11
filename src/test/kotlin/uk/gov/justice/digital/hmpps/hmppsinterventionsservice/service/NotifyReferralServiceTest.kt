@@ -24,6 +24,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFacto
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralDetailsFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Optional
 import java.util.UUID
 
@@ -68,6 +69,7 @@ class NotifyReferralServiceTest {
       "enforceableDaysUpdatedTemplateID",
       "reasonForReferralUpdatedTemplateID",
       "prisonEstablishmentUpdatedTemplateID",
+      "expectedReleaseDateUpdatedTemplatedID",
       "http://interventions-ui.example.com",
       "/referral/{id}",
       emailSender,
@@ -224,6 +226,25 @@ class NotifyReferralServiceTest {
         data = mapOf(
           "oldPrisonEstablishment" to "London",
           "newPrisonEstablishment" to "Sheffield",
+          "currentAssignee" to if (assigned) AuthUserDTO.from(referral.currentAssignee!!) else null,
+          "crn" to referral.serviceUserCRN,
+          "sentBy" to referral.sentBy,
+          "createdBy" to referral.createdBy,
+          "updater" to referral.createdBy,
+        ),
+      )
+    }
+
+    private val makeExpectedReleaseDateUpdatedEvent = { assigned: Boolean ->
+      val formatter = DateTimeFormatter.ofPattern("dd-MMM-yyyy")
+      ReferralEvent(
+        "source",
+        ReferralEventType.EXPECTED_RELEASE_DATE,
+        referral,
+        "http://localhost:8080/sent-referral/${referral.id}",
+        data = mapOf(
+          "oldExpectedReleaseDateDetails" to formatter.format(LocalDate.now()),
+          "newExpectedReleaseDateDetails" to formatter.format(LocalDate.now().plusDays(2)),
           "currentAssignee" to if (assigned) AuthUserDTO.from(referral.currentAssignee!!) else null,
           "crn" to referral.serviceUserCRN,
           "sentBy" to referral.sentBy,
@@ -448,6 +469,40 @@ class NotifyReferralServiceTest {
       )
       assertThat(personalisationCaptor.firstValue["oldPrisonEstablishment"]).isEqualTo("London")
       assertThat(personalisationCaptor.firstValue["newPrisonEstablishment"]).isEqualTo("Sheffield")
+      assertThat(personalisationCaptor.firstValue["caseWorkerFirstName"]).isEqualTo("tom")
+      assertThat(personalisationCaptor.firstValue["changedByName"]).isEqualTo("sally smith")
+      assertThat(personalisationCaptor.firstValue["referralDetailsURL"]).isEqualTo("http://interventions-ui.example.com/referral/${referral.id}")
+      assertThat(personalisationCaptor.firstValue["referralNumber"]).isEqualTo(referral.referenceNumber)
+      assertThat(personalisationCaptor.firstValue["popFullName"]).isEqualTo("${referral.serviceUserData?.firstName} ${referral.serviceUserData?.lastName}")
+    }
+
+    @Test
+    fun `amending 'expected release date' notifies the assigned caseworker via email`() {
+      whenever(authUserRepository.findById(referral.createdBy.id)).thenReturn(Optional.of(referral.createdBy))
+      whenever(hmppsAuthService.getUserDetail(referral.createdBy)).thenReturn(
+        UserDetail(
+          "sally",
+          "sally@tom.com",
+          "smith",
+        ),
+      )
+      whenever(hmppsAuthService.getUserDetail(AuthUserDTO.from(referral.currentAssignee!!))).thenReturn(
+        UserDetail(
+          "tom",
+          "tom@tom.tom",
+          "jones",
+        ),
+      )
+      val referralEvent = makeExpectedReleaseDateUpdatedEvent(true)
+      notifyService().onApplicationEvent(referralEvent)
+      val personalisationCaptor = argumentCaptor<Map<String, String>>()
+      verify(emailSender).sendEmail(
+        eq("expectedReleaseDateUpdatedTemplatedID"),
+        eq("tom@tom.tom"),
+        personalisationCaptor.capture(),
+      )
+      assertThat(personalisationCaptor.firstValue["oldExpectedReleaseDateDetails"]).isEqualTo(referralEvent.data["oldExpectedReleaseDateDetails"])
+      assertThat(personalisationCaptor.firstValue["newExpectedReleaseDateDetails"]).isEqualTo(referralEvent.data["newExpectedReleaseDateDetails"])
       assertThat(personalisationCaptor.firstValue["caseWorkerFirstName"]).isEqualTo("tom")
       assertThat(personalisationCaptor.firstValue["changedByName"]).isEqualTo("sally smith")
       assertThat(personalisationCaptor.firstValue["referralDetailsURL"]).isEqualTo("http://interventions-ui.example.com/referral/${referral.id}")

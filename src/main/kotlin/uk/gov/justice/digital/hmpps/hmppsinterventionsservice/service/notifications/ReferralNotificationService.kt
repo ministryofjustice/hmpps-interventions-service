@@ -36,6 +36,7 @@ class ReferralNotificationService(
   @Value("\${notify.templates.enforceable-days-updated}") private val enforceableDaysUpdatedTemplateID: String,
   @Value("\${notify.templates.reason-for-referral-updated}") private val reasonForReferralUpdatedTemplateID: String,
   @Value("\${notify.templates.prison-establishment-updated}") private val prisonEstablishmentUpdatedTemplateID: String,
+  @Value("\${notify.templates.expected-release-date-updated}") private val expectedReleaseDateUpdatedTemplateID: String,
   @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
   @Value("\${interventions-ui.locations.service-provider.referral-details}") private val spReferralDetailsLocation: String,
   private val emailSender: EmailSender,
@@ -98,12 +99,34 @@ class ReferralNotificationService(
       ReferralEventType.PRISON_ESTABLISHMENT_AMENDED -> {
         notifyCaseWorkerThatPrisonEstablishmentChanged(event)
       }
+
+      ReferralEventType.EXPECTED_RELEASE_DATE -> {
+        notifyCaseWorkerThatExpectedReleaseDateChanged(event)
+      }
     }
   }
 
   private fun notifyCaseWorkerThatPrisonEstablishmentChanged(event: ReferralEvent) {
-    val oldPrisonEstablishment = event.data["oldPrisonEstablishment"] as String
-    val newPrisonEstablishment = event.data["newPrisonEstablishment"] as String
+    notifyCaseWorker(
+      event,
+      "oldPrisonEstablishment",
+      "newPrisonEstablishment",
+      prisonEstablishmentUpdatedTemplateID,
+    )
+  }
+
+  private fun notifyCaseWorkerThatExpectedReleaseDateChanged(event: ReferralEvent) {
+    notifyCaseWorker(
+      event,
+      "oldExpectedReleaseDateDetails",
+      "newExpectedReleaseDateDetails",
+      expectedReleaseDateUpdatedTemplateID,
+    )
+  }
+
+  private fun notifyCaseWorker(event: ReferralEvent, newValueKey: String, oldValueKey: String, emailTemplatedId: String) {
+    val oldValue = event.data[oldValueKey] as String
+    val newValue = event.data[newValueKey] as String
     val updater = event.data["updater"] as AuthUser
 
     val currentAssignee = event.data["currentAssignee"] as AuthUserDTO? ?: return
@@ -111,14 +134,14 @@ class ReferralNotificationService(
     val recipient = hmppsAuthService.getUserDetail(currentAssignee)
     val frontendUrl = generateResourceUrl(interventionsUIBaseURL, spReferralDetailsLocation, event.referral.id)
 
-    if (oldPrisonEstablishment != newPrisonEstablishment) {
+    if (oldValue != newValue) {
       emailSender.sendEmail(
-        prisonEstablishmentUpdatedTemplateID,
+        emailTemplatedId,
         recipient.email,
         mapOf(
           "caseWorkerFirstName" to recipient.firstName,
-          "oldPrisonEstablishment" to oldPrisonEstablishment,
-          "newPrisonEstablishment" to newPrisonEstablishment,
+          oldValueKey to oldValue,
+          newValueKey to newValue,
           "changedByName" to "${updaterUserDetails.firstName} ${updaterUserDetails.lastName}",
           "referralDetailsURL" to frontendUrl.toString(),
           "referralNumber" to event.referral.referenceNumber!!,
