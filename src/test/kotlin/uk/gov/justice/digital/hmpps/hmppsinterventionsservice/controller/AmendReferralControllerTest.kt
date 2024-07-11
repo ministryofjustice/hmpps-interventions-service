@@ -15,6 +15,7 @@ import org.springframework.web.server.ServerWebInputException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendComplexityLevelDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOutcomesDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendExpectedReleaseDateDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendPrisonEstablishmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogUpdateDTO
@@ -27,6 +28,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFacto
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ChangeLogFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -194,6 +196,26 @@ internal class AmendReferralControllerTest {
         .amendPrisonEstablishment(eq(referral.id), eq(amendPrisonEstablishmentDTO), eq(token), eq(user))
       val returnedValue =
         amendReferralController.amendPrisonEstablishment(token, referral.id, amendPrisonEstablishmentDTO)
+      assertThat(returnedValue.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
+    }
+  }
+
+  @Nested
+  inner class AmendExpectedReleaseDate {
+    private val referral = referralFactory.createSent()
+    private val user = authUserFactory.create()
+    private val token = tokenFactory.create(userID = user.id, userName = user.userName, authSource = user.authSource)
+
+    @Test
+    fun `amendExpectedReleseDate updates details in referral for the correct type`() {
+      val amendExpectedReleaseDateDTO = AmendExpectedReleaseDateDTO(
+        expectedReleaseDate = LocalDate.now(),
+        expectedReleaseDateMissingReason = null,
+      )
+      doNothing().whenever(amendReferralService)
+        .amendExpectedReleaseDate(eq(referral.id), eq(amendExpectedReleaseDateDTO), eq(token), eq(user))
+      val returnedValue =
+        amendReferralController.amendExpectedReleaseDate(token, referral.id, amendExpectedReleaseDateDTO)
       assertThat(returnedValue.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
     }
   }

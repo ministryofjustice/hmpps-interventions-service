@@ -225,6 +225,15 @@ class AmendReferralService(
     user: AuthUser,
   ) {
     val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
+    val expectedReleaseDate = referral.referralLocation?.expectedReleaseDate
+    val expectedReleaseDateMissingReason = referral.referralLocation?.expectedReleaseDateMissingReason
+
+    if ((amendExpectedReleaseDateDTO.expectedReleaseDate != null && expectedReleaseDate == amendExpectedReleaseDateDTO.expectedReleaseDate) ||
+      (amendExpectedReleaseDateDTO.expectedReleaseDateMissingReason != null && expectedReleaseDateMissingReason == amendExpectedReleaseDateDTO.expectedReleaseDateMissingReason)
+    ) {
+      // do not amend or save in the change log if the values are same
+      return
+    }
 
     val oldValues = mutableListOf<String>()
     val newValues = mutableListOf<String>()
@@ -264,6 +273,7 @@ class AmendReferralService(
     )
     changelogRepository.save(changelog)
     referralLocation?.let { referralLocationRepository.save(it) }
+    referralEventPublisher.referralExpectedReleaseDateChangedEvent(referral, oldValues[0], newValues[0], user)
   }
 
   fun getSentReferralForAuthenticatedUser(referralId: UUID, authentication: JwtAuthenticationToken): Referral {

@@ -126,6 +126,7 @@ notify:
     needs-and-requirements-outcome-changed: "41d31358-1e87-41e4-a84f-10006cf64423"
     reason-for-referral-updated: "53df945a-a4c9-4a3f-b230-dd1cd6882ccd"
     prison-establishment-updated: "4eb14032-a420-4b9d-a5ef-6537ccd9e63c"
+    expected-release-date-updated: "fb50c602-073c-4d8b-ab40-1d9277aed8cd"
     referral-cancelled: "b15ca66f-94a8-41ff-960f-5933cb8be841"
     referral-pre-ica-withdrawn: "dc41a8ab-0760-4274-bf1c-fc7530e648fa"
     referral-post-ica-withdrawn: "17641582-310b-4960-bd00-1ae400a70b6e"
