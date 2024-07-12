@@ -237,15 +237,20 @@ class AmendReferralService(
 
     val oldValues = mutableListOf<String>()
     val newValues = mutableListOf<String>()
+    var oldValueForNotify = ""
+    var newValueForNotify = ""
     val formatter = DateTimeFormatter.ofPattern("dd-MMM-yyyy")
     val referralLocation = referral.referralLocation
     amendExpectedReleaseDateDTO.expectedReleaseDate?.let {
       if (referral.referralLocation?.expectedReleaseDate !== null) {
         oldValues.add(formatter.format(referral.referralLocation?.expectedReleaseDate!!))
+        oldValueForNotify = formatter.format(referral.referralLocation?.expectedReleaseDate!!)
       } else if (referral.referralLocation?.expectedReleaseDateMissingReason != null) {
         oldValues.add(referral.referralLocation?.expectedReleaseDateMissingReason!!)
+        oldValueForNotify = "Expected release date is not known"
       }
       newValues.add(formatter.format(amendExpectedReleaseDateDTO.expectedReleaseDate))
+      newValueForNotify = formatter.format(amendExpectedReleaseDateDTO.expectedReleaseDate)
       referralLocation?.expectedReleaseDate = amendExpectedReleaseDateDTO.expectedReleaseDate
       referralLocation?.expectedReleaseDateMissingReason = null
     }
@@ -253,10 +258,13 @@ class AmendReferralService(
     amendExpectedReleaseDateDTO.expectedReleaseDateMissingReason?.let {
       if (referral.referralLocation?.expectedReleaseDateMissingReason != null) {
         oldValues.add(referral.referralLocation?.expectedReleaseDateMissingReason!!)
+        oldValueForNotify = "Expected release date is not known"
       } else if (referral.referralLocation?.expectedReleaseDate !== null) {
         oldValues.add(formatter.format(referral.referralLocation?.expectedReleaseDate!!))
+        oldValueForNotify = formatter.format(referral.referralLocation?.expectedReleaseDate!!)
       }
       newValues.add(amendExpectedReleaseDateDTO.expectedReleaseDateMissingReason)
+      newValueForNotify = "Expected release date is not known"
       referralLocation?.expectedReleaseDateMissingReason = amendExpectedReleaseDateDTO.expectedReleaseDateMissingReason
       referralLocation?.expectedReleaseDate = null
     }
@@ -273,7 +281,7 @@ class AmendReferralService(
     )
     changelogRepository.save(changelog)
     referralLocation?.let { referralLocationRepository.save(it) }
-    referralEventPublisher.referralExpectedReleaseDateChangedEvent(referral, oldValues[0], newValues[0], user)
+    referralEventPublisher.referralExpectedReleaseDateChangedEvent(referral, oldValueForNotify, newValueForNotify, user)
   }
 
   fun getSentReferralForAuthenticatedUser(referralId: UUID, authentication: JwtAuthenticationToken): Referral {
