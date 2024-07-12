@@ -746,20 +746,20 @@ class AmendReferralServiceUnitTest {
       val argumentCaptorChangelog = argumentCaptor<Changelog>()
       verify(changelogRepository, atLeast(1)).save(argumentCaptorChangelog.capture())
 
-      val argumentCaptorOldExpectedReleaseDate = argumentCaptor<String>()
-      val argumentCaptorNewExpectedReleaseDate = argumentCaptor<String>()
-      verify(referralEventPublisher, atLeast(1)).referralExpectedReleaseDateChangedEvent(eq(referral), argumentCaptorOldExpectedReleaseDate.capture(), argumentCaptorNewExpectedReleaseDate.capture(), eq(authUser))
+      val argumentCaptorOldExpectedReleaseDateUnknownReason = argumentCaptor<String>()
+      val argumentCaptorNewExpectedReleaseDateUnknownReason = argumentCaptor<String>()
+      verify(referralEventPublisher, atLeast(1)).referralExpectedReleaseDateChangedEvent(eq(referral), argumentCaptorOldExpectedReleaseDateUnknownReason.capture(), argumentCaptorNewExpectedReleaseDateUnknownReason.capture(), eq(authUser))
 
       val changeLogValues = argumentCaptorChangelog.firstValue
       assertThat(changeLogValues.id).isNotNull
       assertThat(changeLogValues.newVal.values).contains("new reason")
       assertThat(changeLogValues.oldVal.values).contains("some reason")
 
-      val oldExpectedReleaseDate = argumentCaptorOldExpectedReleaseDate.firstValue
-      assertThat(oldExpectedReleaseDate).isEqualTo("some reason")
+      val oldExpectedReleaseDate = argumentCaptorOldExpectedReleaseDateUnknownReason.firstValue
+      assertThat(oldExpectedReleaseDate).isEqualTo("Expected release date is not known")
 
-      val newExpectedReleaseDate = argumentCaptorNewExpectedReleaseDate.firstValue
-      assertThat(newExpectedReleaseDate).isEqualTo("new reason")
+      val newExpectedReleaseDate = argumentCaptorNewExpectedReleaseDateUnknownReason.firstValue
+      assertThat(newExpectedReleaseDate).isEqualTo("Expected release date is not known")
     }
 
     @Test
@@ -795,7 +795,7 @@ class AmendReferralServiceUnitTest {
     }
 
     @Test
-    fun `do not update expected release date unknow reason for the referral when the existing and update values are same`() {
+    fun `do not update expected release date unknown reason for the referral when the existing and update values are same`() {
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
 
       val referral = referralFactory.createSent()
@@ -829,9 +829,7 @@ class AmendReferralServiceUnitTest {
     fun `update expected release date when not know reason was registered`() {
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
 
-      val referral = referralFactory.createSent(
-        needsInterpreter = false,
-      )
+      val referral = referralFactory.createSent()
       val expectedReleaseDate = LocalDate.now()
       val referralLocation = ReferralLocation(
         id = UUID.randomUUID(),
@@ -874,7 +872,7 @@ class AmendReferralServiceUnitTest {
       assertThat(changeLogValues.oldVal.values).contains("some reason")
 
       val oldExpectedReleaseDate = argumentCaptorOldExpectedReleaseDate.firstValue
-      assertThat(oldExpectedReleaseDate).isEqualTo("some reason")
+      assertThat(oldExpectedReleaseDate).isEqualTo("Expected release date is not known")
 
       val newExpectedReleaseDate = argumentCaptorNewExpectedReleaseDate.firstValue
       assertThat(newExpectedReleaseDate).isEqualTo(formatter.format(updateToReferral.expectedReleaseDate))
@@ -884,9 +882,7 @@ class AmendReferralServiceUnitTest {
     fun `update expected release date not know reason when expected release date was registered`() {
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
 
-      val referral = referralFactory.createSent(
-        needsInterpreter = false,
-      )
+      val referral = referralFactory.createSent()
       val expectedReleaseDate = LocalDate.now()
       val referralLocation = ReferralLocation(
         id = UUID.randomUUID(),
@@ -932,7 +928,7 @@ class AmendReferralServiceUnitTest {
       assertThat(oldExpectedReleaseDate).isEqualTo(formatter.format(expectedReleaseDate))
 
       val newExpectedReleaseDate = argumentCaptorNewExpectedReleaseDate.firstValue
-      assertThat(newExpectedReleaseDate).isEqualTo("some reason")
+      assertThat(newExpectedReleaseDate).isEqualTo("Expected release date is not known")
     }
   }
 }
