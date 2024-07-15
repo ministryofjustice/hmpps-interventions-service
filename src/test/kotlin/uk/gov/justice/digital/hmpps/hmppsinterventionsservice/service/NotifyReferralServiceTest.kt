@@ -254,6 +254,44 @@ class NotifyReferralServiceTest {
       )
     }
 
+    private val makeExpectedReleaseDateUpdateTheSameDateEvent = { assigned: Boolean ->
+      val formatter = DateTimeFormatter.ofPattern("dd-MMM-yyyy")
+      val expectedReleaseDate = LocalDate.now()
+      ReferralEvent(
+        "source",
+        ReferralEventType.EXPECTED_RELEASE_DATE,
+        referral,
+        "http://localhost:8080/sent-referral/${referral.id}",
+        data = mapOf(
+          "oldExpectedReleaseDateDetails" to formatter.format(expectedReleaseDate),
+          "newExpectedReleaseDateDetails" to formatter.format(expectedReleaseDate),
+          "currentAssignee" to if (assigned) AuthUserDTO.from(referral.currentAssignee!!) else null,
+          "crn" to referral.serviceUserCRN,
+          "sentBy" to referral.sentBy,
+          "createdBy" to referral.createdBy,
+          "updater" to referral.createdBy,
+        ),
+      )
+    }
+
+    private val makeExpectedReleaseDateMissingReasonUpdatedEvent = { assigned: Boolean ->
+      ReferralEvent(
+        "source",
+        ReferralEventType.EXPECTED_RELEASE_DATE,
+        referral,
+        "http://localhost:8080/sent-referral/${referral.id}",
+        data = mapOf(
+          "oldExpectedReleaseDateDetails" to "Expected release date is not known",
+          "newExpectedReleaseDateDetails" to "Expected release date is not known",
+          "currentAssignee" to if (assigned) AuthUserDTO.from(referral.currentAssignee!!) else null,
+          "crn" to referral.serviceUserCRN,
+          "sentBy" to referral.sentBy,
+          "createdBy" to referral.createdBy,
+          "updater" to referral.createdBy,
+        ),
+      )
+    }
+
     @Test
     fun `amending 'completion deadline' notifies the assigned caseworker via email`() {
       whenever(authUserRepository.findById(referral.createdBy.id)).thenReturn(Optional.of(referral.createdBy))
@@ -494,6 +532,62 @@ class NotifyReferralServiceTest {
         ),
       )
       val referralEvent = makeExpectedReleaseDateUpdatedEvent(true)
+      notifyService().onApplicationEvent(referralEvent)
+      val personalisationCaptor = argumentCaptor<Map<String, String>>()
+      verify(emailSender).sendEmail(
+        eq("expectedReleaseDateUpdatedTemplatedID"),
+        eq("tom@tom.tom"),
+        personalisationCaptor.capture(),
+      )
+      assertThat(personalisationCaptor.firstValue["oldExpectedReleaseDateDetails"]).isEqualTo(referralEvent.data["oldExpectedReleaseDateDetails"])
+      assertThat(personalisationCaptor.firstValue["newExpectedReleaseDateDetails"]).isEqualTo(referralEvent.data["newExpectedReleaseDateDetails"])
+      assertThat(personalisationCaptor.firstValue["caseWorkerFirstName"]).isEqualTo("tom")
+      assertThat(personalisationCaptor.firstValue["changedByName"]).isEqualTo("sally smith")
+      assertThat(personalisationCaptor.firstValue["referralDetailsURL"]).isEqualTo("http://interventions-ui.example.com/referral/${referral.id}")
+      assertThat(personalisationCaptor.firstValue["referralNumber"]).isEqualTo(referral.referenceNumber)
+      assertThat(personalisationCaptor.firstValue["popFullName"]).isEqualTo("${referral.serviceUserData?.firstName} ${referral.serviceUserData?.lastName}")
+    }
+
+    @Test
+    fun `amending 'expected release date' does not notifies when the update values are same`() {
+      whenever(authUserRepository.findById(referral.createdBy.id)).thenReturn(Optional.of(referral.createdBy))
+      whenever(hmppsAuthService.getUserDetail(referral.createdBy)).thenReturn(
+        UserDetail(
+          "sally",
+          "sally@tom.com",
+          "smith",
+        ),
+      )
+      whenever(hmppsAuthService.getUserDetail(AuthUserDTO.from(referral.currentAssignee!!))).thenReturn(
+        UserDetail(
+          "tom",
+          "tom@tom.tom",
+          "jones",
+        ),
+      )
+      val referralEvent = makeExpectedReleaseDateUpdateTheSameDateEvent(true)
+      notifyService().onApplicationEvent(referralEvent)
+      verifyNoInteractions(emailSender)
+    }
+
+    @Test
+    fun `amending 'expected release date unknown reason' notifies the assigned caseworker via email`() {
+      whenever(authUserRepository.findById(referral.createdBy.id)).thenReturn(Optional.of(referral.createdBy))
+      whenever(hmppsAuthService.getUserDetail(referral.createdBy)).thenReturn(
+        UserDetail(
+          "sally",
+          "sally@tom.com",
+          "smith",
+        ),
+      )
+      whenever(hmppsAuthService.getUserDetail(AuthUserDTO.from(referral.currentAssignee!!))).thenReturn(
+        UserDetail(
+          "tom",
+          "tom@tom.tom",
+          "jones",
+        ),
+      )
+      val referralEvent = makeExpectedReleaseDateMissingReasonUpdatedEvent(true)
       notifyService().onApplicationEvent(referralEvent)
       val personalisationCaptor = argumentCaptor<Map<String, String>>()
       verify(emailSender).sendEmail(
