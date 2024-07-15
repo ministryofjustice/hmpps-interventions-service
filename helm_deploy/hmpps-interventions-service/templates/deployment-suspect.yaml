@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "app.labels" . | nindent 4 }}
 spec:
-  replicas: 3
+  replicas: 4
   revisionHistoryLimit: 2
   minReadySeconds: 10
   strategy:
