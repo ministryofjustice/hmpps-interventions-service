@@ -41,7 +41,7 @@ spring:
     username: ${postgres.username}
     password: ${postgres.password}
     hikari:
-      maximum-pool-size: 30
+      maximum-pool-size: 50
   jpa:
     hibernate:
       ddl-auto: validate
