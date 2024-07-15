@@ -107,48 +107,56 @@ class ReferralNotificationService(
   }
 
   private fun notifyCaseWorkerThatPrisonEstablishmentChanged(event: ReferralEvent) {
-    notifyCaseWorker(
-      event,
-      "oldPrisonEstablishment",
-      "newPrisonEstablishment",
-      prisonEstablishmentUpdatedTemplateID,
-    )
+    val oldValue = event.data["oldPrisonEstablishment"] as String
+    val newValue = event.data["newPrisonEstablishment"] as String
+    if (oldValue != newValue) {
+      notifyCaseWorker(
+        event,
+        "oldPrisonEstablishment" to oldValue,
+        "newPrisonEstablishment" to newValue,
+        prisonEstablishmentUpdatedTemplateID,
+      )
+    }
   }
 
   private fun notifyCaseWorkerThatExpectedReleaseDateChanged(event: ReferralEvent) {
-    notifyCaseWorker(
-      event,
-      "oldExpectedReleaseDateDetails",
-      "newExpectedReleaseDateDetails",
-      expectedReleaseDateUpdatedTemplateID,
-    )
+    val oldValue = event.data["oldExpectedReleaseDateDetails"] as String
+    val newValue = event.data["newExpectedReleaseDateDetails"] as String
+    if ((oldValue == "Expected release date is not known" && newValue == "Expected release date is not known") || oldValue != newValue) {
+      notifyCaseWorker(
+        event,
+        "oldExpectedReleaseDateDetails" to oldValue,
+        "newExpectedReleaseDateDetails" to newValue,
+        expectedReleaseDateUpdatedTemplateID,
+      )
+    }
   }
 
-  private fun notifyCaseWorker(event: ReferralEvent, newValueKey: String, oldValueKey: String, emailTemplatedId: String) {
-    val oldValue = event.data[oldValueKey] as String
-    val newValue = event.data[newValueKey] as String
+  private fun notifyCaseWorker(
+    event: ReferralEvent,
+    olValuePair: Pair<String, String>,
+    newValuePair: Pair<String, String>,
+    emailTemplatedId: String,
+  ) {
     val updater = event.data["updater"] as AuthUser
 
     val currentAssignee = event.data["currentAssignee"] as AuthUserDTO? ?: return
     val updaterUserDetails = hmppsAuthService.getUserDetail(updater)
     val recipient = hmppsAuthService.getUserDetail(currentAssignee)
     val frontendUrl = generateResourceUrl(interventionsUIBaseURL, spReferralDetailsLocation, event.referral.id)
-
-    if (oldValue != newValue) {
-      emailSender.sendEmail(
-        emailTemplatedId,
-        recipient.email,
-        mapOf(
-          "caseWorkerFirstName" to recipient.firstName,
-          oldValueKey to oldValue,
-          newValueKey to newValue,
-          "changedByName" to "${updaterUserDetails.firstName} ${updaterUserDetails.lastName}",
-          "referralDetailsURL" to frontendUrl.toString(),
-          "referralNumber" to event.referral.referenceNumber!!,
-          "popFullName" to "${event.referral.serviceUserData?.firstName} ${event.referral.serviceUserData?.lastName}",
-        ),
-      )
-    }
+    emailSender.sendEmail(
+      emailTemplatedId,
+      recipient.email,
+      mapOf(
+        "caseWorkerFirstName" to recipient.firstName,
+        olValuePair,
+        newValuePair,
+        "changedByName" to "${updaterUserDetails.firstName} ${updaterUserDetails.lastName}",
+        "referralDetailsURL" to frontendUrl.toString(),
+        "referralNumber" to event.referral.referenceNumber!!,
+        "popFullName" to "${event.referral.serviceUserData?.firstName} ${event.referral.serviceUserData?.lastName}",
+      ),
+    )
   }
 
   private fun notifyCaseWorkerThatDetailsChanged(event: ReferralEventType, templateId: String, referral: Referral) {
@@ -182,7 +190,8 @@ class ReferralNotificationService(
     val newDetailsCreatedAuthUser = authUserRepository.findByIdOrNull(newDetails.createdById)
     val updater = hmppsAuthService.getUserDetail(newDetailsCreatedAuthUser!!)
     val responsibleProbationPractitioner = referralService.getResponsibleProbationPractitioner(crn, sentBy, createdBy)
-    val isUserTheResponsibleOfficer = referralService.isUserTheResponsibleOfficer(responsibleProbationPractitioner, newDetailsCreatedAuthUser)
+    val isUserTheResponsibleOfficer =
+      referralService.isUserTheResponsibleOfficer(responsibleProbationPractitioner, newDetailsCreatedAuthUser)
     val frontendUrl = generateResourceUrl(interventionsUIBaseURL, spReferralDetailsLocation, event.referral.id)
 
     if (newDetails.completionDeadline != previousDetails.completionDeadline) {
