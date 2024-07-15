@@ -29,6 +29,8 @@ data class ChangelogValuesDTO(
       AmendTopic.REASON_FOR_REFERRAL to "Reason for this referral and further information has changed",
       AmendTopic.PRISON_ESTABLISHMENT to "Prison establishment has changed",
       AmendTopic.EXPECTED_RELEASE_DATE to "Expected release date has changed",
+      AmendTopic.EXPECTED_PROBATION_OFFICE to "Expected probation office has changed",
+      AmendTopic.PROBATION_PRACTITIONER_PROBATION_OFFICE to "Probation practitioner probation office has changed",
     )
     fun from(changelog: Changelog, userDetail: UserDetail): ChangelogValuesDTO {
       val dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy 'at' h.mma")

@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOu
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendExpectedReleaseDateDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendPrisonEstablishmentDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationOfficeDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogUpdateDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendReferralService
@@ -216,6 +217,33 @@ internal class AmendReferralControllerTest {
         .amendExpectedReleaseDate(eq(referral.id), eq(amendExpectedReleaseDateDTO), eq(token), eq(user))
       val returnedValue =
         amendReferralController.amendExpectedReleaseDate(token, referral.id, amendExpectedReleaseDateDTO)
+      assertThat(returnedValue.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
+    }
+  }
+
+  @Nested
+  inner class AmendProbationOffice {
+    private val referral = referralFactory.createSent()
+    private val user = authUserFactory.create()
+    private val token = tokenFactory.create(userID = user.id, userName = user.userName, authSource = user.authSource)
+
+    @Test
+    fun `amendExpectedProbationOffice updates details in referral for the correct type`() {
+      val amendProbationOfficeDTO = AmendProbationOfficeDTO("aaa")
+      doNothing().whenever(amendReferralService)
+        .amendExpectedProbationOffice(eq(referral.id), eq(amendProbationOfficeDTO), eq(token), eq(user))
+      val returnedValue =
+        amendReferralController.amendExpectedProbationOffice(token, referral.id, amendProbationOfficeDTO)
+      assertThat(returnedValue.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
+    }
+
+    @Test
+    fun `amendProbationPractitionerProbationOffice updates details in referral for the correct type`() {
+      val amendProbationOfficeDTO = AmendProbationOfficeDTO("aaa")
+      doNothing().whenever(amendReferralService)
+        .amendProbationPractitionerProbationOffice(eq(referral.id), eq(amendProbationOfficeDTO), eq(token), eq(user))
+      val returnedValue =
+        amendReferralController.amendProbationPractitionerProbationOffice(token, referral.id, amendProbationOfficeDTO)
       assertThat(returnedValue.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
     }
   }

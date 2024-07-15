@@ -37,6 +37,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ComplexityLevelRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DesiredOutcomeRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ProbationPractitionerDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralLocationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
@@ -59,6 +60,7 @@ class AmendReferralServiceUnitTest {
   private val complexityLevelRepository: ComplexityLevelRepository = mock()
   private val desiredOutcomeRepository: DesiredOutcomeRepository = mock()
   private val referralLocationRepository: ReferralLocationRepository = mock()
+  private val probationPractitionerDetailsRepository: ProbationPractitionerDetailsRepository = mock()
   private val referralEventPublisher: ReferralEventPublisher = mock()
   private val jwtAuthenticationToken = JwtAuthenticationToken(mock())
 
@@ -78,6 +80,7 @@ class AmendReferralServiceUnitTest {
     complexityLevelRepository,
     desiredOutcomeRepository,
     referralLocationRepository,
+    probationPractitionerDetailsRepository,
     userMapper,
     referralService,
   )

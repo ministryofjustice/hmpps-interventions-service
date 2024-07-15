@@ -70,6 +70,7 @@ class NotifyReferralServiceTest {
       "reasonForReferralUpdatedTemplateID",
       "prisonEstablishmentUpdatedTemplateID",
       "expectedReleaseDateUpdatedTemplatedID",
+      "probationOfficeUpdatedTemplateID",
       "http://interventions-ui.example.com",
       "/referral/{id}",
       emailSender,
@@ -245,6 +246,24 @@ class NotifyReferralServiceTest {
         data = mapOf(
           "oldExpectedReleaseDateDetails" to formatter.format(LocalDate.now()),
           "newExpectedReleaseDateDetails" to formatter.format(LocalDate.now().plusDays(2)),
+          "currentAssignee" to if (assigned) AuthUserDTO.from(referral.currentAssignee!!) else null,
+          "crn" to referral.serviceUserCRN,
+          "sentBy" to referral.sentBy,
+          "createdBy" to referral.createdBy,
+          "updater" to referral.createdBy,
+        ),
+      )
+    }
+
+    private val makeProbationOfficeUpdatedEvent = { assigned: Boolean ->
+      ReferralEvent(
+        "source",
+        ReferralEventType.PROBATION_OFFICE_AMENDED,
+        referral,
+        "http://localhost:8080/sent-referral/${referral.id}",
+        data = mapOf(
+          "oldProbationOffice" to "Derby: Derwent Centre",
+          "newProbationOffice" to "Bristol: Bridewell Police Station",
           "currentAssignee" to if (assigned) AuthUserDTO.from(referral.currentAssignee!!) else null,
           "crn" to referral.serviceUserCRN,
           "sentBy" to referral.sentBy,
@@ -597,6 +616,40 @@ class NotifyReferralServiceTest {
       )
       assertThat(personalisationCaptor.firstValue["oldExpectedReleaseDateDetails"]).isEqualTo(referralEvent.data["oldExpectedReleaseDateDetails"])
       assertThat(personalisationCaptor.firstValue["newExpectedReleaseDateDetails"]).isEqualTo(referralEvent.data["newExpectedReleaseDateDetails"])
+      assertThat(personalisationCaptor.firstValue["caseWorkerFirstName"]).isEqualTo("tom")
+      assertThat(personalisationCaptor.firstValue["changedByName"]).isEqualTo("sally smith")
+      assertThat(personalisationCaptor.firstValue["referralDetailsURL"]).isEqualTo("http://interventions-ui.example.com/referral/${referral.id}")
+      assertThat(personalisationCaptor.firstValue["referralNumber"]).isEqualTo(referral.referenceNumber)
+      assertThat(personalisationCaptor.firstValue["popFullName"]).isEqualTo("${referral.serviceUserData?.firstName} ${referral.serviceUserData?.lastName}")
+    }
+
+    @Test
+    fun `amending 'probation office' notifies the assigned caseworker via email`() {
+      whenever(authUserRepository.findById(referral.createdBy.id)).thenReturn(Optional.of(referral.createdBy))
+      whenever(hmppsAuthService.getUserDetail(referral.createdBy)).thenReturn(
+        UserDetail(
+          "sally",
+          "sally@tom.com",
+          "smith",
+        ),
+      )
+      whenever(hmppsAuthService.getUserDetail(AuthUserDTO.from(referral.currentAssignee!!))).thenReturn(
+        UserDetail(
+          "tom",
+          "tom@tom.tom",
+          "jones",
+        ),
+      )
+
+      notifyService().onApplicationEvent(makeProbationOfficeUpdatedEvent(true))
+      val personalisationCaptor = argumentCaptor<Map<String, String>>()
+      verify(emailSender).sendEmail(
+        eq("probationOfficeUpdatedTemplateID"),
+        eq("tom@tom.tom"),
+        personalisationCaptor.capture(),
+      )
+      assertThat(personalisationCaptor.firstValue["oldProbationOffice"]).isEqualTo("Derby: Derwent Centre")
+      assertThat(personalisationCaptor.firstValue["newProbationOffice"]).isEqualTo("Bristol: Bridewell Police Station")
       assertThat(personalisationCaptor.firstValue["caseWorkerFirstName"]).isEqualTo("tom")
       assertThat(personalisationCaptor.firstValue["changedByName"]).isEqualTo("sally smith")
       assertThat(personalisationCaptor.firstValue["referralDetailsURL"]).isEqualTo("http://interventions-ui.example.com/referral/${referral.id}")

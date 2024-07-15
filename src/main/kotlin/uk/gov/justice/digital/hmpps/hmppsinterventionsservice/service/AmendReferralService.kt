@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOu
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendExpectedReleaseDateDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendPrisonEstablishmentDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationOfficeDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogUpdateDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
@@ -26,6 +27,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Selecte
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ChangelogRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ComplexityLevelRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DesiredOutcomeRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ProbationPractitionerDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralLocationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
@@ -45,6 +47,8 @@ enum class AmendTopic {
   REASON_FOR_REFERRAL,
   PRISON_ESTABLISHMENT,
   EXPECTED_RELEASE_DATE,
+  EXPECTED_PROBATION_OFFICE,
+  PROBATION_PRACTITIONER_PROBATION_OFFICE
 }
 
 @Service
@@ -57,6 +61,7 @@ class AmendReferralService(
   private val complexityLevelRepository: ComplexityLevelRepository,
   private val desiredOutcomeRepository: DesiredOutcomeRepository,
   private val referralLocationRepository: ReferralLocationRepository,
+  private val probationPractitionerDetailsRepository: ProbationPractitionerDetailsRepository,
   private val userMapper: UserMapper,
   @Lazy private val referralService: ReferralService,
 ) {
@@ -288,6 +293,70 @@ class AmendReferralService(
     val user = userMapper.fromToken(authentication)
     return referralService.getSentReferralForUser(referralId, user)
       ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "sent referral not found [id=$referralId]")
+  }
+
+  fun amendExpectedProbationOffice(
+    referralId: UUID,
+    amendProbationOfficeDTO: AmendProbationOfficeDTO,
+    authentication: JwtAuthenticationToken,
+    user: AuthUser,
+  ) {
+    val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
+
+    val oldValues = mutableListOf<String>()
+    referral.referralLocation?.expectedProbationOffice?.let { oldValues.add(referral.referralLocation?.expectedProbationOffice!!) }
+
+    val newValues = mutableListOf<String>()
+    newValues.add(amendProbationOfficeDTO.probationOffice)
+
+    val referralLocation = referral.referralLocation
+    referralLocation?.expectedProbationOffice = amendProbationOfficeDTO.probationOffice
+
+    val changelog = Changelog(
+      referral.id,
+      UUID.randomUUID(),
+      AmendTopic.EXPECTED_PROBATION_OFFICE,
+      ReferralAmendmentDetails(values = oldValues),
+      ReferralAmendmentDetails(values = newValues),
+      "",
+      OffsetDateTime.now(),
+      userMapper.fromToken(authentication),
+    )
+    changelogRepository.save(changelog)
+    referralLocation?.let { referralLocationRepository.save(it) }
+    referralEventPublisher.referralProbationOfficeChangedEvent(referral, oldValues[0], newValues[0], user)
+  }
+
+  fun amendProbationPractitionerProbationOffice(
+    referralId: UUID,
+    amendProbationOfficeDTO: AmendProbationOfficeDTO,
+    authentication: JwtAuthenticationToken,
+    user: AuthUser,
+  ) {
+    val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
+
+    val oldValues = mutableListOf<String>()
+    referral.probationPractitionerDetails?.probationOffice?.let { oldValues.add(referral.probationPractitionerDetails?.probationOffice!!) }
+
+    val newValues = mutableListOf<String>()
+    newValues.add(amendProbationOfficeDTO.probationOffice)
+
+    val probationPractitionerDetails = referral.probationPractitionerDetails
+    probationPractitionerDetails?.probationOffice = amendProbationOfficeDTO.probationOffice
+
+    val changelog = Changelog(
+      referral.id,
+      UUID.randomUUID(),
+      AmendTopic.PROBATION_PRACTITIONER_PROBATION_OFFICE,
+      ReferralAmendmentDetails(values = oldValues),
+      ReferralAmendmentDetails(values = newValues),
+      "",
+      OffsetDateTime.now(),
+      userMapper.fromToken(authentication),
+    )
+    changelogRepository.save(changelog)
+    probationPractitionerDetails?.let { probationPractitionerDetailsRepository.save(it) }
+    referralEventPublisher.referralProbationOfficeChangedEvent(referral, oldValues[0], newValues[0], user)
   }
 
   fun getListOfChangeLogEntries(referral: Referral): List<Changelog> {
