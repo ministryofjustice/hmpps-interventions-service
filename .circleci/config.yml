@@ -339,3 +339,4 @@ workflows:
           cache_key: "v2-bump"
           slack_channel: << pipeline.parameters.alerts-slack-channel >>
           context: [hmpps-common-vars]
+          jdk_tag: "21.0"
