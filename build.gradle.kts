@@ -85,8 +85,8 @@ dependencies {
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
-  implementation("io.sentry:sentry-spring-boot-starter:7.11.0")
-  implementation("io.sentry:sentry-logback:7.11.0")
+  implementation("io.sentry:sentry-spring-boot-starter:7.12.0")
+  implementation("io.sentry:sentry-logback:7.12.0")
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
   implementation("net.logstash.logback:logstash-logback-encoder:7.4")
 
@@ -104,9 +104,9 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.26.19")
-  implementation("software.amazon.awssdk:s3:2.26.19")
-  implementation("software.amazon.awssdk:sts:2.26.19")
+  implementation("software.amazon.awssdk:sns:2.26.20")
+  implementation("software.amazon.awssdk:s3:2.26.20")
+  implementation("software.amazon.awssdk:sts:2.26.20")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux:3.3.1")
@@ -117,7 +117,7 @@ dependencies {
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
-  implementation("com.h2database:h2:2.2.224")
+  implementation("com.h2database:h2:2.3.230")
   implementation("org.hibernate:hibernate-core:6.5.2.Final")
   implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.8.1")
 
