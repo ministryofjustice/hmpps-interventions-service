@@ -23,6 +23,7 @@ enum class ReferralEventType {
   NEEDS_AND_REQUIREMENTS_AMENDED,
   PRISON_ESTABLISHMENT_AMENDED,
   EXPECTED_RELEASE_DATE,
+  PROBATION_OFFICE_AMENDED,
 }
 
 class ReferralEvent(
@@ -127,6 +128,31 @@ class ReferralEventPublisher(
         mapOf(
           "oldExpectedReleaseDateDetails" to oldExpectedReleaseDateDetails,
           "newExpectedReleaseDateDetails" to newExpectedReleaseDateDetails,
+          "currentAssignee" to referral.currentAssignee?.let { AuthUserDTO.from(it) },
+          "crn" to referral.serviceUserCRN,
+          "sentBy" to referral.sentBy,
+          "createdBy" to referral.createdBy,
+          "updater" to user,
+        ),
+      ),
+    )
+  }
+
+  fun referralProbationOfficeChangedEvent(
+    referral: Referral,
+    oldProbationOffice: String,
+    newProbationOffice: String,
+    user: AuthUser,
+  ) {
+    applicationEventPublisher.publishEvent(
+      ReferralEvent(
+        this,
+        ReferralEventType.PROBATION_OFFICE_AMENDED,
+        referral,
+        getSentReferralURL(referral),
+        mapOf(
+          "oldProbationOffice" to oldProbationOffice,
+          "newProbationOffice" to newProbationOffice,
           "currentAssignee" to referral.currentAssignee?.let { AuthUserDTO.from(it) },
           "crn" to referral.serviceUserCRN,
           "sentBy" to referral.sentBy,

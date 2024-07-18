@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOu
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendExpectedReleaseDateDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendPrisonEstablishmentDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationOfficeDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogValuesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AmendReferralService
@@ -90,6 +91,28 @@ class AmendReferralController(
   ): ResponseEntity<Any> {
     val user = userMapper.fromToken(authentication)
     amendReferralService.amendExpectedReleaseDate(referralId, request, authentication, user)
+    return ResponseEntity(NO_CONTENT)
+  }
+
+  @PostMapping("/sent-referral/{referralId}/amend-expected-probation-office")
+  fun amendExpectedProbationOffice(
+    authentication: JwtAuthenticationToken,
+    @PathVariable referralId: UUID,
+    @RequestBody request: AmendProbationOfficeDTO,
+  ): ResponseEntity<Any> {
+    val user = userMapper.fromToken(authentication)
+    amendReferralService.amendExpectedProbationOffice(referralId, request, authentication, user)
+    return ResponseEntity(NO_CONTENT)
+  }
+
+  @PostMapping("/sent-referral/{referralId}/amend-pp-probation-office")
+  fun amendProbationPractitionerProbationOffice(
+    authentication: JwtAuthenticationToken,
+    @PathVariable referralId: UUID,
+    @RequestBody request: AmendProbationOfficeDTO,
+  ): ResponseEntity<Any> {
+    val user = userMapper.fromToken(authentication)
+    amendReferralService.amendProbationPractitionerProbationOffice(referralId, request, authentication, user)
     return ResponseEntity(NO_CONTENT)
   }
 

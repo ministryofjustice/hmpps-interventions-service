@@ -578,7 +578,7 @@ class DraftReferralService(
         expectedReleaseDate = draftReferral.expectedReleaseDate,
         expectedReleaseDateMissingReason = draftReferral.expectedReleaseDateMissingReason,
         isReferralReleasingIn12Weeks = draftReferral.isReferralReleasingIn12Weeks,
-        expectedProbationOffice = draftReferral.expectedProbationOffice,
+        expectedProbationOffice = draftReferral.expectedProbationOffice ?: if (draftReferral.personCurrentLocationType == PersonCurrentLocationType.CUSTODY) draftReferral.ppProbationOffice else null,
         expectedProbationOfficeUnknownReason = draftReferral.expectedProbationOfficeUnknownReason,
       ),
     )

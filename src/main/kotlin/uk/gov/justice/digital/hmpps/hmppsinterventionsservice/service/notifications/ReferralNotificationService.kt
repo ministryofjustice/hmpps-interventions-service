@@ -37,6 +37,7 @@ class ReferralNotificationService(
   @Value("\${notify.templates.reason-for-referral-updated}") private val reasonForReferralUpdatedTemplateID: String,
   @Value("\${notify.templates.prison-establishment-updated}") private val prisonEstablishmentUpdatedTemplateID: String,
   @Value("\${notify.templates.expected-release-date-updated}") private val expectedReleaseDateUpdatedTemplateID: String,
+  @Value("\${notify.templates.probation-office-updated}") private val probationOfficeUpdatedTemplateID: String,
   @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
   @Value("\${interventions-ui.locations.service-provider.referral-details}") private val spReferralDetailsLocation: String,
   private val emailSender: EmailSender,
@@ -103,6 +104,10 @@ class ReferralNotificationService(
       ReferralEventType.EXPECTED_RELEASE_DATE -> {
         notifyCaseWorkerThatExpectedReleaseDateChanged(event)
       }
+
+      ReferralEventType.PROBATION_OFFICE_AMENDED -> {
+        notifyCaseWorkerThatProbationOfficeChanged(event)
+      }
     }
   }
 
@@ -157,6 +162,33 @@ class ReferralNotificationService(
         "popFullName" to "${event.referral.serviceUserData?.firstName} ${event.referral.serviceUserData?.lastName}",
       ),
     )
+  }
+
+  private fun notifyCaseWorkerThatProbationOfficeChanged(event: ReferralEvent) {
+    val oldProbationOffice = event.data["oldProbationOffice"] as String
+    val newProbationOffice = event.data["newProbationOffice"] as String
+    val updater = event.data["updater"] as AuthUser
+
+    val currentAssignee = event.data["currentAssignee"] as AuthUserDTO? ?: return
+    val updaterUserDetails = hmppsAuthService.getUserDetail(updater)
+    val recipient = hmppsAuthService.getUserDetail(currentAssignee)
+    val frontendUrl = generateResourceUrl(interventionsUIBaseURL, spReferralDetailsLocation, event.referral.id)
+
+    if (oldProbationOffice != newProbationOffice) {
+      emailSender.sendEmail(
+        probationOfficeUpdatedTemplateID,
+        recipient.email,
+        mapOf(
+          "caseWorkerFirstName" to recipient.firstName,
+          "oldProbationOffice" to oldProbationOffice,
+          "newProbationOffice" to newProbationOffice,
+          "changedByName" to "${updaterUserDetails.firstName} ${updaterUserDetails.lastName}",
+          "referralDetailsURL" to frontendUrl.toString(),
+          "referralNumber" to event.referral.referenceNumber!!,
+          "popFullName" to "${event.referral.serviceUserData?.firstName} ${event.referral.serviceUserData?.lastName}",
+        ),
+      )
+    }
   }
 
   private fun notifyCaseWorkerThatDetailsChanged(event: ReferralEventType, templateId: String, referral: Referral) {

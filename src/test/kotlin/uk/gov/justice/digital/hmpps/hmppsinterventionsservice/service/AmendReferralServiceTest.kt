@@ -34,6 +34,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Del
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DesiredOutcomeRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ProbationPractitionerDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralLocationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
@@ -63,6 +64,7 @@ class AmendReferralServiceTest @Autowired constructor(
   val desiredOutcomeRepository: DesiredOutcomeRepository,
   val changelogRepository: ChangelogRepository,
   val referralLocationRepository: ReferralLocationRepository,
+  val probationPractitionerDetailsRepository: ProbationPractitionerDetailsRepository,
 ) {
 
   private val referralEventPublisher: ReferralEventPublisher = mock()
@@ -85,6 +87,7 @@ class AmendReferralServiceTest @Autowired constructor(
     complexityLevelRepository,
     desiredOutcomeRepository,
     referralLocationRepository,
+    probationPractitionerDetailsRepository,
     userMapper,
     referralService,
   )
