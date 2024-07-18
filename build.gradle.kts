@@ -104,14 +104,14 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.26.20")
-  implementation("software.amazon.awssdk:s3:2.26.20")
-  implementation("software.amazon.awssdk:sts:2.26.20")
+  implementation("software.amazon.awssdk:sns:2.26.21")
+  implementation("software.amazon.awssdk:s3:2.26.21")
+  implementation("software.amazon.awssdk:sts:2.26.21")
 
   // security
-  implementation("org.springframework.boot:spring-boot-starter-webflux:3.3.1")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.3.1")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.3.1")
+  implementation("org.springframework.boot:spring-boot-starter-webflux:3.3.2")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.3.2")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.3.2")
   implementation("com.nimbusds:oauth2-oidc-sdk:11.13")
 
   // database
