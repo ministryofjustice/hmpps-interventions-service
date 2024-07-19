@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.loade
 
 import org.assertj.core.api.Assertions.assertThat
 import org.hibernate.SessionFactory
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.batch.item.ExecutionContext
 import org.springframework.beans.factory.annotation.Autowired
@@ -39,5 +38,4 @@ internal class LoadEndOfSentenceReaderTest
     reader.open(ExecutionContext())
     assertThat(reader.read()?.id).isEqualTo(targetReferral.id)
   }
-
 }
