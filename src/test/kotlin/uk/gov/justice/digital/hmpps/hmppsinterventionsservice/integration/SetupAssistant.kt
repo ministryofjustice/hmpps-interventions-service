@@ -465,6 +465,7 @@ class SetupAssistant(
     personCustodyPrisonId: String? = null,
     expectedReleaseDate: LocalDate? = null,
     probationPractitionerDetails: ProbationPractitionerDetails? = null,
+    relevantSentenceEndDate: LocalDate? = null,
   ): Referral {
     createDraftReferral(
       id = id,
@@ -485,6 +486,7 @@ class SetupAssistant(
       needsInterpreter = needsInterpreter,
       interpreterLanguage = interpreterLanguage,
       probationPractitionerDetails = probationPractitionerDetails,
+      relevantSentenceEndDate = relevantSentenceEndDate,
     )
 
     referral = referralRepository.save(
