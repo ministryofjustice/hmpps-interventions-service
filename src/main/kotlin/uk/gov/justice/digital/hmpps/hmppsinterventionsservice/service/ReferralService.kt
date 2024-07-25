@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
 import mu.KotlinLogging
 import net.logstash.logback.argument.StructuredArguments.kv
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Lazy
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
@@ -27,7 +28,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Cancell
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SentReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceProviderSentReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.WithdrawalReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
@@ -36,6 +36,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Del
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralSummary
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralSummaryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSummariesRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.WithdrawalReasonRepository
@@ -51,11 +53,26 @@ data class ResponsibleProbationPractitioner(
   override val lastName: String,
 ) : ContactablePerson
 
+data class ReferralSummaryQuery(
+  val concluded: Boolean?,
+  val cancelled: Boolean?,
+  val unassigned: Boolean?,
+  val assignedToUserId: String?,
+  val page: Pageable,
+  val searchText: String?,
+  val isSpUser: Boolean,
+  val isPPUser: Boolean,
+  val createdById: String?,
+  val serviceUserCrns: List<String> = emptyList(),
+  val serviceProviders: List<String> = emptyList(),
+)
+
 @Service
 @Transactional
 class ReferralService(
   val referralRepository: ReferralRepository,
   val sentReferralSummariesRepository: SentReferralSummariesRepository,
+  @Qualifier("referralSummaryRepositoryImpl") val referralSummaryRepository: ReferralSummaryRepository,
   val authUserRepository: AuthUserRepository,
   val interventionRepository: InterventionRepository,
   val referralConcluder: ReferralConcluder,
@@ -112,17 +129,40 @@ class ReferralService(
     return assignedReferral
   }
 
-  fun getSentReferralSummaryForUser(user: AuthUser, concluded: Boolean?, cancelled: Boolean?, unassigned: Boolean?, assignedToUserId: String?, page: Pageable, searchText: String? = null): Iterable<SentReferralSummary> {
-    val findSentReferralsSpec: Specification<SentReferralSummary> = createSpecification(concluded, cancelled, unassigned, assignedToUserId, searchText)
-
+  fun getSentReferralSummaryForUser(user: AuthUser, concluded: Boolean?, cancelled: Boolean?, unassigned: Boolean?, assignedToUserId: String?, page: Pageable, searchText: String? = null): Iterable<ReferralSummary> {
     if (userTypeChecker.isServiceProviderUser(user)) {
-      return getSentReferralSummaryForServiceProviderUser(user, findSentReferralsSpec, page)
+      val serviceProviders = serviceProviderUserAccessScopeMapper.fromUser(user).serviceProviders.map { it.id }
+      val referralSummary = ReferralSummaryQuery(
+        concluded,
+        cancelled,
+        unassigned,
+        assignedToUserId,
+        page,
+        searchText,
+        isSpUser = true,
+        isPPUser = false,
+        user.id,
+        serviceProviders = serviceProviders,
+      )
+      return referralSummaryRepository.getReferralSummaries(referralSummary)
     }
 
     if (userTypeChecker.isProbationPractitionerUser(user)) {
-      return getSentReferralSummaryForProbationPractitionerUser(user, findSentReferralsSpec, page)
+      val serviceUserCrns = crnsAssociatedWithPP(user)
+      val referralSummary = ReferralSummaryQuery(
+        concluded,
+        cancelled,
+        unassigned,
+        assignedToUserId,
+        page,
+        searchText,
+        isSpUser = false,
+        isPPUser = true,
+        user.id,
+        serviceUserCrns = serviceUserCrns,
+      )
+      return referralSummaryRepository.getReferralSummaries(referralSummary)
     }
-
     throw AccessError(user, "unsupported user type", listOf("logins from ${user.authSource} are not supported"))
   }
 
@@ -138,21 +178,10 @@ class ReferralService(
     return existingSpec.and(if (predicate) specToJoin else not(specToJoin))
   }
 
-  private fun getSentReferralSummaryForServiceProviderUser(user: AuthUser, sentReferralFilterSpecification: Specification<SentReferralSummary>, page: Pageable): Iterable<SentReferralSummary> {
-    // todo: query for referrals where the service provider has been granted nominated access only
-    val filteredSpec = referralAccessFilter.serviceProviderReferrals(sentReferralFilterSpecification, user)
-    return sentReferralSummariesRepository.findAll(filteredSpec, page)
-  }
-
   private fun getSentReferralSummariesForServiceProviderUser(user: AuthUser, dashboardType: DashboardType?): List<ServiceProviderSentReferralSummary> {
     val serviceProviders = serviceProviderUserAccessScopeMapper.fromUser(user).serviceProviders
     val referralSummaries = referralRepository.getSentReferralSummaries(user, serviceProviders = serviceProviders.map { serviceProvider -> serviceProvider.id }, dashboardType)
     return referralAccessFilter.serviceProviderReferralSummaries(referralSummaries, user)
-  }
-
-  private fun getSentReferralSummaryForProbationPractitionerUser(user: AuthUser, sentReferralFilterSpecification: Specification<SentReferralSummary>, page: Pageable): Iterable<SentReferralSummary> {
-    val filteredSpec = createSpecificationForProbationPractitionerUser(user, sentReferralFilterSpecification)
-    return sentReferralSummariesRepository.findAll(filteredSpec, page)
   }
 
   private inline fun <reified T> createSpecification(
@@ -204,6 +233,22 @@ class ReferralService(
     // todo: filter out referrals for limited access offenders (LAOs)
     val referralSpecification = where(referralsForPPUser).and(sentReferralFilterSpecification)
     return referralAccessFilter.probationPractitionerReferrals(referralSpecification, user)
+  }
+
+  private fun crnsAssociatedWithPP(
+    user: AuthUser,
+  ): List<String> {
+    try {
+      return communityAPIOffenderService.getManagedOffendersForDeliusUser(user).map { it.crnNumber }
+    } catch (e: WebClientResponseException) {
+      // don't stop users seeing their own referrals just because delius is not playing nice
+      logger.error(
+        "failed to get managed offenders for user {}, {}",
+        e,
+        kv("username", user.userName),
+      )
+    }
+    return emptyList()
   }
 
   fun requestReferralEnd(referral: Referral, user: AuthUser, withdrawReferralRequestDTO: WithdrawReferralRequestDTO): Referral {
