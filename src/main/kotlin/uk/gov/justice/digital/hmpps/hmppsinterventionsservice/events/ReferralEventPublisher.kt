@@ -143,6 +143,7 @@ class ReferralEventPublisher(
     oldProbationOffice: String,
     newProbationOffice: String,
     user: AuthUser,
+    preventEmailNotification: Boolean?
   ) {
     applicationEventPublisher.publishEvent(
       ReferralEvent(
@@ -158,6 +159,7 @@ class ReferralEventPublisher(
           "sentBy" to referral.sentBy,
           "createdBy" to referral.createdBy,
           "updater" to user,
+          "preventEmailNotification" to preventEmailNotification,
         ),
       ),
     )

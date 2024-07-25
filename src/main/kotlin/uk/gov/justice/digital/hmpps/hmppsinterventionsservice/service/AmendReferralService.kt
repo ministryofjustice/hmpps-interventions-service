@@ -324,7 +324,13 @@ class AmendReferralService(
     )
     changelogRepository.save(changelog)
     referralLocation?.let { referralLocationRepository.save(it) }
-    referralEventPublisher.referralProbationOfficeChangedEvent(referral, oldValues[0], newValues[0], user)
+    referralEventPublisher.referralProbationOfficeChangedEvent(
+      referral,
+      oldValues[0],
+      newValues[0],
+      user,
+      amendProbationOfficeDTO.preventEmailNotification
+    )
   }
 
   fun amendProbationPractitionerProbationOffice(
@@ -356,7 +362,13 @@ class AmendReferralService(
     )
     changelogRepository.save(changelog)
     probationPractitionerDetails?.let { probationPractitionerDetailsRepository.save(it) }
-    referralEventPublisher.referralProbationOfficeChangedEvent(referral, oldValues[0], newValues[0], user)
+    referralEventPublisher.referralProbationOfficeChangedEvent(
+      referral,
+      oldValues[0],
+      newValues[0],
+      user,
+      amendProbationOfficeDTO.preventEmailNotification
+    )
   }
 
   fun getListOfChangeLogEntries(referral: Referral): List<Changelog> {

@@ -8,6 +8,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -655,6 +656,45 @@ class NotifyReferralServiceTest {
       assertThat(personalisationCaptor.firstValue["referralDetailsURL"]).isEqualTo("http://interventions-ui.example.com/referral/${referral.id}")
       assertThat(personalisationCaptor.firstValue["referralNumber"]).isEqualTo(referral.referenceNumber)
       assertThat(personalisationCaptor.firstValue["popFullName"]).isEqualTo("${referral.serviceUserData?.firstName} ${referral.serviceUserData?.lastName}")
+    }
+
+    @Test
+    fun `amending 'probation office' does not notify the assigned caseworker via email if preventEmailNotification is true`() {
+      whenever(authUserRepository.findById(referral.createdBy.id)).thenReturn(Optional.of(referral.createdBy))
+      whenever(hmppsAuthService.getUserDetail(referral.createdBy)).thenReturn(
+        UserDetail(
+          "sally",
+          "sally@tom.com",
+          "smith",
+        ),
+      )
+      whenever(hmppsAuthService.getUserDetail(AuthUserDTO.from(referral.currentAssignee!!))).thenReturn(
+        UserDetail(
+          "tom",
+          "tom@tom.tom",
+          "jones",
+        ),
+      )
+
+      val event = ReferralEvent(
+        "source",
+        ReferralEventType.PROBATION_OFFICE_AMENDED,
+        referral,
+        "http://localhost:8080/sent-referral/${referral.id}",
+        data = mapOf(
+          "preventEmailNotification" to  true,
+          "oldProbationOffice" to "Derby: Derwent Centre",
+          "newProbationOffice" to "Bristol: Bridewell Police Station",
+          "currentAssignee" to if (true) AuthUserDTO.from(referral.currentAssignee!!) else null,
+          "crn" to referral.serviceUserCRN,
+          "sentBy" to referral.sentBy,
+          "createdBy" to referral.createdBy,
+          "updater" to referral.createdBy,
+        ),
+      )
+
+      notifyService().onApplicationEvent(event)
+      verify(emailSender, never()).sendEmail(any(), any(), any())
     }
 
     @Test
