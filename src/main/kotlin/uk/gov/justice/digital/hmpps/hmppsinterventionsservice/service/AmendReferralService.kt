@@ -329,7 +329,7 @@ class AmendReferralService(
       oldValues[0],
       newValues[0],
       user,
-      amendProbationOfficeDTO.preventEmailNotification
+      amendProbationOfficeDTO.preventEmailNotification,
     )
   }
 
@@ -367,7 +367,7 @@ class AmendReferralService(
       oldValues[0],
       newValues[0],
       user,
-      amendProbationOfficeDTO.preventEmailNotification
+      amendProbationOfficeDTO.preventEmailNotification,
     )
   }
 

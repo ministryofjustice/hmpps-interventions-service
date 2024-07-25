@@ -682,7 +682,7 @@ class NotifyReferralServiceTest {
         referral,
         "http://localhost:8080/sent-referral/${referral.id}",
         data = mapOf(
-          "preventEmailNotification" to  true,
+          "preventEmailNotification" to true,
           "oldProbationOffice" to "Derby: Derwent Centre",
           "newProbationOffice" to "Bristol: Bridewell Police Station",
           "currentAssignee" to if (true) AuthUserDTO.from(referral.currentAssignee!!) else null,
