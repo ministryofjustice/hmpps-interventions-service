@@ -56,6 +56,7 @@ class DraftReferralService(
   val serviceCategoryRepository: ServiceCategoryRepository,
   val userTypeChecker: UserTypeChecker,
   val ramDeliusReferralService: RamDeliusReferralService,
+  val ramDeliusConvictionService: RamDeliusAPIConvictionService,
   val assessRisksAndNeedsService: RisksAndNeedsService,
   val supplierAssessmentService: SupplierAssessmentService,
   val hmppsAuthService: HMPPSAuthService,
@@ -533,7 +534,10 @@ class DraftReferralService(
      */
     submitAdditionalRiskInformation(referral, user)
     ramDeliusReferralService.send(referral)
-
+    // record sentence end date if possible
+    if (referral.relevantSentenceId != null && referral.serviceUserCRN != null) {
+      referral.relevantSentenceEndDate = lookupSentenceEndDate(referral.serviceUserCRN, referral.relevantSentenceId!!)
+    }
     val sentReferral = referralRepository.save(referral)
     createReferralLocation(draftReferral, sentReferral)
     createProbationPractitionerDetails(draftReferral, sentReferral)
@@ -728,5 +732,11 @@ class DraftReferralService(
       StructuredArguments.kv("referral_id", draftReferral.id),
     )
     return null
+  }
+
+  private fun lookupSentenceEndDate(crn: String, convictionId: Long): LocalDate? {
+    val sentenceEndDate = ramDeliusConvictionService
+      .getConvictionDetails(crn, convictionId)?.conviction?.sentence?.expectedEndDate
+    return sentenceEndDate
   }
 }

@@ -71,6 +71,7 @@ class DraftReferralServiceUnitTest {
   private val referralAccessFilter: ReferralAccessFilter = mock()
   private val referralAccessChecker: ReferralAccessChecker = mock()
   private val ramDeliusReferralService: RamDeliusReferralService = mock()
+  private val ramDeliusConvictionService: RamDeliusAPIConvictionService = mock()
   private val userTypeChecker: UserTypeChecker = mock()
   private val serviceUserAccessChecker: ServiceUserAccessChecker = mock()
   private val assessRisksAndNeedsService: RisksAndNeedsService = mock()
@@ -104,6 +105,7 @@ class DraftReferralServiceUnitTest {
     serviceCategoryRepository,
     userTypeChecker,
     ramDeliusReferralService,
+    ramDeliusConvictionService,
     assessRisksAndNeedsService,
     supplierAssessmentService,
     hmppsAuthService,

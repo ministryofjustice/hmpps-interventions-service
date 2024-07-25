@@ -82,6 +82,14 @@ class SingleReferralEndpoints : IntegrationTestBase() {
       whenever(mockCommunityAPIOffenderService.checkIfAuthenticatedDeliusUserHasAccessToServiceUser(any(), eq(it)))
         .thenReturn(ServiceUserAccessResult(false, listOf("exclusion message", "restriction message")))
     }
+
+    whenever(mockCommunityAPIConvictionService.checkIfAuthenticatedDeliusUserHasAccessToServiceUser(any(), any()))
+      .thenReturn(ServiceUserAccessResult(true, listOf()))
+
+    crns.forEach {
+      whenever(mockCommunityAPIConvictionService.checkIfAuthenticatedDeliusUserHasAccessToServiceUser(any(), eq(it)))
+        .thenReturn(ServiceUserAccessResult(false, listOf("exclusion message", "restriction message")))
+    }
   }
 
   private fun createSentReferral(contract: DynamicFrameworkContract): Referral {

@@ -85,6 +85,7 @@ class DraftReferralServiceTest @Autowired constructor(
   private val serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper = mock()
   private val referralAccessFilter = ReferralAccessFilter(serviceProviderAccessScopeMapper)
   private val ramDeliusReferralService: RamDeliusReferralService = mock()
+  private val ramDeliusConvictionService: RamDeliusAPIConvictionService = mock()
   private val serviceUserAccessChecker: ServiceUserAccessChecker = mock()
   private val assessRisksAndNeedsService: RisksAndNeedsService = mock()
   private val supplierAssessmentService: SupplierAssessmentService = mock()
@@ -106,6 +107,7 @@ class DraftReferralServiceTest @Autowired constructor(
     serviceCategoryRepository,
     userTypeChecker,
     ramDeliusReferralService,
+    ramDeliusConvictionService,
     assessRisksAndNeedsService,
     supplierAssessmentService,
     hmppsAuthService,
