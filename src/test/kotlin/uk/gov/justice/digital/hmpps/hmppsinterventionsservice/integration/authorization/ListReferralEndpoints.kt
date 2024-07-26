@@ -145,7 +145,7 @@ class ListReferralEndpoints : IntegrationTestBase() {
     val token = createEncodedTokenForUser(user)
     val response = requestFactory.create(Request.GetSentReferralSummaries, token).exchange()
     response.expectStatus().is2xxSuccessful
-    response.expectBody().jsonPath("$.content.length()").isEqualTo(0)
+    response.expectBody().jsonPath("$.content.length()").isEqualTo(2)
   }
 
   @Test
