@@ -1,6 +1,8 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Service
 import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.RestClient
@@ -39,7 +41,8 @@ class RamDeliusAPIConvictionService(
       .buildAndExpand(crn, id)
       .toString()
 
-    val convictionDetails = ramDeliusApiClient.get(convictionPath)
+    val auth = SecurityContextHolder.getContext().getAuthentication() as JwtAuthenticationToken
+    val convictionDetails = ramDeliusApiClient.get(convictionPath, null, auth)
       .retrieve()
       .bodyToMono(ConvictionDetails::class.java)
       .block()

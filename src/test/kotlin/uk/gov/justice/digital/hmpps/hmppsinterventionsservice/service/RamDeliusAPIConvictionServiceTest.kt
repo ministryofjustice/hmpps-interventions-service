@@ -48,11 +48,11 @@ internal class RamDeliusAPIConvictionServiceTest {
           convictionLocation,
           HttpStatus.OK,
           "{\n" +
-            "\"caseDetail\": {\n" +
-            "\"crn\": \"string\",\n" +
-            "\"name\": {\n" +
-            "\"forename\": \"string\",\n" +
-            "\"surname\": \"string\"\n" +
+            " \"caseDetail\": {\n" +
+            " \"crn\": \"string\",\n" +
+            " \"name\": {\n" +
+            " \"forename\": \"string\",\n" +
+            " \"surname\": \"string\"\n" +
             "},\n" +
             "\"dateOfBirth\": \"2024-07-24\",\n" +
             "\"gender\": \"string\",\n" +
@@ -62,22 +62,22 @@ internal class RamDeliusAPIConvictionServiceTest {
             "\"religion\": \"string\",\n" +
             "\"disabilities\": [\n" +
             "{\n" +
-            "\"type\": \"string\",\n" +
-            "\"startDate\": \"2024-07-24\",\n" +
-            "\"notes\": \"string\"\n" +
+            " \"type\": \"string\",\n" +
+            " \"startDate\": \"2024-07-24\",\n" +
+            " \"notes\": \"string\"\n" +
             "}\n" +
             "]\n" +
             "},\n" +
             "\"contactDetails\": {\n" +
-            "\"noFixedAbode\": true,\n" +
-            "\"mainAddress\": {\n" +
-            "\"buildingName\": \"string\",\n" +
-            "\"buildingNumber\": \"string\",\n" +
-            "\"streetName\": \"string\",\n" +
-            "\"district\": \"string\",\n" +
-            "\"town\": \"string\",\n" +
-            "\"county\": \"string\",\n" +
-            "\"postcode\": \"string\"\n" +
+            " \"noFixedAbode\": true,\n" +
+            " \"mainAddress\": {\n" +
+            " \"buildingName\": \"string\",\n" +
+            " \"buildingNumber\": \"string\",\n" +
+            " \"streetName\": \"string\",\n" +
+            " \"district\": \"string\",\n" +
+            " \"town\": \"string\",\n" +
+            " \"county\": \"string\",\n" +
+            " \"postcode\": \"string\"\n" +
             "}," +
             "\"emailAddress\": \"string\",\n" +
             "\"telephoneNumber\": \"string\",\n" +
@@ -85,15 +85,15 @@ internal class RamDeliusAPIConvictionServiceTest {
             "}\n" +
             "},\n" +
             "\"conviction\": {\n" +
-            "\"id\": 123456,\n" +
-            "\"date\": \"2024-07-24\",\n" +
-            "\"sentence\": {\n" +
-            "\"description\": \"string\",\n" +
-            "\"expectedEndDate\": \"2024-01-01\"\n" +
-            "},\n" +
-            "\"mainOffence\": {\n" +
-            "\"category\": \"string\",\n" +
-            "\"subCategory\": \"string\"\n" +
+            " \"id\": 123456,\n" +
+            " \"date\": \"2024-07-24\",\n" +
+            " \"sentence\": {\n" +
+            "   \"description\": \"string\",\n" +
+            "   \"expectedEndDate\": \"2024-01-01\"\n" +
+            " },\n" +
+            " \"mainOffence\": {\n" +
+            " \"category\": \"string\",\n" +
+            " \"subCategory\": \"string\"\n" +
             "},\n" +
             "\"active\": true\n" +
             "}\n" +
