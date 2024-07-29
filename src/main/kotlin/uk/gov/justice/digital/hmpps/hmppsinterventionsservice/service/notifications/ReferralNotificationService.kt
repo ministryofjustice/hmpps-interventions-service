@@ -106,6 +106,8 @@ class ReferralNotificationService(
       }
 
       ReferralEventType.PROBATION_OFFICE_AMENDED -> {
+        val preventEmailNotification = event.data["preventEmailNotification"] as Boolean?
+        if (preventEmailNotification == true) return
         notifyCaseWorkerThatProbationOfficeChanged(event)
       }
     }
