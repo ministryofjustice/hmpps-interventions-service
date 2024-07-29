@@ -41,8 +41,13 @@ class RamDeliusAPIConvictionService(
       .buildAndExpand(crn, id)
       .toString()
 
-    val auth = SecurityContextHolder.getContext().getAuthentication() as JwtAuthenticationToken
-    val convictionDetails = ramDeliusApiClient.get(convictionPath, null, auth)
+    val auth = SecurityContextHolder.getContext()?.getAuthentication()
+    var token: JwtAuthenticationToken? = null
+    if (auth !== null) {
+      token = auth as JwtAuthenticationToken
+    }
+
+    val convictionDetails = ramDeliusApiClient.get(convictionPath, null, token)
       .retrieve()
       .bodyToMono(ConvictionDetails::class.java)
       .block()
