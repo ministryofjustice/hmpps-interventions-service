@@ -66,7 +66,7 @@ class PactTest : IntegrationTestBase() {
 
     whenever(communityAPIOffenderService.checkIfAuthenticatedDeliusUserHasAccessToServiceUser(any(), any()))
       .thenReturn(ServiceUserAccessResult(true, emptyList()))
-    whenever(ramDeliusAPIConvictionService.getConvictionDetails(any(), any())).thenReturn(ConvictionDetails(Conviction(123456L, LocalDate.now(), Sentence("custodial", LocalDate.now()), Offence("" ,""), false)))
+    whenever(ramDeliusAPIConvictionService.getConvictionDetails(any(), any())).thenReturn(ConvictionDetails(Conviction(123456L, LocalDate.now(), Sentence("custodial", LocalDate.now()), Offence("", ""), false)))
     // required for SP users
     whenever(hmppsAuthService.getUserDetail(any<AuthUserDTO>())).thenReturn(UserDetail("tom", "tom@tom.tom", "jones"))
     whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("tom", "tom@tom.tom", "jones"))
