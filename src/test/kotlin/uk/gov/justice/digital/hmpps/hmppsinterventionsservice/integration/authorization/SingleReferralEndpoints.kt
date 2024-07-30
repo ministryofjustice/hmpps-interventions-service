@@ -15,11 +15,17 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUse
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DynamicFrameworkContract
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.CommunityAPIOffenderService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.Conviction
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ConvictionDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.Offence
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.RamDeliusAPIConvictionService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.RamDeliusReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.RisksAndNeedsService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.Sentence
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ServiceUserAccessResult
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFactory
+import java.time.LocalDate
 import java.util.UUID
 
 // @Suppress("UNUSED") is used for things that are only used through parameterised tests, so appear unused
@@ -31,6 +37,9 @@ class SingleReferralEndpoints : IntegrationTestBase() {
   @MockBean
   @Suppress("UNUSED")
   lateinit var ramDeliusReferralService: RamDeliusReferralService
+
+  @MockBean
+  lateinit var ramDeliusAPIConvictionService: RamDeliusAPIConvictionService
 
   @MockBean lateinit var mockRisksAndNeedsService: RisksAndNeedsService
 
@@ -47,6 +56,7 @@ class SingleReferralEndpoints : IntegrationTestBase() {
   fun setupMocks() {
     // required for 'sendDraftReferral' to return a valid DTO
     whenever(mockRisksAndNeedsService.createSupplementaryRisk(any(), any(), any(), anyOrNull(), any(), anyOrNull())).thenReturn(UUID.randomUUID())
+    whenever(ramDeliusAPIConvictionService.getConvictionDetails(any(), any())).thenReturn(ConvictionDetails(Conviction(123456L, LocalDate.now(), Sentence("custodial", LocalDate.now()), Offence("", ""), false)))
   }
 
   companion object {
