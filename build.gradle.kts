@@ -85,8 +85,8 @@ dependencies {
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
-  implementation("io.sentry:sentry-spring-boot-starter:7.12.1")
-  implementation("io.sentry:sentry-logback:7.12.1")
+  implementation("io.sentry:sentry-spring-boot-starter:7.13.0")
+  implementation("io.sentry:sentry-logback:7.13.0")
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
   implementation("net.logstash.logback:logstash-logback-encoder:7.4")
 
@@ -96,7 +96,7 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
   implementation("javax.xml.bind:jaxb-api:2.3.1")
   // notifications
-  implementation("uk.gov.service.notify:notifications-java-client:5.1.0-RELEASE")
+  implementation("uk.gov.service.notify:notifications-java-client:5.2.0-RELEASE")
   implementation("org.json:json") {
     version {
       strictly("20231013")
@@ -104,15 +104,15 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.26.26")
-  implementation("software.amazon.awssdk:s3:2.26.26")
-  implementation("software.amazon.awssdk:sts:2.26.26")
+  implementation("software.amazon.awssdk:sns:2.26.27")
+  implementation("software.amazon.awssdk:s3:2.26.27")
+  implementation("software.amazon.awssdk:sts:2.26.27")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux:3.3.2")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.3.2")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.3.2")
-  implementation("com.nimbusds:oauth2-oidc-sdk:11.13")
+  implementation("com.nimbusds:oauth2-oidc-sdk:11.14")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
