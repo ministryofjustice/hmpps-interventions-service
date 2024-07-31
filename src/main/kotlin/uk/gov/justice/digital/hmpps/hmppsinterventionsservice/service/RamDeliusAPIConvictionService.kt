@@ -5,7 +5,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Service
 import org.springframework.web.util.UriComponentsBuilder
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.RestClient
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.RamDeliusClient
 import java.time.LocalDate
 
 data class Sentence(
@@ -33,7 +33,7 @@ data class ConvictionDetails(
 @Service
 class RamDeliusAPIConvictionService(
   @Value("\${refer-and-monitor-and-delius.locations.conviction}") private val convictionLocation: String,
-  private val ramDeliusApiClient: RestClient,
+  private val ramDeliusApiClient: RamDeliusClient,
   private val telemetryService: TelemetryService,
 ) {
   fun getConvictionDetails(crn: String, id: Long): ConvictionDetails? {
@@ -47,10 +47,7 @@ class RamDeliusAPIConvictionService(
       token = auth as JwtAuthenticationToken
     }
 
-    val convictionDetails = ramDeliusApiClient.get(convictionPath, null, token)
-      .retrieve()
-      .bodyToMono(ConvictionDetails::class.java)
-      .block()
+    val convictionDetails = ramDeliusApiClient.makeGetConvictionRequest(convictionPath, token)
 
     if (convictionDetails?.conviction?.sentence?.expectedEndDate == null) {
       telemetryService.reportInvalidAssumption(

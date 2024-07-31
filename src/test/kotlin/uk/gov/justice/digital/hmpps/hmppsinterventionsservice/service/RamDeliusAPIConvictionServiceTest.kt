@@ -9,35 +9,38 @@ import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Mono
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.RamDeliusClient
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.RestClient
 
 internal class RamDeliusAPIConvictionServiceTest {
   private val convictionLocation = "convictions"
   private val telemetryService = mock<TelemetryService>()
 
-  private fun createMockedRestClient(vararg responses: MockedResponse): RestClient {
-    return RestClient(
-      WebClient.builder()
-        .exchangeFunction exchange@{ req ->
-          responses.forEach {
-            if (req.url().path == it.path) {
-              return@exchange Mono.just(
-                ClientResponse.create(it.status)
-                  .header("content-type", "application/json")
-                  .body(it.responseBody)
-                  .build(),
-              )
+  private fun createMockedRestClient(vararg responses: MockedResponse): RamDeliusClient {
+    return RamDeliusClient(
+      RestClient(
+        WebClient.builder()
+          .exchangeFunction exchange@{ req ->
+            responses.forEach {
+              if (req.url().path == it.path) {
+                return@exchange Mono.just(
+                  ClientResponse.create(it.status)
+                    .header("content-type", "application/json")
+                    .body(it.responseBody)
+                    .build(),
+                )
+              }
             }
+            Mono.empty()
           }
-          Mono.empty()
-        }
-        .build(),
-      "client-registration-id",
+          .build(),
+        "client-registration-id",
+      ),
     )
   }
 
-  private fun convictionServiceFactory(restClient: RestClient): RamDeliusAPIConvictionService {
-    return RamDeliusAPIConvictionService(convictionLocation, restClient, telemetryService)
+  private fun convictionServiceFactory(ramDeliusClient: RamDeliusClient): RamDeliusAPIConvictionService {
+    return RamDeliusAPIConvictionService(convictionLocation, ramDeliusClient, telemetryService)
   }
 
   @Test
