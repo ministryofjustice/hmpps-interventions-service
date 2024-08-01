@@ -38,7 +38,7 @@ class RamDeliusAPIConvictionService(
     val convictionPath = UriComponentsBuilder.fromPath(convictionLocation)
       .buildAndExpand(crn, id)
       .toString()
-    
+
     val convictionDetails = ramDeliusApiClient.makeGetConvictionRequest(convictionPath, null)
 
     if (convictionDetails?.conviction?.sentence?.expectedEndDate == null) {
