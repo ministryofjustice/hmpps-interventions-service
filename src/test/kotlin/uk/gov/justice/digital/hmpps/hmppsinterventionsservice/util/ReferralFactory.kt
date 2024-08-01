@@ -114,6 +114,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     createdBy: AuthUser = authUserFactory.create(),
     serviceUserCRN: String = "X123456",
     relevantSentenceId: Long = 1234567L,
+    relevantSentenceEndDate: LocalDate? = null,
     intervention: Intervention = interventionFactory.create(),
     selectedServiceCategories: MutableSet<ServiceCategory>? = null,
     desiredOutcomes: List<DesiredOutcome> = emptyList(),
@@ -183,6 +184,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       probationPractitionerDetails = probationPractitionerDetails,
       withdrawalReasonCode = withdrawReasonCode,
       withdrawalComments = withdrawalComments,
+      relevantSentenceEndDate = relevantSentenceEndDate,
     )
     val probationPractitionerDetails = probationPractitionerDetailsFactory.create(referral = referral)
     referral.probationPractitionerDetails = probationPractitionerDetails

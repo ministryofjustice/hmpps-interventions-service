@@ -59,6 +59,7 @@ COMMENT ON COLUMN referral.supplementary_risk_id IS 'ID of the supplementary ris
 COMMENT ON COLUMN referral.reference_number IS 'referral number';
 COMMENT ON COLUMN referral.sent_at IS 'when the referral was sent';
 COMMENT ON COLUMN referral.sent_by_id IS 'ID of the person who sent the referral';
+COMMENT ON COLUMN referral.relevant_sentence_end_date IS 'Date that the sentence selected for this referral ends';
 
 COMMENT ON TABLE referral_assignments IS 'snapshots of referral assignments';
 COMMENT ON COLUMN referral_assignments.referral_id IS 'the referral being assigned';
@@ -213,4 +214,8 @@ COMMENT ON COLUMN withdrawal_reason.description IS 'withdrawal reasons codes des
 COMMENT ON COLUMN withdrawal_reason.grouping IS 'withdrawal reasons codes grouping';
 COMMENT ON COLUMN referral.withdrawal_reason_code IS 'withdrawal reasons code for the referral';
 COMMENT ON COLUMN referral.withdrawal_comments IS 'withdrawal reason comments';
+
+COMMENT ON TABLE relevant_sentence_end_dataload IS 'temporary table allowing loading of records for endOfSentence date implementation';
+COMMENT ON COLUMN relevant_sentence_end_dataload.relevant_sentence_id IS 'sentence id for the applicable sentence';
+COMMENT ON COLUMN relevant_sentence_end_dataload.relevant_sentence_end_date IS 'end date for the applicable sentence';
 -- some definitions are in V1_34__document_contract_table.sql; needs lifting

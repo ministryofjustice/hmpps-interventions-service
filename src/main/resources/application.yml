@@ -156,6 +156,7 @@ refer-and-monitor-and-delius:
     appointment-merge: "/probation-case/{crn}/referrals/{referralId}/appointments"
     case-access: "/users/{username}/access"
     case-identifiers: "/probation-case/{crn}/identifiers"
+    conviction: "/probation-case/{crn}/convictions/{id}"
     managed-cases: "/users/{username}/managed-cases"
     referral-start: "/probation-case/{crn}/referrals"
     responsible-officer: "/probation-case/{crn}/responsible-officer"

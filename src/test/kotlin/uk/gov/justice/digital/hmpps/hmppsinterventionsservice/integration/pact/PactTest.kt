@@ -19,13 +19,19 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AuthUserDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.CommunityAPIOffenderService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.Conviction
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ConvictionDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.Offence
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.RamDeliusAPIConvictionService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.RamDeliusReferralService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.RisksAndNeedsService
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.Sentence
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ServiceUserAccessResult
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.UserDetail
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFrameworkContractFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceProviderFactory
+import java.time.LocalDate
 import java.util.UUID
 
 @PactBroker
@@ -33,6 +39,8 @@ import java.util.UUID
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class PactTest : IntegrationTestBase() {
   @MockBean private lateinit var communityAPIOffenderService: CommunityAPIOffenderService
+
+  @MockBean private lateinit var ramDeliusAPIConvictionService: RamDeliusAPIConvictionService
 
   @MockBean private lateinit var ramDeliusReferralService: RamDeliusReferralService
 
@@ -58,6 +66,7 @@ class PactTest : IntegrationTestBase() {
 
     whenever(communityAPIOffenderService.checkIfAuthenticatedDeliusUserHasAccessToServiceUser(any(), any()))
       .thenReturn(ServiceUserAccessResult(true, emptyList()))
+    whenever(ramDeliusAPIConvictionService.getConvictionDetails(any(), any())).thenReturn(ConvictionDetails(Conviction(123456L, LocalDate.now(), Sentence("custodial", LocalDate.now()), Offence("", ""), false)))
     // required for SP users
     whenever(hmppsAuthService.getUserDetail(any<AuthUserDTO>())).thenReturn(UserDetail("tom", "tom@tom.tom", "jones"))
     whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("tom", "tom@tom.tom", "jones"))

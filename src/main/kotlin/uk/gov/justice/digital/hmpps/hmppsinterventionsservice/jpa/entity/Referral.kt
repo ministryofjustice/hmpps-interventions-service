@@ -22,6 +22,7 @@ import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode.JOIN
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -73,6 +74,7 @@ class Referral(
   var selectedDesiredOutcomes: MutableList<SelectedDesiredOutcomesMapping>? = null,
 
   var relevantSentenceId: Long? = null,
+  var relevantSentenceEndDate: LocalDate? = null,
 
   @OneToMany(fetch = FetchType.LAZY)
   @OrderBy("createdAt")

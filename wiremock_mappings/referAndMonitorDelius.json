@@ -8,6 +8,67 @@
     "headers": {
       "Content-Type": "application/json"
     },
-    "jsonBody": {}
+    "jsonBody": {
+    }
+  },
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/probation-case/.*/convictions/.*"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+    "caseDetail": {
+    "crn": "X000000",
+    "name": {
+    "forename": "string",
+    "surname": "string"
+    },
+    "dateOfBirth": "2024-07-24",
+    "gender": "string",
+    "profile": {
+    "primaryLanguage": "string",
+    "ethnicity": "string",
+    "religion": "string",
+    "disabilities": [
+    {
+    "type": "string",
+    "startDate": "2024-07-24",
+    "notes": "string"
+    }]
+    },
+    "contactDetails": {
+    "noFixedAbode": true,
+    "mainAddress": {
+    "buildingName": "string",
+    "buildingNumber": "string",
+    "streetName": "string",
+    "district": "string",
+    "town": "string",
+    "county": "string",
+    "postcode": "string"
+    },
+    "emailAddress": "string",
+    "telephoneNumber": "string",
+    "mobileNumber": "string"
+    }
+    },
+    "conviction": {
+    "id": 2600295124,
+    "date": "2023-01-01",
+    "sentence": {
+    "description": "string",
+    "expectedEndDate": "2024-07-24"
+    },
+    "mainOffence": {
+    "category": "string",
+    "subCategory": "string"
+    },
+    "active": true
+    }
+    }
   }
 }
