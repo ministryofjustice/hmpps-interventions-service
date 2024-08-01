@@ -1,8 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Service
 import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.RamDeliusClient
@@ -41,13 +39,7 @@ class RamDeliusAPIConvictionService(
       .buildAndExpand(crn, id)
       .toString()
 
-    val auth = SecurityContextHolder.getContext()?.getAuthentication()
-    var token: JwtAuthenticationToken? = null
-    if (auth !== null) {
-      token = auth as JwtAuthenticationToken
-    }
-
-    val convictionDetails = ramDeliusApiClient.makeGetConvictionRequest(convictionPath, token)
+    val convictionDetails = ramDeliusApiClient.makeGetConvictionRequest(convictionPath, null)
 
     if (convictionDetails?.conviction?.sentence?.expectedEndDate == null) {
       telemetryService.reportInvalidAssumption(
