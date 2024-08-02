@@ -39,7 +39,7 @@ class RamDeliusAPIConvictionService(
       .buildAndExpand(crn, id)
       .toString()
 
-    val convictionDetails = ramDeliusApiClient.makeGetConvictionRequest(convictionPath, null)
+    val convictionDetails = ramDeliusApiClient.makeGetConvictionRequest(convictionPath)
 
     if (convictionDetails?.conviction?.sentence?.expectedEndDate == null) {
       telemetryService.reportInvalidAssumption(
