@@ -14,5 +14,5 @@ class RamDeliusClient(private val ramDeliusApiClient: RestClient) {
     ramDeliusApiClient.put(uri, requestBody).retrieve().bodyToMono(AppointmentResponseDTO::class.java).block()
 
   fun makeGetConvictionRequest(uri: String): ConvictionDetails =
-    ramDeliusApiClient.get(uri, null, null).retrieve().bodyToMono(ConvictionDetails::class.java).block()
+    ramDeliusApiClient.get(uri).retrieve().bodyToMono(ConvictionDetails::class.java).block()
 }
