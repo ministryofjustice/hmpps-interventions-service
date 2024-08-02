@@ -1,0 +1,2 @@
+create index idx_prime_provider_id on dynamic_framework_contract (prime_provider_id);
+create index idx_sub_contractor_prime_provider_id on dynamic_framework_contract_sub_contractor (subcontractor_provider_id);
