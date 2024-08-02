@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component
 
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AppointmentResponseDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ConvictionDetails
