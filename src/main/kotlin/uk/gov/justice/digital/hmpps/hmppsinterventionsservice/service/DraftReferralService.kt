@@ -532,12 +532,16 @@ class DraftReferralService(
      * duplicate NSI gets created in Delius as the Delius call is not idempotent. This order avoids creating
      * duplicate NSIs in nDelius on user retry.
      */
+    // record sentence end date if possible
+    try {
+      if (referral.relevantSentenceId != null && referral.serviceUserCRN != null) {
+        referral.relevantSentenceEndDate = lookupSentenceEndDate(referral.serviceUserCRN, referral.relevantSentenceId!!)
+      }
+    } catch (ex: Exception) {
+      // ignore null return or errors associated with the optional call
+    }
     submitAdditionalRiskInformation(referral, user)
     ramDeliusReferralService.send(referral)
-    // record sentence end date if possible
-    if (referral.relevantSentenceId != null && referral.serviceUserCRN != null) {
-      referral.relevantSentenceEndDate = lookupSentenceEndDate(referral.serviceUserCRN, referral.relevantSentenceId!!)
-    }
     val sentReferral = referralRepository.save(referral)
     createReferralLocation(draftReferral, sentReferral)
     createProbationPractitionerDetails(draftReferral, sentReferral)
