@@ -532,18 +532,23 @@ class DraftReferralService(
      * duplicate NSI gets created in Delius as the Delius call is not idempotent. This order avoids creating
      * duplicate NSIs in nDelius on user retry.
      */
-    submitAdditionalRiskInformation(referral, user)
-    ramDeliusReferralService.send(referral)
     // record sentence end date if possible
-    if (referral.relevantSentenceId != null && referral.serviceUserCRN != null) {
-      referral.relevantSentenceEndDate = lookupSentenceEndDate(referral.serviceUserCRN, referral.relevantSentenceId!!)
+    try {
+      if (referral.relevantSentenceId != null && referral.serviceUserCRN != null) {
+        referral.relevantSentenceEndDate = lookupSentenceEndDate(referral.serviceUserCRN, referral.relevantSentenceId!!)
+      }
+    } catch (ex: Exception) {
+      // ignore null return or errors associated with the optional call
+    } finally {
+      submitAdditionalRiskInformation(referral, user)
+      ramDeliusReferralService.send(referral)
+      val sentReferral = referralRepository.save(referral)
+      createReferralLocation(draftReferral, sentReferral)
+      createProbationPractitionerDetails(draftReferral, sentReferral)
+      eventPublisher.referralSentEvent(sentReferral)
+      supplierAssessmentService.createSupplierAssessment(referral)
+      return sentReferral
     }
-    val sentReferral = referralRepository.save(referral)
-    createReferralLocation(draftReferral, sentReferral)
-    createProbationPractitionerDetails(draftReferral, sentReferral)
-    eventPublisher.referralSentEvent(sentReferral)
-    supplierAssessmentService.createSupplierAssessment(referral)
-    return sentReferral
   }
 
   private fun createSentReferral(draftReferral: DraftReferral, sentByUser: AuthUser): Referral {
