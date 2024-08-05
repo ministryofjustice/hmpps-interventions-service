@@ -539,15 +539,16 @@ class DraftReferralService(
       }
     } catch (ex: Exception) {
       // ignore null return or errors associated with the optional call
+    } finally {
+      submitAdditionalRiskInformation(referral, user)
+      ramDeliusReferralService.send(referral)
+      val sentReferral = referralRepository.save(referral)
+      createReferralLocation(draftReferral, sentReferral)
+      createProbationPractitionerDetails(draftReferral, sentReferral)
+      eventPublisher.referralSentEvent(sentReferral)
+      supplierAssessmentService.createSupplierAssessment(referral)
+      return sentReferral
     }
-    submitAdditionalRiskInformation(referral, user)
-    ramDeliusReferralService.send(referral)
-    val sentReferral = referralRepository.save(referral)
-    createReferralLocation(draftReferral, sentReferral)
-    createProbationPractitionerDetails(draftReferral, sentReferral)
-    eventPublisher.referralSentEvent(sentReferral)
-    supplierAssessmentService.createSupplierAssessment(referral)
-    return sentReferral
   }
 
   private fun createSentReferral(draftReferral: DraftReferral, sentByUser: AuthUser): Referral {
