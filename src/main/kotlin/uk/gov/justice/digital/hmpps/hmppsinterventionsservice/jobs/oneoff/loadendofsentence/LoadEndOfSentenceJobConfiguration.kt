@@ -46,7 +46,7 @@ class LoadEndOfSentenceJobConfiguration(
     transactionManager: PlatformTransactionManager,
   ): Step {
     return stepBuilderFactory.get("loadEndOfSentenceStep")
-      .chunk<Referral, Referral>(10, transactionManager)
+      .chunk<Referral, Referral>(20000, transactionManager)
       .reader(reader)
       .processor(processor)
       .writer(writer)
