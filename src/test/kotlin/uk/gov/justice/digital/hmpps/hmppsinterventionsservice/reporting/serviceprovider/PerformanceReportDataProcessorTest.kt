@@ -71,6 +71,7 @@ internal class PerformanceReportDataProcessorTest {
       eosrSubmittedAt = OffsetDateTime.now(),
       concludedAt = referral.concludedAt,
       completionDeadline = today,
+      endOfSentenceDate = today.plusDays(60),
     )
 
     whenever(appointmentRepository.findAllByReferralId(referral.id)).thenReturn(listOf(supplierAssessmentFirstAppointment, supplierAssessmentNewAppointment))
@@ -93,6 +94,7 @@ internal class PerformanceReportDataProcessorTest {
     assertThat(performanceReportData.numberOfSessionsAttended).isEqualTo(2)
     assertThat(performanceReportData.supplierAssessmentAttendedOnTime).isEqualTo(true)
     assertThat(performanceReportData.dateInterventionToBeCompletedBy).isEqualTo(today)
+    assertThat(performanceReportData.dateInterventionToBeCompletedBy).isEqualTo(today.plusDays(60))
   }
 
   @Test
@@ -132,6 +134,7 @@ internal class PerformanceReportDataProcessorTest {
       eosrSubmittedAt = OffsetDateTime.now(),
       concludedAt = referral.concludedAt,
       completionDeadline = today,
+      endOfSentenceDate = today.plusDays(60),
     )
 
     whenever(appointmentRepository.findAllByReferralId(referral.id)).thenReturn(listOf(supplierAssessmentFirstAppointment, supplierAssessmentNewAppointment))

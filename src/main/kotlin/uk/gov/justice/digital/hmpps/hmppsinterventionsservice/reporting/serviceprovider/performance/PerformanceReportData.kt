@@ -61,6 +61,7 @@ data class PerformanceReportData(
       "concludedAt",
       "referralEndState",
       "dateInterventionToBeCompletedBy",
+      "endOfSentenceDate",
     )
     val headers = listOf(
       "referral_ref",
@@ -89,6 +90,7 @@ data class PerformanceReportData(
       "concluded_at",
       "referral_end_state",
       "date_intervention_to_be_completed_by",
+      "end_of_sentence_date",
     )
   }
 }

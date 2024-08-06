@@ -30,4 +30,5 @@ data class ReferralPerformanceReport(
   val eosrSubmittedAt: OffsetDateTime?,
   val concludedAt: OffsetDateTime?,
   val completionDeadline: LocalDate?,
+  val endOfSentenceDate: LocalDate?,
 )

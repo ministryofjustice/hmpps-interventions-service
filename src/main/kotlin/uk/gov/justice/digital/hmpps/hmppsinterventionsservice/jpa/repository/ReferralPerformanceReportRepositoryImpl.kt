@@ -71,6 +71,7 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
       val eosrSubmittedAt = timestampToOffset(row[21] as Timestamp?) as OffsetDateTime?
       val concludedAt = timestampToOffset(row[22] as Timestamp?) as OffsetDateTime?
       val completionDeadline = (row[23] as Date?)?.toLocalDate()
+      val endOfSentenceDate = (row[24] as Date?)?.toLocalDate()
       records.add(
         ReferralPerformanceReport(
           referralId = referralId,
@@ -97,6 +98,7 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
           eosrSubmittedAt = eosrSubmittedAt,
           concludedAt = concludedAt,
           completionDeadline = completionDeadline,
+          endOfSentenceDate = endOfSentenceDate,
         ),
       )
     }
