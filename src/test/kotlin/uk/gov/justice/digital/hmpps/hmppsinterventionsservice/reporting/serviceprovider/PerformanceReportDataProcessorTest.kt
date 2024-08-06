@@ -94,7 +94,7 @@ internal class PerformanceReportDataProcessorTest {
     assertThat(performanceReportData.numberOfSessionsAttended).isEqualTo(2)
     assertThat(performanceReportData.supplierAssessmentAttendedOnTime).isEqualTo(true)
     assertThat(performanceReportData.dateInterventionToBeCompletedBy).isEqualTo(today)
-    assertThat(performanceReportData.dateInterventionToBeCompletedBy).isEqualTo(today.plusDays(60))
+    assertThat(performanceReportData.endOfSentenceDate).isEqualTo(today.plusDays(60))
   }
 
   @Test

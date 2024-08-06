@@ -31,6 +31,7 @@ data class PerformanceReportData(
   val concludedAt: OffsetDateTime?,
   val referralEndState: String?,
   val dateInterventionToBeCompletedBy: LocalDate?,
+  val endOfSentenceDate: LocalDate?,
 ) {
   companion object {
     // it would be neater to use reflection to get the fields, but we cannot guarantee the order
