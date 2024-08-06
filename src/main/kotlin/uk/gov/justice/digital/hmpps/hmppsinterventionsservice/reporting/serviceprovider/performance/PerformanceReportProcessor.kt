@@ -45,6 +45,7 @@ class PerformanceReportProcessor(
       concludedAt = referral.concludedAt,
       referralEndState = endState(referral),
       dateInterventionToBeCompletedBy = referral.completionDeadline,
+      endOfSentenceDate = referral.endOfSentenceDate,
     )
   }
 
