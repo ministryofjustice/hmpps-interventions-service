@@ -31,6 +31,7 @@ data class PerformanceReportData(
   val concludedAt: OffsetDateTime?,
   val referralEndState: String?,
   val dateInterventionToBeCompletedBy: LocalDate?,
+  val endOfSentenceDate: LocalDate?,
 ) {
   companion object {
     // it would be neater to use reflection to get the fields, but we cannot guarantee the order
@@ -61,6 +62,7 @@ data class PerformanceReportData(
       "concludedAt",
       "referralEndState",
       "dateInterventionToBeCompletedBy",
+      "endOfSentenceDate",
     )
     val headers = listOf(
       "referral_ref",
@@ -89,6 +91,7 @@ data class PerformanceReportData(
       "concluded_at",
       "referral_end_state",
       "date_intervention_to_be_completed_by",
+      "end_of_sentence_date",
     )
   }
 }
