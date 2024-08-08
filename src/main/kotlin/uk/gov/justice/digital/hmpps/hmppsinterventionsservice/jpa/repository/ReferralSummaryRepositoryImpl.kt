@@ -54,6 +54,16 @@ class ReferralSummaryRepositoryImpl : ReferralSummaryRepository {
     private val logger = KotlinLogging.logger {}
   }
 
+  private val sortKeyMapper = mapOf(
+    "sentAt" to "sentat",
+    "referenceNumber" to "referencenumber",
+    "serviceUserData.lastName" to "serviceuserlastname",
+    "intervention.title" to "interventiontitle",
+    "intervention.dynamicFrameworkContract.primeProvider.name" to "serviceprovidername",
+    "assignments.assignedTo.userName" to "assignedtousername",
+    "referralLocation.expectedReleaseDate" to "expectedreleasedate",
+  )
+
   @PersistenceContext
   private lateinit var entityManager: EntityManager
 
@@ -239,8 +249,7 @@ WHERE  assigned_at_desc_seq = 1
     if (page.sort.isSorted) {
       queryBuilder.append(" ORDER BY ")
       page.sort.forEach { order ->
-        // Assuming the sort property is in the format "table.column"
-        val column = order.property
+        val column = if (sortKeyMapper.containsKey(order.property)) sortKeyMapper[order.property] else order.property
         val direction = order.direction
         queryBuilder.append("$column $direction")
         queryBuilder.append(", ")
