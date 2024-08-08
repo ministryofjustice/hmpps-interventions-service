@@ -25,6 +25,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.WithdrawReferr
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DynamicFrameworkContract
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
@@ -64,7 +65,7 @@ data class ReferralSummaryQuery(
   val isPPUser: Boolean,
   val createdById: String?,
   val serviceUserCrns: List<String> = emptyList(),
-  val serviceProviders: List<String> = emptyList(),
+  val contracts: Set<DynamicFrameworkContract> = emptySet(),
 )
 
 @Service
@@ -131,7 +132,7 @@ class ReferralService(
 
   fun getSentReferralSummaryForUser(user: AuthUser, concluded: Boolean?, cancelled: Boolean?, unassigned: Boolean?, assignedToUserId: String?, page: Pageable, searchText: String? = null): Iterable<ReferralSummary> {
     if (userTypeChecker.isServiceProviderUser(user)) {
-      val serviceProviders = serviceProviderUserAccessScopeMapper.fromUser(user).serviceProviders.map { it.id }
+      val contracts = serviceProviderUserAccessScopeMapper.fromUser(user).contracts
       val referralSummary = ReferralSummaryQuery(
         concluded,
         cancelled,
@@ -142,7 +143,7 @@ class ReferralService(
         isSpUser = true,
         isPPUser = false,
         user.id,
-        serviceProviders = serviceProviders,
+        contracts = contracts,
       )
       return referralSummaryRepository.getReferralSummaries(referralSummary)
     }
