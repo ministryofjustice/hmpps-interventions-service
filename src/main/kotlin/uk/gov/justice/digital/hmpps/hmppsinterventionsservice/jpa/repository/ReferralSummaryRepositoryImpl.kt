@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DashboardType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DynamicFrameworkContract
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceProviderSentReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralSummaryQuery
@@ -19,6 +20,7 @@ import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.util.UUID
+import kotlin.contracts.contract
 
 data class ReferralSummary(
   val referralId: UUID,
@@ -240,10 +242,10 @@ WHERE  assigned_at_desc_seq = 1
       isPPUser,
       createdById,
       serviceUserCrns,
-      serviceProviders,
+      contracts,
     ) = referralSummaryQuery
 
-    val queryBuilder = StringBuilder(referralSummaryQuery(constructCustomCriteria(concluded, cancelled, unassigned, assignedToUserId, searchText, isSpUser, isPPUser)))
+    val queryBuilder = StringBuilder(referralSummaryQuery(constructCustomCriteria(concluded, cancelled, unassigned, assignedToUserId, searchText, isSpUser, isPPUser, contracts)))
 
     // Append ORDER BY clause if sorting is specified
     if (page.sort.isSorted) {
@@ -280,7 +282,16 @@ WHERE  assigned_at_desc_seq = 1
     isSpUser.let {
       if (it) {
         assignedToUserId?.let { query.setParameter("assignedToUserId", assignedToUserId) }
-        query.setParameter("serviceProviders", serviceProviders)
+        val serviceProviders = contracts.map { contract -> contract.primeProvider.id }
+        val subContractServiceProviders = contracts.flatMap { contract -> contract.subcontractorProviders.map { subcontract -> subcontract.id } }
+        val providers = serviceProviders + subContractServiceProviders
+        val npsRegion = contracts.filter { contract -> contract.npsRegion != null }.map { contract -> contract.npsRegion?.id }
+        val pccRegion = contracts.filter { contract -> contract.pccRegion != null }.map { contract -> contract.pccRegion?.id }
+        val contractReferences = contracts.map { contract -> contract.contractReference }
+        query.setParameter("serviceProviders", providers)
+        if (npsRegion.isNotEmpty()) query.setParameter("npsRegions", npsRegion)
+        if (pccRegion.isNotEmpty()) query.setParameter("pccRegions", pccRegion)
+        query.setParameter("contractReferences", contractReferences)
       }
     }
 
@@ -352,7 +363,7 @@ WHERE  assigned_at_desc_seq = 1
       isPPUser,
       createdById,
       serviceUserCrns,
-      serviceProviders,
+      contracts,
     )
     // Create Pageable object
     val pageable = PageRequest.of(page.pageNumber, page.pageSize, page.sort ?: Sort.unsorted())
@@ -371,7 +382,7 @@ WHERE  assigned_at_desc_seq = 1
     isPPUser: Boolean,
     createdById: String?,
     serviceUserCrns: List<String>?,
-    serviceProviders: List<String>?,
+    contracts: Set<DynamicFrameworkContract>,
   ): Long {
     // Get total count (you need a separate count query for this)
     val countQuery = "SELECT COUNT(*) FROM (${
@@ -384,6 +395,7 @@ WHERE  assigned_at_desc_seq = 1
           searchText,
           isSpUser,
           isPPUser,
+          contracts,
         ),
       )
     }) as count_query"
@@ -401,7 +413,16 @@ WHERE  assigned_at_desc_seq = 1
     isSpUser.let {
       if (it) {
         assignedToUserId?.let { countQueryObj.setParameter("assignedToUserId", assignedToUserId) }
-        countQueryObj.setParameter("serviceProviders", serviceProviders)
+        val serviceProviders = contracts.map { contract -> contract.primeProvider.id }
+        val subContractServiceProviders = contracts.flatMap { contract -> contract.subcontractorProviders.map { subcontract -> subcontract.id } }
+        val providers = serviceProviders + subContractServiceProviders
+        val npsRegion = contracts.filter { contract -> contract.npsRegion != null }.map { contract -> contract.npsRegion?.id }
+        val pccRegion = contracts.filter { contract -> contract.pccRegion != null }.map { contract -> contract.pccRegion?.id }
+        val contractReferences = contracts.map { contract -> contract.contractReference }
+        countQueryObj.setParameter("serviceProviders", providers)
+        if (npsRegion.isNotEmpty()) countQueryObj.setParameter("npsRegions", npsRegion)
+        if (pccRegion.isNotEmpty()) countQueryObj.setParameter("pccRegions", pccRegion)
+        countQueryObj.setParameter("contractReferences", contractReferences)
       }
     }
 
@@ -417,6 +438,7 @@ WHERE  assigned_at_desc_seq = 1
     searchText: String?,
     isSpUser: Boolean,
     isPpUser: Boolean,
+    contracts: Set<DynamicFrameworkContract>,
   ): String {
     val customCriteria = StringBuilder()
     concluded?.let { if (it) customCriteria.append("and r.concluded_at  is not null ") else customCriteria.append("and r.concluded_at  is null ") }
@@ -424,7 +446,7 @@ WHERE  assigned_at_desc_seq = 1
     unassigned?.let { if (it) customCriteria.append("and ra.assigned_to_id is null ") else customCriteria.append("and not (ra.assigned_to_id is null) ") }
     assignedToUserId?.let { customCriteria.append("and au.id = :assignedToUserId ") }
     searchText?.let { customCriteria.append(searchQuery(it)) }
-    isSpUser.let { if (it) customCriteria.append(constructSPQuery()) }
+    isSpUser.let { if (it) customCriteria.append(constructSPQuery(contracts)) }
     isPpUser.let { if (it) customCriteria.append(constructPPQuery()) }
     return customCriteria.toString()
   }
@@ -433,8 +455,14 @@ WHERE  assigned_at_desc_seq = 1
     return "and (r.created_by_id = :createdById or r.service_usercrn in :serviceUserCrns) "
   }
 
-  private fun constructSPQuery(): String {
-    return "and ( dfc.prime_provider_id in :serviceProviders or dfcsc.subcontractor_provider_id in :serviceProviders ) "
+  private fun constructSPQuery(contracts: Set<DynamicFrameworkContract>): String {
+    return if (contracts.any { it.npsRegion != null } && contracts.any { it.pccRegion != null }) {
+      "and ( dfc.prime_provider_id in :serviceProviders or dfcsc.subcontractor_provider_id in :serviceProviders ) and (nps_region_id in :npsRegions or pcc_region_id in :pccRegions) and contract_reference in :contractReferences "
+    } else if (contracts.any { it.npsRegion != null }) {
+      "and ( dfc.prime_provider_id in :serviceProviders or dfcsc.subcontractor_provider_id in :serviceProviders ) and nps_region_id in :npsRegions and contract_reference in :contractReferences "
+    } else {
+      "and ( dfc.prime_provider_id in :serviceProviders or dfcsc.subcontractor_provider_id in :serviceProviders ) and pcc_region_id in :pccRegions and contract_reference in :contractReferences "
+    }
   }
 
   private fun searchQuery(searchText: String): String {
