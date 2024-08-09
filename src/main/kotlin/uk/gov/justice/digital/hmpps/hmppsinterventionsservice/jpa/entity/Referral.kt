@@ -6,6 +6,8 @@ import jakarta.persistence.Column
 import jakarta.persistence.ElementCollection
 import jakarta.persistence.Embeddable
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.FetchType
 import jakarta.persistence.Id
 import jakarta.persistence.Index
@@ -22,6 +24,8 @@ import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode.JOIN
+import org.hibernate.annotations.JdbcType
+import org.hibernate.dialect.PostgreSQLEnumJdbcType
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -33,6 +37,11 @@ class SelectedDesiredOutcomesMapping(
   @Column(name = "desired_outcome_id")
   var desiredOutcomeId: UUID,
 )
+
+enum class Status {
+  PRE_ICA,
+  POST_ICA,
+}
 
 @Entity
 @Table(name = "referral", indexes = [Index(columnList = "created_by_id")])
@@ -125,6 +134,12 @@ class Referral(
 
   @Column(name = "withdrawal_reason_code") var withdrawalReasonCode: String? = null,
   @Column(name = "withdrawal_comments") var withdrawalComments: String? = null,
+
+  @Enumerated(EnumType.STRING)
+  @Column(columnDefinition = "status")
+  @JdbcType(PostgreSQLEnumJdbcType::class)
+  @org.jetbrains.annotations.NotNull
+  var status: Status? = Status.PRE_ICA,
 ) {
   val urn: String
     get() = "urn:hmpps:interventions-referral:$id"

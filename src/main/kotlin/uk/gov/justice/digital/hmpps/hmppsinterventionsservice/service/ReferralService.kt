@@ -30,6 +30,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceProviderSentReferralSummary
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Status
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.WithdrawalReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
@@ -55,7 +56,7 @@ data class ResponsibleProbationPractitioner(
 ) : ContactablePerson
 
 data class ReferralSummaryQuery(
-  val concluded: Boolean?,
+  val completed: Boolean?,
   val cancelled: Boolean?,
   val unassigned: Boolean?,
   val assignedToUserId: String?,
@@ -130,11 +131,16 @@ class ReferralService(
     return assignedReferral
   }
 
-  fun getSentReferralSummaryForUser(user: AuthUser, concluded: Boolean?, cancelled: Boolean?, unassigned: Boolean?, assignedToUserId: String?, page: Pageable, searchText: String? = null): Iterable<ReferralSummary> {
+  fun setReferralStatus(referral: Referral, status: Status) {
+    referral.status = status
+    referralRepository.save(referral)
+  }
+
+  fun getSentReferralSummaryForUser(user: AuthUser, completed: Boolean?, cancelled: Boolean?, unassigned: Boolean?, assignedToUserId: String?, page: Pageable, searchText: String? = null): Iterable<ReferralSummary> {
     if (userTypeChecker.isServiceProviderUser(user)) {
       val contracts = serviceProviderUserAccessScopeMapper.fromUser(user).contracts
       val referralSummary = ReferralSummaryQuery(
-        concluded,
+        completed,
         cancelled,
         unassigned,
         assignedToUserId,
@@ -151,7 +157,7 @@ class ReferralService(
     if (userTypeChecker.isProbationPractitionerUser(user)) {
       val serviceUserCrns = crnsAssociatedWithPP(user)
       val referralSummary = ReferralSummaryQuery(
-        concluded,
+        completed,
         cancelled,
         unassigned,
         assignedToUserId,
