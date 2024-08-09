@@ -84,8 +84,8 @@ class DeliverySessionController(
     if (updateAppointmentDTO.attendanceFeedback?.attended != Attended.NO) {
       val referral = session.currentAppointment?.referral ?: session.referral
       if (referral.status != Status.POST_ICA) {
-      referralService.setReferralStatus(referral, Status.POST_ICA)
-        }
+        referralService.setReferralStatus(referral, Status.POST_ICA)
+      }
     }
     return DeliverySessionDTO.from(deliverySession)
   }

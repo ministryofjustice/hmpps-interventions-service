@@ -227,7 +227,7 @@ internal class DeliverySessionControllerTest {
           AppointmentDeliveryType.PHONE_CALL,
           AppointmentSessionType.ONE_TO_ONE,
           attended = YES,
-          didSessionHappen = false
+          didSessionHappen = false,
         ),
       ).thenReturn(deliverySession)
 
@@ -267,7 +267,7 @@ internal class DeliverySessionControllerTest {
           AppointmentDeliveryType.PHONE_CALL,
           AppointmentSessionType.ONE_TO_ONE,
           attended = NO,
-          didSessionHappen = false
+          didSessionHappen = false,
         ),
       ).thenReturn(deliverySession)
 
