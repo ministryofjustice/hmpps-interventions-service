@@ -805,7 +805,7 @@ class ReferralServiceTest @Autowired constructor(
         endRequestedReason = cancellationReasonFactory.create("ANY"),
         endRequestedAt = OffsetDateTime.now(),
         concludedAt = OffsetDateTime.now(),
-        status = Status.POST_ICA
+        status = Status.POST_ICA,
       ).also { referral ->
         referral.endOfServiceReport = endOfServiceReportFactory.create(referral = referral)
       }
