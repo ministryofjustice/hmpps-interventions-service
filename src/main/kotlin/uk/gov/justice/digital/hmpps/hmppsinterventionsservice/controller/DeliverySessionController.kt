@@ -21,6 +21,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DeliverySessio
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DeliverySessionDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SessionFeedbackRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Status
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AppointmentService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DeliverySessionService
@@ -79,6 +81,12 @@ class DeliverySessionController(
       updateAppointmentDTO.sessionFeedback?.sessionBehaviour,
       updateAppointmentDTO.sessionFeedback?.sessionConcerns,
     )
+    if (updateAppointmentDTO.attendanceFeedback?.attended != Attended.NO) {
+      val referral = session.currentAppointment?.referral ?: session.referral
+      if (referral.status != Status.POST_ICA) {
+        referralService.setReferralStatus(referral, Status.POST_ICA)
+      }
+    }
     return DeliverySessionDTO.from(deliverySession)
   }
 
@@ -304,6 +312,11 @@ class DeliverySessionController(
     )
     referralAccessChecker.forUser(referral, user)
     val sessionAndAppointment = deliverySessionService.submitAppointmentFeedback(referralId, appointmentId, user)
+    if (sessionAndAppointment.second.attended != Attended.NO) {
+      if (referral.status != Status.POST_ICA) {
+        referralService.setReferralStatus(referral, Status.POST_ICA)
+      }
+    }
     return DeliverySessionAppointmentDTO.from(sessionAndAppointment.first.sessionNumber, sessionAndAppointment.second)
   }
 }

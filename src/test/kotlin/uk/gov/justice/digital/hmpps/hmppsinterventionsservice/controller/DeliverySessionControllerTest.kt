@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessChecker
@@ -22,6 +24,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appoint
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentSessionType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.NO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.YES
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Status
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.AppointmentService
@@ -191,6 +194,86 @@ internal class DeliverySessionControllerTest {
       ).thenReturn(deliverySession)
 
       val sessionResponse = sessionsController.updateSessionAppointment(actionPlanId, sessionNumber, updateAppointmentDTO, userToken)
+
+      assertThat(sessionResponse).isEqualTo(DeliverySessionDTO.from(deliverySession))
+    }
+
+    @Test
+    fun `updates a session and sets referral status to post ica when the session was attended`() {
+      val user = authUserFactory.create()
+      val userToken = jwtTokenFactory.create(user)
+      val deliverySession = deliverySessionFactory.createScheduled(createdBy = user)
+      val actionPlanId = UUID.randomUUID()
+      val sessionNumber = deliverySession.sessionNumber
+
+      val attendanceFeedbackRequestDTO = AttendanceFeedbackRequestDTO(attended = YES, didSessionHappen = false)
+      val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, attendanceFeedbackRequestDTO)
+
+      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
+      whenever(
+        sessionsService.getDeliverySessionByActionPlanIdOrThrowException(
+          actionPlanId,
+          sessionNumber,
+        ),
+      ).thenReturn(deliverySession)
+
+      whenever(
+        sessionsService.updateSessionAppointment(
+          actionPlanId,
+          sessionNumber,
+          updateAppointmentDTO.appointmentTime,
+          updateAppointmentDTO.durationInMinutes,
+          user,
+          AppointmentDeliveryType.PHONE_CALL,
+          AppointmentSessionType.ONE_TO_ONE,
+          attended = YES,
+          didSessionHappen = false,
+        ),
+      ).thenReturn(deliverySession)
+
+      val sessionResponse = sessionsController.updateSessionAppointment(actionPlanId, sessionNumber, updateAppointmentDTO, userToken)
+
+      verify(referralService, times(1)).setReferralStatus(deliverySession.currentAppointment!!.referral, Status.POST_ICA)
+
+      assertThat(sessionResponse).isEqualTo(DeliverySessionDTO.from(deliverySession))
+    }
+
+    @Test
+    fun `updates a session and does not set referral status to post ica when the session was not attended`() {
+      val user = authUserFactory.create()
+      val userToken = jwtTokenFactory.create(user)
+      val deliverySession = deliverySessionFactory.createScheduled(createdBy = user)
+      val actionPlanId = UUID.randomUUID()
+      val sessionNumber = deliverySession.sessionNumber
+
+      val attendanceFeedbackRequestDTO = AttendanceFeedbackRequestDTO(attended = NO, didSessionHappen = false)
+      val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, attendanceFeedbackRequestDTO)
+
+      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
+      whenever(
+        sessionsService.getDeliverySessionByActionPlanIdOrThrowException(
+          actionPlanId,
+          sessionNumber,
+        ),
+      ).thenReturn(deliverySession)
+
+      whenever(
+        sessionsService.updateSessionAppointment(
+          actionPlanId,
+          sessionNumber,
+          updateAppointmentDTO.appointmentTime,
+          updateAppointmentDTO.durationInMinutes,
+          user,
+          AppointmentDeliveryType.PHONE_CALL,
+          AppointmentSessionType.ONE_TO_ONE,
+          attended = NO,
+          didSessionHappen = false,
+        ),
+      ).thenReturn(deliverySession)
+
+      val sessionResponse = sessionsController.updateSessionAppointment(actionPlanId, sessionNumber, updateAppointmentDTO, userToken)
+
+      verify(referralService, times(0)).setReferralStatus(deliverySession.currentAppointment!!.referral, Status.POST_ICA)
 
       assertThat(sessionResponse).isEqualTo(DeliverySessionDTO.from(deliverySession))
     }

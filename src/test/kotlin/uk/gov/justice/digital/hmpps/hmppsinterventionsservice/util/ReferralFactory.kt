@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Status
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.WithdrawalReason
 import java.time.LocalDate
@@ -277,6 +278,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     ppEmailAddress: String? = "alice@example.com",
     ppProbationOffice: String? = "London",
     ppPdu: String? = "East Sussex",
+    status: Status? = null,
   ): Referral {
     createDraft(
       id = id,
@@ -313,6 +315,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       withdrawalComments = withdrawalComments,
       concludedAt = concludedAt,
       endOfServiceReport = endOfServiceReport,
+      status = status,
     )
     val probationPractitionerDetails = probationPractitionerDetailsFactory.create(
       referral = referral,

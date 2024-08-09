@@ -39,6 +39,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SentReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceProvider
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Status
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
@@ -804,6 +805,7 @@ class ReferralServiceTest @Autowired constructor(
         endRequestedReason = cancellationReasonFactory.create("ANY"),
         endRequestedAt = OffsetDateTime.now(),
         concludedAt = OffsetDateTime.now(),
+        status = Status.POST_ICA,
       ).also { referral ->
         referral.endOfServiceReport = endOfServiceReportFactory.create(referral = referral)
       }
@@ -868,7 +870,7 @@ class ReferralServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `setting concluded returns only concluded referrals`() {
+    fun `setting completed returns only completed referrals`() {
       val appointment =
         appointmentFactory.create(referral = completedReferral, attendanceSubmittedAt = OffsetDateTime.now())
       val superSededAppointment =
@@ -881,7 +883,7 @@ class ReferralServiceTest @Autowired constructor(
       val result = referralService.getSentReferralSummaryForUser(user, true, null, null, null, pageRequest)
       assertThat(result)
         .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
-        .containsExactlyInAnyOrder(completedSentReferralSummary, cancelledSentReferralSummary)
+        .containsExactlyInAnyOrder(completedSentReferralSummary)
       assertThat(result).doesNotContain(liveSentReferralSummary, selfAssignedSentReferralSummary, otherAssignedSentReferralSummary)
     }
 
