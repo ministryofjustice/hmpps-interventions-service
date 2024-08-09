@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: delete-draft-referral-older-than-90-days
+spec:
+  schedule: "0 4 1 * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: "Never"
+          containers:
+            - name: delete-draft-referral-older-than-90-days
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              imagePullPolicy: Always
+              args: ["--jobName=deleteOldDraftReferralsJob"]
+{{- include "deployment.envs" . | nindent 14 }}

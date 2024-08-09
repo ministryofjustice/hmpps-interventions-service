@@ -20,6 +20,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Cha
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ContractTypeRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DesiredOutcomeRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftOasysRiskInformationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DynamicFrameworkContractRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
@@ -92,6 +93,8 @@ abstract class IntegrationTestBase {
 
   @Autowired protected lateinit var probationPractitionerDetailsRepository: ProbationPractitionerDetailsRepository
 
+  @Autowired protected lateinit var draftOasysRiskInformationRepository: DraftOasysRiskInformationRepository
+
   protected lateinit var setupAssistant: SetupAssistant
 
   @BeforeEach
@@ -121,6 +124,7 @@ abstract class IntegrationTestBase {
       changeLogRepository,
       referralLocationRepository,
       probationPractitionerDetailsRepository,
+      draftOasysRiskInformationRepository,
     )
     setupAssistant.cleanAll()
   }
