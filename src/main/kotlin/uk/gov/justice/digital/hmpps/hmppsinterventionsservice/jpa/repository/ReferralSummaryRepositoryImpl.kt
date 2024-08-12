@@ -457,11 +457,11 @@ WHERE  assigned_at_desc_seq = 1
 
   private fun constructSPQuery(contracts: Set<DynamicFrameworkContract>): String {
     return if (contracts.any { it.npsRegion != null } && contracts.any { it.pccRegion != null }) {
-      "and ( dfc.prime_provider_id in :serviceProviders or dfcsc.subcontractor_provider_id in :serviceProviders ) and (nps_region_id in :npsRegions or pcc_region_id in :pccRegions) and contract_reference in :contractReferences "
+      "and ( dfc.prime_provider_id in :serviceProviders or dfcsc.subcontractor_provider_id in :serviceProviders ) and (dfc.nps_region_id in :npsRegions or dfc.pcc_region_id in :pccRegions) and dfc.contract_reference in :contractReferences "
     } else if (contracts.any { it.npsRegion != null }) {
-      "and ( dfc.prime_provider_id in :serviceProviders or dfcsc.subcontractor_provider_id in :serviceProviders ) and nps_region_id in :npsRegions and contract_reference in :contractReferences "
+      "and ( dfc.prime_provider_id in :serviceProviders or dfcsc.subcontractor_provider_id in :serviceProviders ) and dfc.nps_region_id in :npsRegions and dfc.contract_reference in :contractReferences "
     } else {
-      "and ( dfc.prime_provider_id in :serviceProviders or dfcsc.subcontractor_provider_id in :serviceProviders ) and pcc_region_id in :pccRegions and contract_reference in :contractReferences "
+      "and ( dfc.prime_provider_id in :serviceProviders or dfcsc.subcontractor_provider_id in :serviceProviders ) and dfc.pcc_region_id in :pccRegions and dfc.contract_reference in :contractReferences "
     }
   }
 
