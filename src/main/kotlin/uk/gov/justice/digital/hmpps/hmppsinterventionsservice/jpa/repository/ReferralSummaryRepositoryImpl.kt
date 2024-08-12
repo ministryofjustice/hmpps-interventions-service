@@ -232,7 +232,7 @@ WHERE  assigned_at_desc_seq = 1
     referralSummaryQuery: ReferralSummaryQuery,
   ): Page<ReferralSummary> {
     val (
-      concluded,
+      completed,
       cancelled,
       unassigned,
       assignedToUserId,
@@ -245,7 +245,7 @@ WHERE  assigned_at_desc_seq = 1
       contracts,
     ) = referralSummaryQuery
 
-    val queryBuilder = StringBuilder(referralSummaryQuery(constructCustomCriteria(concluded, cancelled, unassigned, assignedToUserId, searchText, isSpUser, isPPUser, contracts)))
+    val queryBuilder = StringBuilder(referralSummaryQuery(constructCustomCriteria(completed, cancelled, unassigned, assignedToUserId, searchText, isSpUser, isPPUser, contracts)))
 
     // Append ORDER BY clause if sorting is specified
     if (page.sort.isSorted) {
@@ -354,7 +354,7 @@ WHERE  assigned_at_desc_seq = 1
     }
 
     val totalCount = totalCount(
-      concluded,
+      completed,
       cancelled,
       unassigned,
       assignedToUserId,
@@ -373,7 +373,7 @@ WHERE  assigned_at_desc_seq = 1
   }
 
   private fun totalCount(
-    concluded: Boolean?,
+    completed: Boolean?,
     cancelled: Boolean?,
     unassigned: Boolean?,
     assignedToUserId: String?,
@@ -388,7 +388,7 @@ WHERE  assigned_at_desc_seq = 1
     val countQuery = "SELECT COUNT(*) FROM (${
       referralSummaryQuery(
         constructCustomCriteria(
-          concluded,
+          completed,
           cancelled,
           unassigned,
           assignedToUserId,
@@ -431,7 +431,7 @@ WHERE  assigned_at_desc_seq = 1
   }
 
   private fun constructCustomCriteria(
-    concluded: Boolean?,
+    completed: Boolean?,
     cancelled: Boolean?,
     unassigned: Boolean?,
     assignedToUserId: String?,
@@ -441,8 +441,8 @@ WHERE  assigned_at_desc_seq = 1
     contracts: Set<DynamicFrameworkContract>,
   ): String {
     val customCriteria = StringBuilder()
-    concluded?.let { if (it) customCriteria.append("and r.concluded_at  is not null ") else customCriteria.append("and r.concluded_at  is null ") }
-    cancelled?.let { if (it) customCriteria.append("and (r.concluded_at is not null and  r.end_requested_at is not null and eosr.id is null) ") else customCriteria.append("and not (r.concluded_at is not null and r.end_requested_at is not null and eosr.id is null) ") }
+    completed?.let { if (it) customCriteria.append("and (r.concluded_at is not null and eosr.id is not null and r.status = 'POST_ICA')") else customCriteria.append("and not(r.concluded_at is not null and eosr.id is not null and r.status = 'POST_ICA')") }
+    cancelled?.let { if (it) customCriteria.append("and (r.concluded_at is not null and r.end_requested_at is not null and eosr.id is null and r.status = 'PRE_ICA') ") else customCriteria.append("and not (r.concluded_at is not null and r.end_requested_at is not null and eosr.id is null and r.status = 'PRE_ICA') ") }
     unassigned?.let { if (it) customCriteria.append("and ra.assigned_to_id is null ") else customCriteria.append("and not (ra.assigned_to_id is null) ") }
     assignedToUserId?.let { customCriteria.append("and au.id = :assignedToUserId ") }
     searchText?.let { customCriteria.append(searchQuery(it)) }
