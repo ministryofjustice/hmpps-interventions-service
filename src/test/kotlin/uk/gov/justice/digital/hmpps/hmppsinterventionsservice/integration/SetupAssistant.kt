@@ -48,6 +48,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Cha
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ContractTypeRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DesiredOutcomeRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftOasysRiskInformationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DynamicFrameworkContractRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
@@ -111,6 +112,7 @@ class SetupAssistant(
   private val changeLogRepository: ChangelogRepository,
   private val referralLocationRepository: ReferralLocationRepository,
   private val probationPractitionerDetailsRepository: ProbationPractitionerDetailsRepository,
+  private val draftOasysRiskInformationRepository: DraftOasysRiskInformationRepository,
 ) {
   private val dynamicFrameworkContractFactory = DynamicFrameworkContractFactory()
   private val interventionFactory = InterventionFactory()
@@ -156,6 +158,7 @@ class SetupAssistant(
 
     serviceProviderRepository.deleteAll()
     authUserRepository.deleteAll()
+    draftOasysRiskInformationRepository.deleteAll()
   }
 
   private fun deleteAllReferralDetails() {

@@ -5,9 +5,11 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.explore.JobExplorer
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean
+import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.launch.JobLauncher
 import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher
 import org.springframework.batch.core.repository.JobRepository
+import org.springframework.batch.core.step.builder.StepBuilder
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -47,6 +49,16 @@ class BatchConfiguration(
   @Bean("batchJobBuilderFactory")
   fun jobBuilderFactory(jobRepository: JobRepository): JobBuilderFactory {
     return JobBuilderFactory(jobRepository)
+  }
+
+  @Bean("batchJobBuilder")
+  fun batchJobBuilder(jobRepository: JobRepository): JobBuilder {
+    return JobBuilder("batchJobBuilder", jobRepository)
+  }
+
+  @Bean("batchStepBuilder")
+  fun batchStepBuilder(jobRepository: JobRepository): StepBuilder {
+    return StepBuilder("batchStepBuilder", jobRepository)
   }
 
   @Bean("batchStepBuilderFactory")
