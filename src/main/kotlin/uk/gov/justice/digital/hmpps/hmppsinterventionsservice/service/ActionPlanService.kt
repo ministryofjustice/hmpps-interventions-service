@@ -87,11 +87,10 @@ class ActionPlanService(
     val savedSubmittedActionPlan = actionPlanRepository.save(submittedActionPlan)
     actionPlanEventPublisher.actionPlanSubmitEvent(savedSubmittedActionPlan)
 
-    //if after 2nd september, auto-approve
-    if(LocalDate.now().isAfter(LocalDate.of(2024,9,1))){
+    // if after 2nd september, auto-approve
+    if (LocalDate.now().isAfter(LocalDate.of(2024, 9, 1))) {
       approveActionPlan(id, AuthUser.interventionsServiceUser)
     }
-
 
     return savedSubmittedActionPlan
   }
