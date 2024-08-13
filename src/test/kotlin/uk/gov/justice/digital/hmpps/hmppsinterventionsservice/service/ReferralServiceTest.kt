@@ -39,6 +39,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SentReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceProvider
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Status
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CancellationReasonRepository
@@ -804,6 +805,7 @@ class ReferralServiceTest @Autowired constructor(
         endRequestedReason = cancellationReasonFactory.create("ANY"),
         endRequestedAt = OffsetDateTime.now(),
         concludedAt = OffsetDateTime.now(),
+        status = Status.POST_ICA,
       ).also { referral ->
         referral.endOfServiceReport = endOfServiceReportFactory.create(referral = referral)
       }
@@ -823,6 +825,7 @@ class ReferralServiceTest @Autowired constructor(
         concludedAt = OffsetDateTime.now(),
         endOfServiceReport = null,
         actionPlans = mutableListOf(actionPlanFactory.createSubmitted()),
+        status = Status.PRE_ICA,
       )
 
       cancelledSentReferralSummary = referralSummariesFactory.getReferralSummary(cancelledReferral)
@@ -868,7 +871,7 @@ class ReferralServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `setting concluded returns only concluded referrals`() {
+    fun `setting completed returns only completed referrals`() {
       val appointment =
         appointmentFactory.create(referral = completedReferral, attendanceSubmittedAt = OffsetDateTime.now())
       val superSededAppointment =
@@ -881,17 +884,17 @@ class ReferralServiceTest @Autowired constructor(
       val result = referralService.getSentReferralSummaryForUser(user, true, null, null, null, pageRequest)
       assertThat(result)
         .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
-        .containsExactlyInAnyOrder(completedSentReferralSummary, cancelledSentReferralSummary)
+        .containsExactlyInAnyOrder(completedSentReferralSummary)
       assertThat(result).doesNotContain(liveSentReferralSummary, selfAssignedSentReferralSummary, otherAssignedSentReferralSummary)
     }
 
     @Test
-    fun `setting not concluded returns only non concluded referrals`() {
+    fun `setting not completed returns only non completed referrals`() {
       val result = referralService.getSentReferralSummaryForUser(user, false, null, null, null, pageRequest)
       assertThat(result)
         .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
-        .containsExactlyInAnyOrder(liveSentReferralSummary, selfAssignedSentReferralSummary, otherAssignedSentReferralSummary)
-      assertThat(result).doesNotContain(completedSentReferralSummary, cancelledSentReferralSummary)
+        .containsExactlyInAnyOrder(liveSentReferralSummary, selfAssignedSentReferralSummary, otherAssignedSentReferralSummary, cancelledSentReferralSummary)
+      assertThat(result).doesNotContain(completedSentReferralSummary)
     }
 
     @Test
@@ -981,7 +984,7 @@ class ReferralServiceTest @Autowired constructor(
       entityManager.refresh(completedReferral)
       completedSentReferralSummary = referralSummariesFactory.getReferralSummary(completedReferral)
       val result = referralService.getSentReferralSummaryForUser(user, true, true, true, null, pageRequest)
-      assertThat(result).isNotEmpty
+      assertThat(result).isEmpty()
     }
 
     @Test

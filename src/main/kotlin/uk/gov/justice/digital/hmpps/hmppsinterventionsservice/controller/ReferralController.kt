@@ -92,8 +92,8 @@ class ReferralController(
   fun getSentReferralsSummaries(
     authentication: JwtAuthenticationToken,
     @Nullable
-    @RequestParam(name = "concluded", required = false)
-    concluded: Boolean?,
+    @RequestParam(name = "completed", required = false)
+    completed: Boolean?,
     @Nullable
     @RequestParam(name = "cancelled", required = false)
     cancelled: Boolean?,
@@ -109,7 +109,7 @@ class ReferralController(
     @PageableDefault(page = 0, size = 50, sort = ["sentAt"]) page: Pageable,
   ): Page<SentReferralSummariesDTO> {
     val user = userMapper.fromToken(authentication)
-    return (referralService.getSentReferralSummaryForUser(user, concluded, cancelled, unassigned, assignedToUserId, page, searchText) as Page<ReferralSummary>).map { SentReferralSummariesDTO.from(it) }.also {
+    return (referralService.getSentReferralSummaryForUser(user, completed, cancelled, unassigned, assignedToUserId, page, searchText) as Page<ReferralSummary>).map { SentReferralSummariesDTO.from(it) }.also {
       telemetryClient.trackEvent(
         "PagedDashboardRequest",
         null,

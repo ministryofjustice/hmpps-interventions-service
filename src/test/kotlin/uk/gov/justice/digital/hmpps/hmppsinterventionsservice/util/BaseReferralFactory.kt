@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SelectedDesiredOutcomesMapping
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Status
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -61,6 +62,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
     needsInterpreter: Boolean? = null,
     interpreterLanguage: String? = null,
     probationPractitionerDetails: ProbationPractitionerDetails? = null,
+    status: Status? = null,
   ): Referral {
     val referral = save(
       Referral(
@@ -98,6 +100,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
         needsInterpreter = needsInterpreter,
         interpreterLanguage = interpreterLanguage,
         probationPractitionerDetails = probationPractitionerDetails,
+        status = status,
         referralDetailsHistory = if (referralDetails != null) {
           setOf(
             referralDetails.let {
