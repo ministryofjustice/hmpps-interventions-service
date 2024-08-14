@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanE
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanEventType.APPROVED
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanEventType.SUBMITTED
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralServiceUserData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import java.time.OffsetDateTime
@@ -39,8 +40,10 @@ class NotifyActionPlanServiceTest {
         referenceNumber = "HAS71263",
         sentAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00"),
         sentBy = AuthUser("abc999", "auth", "abc999"),
+        serviceUserData = ReferralServiceUserData(firstName = "Tom", lastName = "Mason"),
       ),
       submittedBy = AuthUser("abc123", "auth", "abc123"),
+
     ),
     "http://localhost:8080/action-plan/42c7d267-0776-4272-a8e8-a673bfe30d0d",
   )
@@ -51,6 +54,15 @@ class NotifyActionPlanServiceTest {
     actionPlanFactory.createApproved(
       id = UUID.fromString("42c7d267-0776-4272-a8e8-a673bfe30d0d"),
       submittedBy = AuthUser("abc123", "auth", "abc123"),
+      referral = SampleData.sampleReferral(
+        "X123456",
+        "Harmony Living",
+        id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
+        referenceNumber = "HAS71263",
+        sentAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00"),
+        sentBy = AuthUser("abc999", "auth", "abc999"),
+        serviceUserData = ReferralServiceUserData(firstName = "Tom", lastName = "Mason"),
+      ),
     ),
     "http://localhost:8080/referrals/42c7d267-0776-4272-a8e8-a673bfe30d0d",
   )
@@ -99,6 +111,7 @@ class NotifyActionPlanServiceTest {
     assertThat(personalisationCaptor.firstValue["submitterFirstName"]).isEqualTo("tom")
     assertThat(personalisationCaptor.firstValue["referenceNumber"]).isEqualTo(actionPlan.referral.referenceNumber)
     assertThat(personalisationCaptor.firstValue["actionPlanUrl"]).isEqualTo("http://example.com/sp/referrals/${actionPlan.referral.id}/action-plan")
+    assertThat(personalisationCaptor.firstValue["popFullName"]).isEqualTo("Tom Mason")
   }
 
   @Test
@@ -112,5 +125,6 @@ class NotifyActionPlanServiceTest {
     assertThat(personalisationCaptor.firstValue["submitterFirstName"]).isEqualTo("tom")
     assertThat(personalisationCaptor.firstValue["referenceNumber"]).isEqualTo("HAS71263")
     assertThat(personalisationCaptor.firstValue["actionPlanUrl"]).isEqualTo("http://example.com/pp/referrals/${actionPlanSubmittedEvent.actionPlan.referral.id}/action-plan")
+    assertThat(personalisationCaptor.firstValue["popFullName"]).isEqualTo("Tom Mason")
   }
 }

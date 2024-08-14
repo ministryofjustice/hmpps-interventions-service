@@ -42,12 +42,12 @@ class NotifyActionPlanService(
 
   @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: ActionPlanEvent) {
+    val popFirstName = event.actionPlan.referral.serviceUserData!!.firstName?.lowercase()?.replaceFirstChar { it.uppercase() }
+    val popLastName = event.actionPlan.referral.serviceUserData!!.lastName?.lowercase()?.replaceFirstChar { it.uppercase() }
     when (event.type) {
       ActionPlanEventType.SUBMITTED -> {
         val recipient = referralService.getResponsibleProbationPractitioner(event.actionPlan.referral)
         val location = generateResourceUrl(interventionsUIBaseURL, ppActionPlanLocation, event.actionPlan.referral.id)
-        val popFirstName = event.actionPlan.referral.serviceUserData!!.firstName?.lowercase()?.replaceFirstChar { it.uppercase() }
-        val popLastName = event.actionPlan.referral.serviceUserData!!.lastName?.lowercase()?.replaceFirstChar { it.uppercase() }
 
         emailSender.sendEmail(
           actionPlanSubmittedTemplateID,
@@ -71,6 +71,8 @@ class NotifyActionPlanService(
             "submitterFirstName" to recipient.firstName,
             "referenceNumber" to event.actionPlan.referral.referenceNumber!!,
             "actionPlanUrl" to location.toString(),
+            "popFullName" to "$popFirstName $popLastName",
+            "crn" to event.actionPlan.referral.serviceUserCRN,
           ),
         )
       }
