@@ -144,6 +144,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
     probationPractitionerDetails: ProbationPractitionerDetails? = null,
     ppEstablishment: String? = null,
     endRequestedBy: AuthUser? = null,
+    status: Status? = null,
   ): Referral {
     if (createDraft) {
       createDraft(
@@ -186,6 +187,7 @@ class ReferralFactory(em: TestEntityManager? = null) : BaseReferralFactory(em) {
       withdrawalReasonCode = withdrawReasonCode,
       withdrawalComments = withdrawalComments,
       relevantSentenceEndDate = relevantSentenceEndDate,
+      status = status,
     )
     val probationPractitionerDetails = probationPractitionerDetailsFactory.create(referral = referral)
     referral.probationPractitionerDetails = probationPractitionerDetails
