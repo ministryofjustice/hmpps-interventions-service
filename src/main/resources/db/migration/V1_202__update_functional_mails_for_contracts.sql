@@ -1,0 +1,2 @@
+update intervention set incoming_referral_distribution_email = 'turnaround.referrals@pss.org.uk' where incoming_referral_distribution_email = 'Turnaroundreferrals@pss.org.uk';
+update intervention set incoming_referral_distribution_email = 'dyfedpowys@forwardtrust.org.uk' where incoming_referral_distribution_email = 'dyfedpower@forwardtrust.org.uk'
