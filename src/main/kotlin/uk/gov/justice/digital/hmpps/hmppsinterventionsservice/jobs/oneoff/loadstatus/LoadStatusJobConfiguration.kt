@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.transferreferrals
+package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.loadstatus
 
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
@@ -17,35 +17,35 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.Timestam
 
 @Configuration
 @EnableTransactionManagement
-class LoadEndOfSentenceJobConfiguration(
+class LoadStatusJobConfiguration(
   private val jobRepository: JobRepository,
-  private val listener: LoadEndOfSentenceJobListener,
+  private val listener: LoadStatusJobListener,
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
   @Qualifier("batchJobBuilderFactory") private val jobBuilderFactory: JobBuilderFactory,
   @Qualifier("batchStepBuilderFactory") private val stepBuilderFactory: StepBuilderFactory,
 ) {
   @Bean
-  fun loadEndOfSentenceJobLauncher(loadEndOfSentenceJob: Job): ApplicationRunner {
-    return onStartupJobLauncherFactory.makeBatchLauncher(loadEndOfSentenceJob)
+  fun loadStatusJobLauncher(loadStatusJob: Job): ApplicationRunner {
+    return onStartupJobLauncherFactory.makeBatchLauncher(loadStatusJob)
   }
 
   @Bean
-  fun loadEndOfSentenceJob(loadEndOfSentenceStep: Step): Job {
-    return jobBuilderFactory.get("loadEndOfSentenceJob")
+  fun loadStatusJob(loadStatusStep: Step): Job {
+    return jobBuilderFactory.get("loadStatusJob")
       .incrementer(TimestampIncrementer())
       .listener(listener)
-      .start(loadEndOfSentenceStep)
+      .start(loadStatusStep)
       .build()
   }
 
   @Bean
-  fun loadEndOfSentenceStep(
-    reader: LoadEndOfSentenceReader,
-    processor: LoadEndOfSentenceProcessor,
-    writer: LoadEndOfSentenceWriter,
+  fun loadStatusStep(
+    reader: LoadStatusReader,
+    processor: LoadStatusProcessor,
+    writer: LoadStatusWriter,
     transactionManager: PlatformTransactionManager,
   ): Step {
-    return stepBuilderFactory.get("loadEndOfSentenceStep")
+    return stepBuilderFactory.get("loadStatusStep")
       .chunk<Referral, Referral>(5000, transactionManager)
       .reader(reader)
       .processor(processor)

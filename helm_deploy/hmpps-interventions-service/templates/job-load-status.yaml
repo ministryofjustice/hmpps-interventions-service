@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: load-end-of-sentence
+  name: load-status
 spec:
   schedule: "0 2 * * *"
   suspend: true
@@ -11,8 +11,8 @@ spec:
         spec:
           restartPolicy: "Never"
           containers:
-            - name: load-send-of-sentence
+            - name: load-status
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
               imagePullPolicy: Always
-              args: ["--jobName=loadEndOfSentenceJob"]
+              args: ["--jobName=loadStatusJob"]
 {{- include "deployment.envs" . | nindent 14 }}

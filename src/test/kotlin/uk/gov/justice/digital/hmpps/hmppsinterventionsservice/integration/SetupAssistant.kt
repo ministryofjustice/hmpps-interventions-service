@@ -35,6 +35,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SelectedDesiredOutcomesMapping
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceUserData
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Status
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.WithdrawalReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
@@ -469,6 +470,7 @@ class SetupAssistant(
     expectedReleaseDate: LocalDate? = null,
     probationPractitionerDetails: ProbationPractitionerDetails? = null,
     relevantSentenceEndDate: LocalDate? = null,
+    status: Status? = null,
   ): Referral {
     createDraftReferral(
       id = id,
@@ -490,6 +492,7 @@ class SetupAssistant(
       interpreterLanguage = interpreterLanguage,
       probationPractitionerDetails = probationPractitionerDetails,
       relevantSentenceEndDate = relevantSentenceEndDate,
+      status = status,
     )
 
     referral = referralRepository.save(

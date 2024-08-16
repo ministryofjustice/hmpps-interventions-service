@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.transferreferrals
+package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.loadstatus
 
 import mu.KLogging
 import net.logstash.logback.argument.StructuredArguments.kv
@@ -8,7 +8,7 @@ import org.springframework.batch.core.JobExecutionListener
 import org.springframework.stereotype.Component
 
 @Component
-class LoadEndOfSentenceJobListener : JobExecutionListener {
+class LoadStatusJobListener : JobExecutionListener {
   companion object : KLogging()
 
   override fun beforeJob(jobExecution: JobExecution) {
@@ -24,7 +24,7 @@ class LoadEndOfSentenceJobListener : JobExecutionListener {
 
       else -> {
         logger.warn(
-          "unexpected status encountered for load end of sentence {} {}",
+          "unexpected status encountered for load status {} {}",
           kv("status", jobExecution.status),
           kv("exitDescription", jobExecution.exitStatus.exitDescription),
         )

@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.transferreferrals
+package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.loadstatus
 
 import org.hibernate.SessionFactory
 import org.springframework.batch.core.configuration.annotation.JobScope
@@ -8,14 +8,14 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 
 @Component
 @JobScope
-class LoadEndOfSentenceReader(
+class LoadStatusReader(
   sessionFactory: SessionFactory,
 ) : HibernateCursorItemReader<Referral>() {
   init {
-    this.setName("loadEndOfSentenceReader")
+    this.setName("loadStatusReader")
     this.setSessionFactory(sessionFactory)
     this.setQueryString(
-      "SELECT r FROM Referral r where r.relevantSentenceEndDate is null",
+      "SELECT r FROM Referral r where r.status is null",
     )
   }
 }
