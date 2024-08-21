@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.EndOfServic
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.AsyncEventExceptionHandling
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentType
 import java.net.URI
+import java.time.LocalDate
 
 interface NotifyService {
   fun generateResourceUrl(baseURL: String, path: String, vararg args: Any): URI {
@@ -32,6 +33,8 @@ interface ContactablePerson {
 class NotifyActionPlanService(
   @Value("\${notify.templates.action-plan-submitted}") private val actionPlanSubmittedTemplateID: String,
   @Value("\${notify.templates.action-plan-approved}") private val actionPlanApprovedTemplateID: String,
+  @Value("\${notify.templates.action-plan-approved-old}") private val actionPlanApprovedOldTemplateID: String,
+
   @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
   @Value("\${interventions-ui.locations.probation-practitioner.action-plan}") private val ppActionPlanLocation: String,
   @Value("\${interventions-ui.locations.service-provider.action-plan}") private val spActionPlanLocation: String,
@@ -64,8 +67,14 @@ class NotifyActionPlanService(
       ActionPlanEventType.APPROVED -> {
         val recipient = hmppsAuthService.getUserDetail(event.actionPlan.submittedBy!!)
         val location = generateResourceUrl(interventionsUIBaseURL, spActionPlanLocation, event.actionPlan.referral.id)
+        val emailTemplate = if(event.actionPlan.submittedAt!!.toLocalDate().isAfter(LocalDate.of(2024, 8, 20))){
+          actionPlanApprovedTemplateID
+        } else{
+          actionPlanApprovedOldTemplateID
+        }
+
         emailSender.sendEmail(
-          actionPlanApprovedTemplateID,
+          emailTemplate,
           recipient.email,
           mapOf(
             "submitterFirstName" to recipient.firstName,

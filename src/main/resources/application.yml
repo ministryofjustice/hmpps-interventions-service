@@ -110,6 +110,7 @@ notify:
     referral-assigned: "f0fe2fce-df0f-46c0-839a-822037d39c28"
     action-plan-submitted: "7275f8ff-7ef1-46b3-8b73-052560fe15e5"
     action-plan-approved: "043018bd-7aa8-49c9-b1ba-6c2b513ffc60"
+    action-plan-approved-old: "f060e1ae-c2a6-4752-ad20-436120c5880b"
     appointment-not-attended: "4dfce2d7-c328-4f6e-8aee-258f14f6c316"
     session-poor-behaviour: "09127e87-2a72-41b6-8c8d-cfa7b525233d"
     session-concerns: "2958097e-21b5-4f28-abc7-6fb47a693bde"
