@@ -109,7 +109,7 @@ class ActionPlanService(
     return approvedActionPlan
   }
 
-  private fun verifySafeForApproval(actionPlan: ActionPlan) {
+  fun verifySafeForApproval(actionPlan: ActionPlan) {
     if (actionPlan.approvedAt != null) {
       throw ValidationError("Action plan has already been approved", listOf())
     } else if (actionPlan.referral.actionPlans?.filter { it.approvedAt == null && it.submittedAt != null }?.maxByOrNull { it.submittedAt!! }?.id != actionPlan.id) {

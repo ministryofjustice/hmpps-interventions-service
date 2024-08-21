@@ -85,7 +85,7 @@ class Referral(
   var relevantSentenceId: Long? = null,
   var relevantSentenceEndDate: LocalDate? = null,
 
-  @OneToMany(fetch = FetchType.LAZY)
+  @OneToMany(fetch = FetchType.EAGER)
   @OrderBy("createdAt")
   @JoinColumn(name = "referral_id")
   var actionPlans: MutableList<ActionPlan>? = null,
