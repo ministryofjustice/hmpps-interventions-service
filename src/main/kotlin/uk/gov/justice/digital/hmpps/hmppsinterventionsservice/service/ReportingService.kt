@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceProviderAccessScopeMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUtils
+import java.nio.file.Files.createTempDirectory
 import java.time.Instant
 import java.time.LocalDate
 
@@ -14,7 +15,7 @@ import java.time.LocalDate
 class ReportingService(
   private val asyncJobLauncher: JobLauncher,
   private val performanceReportJob: Job,
-  // private val ndmisPerformanceReportJob: Job,
+  private val approveActionPlansJob: Job,
   private val serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper,
   private val batchUtils: BatchUtils,
   private val hmppsAuthService: HMPPSAuthService,
@@ -36,4 +37,15 @@ class ReportingService(
         .toJobParameters(),
     )
   }
+
+  fun generateNdmisPerformanceReport() {
+    val outputDir = createTempDirectory("test")
+    asyncJobLauncher.run(
+      approveActionPlansJob,
+      JobParametersBuilder()
+        .addString("timestamp", Instant.now().toEpochMilli().toString())
+        .toJobParameters(),
+    )
+  }
+
 }
