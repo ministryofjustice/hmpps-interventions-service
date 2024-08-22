@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceProviderAccessScopeMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUtils
-import java.nio.file.Files.createTempDirectory
 import java.time.Instant
 import java.time.LocalDate
 
@@ -33,16 +32,6 @@ class ReportingService(
         .addString("user.email", userDetail.email)
         .addDate("from", batchUtils.parseLocalDateToDate(from))
         .addDate("to", batchUtils.parseLocalDateToDate(to.plusDays(1))) // 'to' is inclusive
-        .addString("timestamp", Instant.now().toEpochMilli().toString())
-        .toJobParameters(),
-    )
-  }
-
-  fun generateNdmisPerformanceReport() {
-    val outputDir = createTempDirectory("test")
-    asyncJobLauncher.run(
-      approveActionPlansJob,
-      JobParametersBuilder()
         .addString("timestamp", Instant.now().toEpochMilli().toString())
         .toJobParameters(),
     )

@@ -36,30 +36,8 @@ class ApproveActionPlansProcessor(
 
     actionPlan.approvedAt = OffsetDateTime.now()
     actionPlan.approvedBy = authUserRepository.save(user)
+    actionPlanRepository.save(actionPlan)
 
-    val approvedActionPlan = actionPlanRepository.save(actionPlan)
-//    actionPlanEventPublisher.actionPlanApprovedEvent(approvedActionPlan)
     return actionPlan
   }
-
-//  override fun process(referral: Referral): ActionPlan {
-// //    logger.info("processing action plan {} for approval", kv("actionPlanId", referral.currentActionPlan!!.id))
-//    return approveActionPlan(referral)
-//  }
-//
-//
-//  fun approveActionPlan(referral: Referral): ActionPlan {
-//    print(referral)
-//    val user = AuthUser.interventionsServiceUser
-// //    actionPlanService.verifySafeForApproval(referral.currentActionPlan!!)
-//
-//    deliverySessionService.createUnscheduledSessionsForActionPlan(referral.currentActionPlan!!)
-//
-//    referral.currentActionPlan!!.approvedAt = OffsetDateTime.now()
-//    referral.currentActionPlan!!.approvedBy = authUserRepository.save(user)
-//
-//    val approvedActionPlan = actionPlanRepository.save(referral.currentActionPlan!!)
-// //    actionPlanEventPublisher.actionPlanApprovedEvent(approvedActionPlan)
-//    return referral.currentActionPlan!!
-//  }
 }
