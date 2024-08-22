@@ -210,8 +210,8 @@ internal class ActionPlanServiceTest {
             it.createdBy == actionPlan.createdBy &&
             it.submittedAt!!.isAfter(timeBeforeSubmit) &&
             it.submittedBy == authUser &&
- //            it.approvedAt == null &&
- //            it.approvedBy == null &&
+            //            it.approvedAt == null &&
+            //            it.approvedBy == null &&
             it.referral == actionPlan.referral
         },
       ),
