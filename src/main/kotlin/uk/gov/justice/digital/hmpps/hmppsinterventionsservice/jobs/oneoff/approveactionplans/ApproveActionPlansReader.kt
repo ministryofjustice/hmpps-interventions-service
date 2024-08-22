@@ -1,15 +1,11 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.transferreferrals
 
-import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityManagerFactory
 import org.hibernate.SessionFactory
 import org.springframework.batch.core.configuration.annotation.JobScope
-import org.springframework.batch.item.database.HibernateCursorItemReader
 import org.springframework.batch.item.database.JpaCursorItemReader
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 
 @Component
 @JobScope
@@ -59,14 +55,11 @@ class ApproveActionPlansReader(
 //        "AND ap.approved_at is null " +
 //        "AND r.concluded_at is null ",
 //    )
-////    this.setParameterValues(
-////      mapOf(
-////        "fromContract" to fromContract,
-////        "transferSignalText" to transferSignalText,
-////      ),
-////    )
+// //    this.setParameterValues(
+// //      mapOf(
+// //        "fromContract" to fromContract,
+// //        "transferSignalText" to transferSignalText,
+// //      ),
+// //    )
 //  }
 }
-
-
-

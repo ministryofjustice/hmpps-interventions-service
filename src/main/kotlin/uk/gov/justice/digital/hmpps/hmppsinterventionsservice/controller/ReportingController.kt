@@ -34,5 +34,4 @@ class ReportingController(
     reportingService.generateNdmisPerformanceReport()
     return ResponseEntity.accepted().build()
   }
-
 }

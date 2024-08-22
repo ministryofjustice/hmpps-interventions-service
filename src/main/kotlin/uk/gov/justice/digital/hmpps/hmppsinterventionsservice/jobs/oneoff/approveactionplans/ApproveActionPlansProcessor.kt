@@ -7,7 +7,6 @@ import org.springframework.batch.item.ItemProcessor
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
@@ -29,7 +28,6 @@ class ApproveActionPlansProcessor(
     return approveActionPlan(actionPlan)
   }
 
-
   fun approveActionPlan(actionPlan: ActionPlan): ActionPlan {
     val user = AuthUser.interventionsServiceUser
     actionPlanService.verifySafeForApproval(actionPlan)
@@ -45,7 +43,7 @@ class ApproveActionPlansProcessor(
   }
 
 //  override fun process(referral: Referral): ActionPlan {
-////    logger.info("processing action plan {} for approval", kv("actionPlanId", referral.currentActionPlan!!.id))
+// //    logger.info("processing action plan {} for approval", kv("actionPlanId", referral.currentActionPlan!!.id))
 //    return approveActionPlan(referral)
 //  }
 //
@@ -53,7 +51,7 @@ class ApproveActionPlansProcessor(
 //  fun approveActionPlan(referral: Referral): ActionPlan {
 //    print(referral)
 //    val user = AuthUser.interventionsServiceUser
-////    actionPlanService.verifySafeForApproval(referral.currentActionPlan!!)
+// //    actionPlanService.verifySafeForApproval(referral.currentActionPlan!!)
 //
 //    deliverySessionService.createUnscheduledSessionsForActionPlan(referral.currentActionPlan!!)
 //
@@ -61,7 +59,7 @@ class ApproveActionPlansProcessor(
 //    referral.currentActionPlan!!.approvedBy = authUserRepository.save(user)
 //
 //    val approvedActionPlan = actionPlanRepository.save(referral.currentActionPlan!!)
-////    actionPlanEventPublisher.actionPlanApprovedEvent(approvedActionPlan)
+// //    actionPlanEventPublisher.actionPlanApprovedEvent(approvedActionPlan)
 //    return referral.currentActionPlan!!
 //  }
 }
