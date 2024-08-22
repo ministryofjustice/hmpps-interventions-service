@@ -193,36 +193,36 @@ internal class ActionPlanServiceTest {
     assertThat(exception.message).isEqualTo("action plan not found [id=$actionPlanId]")
   }
 
-//  @Test
-//  fun `submit action plan`() {
-//    val timeBeforeSubmit = OffsetDateTime.now()
-//    val actionPlanId = UUID.randomUUID()
-//    val actionPlan = SampleData.sampleActionPlan(id = actionPlanId, numberOfSessions = 2)
-//    val authUser = AuthUser("CRN123", "auth", "user")
-//    whenever(actionPlanRepository.findByIdAndSubmittedAtIsNull(actionPlanId)).thenReturn(actionPlan)
-//    whenever(
-//      actionPlanRepository.save(
-//        ArgumentMatchers.argThat {
-//          it.numberOfSessions == actionPlan.numberOfSessions &&
-//            it.activities.size == actionPlan.activities.size &&
-//            it.activities.first() == actionPlan.activities.first() &&
-//            it.createdAt == actionPlan.createdAt &&
-//            it.createdBy == actionPlan.createdBy &&
-//            it.submittedAt!!.isAfter(timeBeforeSubmit) &&
-//            it.submittedBy == authUser &&
-// //            it.approvedAt == null &&
-// //            it.approvedBy == null &&
-//            it.referral == actionPlan.referral
-//        },
-//      ),
-//    ).thenReturn(SampleData.sampleActionPlan())
-//    whenever(authUserRepository.save(any())).thenReturn(SampleData.sampleAuthUser())
-//
-//    val submittedActionPlan = actionPlanService.submitDraftActionPlan(actionPlanId, authUser)
-//
-//    assertThat(submittedActionPlan).isNotNull
-//    verify(actionPlanValidator).validateSubmittedActionPlan(any())
-//  }
+  @Test
+  fun `submit action plan`() {
+    val timeBeforeSubmit = OffsetDateTime.now()
+    val actionPlanId = UUID.randomUUID()
+    val actionPlan = SampleData.sampleActionPlan(id = actionPlanId, numberOfSessions = 2)
+    val authUser = AuthUser("CRN123", "auth", "user")
+    whenever(actionPlanRepository.findByIdAndSubmittedAtIsNull(actionPlanId)).thenReturn(actionPlan)
+    whenever(
+      actionPlanRepository.save(
+        ArgumentMatchers.argThat {
+          it.numberOfSessions == actionPlan.numberOfSessions &&
+            it.activities.size == actionPlan.activities.size &&
+            it.activities.first() == actionPlan.activities.first() &&
+            it.createdAt == actionPlan.createdAt &&
+            it.createdBy == actionPlan.createdBy &&
+            it.submittedAt!!.isAfter(timeBeforeSubmit) &&
+            it.submittedBy == authUser &&
+ //            it.approvedAt == null &&
+ //            it.approvedBy == null &&
+            it.referral == actionPlan.referral
+        },
+      ),
+    ).thenReturn(SampleData.sampleActionPlan())
+    whenever(authUserRepository.save(any())).thenReturn(SampleData.sampleAuthUser())
+
+    val submittedActionPlan = actionPlanService.submitDraftActionPlan(actionPlanId, authUser)
+
+    assertThat(submittedActionPlan).isNotNull
+    verify(actionPlanValidator).validateSubmittedActionPlan(any())
+  }
 
   @Test
   fun `action plan approval sets approved and creates unscheduled sessions`() {
