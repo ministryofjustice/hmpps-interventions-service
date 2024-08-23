@@ -5,6 +5,7 @@ import net.logstash.logback.argument.StructuredArguments.kv
 import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.item.ItemProcessor
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
@@ -20,6 +21,7 @@ class ApproveActionPlansProcessor(
   private val deliverySessionService: DeliverySessionService,
   private val authUserRepository: AuthUserRepository,
   private val actionPlanRepository: ActionPlanRepository,
+  val actionPlanEventPublisher: ActionPlanEventPublisher,
 ) : ItemProcessor<ActionPlan, ActionPlan> {
   companion object : KLogging()
 
@@ -36,8 +38,9 @@ class ApproveActionPlansProcessor(
 
     actionPlan.approvedAt = OffsetDateTime.now()
     actionPlan.approvedBy = authUserRepository.save(user)
-    actionPlanRepository.save(actionPlan)
 
-    return actionPlan
+    val approvedActionPlan = actionPlanRepository.save(actionPlan)
+    actionPlanEventPublisher.actionPlanApprovedEvent(approvedActionPlan)
+    return approvedActionPlan
   }
 }
