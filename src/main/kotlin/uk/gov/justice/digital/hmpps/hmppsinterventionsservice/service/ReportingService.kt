@@ -14,7 +14,7 @@ import java.time.LocalDate
 class ReportingService(
   private val asyncJobLauncher: JobLauncher,
   private val performanceReportJob: Job,
-  // private val ndmisPerformanceReportJob: Job,
+  private val approveActionPlansJob: Job,
   private val serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper,
   private val batchUtils: BatchUtils,
   private val hmppsAuthService: HMPPSAuthService,

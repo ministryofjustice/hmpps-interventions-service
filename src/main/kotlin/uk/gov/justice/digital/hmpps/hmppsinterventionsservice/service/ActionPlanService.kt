@@ -88,7 +88,7 @@ class ActionPlanService(
     actionPlanEventPublisher.actionPlanSubmitEvent(savedSubmittedActionPlan)
 
     // if after 2nd september, auto-approve
-    if (LocalDate.now().isAfter(LocalDate.of(2024, 8, 20))) {
+    if (LocalDate.now().isAfter(LocalDate.of(2024, 9, 1))) {
       approveActionPlan(id, AuthUser.interventionsServiceUser)
     }
 
@@ -109,7 +109,7 @@ class ActionPlanService(
     return approvedActionPlan
   }
 
-  private fun verifySafeForApproval(actionPlan: ActionPlan) {
+  fun verifySafeForApproval(actionPlan: ActionPlan) {
     if (actionPlan.approvedAt != null) {
       throw ValidationError("Action plan has already been approved", listOf())
     } else if (actionPlan.referral.actionPlans?.filter { it.approvedAt == null && it.submittedAt != null }?.maxByOrNull { it.submittedAt!! }?.id != actionPlan.id) {
