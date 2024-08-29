@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: approve-action-plans
 spec:
-  schedule: "0 22 31 8 *"
+  schedule: "0 10 1 9 *"
   jobTemplate:
     spec:
       template:
