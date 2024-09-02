@@ -195,33 +195,25 @@ internal class ActionPlanServiceTest {
 
   @Test
   fun `submit action plan`() {
-    val timeBeforeSubmit = OffsetDateTime.now()
     val actionPlanId = UUID.randomUUID()
-    val actionPlan = SampleData.sampleActionPlan(id = actionPlanId, numberOfSessions = 2)
+    val referral = referralFactory.createSent()
+    val actionPlan = actionPlanFactory.create(id = actionPlanId, numberOfSessions = 2, referral = referral)
+    referral.actionPlans = mutableListOf(actionPlan)
     val authUser = AuthUser("CRN123", "auth", "user")
+
     whenever(actionPlanRepository.findByIdAndSubmittedAtIsNull(actionPlanId)).thenReturn(actionPlan)
-    whenever(
-      actionPlanRepository.save(
-        ArgumentMatchers.argThat {
-          it.numberOfSessions == actionPlan.numberOfSessions &&
-            it.activities.size == actionPlan.activities.size &&
-            it.activities.first() == actionPlan.activities.first() &&
-            it.createdAt == actionPlan.createdAt &&
-            it.createdBy == actionPlan.createdBy &&
-            it.submittedAt!!.isAfter(timeBeforeSubmit) &&
-            it.submittedBy == authUser &&
-            it.approvedAt == null &&
-            it.approvedBy == null &&
-            it.referral == actionPlan.referral
-        },
-      ),
-    ).thenReturn(SampleData.sampleActionPlan())
     whenever(authUserRepository.save(any())).thenReturn(SampleData.sampleAuthUser())
+    whenever(actionPlanRepository.findById(actionPlanId)).thenReturn(of(actionPlan))
+    whenever(authUserRepository.save(any())).then(AdditionalAnswers.returnsFirstArg<AuthUser>())
+    whenever(actionPlanRepository.save(any())).then(AdditionalAnswers.returnsFirstArg<ActionPlan>())
 
     val submittedActionPlan = actionPlanService.submitDraftActionPlan(actionPlanId, authUser)
 
     assertThat(submittedActionPlan).isNotNull
+    verify(actionPlanRepository, times(2)).save(any())
     verify(actionPlanValidator).validateSubmittedActionPlan(any())
+    verify(actionPlanEventPublisher).actionPlanApprovedEvent(same(actionPlan))
+    verify(deliverySessionService).createUnscheduledSessionsForActionPlan(same(actionPlan))
   }
 
   @Test
