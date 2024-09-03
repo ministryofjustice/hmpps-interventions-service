@@ -807,7 +807,7 @@ class ReferralServiceTest @Autowired constructor(
         concludedAt = OffsetDateTime.now(),
         status = Status.POST_ICA,
       ).also { referral ->
-        referral.endOfServiceReport = endOfServiceReportFactory.create(referral = referral)
+        referral.endOfServiceReport = endOfServiceReportFactory.create(referral = referral, submittedAt = OffsetDateTime.now())
       }
 
       completedSentReferralSummary = referralSummariesFactory.getReferralSummary(completedReferral)
