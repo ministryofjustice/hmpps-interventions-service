@@ -441,7 +441,7 @@ WHERE  assigned_at_desc_seq = 1
     contracts: Set<DynamicFrameworkContract>,
   ): String {
     val customCriteria = StringBuilder()
-    completed?.let { if (it) customCriteria.append("and (r.concluded_at is not null and eosr.id is not null and r.status = 'POST_ICA')") else customCriteria.append("and not(r.concluded_at is not null and eosr.id is not null and r.status = 'POST_ICA')") }
+    completed?.let { if (it) customCriteria.append("and (r.concluded_at is not null and eosr.id is not null and eosr.submitted_at is not null)") else customCriteria.append("and not(r.concluded_at is not null and eosr.id is not null and eosr.submitted_at is not null)") }
     cancelled?.let { if (it) customCriteria.append("and (r.concluded_at is not null and r.end_requested_at is not null and eosr.id is null and r.status = 'PRE_ICA') ") else customCriteria.append("and not (r.concluded_at is not null and r.end_requested_at is not null and eosr.id is null and r.status = 'PRE_ICA') ") }
     unassigned?.let { if (it) customCriteria.append("and ra.assigned_to_id is null ") else customCriteria.append("and not (ra.assigned_to_id is null) ") }
     assignedToUserId?.let { customCriteria.append("and au.id = :assignedToUserId ") }
