@@ -16,8 +16,8 @@ class RescheduledReasonReader(
     this.setName("rescheduledReasonReader")
     this.setEntityManagerFactory(entityManagerFactory)
     this.setQueryString(
-      "SELECT a " +
-        "FROM appointment ap " +
+      "SELECT ap " +
+        "FROM Appointment ap " +
         "WHERE ap.superseded is true ",
     )
   }

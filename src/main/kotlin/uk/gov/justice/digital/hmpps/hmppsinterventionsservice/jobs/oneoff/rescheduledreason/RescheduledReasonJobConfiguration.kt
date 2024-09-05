@@ -31,7 +31,7 @@ class RescheduledReasonJobConfiguration(
   @Qualifier("batchStepBuilderFactory") private val stepBuilderFactory: StepBuilderFactory,
 ) {
   @Bean
-  fun approveActionPlansJobLauncher(rescheduledReasonJob: Job): ApplicationRunner {
+  fun rescheduledReasonJobLauncher(rescheduledReasonJob: Job): ApplicationRunner {
     return onStartupJobLauncherFactory.makeBatchLauncher(rescheduledReasonJob)
   }
 

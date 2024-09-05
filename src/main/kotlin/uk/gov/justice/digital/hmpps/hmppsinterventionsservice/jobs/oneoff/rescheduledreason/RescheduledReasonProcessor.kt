@@ -20,7 +20,6 @@ import java.time.OffsetDateTime
 @JobScope
 class RescheduledReasonProcessor(
   private val appointmentRepository: AppointmentRepository,
-  val actionPlanEventPublisher: ActionPlanEventPublisher,
 ) : ItemProcessor<Appointment, Appointment> {
   companion object : KLogging()
 
