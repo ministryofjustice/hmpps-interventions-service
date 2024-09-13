@@ -23,10 +23,26 @@ class SarsDataController(
     @RequestParam toDate: String? = null,
     authentication: JwtAuthenticationToken,
   ): ResponseEntity<SarDataDTO> {
+    var from: String?
+    var to: String?
+
     if (crn == null) {
       return ResponseEntity(null, null, 209)
     }
-    val sarsData = sarsDataService.getSarsReferralData(crn, fromDate, toDate)
+
+    if (fromDate != null && fromDate.equals("")) {
+      from = null
+    } else {
+      from = fromDate
+    }
+
+    if (toDate != null && toDate.equals("")) {
+      to = null
+    } else {
+      to = toDate
+    }
+
+    val sarsData = sarsDataService.getSarsReferralData(crn, from, to)
     if (sarsData.isEmpty()) {
       return ResponseEntity(SarDataDTO.from(crn, sarsData), HttpStatus.NO_CONTENT)
     }

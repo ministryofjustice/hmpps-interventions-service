@@ -80,7 +80,7 @@ class SarsDataServiceTest @Autowired constructor(
     deliverySessionFactory.createAttended(referral = referral1, sessionNumber = 2)
     deliverySessionFactory.createAttended(referral = referral2, sessionNumber = 1)
 
-    val sarsData = sarsDataService.getSarsReferralData("crn", "2024-01-01", "2024-06-01")
+    val sarsData = sarsDataService.getSarsReferralData("crn", "01-01-2024", "01-06-2024")
 
     assertThat(sarsData.size).isEqualTo(2)
     assertThat(sarsData.map { it.referral })
