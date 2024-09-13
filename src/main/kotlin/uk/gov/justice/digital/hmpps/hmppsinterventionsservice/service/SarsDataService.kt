@@ -16,10 +16,13 @@ class SarsDataService(
   val referralRepository: ReferralRepository,
   val deliverySessionRepository: DeliverySessionRepository,
 ) {
+
+  val ukDatePattern = "dd-MM-yyyy"
+
   fun getSarsReferralData(crn: String, fromDateString: String? = null, toDateString: String? = null): List<SarsReferralData> {
     val referrals: List<Referral> = if (fromDateString != null && toDateString != null) {
-      val fromDate = OffsetDateTime.of(LocalDate.parse(fromDateString, DateTimeFormatter.ISO_DATE), LocalTime.MIDNIGHT, ZoneOffset.UTC)
-      val toDate = OffsetDateTime.of(LocalDate.parse(toDateString, DateTimeFormatter.ISO_DATE), LocalTime.MIDNIGHT, ZoneOffset.UTC)
+      val fromDate = OffsetDateTime.of(LocalDate.parse(fromDateString, DateTimeFormatter.ofPattern(ukDatePattern)), LocalTime.MIDNIGHT, ZoneOffset.UTC)
+      val toDate = OffsetDateTime.of(LocalDate.parse(toDateString, DateTimeFormatter.ofPattern(ukDatePattern)), LocalTime.MIDNIGHT, ZoneOffset.UTC)
       referralRepository.referralForSar(crn, fromDate, toDate)
     } else {
       referralRepository.findByServiceUserCRN(crn)
