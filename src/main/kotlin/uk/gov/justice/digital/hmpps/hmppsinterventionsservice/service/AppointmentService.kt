@@ -49,6 +49,7 @@ class AppointmentService(
     appointmentSessionType: AppointmentSessionType?,
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
+    rescheduledReason: String? = null,
     attended: Attended? = null,
     notifyProbationPractitionerOfBehaviour: Boolean? = null,
     notifyProbationPractitionerOfConcerns: Boolean? = null,
@@ -115,6 +116,7 @@ class AppointmentService(
           appointmentSessionType,
           appointmentDeliveryAddress,
           npsOfficeCode,
+          rescheduledReason,
           attended,
           referral,
           noAttendanceInformation,
@@ -441,6 +443,7 @@ class AppointmentService(
     appointmentSessionType: AppointmentSessionType?,
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String?,
+    rescheduledReason: String?,
     attended: Attended?,
     referral: Referral,
     noAttendanceInformation: String?,
@@ -492,6 +495,7 @@ class AppointmentService(
     )
     oldAppointment.supersededByAppointmentId = appointment.id
     oldAppointment.superseded = true
+    oldAppointment.rescheduledReason = rescheduledReason
     appointmentRepository.save(oldAppointment)
     appointmentRepository.save(appointment)
     return appointment

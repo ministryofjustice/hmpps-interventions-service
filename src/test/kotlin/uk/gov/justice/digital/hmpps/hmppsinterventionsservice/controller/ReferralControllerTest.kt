@@ -198,7 +198,7 @@ internal class ReferralControllerTest {
       )
       assertThat(supplierAssessmentDto.id).isEqualTo(supplierAssessment.id)
       assertThat(supplierAssessmentDto.appointments)
-        .hasSize(1)
+        .hasSize(2)
         .extracting("id")
         .contains(newAppointment.id)
     }

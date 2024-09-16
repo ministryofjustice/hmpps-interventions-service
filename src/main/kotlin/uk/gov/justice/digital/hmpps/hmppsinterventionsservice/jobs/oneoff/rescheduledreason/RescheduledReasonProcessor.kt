@@ -5,16 +5,8 @@ import net.logstash.logback.argument.StructuredArguments.kv
 import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.item.ItemProcessor
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanEventPublisher
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DeliverySessionService
-import java.time.OffsetDateTime
 
 @Component
 @JobScope

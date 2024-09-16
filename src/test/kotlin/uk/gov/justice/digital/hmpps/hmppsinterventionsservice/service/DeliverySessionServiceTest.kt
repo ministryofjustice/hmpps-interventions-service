@@ -722,6 +722,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         AppointmentSessionType.ONE_TO_ONE,
         null,
         null,
+        null,
         Attended.YES,
         true,
         true,
@@ -786,6 +787,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         defaultUser,
         AppointmentDeliveryType.PHONE_CALL,
         AppointmentSessionType.ONE_TO_ONE,
+        null,
         null,
         null,
         Attended.YES,
@@ -853,6 +855,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         AppointmentSessionType.ONE_TO_ONE,
         null,
         null,
+        null,
         Attended.NO,
         null,
         false,
@@ -909,6 +912,7 @@ class DeliverySessionServiceTest @Autowired constructor(
 
       val updatedSession = deliverySessionService.updateSessionAppointment(
         actionPlan.id, session.sessionNumber, defaultPastAppointmentTime, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE,
+        null,
         null,
         null,
         Attended.YES,

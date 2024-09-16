@@ -52,6 +52,7 @@ class SupplierAssessmentController(
         updateAppointmentDTO.sessionType,
         updateAppointmentDTO.appointmentDeliveryAddress,
         updateAppointmentDTO.npsOfficeCode,
+        updateAppointmentDTO.rescheduledReason,
         updateAppointmentDTO.attendanceFeedback?.attended,
         updateAppointmentDTO.attendanceFeedback?.didSessionHappen,
         updateAppointmentDTO.sessionFeedback?.notifyProbationPractitionerOfBehaviour,

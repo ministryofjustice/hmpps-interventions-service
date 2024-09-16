@@ -317,6 +317,7 @@ class DeliverySessionService(
     appointmentSessionType: AppointmentSessionType? = null,
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
+    rescheduledReason: String? = null,
     attended: Attended? = null,
     didSessionHappen: Boolean? = null,
     notifyProbationPractitionerOfBehaviour: Boolean? = null,
@@ -366,6 +367,7 @@ class DeliverySessionService(
     existingAppointment?.let {
       it.supersededByAppointmentId = appointment.id
       it.superseded = true
+      it.rescheduledReason = rescheduledReason
     }
 
     session.appointments.map { appt ->
