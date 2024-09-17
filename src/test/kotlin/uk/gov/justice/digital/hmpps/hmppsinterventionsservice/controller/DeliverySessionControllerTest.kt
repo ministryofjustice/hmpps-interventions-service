@@ -265,7 +265,7 @@ internal class DeliverySessionControllerTest {
           updateAppointmentDTO.durationInMinutes,
           user,
           AppointmentDeliveryType.PHONE_CALL,
-          AppointmentSessionType.ONE_TO_ONE
+          AppointmentSessionType.ONE_TO_ONE,
         ),
       ).thenReturn(deliverySession)
 
