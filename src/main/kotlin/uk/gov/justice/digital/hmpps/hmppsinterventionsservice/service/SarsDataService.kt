@@ -19,8 +19,31 @@ class SarsDataService(
 
   fun getSarsReferralData(crn: String, fromDateString: String? = null, toDateString: String? = null): List<SarsReferralData> {
     val referrals: List<Referral> = if (fromDateString != null && toDateString != null) {
-      val fromDate = OffsetDateTime.of(LocalDate.parse(fromDateString, DateTimeFormatter.ISO_DATE), LocalTime.MIDNIGHT, ZoneOffset.UTC)
-      val toDate = OffsetDateTime.of(LocalDate.parse(toDateString, DateTimeFormatter.ISO_DATE), LocalTime.MIDNIGHT, ZoneOffset.UTC)
+      val fromDate = OffsetDateTime.of(
+        LocalDate.parse(fromDateString, DateTimeFormatter.ISO_DATE),
+        LocalTime.MIDNIGHT,
+        ZoneOffset.UTC,
+      )
+      val toDate =
+        OffsetDateTime.of(LocalDate.parse(toDateString, DateTimeFormatter.ISO_DATE), LocalTime.MIDNIGHT, ZoneOffset.UTC)
+      referralRepository.referralForSar(crn, fromDate, toDate)
+    } else if (fromDateString == null && toDateString != null) {
+      val fromDate = OffsetDateTime.of(
+        LocalDate.parse("1970-01-01", DateTimeFormatter.ISO_DATE),
+        LocalTime.MIDNIGHT,
+        ZoneOffset.UTC,
+      )
+      val toDate =
+        OffsetDateTime.of(LocalDate.parse(toDateString, DateTimeFormatter.ISO_DATE), LocalTime.MIDNIGHT, ZoneOffset.UTC)
+      referralRepository.referralForSar(crn, fromDate, toDate)
+    } else if (fromDateString != null && toDateString == null) {
+      val fromDate = OffsetDateTime.of(
+        LocalDate.parse(fromDateString, DateTimeFormatter.ISO_DATE),
+        LocalTime.MIDNIGHT,
+        ZoneOffset.UTC,
+      )
+      val toDate =
+        OffsetDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT, ZoneOffset.UTC)
       referralRepository.referralForSar(crn, fromDate, toDate)
     } else {
       referralRepository.findByServiceUserCRN(crn)
