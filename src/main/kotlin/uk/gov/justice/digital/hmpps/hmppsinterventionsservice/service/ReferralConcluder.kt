@@ -49,18 +49,18 @@ class ReferralConcluder(
 ) {
   fun concludeIfEligible(referral: Referral) {
     val deliveryState = deliveryState(referral)
-    signalEnding(referral, deliveryState.concludedState)
 
     val endState = endState(deliveryState, referral.endOfServiceReport)
     if (endState == ReferralEndState.CAN_CONCLUDE) {
       conclude(referral, deliveryState.concludedState)
     }
+    signalEnding(referral, deliveryState.concludedState)
   }
 
   fun withdrawReferral(referral: Referral, withdrawalState: ReferralWithdrawalState) {
     val deliveryState = deliveryState(referral)
-    signalEnding(referral, deliveryState.concludedState)
     conclude(referral, deliveryState.concludedState, withdrawalState)
+    signalEnding(referral, deliveryState.concludedState)
   }
 
   private fun signalEnding(referral: Referral, concludedState: ReferralConcludedState) {
