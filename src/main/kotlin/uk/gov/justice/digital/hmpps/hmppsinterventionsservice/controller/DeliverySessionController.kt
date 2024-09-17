@@ -81,7 +81,7 @@ class DeliverySessionController(
       updateAppointmentDTO.sessionFeedback?.sessionBehaviour,
       updateAppointmentDTO.sessionFeedback?.sessionConcerns,
     )
-    if (updateAppointmentDTO.attendanceFeedback?.attended != Attended.NO) {
+    if (updateAppointmentDTO.attendanceFeedback?.attended == Attended.YES) {
       val referral = session.currentAppointment?.referral ?: session.referral
       if (referral.status != Status.POST_ICA) {
         referralService.setReferralStatus(referral, Status.POST_ICA)
@@ -312,7 +312,7 @@ class DeliverySessionController(
     )
     referralAccessChecker.forUser(referral, user)
     val sessionAndAppointment = deliverySessionService.submitAppointmentFeedback(referralId, appointmentId, user)
-    if (sessionAndAppointment.second.attended != Attended.NO) {
+    if (sessionAndAppointment.second.attended == Attended.YES) {
       if (referral.status != Status.POST_ICA) {
         referralService.setReferralStatus(referral, Status.POST_ICA)
       }

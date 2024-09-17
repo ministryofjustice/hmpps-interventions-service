@@ -239,6 +239,44 @@ internal class DeliverySessionControllerTest {
     }
 
     @Test
+    fun `updates a session and does not set referral status to post ica when the session is rescheduled with no attendance feedback`() {
+      val user = authUserFactory.create()
+      val userToken = jwtTokenFactory.create(user)
+      val deliverySession = deliverySessionFactory.createScheduled(createdBy = user)
+      val actionPlanId = UUID.randomUUID()
+      val sessionNumber = deliverySession.sessionNumber
+
+      val attendanceFeedbackRequestDTO = AttendanceFeedbackRequestDTO(attended = NO, didSessionHappen = false)
+      val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, null)
+
+      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
+      whenever(
+        sessionsService.getDeliverySessionByActionPlanIdOrThrowException(
+          actionPlanId,
+          sessionNumber,
+        ),
+      ).thenReturn(deliverySession)
+
+      whenever(
+        sessionsService.updateSessionAppointment(
+          actionPlanId,
+          sessionNumber,
+          updateAppointmentDTO.appointmentTime,
+          updateAppointmentDTO.durationInMinutes,
+          user,
+          AppointmentDeliveryType.PHONE_CALL,
+          AppointmentSessionType.ONE_TO_ONE
+        ),
+      ).thenReturn(deliverySession)
+
+      val sessionResponse = sessionsController.updateSessionAppointment(actionPlanId, sessionNumber, updateAppointmentDTO, userToken)
+
+      verify(referralService, times(0)).setReferralStatus(deliverySession.currentAppointment!!.referral, Status.POST_ICA)
+
+      assertThat(sessionResponse).isEqualTo(DeliverySessionDTO.from(deliverySession))
+    }
+
+    @Test
     fun `updates a session and does not set referral status to post ica when the session was not attended`() {
       val user = authUserFactory.create()
       val userToken = jwtTokenFactory.create(user)
