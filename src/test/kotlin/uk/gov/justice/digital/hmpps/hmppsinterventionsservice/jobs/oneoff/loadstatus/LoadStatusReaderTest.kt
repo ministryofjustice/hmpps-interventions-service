@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.loads
 
 import jakarta.persistence.EntityManagerFactory
 import org.assertj.core.api.Assertions.assertThat
-import org.hibernate.SessionFactory
 import org.junit.jupiter.api.Test
 import org.springframework.batch.item.ExecutionContext
 import org.springframework.beans.factory.annotation.Autowired

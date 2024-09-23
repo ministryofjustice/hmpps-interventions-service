@@ -9,7 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 @Component
 @JobScope
 class LoadStatusReader(
-  entityManagerFactory: EntityManagerFactory
+  entityManagerFactory: EntityManagerFactory,
 ) : JpaCursorItemReader<Referral>() {
   init {
     this.setName("loadStatusReader")
