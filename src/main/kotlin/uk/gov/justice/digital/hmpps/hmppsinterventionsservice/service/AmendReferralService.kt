@@ -384,6 +384,10 @@ class AmendReferralService(
     val oldValues = mutableListOf<String>()
     referral.probationPractitionerDetails?.name?.let { oldValues.add(referral.probationPractitionerDetails?.name!!) }
 
+    if (oldValues.isEmpty()) {
+      referral.probationPractitionerDetails?.nDeliusName?.let { oldValues.add(referral.probationPractitionerDetails?.nDeliusName!!) }
+    }
+
     val newValues = mutableListOf<String>()
     newValues.add(amendProbationPractitionerNameDTO.ppName)
 
@@ -404,9 +408,7 @@ class AmendReferralService(
     probationPractitionerDetails?.let { probationPractitionerDetailsRepository.save(it) }
   }
 
-  fun getListOfChangeLogEntries(referral: Referral): List<Changelog> {
-    return changelogRepository.findByReferralIdOrderByChangedAtDesc(referral.id)
-  }
+  fun getListOfChangeLogEntries(referral: Referral): List<Changelog> = changelogRepository.findByReferralIdOrderByChangedAtDesc(referral.id)
 
   fun getChangeLogById(changeLogId: UUID, authentication: JwtAuthenticationToken): ChangelogUpdateDTO {
     val changelog = changelogRepository.findById(changeLogId)
