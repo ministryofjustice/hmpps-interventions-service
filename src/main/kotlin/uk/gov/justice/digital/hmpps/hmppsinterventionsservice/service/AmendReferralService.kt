@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendExpectedR
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendPrisonEstablishmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationOfficeDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationPractitionerNameDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogUpdateDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
@@ -49,6 +50,7 @@ enum class AmendTopic {
   EXPECTED_RELEASE_DATE,
   EXPECTED_PROBATION_OFFICE,
   PROBATION_PRACTITIONER_PROBATION_OFFICE,
+  PROBATION_PRACTITIONER_NAME,
 }
 
 @Service
@@ -371,9 +373,42 @@ class AmendReferralService(
     )
   }
 
-  fun getListOfChangeLogEntries(referral: Referral): List<Changelog> {
-    return changelogRepository.findByReferralIdOrderByChangedAtDesc(referral.id)
+  fun amendProbationPractitionerName(
+    referralId: UUID,
+    amendProbationPractitionerNameDTO: AmendProbationPractitionerNameDTO,
+    authentication: JwtAuthenticationToken,
+    user: AuthUser,
+  ) {
+    val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
+
+    val oldValues = mutableListOf<String>()
+    referral.probationPractitionerDetails?.name?.let { oldValues.add(referral.probationPractitionerDetails?.name!!) }
+
+    if (oldValues.isEmpty()) {
+      referral.probationPractitionerDetails?.nDeliusName?.let { oldValues.add(referral.probationPractitionerDetails?.nDeliusName!!) }
+    }
+
+    val newValues = mutableListOf<String>()
+    newValues.add(amendProbationPractitionerNameDTO.ppName)
+
+    val probationPractitionerDetails = referral.probationPractitionerDetails
+    probationPractitionerDetails?.name = amendProbationPractitionerNameDTO.ppName
+
+    val changelog = Changelog(
+      referral.id,
+      UUID.randomUUID(),
+      AmendTopic.PROBATION_PRACTITIONER_NAME,
+      ReferralAmendmentDetails(values = oldValues),
+      ReferralAmendmentDetails(values = newValues),
+      "",
+      OffsetDateTime.now(),
+      userMapper.fromToken(authentication),
+    )
+    changelogRepository.save(changelog)
+    probationPractitionerDetails?.let { probationPractitionerDetailsRepository.save(it) }
   }
+
+  fun getListOfChangeLogEntries(referral: Referral): List<Changelog> = changelogRepository.findByReferralIdOrderByChangedAtDesc(referral.id)
 
   fun getChangeLogById(changeLogId: UUID, authentication: JwtAuthenticationToken): ChangelogUpdateDTO {
     val changelog = changelogRepository.findById(changeLogId)

@@ -445,6 +445,38 @@ internal class AmendReferralControllerTest {
     }
 
     @Test
+    fun `getChangelogDetails returns the amended pp name changelog entry`() {
+      val changelog = changeLogFactory.create(
+        UUID.randomUUID(),
+        AmendTopic.PROBATION_PRACTITIONER_NAME,
+        referral.id,
+        ReferralAmendmentDetails(mutableListOf("Old Name")),
+        ReferralAmendmentDetails(mutableListOf("New Name")),
+        "A reason",
+        OffsetDateTime.now(),
+        user,
+      )
+
+      val changelogUpdateDTO = ChangelogUpdateDTO(
+        changelog,
+        oldValue = "Old Name",
+        newValue = "New Name",
+      )
+      whenever(amendReferralService.getChangeLogById(changelog.id, token)).thenReturn(changelogUpdateDTO)
+      whenever(userMapper.fromToken(any())).thenReturn(user)
+      val userDetail = UserDetail("firstname", "email", "lastname")
+
+      whenever(hmppsAuthService.getUserDetail(eq(user))).thenReturn(userDetail)
+
+      val returnedChangeLogObject = amendReferralController.getChangelogDetails(changelog.id, token)
+
+      assertThat(returnedChangeLogObject.changelogId).isEqualTo(changelog.id)
+      assertThat(returnedChangeLogObject.referralId).isEqualTo(changelog.referralId)
+      assertThat(returnedChangeLogObject.oldValue).containsExactly("Old Name")
+      assertThat(returnedChangeLogObject.newValue).containsExactly("New Name")
+    }
+
+    @Test
     fun `getChangelogDetails throws 404 when changelog is not present`() {
       val changelog = changeLogFactory.create(
         UUID.randomUUID(),

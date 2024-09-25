@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOu
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendExpectedReleaseDateDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendPrisonEstablishmentDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationPractitionerNameDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
@@ -25,6 +26,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Complex
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ProbationPractitionerDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralLocation
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
@@ -310,6 +312,44 @@ class AmendReferralServiceTest @Autowired constructor(
     val newReferral = referralRepository.findById(referral.id).get()
 
     assertThat(newReferral.referralLocation?.prisonId).isEqualTo("London")
+  }
+
+  @Test
+  fun `amend probation practitioner name`() {
+    val someoneElse = userFactory.create("helper_pp_user", "delius")
+    val user = userFactory.create("pp_user_1", "delius")
+
+    val referral = referralFactory.createSent(createdBy = someoneElse)
+    val probationPractitioner = ProbationPractitionerDetails(
+      id = UUID.randomUUID(),
+      name = "Bob Wills",
+      referral = referral,
+    )
+    probationPractitionerDetailsRepository.saveAndFlush(probationPractitioner)
+    referral.probationPractitionerDetails = probationPractitioner
+    referralRepository.saveAndFlush(referral)
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
+    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+
+    amendReferralService.amendProbationPractitionerName(
+      referral.id,
+      AmendProbationPractitionerNameDTO(
+        ppName = "Bob Moore",
+      ),
+      jwtAuthenticationToken,
+      user,
+    )
+    val changelog = entityManager.entityManager.createQuery("FROM Changelog u WHERE u.referralId = :referralId")
+      .setParameter("referralId", referral.id)
+      .singleResult as Changelog
+
+    assertThat(changelog.newVal.values.size).isEqualTo(1)
+    assertThat(changelog.newVal.values).contains("Bob Moore")
+    assertThat(changelog.oldVal.values).contains("Bob Wills")
+
+    val newReferral = referralRepository.findById(referral.id).get()
+
+    assertThat(newReferral.probationPractitionerDetails?.name).isEqualTo("Bob Moore")
   }
 
   @Test
