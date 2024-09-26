@@ -17,7 +17,7 @@ class RescheduledReasonProcessor(
 
   override fun process(appointment: Appointment): Appointment {
     logger.info("processing appointment {} for rescheduled reason", kv("appointmentId", appointment.id))
-    appointment.rescheduledReason = "Old rescheduled appointment"
+    appointment.rescheduledReason = "---"
 
     return appointmentRepository.save(appointment)
   }
