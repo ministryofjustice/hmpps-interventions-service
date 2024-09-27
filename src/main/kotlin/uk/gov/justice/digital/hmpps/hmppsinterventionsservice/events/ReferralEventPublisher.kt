@@ -24,6 +24,7 @@ enum class ReferralEventType {
   PRISON_ESTABLISHMENT_AMENDED,
   EXPECTED_RELEASE_DATE,
   PROBATION_OFFICE_AMENDED,
+  PROBATION_PRACTITIONER_NAME_AMENDED,
 }
 
 class ReferralEvent(
@@ -33,9 +34,7 @@ class ReferralEvent(
   val detailUrl: String,
   val data: Map<String, Any?> = emptyMap(),
 ) : ApplicationEvent(source) {
-  override fun toString(): String {
-    return "ReferralEvent(type=$type, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
-  }
+  override fun toString(): String = "ReferralEvent(type=$type, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
 }
 
 class ReferralEndingEvent(
@@ -44,9 +43,7 @@ class ReferralEndingEvent(
   val referral: Referral,
   val detailUrl: String,
 ) : ApplicationEvent(source) {
-  override fun toString(): String {
-    return "ReferralEndingEvent(state=$state, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
-  }
+  override fun toString(): String = "ReferralEndingEvent(state=$state, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
 }
 
 class ReferralConcludedEvent(
@@ -56,9 +53,7 @@ class ReferralConcludedEvent(
   val detailUrl: String,
   val referralWithdrawalState: ReferralWithdrawalState? = null,
 ) : ApplicationEvent(source) {
-  override fun toString(): String {
-    return "ReferralConcludedEvent(type=$type, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
-  }
+  override fun toString(): String = "ReferralConcludedEvent(type=$type, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
 }
 
 @Component

@@ -72,6 +72,7 @@ class NotifyReferralServiceTest {
       "prisonEstablishmentUpdatedTemplateID",
       "expectedReleaseDateUpdatedTemplatedID",
       "probationOfficeUpdatedTemplateID",
+      "probationPractitionerNameUpdatedTemplateID",
       "http://interventions-ui.example.com",
       "/referral/{id}",
       emailSender,
@@ -237,6 +238,40 @@ class NotifyReferralServiceTest {
       )
     }
 
+    @Test
+    fun `amending 'probation practitioner name' notifies the assigned caseworker via email`() {
+      whenever(authUserRepository.findById(referral.createdBy.id)).thenReturn(Optional.of(referral.createdBy))
+      whenever(hmppsAuthService.getUserDetail(referral.createdBy)).thenReturn(
+        UserDetail(
+          "sally",
+          "sally@tom.com",
+          "smith",
+        ),
+      )
+      whenever(hmppsAuthService.getUserDetail(AuthUserDTO.from(referral.currentAssignee!!))).thenReturn(
+        UserDetail(
+          "tom",
+          "tom@tom.tom",
+          "jones",
+        ),
+      )
+
+      notifyService().onApplicationEvent(makeProbationPractitionerNameUpdatedEvent(true))
+      val personalisationCaptor = argumentCaptor<Map<String, String>>()
+      verify(emailSender).sendEmail(
+        eq("probationPractitionerNameUpdatedTemplateID"),
+        eq("tom@tom.tom"),
+        personalisationCaptor.capture(),
+      )
+      assertThat(personalisationCaptor.firstValue["oldProbationPractitionerName"]).isEqualTo("Individual#1")
+      assertThat(personalisationCaptor.firstValue["newProbationPractitionerName"]).isEqualTo("Individual#2")
+      assertThat(personalisationCaptor.firstValue["caseWorkerFirstName"]).isEqualTo("tom")
+      assertThat(personalisationCaptor.firstValue["changedByName"]).isEqualTo("sally smith")
+      assertThat(personalisationCaptor.firstValue["referralDetailsURL"]).isEqualTo("http://interventions-ui.example.com/referral/${referral.id}")
+      assertThat(personalisationCaptor.firstValue["referralNumber"]).isEqualTo(referral.referenceNumber)
+      assertThat(personalisationCaptor.firstValue["popFullName"]).isEqualTo("${referral.serviceUserData?.firstName} ${referral.serviceUserData?.lastName}")
+    }
+
     private val makeExpectedReleaseDateUpdatedEvent = { assigned: Boolean ->
       val formatter = DateTimeFormatter.ofPattern("dd-MMM-yyyy")
       ReferralEvent(
@@ -303,6 +338,24 @@ class NotifyReferralServiceTest {
         data = mapOf(
           "oldExpectedReleaseDateDetails" to "Expected release date is not known",
           "newExpectedReleaseDateDetails" to "Expected release date is not known",
+          "currentAssignee" to if (assigned) AuthUserDTO.from(referral.currentAssignee!!) else null,
+          "crn" to referral.serviceUserCRN,
+          "sentBy" to referral.sentBy,
+          "createdBy" to referral.createdBy,
+          "updater" to referral.createdBy,
+        ),
+      )
+    }
+
+    private val makeProbationPractitionerNameUpdatedEvent = { assigned: Boolean ->
+      ReferralEvent(
+        "source",
+        ReferralEventType.PROBATION_PRACTITIONER_NAME_AMENDED,
+        referral,
+        "http://localhost:8080/sent-referral/${referral.id}",
+        data = mapOf(
+          "oldProbationPractitionerName" to "Individual#1",
+          "newProbationPractitionerName" to "Individual#2",
           "currentAssignee" to if (assigned) AuthUserDTO.from(referral.currentAssignee!!) else null,
           "crn" to referral.serviceUserCRN,
           "sentBy" to referral.sentBy,
