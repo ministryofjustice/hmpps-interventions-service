@@ -123,6 +123,7 @@ class NotifyReferralServiceTest {
     assertThat(personalisationCaptor.firstValue["referralUrl"]).isEqualTo("http://interventions-ui.example.com/referral/42c7d267-0776-4272-a8e8-a673bfe30d0d")
   }
 
+
   @Nested
   inner class ReferralDetailsChangedEvent {
     private val referralDetailsFactory = ReferralDetailsFactory()
