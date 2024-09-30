@@ -408,8 +408,8 @@ class AmendReferralService(
     probationPractitionerDetails?.let { probationPractitionerDetailsRepository.save(it) }
     referralEventPublisher.referralProbationPractitionerNameChangedEvent(
       referral,
-      oldValues,
-      newValues,
+      newValues.get(0),
+      oldValues.get(0),
     )
   }
 

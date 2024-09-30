@@ -191,7 +191,7 @@ class ReferralEventPublisher(
     )
   }
 
-  fun referralProbationPractitionerNameChangedEvent(referral: Referral, newPpName: MutableList<String>, previousPpName: MutableList<String>) {
+  fun referralProbationPractitionerNameChangedEvent(referral: Referral, newPpName: String, previousPpName: String) {
     applicationEventPublisher.publishEvent(
       ReferralEvent(
         this,
@@ -199,8 +199,8 @@ class ReferralEventPublisher(
         referral,
         getSentReferralURL(referral),
         mapOf(
-          "newProbationPractitionerName" to newPpName?.get(0),
-          "oldProbationPractitionerName" to previousPpName?.get(0),
+          "newProbationPractitionerName" to newPpName,
+          "oldProbationPractitionerName" to previousPpName,
           "currentAssignee" to referral.currentAssignee?.let { AuthUserDTO.from(it) },
           "crn" to referral.serviceUserCRN,
           "sentBy" to referral.sentBy,

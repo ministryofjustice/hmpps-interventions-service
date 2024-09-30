@@ -80,4 +80,26 @@ class ReferralEventPublisherTest {
     assertThat(event.referral).isSameAs(referral)
     assertThat(event.detailUrl).isEqualTo(uri.toString())
   }
+
+  @Test
+  fun `builds an referral pp name updated event and publishes it`() {
+    val referral = SampleData.sampleReferral("CRN1234", "Service Provider Name")
+    val uri = URI.create("http://localhost/sent-referral/" + referral.id)
+    whenever(locationMapper.expandPathToCurrentContextPathUrl("/sent-referral/{id}", referral.id)).thenReturn(uri)
+    whenever(locationMapper.getPathFromControllerMethod(ReferralController::getSentReferral)).thenReturn("/sent-referral/{id}")
+    val publisher = ReferralEventPublisher(eventPublisher, locationMapper)
+
+    publisher.referralProbationPractitionerNameChangedEvent(referral, "new", "original")
+
+    val eventCaptor = argumentCaptor<ReferralEvent>()
+    verify(eventPublisher).publishEvent(eventCaptor.capture())
+    val event = eventCaptor.firstValue
+
+    assertThat(event.source).isSameAs(publisher)
+    assertThat(event.type).isEqualTo(ReferralEventType.PROBATION_PRACTITIONER_NAME_AMENDED)
+    assertThat(event.referral).isSameAs(referral)
+    assertThat(event.detailUrl).isEqualTo(uri.toString())
+    assertThat(event.data["newProbationPractitionerName"]).isEqualTo("new")
+    assertThat(event.data["oldProbationPractitionerName"]).isEqualTo("original")
+  }
 }
