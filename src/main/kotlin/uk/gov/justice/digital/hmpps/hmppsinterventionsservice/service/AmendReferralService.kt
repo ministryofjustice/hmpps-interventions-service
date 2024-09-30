@@ -406,6 +406,11 @@ class AmendReferralService(
     )
     changelogRepository.save(changelog)
     probationPractitionerDetails?.let { probationPractitionerDetailsRepository.save(it) }
+    referralEventPublisher.referralProbationPractitionerNameChangedEvent(
+      referral,
+      oldValues,
+      newValues,
+    )
   }
 
   fun getListOfChangeLogEntries(referral: Referral): List<Changelog> = changelogRepository.findByReferralIdOrderByChangedAtDesc(referral.id)
