@@ -225,7 +225,7 @@ internal class DeliverySessionsServiceTest {
     val appointmentTime = OffsetDateTime.now()
     val durationInMinutes = 200
 
-    whenever(communityAPIBookingService.book(any(), isNull(), any(), any(), eq(SERVICE_DELIVERY), isNull(), eq(Attended.NO), eq(false), eq(false), eq(true), isNull()))
+    whenever(communityAPIBookingService.book(any(), isNull(), any(), any(), eq(SERVICE_DELIVERY), isNull(), eq(Attended.NO), eq(false), eq(false), eq(true), isNull(), isNull()))
       .thenReturn(Pair(46298523523L, UUID.randomUUID()))
 
     val updatedSession = deliverySessionsService.updateSessionAppointment(
@@ -268,7 +268,7 @@ internal class DeliverySessionsServiceTest {
     val newTime = OffsetDateTime.now()
     val newDuration = 200
 
-    whenever(communityAPIBookingService.book(any(), isNotNull(), eq(newTime), eq(newDuration), eq(SERVICE_DELIVERY), isNull(), isNull(), isNull(), isNull(), isNull(), isNull()))
+    whenever(communityAPIBookingService.book(any(), isNotNull(), eq(newTime), eq(newDuration), eq(SERVICE_DELIVERY), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull()))
       .thenReturn(Pair(23523541087L, UUID.randomUUID()))
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(session)
     whenever(deliverySessionRepository.saveAndFlush(any())).thenAnswer { it.arguments[0] }

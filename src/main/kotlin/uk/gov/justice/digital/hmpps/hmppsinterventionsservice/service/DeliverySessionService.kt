@@ -317,6 +317,7 @@ class DeliverySessionService(
     appointmentSessionType: AppointmentSessionType? = null,
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
+    rescheduleRequestedBy: String? = null,
     rescheduledReason: String? = null,
     attended: Attended? = null,
     didSessionHappen: Boolean? = null,
@@ -351,6 +352,7 @@ class DeliverySessionService(
       notifyProbationPractitionerOfConcerns,
       didSessionHappen,
       noSessionReasonType,
+      rescheduleRequestedBy,
     )
 
     // creating a new appointment from the existing appointment or else create a new appointment
@@ -367,6 +369,7 @@ class DeliverySessionService(
     existingAppointment?.let {
       it.supersededByAppointmentId = appointment.id
       it.superseded = true
+      it.rescheduleRequestedBy = rescheduleRequestedBy
       it.rescheduledReason = rescheduledReason
     }
 

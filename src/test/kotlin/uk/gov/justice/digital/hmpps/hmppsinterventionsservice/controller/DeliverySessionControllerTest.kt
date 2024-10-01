@@ -111,7 +111,7 @@ internal class DeliverySessionControllerTest {
         notifyProbationPractitionerOfBehaviour = false,
         notifyProbationPractitionerOfConcerns = false,
       )
-      val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, null, attendanceFeedbackRequestDTO, sessionFeedbackRequestDTO)
+      val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, null, null, attendanceFeedbackRequestDTO, sessionFeedbackRequestDTO)
 
       whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
       whenever(
@@ -161,7 +161,7 @@ internal class DeliverySessionControllerTest {
         notifyProbationPractitionerOfBehaviour = false,
         notifyProbationPractitionerOfConcerns = false,
       )
-      val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, null, attendanceFeedbackRequestDTO, sessionFeedbackRequestDTO)
+      val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, null, null, attendanceFeedbackRequestDTO, sessionFeedbackRequestDTO)
       val newAppointment = Appointment(
         id = UUID.randomUUID(),
         createdBy = user,
@@ -207,7 +207,7 @@ internal class DeliverySessionControllerTest {
       val sessionNumber = deliverySession.sessionNumber
 
       val attendanceFeedbackRequestDTO = AttendanceFeedbackRequestDTO(attended = YES, didSessionHappen = false)
-      val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, null, attendanceFeedbackRequestDTO)
+      val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, null, null, attendanceFeedbackRequestDTO)
 
       whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
       whenever(
@@ -285,7 +285,7 @@ internal class DeliverySessionControllerTest {
       val sessionNumber = deliverySession.sessionNumber
 
       val attendanceFeedbackRequestDTO = AttendanceFeedbackRequestDTO(attended = NO, didSessionHappen = false)
-      val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, null, attendanceFeedbackRequestDTO)
+      val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, null, null, attendanceFeedbackRequestDTO)
 
       whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
       whenever(

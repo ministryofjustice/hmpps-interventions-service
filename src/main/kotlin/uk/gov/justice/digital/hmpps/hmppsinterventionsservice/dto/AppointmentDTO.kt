@@ -17,6 +17,7 @@ data class AppointmentDTO(
   val npsOfficeCode: String?,
   val createdAt: OffsetDateTime?,
   val superseded: Boolean,
+  val rescheduleRequestedBy: String?,
   val rescheduledReason: String?,
 ) {
   companion object {
@@ -39,6 +40,7 @@ data class AppointmentDTO(
         npsOfficeCode = appointment.appointmentDelivery?.npsOfficeCode,
         createdAt = appointment.createdAt,
         superseded = appointment.superseded,
+        rescheduleRequestedBy = appointment.rescheduleRequestedBy,
         rescheduledReason = appointment.rescheduledReason,
       )
     }

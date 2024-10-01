@@ -92,6 +92,7 @@ data class Appointment(
   @Id var id: UUID,
   var supersededByAppointmentId: UUID? = null,
   var stale: Boolean = false,
+  var rescheduleRequestedBy: String? = null,
   var rescheduledReason: String? = null,
 ) {
   override fun equals(other: Any?): Boolean {
