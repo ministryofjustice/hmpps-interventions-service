@@ -348,7 +348,7 @@ class AmendReferralServiceTest @Autowired constructor(
     assertThat(changelog.newVal.values).contains("Bob Moore")
     assertThat(changelog.oldVal.values).contains("Bob Wills")
 
-    verify(referralEventPublisher).referralProbationPractitionerNameChangedEvent(eq(referral), eq("Bob Moore"), eq("Bob Wills"))
+    verify(referralEventPublisher).referralProbationPractitionerNameChangedEvent(eq(referral), eq("Bob Moore"), eq("Bob Wills"), eq(user))
 
     val newReferral = referralRepository.findById(referral.id).get()
 

@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.Location
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller.ReferralController
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType.ASSIGNED
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType.SENT
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralWithdrawalState
@@ -19,6 +20,7 @@ import java.net.URI
 class ReferralEventPublisherTest {
   private val eventPublisher = mock<ApplicationEventPublisher>()
   private val locationMapper = mock<LocationMapper>()
+  private val targetUser = mock<AuthUser>()
 
   @Test
   fun `builds an referral sent event and publishes it`() {
@@ -89,7 +91,7 @@ class ReferralEventPublisherTest {
     whenever(locationMapper.getPathFromControllerMethod(ReferralController::getSentReferral)).thenReturn("/sent-referral/{id}")
     val publisher = ReferralEventPublisher(eventPublisher, locationMapper)
 
-    publisher.referralProbationPractitionerNameChangedEvent(referral, "new", "original")
+    publisher.referralProbationPractitionerNameChangedEvent(referral, "new", "original", targetUser)
 
     val eventCaptor = argumentCaptor<ReferralEvent>()
     verify(eventPublisher).publishEvent(eventCaptor.capture())
