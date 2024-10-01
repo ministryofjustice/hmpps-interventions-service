@@ -410,6 +410,7 @@ class AmendReferralService(
       referral,
       newValues.get(0),
       oldValues.get(0),
+      user,
     )
   }
 

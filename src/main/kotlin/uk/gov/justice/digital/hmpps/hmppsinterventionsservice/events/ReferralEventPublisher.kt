@@ -191,7 +191,7 @@ class ReferralEventPublisher(
     )
   }
 
-  fun referralProbationPractitionerNameChangedEvent(referral: Referral, newPpName: String, previousPpName: String) {
+  fun referralProbationPractitionerNameChangedEvent(referral: Referral, newPpName: String, previousPpName: String, user: AuthUser) {
     applicationEventPublisher.publishEvent(
       ReferralEvent(
         this,
@@ -205,6 +205,7 @@ class ReferralEventPublisher(
           "crn" to referral.serviceUserCRN,
           "sentBy" to referral.sentBy,
           "createdBy" to referral.createdBy,
+          "updater" to user,
         ),
       ),
     )
