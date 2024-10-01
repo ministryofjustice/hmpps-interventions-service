@@ -7,6 +7,7 @@ import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
@@ -346,6 +347,8 @@ class AmendReferralServiceTest @Autowired constructor(
     assertThat(changelog.newVal.values.size).isEqualTo(1)
     assertThat(changelog.newVal.values).contains("Bob Moore")
     assertThat(changelog.oldVal.values).contains("Bob Wills")
+
+    verify(referralEventPublisher).referralProbationPractitionerNameChangedEvent(eq(referral), eq("Bob Moore"), eq("Bob Wills"), eq(user))
 
     val newReferral = referralRepository.findById(referral.id).get()
 
