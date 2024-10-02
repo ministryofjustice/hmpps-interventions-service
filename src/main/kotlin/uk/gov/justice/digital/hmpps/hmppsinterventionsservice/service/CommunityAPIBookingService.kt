@@ -45,12 +45,13 @@ class CommunityAPIBookingService(
     notifyProbationPractitionerOfConcerns: Boolean? = null,
     didSessionHappen: Boolean? = null,
     noSessionReasonType: NoSessionReasonType? = null,
+    rescheduleRequestedBy: String? = null,
   ): Pair<Long?, UUID?> {
     if (!bookingsEnabled) {
       return existingAppointment?.deliusAppointmentId to null
     }
 
-    return processingBooking(referral, existingAppointment, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode, attended, notifyProbationPractitionerOfBehaviour, notifyProbationPractitionerOfConcerns, didSessionHappen, noSessionReasonType)
+    return processingBooking(referral, existingAppointment, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode, attended, notifyProbationPractitionerOfBehaviour, notifyProbationPractitionerOfConcerns, didSessionHappen, noSessionReasonType, rescheduleRequestedBy)
   }
 
   private fun processingBooking(
@@ -65,6 +66,7 @@ class CommunityAPIBookingService(
     notifyProbationPractitionerOfConcerns: Boolean?,
     didSessionHappen: Boolean?,
     noSessionReasonType: NoSessionReasonType?,
+    rescheduleRequestedBy: String?,
   ): Pair<Long?, UUID> {
     return existingAppointment?.let {
       if (isDifferentTimings(existingAppointment, appointmentTime, durationInMinutes) ||
@@ -80,6 +82,7 @@ class CommunityAPIBookingService(
           attended,
           didSessionHappen,
           noSessionReasonType,
+          rescheduleRequestedBy,
         )
         mergeAppointment(appointmentMerge)
       } else {
@@ -105,6 +108,7 @@ class CommunityAPIBookingService(
         attended?.let { AppointmentMerge.Outcome(it.forMerge(), attended == NO, notifyProbationPractitionerOfBehaviour == true, notifyProbationPractitionerOfConcerns == true, didSessionHappen, noSessionReasonType) },
         null,
         null,
+        rescheduleRequestedBy,
       )
       mergeAppointment(mergeAppointment)
     }
@@ -120,6 +124,7 @@ class CommunityAPIBookingService(
     attended: Attended?,
     didSessionHappen: Boolean?,
     noSessionReasonType: NoSessionReasonType?,
+    rescheduleRequestedBy: String?,
   ) = AppointmentMerge(
     UUID.randomUUID(),
     referral.id,
@@ -140,6 +145,7 @@ class CommunityAPIBookingService(
     },
     id,
     deliusAppointmentId,
+    rescheduleRequestedBy,
   )
 
   private fun Attended.forMerge() = when (this) {
@@ -198,6 +204,7 @@ data class AppointmentMerge(
   val outcome: Outcome?,
   val previousId: UUID?,
   val deliusId: Long?,
+  val rescheduleRequestedBy: String?,
 ) {
   data class Outcome(
     val attended: Attended,

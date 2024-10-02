@@ -198,6 +198,7 @@ class AppointmentServiceTest {
     val existingAppointment = appointmentFactory.create(deliusAppointmentId = 98L, attended = null)
     val referral = referralFactory.createSent()
     val rescheduledDeliusAppointmentId = 99L
+    val rescheduleRequestedBy = "Service Provider"
 
     whenever(communityAPIBookingService.book(referral, existingAppointment, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null))
       .thenReturn(Pair(rescheduledDeliusAppointmentId, UUID.randomUUID()))
@@ -205,7 +206,7 @@ class AppointmentServiceTest {
     whenever(appointmentRepository.saveAndFlush(any())).thenAnswer { it.arguments[0] }
 
     // When
-    val updatedAppointment = appointmentService.createOrUpdateAppointment(referral, existingAppointment, durationInMinutes, appointmentTime, SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
+    val updatedAppointment = appointmentService.createOrUpdateAppointment(referral, existingAppointment, durationInMinutes, appointmentTime, SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, rescheduleRequestedBy = rescheduleRequestedBy)
 
     // Then
     verifyResponse(
@@ -222,6 +223,8 @@ class AppointmentServiceTest {
     verify(appointmentRepository, times(2)).save(argumentCaptor.capture())
     val oldAppointmentArguments = argumentCaptor.firstValue
     assertThat(oldAppointmentArguments.superseded).isTrue
+    assertThat(oldAppointmentArguments.rescheduleRequestedBy).isEqualTo(rescheduleRequestedBy)
+    assertThat(updatedAppointment.rescheduleRequestedBy).isNull()
     assertThat(updatedAppointment.attended).isNull()
     assertThat(updatedAppointment.additionalAttendanceInformation).isNull()
     assertThat(updatedAppointment.attendanceBehaviour).isNull()

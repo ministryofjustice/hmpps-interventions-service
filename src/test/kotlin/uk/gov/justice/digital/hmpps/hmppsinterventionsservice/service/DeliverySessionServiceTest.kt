@@ -105,7 +105,7 @@ class DeliverySessionServiceTest @Autowired constructor(
     fun `can schedule new appointment on empty session`() {
       val session = deliverySessionFactory.createUnscheduled()
 
-      whenever(communityAPIBookingService.book(any(), isNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
+      whenever(communityAPIBookingService.book(any(), isNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
         .thenReturn(Pair(384567262L, UUID.randomUUID()))
 
       val updatedSession = deliverySessionService.scheduleNewDeliverySessionAppointment(
@@ -131,7 +131,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       val existingAppointment = session.currentAppointment!!
       val newTime = existingAppointment.appointmentTime.plusHours(1)
 
-      whenever(communityAPIBookingService.book(any(), isNotNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
+      whenever(communityAPIBookingService.book(any(), isNotNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
         .thenReturn(Pair(75638101746410L, UUID.randomUUID()))
 
       val updatedSession = deliverySessionService.scheduleNewDeliverySessionAppointment(session.referral.id, session.sessionNumber, newTime, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
@@ -161,7 +161,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         null
       }
 
-      whenever(communityAPIBookingService.book(eq(session.referral), isNull(), eq(pastDate), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
+      whenever(communityAPIBookingService.book(eq(session.referral), isNull(), eq(pastDate), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
         .thenReturn(Pair(462818752L, UUID.randomUUID()))
 
       val updatedSession = deliverySessionService.scheduleNewDeliverySessionAppointment(
@@ -279,7 +279,7 @@ class DeliverySessionServiceTest @Autowired constructor(
       val existingAppointment = session.currentAppointment!!
       val newTime = existingAppointment.appointmentTime.plusHours(1)
 
-      whenever(communityAPIBookingService.book(eq(session.referral), isNotNull(), eq(newTime), eq(2), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
+      whenever(communityAPIBookingService.book(eq(session.referral), isNotNull(), eq(newTime), eq(2), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
         .thenReturn(Pair(32250921735125L, UUID.randomUUID()))
 
       val updatedSession = deliverySessionService.rescheduleDeliverySessionAppointment(
@@ -319,7 +319,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         null
       }
 
-      whenever(communityAPIBookingService.book(eq(session.referral), isNotNull(), eq(pastDate), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
+      whenever(communityAPIBookingService.book(eq(session.referral), isNotNull(), eq(pastDate), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
         .thenReturn(Pair(2452352906724579L, UUID.randomUUID()))
 
       val updatedSession = deliverySessionService.rescheduleDeliverySessionAppointment(
@@ -709,7 +709,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         null
       }
 
-      whenever(communityAPIBookingService.book(any(), isNull(), eq(appointmentTime), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), isNull(), eq(Attended.YES), eq(true), anyOrNull(), anyOrNull(), anyOrNull()))
+      whenever(communityAPIBookingService.book(any(), isNull(), eq(appointmentTime), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), isNull(), eq(Attended.YES), eq(true), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
         .thenReturn(Pair(32718L, UUID.randomUUID()))
 
       val updatedSession = deliverySessionService.updateSessionAppointment(
@@ -720,6 +720,8 @@ class DeliverySessionServiceTest @Autowired constructor(
         defaultUser,
         AppointmentDeliveryType.PHONE_CALL,
         AppointmentSessionType.ONE_TO_ONE,
+        null,
+        null,
         null,
         null,
         Attended.YES,
@@ -775,7 +777,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         null
       }
 
-      whenever(communityAPIBookingService.book(eq(session.referral), isNotNull(), eq(defaultPastAppointmentTime), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
+      whenever(communityAPIBookingService.book(eq(session.referral), isNotNull(), eq(defaultPastAppointmentTime), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
         .thenReturn(Pair(6571124135135L, UUID.randomUUID()))
 
       val updatedSession = deliverySessionService.updateSessionAppointment(
@@ -786,6 +788,8 @@ class DeliverySessionServiceTest @Autowired constructor(
         defaultUser,
         AppointmentDeliveryType.PHONE_CALL,
         AppointmentSessionType.ONE_TO_ONE,
+        null,
+        null,
         null,
         null,
         Attended.YES,
@@ -840,7 +844,7 @@ class DeliverySessionServiceTest @Autowired constructor(
         null
       }
 
-      whenever(communityAPIBookingService.book(eq(session.referral), isNull(), eq(defaultPastAppointmentTime), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
+      whenever(communityAPIBookingService.book(eq(session.referral), isNull(), eq(defaultPastAppointmentTime), eq(defaultDuration), eq(AppointmentType.SERVICE_DELIVERY), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
         .thenReturn(Pair(16725461L, UUID.randomUUID()))
 
       val updatedSession = deliverySessionService.updateSessionAppointment(
@@ -851,6 +855,8 @@ class DeliverySessionServiceTest @Autowired constructor(
         defaultUser,
         AppointmentDeliveryType.PHONE_CALL,
         AppointmentSessionType.ONE_TO_ONE,
+        null,
+        null,
         null,
         null,
         Attended.NO,
@@ -904,11 +910,13 @@ class DeliverySessionServiceTest @Autowired constructor(
         null
       }
 
-      whenever(communityAPIBookingService.book(any(), isNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
+      whenever(communityAPIBookingService.book(any(), isNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
         .thenReturn(Pair(564726L, UUID.randomUUID()))
 
       val updatedSession = deliverySessionService.updateSessionAppointment(
         actionPlan.id, session.sessionNumber, defaultPastAppointmentTime, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE,
+        null,
+        null,
         null,
         null,
         Attended.YES,
@@ -977,11 +985,13 @@ class DeliverySessionServiceTest @Autowired constructor(
           anyOrNull(),
           anyOrNull(),
           anyOrNull(),
+          anyOrNull(),
         ),
       ).thenReturn(Pair(56381916L, UUID.randomUUID()))
 
       val updatedSession = deliverySessionService.updateSessionAppointment(
         actionPlan.id, session.sessionNumber, defaultPastAppointmentTime, defaultDuration, defaultUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE,
+        null,
         null,
         null,
         null,

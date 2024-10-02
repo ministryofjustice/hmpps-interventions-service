@@ -98,7 +98,7 @@ class SupplierAssessmentControllerTest {
         notifyProbationPractitionerOfBehaviour = true,
         notifyProbationPractitionerOfConcerns = false,
       )
-      val update = UpdateAppointmentDTO(appointmentTime, durationInMinutes, appointmentDeliveryType, appointmentSessionType, addressDTO, npsOfficeCode, attendanceFeedbackRequestDTO, sessionFeedbackRequestDTO)
+      val update = UpdateAppointmentDTO(appointmentTime, durationInMinutes, appointmentDeliveryType, appointmentSessionType, addressDTO, npsOfficeCode, null, null, attendanceFeedbackRequestDTO, sessionFeedbackRequestDTO)
       val user = authUserFactory.create()
       val token = tokenFactory.create()
       val supplierAssessment = supplierAssessmentFactory.create()

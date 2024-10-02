@@ -16,6 +16,9 @@ data class AppointmentDTO(
   val appointmentDeliveryAddress: AddressDTO?,
   val npsOfficeCode: String?,
   val createdAt: OffsetDateTime?,
+  val superseded: Boolean,
+  val rescheduleRequestedBy: String?,
+  val rescheduledReason: String?,
 ) {
   companion object {
     fun from(appointment: Appointment): AppointmentDTO {
@@ -36,6 +39,9 @@ data class AppointmentDTO(
         appointmentDeliveryAddress = addressDTO,
         npsOfficeCode = appointment.appointmentDelivery?.npsOfficeCode,
         createdAt = appointment.createdAt,
+        superseded = appointment.superseded,
+        rescheduleRequestedBy = appointment.rescheduleRequestedBy,
+        rescheduledReason = appointment.rescheduledReason,
       )
     }
     fun from(appointments: MutableSet<Appointment>): List<AppointmentDTO> {

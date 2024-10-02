@@ -64,6 +64,8 @@ class DeliverySessionController(
       updateAppointmentDTO.sessionType,
       updateAppointmentDTO.appointmentDeliveryAddress,
       updateAppointmentDTO.npsOfficeCode,
+      updateAppointmentDTO.rescheduleRequestedBy,
+      updateAppointmentDTO.rescheduledReason,
       updateAppointmentDTO.attendanceFeedback?.attended,
       updateAppointmentDTO.attendanceFeedback?.didSessionHappen,
       updateAppointmentDTO.sessionFeedback?.notifyProbationPractitionerOfBehaviour,

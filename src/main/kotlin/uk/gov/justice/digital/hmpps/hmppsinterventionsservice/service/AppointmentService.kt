@@ -49,6 +49,8 @@ class AppointmentService(
     appointmentSessionType: AppointmentSessionType?,
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String? = null,
+    rescheduleRequestedBy: String? = null,
+    rescheduledReason: String? = null,
     attended: Attended? = null,
     notifyProbationPractitionerOfBehaviour: Boolean? = null,
     notifyProbationPractitionerOfConcerns: Boolean? = null,
@@ -70,7 +72,7 @@ class AppointmentService(
       // an initial appointment is required or an additional appointment is required
       existingAppointment == null || (existingAppointment.attended == Attended.NO && existingAppointment.didSessionHappen == null) || existingAppointment.didSessionHappen == false -> {
         val (deliusAppointmentId, appointmentId) =
-          communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode, attended, notifyProbationPractitionerOfBehaviour, notifyProbationPractitionerOfConcerns, didSessionHappen, noSessionReasonType)
+          communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, appointmentType, npsOfficeCode, attended, notifyProbationPractitionerOfBehaviour, notifyProbationPractitionerOfConcerns, didSessionHappen, noSessionReasonType, rescheduleRequestedBy)
         createAppointment(
           durationInMinutes,
           appointmentTime,
@@ -115,6 +117,8 @@ class AppointmentService(
           appointmentSessionType,
           appointmentDeliveryAddress,
           npsOfficeCode,
+          rescheduleRequestedBy,
+          rescheduledReason,
           attended,
           referral,
           noAttendanceInformation,
@@ -441,6 +445,8 @@ class AppointmentService(
     appointmentSessionType: AppointmentSessionType?,
     appointmentDeliveryAddress: AddressDTO? = null,
     npsOfficeCode: String?,
+    rescheduleRequestedBy: String?,
+    rescheduledReason: String?,
     attended: Attended?,
     referral: Referral,
     noAttendanceInformation: String?,
@@ -492,6 +498,8 @@ class AppointmentService(
     )
     oldAppointment.supersededByAppointmentId = appointment.id
     oldAppointment.superseded = true
+    oldAppointment.rescheduleRequestedBy = rescheduleRequestedBy
+    oldAppointment.rescheduledReason = rescheduledReason
     appointmentRepository.save(oldAppointment)
     appointmentRepository.save(appointment)
     return appointment
