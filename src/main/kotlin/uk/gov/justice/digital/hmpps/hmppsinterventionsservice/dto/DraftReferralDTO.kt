@@ -73,6 +73,7 @@ data class DraftReferralDTO(
   val ppLocationType: String? = null,
   val allocatedCommunityPP: Boolean? = null,
   val reasonForReferral: String? = null,
+  val reasonForReferralFurtherInformation: String? = null,
   val expectedProbationOffice: String? = null,
   val expectedProbationOfficeUnKnownReason: String? = null,
   val reasonForReferralCreationBeforeAllocation: String? = null,
@@ -136,6 +137,7 @@ data class DraftReferralDTO(
         roleOrJobTitle = referral.roleOrJobTitle,
         allocatedCommunityPP = referral.allocatedCommunityPP,
         reasonForReferral = referral.referralDetails?.reasonForReferral,
+        reasonForReferralFurtherInformation = referral.referralDetails?.reasonForReferralFurtherInformation,
         expectedProbationOffice = referral.expectedProbationOffice,
         expectedProbationOfficeUnKnownReason = referral.expectedProbationOfficeUnknownReason,
         reasonForReferralCreationBeforeAllocation = referral.referralDetails?.reasonForReferralCreationBeforeAllocation,
@@ -150,6 +152,7 @@ data class DraftReferralDTO(
         createdAt = referral.createdAt,
         completionDeadline = referral.referralDetails?.completionDeadline,
         reasonForReferral = referral.referralDetails?.reasonForReferral,
+        reasonForReferralFurtherInformation = referral.referralDetails?.reasonForReferralFurtherInformation,
         reasonForReferralCreationBeforeAllocation = referral.referralDetails?.reasonForReferralCreationBeforeAllocation,
         complexityLevels = referral.complexityLevelIds?.ifEmpty { null }
           ?.map { ReferralComplexityLevel(it.key, it.value) }

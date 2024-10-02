@@ -114,6 +114,7 @@ class DraftReferralService(
         update.expectedReleaseDateMissingReason,
         "initial referral details",
         update.reasonForReferral,
+        update.reasonForReferralFurtherInformation,
         update.reasonForReferralCreationBeforeAllocation,
       ),
       referral.createdBy,
@@ -275,6 +276,10 @@ class DraftReferralService(
 
     update.reasonForReferral?.let {
       newDetails.reasonForReferral = it
+    }
+
+    update.reasonForReferralFurtherInformation?.let {
+      newDetails.reasonForReferralFurtherInformation = it
     }
 
     update.reasonForReferralCreationBeforeAllocation?.let {

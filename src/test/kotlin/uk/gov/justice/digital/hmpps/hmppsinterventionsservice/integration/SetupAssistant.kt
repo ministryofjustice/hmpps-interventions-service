@@ -832,6 +832,7 @@ class SetupAssistant(
     completionDeadline: LocalDate = LocalDate.of(2021, 4, 1),
     furtherInformation: String = "Some information about the service user",
     reasonForReferral: String = "For crs",
+    reasonForReferralFurtherInformation: String = "more info",
     reasonForReferralCreationBeforeAllocation: String = "for quick assessment",
     hasAdditionalResponsibilities: Boolean = true,
     interpreterLanguage: String = "Spanish",
@@ -912,6 +913,7 @@ class SetupAssistant(
           furtherInformation,
           maximumEnforceableDays,
           reasonForReferral,
+          reasonForReferralFurtherInformation,
           reasonForReferralCreationBeforeAllocation,
         ),
       )
@@ -948,6 +950,7 @@ class SetupAssistant(
     furtherInformation: String = "Some information about the service user",
     hasAdditionalResponsibilities: Boolean = true,
     reasonForReferral: String = "for crs",
+    reasonForReferralFurtherInformation: String = "more info",
     reasonForReferralCreationBeforeAllocation: String? = "for quick assessment",
     interpreterLanguage: String = "Spanish",
     maximumEnforceableDays: Int = 10,
@@ -993,6 +996,7 @@ class SetupAssistant(
           furtherInformation,
           maximumEnforceableDays,
           reasonForReferral,
+          reasonForReferralFurtherInformation,
           reasonForReferralCreationBeforeAllocation,
         ),
       )

@@ -21,5 +21,6 @@ data class ReferralDetails(
   var furtherInformation: String? = null,
   var maximumEnforceableDays: Int? = null,
   @Column(name = "reason_for_referral") var reasonForReferral: String? = null,
+  @Column(name = "reason_for_referral_further_information") var reasonForReferralFurtherInformation: String? = null,
   @Column(name = "reason_for_referral_before_allocation") var reasonForReferralCreationBeforeAllocation: String? = null,
 )
