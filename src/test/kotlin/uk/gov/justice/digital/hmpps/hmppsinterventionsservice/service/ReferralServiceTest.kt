@@ -166,15 +166,15 @@ class ReferralServiceTest @Autowired constructor(
       val expectedReleaseDate = LocalDate.of(2023, 12, 31)
       return listOf(
         Arguments.of(
-          UpdateReferralDetailsDTO(20, completionDateToChange, "new information", expectedReleaseDate, null, "we decided 10 days wasn't enough", "some reason for making a referral", null),
+          UpdateReferralDetailsDTO(20, completionDateToChange, "new information", expectedReleaseDate, null, "we decided 10 days wasn't enough", "some reason for making a referral", "more info", null),
           "completion-deadline",
         ),
         Arguments.of(
-          UpdateReferralDetailsDTO(20, null, "new information", null, null, "we decided 10 days wasn't enough", "some reason for making a referral", null),
+          UpdateReferralDetailsDTO(20, null, "new information", null, null, "we decided 10 days wasn't enough", "some reason for making a referral", "more info", null),
           "maximum-enforceable",
         ),
         Arguments.of(
-          UpdateReferralDetailsDTO(20, null, "new information", null, null, "we decided 10 days wasn't enough", "some changes to the referral", null),
+          UpdateReferralDetailsDTO(20, null, "new information", null, null, "we decided 10 days wasn't enough", "some changes to the referral", "more info", null),
           "reason-for-referral",
         ),
       )
