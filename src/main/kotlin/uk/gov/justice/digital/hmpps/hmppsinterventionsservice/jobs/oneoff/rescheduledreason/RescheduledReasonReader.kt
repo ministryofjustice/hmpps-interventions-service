@@ -17,7 +17,8 @@ class RescheduledReasonReader(
     this.setQueryString(
       "SELECT ap " +
         "FROM Appointment ap " +
-        "WHERE ap.superseded is true ",
+        "WHERE ap.superseded is true " +
+        "and ap.rescheduledReason is null ",
     )
   }
 }
