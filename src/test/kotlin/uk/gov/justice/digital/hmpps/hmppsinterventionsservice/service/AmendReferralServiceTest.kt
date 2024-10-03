@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendDesiredOu
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendExpectedReleaseDateDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendPrisonEstablishmentDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationPractitionerEmailDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationPractitionerNameDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
@@ -353,6 +354,47 @@ class AmendReferralServiceTest @Autowired constructor(
     val newReferral = referralRepository.findById(referral.id).get()
 
     assertThat(newReferral.probationPractitionerDetails?.name).isEqualTo("Bob Moore")
+  }
+
+  @Test
+  fun `amend probation practitioner email`() {
+    val someoneElse = userFactory.create("helper_pp_user", "delius")
+    val user = userFactory.create("pp_user_1", "delius")
+
+    val referral = referralFactory.createSent(createdBy = someoneElse)
+    val probationPractitioner = ProbationPractitionerDetails(
+      id = UUID.randomUUID(),
+      name = "Bob Wills",
+      referral = referral,
+      emailAddress = "someone@somewhere.com",
+    )
+    probationPractitionerDetailsRepository.saveAndFlush(probationPractitioner)
+    referral.probationPractitionerDetails = probationPractitioner
+    referralRepository.saveAndFlush(referral)
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
+    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+
+    amendReferralService.amendProbationPractitionerEmail(
+      referral.id,
+      AmendProbationPractitionerEmailDTO(
+        ppEmail = "someoneelse@somewhere.com",
+      ),
+      jwtAuthenticationToken,
+      user,
+    )
+    val changelog = entityManager.entityManager.createQuery("FROM Changelog u WHERE u.referralId = :referralId")
+      .setParameter("referralId", referral.id)
+      .singleResult as Changelog
+
+    assertThat(changelog.newVal.values.size).isEqualTo(1)
+    assertThat(changelog.newVal.values).contains("someoneelse@somewhere.com")
+    assertThat(changelog.oldVal.values).contains("someone@somewhere.com")
+
+    verify(referralEventPublisher).referralProbationPractitionerEmailChangedEvent(eq(referral), eq("someoneelse@somewhere.com"), eq("someone@somewhere.com"), eq(user))
+
+    val newReferral = referralRepository.findById(referral.id).get()
+
+    assertThat(newReferral.probationPractitionerDetails?.emailAddress).isEqualTo("someoneelse@somewhere.com")
   }
 
   @Test

@@ -104,4 +104,26 @@ class ReferralEventPublisherTest {
     assertThat(event.data["newProbationPractitionerName"]).isEqualTo("new")
     assertThat(event.data["oldProbationPractitionerName"]).isEqualTo("original")
   }
+
+  @Test
+  fun `builds an referral pp email updated event and publishes it`() {
+    val referral = SampleData.sampleReferral("CRN1234", "Service Provider Name")
+    val uri = URI.create("http://localhost/sent-referral/" + referral.id)
+    whenever(locationMapper.expandPathToCurrentContextPathUrl("/sent-referral/{id}", referral.id)).thenReturn(uri)
+    whenever(locationMapper.getPathFromControllerMethod(ReferralController::getSentReferral)).thenReturn("/sent-referral/{id}")
+    val publisher = ReferralEventPublisher(eventPublisher, locationMapper)
+
+    publisher.referralProbationPractitionerEmailChangedEvent(referral, "new@somewhere.com", "original@somewhere.com", targetUser)
+
+    val eventCaptor = argumentCaptor<ReferralEvent>()
+    verify(eventPublisher).publishEvent(eventCaptor.capture())
+    val event = eventCaptor.firstValue
+
+    assertThat(event.source).isSameAs(publisher)
+    assertThat(event.type).isEqualTo(ReferralEventType.PROBATION_PRACTITIONER_EMAIL_AMENDED)
+    assertThat(event.referral).isSameAs(referral)
+    assertThat(event.detailUrl).isEqualTo(uri.toString())
+    assertThat(event.data["newProbationPractitionerEmail"]).isEqualTo("new@somewhere.com")
+    assertThat(event.data["oldProbationPractitionerEmail"]).isEqualTo("original@somewhere.com")
+  }
 }

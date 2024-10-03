@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendExpectedR
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendPrisonEstablishmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationOfficeDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationPractitionerEmailDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationPractitionerNameDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogUpdateDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
@@ -52,6 +53,7 @@ enum class AmendTopic {
   EXPECTED_PROBATION_OFFICE,
   PROBATION_PRACTITIONER_PROBATION_OFFICE,
   PROBATION_PRACTITIONER_NAME,
+  PROBATION_PRACTITIONER_EMAIL,
 }
 
 @Service
@@ -408,6 +410,47 @@ class AmendReferralService(
     changelogRepository.save(changelog)
     probationPractitionerDetails?.let { probationPractitionerDetailsRepository.save(it) }
     referralEventPublisher.referralProbationPractitionerNameChangedEvent(
+      referral,
+      newValues.get(0),
+      oldValues.get(0),
+      user,
+    )
+  }
+
+  fun amendProbationPractitionerEmail(
+    referralId: UUID,
+    amendProbationPractitionerEmailDTO: AmendProbationPractitionerEmailDTO,
+    authentication: JwtAuthenticationToken,
+    user: AuthUser,
+  ) {
+    val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
+
+    val oldValues = mutableListOf<String>()
+    referral.probationPractitionerDetails?.emailAddress?.let { oldValues.add(referral.probationPractitionerDetails?.emailAddress!!) }
+
+    if (oldValues.isEmpty()) {
+      referral.probationPractitionerDetails?.nDeliusEmailAddress?.let { oldValues.add(referral.probationPractitionerDetails?.nDeliusEmailAddress!!) }
+    }
+
+    val newValues = mutableListOf<String>()
+    newValues.add(amendProbationPractitionerEmailDTO.ppEmail)
+
+    val probationPractitionerDetails = referral.probationPractitionerDetails
+    probationPractitionerDetails?.emailAddress = amendProbationPractitionerEmailDTO.ppEmail
+
+    val changelog = Changelog(
+      referral.id,
+      UUID.randomUUID(),
+      AmendTopic.PROBATION_PRACTITIONER_EMAIL,
+      ReferralAmendmentDetails(values = oldValues),
+      ReferralAmendmentDetails(values = newValues),
+      "",
+      OffsetDateTime.now(),
+      userMapper.fromToken(authentication),
+    )
+    changelogRepository.save(changelog)
+    probationPractitionerDetails?.let { probationPractitionerDetailsRepository.save(it) }
+    referralEventPublisher.referralProbationPractitionerEmailChangedEvent(
       referral,
       newValues.get(0),
       oldValues.get(0),
