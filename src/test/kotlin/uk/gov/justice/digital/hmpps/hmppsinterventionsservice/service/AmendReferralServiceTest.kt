@@ -720,11 +720,9 @@ class AmendReferralServiceTest @Autowired constructor(
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
     whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
 
-    val uuid1 = UUID.randomUUID()
-
     amendReferralService.logChanges(referralDetails, referralToUpdate, user)
     val changeLogReturned = changelogRepository.findAll().filter { x -> x.referralId == id }
-    assertThat(changeLogReturned.size).isEqualTo(1)
+    assertThat(changeLogReturned.size).isEqualTo(3)
 
     assertThat(changeLogReturned.firstOrNull()?.referralId).isEqualTo(referral.id)
     assertThat(changeLogReturned.firstOrNull()?.newVal).isNotNull

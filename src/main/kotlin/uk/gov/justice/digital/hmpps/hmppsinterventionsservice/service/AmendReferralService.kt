@@ -46,6 +46,7 @@ enum class AmendTopic {
   NEEDS_AND_REQUIREMENTS_ADDITIONAL_INFORMATION,
   NEEDS_AND_REQUIREMENTS_INTERPRETER_REQUIRED,
   REASON_FOR_REFERRAL,
+  REASON_FOR_REFERRAL_FURTHER_INFORMATION,
   PRISON_ESTABLISHMENT,
   EXPECTED_RELEASE_DATE,
   EXPECTED_PROBATION_OFFICE,
@@ -471,6 +472,13 @@ class AmendReferralService(
           newValue = changelog.newVal.values[0],
         )
       }
+      AmendTopic.REASON_FOR_REFERRAL_FURTHER_INFORMATION -> {
+        return ChangelogUpdateDTO(
+          changelog = changelog,
+          oldValue = changelog.oldVal.values[0],
+          newValue = changelog.newVal.values[0],
+        )
+      }
       else -> {}
     }
     return ChangelogUpdateDTO(changelog)
@@ -507,10 +515,17 @@ class AmendReferralService(
       val oldValue = ReferralAmendmentDetails(listOf(referralDetails.maximumEnforceableDays.toString()))
       val newValue = ReferralAmendmentDetails(listOf(update.maximumEnforceableDays.toString()))
       processChangeLog(AmendTopic.MAXIMUM_ENFORCEABLE_DAYS, oldValue, newValue, referralDetails.referralId, actor, update)
-    } else if (update.reasonForReferral != null) {
+    }
+    if (update.reasonForReferral != null) {
       val oldValue = ReferralAmendmentDetails(listOf(referralDetails.reasonForReferral!!))
       val newValue = ReferralAmendmentDetails(listOf(update.reasonForReferral))
       processChangeLog(AmendTopic.REASON_FOR_REFERRAL, oldValue, newValue, referralDetails.referralId, actor, update)
+    }
+    if (update.reasonForReferralFurtherInformation != null) {
+      val currentValue = referralDetails.reasonForReferralFurtherInformation?.let { it }.orEmpty()
+      val oldValue = ReferralAmendmentDetails(listOf(currentValue))
+      val newValue = ReferralAmendmentDetails(listOf(update.reasonForReferralFurtherInformation))
+      processChangeLog(AmendTopic.REASON_FOR_REFERRAL_FURTHER_INFORMATION, oldValue, newValue, referralDetails.referralId, actor, update)
     }
   }
   private fun generateDescription(values: List<String>): String {
