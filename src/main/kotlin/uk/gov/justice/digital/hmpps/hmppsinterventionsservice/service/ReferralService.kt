@@ -297,6 +297,7 @@ class ReferralService(
       existingDetails?.furtherInformation,
       existingDetails?.maximumEnforceableDays,
       existingDetails?.reasonForReferral,
+      existingDetails?.reasonForReferralFurtherInformation,
     )
 
     amendReferralService.logChanges(
@@ -319,6 +320,10 @@ class ReferralService(
 
     update.reasonForReferral?.let {
       newDetails.reasonForReferral = it
+    }
+
+    update.reasonForReferralFurtherInformation?.let {
+      newDetails.reasonForReferralFurtherInformation = it
     }
 
     referralDetailsRepository.save(newDetails)

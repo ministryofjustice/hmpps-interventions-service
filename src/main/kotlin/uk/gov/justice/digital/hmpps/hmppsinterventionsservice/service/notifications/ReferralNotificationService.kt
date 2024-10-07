@@ -280,7 +280,7 @@ class ReferralNotificationService(
         ),
       )
     }
-    if (newDetails.reasonForReferral != previousDetails.reasonForReferral) {
+    if ((newDetails.reasonForReferral != previousDetails.reasonForReferral) || (newDetails.reasonForReferralFurtherInformation != previousDetails.reasonForReferralFurtherInformation)) {
       emailSender.sendEmail(
         reasonForReferralUpdatedTemplateID,
         recipient.email,
