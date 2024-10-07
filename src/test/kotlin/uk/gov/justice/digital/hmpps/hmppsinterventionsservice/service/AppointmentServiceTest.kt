@@ -200,7 +200,7 @@ class AppointmentServiceTest {
     val rescheduledDeliusAppointmentId = 99L
     val rescheduleRequestedBy = "Service Provider"
 
-    whenever(communityAPIBookingService.book(referral, existingAppointment, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null))
+    whenever(communityAPIBookingService.book(referral, existingAppointment, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null, rescheduleRequestedBy = rescheduleRequestedBy))
       .thenReturn(Pair(rescheduledDeliusAppointmentId, UUID.randomUUID()))
 
     whenever(appointmentRepository.saveAndFlush(any())).thenAnswer { it.arguments[0] }
