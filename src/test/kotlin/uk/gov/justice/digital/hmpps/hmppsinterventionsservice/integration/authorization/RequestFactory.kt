@@ -21,7 +21,6 @@ enum class Request {
   EndSentReferral,
   GetDraftReferrals,
   GetSentReferralSummaries,
-  GetServiceProviderReferralsSummary,
   CreateCaseNote,
 }
 
@@ -48,8 +47,6 @@ class RequestFactory(private val webTestClient: WebTestClient, private val setup
 
       Request.GetDraftReferrals -> webTestClient.get().uri("/draft-referrals")
       Request.GetSentReferralSummaries -> webTestClient.get().uri("/sent-referrals/summaries")
-      Request.GetServiceProviderReferralsSummary -> webTestClient.get().uri("/sent-referrals/summary/service-provider")
-
       Request.CreateCaseNote -> webTestClient.post().uri("/case-note").bodyValue(
         if (body != null) body as CreateCaseNoteDTO else CreateCaseNoteDTO(urlParams[0] as UUID, "subject", "body", false),
       )

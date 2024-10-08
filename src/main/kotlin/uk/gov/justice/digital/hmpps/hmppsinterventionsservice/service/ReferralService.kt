@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Lazy
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.domain.Specification.not
-import org.springframework.data.jpa.domain.Specification.where
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -19,7 +18,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.Refe
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceProviderAccessScopeMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserTypeChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.AccessError
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DashboardType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.WithdrawReferralRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
@@ -29,7 +27,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Dynamic
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceProviderSentReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Status
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.WithdrawalReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
@@ -43,7 +40,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Ref
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SentReferralSummariesRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.WithdrawalReasonRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.specification.ReferralSpecifications
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -173,73 +169,9 @@ class ReferralService(
     throw AccessError(user, "unsupported user type", listOf("logins from ${user.authSource} are not supported"))
   }
 
-  fun getServiceProviderSummaries(user: AuthUser, dashboardType: DashboardType? = null): List<ServiceProviderSentReferralSummary> {
-    if (userTypeChecker.isServiceProviderUser(user)) {
-      return getSentReferralSummariesForServiceProviderUser(user, dashboardType)
-    }
-    throw AccessError(user, "unsupported user type", listOf("logins from ${user.authSource} are not supported"))
-  }
-
   private fun <T> applyOptionalConjunction(existingSpec: Specification<T>, predicate: Boolean?, specToJoin: Specification<T>): Specification<T> {
     if (predicate == null) return existingSpec
     return existingSpec.and(if (predicate) specToJoin else not(specToJoin))
-  }
-
-  private fun getSentReferralSummariesForServiceProviderUser(user: AuthUser, dashboardType: DashboardType?): List<ServiceProviderSentReferralSummary> {
-    val serviceProviders = serviceProviderUserAccessScopeMapper.fromUser(user).serviceProviders
-    val referralSummaries = referralRepository.getSentReferralSummaries(user, serviceProviders = serviceProviders.map { serviceProvider -> serviceProvider.id }, dashboardType)
-    return referralAccessFilter.serviceProviderReferralSummaries(referralSummaries, user)
-  }
-
-  private inline fun <reified T> createSpecification(
-    concluded: Boolean?,
-    cancelled: Boolean?,
-    unassigned: Boolean?,
-    assignedToUserId: String?,
-    searchText: String?,
-  ): Specification<T> {
-    var findSentReferralsSpec = ReferralSpecifications.sent<T>()
-
-    findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, concluded, ReferralSpecifications.concluded())
-    findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, cancelled, ReferralSpecifications.cancelled())
-    findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, unassigned, ReferralSpecifications.unassigned())
-    assignedToUserId?.let {
-      findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, true, ReferralSpecifications.currentlyAssignedTo(it))
-    }
-    searchText?.let {
-      findSentReferralsSpec = applyOptionalConjunction(findSentReferralsSpec, true, searchSpec(searchText))
-    }
-    return findSentReferralsSpec
-  }
-
-  private fun <T> searchSpec(searchText: String): Specification<T> {
-    return if (searchText.matches(Regex("[A-Z]{2}[0-9]{4}[A-Z]{2}"))) {
-      ReferralSpecifications.searchByReferenceNumber(searchText)
-    } else {
-      ReferralSpecifications.searchByPoPName(searchText)
-    }
-  }
-
-  private fun <T> createSpecificationForProbationPractitionerUser(
-    user: AuthUser,
-    sentReferralFilterSpecification: Specification<T>,
-  ): Specification<T> {
-    var referralsForPPUser = ReferralSpecifications.createdBy<T>(user)
-    try {
-      val serviceUserCRNs = communityAPIOffenderService.getManagedOffendersForDeliusUser(user).map { it.crnNumber }
-      referralsForPPUser = referralsForPPUser.or(ReferralSpecifications.matchingServiceUserReferrals(serviceUserCRNs))
-    } catch (e: WebClientResponseException) {
-      // don't stop users seeing their own referrals just because delius is not playing nice
-      logger.error(
-        "failed to get managed offenders for user {}",
-        e,
-        kv("username", user.userName),
-      )
-    }
-
-    // todo: filter out referrals for limited access offenders (LAOs)
-    val referralSpecification = where(referralsForPPUser).and(sentReferralFilterSpecification)
-    return referralAccessFilter.probationPractitionerReferrals(referralSpecification, user)
   }
 
   private fun crnsAssociatedWithPP(

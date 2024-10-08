@@ -90,64 +90,6 @@ class ReferralSpecificationsTest @Autowired constructor(
   }
 
   @Nested
-  inner class Sent {
-    @Test
-    fun `only sent referrals are returned`() {
-      val sent = referralFactory.createSent()
-      val sentReferralSummary = referralSumariesFactory.getReferralSummary(sent)
-      val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.sent())
-      assertThat(result)
-        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
-        .containsExactly(sentReferralSummary)
-    }
-  }
-
-  inner class Concluded {
-    @Test
-    fun `only concluded referrals are returned`() {
-      val sent = referralFactory.createSent()
-      val cancelled = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now(), concludedAt = OffsetDateTime.now(), endOfServiceReport = null)
-      val completed = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now(), concludedAt = OffsetDateTime.now())
-      val appointment =
-        appointmentFactory.create(referral = completed, attendanceSubmittedAt = OffsetDateTime.now())
-      val superSededAppointment =
-        appointmentFactory.create(referral = completed, attendanceSubmittedAt = OffsetDateTime.now(), superseded = true, supersededById = appointment.id)
-      val supplierAssessmentAppointment =
-        supplierAssessmentFactory.createWithMultipleAppointments(appointments = mutableSetOf(appointment, superSededAppointment), referral = completed)
-      completed.supplierAssessment = supplierAssessmentAppointment
-      entityManager.refresh(completed)
-      val endOfServiceReport = endOfServiceReportFactory.create(referral = completed)
-      val sentReferralSummary = referralSumariesFactory.getReferralSummary(sent)
-      val cancelledReferralSummary = referralSumariesFactory.getReferralSummary(cancelled)
-      val completedReferralSummary = referralSumariesFactory.getReferralSummary(completed, endOfServiceReport)
-      val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.concluded())
-      assertThat(result)
-        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
-        .contains(completedReferralSummary)
-      assertThat(result)
-        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
-        .doesNotContain(sentReferralSummary, cancelledReferralSummary)
-    }
-  }
-
-  @Nested
-  inner class Cancelled {
-    @Test
-    fun `only cancelled referrals are returned`() {
-      val cancelled = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now(), concludedAt = OffsetDateTime.now(), endOfServiceReport = null)
-      val completed = referralFactory.createEnded(endRequestedAt = OffsetDateTime.now(), concludedAt = OffsetDateTime.now())
-      val endOfServiceReport = endOfServiceReportFactory.create(referral = completed)
-      val cancelledReferralSummary = referralSumariesFactory.getReferralSummary(cancelled)
-      val completedReferralSummary = referralSumariesFactory.getReferralSummary(completed, endOfServiceReport)
-      val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.cancelled())
-      assertThat(result)
-        .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
-        .containsExactly(cancelledReferralSummary)
-      assertThat(result).doesNotContain(completedReferralSummary)
-    }
-  }
-
-  @Nested
   inner class WithSPAccess {
     @Test
     fun `sp with no contracts should never return a referral`() {
@@ -177,45 +119,6 @@ class ReferralSpecificationsTest @Autowired constructor(
         .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
         .containsExactly(referralSummaryWithSpContract)
       assertThat(result).doesNotContain(someOtherReferralSummaryWithSpContract)
-    }
-  }
-
-  @Nested
-  inner class AssignedTo {
-    @Test
-    fun `returns referral if user is currently assigned`() {
-      val user = authUserFactory.create(id = "loggedInUser")
-      val someOtherUser = authUserFactory.create(id = "someOtherUser")
-      val assignments = assignmentsFactory.createInOrder(someOtherUser, user)
-
-      val assignedReferral = referralFactory.createAssigned(assignments = assignments)
-      val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.currentlyAssignedTo(user.id))
-
-      assertThat(result.map { it.id }).containsExactly(assignedReferral.id)
-    }
-
-    @Test
-    fun `does not return referral if user is previously assigned`() {
-      val user = authUserFactory.create(id = "loggedInUser")
-      val someOtherUser = authUserFactory.create(id = "someOtherUser")
-      val assignments = assignmentsFactory.createInOrder(user, someOtherUser)
-
-      referralFactory.createAssigned(assignments = assignments)
-      val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.currentlyAssignedTo(user.id))
-      assertThat(result).isEmpty()
-    }
-
-    @Test
-    fun `does not return referral if user has never been assigned`() {
-      val user = authUserFactory.create(id = "loggedInUser")
-      val someOtherUser = authUserFactory.create(id = "someOtherUser")
-      val assignments = assignmentsFactory.createInOrder(someOtherUser)
-
-      referralFactory.createAssigned(assignments = assignments)
-      referralFactory.createAssigned(assignments = emptyList())
-
-      val result = sentReferralSummariesRepository.findAll(ReferralSpecifications.currentlyAssignedTo(user.id))
-      assertThat(result).isEmpty()
     }
   }
 }

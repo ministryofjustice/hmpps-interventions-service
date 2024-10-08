@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller
 
-import ServiceProviderSentReferralSummaryDTO
 import com.fasterxml.jackson.annotation.JsonView
 import com.microsoft.applicationinsights.TelemetryClient
 import jakarta.annotation.Nullable
@@ -22,7 +21,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.Clie
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller.mappers.CancellationReasonMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ActionPlanSummaryDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DashboardType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAssignmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SentReferralDTO
@@ -116,27 +114,6 @@ class ReferralController(
         mutableMapOf("totalNumberOfReferrals" to it.totalElements.toDouble(), "pageSize" to page.pageSize.toDouble()),
       )
     }
-  }
-
-  @Deprecated(message = "This is a temporary solution to by-pass the extremely long wait times in production that occurs with /sent-referrals")
-  @JsonView(Views.SentReferral::class)
-  @GetMapping("/sent-referrals/summary/service-provider")
-  fun getServiceProviderSentReferralsSummary(
-    authentication: JwtAuthenticationToken,
-    @Nullable
-    @RequestParam(name = "dashboardType", required = false)
-    dashboardTypeSelection: String?,
-  ): List<ServiceProviderSentReferralSummaryDTO> {
-    val user = userMapper.fromToken(authentication)
-    val dashboardType = dashboardTypeSelection?.let { DashboardType.valueOf(it) }
-    return referralService.getServiceProviderSummaries(user, dashboardType)
-      .map { ServiceProviderSentReferralSummaryDTO.from(it) }.also {
-        telemetryClient.trackEvent(
-          "ServiceProviderReferralSummaryRequest",
-          null,
-          mutableMapOf("totalNumberOfReferrals" to it.size.toDouble()),
-        )
-      }
   }
 
   @GetMapping("/service-category/{id}")
