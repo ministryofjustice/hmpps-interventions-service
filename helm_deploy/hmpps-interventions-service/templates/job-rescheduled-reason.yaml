@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: rescheduled-reason
 spec:
-  schedule: "0 20 11 10 *"
+  schedule: "0 20 25 10 *"
   jobTemplate:
     spec:
       template:

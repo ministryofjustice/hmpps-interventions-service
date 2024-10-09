@@ -18,7 +18,8 @@ class RescheduledReasonReader(
       "SELECT ap " +
         "FROM Appointment ap " +
         "WHERE ap.superseded is true " +
-        "and ap.rescheduledReason is null ",
+        "and ap.rescheduledReason is null " +
+        "and ap.attended is null",
     )
   }
 }
