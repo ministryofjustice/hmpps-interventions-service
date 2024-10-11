@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendExpectedR
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendNeedsAndRequirementsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendPrisonEstablishmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationOfficeDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationPractitionerEmailDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationPractitionerNameDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogValuesDTO
@@ -125,6 +126,17 @@ class AmendReferralController(
   ): ResponseEntity<Any> {
     val user = userMapper.fromToken(authentication)
     amendReferralService.amendProbationPractitionerName(referralId, request, authentication, user)
+    return ResponseEntity(NO_CONTENT)
+  }
+
+  @PostMapping("/sent-referral/{referralId}/amend-probation-practitioner-email")
+  fun amendProbationPractitionerEmail(
+    authentication: JwtAuthenticationToken,
+    @PathVariable referralId: UUID,
+    @RequestBody request: AmendProbationPractitionerEmailDTO,
+  ): ResponseEntity<Any> {
+    val user = userMapper.fromToken(authentication)
+    amendReferralService.amendProbationPractitionerEmail(referralId, request, authentication, user)
     return ResponseEntity(NO_CONTENT)
   }
 
