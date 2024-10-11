@@ -133,6 +133,7 @@ notify:
     referral-post-ica-withdrawn: "17641582-310b-4960-bd00-1ae400a70b6e"
     referral-withdraw-early: "110f37e1-69e9-404b-b89e-b05162d3affd"
     probation-practitioner-name-updated: "273a7e82-8ad6-4e86-b9ea-530716b80583"
+    probation-practitioner-email-updated: "060c3eed-dd2f-480e-a30c-f396b1292058"
 interventions-ui:
   locations:
     service-provider:

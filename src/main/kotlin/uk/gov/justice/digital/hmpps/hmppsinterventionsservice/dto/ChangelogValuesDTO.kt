@@ -33,6 +33,7 @@ data class ChangelogValuesDTO(
       AmendTopic.EXPECTED_PROBATION_OFFICE to "Expected probation office has changed",
       AmendTopic.PROBATION_PRACTITIONER_PROBATION_OFFICE to "Probation practitioner probation office has changed",
       AmendTopic.PROBATION_PRACTITIONER_NAME to "Probation practitioner name has changed",
+      AmendTopic.PROBATION_PRACTITIONER_EMAIL to "Probation practitioner email address has changed",
     )
     fun from(changelog: Changelog, userDetail: UserDetail): ChangelogValuesDTO {
       val dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy 'at' h.mma")
