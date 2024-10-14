@@ -246,7 +246,7 @@ class AppointmentServiceTest {
     val referral = referralFactory.createSent()
     val additionalDeliusAppointmentId = 99L
 
-    whenever(communityAPIBookingService.book(referral, existingAppointment, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null))
+    whenever(communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null))
       .thenReturn(Pair(additionalDeliusAppointmentId, UUID.randomUUID()))
     whenever(appointmentRepository.save(any())).thenAnswer { it.arguments[0] }
 
@@ -274,51 +274,6 @@ class AppointmentServiceTest {
     assertThat(newAppointment.attendanceBehaviourSubmittedBy).isNull()
     assertThat(newAppointment.appointmentFeedbackSubmittedAt).isNull()
     assertThat(newAppointment.appointmentFeedbackSubmittedBy).isNull()
-    assertThat(existingAppointment.rescheduleRequestedBy).isNull()
-    assertThat(existingAppointment.rescheduledReason).isNull()
-  }
-
-  @Test
-  fun `appointment with none attendance will create a new appointment and update rescheduled details`() {
-    // Given
-    val durationInMinutes = 60
-    val appointmentTime = OffsetDateTime.parse("2022-12-04T10:42:43+00:00")
-    val existingAppointment = appointmentFactory.create(deliusAppointmentId = 98L, didSessionHappen = false)
-    val referral = referralFactory.createSent()
-    val additionalDeliusAppointmentId = 99L
-    val rescheduleRequestedBy = "Service Provider"
-    val rescheduledReason = "test reason"
-
-    whenever(communityAPIBookingService.book(referral, existingAppointment, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null, null, null, null, null, null, rescheduleRequestedBy))
-      .thenReturn(Pair(additionalDeliusAppointmentId, UUID.randomUUID()))
-    whenever(appointmentRepository.save(any())).thenAnswer { it.arguments[0] }
-
-    // When
-    val newAppointment = appointmentService.createOrUpdateAppointment(referral, existingAppointment, durationInMinutes, appointmentTime, SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, rescheduleRequestedBy = rescheduleRequestedBy, rescheduledReason = rescheduledReason)
-
-    // Then
-    verifyResponse(
-      newAppointment,
-      existingAppointment.id,
-      additionalDeliusAppointmentId,
-      appointmentTime,
-      durationInMinutes,
-      AppointmentDeliveryType.PHONE_CALL,
-      AppointmentSessionType.ONE_TO_ONE,
-    )
-    verifySavedAppointment(appointmentTime, durationInMinutes, additionalDeliusAppointmentId, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
-    assertThat(newAppointment.attended).isNull()
-    assertThat(newAppointment.additionalAttendanceInformation).isNull()
-    assertThat(newAppointment.attendanceBehaviour).isNull()
-    assertThat(newAppointment.notifyPPOfAttendanceBehaviour).isNull()
-    assertThat(newAppointment.attendanceSubmittedAt).isNull()
-    assertThat(newAppointment.attendanceSubmittedBy).isNull()
-    assertThat(newAppointment.attendanceBehaviourSubmittedAt).isNull()
-    assertThat(newAppointment.attendanceBehaviourSubmittedBy).isNull()
-    assertThat(newAppointment.appointmentFeedbackSubmittedAt).isNull()
-    assertThat(newAppointment.appointmentFeedbackSubmittedBy).isNull()
-    assertThat(existingAppointment.rescheduleRequestedBy).isEqualTo(rescheduleRequestedBy)
-    assertThat(existingAppointment.rescheduledReason).isEqualTo(rescheduledReason)
   }
 
   @Test
