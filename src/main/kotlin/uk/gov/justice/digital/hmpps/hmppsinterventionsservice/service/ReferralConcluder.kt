@@ -54,7 +54,14 @@ class ReferralConcluder(
     if (endState == ReferralEndState.CAN_CONCLUDE) {
       conclude(referral, deliveryState.concludedState)
     }
-    signalEnding(referral, deliveryState.concludedState)
+
+    // cancelling or can be concluded - notify external listening system(s)
+    if (referral.endRequestedAt != null ||
+      referral.concludedAt != null ||
+      endState == ReferralEndState.CAN_CONCLUDE
+    ) {
+      signalEnding(referral, deliveryState.concludedState)
+    }
   }
 
   fun withdrawReferral(referral: Referral, withdrawalState: ReferralWithdrawalState) {

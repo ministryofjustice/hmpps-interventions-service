@@ -210,4 +210,26 @@ class EndOfServiceReportServiceTest {
     assertThat(argumentCaptor.firstValue.submittedAt).isNotNull
     assertThat(argumentCaptor.firstValue.submittedBy).isEqualTo(authUser)
   }
+
+  @Test
+  fun `submit an end of service report copes with error without notifying nDelius`() {
+    val endOfServiceReportId = UUID.randomUUID()
+    val authUser = AuthUser("CRN123", "auth", "user")
+
+    val endOfServiceReport = endOfServiceReportFactory.create(id = endOfServiceReportId)
+
+    whenever(endOfServiceReportRepository.findById(any())).thenReturn(of(endOfServiceReport))
+    whenever(endOfServiceReportRepository.save(any())).thenThrow(RuntimeException("error saving"))
+    whenever(authUserRepository.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg<AuthUser>())
+
+    val argumentCaptor: ArgumentCaptor<EndOfServiceReport> = ArgumentCaptor.forClass(EndOfServiceReport::class.java)
+
+    try {
+      endOfServiceReportService.submitEndOfServiceReport(endOfServiceReportId, authUser)
+    } catch (e: Exception) {
+    }
+
+    verify(endOfServiceReportRepository).save(argumentCaptor.capture())
+    verify(referralConcluder, never()).concludeIfEligible(endOfServiceReport.referral)
+  }
 }
