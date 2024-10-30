@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendPrisonEst
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationOfficeDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationPractitionerEmailDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationPractitionerNameDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationPractitionerPhoneNumberDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ChangelogUpdateDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
@@ -54,6 +55,7 @@ enum class AmendTopic {
   PROBATION_PRACTITIONER_PROBATION_OFFICE,
   PROBATION_PRACTITIONER_NAME,
   PROBATION_PRACTITIONER_EMAIL,
+  PROBATION_PRACTITIONER_PHONE_NUMBER,
 }
 
 @Service
@@ -451,6 +453,47 @@ class AmendReferralService(
     changelogRepository.save(changelog)
     probationPractitionerDetails?.let { probationPractitionerDetailsRepository.save(it) }
     referralEventPublisher.referralProbationPractitionerEmailChangedEvent(
+      referral,
+      newValues.get(0),
+      oldValues.get(0),
+      user,
+    )
+  }
+
+  fun amendProbationPractitionerPhoneNumber(
+    referralId: UUID,
+    amendProbationPractitionerPhoneNumberDTO: AmendProbationPractitionerPhoneNumberDTO,
+    authentication: JwtAuthenticationToken,
+    user: AuthUser,
+  ) {
+    val referral = getSentReferralForAuthenticatedUser(referralId, authentication)
+
+    val oldValues = mutableListOf<String>()
+    referral.probationPractitionerDetails?.ppPhoneNumber?.let { oldValues.add(referral.probationPractitionerDetails?.ppPhoneNumber!!) }
+
+    if (oldValues.isEmpty()) {
+      referral.probationPractitionerDetails?.nDeliusPPTelephoneNumber?.let { oldValues.add(referral.probationPractitionerDetails?.nDeliusPPTelephoneNumber!!) }
+    }
+
+    val newValues = mutableListOf<String>()
+    newValues.add(amendProbationPractitionerPhoneNumberDTO.ppPhoneNumber)
+
+    val probationPractitionerDetails = referral.probationPractitionerDetails
+    probationPractitionerDetails?.ppPhoneNumber = amendProbationPractitionerPhoneNumberDTO.ppPhoneNumber
+
+    val changelog = Changelog(
+      referral.id,
+      UUID.randomUUID(),
+      AmendTopic.PROBATION_PRACTITIONER_PHONE_NUMBER,
+      ReferralAmendmentDetails(values = oldValues),
+      ReferralAmendmentDetails(values = newValues),
+      "",
+      OffsetDateTime.now(),
+      userMapper.fromToken(authentication),
+    )
+    changelogRepository.save(changelog)
+    probationPractitionerDetails?.let { probationPractitionerDetailsRepository.save(it) }
+    referralEventPublisher.referralProbationPractitionerPhoneNumberChangedEvent(
       referral,
       newValues.get(0),
       oldValues.get(0),

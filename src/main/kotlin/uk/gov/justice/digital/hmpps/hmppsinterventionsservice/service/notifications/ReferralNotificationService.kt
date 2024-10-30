@@ -40,6 +40,7 @@ class ReferralNotificationService(
   @Value("\${notify.templates.probation-office-updated}") private val probationOfficeUpdatedTemplateID: String,
   @Value("\${notify.templates.probation-practitioner-name-updated}") private val probationPractitionerNameUpdatedTemplateID: String,
   @Value("\${notify.templates.probation-practitioner-email-updated}") private val probationPractitionerEmailUpdatedTemplateID: String,
+  @Value("\${notify.templates.probation-practitioner-phone-number-updated}") private val probationPractitionerPhoneNumberUpdatedTemplateID: String,
   @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
   @Value("\${interventions-ui.locations.service-provider.referral-details}") private val spReferralDetailsLocation: String,
   private val emailSender: EmailSender,
@@ -111,6 +112,10 @@ class ReferralNotificationService(
         notifyCaseWorkerThatProbationPractitonerEmailChanged(event)
       }
 
+      ReferralEventType.PROBATION_PRACTITIONER_PHONE_NUMBER_AMENDED -> {
+        notifyCaseWorkerThatProbationPractitonerPhoneNumberChanged(event)
+      }
+
       ReferralEventType.EXPECTED_RELEASE_DATE -> {
         notifyCaseWorkerThatExpectedReleaseDateChanged(event)
       }
@@ -145,6 +150,19 @@ class ReferralNotificationService(
         "oldProbationPractitionerEmail" to oldValue,
         "newProbationPractitionerEmail" to newValue,
         probationPractitionerEmailUpdatedTemplateID,
+      )
+    }
+  }
+
+  private fun notifyCaseWorkerThatProbationPractitonerPhoneNumberChanged(event: ReferralEvent) {
+    val oldValue = event.data["oldProbationPractitionerPhoneNumber"] as String
+    val newValue = event.data["newProbationPractitionerPhoneNumber"] as String
+    if (oldValue != newValue) {
+      notifyCaseWorker(
+        event,
+        "oldProbationPractitionerPhoneNumber" to oldValue,
+        "newProbationPractitionerPhoneNumber" to newValue,
+        probationPractitionerPhoneNumberUpdatedTemplateID,
       )
     }
   }
