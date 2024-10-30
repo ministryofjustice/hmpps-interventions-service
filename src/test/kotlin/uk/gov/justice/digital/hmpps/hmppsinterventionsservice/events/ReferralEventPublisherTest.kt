@@ -135,7 +135,7 @@ class ReferralEventPublisherTest {
     whenever(locationMapper.getPathFromControllerMethod(ReferralController::getSentReferral)).thenReturn("/sent-referral/{id}")
     val publisher = ReferralEventPublisher(eventPublisher, locationMapper)
 
-    publisher.referralProbationPractitionerPhoneNumberChangedEvent(referral, "new@somewhere.com", "original@somewhere.com", targetUser)
+    publisher.referralProbationPractitionerPhoneNumberChangedEvent(referral, "11111111111", "00000000000", targetUser)
 
     val eventCaptor = argumentCaptor<ReferralEvent>()
     verify(eventPublisher).publishEvent(eventCaptor.capture())
@@ -145,7 +145,29 @@ class ReferralEventPublisherTest {
     assertThat(event.type).isEqualTo(ReferralEventType.PROBATION_PRACTITIONER_PHONE_NUMBER_AMENDED)
     assertThat(event.referral).isSameAs(referral)
     assertThat(event.detailUrl).isEqualTo(uri.toString())
-    assertThat(event.data["newProbationPractitionerPhoneNumber"]).isEqualTo("new@somewhere.com")
-    assertThat(event.data["oldProbationPractitionerPhoneNumber"]).isEqualTo("original@somewhere.com")
+    assertThat(event.data["newProbationPractitionerPhoneNumber"]).isEqualTo("11111111111")
+    assertThat(event.data["oldProbationPractitionerPhoneNumber"]).isEqualTo("00000000000")
+  }
+
+  @Test
+  fun `builds an referral pp team phone number updated event and publishes it`() {
+    val referral = SampleData.sampleReferral("CRN1234", "Service Provider Name")
+    val uri = URI.create("http://localhost/sent-referral/" + referral.id)
+    whenever(locationMapper.expandPathToCurrentContextPathUrl("/sent-referral/{id}", referral.id)).thenReturn(uri)
+    whenever(locationMapper.getPathFromControllerMethod(ReferralController::getSentReferral)).thenReturn("/sent-referral/{id}")
+    val publisher = ReferralEventPublisher(eventPublisher, locationMapper)
+
+    publisher.referralProbationPractitionerTeamPhoneNumberChangedEvent(referral, "11111111111", "00000000000", targetUser)
+
+    val eventCaptor = argumentCaptor<ReferralEvent>()
+    verify(eventPublisher).publishEvent(eventCaptor.capture())
+    val event = eventCaptor.firstValue
+
+    assertThat(event.source).isSameAs(publisher)
+    assertThat(event.type).isEqualTo(ReferralEventType.PROBATION_PRACTITIONER_TEAM_PHONE_NUMBER_AMENDED)
+    assertThat(event.referral).isSameAs(referral)
+    assertThat(event.detailUrl).isEqualTo(uri.toString())
+    assertThat(event.data["newProbationPractitionerTeamPhoneNumber"]).isEqualTo("11111111111")
+    assertThat(event.data["oldProbationPractitionerTeamPhoneNumber"]).isEqualTo("00000000000")
   }
 }

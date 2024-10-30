@@ -27,6 +27,7 @@ enum class ReferralEventType {
   PROBATION_PRACTITIONER_NAME_AMENDED,
   PROBATION_PRACTITIONER_EMAIL_AMENDED,
   PROBATION_PRACTITIONER_PHONE_NUMBER_AMENDED,
+  PROBATION_PRACTITIONER_TEAM_PHONE_NUMBER_AMENDED,
 }
 
 class ReferralEvent(
@@ -243,6 +244,26 @@ class ReferralEventPublisher(
         mapOf(
           "newProbationPractitionerPhoneNumber" to newPpPhoneNumber,
           "oldProbationPractitionerPhoneNumber" to previousPpPhoneNumber,
+          "currentAssignee" to referral.currentAssignee?.let { AuthUserDTO.from(it) },
+          "crn" to referral.serviceUserCRN,
+          "sentBy" to referral.sentBy,
+          "createdBy" to referral.createdBy,
+          "updater" to user,
+        ),
+      ),
+    )
+  }
+
+  fun referralProbationPractitionerTeamPhoneNumberChangedEvent(referral: Referral, newPpTeamPhoneNumber: String, previousPpTeamPhoneNumber: String, user: AuthUser) {
+    applicationEventPublisher.publishEvent(
+      ReferralEvent(
+        this,
+        ReferralEventType.PROBATION_PRACTITIONER_TEAM_PHONE_NUMBER_AMENDED,
+        referral,
+        getSentReferralURL(referral),
+        mapOf(
+          "newProbationPractitionerTeamPhoneNumber" to newPpTeamPhoneNumber,
+          "oldProbationPractitionerTeamPhoneNumber" to previousPpTeamPhoneNumber,
           "currentAssignee" to referral.currentAssignee?.let { AuthUserDTO.from(it) },
           "crn" to referral.serviceUserCRN,
           "sentBy" to referral.sentBy,
