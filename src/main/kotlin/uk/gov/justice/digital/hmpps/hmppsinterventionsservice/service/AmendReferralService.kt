@@ -527,7 +527,7 @@ class AmendReferralService(
     val changelog = Changelog(
       referral.id,
       UUID.randomUUID(),
-      AmendTopic.PROBATION_PRACTITIONER_PHONE_NUMBER,
+      AmendTopic.PROBATION_PRACTITIONER_TEAM_PHONE_NUMBER,
       ReferralAmendmentDetails(values = oldValues),
       ReferralAmendmentDetails(values = newValues),
       "",
