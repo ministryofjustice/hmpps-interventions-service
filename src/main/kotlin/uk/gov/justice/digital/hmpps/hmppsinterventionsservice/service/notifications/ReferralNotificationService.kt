@@ -41,6 +41,7 @@ class ReferralNotificationService(
   @Value("\${notify.templates.probation-practitioner-name-updated}") private val probationPractitionerNameUpdatedTemplateID: String,
   @Value("\${notify.templates.probation-practitioner-email-updated}") private val probationPractitionerEmailUpdatedTemplateID: String,
   @Value("\${notify.templates.probation-practitioner-phone-number-updated}") private val probationPractitionerPhoneNumberUpdatedTemplateID: String,
+  @Value("\${notify.templates.probation-practitioner-team-phone-number-updated}") private val probationPractitionerTeamPhoneNumberUpdatedTemplateID: String,
   @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
   @Value("\${interventions-ui.locations.service-provider.referral-details}") private val spReferralDetailsLocation: String,
   private val emailSender: EmailSender,
@@ -116,6 +117,10 @@ class ReferralNotificationService(
         notifyCaseWorkerThatProbationPractitonerPhoneNumberChanged(event)
       }
 
+      ReferralEventType.PROBATION_PRACTITIONER_TEAM_PHONE_NUMBER_AMENDED -> {
+        notifyCaseWorkerThatProbationPractitonerTeamPhoneNumberChanged(event)
+      }
+
       ReferralEventType.EXPECTED_RELEASE_DATE -> {
         notifyCaseWorkerThatExpectedReleaseDateChanged(event)
       }
@@ -163,6 +168,19 @@ class ReferralNotificationService(
         "oldProbationPractitionerPhoneNumber" to oldValue,
         "newProbationPractitionerPhoneNumber" to newValue,
         probationPractitionerPhoneNumberUpdatedTemplateID,
+      )
+    }
+  }
+
+  private fun notifyCaseWorkerThatProbationPractitonerTeamPhoneNumberChanged(event: ReferralEvent) {
+    val oldValue = event.data["oldProbationPractitionerTeamPhoneNumber"] as String
+    val newValue = event.data["newProbationPractitionerTeamPhoneNumber"] as String
+    if (oldValue != newValue) {
+      notifyCaseWorker(
+        event,
+        "oldProbationPractitionerTeamPhoneNumber" to oldValue,
+        "newProbationPractitionerTeamPhoneNumber" to newValue,
+        probationPractitionerTeamPhoneNumberUpdatedTemplateID,
       )
     }
   }

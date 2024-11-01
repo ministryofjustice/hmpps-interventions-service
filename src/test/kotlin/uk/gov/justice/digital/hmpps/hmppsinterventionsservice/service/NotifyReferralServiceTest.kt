@@ -75,6 +75,7 @@ class NotifyReferralServiceTest {
       "probationPractitionerNameUpdatedTemplateID",
       "probationPractitionerEmailUpdatedTemplateID",
       "probationPractitionerPhoneNumberUpdatedTemplateID",
+      "probationPractitionerTeamPhoneNumberUpdatedTemplateID",
       "http://interventions-ui.example.com",
       "/referral/{id}",
       emailSender,

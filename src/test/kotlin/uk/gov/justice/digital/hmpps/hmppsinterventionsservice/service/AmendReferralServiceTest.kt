@@ -21,6 +21,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendPrisonEst
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationPractitionerEmailDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationPractitionerNameDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationPractitionerPhoneNumberDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbationPractitionerTeamPhoneNumberDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
@@ -438,6 +439,48 @@ class AmendReferralServiceTest @Autowired constructor(
     val newReferral = referralRepository.findById(referral.id).get()
 
     assertThat(newReferral.probationPractitionerDetails?.ppPhoneNumber).isEqualTo("1111111111")
+  }
+
+  @Test
+  fun `amend probation practitioner team phone number`() {
+    val someoneElse = userFactory.create("helper_pp_user", "delius")
+    val user = userFactory.create("pp_user_1", "delius")
+
+    val referral = referralFactory.createSent(createdBy = someoneElse)
+    val probationPractitioner = ProbationPractitionerDetails(
+      id = UUID.randomUUID(),
+      name = "Bob Wills",
+      referral = referral,
+      emailAddress = "someone@somewhere.com",
+      ppTeamTelephoneNumber = "0123456789",
+    )
+    probationPractitionerDetailsRepository.saveAndFlush(probationPractitioner)
+    referral.probationPractitionerDetails = probationPractitioner
+    referralRepository.saveAndFlush(referral)
+    whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
+    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+
+    amendReferralService.amendProbationPractitionerTeamPhoneNumber(
+      referral.id,
+      AmendProbationPractitionerTeamPhoneNumberDTO(
+        ppTeamPhoneNumber = "1111111111",
+      ),
+      jwtAuthenticationToken,
+      user,
+    )
+    val changelog = entityManager.entityManager.createQuery("FROM Changelog u WHERE u.referralId = :referralId")
+      .setParameter("referralId", referral.id)
+      .singleResult as Changelog
+
+    assertThat(changelog.newVal.values.size).isEqualTo(1)
+    assertThat(changelog.newVal.values).contains("1111111111")
+    assertThat(changelog.oldVal.values).contains("0123456789")
+
+    verify(referralEventPublisher).referralProbationPractitionerTeamPhoneNumberChangedEvent(eq(referral), eq("1111111111"), eq("0123456789"), eq(user))
+
+    val newReferral = referralRepository.findById(referral.id).get()
+
+    assertThat(newReferral.probationPractitionerDetails?.ppTeamTelephoneNumber).isEqualTo("1111111111")
   }
 
   @Test
