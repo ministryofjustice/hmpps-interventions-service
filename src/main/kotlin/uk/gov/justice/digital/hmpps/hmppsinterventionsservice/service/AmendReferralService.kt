@@ -536,10 +536,15 @@ class AmendReferralService(
     )
     changelogRepository.save(changelog)
     probationPractitionerDetails?.let { probationPractitionerDetailsRepository.save(it) }
+    val oldValue = if(oldValues.size == 0) {
+      " "
+    } else {
+      oldValues[0]
+    }
     referralEventPublisher.referralProbationPractitionerTeamPhoneNumberChangedEvent(
       referral,
-      newValues.get(0),
-      oldValues.get(0),
+      newValues[0],
+      oldValue,
       user,
     )
   }
