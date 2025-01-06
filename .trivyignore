@@ -10,3 +10,6 @@
 # Suppression for h2 2.1.214 password on command line vulnerability
 #   can be suppressed as we only run h2 locally and not on build environments
 CVE-2022-45868
+# Suppression for CVE-2024-50379 as this affects the default tomcat servlet that we don't include.
+# This is suppressed in dps-gradle-spring-boot.
+CVE-2024-50379

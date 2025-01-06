@@ -4,6 +4,7 @@ plugins {
   id("org.jetbrains.kotlin.plugin.jpa") version "2.0.10"
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.9"
   id("jacoco")
+  id("project-report")
 }
 
 configurations {
