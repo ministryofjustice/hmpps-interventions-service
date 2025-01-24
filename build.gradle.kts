@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
-  kotlin("plugin.spring") version "2.0.10"
+  kotlin("plugin.spring") version "2.0.20"
   id("org.jetbrains.kotlin.plugin.jpa") version "2.0.10"
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.9"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.1.2"
   id("jacoco")
   id("project-report")
 }
@@ -94,7 +94,7 @@ dependencies {
   runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.2") // needed for OffsetDateTime for AppInsights
 
   // openapi
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.1")
   implementation("javax.xml.bind:jaxb-api:2.3.1")
   // notifications
   implementation("uk.gov.service.notify:notifications-java-client:5.2.0-RELEASE")
