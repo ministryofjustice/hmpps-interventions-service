@@ -66,8 +66,9 @@ class EndOfServiceReportService(
 
     endOfServiceReportEventPublisher.endOfServiceReportSubmittedEvent(draftEndOfServiceReport)
 
-    return endOfServiceReportRepository.save(draftEndOfServiceReport)
-      .also { referralConcluder.concludeIfEligible(it.referral) }
+    var result = endOfServiceReportRepository.save(draftEndOfServiceReport)
+    referralConcluder.concludeIfEligible(result.referral)
+    return result
   }
 
   private fun updateDraftEndOfServiceReportAsSubmitted(endOfServiceReport: EndOfServiceReport, submittedByUser: AuthUser) {

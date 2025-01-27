@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.AdditionalAnswers
 import org.mockito.ArgumentCaptor
+import org.mockito.Mockito.never
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.firstValue
@@ -15,6 +16,7 @@ import org.mockito.kotlin.secondValue
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessFilter
@@ -161,6 +163,21 @@ class ReferralServiceUnitTest {
     verify(withdrawalReasonRepository, times(1)).findByCode("MIS")
     assertThat(exception.statusCode.value()).isEqualTo(400)
     assertThat(exception.reason).isEqualTo("Invalid withdrawal code. [code=MIS]")
+  }
+
+  @Test
+  fun `withdrawal attempt copes with error without notifying nDelius`() {
+    val referral = referralFactory.createSent()
+    val authUser = authUserFactory.create()
+    val withdrawalReason = withdrawReasonFactory.create()
+    val withdrawReferralRequestDTO = WithdrawReferralRequestDTO(withdrawalReason.code, withdrawalReason.description, ReferralWithdrawalState.PRE_ICA_WITHDRAWAL.name)
+    whenever(authUserRepository.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg<AuthUser>())
+    whenever(referralRepository.save(any())).thenThrow(DataIntegrityViolationException("db error"))
+
+    val exception = assertThrows<Exception> {
+      referralService.requestReferralEnd(referral, authUser, withdrawReferralRequestDTO)
+    }
+    verify(referralConcluder, never()).withdrawReferral(eq(referral), any())
   }
 
   @Test
