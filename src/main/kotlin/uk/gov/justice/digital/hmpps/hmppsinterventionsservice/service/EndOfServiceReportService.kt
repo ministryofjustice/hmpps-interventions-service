@@ -66,7 +66,7 @@ class EndOfServiceReportService(
 
     endOfServiceReportEventPublisher.endOfServiceReportSubmittedEvent(draftEndOfServiceReport)
 
-    var result = endOfServiceReportRepository.save(draftEndOfServiceReport)
+    val result = endOfServiceReportRepository.save(draftEndOfServiceReport)
     referralConcluder.concludeIfEligible(result.referral)
     return result
   }

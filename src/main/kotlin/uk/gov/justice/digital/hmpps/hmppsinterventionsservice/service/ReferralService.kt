@@ -263,7 +263,7 @@ class ReferralService(
     referral.endRequestedAt = now
     referral.endRequestedBy = authUserRepository.save(user)
     updateWithdrawalInformation(referral, withdrawReferralRequestDTO)
-    var result = referralRepository.save(referral)
+    val result = referralRepository.save(referral)
     referralConcluder.withdrawReferral(result, ReferralWithdrawalState.valueOf(withdrawReferralRequestDTO.withdrawalState))
     return result
   }
