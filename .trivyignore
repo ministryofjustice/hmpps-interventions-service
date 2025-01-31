@@ -7,3 +7,4 @@ CVE-2022-45868
 # Suppression for tomcat Time-of-check Time-of-use (TOCTOU) Race Condition vulnerability
 #   can be suppressed as we run java v17 and this defaults to non-vulnerable state, required property is not set
 CVE-2024-56337
+CVE-2024-50379
