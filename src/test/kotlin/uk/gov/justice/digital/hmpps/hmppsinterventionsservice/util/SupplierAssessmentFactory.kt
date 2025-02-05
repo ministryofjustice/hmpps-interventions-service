@@ -14,15 +14,13 @@ class SupplierAssessmentFactory(em: TestEntityManager? = null) : EntityFactory(e
     id: UUID = UUID.randomUUID(),
     referral: Referral = referralFactory.createSent(),
     appointment: Appointment = appointmentFactory.create(),
-  ): SupplierAssessment {
-    return save(
-      SupplierAssessment(
-        id = id,
-        referral = referral,
-        appointments = mutableSetOf(appointment),
-      ),
-    )
-  }
+  ): SupplierAssessment = save(
+    SupplierAssessment(
+      id = id,
+      referral = referral,
+      appointments = mutableSetOf(appointment),
+    ),
+  )
 
   fun createWithMultipleAppointments(
     id: UUID = UUID.randomUUID(),
@@ -32,26 +30,22 @@ class SupplierAssessmentFactory(em: TestEntityManager? = null) : EntityFactory(e
         appointmentFactory.create(referral = referral),
         appointmentFactory.create(referral = referral),
       ),
-  ): SupplierAssessment {
-    return save(
-      SupplierAssessment(
-        id = id,
-        referral = referral,
-        appointments = appointments,
-      ),
-    )
-  }
+  ): SupplierAssessment = save(
+    SupplierAssessment(
+      id = id,
+      referral = referral,
+      appointments = appointments,
+    ),
+  )
 
   fun createWithNoAppointment(
     id: UUID = UUID.randomUUID(),
     referral: Referral = referralFactory.createSent(),
-  ): SupplierAssessment {
-    return save(
-      SupplierAssessment(
-        id = id,
-        referral = referral,
-        appointments = mutableSetOf(),
-      ),
-    )
-  }
+  ): SupplierAssessment = save(
+    SupplierAssessment(
+      id = id,
+      referral = referral,
+      appointments = mutableSetOf(),
+    ),
+  )
 }

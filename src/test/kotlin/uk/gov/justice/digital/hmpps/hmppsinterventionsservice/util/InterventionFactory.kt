@@ -20,18 +20,16 @@ class InterventionFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     """,
     incomingReferralDistributionEmail: String = "shs-incoming@provider.example.com",
     contract: DynamicFrameworkContract? = null,
-  ): Intervention {
-    return save(
-      Intervention(
-        id = id ?: UUID.randomUUID(),
-        createdAt = createdAt ?: OffsetDateTime.now(),
-        title = title,
-        description = description,
-        incomingReferralDistributionEmail = incomingReferralDistributionEmail,
-        dynamicFrameworkContract = contract ?: dynamicFrameworkContractFactory.create(),
-      ),
-    )
-  }
+  ): Intervention = save(
+    Intervention(
+      id = id ?: UUID.randomUUID(),
+      createdAt = createdAt ?: OffsetDateTime.now(),
+      title = title,
+      description = description,
+      incomingReferralDistributionEmail = incomingReferralDistributionEmail,
+      dynamicFrameworkContract = contract ?: dynamicFrameworkContractFactory.create(),
+    ),
+  )
 
   fun createWithContractCode(contractReference: String, title: String = "Sheffield Housing Services"): Intervention {
     val contract = dynamicFrameworkContractFactory.create(contractReference = contractReference)

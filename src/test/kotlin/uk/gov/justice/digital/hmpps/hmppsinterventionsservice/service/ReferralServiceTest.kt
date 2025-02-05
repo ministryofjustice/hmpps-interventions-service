@@ -153,12 +153,10 @@ class ReferralServiceTest @Autowired constructor(
 
   companion object {
     @JvmStatic
-    fun names1234(): List<Arguments> {
-      return listOf(
-        Arguments.of("bob-smith", "smith", "bob-smith smith"),
-        Arguments.of("john", "blue-red", "john blue-red"),
-      )
-    }
+    fun names1234(): List<Arguments> = listOf(
+      Arguments.of("bob-smith", "smith", "bob-smith smith"),
+      Arguments.of("john", "blue-red", "john blue-red"),
+    )
 
     @JvmStatic
     fun referralDetailsFieldToUpdate(): List<Arguments> {

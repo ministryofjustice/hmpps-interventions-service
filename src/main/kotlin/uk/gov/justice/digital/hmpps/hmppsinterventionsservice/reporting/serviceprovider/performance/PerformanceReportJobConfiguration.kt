@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.FileSystemResource
 import org.springframework.transaction.PlatformTransactionManager
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.OnStartupJobLauncherFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.OnStartupJobLauncherFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralPerformanceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUtils
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model.ReferralPerformanceReport
@@ -36,9 +36,7 @@ class PerformanceReportJobConfiguration(
 ) {
 
   @Bean
-  fun performanceReportJobLauncher(performanceReportJob: Job): ApplicationRunner {
-    return onStartupJobLauncherFactory.makeBatchLauncher(performanceReportJob)
-  }
+  fun performanceReportJobLauncher(performanceReportJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(performanceReportJob)
 
   @Bean
   @JobScope
@@ -60,14 +58,12 @@ class PerformanceReportJobConfiguration(
 
   @Bean
   @JobScope
-  fun writer(@Value("#{jobExecutionContext['output.file.path']}") path: String): FlatFileItemWriter<PerformanceReportData> {
-    return batchUtils.csvFileWriter(
-      "performanceReportWriter",
-      FileSystemResource(path),
-      PerformanceReportData.headers,
-      PerformanceReportData.fields,
-    )
-  }
+  fun writer(@Value("#{jobExecutionContext['output.file.path']}") path: String): FlatFileItemWriter<PerformanceReportData> = batchUtils.csvFileWriter(
+    "performanceReportWriter",
+    FileSystemResource(path),
+    PerformanceReportData.headers,
+    PerformanceReportData.fields,
+  )
 
   @Bean
   fun performanceReportJob(writeToCsvStep: Step): Job {
@@ -96,12 +92,10 @@ class PerformanceReportJobConfiguration(
     reader: ListItemReader<ReferralPerformanceReport>,
     processor: ItemProcessor<ReferralPerformanceReport, PerformanceReportData>,
     writer: FlatFileItemWriter<PerformanceReportData>,
-  ): Step {
-    return StepBuilder("writeToCsvStep", jobRepository)
-      .chunk<ReferralPerformanceReport, PerformanceReportData>(chunkSize, transactionManager)
-      .reader(reader)
-      .processor(processor)
-      .writer(writer)
-      .build()
-  }
+  ): Step = StepBuilder("writeToCsvStep", jobRepository)
+    .chunk<ReferralPerformanceReport, PerformanceReportData>(chunkSize, transactionManager)
+    .reader(reader)
+    .processor(processor)
+    .writer(writer)
+    .build()
 }

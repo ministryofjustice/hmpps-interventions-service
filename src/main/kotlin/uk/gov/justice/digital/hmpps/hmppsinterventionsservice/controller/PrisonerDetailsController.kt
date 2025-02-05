@@ -18,7 +18,5 @@ class PrisonerDetailsController(
   fun prisonerDetails(
     @PathVariable crn: String,
     authentication: JwtAuthenticationToken,
-  ): Prisoner? {
-    return prisonerDetailsService.details(crn)
-  }
+  ): Prisoner? = prisonerDetailsService.details(crn)
 }

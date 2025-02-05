@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.OnStartupJobLauncherFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.OnStartupJobLauncherFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
 
@@ -23,52 +23,42 @@ class UpsertContractsJobConfiguration(
 ) {
 
   @Bean
-  fun upsertContractsJobLauncher(upsertContractsJob: Job): ApplicationRunner {
-    return onStartupJobLauncherFactory.makeBatchLauncher(upsertContractsJob)
-  }
+  fun upsertContractsJobLauncher(upsertContractsJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(upsertContractsJob)
 
   @Bean
-  fun upsertContractsJob(upsertProvidersStep: Step, upsertContractStep: Step, upsertContractDetailsStep: Step): Job {
-    return JobBuilder("upsertContractsJob", jobRepository)
-      .incrementer(TimestampIncrementer())
-      .start(upsertProvidersStep)
-      .next(upsertContractDetailsStep)
-      .next(upsertContractStep)
-      .build()
-  }
+  fun upsertContractsJob(upsertProvidersStep: Step, upsertContractStep: Step, upsertContractDetailsStep: Step): Job = JobBuilder("upsertContractsJob", jobRepository)
+    .incrementer(TimestampIncrementer())
+    .start(upsertProvidersStep)
+    .next(upsertContractDetailsStep)
+    .next(upsertContractStep)
+    .build()
 
   @Bean
   fun upsertProvidersStep(
     providerSetup: ProviderSetupTasklet,
     platformTransactionManager: PlatformTransactionManager,
-  ): Step {
-    return StepBuilder("upsertProvidersStep", jobRepository)
-      .tasklet(providerSetup, platformTransactionManager)
-      .build()
-  }
+  ): Step = StepBuilder("upsertProvidersStep", jobRepository)
+    .tasklet(providerSetup, platformTransactionManager)
+    .build()
 
   @Bean
   fun upsertContractDetailsStep(
     contractDetailsSetupTasklet: ContractDetailsSetupTasklet,
     platformTransactionManager: PlatformTransactionManager,
-  ): Step {
-    return StepBuilder("upsertContractDetailsStep", jobRepository)
-      .tasklet(contractDetailsSetupTasklet, platformTransactionManager)
-      .build()
-  }
+  ): Step = StepBuilder("upsertContractDetailsStep", jobRepository)
+    .tasklet(contractDetailsSetupTasklet, platformTransactionManager)
+    .build()
 
   @Bean
   fun upsertContractStep(
     reader: ContractDefinitionReader,
     processor: UpsertContractProcessor,
     platformTransactionManager: PlatformTransactionManager,
-  ): Step {
-    return StepBuilder("upsertContractStep", jobRepository)
-      .chunk<ContractDefinition, Intervention>(10)
-      .reader(reader)
-      .processor(processor)
-      .writer {}
-      .transactionManager(platformTransactionManager)
-      .build()
-  }
+  ): Step = StepBuilder("upsertContractStep", jobRepository)
+    .chunk<ContractDefinition, Intervention>(10)
+    .reader(reader)
+    .processor(processor)
+    .writer {}
+    .transactionManager(platformTransactionManager)
+    .build()
 }

@@ -37,8 +37,7 @@ class RetryingClientCredentialsTokenResponseClient(
 ) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
   companion object : KLogging()
 
-  override fun getTokenResponse(authorizationGrantRequest: OAuth2ClientCredentialsGrantRequest?): OAuth2AccessTokenResponse =
-    customizedClient.getTokenResponse(authorizationGrantRequest)
+  override fun getTokenResponse(authorizationGrantRequest: OAuth2ClientCredentialsGrantRequest?): OAuth2AccessTokenResponse = customizedClient.getTokenResponse(authorizationGrantRequest)
 
   private val errorHandler = OAuth2ErrorResponseErrorHandler()
 

@@ -81,7 +81,5 @@ internal class SNSReferralServiceTest {
     )
   }
 
-  private fun snsReferralService(): SNSReferralService {
-    return SNSReferralService(snsPublisher)
-  }
+  private fun snsReferralService(): SNSReferralService = SNSReferralService(snsPublisher)
 }

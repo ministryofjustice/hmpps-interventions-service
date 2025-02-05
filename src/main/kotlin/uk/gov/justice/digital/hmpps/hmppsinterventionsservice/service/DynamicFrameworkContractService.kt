@@ -10,7 +10,5 @@ import java.util.UUID
 @Service
 @Transactional
 class DynamicFrameworkContractService(val referralRepository: ReferralRepository) {
-  fun getDynamicFrameworkContractByReferralId(id: UUID): DynamicFrameworkContract? {
-    return referralRepository.findByIdOrNull(id)?.intervention?.dynamicFrameworkContract
-  }
+  fun getDynamicFrameworkContractByReferralId(id: UUID): DynamicFrameworkContract? = referralRepository.findByIdOrNull(id)?.intervention?.dynamicFrameworkContract
 }

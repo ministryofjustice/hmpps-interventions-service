@@ -405,12 +405,10 @@ internal class CommunityAPIBookingServiceTest {
     appointmentTime: OffsetDateTime,
     durationInMinutes: Int,
     deliusAppointmentId: Long? = null,
-  ): Appointment {
-    return appointmentFactory.create(
-      createdAt = createdAt,
-      appointmentTime = appointmentTime,
-      durationInMinutes = durationInMinutes,
-      deliusAppointmentId = deliusAppointmentId,
-    )
-  }
+  ): Appointment = appointmentFactory.create(
+    createdAt = createdAt,
+    appointmentTime = appointmentTime,
+    durationInMinutes = durationInMinutes,
+    deliusAppointmentId = deliusAppointmentId,
+  )
 }

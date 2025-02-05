@@ -29,9 +29,7 @@ AppointmentEvent(
   val notifyProbationPractitionerOfBehaviour: Boolean? = null,
   val notifyProbationPractitionerOfConcerns: Boolean? = null,
 ) : ApplicationEvent(source) {
-  override fun toString(): String {
-    return "AppointmentEvent(type=$type, appointmentId=${appointment.id}, detailUrl='$detailUrl', source=$source)"
-  }
+  override fun toString(): String = "AppointmentEvent(type=$type, appointmentId=${appointment.id}, detailUrl='$detailUrl', source=$source)"
 }
 
 @Component

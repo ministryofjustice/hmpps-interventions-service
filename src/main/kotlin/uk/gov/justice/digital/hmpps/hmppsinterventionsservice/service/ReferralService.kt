@@ -109,13 +109,9 @@ class ReferralService(
   }
 
   // This is required for Client API access where the authority to access ALL referrals is pre-checked in the controller
-  fun getSentReferral(id: UUID): Referral? {
-    return referralRepository.findByIdAndSentAtIsNotNull(id)
-  }
+  fun getSentReferral(id: UUID): Referral? = referralRepository.findByIdAndSentAtIsNotNull(id)
 
-  fun getReferralDetailsById(id: UUID?): ReferralDetails? {
-    return referralDetailsRepository.findByIdOrNull(id)
-  }
+  fun getReferralDetailsById(id: UUID?): ReferralDetails? = referralDetailsRepository.findByIdOrNull(id)
 
   fun assignSentReferral(referral: Referral, assignedBy: AuthUser, assignedTo: AuthUser): Referral {
     val assignment = ReferralAssignment(
@@ -212,12 +208,10 @@ class ReferralService(
     return findSentReferralsSpec
   }
 
-  private fun <T> searchSpec(searchText: String): Specification<T> {
-    return if (searchText.matches(Regex("[A-Z]{2}[0-9]{4}[A-Z]{2}"))) {
-      ReferralSpecifications.searchByReferenceNumber(searchText)
-    } else {
-      ReferralSpecifications.searchByPoPName(searchText)
-    }
+  private fun <T> searchSpec(searchText: String): Specification<T> = if (searchText.matches(Regex("[A-Z]{2}[0-9]{4}[A-Z]{2}"))) {
+    ReferralSpecifications.searchByReferenceNumber(searchText)
+  } else {
+    ReferralSpecifications.searchByPoPName(searchText)
   }
 
   private fun <T> createSpecificationForProbationPractitionerUser(
@@ -339,21 +333,13 @@ class ReferralService(
     return newDetails
   }
 
-  fun getCancellationReasons(): List<CancellationReason> {
-    return cancellationReasonRepository.findAll()
-  }
+  fun getCancellationReasons(): List<CancellationReason> = cancellationReasonRepository.findAll()
 
-  fun getWithdrawalReasons(): List<WithdrawalReason> {
-    return withdrawalReasonRepository.findAll()
-  }
+  fun getWithdrawalReasons(): List<WithdrawalReason> = withdrawalReasonRepository.findAll()
 
-  fun getWithdrawalReason(code: String): WithdrawalReason? {
-    return withdrawalReasonRepository.findByCode(code)
-  }
+  fun getWithdrawalReason(code: String): WithdrawalReason? = withdrawalReasonRepository.findByCode(code)
 
-  fun getResponsibleProbationPractitioner(referral: Referral): ResponsibleProbationPractitioner {
-    return getResponsibleProbationPractitioner(referral.serviceUserCRN, referral.sentBy, referral.createdBy)
-  }
+  fun getResponsibleProbationPractitioner(referral: Referral): ResponsibleProbationPractitioner = getResponsibleProbationPractitioner(referral.serviceUserCRN, referral.sentBy, referral.createdBy)
 
   fun getResponsibleProbationPractitioner(crn: String, sentBy: AuthUser?, createdBy: AuthUser): ResponsibleProbationPractitioner {
     try {
@@ -396,7 +382,5 @@ class ReferralService(
     )
   }
 
-  fun isUserTheResponsibleOfficer(responsibleOfficer: ResponsibleProbationPractitioner, user: AuthUser): Boolean {
-    return userTypeChecker.isProbationPractitionerUser(user) && (responsibleOfficer.authUser?.let { it.userName == user.userName } ?: false)
-  }
+  fun isUserTheResponsibleOfficer(responsibleOfficer: ResponsibleProbationPractitioner, user: AuthUser): Boolean = userTypeChecker.isProbationPractitionerUser(user) && (responsibleOfficer.authUser?.let { it.userName == user.userName } ?: false)
 }

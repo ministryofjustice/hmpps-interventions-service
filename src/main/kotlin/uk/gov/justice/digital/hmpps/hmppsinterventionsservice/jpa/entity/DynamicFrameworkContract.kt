@@ -90,9 +90,7 @@ data class DynamicFrameworkContract(
   // using contract_reference for hashCode and equals because
   // it's guaranteed to have a unique hash (UUID isn't).
   // the field is enforced as unique at the database level.
-  override fun hashCode(): Int {
-    return contractReference.hashCode()
-  }
+  override fun hashCode(): Int = contractReference.hashCode()
 
   override fun equals(other: Any?): Boolean {
     if (other == null || other !is DynamicFrameworkContract) {

@@ -46,37 +46,31 @@ class BatchUtils {
     name: String,
     resource: WritableResource,
     headers: List<String>,
-  ): FlatFileItemWriterBuilder<T> {
-    return FlatFileItemWriterBuilder<T>()
-      .name(name)
-      .resource(resource)
-      .headerCallback(HeaderWriter(headers.joinToString(",")))
-  }
+  ): FlatFileItemWriterBuilder<T> = FlatFileItemWriterBuilder<T>()
+    .name(name)
+    .resource(resource)
+    .headerCallback(HeaderWriter(headers.joinToString(",")))
 
   fun <T> csvFileWriter(
     name: String,
     resource: WritableResource,
     headers: List<String>,
     fields: List<String>,
-  ): FlatFileItemWriter<T> {
-    return csvFileWriterBase<T>(name, resource, headers)
-      .lineAggregator(CsvLineAggregator(fields))
-      .build()
-  }
+  ): FlatFileItemWriter<T> = csvFileWriterBase<T>(name, resource, headers)
+    .lineAggregator(CsvLineAggregator(fields))
+    .build()
 
   fun <T> recursiveCollectionCsvFileWriter(
     name: String,
     resource: WritableResource,
     headers: List<String>,
     fields: List<String>,
-  ): FlatFileItemWriter<Collection<T>> {
-    return csvFileWriterBase<Collection<T>>(name, resource, headers)
-      .lineAggregator(
-        RecursiveCollectionLineAggregator<T>().apply {
-          setDelegate(CsvLineAggregator(fields))
-        },
-      ).build()
-  }
+  ): FlatFileItemWriter<Collection<T>> = csvFileWriterBase<Collection<T>>(name, resource, headers)
+    .lineAggregator(
+      RecursiveCollectionLineAggregator<T>().apply {
+        setDelegate(CsvLineAggregator(fields))
+      },
+    ).build()
 }
 
 class HeaderWriter(private val header: String) : FlatFileHeaderCallback {
@@ -125,14 +119,12 @@ class OutputPathIncrementer : JobParametersIncrementer {
 }
 
 class NPESkipPolicy : SkipPolicy {
-  override fun shouldSkip(t: Throwable, skipCount: Long): Boolean {
-    return when (t) {
-      is NullPointerException -> {
-        NdmisReferralPerformanceReportJobConfiguration.logger.warn("skipping row with unexpected state", t)
-        true
-      }
-      else -> false
+  override fun shouldSkip(t: Throwable, skipCount: Long): Boolean = when (t) {
+    is NullPointerException -> {
+      NdmisReferralPerformanceReportJobConfiguration.logger.warn("skipping row with unexpected state", t)
+      true
     }
+    else -> false
   }
 }
 

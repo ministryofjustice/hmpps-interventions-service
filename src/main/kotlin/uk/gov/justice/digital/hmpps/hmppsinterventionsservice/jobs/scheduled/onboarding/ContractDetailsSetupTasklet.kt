@@ -155,12 +155,10 @@ class ContractDetailsSetupTasklet @Autowired constructor(
     return newComplexityLevels
   }
 
-  private fun deriveTitle(severity: String): String {
-    return when (severity) {
-      "LOW" -> "Low complexity"
-      "MEDIUM" -> "Medium complexity"
-      "HIGH" -> "High complexity"
-      else -> ""
-    }
+  private fun deriveTitle(severity: String): String = when (severity) {
+    "LOW" -> "Low complexity"
+    "MEDIUM" -> "Medium complexity"
+    "HIGH" -> "High complexity"
+    else -> ""
   }
 }

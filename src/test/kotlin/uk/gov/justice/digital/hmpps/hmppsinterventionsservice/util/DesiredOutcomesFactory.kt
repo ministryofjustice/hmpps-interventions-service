@@ -10,9 +10,7 @@ class DesiredOutcomesFactory(em: TestEntityManager? = null) : EntityFactory(em) 
   fun create(
     serviceCategory: ServiceCategory = serviceCategoryFactory.create(),
     number: Int,
-  ): List<DesiredOutcome> {
-    return (1..number).map {
-      save(DesiredOutcome(id = UUID.randomUUID(), "", serviceCategoryId = serviceCategory.id))
-    }
+  ): List<DesiredOutcome> = (1..number).map {
+    save(DesiredOutcome(id = UUID.randomUUID(), "", serviceCategoryId = serviceCategory.id))
   }
 }

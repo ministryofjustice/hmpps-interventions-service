@@ -14,14 +14,12 @@ class EndOfServiceReportOutcomeFactory(em: TestEntityManager? = null) : EntityFa
     achievementLevel: AchievementLevel = AchievementLevel.ACHIEVED,
     progressionComments: String? = null,
     additionalTaskComments: String? = null,
-  ): EndOfServiceReportOutcome {
-    return save(
-      EndOfServiceReportOutcome(
-        desiredOutcome = desiredOutcome ?: desiredOutcomesFactory.create(serviceCategoryFactory.create(), 1)[0],
-        achievementLevel = achievementLevel,
-        progressionComments = progressionComments,
-        additionalTaskComments = additionalTaskComments,
-      ),
-    )
-  }
+  ): EndOfServiceReportOutcome = save(
+    EndOfServiceReportOutcome(
+      desiredOutcome = desiredOutcome ?: desiredOutcomesFactory.create(serviceCategoryFactory.create(), 1)[0],
+      achievementLevel = achievementLevel,
+      progressionComments = progressionComments,
+      additionalTaskComments = additionalTaskComments,
+    ),
+  )
 }

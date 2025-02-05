@@ -38,10 +38,8 @@ class EndOfServiceReportService(
       ?: endOfServiceReportRepository.save(endOfServiceReport)
   }
 
-  fun getEndOfServiceReport(endOfServiceReportId: UUID): EndOfServiceReport {
-    return endOfServiceReportRepository.findById(endOfServiceReportId).orElseThrow {
-      throw EntityNotFoundException("End of service report not found [id=$endOfServiceReportId]")
-    }
+  fun getEndOfServiceReport(endOfServiceReportId: UUID): EndOfServiceReport = endOfServiceReportRepository.findById(endOfServiceReportId).orElseThrow {
+    throw EntityNotFoundException("End of service report not found [id=$endOfServiceReportId]")
   }
 
   fun getEndOfServiceReportByReferralId(referralId: UUID): EndOfServiceReport {
@@ -88,9 +86,7 @@ class EndOfServiceReportService(
     }
   }
 
-  private fun getReferral(referralId: UUID): Referral {
-    return referralRepository.findById(referralId).orElseThrow {
-      throw EntityNotFoundException("Referral not found [id=$referralId]")
-    }
+  private fun getReferral(referralId: UUID): Referral = referralRepository.findById(referralId).orElseThrow {
+    throw EntityNotFoundException("Referral not found [id=$referralId]")
   }
 }

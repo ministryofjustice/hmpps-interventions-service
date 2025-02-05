@@ -2,14 +2,14 @@
 
 ## Jobs
 
-We use Spring Batch to create one-off and scheduled jobs.
+We use Spring Batch to create routine and scheduled jobs.
 
-For a one-off job:
+For a oneoff job:
 
 1. Create a new package under `uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff`
 2. For an example job, see [#1286](https://github.com/ministryofjustice/hmpps-interventions-service/pull/1286)
 
-For a scheduled job:
+For a scheduled cronjob:
 
 1. Create a new package under `uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled`
 2. For an example job, see [the NDMIS report job](https://github.com/ministryofjustice/hmpps-interventions-service/tree/5c1ef9aee2176af88993a68cd2514738132bcba9/src/main/kotlin/uk/gov/justice/digital/hmpps/hmppsinterventionsservice/reporting/ndmis/performance)

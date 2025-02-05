@@ -11,12 +11,10 @@ class ReferralAppointmentDetailsDTO(
 ) {
 
   companion object {
-    fun from(crn: String, referralAppointmentDetails: List<ReferralAppointmentLocationDetails>): ReferralAppointmentDetailsDTO {
-      return ReferralAppointmentDetailsDTO(
-        crn = crn,
-        referrals = referralAppointmentDetails.map { ReferralDetailDTO.from(it) },
-      )
-    }
+    fun from(crn: String, referralAppointmentDetails: List<ReferralAppointmentLocationDetails>): ReferralAppointmentDetailsDTO = ReferralAppointmentDetailsDTO(
+      crn = crn,
+      referrals = referralAppointmentDetails.map { ReferralDetailDTO.from(it) },
+    )
   }
 }
 
@@ -26,13 +24,11 @@ class ReferralDetailDTO(
   val appointments: List<AppointmentDetailsDTO>,
 ) {
   companion object {
-    fun from(referralAppointmentDetails: ReferralAppointmentLocationDetails): ReferralDetailDTO {
-      return ReferralDetailDTO(
-        referral_number = referralAppointmentDetails.referral.referenceNumber,
-        intervention_title = referralAppointmentDetails.referral.intervention.title,
-        appointments = AppointmentDetailsDTO.from(referralAppointmentDetails.appointments),
-      )
-    }
+    fun from(referralAppointmentDetails: ReferralAppointmentLocationDetails): ReferralDetailDTO = ReferralDetailDTO(
+      referral_number = referralAppointmentDetails.referral.referenceNumber,
+      intervention_title = referralAppointmentDetails.referral.intervention.title,
+      appointments = AppointmentDetailsDTO.from(referralAppointmentDetails.appointments),
+    )
   }
 }
 
@@ -49,20 +45,18 @@ class AppointmentDetailsDTO(
 ) {
   companion object {
 
-    fun from(appointments: List<Appointment>): List<AppointmentDetailsDTO> {
-      return appointments.map {
-        AppointmentDetailsDTO(
-          appointment_id = it.id,
-          appointment_date_time = it.appointmentTime,
-          appointment_duration_in_minutes = it.durationInMinutes,
-          superseded_indicator = it.superseded,
-          appointment_delivery_first_address_line = it.appointmentDelivery?.appointmentDeliveryAddress?.firstAddressLine ?: "",
-          appointment_delivery_second_address_line = it.appointmentDelivery?.appointmentDeliveryAddress?.secondAddressLine ?: "",
-          appointment_delivery_town_city = it.appointmentDelivery?.appointmentDeliveryAddress?.townCity ?: "",
-          appointment_delivery_county = it.appointmentDelivery?.appointmentDeliveryAddress?.county ?: "",
-          appointment_delivery_postcode = it.appointmentDelivery?.appointmentDeliveryAddress?.postCode ?: "",
-        )
-      }
+    fun from(appointments: List<Appointment>): List<AppointmentDetailsDTO> = appointments.map {
+      AppointmentDetailsDTO(
+        appointment_id = it.id,
+        appointment_date_time = it.appointmentTime,
+        appointment_duration_in_minutes = it.durationInMinutes,
+        superseded_indicator = it.superseded,
+        appointment_delivery_first_address_line = it.appointmentDelivery?.appointmentDeliveryAddress?.firstAddressLine ?: "",
+        appointment_delivery_second_address_line = it.appointmentDelivery?.appointmentDeliveryAddress?.secondAddressLine ?: "",
+        appointment_delivery_town_city = it.appointmentDelivery?.appointmentDeliveryAddress?.townCity ?: "",
+        appointment_delivery_county = it.appointmentDelivery?.appointmentDeliveryAddress?.county ?: "",
+        appointment_delivery_postcode = it.appointmentDelivery?.appointmentDeliveryAddress?.postCode ?: "",
+      )
     }
   }
 }

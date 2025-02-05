@@ -23,11 +23,9 @@ class InterventionController(
   private val serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper,
 ) {
   @GetMapping("/intervention/{id}")
-  fun getInterventionByID(@PathVariable id: UUID): InterventionDTO {
-    return interventionService.getIntervention(id)?.let {
-      InterventionDTO.from(it, interventionService.getPCCRegions(it))
-    } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "intervention not found [id=$id]")
-  }
+  fun getInterventionByID(@PathVariable id: UUID): InterventionDTO = interventionService.getIntervention(id)?.let {
+    InterventionDTO.from(it, interventionService.getPCCRegions(it))
+  } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "intervention not found [id=$id]")
 
   @GetMapping("/my-interventions")
   fun getInterventionsForUser(authenticationToken: JwtAuthenticationToken): List<InterventionDTO> {
@@ -46,8 +44,6 @@ class InterventionController(
     @RequestParam(name = "allowsMale", required = false) allowsMale: Boolean?,
     @RequestParam(name = "minimumAge", required = false) minimumAge: Int?,
     @RequestParam(name = "maximumAge", required = false) maximumAge: Int?,
-  ): List<InterventionDTO> {
-    return interventionService.getInterventions(pccRegionIds.orEmpty(), allowsFemale, allowsMale, minimumAge, maximumAge)
-      .map { InterventionDTO.from(it, interventionService.getPCCRegions(it)) }
-  }
+  ): List<InterventionDTO> = interventionService.getInterventions(pccRegionIds.orEmpty(), allowsFemale, allowsMale, minimumAge, maximumAge)
+    .map { InterventionDTO.from(it, interventionService.getPCCRegions(it)) }
 }

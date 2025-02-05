@@ -50,13 +50,9 @@ data class ActionPlan(
   @Id val id: UUID,
 ) {
   // This is to avoid stack overflow issues with the bi-directional association with referral
-  override fun toString(): String {
-    return "ActionPlan(referralId=${referral.id}, numberOfSessions=$numberOfSessions, activities=$activities, createdBy=$createdBy, createdAt=$createdAt, submittedBy=$submittedBy, submittedAt=$submittedAt, id=$id)"
-  }
+  override fun toString(): String = "ActionPlan(referralId=${referral.id}, numberOfSessions=$numberOfSessions, activities=$activities, createdBy=$createdBy, createdAt=$createdAt, submittedBy=$submittedBy, submittedAt=$submittedAt, id=$id)"
 
-  override fun hashCode(): Int {
-    return id.hashCode()
-  }
+  override fun hashCode(): Int = id.hashCode()
 
   override fun equals(other: Any?): Boolean {
     if (other == null || other !is ActionPlan) {

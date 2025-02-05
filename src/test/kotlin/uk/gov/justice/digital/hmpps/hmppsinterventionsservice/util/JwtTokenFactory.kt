@@ -13,9 +13,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 
 class JwtTokenFactory {
-  fun create(authUser: AuthUser): JwtAuthenticationToken {
-    return create(userID = authUser.id, authSource = authUser.authSource, userName = authUser.userName)
-  }
+  fun create(authUser: AuthUser): JwtAuthenticationToken = create(userID = authUser.id, authSource = authUser.authSource, userName = authUser.userName)
 
   fun create(
     userID: String = "user",

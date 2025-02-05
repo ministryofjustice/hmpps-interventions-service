@@ -43,9 +43,7 @@ internal class CommunityAPIOffenderServiceTest {
     )
   }
 
-  private fun offenderServiceFactory(restClient: RestClient): CommunityAPIOffenderService {
-    return CommunityAPIOffenderService(offenderAccessLocation, managedOffendersLocation, offenderIdentifiersLocation, restClient)
-  }
+  private fun offenderServiceFactory(restClient: RestClient): CommunityAPIOffenderService = CommunityAPIOffenderService(offenderAccessLocation, managedOffendersLocation, offenderIdentifiersLocation, restClient)
 
   @Test
   fun `checkIfAuthenticatedDeliusUserHasAccessToServiceUser success`() {

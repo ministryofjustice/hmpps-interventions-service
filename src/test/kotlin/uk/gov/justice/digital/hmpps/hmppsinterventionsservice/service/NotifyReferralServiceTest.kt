@@ -59,31 +59,29 @@ class NotifyReferralServiceTest {
     "http://localhost:8080/sent-referral/42c7d267-0776-4272-a8e8-a673bfe30d0d",
   )
 
-  private fun notifyService(): ReferralNotificationService {
-    return ReferralNotificationService(
-      "complexityLevelTemplateID",
-      "desiredOutcomesAmendTemplateID",
-      "needsAndRequirementsAmendTemplateID",
-      "referralSentTemplateID",
-      "referralAssignedTemplateID",
-      "completionDeadlineUpdatedTemplateID",
-      "enforceableDaysUpdatedTemplateID",
-      "reasonForReferralUpdatedTemplateID",
-      "prisonEstablishmentUpdatedTemplateID",
-      "expectedReleaseDateUpdatedTemplatedID",
-      "probationOfficeUpdatedTemplateID",
-      "probationPractitionerNameUpdatedTemplateID",
-      "probationPractitionerEmailUpdatedTemplateID",
-      "probationPractitionerPhoneNumberUpdatedTemplateID",
-      "probationPractitionerTeamPhoneNumberUpdatedTemplateID",
-      "http://interventions-ui.example.com",
-      "/referral/{id}",
-      emailSender,
-      hmppsAuthService,
-      authUserRepository,
-      referralService,
-    )
-  }
+  private fun notifyService(): ReferralNotificationService = ReferralNotificationService(
+    "complexityLevelTemplateID",
+    "desiredOutcomesAmendTemplateID",
+    "needsAndRequirementsAmendTemplateID",
+    "referralSentTemplateID",
+    "referralAssignedTemplateID",
+    "completionDeadlineUpdatedTemplateID",
+    "enforceableDaysUpdatedTemplateID",
+    "reasonForReferralUpdatedTemplateID",
+    "prisonEstablishmentUpdatedTemplateID",
+    "expectedReleaseDateUpdatedTemplatedID",
+    "probationOfficeUpdatedTemplateID",
+    "probationPractitionerNameUpdatedTemplateID",
+    "probationPractitionerEmailUpdatedTemplateID",
+    "probationPractitionerPhoneNumberUpdatedTemplateID",
+    "probationPractitionerTeamPhoneNumberUpdatedTemplateID",
+    "http://interventions-ui.example.com",
+    "/referral/{id}",
+    emailSender,
+    hmppsAuthService,
+    authUserRepository,
+    referralService,
+  )
 
   @Test
   fun `referral sent event generates valid url and sends an email`() {

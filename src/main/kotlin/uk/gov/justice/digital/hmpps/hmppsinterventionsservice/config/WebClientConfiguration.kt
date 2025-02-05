@@ -39,52 +39,40 @@ class WebClientConfiguration(
   private val interventionsClientRegistrationId = "interventions-client"
 
   @Bean
-  fun assessRisksAndNeedsClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient {
-    return RestClient(
-      createAuthorizedWebClient(authorizedClientManager, assessRisksAndNeedsBaseUrl),
-      interventionsClientRegistrationId,
-    )
-  }
+  fun assessRisksAndNeedsClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient = RestClient(
+    createAuthorizedWebClient(authorizedClientManager, assessRisksAndNeedsBaseUrl),
+    interventionsClientRegistrationId,
+  )
 
   @Bean
-  fun hmppsAuthApiClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient {
-    return RestClient(
-      createAuthorizedWebClient(authorizedClientManager, hmppsAuthBaseUrl, hmppsReadTimeoutSeconds, hmppsAuthConnectTimeoutSeconds),
-      interventionsClientRegistrationId,
-    )
-  }
+  fun hmppsAuthApiClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient = RestClient(
+    createAuthorizedWebClient(authorizedClientManager, hmppsAuthBaseUrl, hmppsReadTimeoutSeconds, hmppsAuthConnectTimeoutSeconds),
+    interventionsClientRegistrationId,
+  )
 
   @Bean
-  fun mangeUsersAuthApiClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient {
-    return RestClient(
-      createAuthorizedWebClient(authorizedClientManager, manageUsersAuthBaseUrl, manageUsersReadTimeoutSeconds, manageUsersAuthConnectTimeoutSeconds),
-      interventionsClientRegistrationId,
-    )
-  }
+  fun mangeUsersAuthApiClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient = RestClient(
+    createAuthorizedWebClient(authorizedClientManager, manageUsersAuthBaseUrl, manageUsersReadTimeoutSeconds, manageUsersAuthConnectTimeoutSeconds),
+    interventionsClientRegistrationId,
+  )
 
   @Bean
-  fun communityApiClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient {
-    return RestClient(
-      createAuthorizedWebClient(authorizedClientManager, communityApiBaseUrl),
-      interventionsClientRegistrationId,
-    )
-  }
+  fun communityApiClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient = RestClient(
+    createAuthorizedWebClient(authorizedClientManager, communityApiBaseUrl),
+    interventionsClientRegistrationId,
+  )
 
   @Bean
-  fun ramDeliusApiClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient {
-    return RestClient(
-      createAuthorizedWebClient(authorizedClientManager, ramDelius),
-      interventionsClientRegistrationId,
-    )
-  }
+  fun ramDeliusApiClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient = RestClient(
+    createAuthorizedWebClient(authorizedClientManager, ramDelius),
+    interventionsClientRegistrationId,
+  )
 
   @Bean
-  fun prisonerOffenderSearchClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient {
-    return RestClient(
-      createAuthorizedWebClient(authorizedClientManager, prisonerOffenderSearchApiUrl),
-      interventionsClientRegistrationId,
-    )
-  }
+  fun prisonerOffenderSearchClient(authorizedClientManager: OAuth2AuthorizedClientManager): RestClient = RestClient(
+    createAuthorizedWebClient(authorizedClientManager, prisonerOffenderSearchApiUrl),
+    interventionsClientRegistrationId,
+  )
 
   @Bean
   fun authorizedClientManager(

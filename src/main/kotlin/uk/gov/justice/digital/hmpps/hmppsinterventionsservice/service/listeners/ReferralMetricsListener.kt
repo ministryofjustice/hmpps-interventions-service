@@ -47,21 +47,18 @@ class ReferralMetricsListener(
       .register(registry)
   }
 
-  private fun findPreviousReferral(current: Referral): Referral? {
-    return repository.findAll(
-      otherReferralsForSamePerson(current.id, current.serviceUserCRN),
-      limitToLatestSent(),
-    ).firstOrNull()
-  }
+  private fun findPreviousReferral(current: Referral): Referral? = repository.findAll(
+    otherReferralsForSamePerson(current.id, current.serviceUserCRN),
+    limitToLatestSent(),
+  ).firstOrNull()
 
-  private fun otherReferralsForSamePerson(id: UUID, crn: String) =
-    Specification<Referral> { r, _, cb ->
-      cb.and(
-        cb.notEqual(r.get<String>("id"), id),
-        cb.equal(r.get<String>("serviceUserCRN"), crn),
-        cb.isNotNull(r.get<OffsetDateTime?>("sentAt")),
-      )
-    }
+  private fun otherReferralsForSamePerson(id: UUID, crn: String) = Specification<Referral> { r, _, cb ->
+    cb.and(
+      cb.notEqual(r.get<String>("id"), id),
+      cb.equal(r.get<String>("serviceUserCRN"), crn),
+      cb.isNotNull(r.get<OffsetDateTime?>("sentAt")),
+    )
+  }
 
   private fun limitToLatestSent() = PageRequest.ofSize(1).withSort(Sort.Direction.DESC, "sentAt")
 }

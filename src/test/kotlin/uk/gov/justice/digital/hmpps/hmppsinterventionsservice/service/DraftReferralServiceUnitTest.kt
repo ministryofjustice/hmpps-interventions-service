@@ -629,7 +629,7 @@ class DraftReferralServiceUnitTest {
   }
 
   @Test
-  fun`draft referral risk information is deleted when referral is sent`() {
+  fun `draft referral risk information is deleted when referral is sent`() {
     val draftReferral = referralFactory.createDraft(
       additionalRiskInformation = "something",
       additionalRiskInformationUpdatedAt = OffsetDateTime.now(),

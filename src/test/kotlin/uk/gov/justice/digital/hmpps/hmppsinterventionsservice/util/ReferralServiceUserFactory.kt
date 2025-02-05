@@ -10,14 +10,12 @@ class ReferralServiceUserFactory(em: TestEntityManager? = null) : EntityFactory(
     firstName: String? = null,
     lastName: String? = null,
     referral: Referral = referralFactory.createSent(),
-  ): ReferralServiceUserData {
-    return save(
-      ReferralServiceUserData(
-        firstName = firstName,
-        lastName = lastName,
-        referral = referral,
-        referralID = referral.id,
-      ),
-    )
-  }
+  ): ReferralServiceUserData = save(
+    ReferralServiceUserData(
+      firstName = firstName,
+      lastName = lastName,
+      referral = referral,
+      referralID = referral.id,
+    ),
+  )
 }

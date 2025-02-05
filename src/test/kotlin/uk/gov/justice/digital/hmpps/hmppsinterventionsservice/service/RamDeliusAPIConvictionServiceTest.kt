@@ -39,9 +39,7 @@ internal class RamDeliusAPIConvictionServiceTest {
     )
   }
 
-  private fun convictionServiceFactory(ramDeliusClient: RamDeliusClient): RamDeliusAPIConvictionService {
-    return RamDeliusAPIConvictionService(convictionLocation, ramDeliusClient, telemetryService)
-  }
+  private fun convictionServiceFactory(ramDeliusClient: RamDeliusClient): RamDeliusAPIConvictionService = RamDeliusAPIConvictionService(convictionLocation, ramDeliusClient, telemetryService)
 
   @Test
   fun `getConvictionDetails returns when there are is a matching crn and conviction`() {

@@ -36,9 +36,7 @@ class SNSPublisherTest {
     personReference = PersonReference.crn("X123456"),
   )
 
-  private fun snsPublisher(enabled: Boolean): SNSPublisher {
-    return SNSPublisher(snsClient, objectMapper, telemetryClient, enabled, "arn")
-  }
+  private fun snsPublisher(enabled: Boolean): SNSPublisher = SNSPublisher(snsClient, objectMapper, telemetryClient, enabled, "arn")
 
   @Test
   fun `puts eventType into the message attributes so listener can use it for filtering`() {

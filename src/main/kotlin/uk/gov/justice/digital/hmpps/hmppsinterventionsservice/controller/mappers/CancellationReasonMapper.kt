@@ -11,8 +11,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Can
 class CancellationReasonMapper(
   private val cancellationReasonRepository: CancellationReasonRepository,
 ) {
-  fun mapCancellationReasonIdToCancellationReason(cancellationReasonId: String): CancellationReason {
-    return cancellationReasonRepository.findByIdOrNull(cancellationReasonId)
-      ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid cancellation code. [code=$cancellationReasonId]")
-  }
+  fun mapCancellationReasonIdToCancellationReason(cancellationReasonId: String): CancellationReason = cancellationReasonRepository.findByIdOrNull(cancellationReasonId)
+    ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid cancellation code. [code=$cancellationReasonId]")
 }

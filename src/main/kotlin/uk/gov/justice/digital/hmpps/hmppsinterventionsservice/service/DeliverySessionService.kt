@@ -477,13 +477,9 @@ class DeliverySessionService(
     return Pair(sessionAndAppointment.first, updatedAppointment)
   }
 
-  fun getSessions(referralId: UUID): List<DeliverySession> {
-    return deliverySessionRepository.findAllByReferralId(referralId)
-  }
+  fun getSessions(referralId: UUID): List<DeliverySession> = deliverySessionRepository.findAllByReferralId(referralId)
 
-  fun getSession(referralId: UUID, sessionNumber: Int): DeliverySession {
-    return getDeliverySessionOrThrowException(referralId, sessionNumber)
-  }
+  fun getSession(referralId: UUID, sessionNumber: Int): DeliverySession = getDeliverySessionOrThrowException(referralId, sessionNumber)
 
   private fun setAttendanceAndFeedbackIfHistoricAppointment(
     session: DeliverySession,
@@ -592,33 +588,27 @@ class DeliverySessionService(
     }
   }
 
-  private fun getReferral(referralId: UUID): Referral {
-    return referralRepository.findById(referralId).orElseThrow {
-      throw EntityNotFoundException("Referral not found [id=$referralId]")
-    }
+  private fun getReferral(referralId: UUID): Referral = referralRepository.findById(referralId).orElseThrow {
+    throw EntityNotFoundException("Referral not found [id=$referralId]")
   }
 
   @Deprecated(
     "looking up by action plan ID is no longer necessary",
     ReplaceWith("getDeliverySessionOrThrowException(referralId, sessionNumber)"),
   )
-  fun getDeliverySessionByActionPlanIdOrThrowException(actionPlanId: UUID, sessionNumber: Int): DeliverySession =
-    getDeliverySessionByActionPlanId(actionPlanId, sessionNumber)
-      ?: throw EntityNotFoundException("Action plan session not found [actionPlanId=$actionPlanId, sessionNumber=$sessionNumber]")
+  fun getDeliverySessionByActionPlanIdOrThrowException(actionPlanId: UUID, sessionNumber: Int): DeliverySession = getDeliverySessionByActionPlanId(actionPlanId, sessionNumber)
+    ?: throw EntityNotFoundException("Action plan session not found [actionPlanId=$actionPlanId, sessionNumber=$sessionNumber]")
 
-  private fun getDeliverySessionOrThrowException(referralId: UUID, sessionNumber: Int): DeliverySession =
-    getDeliverySession(referralId, sessionNumber)
-      ?: throw EntityNotFoundException("Action plan session not found [referralId=$referralId, sessionNumber=$sessionNumber]")
+  private fun getDeliverySessionOrThrowException(referralId: UUID, sessionNumber: Int): DeliverySession = getDeliverySession(referralId, sessionNumber)
+    ?: throw EntityNotFoundException("Action plan session not found [referralId=$referralId, sessionNumber=$sessionNumber]")
 
-  private fun getDeliverySession(referralId: UUID, sessionNumber: Int) =
-    deliverySessionRepository.findByReferralIdAndSessionNumber(referralId, sessionNumber)
+  private fun getDeliverySession(referralId: UUID, sessionNumber: Int) = deliverySessionRepository.findByReferralIdAndSessionNumber(referralId, sessionNumber)
 
   @Deprecated(
     "looking up by action plan ID is no longer necessary",
     ReplaceWith("getDeliverySession(referralId, sessionNumber)"),
   )
-  private fun getDeliverySessionByActionPlanId(actionPlanId: UUID, sessionNumber: Int) =
-    deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)
+  private fun getDeliverySessionByActionPlanId(actionPlanId: UUID, sessionNumber: Int) = deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)
 
   private fun getDeliverySessionAppointmentOrThrowException(referralId: UUID, appointmentId: UUID): Pair<DeliverySession, Appointment> = deliverySessionRepository.findAllByReferralId(referralId)
     .flatMap { session -> session.appointments.map { appointment -> Pair(session, appointment) } }

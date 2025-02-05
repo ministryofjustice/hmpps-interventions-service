@@ -1,8 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.explore.JobExplorer
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean
 import org.springframework.batch.core.job.builder.JobBuilder
@@ -46,25 +44,11 @@ class BatchConfiguration(
     return launcher
   }
 
-  @Bean("batchJobBuilderFactory")
-  fun jobBuilderFactory(jobRepository: JobRepository): JobBuilderFactory {
-    return JobBuilderFactory(jobRepository)
-  }
-
   @Bean("batchJobBuilder")
-  fun batchJobBuilder(jobRepository: JobRepository): JobBuilder {
-    return JobBuilder("batchJobBuilder", jobRepository)
-  }
+  fun batchJobBuilder(jobRepository: JobRepository): JobBuilder = JobBuilder("batchJobBuilder", jobRepository)
 
   @Bean("batchStepBuilder")
-  fun batchStepBuilder(jobRepository: JobRepository): StepBuilder {
-    return StepBuilder("batchStepBuilder", jobRepository)
-  }
-
-  @Bean("batchStepBuilderFactory")
-  fun stepBuilderFactory(jobRepository: JobRepository): StepBuilderFactory {
-    return StepBuilderFactory(jobRepository)
-  }
+  fun batchStepBuilder(jobRepository: JobRepository): StepBuilder = StepBuilder("batchStepBuilder", jobRepository)
 
   @Bean("batchJobExplorer")
   fun jobExplorer(

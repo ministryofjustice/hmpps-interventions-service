@@ -208,35 +208,33 @@ internal class CustodyLocationLookupListenerTest {
     )
   }
 
-  private fun mockPrisoner(prisonId: String, prisonerNumber: String, expectedReleaseDate: LocalDate) =
-    Prisoner(
-      prisonId,
-      prisonerNumber,
-      expectedReleaseDate,
-      expectedReleaseDate,
-      expectedReleaseDate,
-      expectedReleaseDate,
-      expectedReleaseDate,
-      expectedReleaseDate,
-      expectedReleaseDate,
-      expectedReleaseDate,
-    )
+  private fun mockPrisoner(prisonId: String, prisonerNumber: String, expectedReleaseDate: LocalDate) = Prisoner(
+    prisonId,
+    prisonerNumber,
+    expectedReleaseDate,
+    expectedReleaseDate,
+    expectedReleaseDate,
+    expectedReleaseDate,
+    expectedReleaseDate,
+    expectedReleaseDate,
+    expectedReleaseDate,
+    expectedReleaseDate,
+  )
 
   private fun mockReferralLocation(
     prisonId: String? = null,
     expectedReleaseDate: LocalDate? = null,
     type: PersonCurrentLocationType,
-  ) =
-    ReferralLocation(
-      UUID.randomUUID(),
-      referral = mock(),
-      type = type,
-      prisonId = prisonId,
-      expectedReleaseDate = expectedReleaseDate,
-      expectedReleaseDateMissingReason = null,
-      expectedProbationOffice = "London",
-      expectedProbationOfficeUnknownReason = null,
-    )
+  ) = ReferralLocation(
+    UUID.randomUUID(),
+    referral = mock(),
+    type = type,
+    prisonId = prisonId,
+    expectedReleaseDate = expectedReleaseDate,
+    expectedReleaseDateMissingReason = null,
+    expectedProbationOffice = "London",
+    expectedProbationOfficeUnknownReason = null,
+  )
 
   private fun referralEvent(
     referralId: UUID,

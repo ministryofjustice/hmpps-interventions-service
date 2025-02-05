@@ -21,18 +21,16 @@ class EndOfServiceReportFactory(em: TestEntityManager? = null) : EntityFactory(e
     submittedBy: AuthUser? = null,
     furtherInformation: String? = null,
     outcomes: MutableSet<EndOfServiceReportOutcome> = mutableSetOf(),
-  ): EndOfServiceReport {
-    return save(
-      EndOfServiceReport(
-        id = id,
-        referral = referral,
-        createdAt = createdAt,
-        createdBy = createdBy,
-        submittedAt = submittedAt,
-        submittedBy = submittedBy,
-        furtherInformation = furtherInformation,
-        outcomes = outcomes,
-      ),
-    )
-  }
+  ): EndOfServiceReport = save(
+    EndOfServiceReport(
+      id = id,
+      referral = referral,
+      createdAt = createdAt,
+      createdBy = createdBy,
+      submittedAt = submittedAt,
+      submittedBy = submittedBy,
+      furtherInformation = furtherInformation,
+      outcomes = outcomes,
+    ),
+  )
 }

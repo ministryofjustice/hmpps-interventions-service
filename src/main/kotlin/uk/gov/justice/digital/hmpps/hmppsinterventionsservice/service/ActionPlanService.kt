@@ -51,10 +51,8 @@ class ActionPlanService(
     return actionPlanRepository.save(draftActionPlan)
   }
 
-  fun getDraftActionPlan(id: UUID): ActionPlan {
-    return actionPlanRepository.findByIdAndSubmittedAtIsNull(id)
-      ?: throw EntityNotFoundException("draft action plan not found [id=$id]")
-  }
+  fun getDraftActionPlan(id: UUID): ActionPlan = actionPlanRepository.findByIdAndSubmittedAtIsNull(id)
+    ?: throw EntityNotFoundException("draft action plan not found [id=$id]")
 
   fun updateActionPlan(
     actionPlanId: UUID,
@@ -118,27 +116,19 @@ class ActionPlanService(
     }
   }
 
-  fun getActionPlan(id: UUID): ActionPlan {
-    return actionPlanRepository.findByIdOrNull(id)
-      ?: throw EntityNotFoundException("action plan not found [id=$id]")
-  }
+  fun getActionPlan(id: UUID): ActionPlan = actionPlanRepository.findByIdOrNull(id)
+    ?: throw EntityNotFoundException("action plan not found [id=$id]")
 
-  fun getApprovedActionPlansByReferral(referralId: UUID): List<ActionPlan> {
-    return actionPlanRepository.findAllByReferralIdAndApprovedAtIsNotNull(referralId)
-  }
+  fun getApprovedActionPlansByReferral(referralId: UUID): List<ActionPlan> = actionPlanRepository.findAllByReferralIdAndApprovedAtIsNotNull(referralId)
 
-  fun getAllAttendedAppointments(actionPlan: ActionPlan): List<Appointment> {
-    return getAllAttendedAppointments(actionPlan.referral.id)
-  }
+  fun getAllAttendedAppointments(actionPlan: ActionPlan): List<Appointment> = getAllAttendedAppointments(actionPlan.referral.id)
 
-  fun getAllAttendedAppointments(referralId: UUID): List<Appointment> {
-    return deliverySessionRepository.findAllByReferralId(referralId)
-      .flatMap { it.appointments }
-      .filter {
-        it.appointmentFeedbackSubmittedAt != null &&
-          listOf(Attended.LATE, Attended.YES).contains(it.attended)
-      }
-  }
+  fun getAllAttendedAppointments(referralId: UUID): List<Appointment> = deliverySessionRepository.findAllByReferralId(referralId)
+    .flatMap { it.appointments }
+    .filter {
+      it.appointmentFeedbackSubmittedAt != null &&
+        listOf(Attended.LATE, Attended.YES).contains(it.attended)
+    }
 
   fun getAllCompletedAppointments(actionPlan: ActionPlan): List<Appointment> {
     val appointments: List<Appointment> = deliverySessionRepository.findAllByReferralId(actionPlan.referral.id)
@@ -152,13 +142,9 @@ class ActionPlanService(
     return appointments
   }
 
-  fun getFirstAttendedAppointment(actionPlan: ActionPlan): Appointment? {
-    return getAllAttendedAppointments(actionPlan).minByOrNull { it.appointmentTime }
-  }
+  fun getFirstAttendedAppointment(actionPlan: ActionPlan): Appointment? = getAllAttendedAppointments(actionPlan).minByOrNull { it.appointmentTime }
 
-  fun getFirstAttendedAppointment(referralId: UUID): Appointment? {
-    return getAllAttendedAppointments(referralId).minByOrNull { it.appointmentTime }
-  }
+  fun getFirstAttendedAppointment(referralId: UUID): Appointment? = getAllAttendedAppointments(referralId).minByOrNull { it.appointmentTime }
 
   private fun updateDraftActivityPlan(
     draftActionPlan: ActionPlan,
@@ -174,10 +160,8 @@ class ActionPlanService(
     }
   }
 
-  private fun getDraftActionPlanOrElseThrowException(id: UUID): ActionPlan {
-    return actionPlanRepository.findByIdAndSubmittedAtIsNull(id)
-      ?: throw EntityNotFoundException("draft action plan not found [id=$id]")
-  }
+  private fun getDraftActionPlanOrElseThrowException(id: UUID): ActionPlan = actionPlanRepository.findByIdAndSubmittedAtIsNull(id)
+    ?: throw EntityNotFoundException("draft action plan not found [id=$id]")
 
   private fun updateDraftActionPlanAsSubmitted(draftActionPlan: ActionPlan, submittedByUser: AuthUser): ActionPlan {
     draftActionPlan.submittedAt = OffsetDateTime.now()

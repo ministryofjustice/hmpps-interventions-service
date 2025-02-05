@@ -60,17 +60,16 @@ internal class PrisonerDetailsServiceTest {
     assertNull(prisonerDetails)
   }
 
-  private fun mockPrisoner(prisonId: String, prisonerNumber: String, expectedReleaseDate: LocalDate) =
-    Prisoner(
-      prisonId,
-      prisonerNumber,
-      expectedReleaseDate,
-      expectedReleaseDate,
-      expectedReleaseDate,
-      expectedReleaseDate,
-      expectedReleaseDate,
-      expectedReleaseDate,
-      expectedReleaseDate,
-      expectedReleaseDate,
-    )
+  private fun mockPrisoner(prisonId: String, prisonerNumber: String, expectedReleaseDate: LocalDate) = Prisoner(
+    prisonId,
+    prisonerNumber,
+    expectedReleaseDate,
+    expectedReleaseDate,
+    expectedReleaseDate,
+    expectedReleaseDate,
+    expectedReleaseDate,
+    expectedReleaseDate,
+    expectedReleaseDate,
+    expectedReleaseDate,
+  )
 }

@@ -71,9 +71,7 @@ class ResourceServerConfiguration(private val tokenVerifier: TokenVerifier) {
 
   @Bean
   @Profile("test")
-  fun testJwtDecoder(): JwtDecoder {
-    return TestJwtDecoder()
-  }
+  fun testJwtDecoder(): JwtDecoder = TestJwtDecoder()
 }
 
 internal class TestJwtDecoder : JwtDecoder {

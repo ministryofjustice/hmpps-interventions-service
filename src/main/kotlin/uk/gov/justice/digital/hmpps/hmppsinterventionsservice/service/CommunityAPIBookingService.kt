@@ -161,8 +161,7 @@ class CommunityAPIBookingService(
     return ramDeliusClient.makePutAppointmentRequest(path, appointmentMerge)?.appointmentId to appointmentMerge.id
   }
 
-  fun setNotifyPPIfAttendedNo(attended: Attended?, notifyPPOfAttendanceBehaviour: Boolean?) =
-    attended == NO || notifyPPOfAttendanceBehaviour == true
+  fun setNotifyPPIfAttendedNo(attended: Attended?, notifyPPOfAttendanceBehaviour: Boolean?) = attended == NO || notifyPPOfAttendanceBehaviour == true
 
   private fun buildReferralResourceUrl(referral: Referral, appointmentType: AppointmentType): String {
     val location = when (appointmentType) {
@@ -176,18 +175,12 @@ class CommunityAPIBookingService(
       .toString()
   }
 
-  fun isRescheduleBooking(existingAppointment: Appointment, appointmentTime: OffsetDateTime, durationInMinutes: Int, npsOfficeCode: String?): Boolean =
-    isDifferentTimings(existingAppointment, appointmentTime, durationInMinutes)
+  fun isRescheduleBooking(existingAppointment: Appointment, appointmentTime: OffsetDateTime, durationInMinutes: Int, npsOfficeCode: String?): Boolean = isDifferentTimings(existingAppointment, appointmentTime, durationInMinutes)
 
-  private fun isDifferentLocation(existingAppointment: Appointment, npsOfficeCode: String?): Boolean {
-    return !npsOfficeCode.equals(existingAppointment.appointmentDelivery?.npsOfficeCode)
-  }
-  private fun isDifferentTimings(existingAppointment: Appointment, appointmentTime: OffsetDateTime, durationInMinutes: Int): Boolean =
-    !existingAppointment.appointmentTime.isEqual(appointmentTime) || existingAppointment.durationInMinutes != durationInMinutes
+  private fun isDifferentLocation(existingAppointment: Appointment, npsOfficeCode: String?): Boolean = !npsOfficeCode.equals(existingAppointment.appointmentDelivery?.npsOfficeCode)
+  private fun isDifferentTimings(existingAppointment: Appointment, appointmentTime: OffsetDateTime, durationInMinutes: Int): Boolean = !existingAppointment.appointmentTime.isEqual(appointmentTime) || existingAppointment.durationInMinutes != durationInMinutes
 
-  private inline fun <reified T> get(appointmentType: AppointmentType, map: Map<AppointmentType, T>): T {
-    return map[appointmentType] ?: throw IllegalStateException("Property value not found for $appointmentType")
-  }
+  private inline fun <reified T> get(appointmentType: AppointmentType, map: Map<AppointmentType, T>): T = map[appointmentType] ?: throw IllegalStateException("Property value not found for $appointmentType")
 }
 
 data class AppointmentMerge(

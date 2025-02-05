@@ -20,7 +20,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.SNSService
 @Service
 class ReferralConcludedListener(
   private val snsPublisher: SNSPublisher,
-) : ApplicationListener<ReferralConcludedEvent>, SNSService {
+) : ApplicationListener<ReferralConcludedEvent>,
+  SNSService {
   @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: ReferralConcludedEvent) {
     val snsEvent = EventDTO(
@@ -46,7 +47,8 @@ class ReferralConcludedNotificationListener(
   private val emailSender: EmailSender,
   private val hmppsAuthService: HMPPSAuthService,
   private val withdrawalReasonRepository: WithdrawalReasonRepository,
-) : ApplicationListener<ReferralConcludedEvent>, NotifyService {
+) : ApplicationListener<ReferralConcludedEvent>,
+  NotifyService {
   @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: ReferralConcludedEvent) {
     val popFirstName = event.referral.serviceUserData!!.firstName?.lowercase()?.replaceFirstChar { it.uppercase() }

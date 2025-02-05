@@ -171,48 +171,26 @@ class SetupAssistant(
       .forEach { referralDetailsRepository.delete(it) }
   }
 
-  fun serviceCategory(id: UUID): ServiceCategory {
-    return serviceCategoryRepository.findById(id).get()
-  }
+  fun serviceCategory(id: UUID): ServiceCategory = serviceCategoryRepository.findById(id).get()
 
-  fun randomServiceCategory(): ServiceCategory {
-    return serviceCategories.random().value
-  }
-  fun randomCancellationReason(): CancellationReason {
-    return cancellationReasons.random().value
-  }
+  fun randomServiceCategory(): ServiceCategory = serviceCategories.random().value
+  fun randomCancellationReason(): CancellationReason = cancellationReasons.random().value
 
-  fun randomWithDrawReason(): WithdrawalReason {
-    return withdrawalReasons.random().value
-  }
+  fun randomWithDrawReason(): WithdrawalReason = withdrawalReasons.random().value
 
-  fun randomDesiredOutcome(): DesiredOutcome {
-    return desiredOutcomeRepository.findAll().random()
-  }
+  fun randomDesiredOutcome(): DesiredOutcome = desiredOutcomeRepository.findAll().random()
 
-  fun randomComplexityLevel(serviceCategory: ServiceCategory): ComplexityLevel {
-    return serviceCategoryRepository.findByIdOrNull(serviceCategory.id)!!.complexityLevels.random()
-  }
+  fun randomComplexityLevel(serviceCategory: ServiceCategory): ComplexityLevel = serviceCategoryRepository.findByIdOrNull(serviceCategory.id)!!.complexityLevels.random()
 
-  fun randomContractType(): ContractType {
-    return contractTypes.random().value
-  }
+  fun randomContractType(): ContractType = contractTypes.random().value
 
-  fun randomNPSRegion(): NPSRegion {
-    return npsRegions.random().value
-  }
+  fun randomNPSRegion(): NPSRegion = npsRegions.random().value
 
-  fun desiredOutcomesForServiceCategory(serviceCategoryId: UUID): List<DesiredOutcome> {
-    return desiredOutcomeRepository.findByServiceCategoryId(serviceCategoryId)
-  }
+  fun desiredOutcomesForServiceCategory(serviceCategoryId: UUID): List<DesiredOutcome> = desiredOutcomeRepository.findByServiceCategoryId(serviceCategoryId)
 
-  fun getDesiredOutcome(desiredOutcomeId: UUID): DesiredOutcome {
-    return desiredOutcomeRepository.findByIdOrNull(desiredOutcomeId)!!
-  }
+  fun getDesiredOutcome(desiredOutcomeId: UUID): DesiredOutcome = desiredOutcomeRepository.findByIdOrNull(desiredOutcomeId)!!
 
-  fun createDesiredOutcome(id: UUID, description: String, serviceCategoryId: UUID): DesiredOutcome {
-    return desiredOutcomeRepository.save(DesiredOutcome(id, description, serviceCategoryId))
-  }
+  fun createDesiredOutcome(id: UUID, description: String, serviceCategoryId: UUID): DesiredOutcome = desiredOutcomeRepository.save(DesiredOutcome(id, description, serviceCategoryId))
 
   fun createPPUser(id: String = "8751622134"): AuthUser {
     val user = AuthUser(id, "delius", "BERNARD.BEAKS")
@@ -295,37 +273,35 @@ class SetupAssistant(
     alreadyKnowPrisonName: Boolean? = null,
     expectedProbationOffice: String? = "London",
     reasonForReferralCreationBeforeAllocation: String? = "for quick assessment",
-  ): DraftReferral {
-    return draftReferralRepository.save(
-      referralFactory.createDraft(
-        id = id,
-        intervention = intervention,
-        createdAt = createdAt,
-        createdBy = createdBy,
-        serviceUserCRN = serviceUserCRN,
-        selectedServiceCategories = selectedServiceCategories,
-        completionDeadline = LocalDate.now(),
-        personCurrentLocationType = personCurrentLocationType,
-        personCustodyPrisonId = personCustodyPrisonId,
-        expectedReleaseDate = expectedReleaseDate,
-        ndeliusPPName = ndeliusPPName,
-        ndeliusPPEmailAddress = ndeliusPPEmailAddress,
-        ndeliusPDU = ndeliusPDU,
-        ppName = ppName,
-        ppEmailAddress = ppEmailAddress,
-        ppProbationOffice = ppProbationOffice,
-        ppPdu = ppPdu,
-        hasValidDeliusPPDetails = hasValidDeliusPPDetails,
-        hasMainPointOfContactDetails = hasMainPointOfContactDetails,
-        roleOrJobTitle = roleOrJobTitle,
-        isReferralReleasingIn12Weeks = isReferralReleasingIn12Weeks,
-        ppEstablishment = ppEstablishment,
-        alreadyKnowPrisonName = alreadyKnowPrisonName,
-        expectedProbationOffice = expectedProbationOffice,
-        reasonForReferralCreationBeforeAllocation = reasonForReferralCreationBeforeAllocation,
-      ),
-    )
-  }
+  ): DraftReferral = draftReferralRepository.save(
+    referralFactory.createDraft(
+      id = id,
+      intervention = intervention,
+      createdAt = createdAt,
+      createdBy = createdBy,
+      serviceUserCRN = serviceUserCRN,
+      selectedServiceCategories = selectedServiceCategories,
+      completionDeadline = LocalDate.now(),
+      personCurrentLocationType = personCurrentLocationType,
+      personCustodyPrisonId = personCustodyPrisonId,
+      expectedReleaseDate = expectedReleaseDate,
+      ndeliusPPName = ndeliusPPName,
+      ndeliusPPEmailAddress = ndeliusPPEmailAddress,
+      ndeliusPDU = ndeliusPDU,
+      ppName = ppName,
+      ppEmailAddress = ppEmailAddress,
+      ppProbationOffice = ppProbationOffice,
+      ppPdu = ppPdu,
+      hasValidDeliusPPDetails = hasValidDeliusPPDetails,
+      hasMainPointOfContactDetails = hasMainPointOfContactDetails,
+      roleOrJobTitle = roleOrJobTitle,
+      isReferralReleasingIn12Weeks = isReferralReleasingIn12Weeks,
+      ppEstablishment = ppEstablishment,
+      alreadyKnowPrisonName = alreadyKnowPrisonName,
+      expectedProbationOffice = expectedProbationOffice,
+      reasonForReferralCreationBeforeAllocation = reasonForReferralCreationBeforeAllocation,
+    ),
+  )
 
   fun createChangeLogEntry(
     changedAt: OffsetDateTime,
@@ -565,14 +541,12 @@ class SetupAssistant(
         intervention = createIntervention(),
       ),
     ),
-  ): SupplierAssessment {
-    return supplierAssessmentRepository.save(
-      SupplierAssessment(
-        id = id,
-        referral = referral,
-      ),
-    )
-  }
+  ): SupplierAssessment = supplierAssessmentRepository.save(
+    SupplierAssessment(
+      id = id,
+      referral = referral,
+    ),
+  )
 
   fun createDynamicFrameworkContract(
     id: UUID = UUID.randomUUID(),
@@ -691,22 +665,20 @@ class SetupAssistant(
     submittedBy: AuthUser? = null,
     approvedAt: OffsetDateTime? = null,
     approvedBy: AuthUser? = null,
-  ): ActionPlan {
-    return actionPlanRepository.save(
-      ActionPlan(
-        id = id,
-        createdAt = createdAt,
-        createdBy = createdBy,
-        referral = referral,
-        activities = activities,
-        numberOfSessions = numberOfSessions,
-        submittedAt = submittedAt,
-        submittedBy = submittedBy,
-        approvedAt = approvedAt,
-        approvedBy = approvedBy,
-      ),
-    )
-  }
+  ): ActionPlan = actionPlanRepository.save(
+    ActionPlan(
+      id = id,
+      createdAt = createdAt,
+      createdBy = createdBy,
+      referral = referral,
+      activities = activities,
+      numberOfSessions = numberOfSessions,
+      submittedAt = submittedAt,
+      submittedBy = submittedBy,
+      approvedAt = approvedAt,
+      approvedBy = approvedBy,
+    ),
+  )
 
   fun createDeliverySession(
     sessionNumber: Int,

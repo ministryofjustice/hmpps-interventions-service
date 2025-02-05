@@ -13,9 +13,7 @@ data class ServiceProvider(
   val id: AuthGroupID,
   @NotNull val name: String,
 ) {
-  override fun hashCode(): Int {
-    return id.hashCode()
-  }
+  override fun hashCode(): Int = id.hashCode()
 
   override fun equals(other: Any?): Boolean {
     if (other == null || other !is ServiceProvider) {

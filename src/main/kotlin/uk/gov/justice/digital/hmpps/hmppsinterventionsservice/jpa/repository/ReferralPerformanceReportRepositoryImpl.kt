@@ -19,21 +19,13 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
   @PersistenceContext
   private lateinit var entityManager: EntityManager
 
-  private fun reportQuery(): String {
-    return "select distinct * from performance_report(string_to_array(cast(:contractReferences as text), ' '), cast(:sent_from as timestamp), cast(:sent_to as timestamp))"
-  } // now filtering for unique rows
+  private fun reportQuery(): String = "select distinct * from performance_report(string_to_array(cast(:contractReferences as text), ' '), cast(:sent_from as timestamp), cast(:sent_to as timestamp))" // now filtering for unique rows
 
-  private fun eosrScoreQuery(): String {
-    return "select * from performance_report_eosr_outcome_score(:eosrId)"
-  }
+  private fun eosrScoreQuery(): String = "select * from performance_report_eosr_outcome_score(:eosrId)"
 
-  private fun attendedAppointmentCountQuery(): String {
-    return "select * from performance_report_attendances_count(:referralId)"
-  }
+  private fun attendedAppointmentCountQuery(): String = "select * from performance_report_attendances_count(:referralId)"
 
-  private fun firstAttendanceDateQuery(): String {
-    return "select * from performance_report_first_attendance(:referralId)"
-  }
+  private fun firstAttendanceDateQuery(): String = "select * from performance_report_first_attendance(:referralId)"
 
   override fun serviceProviderReportReferrals(
     from: OffsetDateTime,

@@ -114,29 +114,25 @@ internal class ReferralConcludedNotificationListenerTest {
   )
   companion object {
     @JvmStatic
-    fun withdrawStateSource(): Stream<Arguments> {
-      return Stream.of(
-        arguments(ReferralConcludedState.CANCELLED, ReferralWithdrawalState.PRE_ICA_WITHDRAWAL, "withDrawnReferralPreIcaTemplateId"),
-        arguments(ReferralConcludedState.CANCELLED, ReferralWithdrawalState.POST_ICA_WITHDRAWAL, "withDrawnReferralPostIcaTemplateId"),
-        arguments(ReferralConcludedState.CANCELLED, ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY, "withDrawnReferralWithdrawnEarlyTemplateId"),
-        arguments(ReferralConcludedState.PREMATURELY_ENDED, ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY, "withDrawnReferralWithdrawnEarlyTemplateId"),
-        arguments(ReferralConcludedState.PREMATURELY_ENDED, ReferralWithdrawalState.POST_ICA_WITHDRAWAL, "withDrawnReferralPostIcaTemplateId"),
-        arguments(ReferralConcludedState.COMPLETED, ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY, "withDrawnReferralWithdrawnEarlyTemplateId"),
-        arguments(ReferralConcludedState.COMPLETED, ReferralWithdrawalState.POST_ICA_WITHDRAWAL, "withDrawnReferralPostIcaTemplateId"),
-      )
-    }
-  }
-
-  private fun notifyService(): ReferralConcludedNotificationListener {
-    return ReferralConcludedNotificationListener(
-      "withDrawnReferralPreIcaTemplateId",
-      "withDrawnReferralPostIcaTemplateId",
-      "withDrawnReferralWithdrawnEarlyTemplateId",
-      emailSender,
-      hmppsAuthService,
-      withdrawalReasonRepository,
+    fun withdrawStateSource(): Stream<Arguments> = Stream.of(
+      arguments(ReferralConcludedState.CANCELLED, ReferralWithdrawalState.PRE_ICA_WITHDRAWAL, "withDrawnReferralPreIcaTemplateId"),
+      arguments(ReferralConcludedState.CANCELLED, ReferralWithdrawalState.POST_ICA_WITHDRAWAL, "withDrawnReferralPostIcaTemplateId"),
+      arguments(ReferralConcludedState.CANCELLED, ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY, "withDrawnReferralWithdrawnEarlyTemplateId"),
+      arguments(ReferralConcludedState.PREMATURELY_ENDED, ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY, "withDrawnReferralWithdrawnEarlyTemplateId"),
+      arguments(ReferralConcludedState.PREMATURELY_ENDED, ReferralWithdrawalState.POST_ICA_WITHDRAWAL, "withDrawnReferralPostIcaTemplateId"),
+      arguments(ReferralConcludedState.COMPLETED, ReferralWithdrawalState.POST_ICA_CLOSE_REFERRAL_EARLY, "withDrawnReferralWithdrawnEarlyTemplateId"),
+      arguments(ReferralConcludedState.COMPLETED, ReferralWithdrawalState.POST_ICA_WITHDRAWAL, "withDrawnReferralPostIcaTemplateId"),
     )
   }
+
+  private fun notifyService(): ReferralConcludedNotificationListener = ReferralConcludedNotificationListener(
+    "withDrawnReferralPreIcaTemplateId",
+    "withDrawnReferralPostIcaTemplateId",
+    "withDrawnReferralWithdrawnEarlyTemplateId",
+    emailSender,
+    hmppsAuthService,
+    withdrawalReasonRepository,
+  )
 
   @ParameterizedTest
   @MethodSource("withdrawStateSource")

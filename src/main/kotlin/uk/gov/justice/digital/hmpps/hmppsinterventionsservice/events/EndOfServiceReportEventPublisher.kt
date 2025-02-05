@@ -16,11 +16,8 @@ class EndOfServiceReportEvent(
   val type: EndOfServiceReportEventType,
   val endOfServiceReport: EndOfServiceReport,
   val detailUrl: String,
-) :
-  ApplicationEvent(source) {
-  override fun toString(): String {
-    return "EndOfServiceReportEvent(type=$type, referralId=${endOfServiceReport.referral.id}, detailUrl='$detailUrl', source=$source)"
-  }
+) : ApplicationEvent(source) {
+  override fun toString(): String = "EndOfServiceReportEvent(type=$type, referralId=${endOfServiceReport.referral.id}, detailUrl='$detailUrl', source=$source)"
 }
 
 @Component

@@ -39,17 +39,16 @@ internal class PrisonerDetailsControllerTest {
     assertNull(prisonerDetailsController.prisonerDetails(serviceUserCRN, jwtAuthenticationToken))
   }
 
-  private fun mockPrisoner(prisonId: String, prisonerNumber: String, expectedReleaseDate: LocalDate) =
-    Prisoner(
-      prisonId,
-      prisonerNumber,
-      expectedReleaseDate,
-      expectedReleaseDate,
-      expectedReleaseDate,
-      expectedReleaseDate,
-      expectedReleaseDate,
-      expectedReleaseDate,
-      expectedReleaseDate,
-      expectedReleaseDate,
-    )
+  private fun mockPrisoner(prisonId: String, prisonerNumber: String, expectedReleaseDate: LocalDate) = Prisoner(
+    prisonId,
+    prisonerNumber,
+    expectedReleaseDate,
+    expectedReleaseDate,
+    expectedReleaseDate,
+    expectedReleaseDate,
+    expectedReleaseDate,
+    expectedReleaseDate,
+    expectedReleaseDate,
+    expectedReleaseDate,
+  )
 }

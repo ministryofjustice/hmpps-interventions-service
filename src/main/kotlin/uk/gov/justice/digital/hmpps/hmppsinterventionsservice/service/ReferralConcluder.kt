@@ -98,12 +98,10 @@ class ReferralConcluder(
     }
   }
 
-  private fun endState(deliveryState: DeliveryState, endOfServiceReport: EndOfServiceReport?): ReferralEndState {
-    return if (deliveryState.requiresEndOfServiceReport && endOfServiceReport?.submittedAt == null) {
-      ReferralEndState.AWAITING_END_OF_SERVICE_REPORT
-    } else {
-      ReferralEndState.CAN_CONCLUDE
-    }
+  private fun endState(deliveryState: DeliveryState, endOfServiceReport: EndOfServiceReport?): ReferralEndState = if (deliveryState.requiresEndOfServiceReport && endOfServiceReport?.submittedAt == null) {
+    ReferralEndState.AWAITING_END_OF_SERVICE_REPORT
+  } else {
+    ReferralEndState.CAN_CONCLUDE
   }
 
   fun requiresEndOfServiceReportCreation(referral: Referral): Boolean {
@@ -128,15 +126,9 @@ class ReferralConcluder(
     }
   }
 
-  private fun countSessionsWithAttendanceRecord(referral: Referral): Int {
-    return deliverySessionRepository.countNumberOfSessionsWithAttendanceRecord(referral.id)
-  }
+  private fun countSessionsWithAttendanceRecord(referral: Referral): Int = deliverySessionRepository.countNumberOfSessionsWithAttendanceRecord(referral.id)
 
-  private fun countSessionsAttended(referral: Referral): Int {
-    return deliverySessionRepository.countNumberOfAttendedSessions(referral.id)
-  }
+  private fun countSessionsAttended(referral: Referral): Int = deliverySessionRepository.countNumberOfAttendedSessions(referral.id)
 
-  private fun deliveredFirstSubstantiveAppointment(referral: Referral): Boolean {
-    return countSessionsAttended(referral) > 0
-  }
+  private fun deliveredFirstSubstantiveAppointment(referral: Referral): Boolean = countSessionsAttended(referral) > 0
 }

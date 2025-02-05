@@ -9,12 +9,10 @@ class RelevantEndOfSentenceFactory(em: TestEntityManager? = null) : EntityFactor
   fun create(
     sentenceId: Long? = 11111111,
     endDate: LocalDate? = LocalDate.now(),
-  ): RelevantEndOfSentenceDataload {
-    return save(
-      RelevantEndOfSentenceDataload(
-        relevantSentenceId = sentenceId,
-        relevantSentenceEndDate = endDate,
-      ),
-    )
-  }
+  ): RelevantEndOfSentenceDataload = save(
+    RelevantEndOfSentenceDataload(
+      relevantSentenceId = sentenceId,
+      relevantSentenceEndDate = endDate,
+    ),
+  )
 }

@@ -31,15 +31,13 @@ class CommunityAPIClient(
       .subscribe()
   }
 
-  fun <T : Any> makeSyncPostRequest(uri: String, requestBody: Any, responseBodyClass: Class<T>): T {
-    return communityApiClient.post(uri, requestBody)
-      .retrieve()
-      .bodyToMono(responseBodyClass)
-      .onErrorMap { e ->
-        handleResponse(e, requestBody)
-      }
-      .block()
-  }
+  fun <T : Any> makeSyncPostRequest(uri: String, requestBody: Any, responseBodyClass: Class<T>): T = communityApiClient.post(uri, requestBody)
+    .retrieve()
+    .bodyToMono(responseBodyClass)
+    .onErrorMap { e ->
+      handleResponse(e, requestBody)
+    }
+    .block()
 
   fun handleResponse(e: Throwable, requestBody: Any): CommunityApiCallError {
     val responseBodyAsString = when (e) {

@@ -10,7 +10,5 @@ import java.util.UUID
 @Service
 @Transactional
 class ServiceProviderService(val referralRepository: ReferralRepository) {
-  fun getServiceProviderByReferralId(id: UUID): ServiceProvider? {
-    return referralRepository.findByIdOrNull(id)?.intervention?.dynamicFrameworkContract?.primeProvider
-  }
+  fun getServiceProviderByReferralId(id: UUID): ServiceProvider? = referralRepository.findByIdOrNull(id)?.intervention?.dynamicFrameworkContract?.primeProvider
 }

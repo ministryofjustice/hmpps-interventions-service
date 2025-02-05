@@ -74,67 +74,61 @@ class HMPPSAuthService(
       .collectList().block()
   }
 
-  fun getUserDetail(user: AuthUser): UserDetail {
-    return getUserDetail(AuthUserDTO.from(user))
-  }
+  fun getUserDetail(user: AuthUser): UserDetail = getUserDetail(AuthUserDTO.from(user))
 
-  fun getUserDetail(user: AuthUserDTO): UserDetail {
-    return if (user.authSource == "auth") {
-      val url = UriComponentsBuilder.fromPath(authUserDetailLocation).buildAndExpand(user.username).toString()
-      mangeUsersAuthApiClient.get(url)
-        .retrieve()
-        .bodyToMono(AuthUserDetailResponse::class.java)
-        .withRetryPolicy()
-        .map {
-          if (!it.verified) {
-            throw UnverifiedEmailException()
-          }
-          UserDetail(it.firstName, it.email, it.lastName)
+  fun getUserDetail(user: AuthUserDTO): UserDetail = if (user.authSource == "auth") {
+    val url = UriComponentsBuilder.fromPath(authUserDetailLocation).buildAndExpand(user.username).toString()
+    mangeUsersAuthApiClient.get(url)
+      .retrieve()
+      .bodyToMono(AuthUserDetailResponse::class.java)
+      .withRetryPolicy()
+      .map {
+        if (!it.verified) {
+          throw UnverifiedEmailException()
         }
-        .block()
-    } else {
-      val detailUrl = UriComponentsBuilder.fromPath(userDetailLocation).buildAndExpand(user.username).toString()
-      val emailUrl = UriComponentsBuilder.fromPath(userEmailLocation).buildAndExpand(user.username).toString()
-      Mono.zip(
-        mangeUsersAuthApiClient.get(detailUrl)
-          .retrieve()
-          .bodyToMono(UserDetailResponse::class.java)
-          .withRetryPolicy()
-          .map { Pair(it.name.substringBefore(' '), it.name.substringAfterLast(' ')) },
-        mangeUsersAuthApiClient.get(emailUrl)
-          .retrieve()
-          .onStatus({ it.equals(HttpStatus.NO_CONTENT) }, { Mono.error(UnverifiedEmailException()) })
-          .bodyToMono(UserEmailResponse::class.java)
-          .withRetryPolicy()
-          .map { it.email },
-      )
-        .map { UserDetail(it.t1.first, it.t2, it.t1.second) }
-        .block()
-    }
+        UserDetail(it.firstName, it.email, it.lastName)
+      }
+      .block()
+  } else {
+    val detailUrl = UriComponentsBuilder.fromPath(userDetailLocation).buildAndExpand(user.username).toString()
+    val emailUrl = UriComponentsBuilder.fromPath(userEmailLocation).buildAndExpand(user.username).toString()
+    Mono.zip(
+      mangeUsersAuthApiClient.get(detailUrl)
+        .retrieve()
+        .bodyToMono(UserDetailResponse::class.java)
+        .withRetryPolicy()
+        .map { Pair(it.name.substringBefore(' '), it.name.substringAfterLast(' ')) },
+      mangeUsersAuthApiClient.get(emailUrl)
+        .retrieve()
+        .onStatus({ it.equals(HttpStatus.NO_CONTENT) }, { Mono.error(UnverifiedEmailException()) })
+        .bodyToMono(UserEmailResponse::class.java)
+        .withRetryPolicy()
+        .map { it.email },
+    )
+      .map { UserDetail(it.t1.first, it.t2, it.t1.second) }
+      .block()
   }
 
-  fun <T> Flux<T>.withRetryPolicy(): Flux<T> {
-    return this
-      .retryWhen(
-        Retry.max(maxRetryAttempts)
-          .filter { isTimeoutException(it) }
-          .doBeforeRetry { logRetrySignal(it) },
-      )
-  }
+  fun <T> Flux<T>.withRetryPolicy(): Flux<T> = this
+    .retryWhen(
+      Retry.max(maxRetryAttempts)
+        .filter { isTimeoutException(it) }
+        .doBeforeRetry { logRetrySignal(it) },
+    )
 
-  fun <T> Mono<T>.withRetryPolicy(): Mono<T> {
-    return this
-      .retryWhen(
-        Retry.max(maxRetryAttempts)
-          .filter { isTimeoutException(it) }
-          .doBeforeRetry { logRetrySignal(it) },
-      )
-  }
+  fun <T> Mono<T>.withRetryPolicy(): Mono<T> = this
+    .retryWhen(
+      Retry.max(maxRetryAttempts)
+        .filter { isTimeoutException(it) }
+        .doBeforeRetry { logRetrySignal(it) },
+    )
 
   fun isTimeoutException(it: Throwable): Boolean {
     // Timeout for NO_RESPONSE is wrapped in a WebClientRequestException
-    return it is ReadTimeoutException || it is ConnectTimeoutException ||
-      it.cause is ReadTimeoutException || it.cause is ConnectTimeoutException
+    return it is ReadTimeoutException ||
+      it is ConnectTimeoutException ||
+      it.cause is ReadTimeoutException ||
+      it.cause is ConnectTimeoutException
   }
 
   fun logRetrySignal(retrySignal: RetrySignal) {

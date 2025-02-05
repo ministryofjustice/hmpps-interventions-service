@@ -8,7 +8,5 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.PCC
 @Service
 @Transactional
 class PCCRegionService(val repository: PCCRegionRepository) {
-  fun getAllPCCRegions(): List<PCCRegion> {
-    return repository.findAll().toList()
-  }
+  fun getAllPCCRegions(): List<PCCRegion> = repository.findAll().toList()
 }

@@ -19,21 +19,13 @@ class InterventionService(
   val interventionRepository: InterventionRepository,
 ) {
 
-  fun getInterventionsForServiceProviderScope(scope: ServiceProviderAccessScope): List<Intervention> {
-    return interventionRepository.findByDynamicFrameworkContractIdIn(scope.contracts.map { it.id })
-  }
+  fun getInterventionsForServiceProviderScope(scope: ServiceProviderAccessScope): List<Intervention> = interventionRepository.findByDynamicFrameworkContractIdIn(scope.contracts.map { it.id })
 
-  fun getIntervention(id: UUID): Intervention? {
-    return interventionRepository.findByIdOrNull(id)
-  }
+  fun getIntervention(id: UUID): Intervention? = interventionRepository.findByIdOrNull(id)
 
-  fun getInterventionsForServiceProvider(id: AuthGroupID): List<Intervention> {
-    return interventionRepository.findByDynamicFrameworkContractPrimeProviderId(id)
-  }
+  fun getInterventionsForServiceProvider(id: AuthGroupID): List<Intervention> = interventionRepository.findByDynamicFrameworkContractPrimeProviderId(id)
 
-  fun getAllInterventions(): List<Intervention> {
-    return interventionRepository.findAll()
-  }
+  fun getAllInterventions(): List<Intervention> = interventionRepository.findAll()
 
   fun getInterventions(
     pccRegionIds: List<PCCRegionID>,
@@ -41,9 +33,7 @@ class InterventionService(
     allowsMale: Boolean?,
     minimumAge: Int?,
     maximumAge: Int?,
-  ): List<Intervention> {
-    return interventionRepository.findByCriteria(pccRegionIds, allowsFemale, allowsMale, minimumAge, maximumAge)
-  }
+  ): List<Intervention> = interventionRepository.findByCriteria(pccRegionIds, allowsFemale, allowsMale, minimumAge, maximumAge)
 
   fun getPCCRegions(intervention: Intervention): List<PCCRegion> {
     val contract = intervention.dynamicFrameworkContract

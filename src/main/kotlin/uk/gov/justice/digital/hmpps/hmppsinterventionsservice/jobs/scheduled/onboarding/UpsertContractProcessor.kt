@@ -53,20 +53,16 @@ class UpsertContractProcessor(
     contractTypeCode: String,
     region: RegionDefinition,
     providers: ProviderDefinition,
-  ): List<String> {
-    return mutableListOf<String>().also {
-      it.addAll(validateContractType(contractTypeCode))
-      it.addAll(validateRegions(region))
-      it.addAll(validateProviders(providers))
-    }
+  ): List<String> = mutableListOf<String>().also {
+    it.addAll(validateContractType(contractTypeCode))
+    it.addAll(validateRegions(region))
+    it.addAll(validateProviders(providers))
   }
 
-  private fun validateContractType(contractTypeCode: String): List<String> {
-    return if (contractTypeRepository.findByCode(contractTypeCode) == null) {
-      listOf("Cannot find $contractTypeCode contract type")
-    } else {
-      listOf()
-    }
+  private fun validateContractType(contractTypeCode: String): List<String> = if (contractTypeRepository.findByCode(contractTypeCode) == null) {
+    listOf("Cannot find $contractTypeCode contract type")
+  } else {
+    listOf()
   }
 
   private fun validateProviders(providers: ProviderDefinition): List<String> {

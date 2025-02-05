@@ -60,7 +60,5 @@ internal class SNSActionPlanServiceTest {
     )
   }
 
-  private fun snsActionPlanService(): SNSActionPlanService {
-    return SNSActionPlanService(snsPublisher, "https://base/url", "/action-plans/{id}")
-  }
+  private fun snsActionPlanService(): SNSActionPlanService = SNSActionPlanService(snsPublisher, "https://base/url", "/action-plans/{id}")
 }

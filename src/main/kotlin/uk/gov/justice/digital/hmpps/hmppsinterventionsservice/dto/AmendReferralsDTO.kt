@@ -11,13 +11,11 @@ data class AmendReferralsDTO(
   val amendTopic: AmendTopic,
 ) {
   companion object {
-    fun from(changelog: Changelog): AmendReferralsDTO {
-      return AmendReferralsDTO(
-        values = changelog.newVal.values,
-        reasonForChange = changelog.reasonForChange,
-        amendTopic = changelog.topic,
-      )
-    }
+    fun from(changelog: Changelog): AmendReferralsDTO = AmendReferralsDTO(
+      values = changelog.newVal.values,
+      reasonForChange = changelog.reasonForChange,
+      amendTopic = changelog.topic,
+    )
   }
 }
 

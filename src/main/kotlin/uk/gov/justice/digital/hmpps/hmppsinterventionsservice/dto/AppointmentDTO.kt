@@ -44,8 +44,6 @@ data class AppointmentDTO(
         rescheduledReason = appointment.rescheduledReason,
       )
     }
-    fun from(appointments: MutableSet<Appointment>): List<AppointmentDTO> {
-      return appointments.map { from(it) }
-    }
+    fun from(appointments: MutableSet<Appointment>): List<AppointmentDTO> = appointments.map { from(it) }
   }
 }

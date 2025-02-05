@@ -75,30 +75,28 @@ class HMPPSAuthServiceTest {
   @Test
   fun `getUserDetail gets details for delius user`() {
     mockWebServer.dispatcher = object : Dispatcher() {
-      override fun dispatch(request: RecordedRequest): MockResponse {
-        return when (request.path) {
-          "/user/email" ->
-            MockResponse()
-              .setHeader("content-type", "application/json")
-              .setBody(
-                """
+      override fun dispatch(request: RecordedRequest): MockResponse = when (request.path) {
+        "/user/email" ->
+          MockResponse()
+            .setHeader("content-type", "application/json")
+            .setBody(
+              """
               {
                 "email": "tom@tom.tom"
               }
-                """.trimIndent(),
-              )
-          "/user/detail" ->
-            MockResponse()
-              .setHeader("content-type", "application/json")
-              .setBody(
-                """
+              """.trimIndent(),
+            )
+        "/user/detail" ->
+          MockResponse()
+            .setHeader("content-type", "application/json")
+            .setBody(
+              """
               {
                 "name": "tom timothy"
               }
-                """.trimIndent(),
-              )
-          else -> MockResponse().setResponseCode(404)
-        }
+              """.trimIndent(),
+            )
+        else -> MockResponse().setResponseCode(404)
       }
     }
     val detail = hmppsAuthService.getUserDetail(AuthUser("id", "delius", "username"))
@@ -110,21 +108,19 @@ class HMPPSAuthServiceTest {
   @Test
   fun `getUserDetail fails for email 204 responses`() {
     mockWebServer.dispatcher = object : Dispatcher() {
-      override fun dispatch(request: RecordedRequest): MockResponse {
-        return when (request.path) {
-          "/user/email" -> MockResponse().setResponseCode(204)
-          "/user/detail" ->
-            MockResponse()
-              .setHeader("content-type", "application/json")
-              .setBody(
-                """
+      override fun dispatch(request: RecordedRequest): MockResponse = when (request.path) {
+        "/user/email" -> MockResponse().setResponseCode(204)
+        "/user/detail" ->
+          MockResponse()
+            .setHeader("content-type", "application/json")
+            .setBody(
+              """
               {
                 "name": "tom timothy"
               }
-                """.trimIndent(),
-              )
-          else -> MockResponse().setResponseCode(404)
-        }
+              """.trimIndent(),
+            )
+        else -> MockResponse().setResponseCode(404)
       }
     }
 

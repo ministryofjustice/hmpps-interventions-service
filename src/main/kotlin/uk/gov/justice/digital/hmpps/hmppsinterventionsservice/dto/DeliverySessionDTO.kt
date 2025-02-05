@@ -126,9 +126,7 @@ data class DeliverySessionDTO(
         appointmentId = session.currentAppointment?.id,
       )
     }
-    fun from(sessions: List<DeliverySession>): List<DeliverySessionDTO> {
-      return sessions.map { from(it) }
-    }
+    fun from(sessions: List<DeliverySession>): List<DeliverySessionDTO> = sessions.map { from(it) }
   }
 }
 
@@ -141,22 +139,20 @@ data class AppointmentFeedbackDTO(
   companion object {
     fun from(
       appointment: Appointment?,
-    ): AppointmentFeedbackDTO {
-      return appointment?.let {
-        AppointmentFeedbackDTO(
-          AttendanceFeedbackDTO.from(appointment),
-          SessionFeedbackDTO.from(appointment),
-          appointment.appointmentFeedbackSubmittedAt !== null,
-          appointment.appointmentFeedbackSubmittedBy?.let { AuthUserDTO.from(it) },
-        )
-      }
-        ?: AppointmentFeedbackDTO(
-          AttendanceFeedbackDTO(),
-          SessionFeedbackDTO(),
-          false,
-          null,
-        )
+    ): AppointmentFeedbackDTO = appointment?.let {
+      AppointmentFeedbackDTO(
+        AttendanceFeedbackDTO.from(appointment),
+        SessionFeedbackDTO.from(appointment),
+        appointment.appointmentFeedbackSubmittedAt !== null,
+        appointment.appointmentFeedbackSubmittedBy?.let { AuthUserDTO.from(it) },
+      )
     }
+      ?: AppointmentFeedbackDTO(
+        AttendanceFeedbackDTO(),
+        SessionFeedbackDTO(),
+        false,
+        null,
+      )
   }
 }
 
@@ -169,16 +165,14 @@ data class AttendanceFeedbackDTO(
   val submittedBy: AuthUserDTO? = null,
 ) {
   companion object {
-    fun from(appointment: Appointment): AttendanceFeedbackDTO {
-      return AttendanceFeedbackDTO(
-        didSessionHappen = appointment.didSessionHappen,
-        attended = appointment.attended,
-        additionalAttendanceInformation = appointment.additionalAttendanceInformation,
-        attendanceFailureInformation = appointment.attendanceFailureInformation,
-        appointment.attendanceSubmittedAt,
-        appointment.attendanceSubmittedBy?.let { AuthUserDTO.from(it) },
-      )
-    }
+    fun from(appointment: Appointment): AttendanceFeedbackDTO = AttendanceFeedbackDTO(
+      didSessionHappen = appointment.didSessionHappen,
+      attended = appointment.attended,
+      additionalAttendanceInformation = appointment.additionalAttendanceInformation,
+      attendanceFailureInformation = appointment.attendanceFailureInformation,
+      appointment.attendanceSubmittedAt,
+      appointment.attendanceSubmittedBy?.let { AuthUserDTO.from(it) },
+    )
   }
 }
 
@@ -201,25 +195,23 @@ data class SessionFeedbackDTO(
   val notifyProbationPractitionerOfConcerns: Boolean? = null,
 ) {
   companion object {
-    fun from(appointment: Appointment): SessionFeedbackDTO {
-      return SessionFeedbackDTO(
-        appointment.late,
-        appointment.lateReason,
-        appointment.futureSessionPlans,
-        appointment.noAttendanceInformation,
-        appointment.noSessionReasonType,
-        appointment.noSessionReasonPopAcceptable,
-        appointment.noSessionReasonPopUnacceptable,
-        appointment.noSessionReasonLogistics,
-        appointment.attendanceBehaviour,
-        appointment.sessionSummary,
-        appointment.sessionResponse,
-        appointment.sessionBehaviour,
-        appointment.sessionConcerns,
-        appointment.notifyPPOfAttendanceBehaviour,
-        appointment.notifyProbationPractitionerOfBehaviour,
-        appointment.notifyProbationPractitionerOfConcerns,
-      )
-    }
+    fun from(appointment: Appointment): SessionFeedbackDTO = SessionFeedbackDTO(
+      appointment.late,
+      appointment.lateReason,
+      appointment.futureSessionPlans,
+      appointment.noAttendanceInformation,
+      appointment.noSessionReasonType,
+      appointment.noSessionReasonPopAcceptable,
+      appointment.noSessionReasonPopUnacceptable,
+      appointment.noSessionReasonLogistics,
+      appointment.attendanceBehaviour,
+      appointment.sessionSummary,
+      appointment.sessionResponse,
+      appointment.sessionBehaviour,
+      appointment.sessionConcerns,
+      appointment.notifyPPOfAttendanceBehaviour,
+      appointment.notifyProbationPractitionerOfBehaviour,
+      appointment.notifyProbationPractitionerOfConcerns,
+    )
   }
 }

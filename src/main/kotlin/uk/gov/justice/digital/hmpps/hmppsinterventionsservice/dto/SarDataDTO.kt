@@ -8,11 +8,9 @@ class SarDataDTO(
   val content: SarsRandmDto,
 ) {
   companion object {
-    fun from(crn: String, sarsReferralData: List<SarsReferralData>): SarDataDTO {
-      return SarDataDTO(
-        content = SarsRandmDto.from(crn, sarsReferralData),
-      )
-    }
+    fun from(crn: String, sarsReferralData: List<SarsReferralData>): SarDataDTO = SarDataDTO(
+      content = SarsRandmDto.from(crn, sarsReferralData),
+    )
   }
 }
 
@@ -21,12 +19,10 @@ class SarsRandmDto(
   val referral: List<SarsReferralDTO>,
 ) {
   companion object {
-    fun from(crn: String, sarsReferralData: List<SarsReferralData>): SarsRandmDto {
-      return SarsRandmDto(
-        crn = crn,
-        referral = sarsReferralData.map { SarsReferralDTO.from(it.referral, it.appointments) },
-      )
-    }
+    fun from(crn: String, sarsReferralData: List<SarsReferralData>): SarsRandmDto = SarsRandmDto(
+      crn = crn,
+      referral = sarsReferralData.map { SarsReferralDTO.from(it.referral, it.appointments) },
+    )
   }
 }
 
@@ -41,18 +37,16 @@ class SarsReferralDTO(
   val end_of_service_report: SarsEndOfServiceReportDTO?,
 ) {
   companion object {
-    fun from(referral: Referral, appointments: List<Appointment>): SarsReferralDTO {
-      return SarsReferralDTO(
-        referral_number = referral.referenceNumber,
-        accessibility_needs = referral.accessibilityNeeds ?: "",
-        additional_needs_information = referral.additionalNeedsInformation ?: "",
-        when_unavailable = referral.whenUnavailable ?: "",
-        end_requested_comments = referral.endRequestedComments ?: "",
-        appointment = appointments.map { SarsAppointmentDTO.from(it) },
-        action_plan_activity = referral.actionPlans?.map { SarsActionPlanActivityDTO(it.activities.map { actionPlanActivity -> actionPlanActivity.description }) },
-        end_of_service_report = referral.endOfServiceReport?.let { SarsEndOfServiceReportDTO(it.outcomes.map { outcome -> SarsEndOfServiceReportOutcomesDTO(outcome.progressionComments ?: "", outcome.additionalTaskComments ?: "") }) },
-      )
-    }
+    fun from(referral: Referral, appointments: List<Appointment>): SarsReferralDTO = SarsReferralDTO(
+      referral_number = referral.referenceNumber,
+      accessibility_needs = referral.accessibilityNeeds ?: "",
+      additional_needs_information = referral.additionalNeedsInformation ?: "",
+      when_unavailable = referral.whenUnavailable ?: "",
+      end_requested_comments = referral.endRequestedComments ?: "",
+      appointment = appointments.map { SarsAppointmentDTO.from(it) },
+      action_plan_activity = referral.actionPlans?.map { SarsActionPlanActivityDTO(it.activities.map { actionPlanActivity -> actionPlanActivity.description }) },
+      end_of_service_report = referral.endOfServiceReport?.let { SarsEndOfServiceReportDTO(it.outcomes.map { outcome -> SarsEndOfServiceReportOutcomesDTO(outcome.progressionComments ?: "", outcome.additionalTaskComments ?: "") }) },
+    )
   }
 }
 
@@ -64,15 +58,13 @@ class SarsAppointmentDTO(
   val future_session_plan: String,
 ) {
   companion object {
-    fun from(appointment: Appointment): SarsAppointmentDTO {
-      return SarsAppointmentDTO(
-        session_summary = appointment.sessionSummary ?: "",
-        session_response = appointment.sessionResponse ?: "",
-        session_concerns = appointment.sessionConcerns ?: "",
-        late_reason = appointment.lateReason ?: "",
-        future_session_plan = appointment.futureSessionPlans ?: "",
-      )
-    }
+    fun from(appointment: Appointment): SarsAppointmentDTO = SarsAppointmentDTO(
+      session_summary = appointment.sessionSummary ?: "",
+      session_response = appointment.sessionResponse ?: "",
+      session_concerns = appointment.sessionConcerns ?: "",
+      late_reason = appointment.lateReason ?: "",
+      future_session_plan = appointment.futureSessionPlans ?: "",
+    )
   }
 }
 

@@ -157,14 +157,12 @@ class ErrorConfiguration(private val telemetryClient: TelemetryClient) {
     )
   }
 
-  fun userMessageForWebClientException(status: HttpStatusCode?): String? {
-    return when {
-      status == null -> null
-      status == HttpStatus.CONFLICT -> null
-      status.is4xxClientError -> "Problem has been encountered. Please contact Support"
-      status.is5xxServerError -> "System is experiencing issues. Please try again later and if the issue persists contact Support"
-      else -> null
-    }
+  fun userMessageForWebClientException(status: HttpStatusCode?): String? = when {
+    status == null -> null
+    status == HttpStatus.CONFLICT -> null
+    status.is4xxClientError -> "Problem has been encountered. Please contact Support"
+    status.is5xxServerError -> "System is experiencing issues. Please try again later and if the issue persists contact Support"
+    else -> null
   }
 
   private fun errorResponse(
@@ -174,18 +172,16 @@ class ErrorConfiguration(private val telemetryClient: TelemetryClient) {
     userMessage: String? = null,
     validationErrors: List<FieldError>? = null,
     accessErrors: List<String>? = null,
-  ): ResponseEntity<ErrorResponse> {
-    return ResponseEntity
-      .status(status)
-      .body(
-        ErrorResponse(
-          status = status.value(),
-          error = summary,
-          message = description,
-          userMessage = userMessage,
-          validationErrors = validationErrors,
-          accessErrors = accessErrors,
-        ),
-      )
-  }
+  ): ResponseEntity<ErrorResponse> = ResponseEntity
+    .status(status)
+    .body(
+      ErrorResponse(
+        status = status.value(),
+        error = summary,
+        message = description,
+        userMessage = userMessage,
+        validationErrors = validationErrors,
+        accessErrors = accessErrors,
+      ),
+    )
 }

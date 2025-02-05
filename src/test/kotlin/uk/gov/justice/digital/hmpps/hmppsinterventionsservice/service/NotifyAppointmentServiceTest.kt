@@ -40,60 +40,54 @@ class NotifyAppointmentServiceTest {
     deliverySession: DeliverySession? = null,
     notifyProbationPractitionerOfBehaviour: Boolean? = null,
     notifyProbationPractitionerOfConcerns: Boolean? = null,
-  ): AppointmentEvent {
-    return AppointmentEvent(
-      "source",
-      type,
-      appointmentFactory.create(
-        id = deliverySession?.currentAppointment?.id ?: UUID.randomUUID(),
-        referral = referralFactory.createSent(
-          id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
-          serviceUserData = ReferralServiceUserData(firstName = "Bob", lastName = "Green"),
-        ),
-      ),
-      "http://localhost:8080/appointment/42c7d267-0776-4272-a8e8-a673bfe30d0d",
-      notifyPP,
-      appointmentType,
-      deliverySession,
-      notifyProbationPractitionerOfBehaviour,
-      notifyProbationPractitionerOfConcerns,
-    )
-  }
-
-  private fun createDeliverySession(attended: Attended, notifyPP: Boolean): DeliverySession {
-    return deliverySessionFactory.createAttended(
-      id = UUID.fromString("42c7d267-0776-4272-a8e8-a673bfe30d0d"),
-      deliusAppointmentId = 12345L,
-      referral = SampleData.sampleReferral(
-        "X123456",
-        "Harmony Living",
+  ): AppointmentEvent = AppointmentEvent(
+    "source",
+    type,
+    appointmentFactory.create(
+      id = deliverySession?.currentAppointment?.id ?: UUID.randomUUID(),
+      referral = referralFactory.createSent(
         id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
-        referenceNumber = "HAS71263",
-        sentAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00"),
-        relevantSentenceId = 123456,
-        supplementaryRiskId = UUID.randomUUID(),
         serviceUserData = ReferralServiceUserData(firstName = "Bob", lastName = "Green"),
       ),
-      createdBy = SampleData.sampleAuthUser(),
-      attended = attended,
-      notifyPPOfAttendanceBehaviour = notifyPP,
-    )
-  }
+    ),
+    "http://localhost:8080/appointment/42c7d267-0776-4272-a8e8-a673bfe30d0d",
+    notifyPP,
+    appointmentType,
+    deliverySession,
+    notifyProbationPractitionerOfBehaviour,
+    notifyProbationPractitionerOfConcerns,
+  )
 
-  private fun notifyService(): NotifyAppointmentService {
-    return NotifyAppointmentService(
-      "appointmentNotAttendedTemplate",
-      "poorBehaviourTemplate",
-      "concerningBehaviourTemplate",
-      "initialAssessmentScheduledTemplate",
-      "http://example.com",
-      "/probation-practitioner/referrals/{id}/progress",
-      "/probation-practitioner/referrals/{id}/supplier-assessment/post-session-feedback",
-      "/probation-practitioner/referrals/{id}/session/{sessionNumber}/appointment/{appointmentId}/post-session-feedback",
-      emailSender,
-      referralService,
-    )
-  }
+  private fun createDeliverySession(attended: Attended, notifyPP: Boolean): DeliverySession = deliverySessionFactory.createAttended(
+    id = UUID.fromString("42c7d267-0776-4272-a8e8-a673bfe30d0d"),
+    deliusAppointmentId = 12345L,
+    referral = SampleData.sampleReferral(
+      "X123456",
+      "Harmony Living",
+      id = UUID.fromString("68df9f6c-3fcb-4ec6-8fcf-96551cd9b080"),
+      referenceNumber = "HAS71263",
+      sentAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00"),
+      relevantSentenceId = 123456,
+      supplementaryRiskId = UUID.randomUUID(),
+      serviceUserData = ReferralServiceUserData(firstName = "Bob", lastName = "Green"),
+    ),
+    createdBy = SampleData.sampleAuthUser(),
+    attended = attended,
+    notifyPPOfAttendanceBehaviour = notifyPP,
+  )
+
+  private fun notifyService(): NotifyAppointmentService = NotifyAppointmentService(
+    "appointmentNotAttendedTemplate",
+    "poorBehaviourTemplate",
+    "concerningBehaviourTemplate",
+    "initialAssessmentScheduledTemplate",
+    "http://example.com",
+    "/probation-practitioner/referrals/{id}/progress",
+    "/probation-practitioner/referrals/{id}/supplier-assessment/post-session-feedback",
+    "/probation-practitioner/referrals/{id}/session/{sessionNumber}/appointment/{appointmentId}/post-session-feedback",
+    emailSender,
+    referralService,
+  )
 
   @Test
   fun `supplier assessment appointment attendance recorded event does not send email when user details are not available`() {
