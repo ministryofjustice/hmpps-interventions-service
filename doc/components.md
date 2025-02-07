@@ -2,7 +2,7 @@
 
 ## Jobs
 
-We use Spring Batch to create routine and scheduled jobs.
+We use Spring Batch to create oneoff and scheduled jobs.
 
 For a oneoff job:
 
