@@ -152,6 +152,7 @@ class SetupAssistant(
     changeLogRepository.deleteAll()
     deleteAllReferralDetails()
     probationPractitionerDetailsRepository.deleteAll()
+    draftOasysRiskInformationRepository.deleteAll()
     referralRepository.deleteAll()
     draftReferralRepository.deleteAll()
     interventionRepository.deleteAll()
