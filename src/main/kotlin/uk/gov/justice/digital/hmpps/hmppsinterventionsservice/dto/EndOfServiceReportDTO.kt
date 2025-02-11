@@ -17,18 +17,16 @@ data class EndOfServiceReportDTO(
   val outcomes: Set<EndOfServiceReportOutcomeDTO> = emptySet(),
 ) {
   companion object {
-    fun from(endOfServiceReport: EndOfServiceReport): EndOfServiceReportDTO {
-      return EndOfServiceReportDTO(
-        id = endOfServiceReport.id,
-        referralId = endOfServiceReport.referral.id,
-        createdAt = endOfServiceReport.createdAt,
-        createdBy = AuthUserDTO.from(endOfServiceReport.createdBy),
-        submittedAt = endOfServiceReport.submittedAt,
-        submittedBy = endOfServiceReport.submittedBy?.let { AuthUserDTO.from(it) },
-        furtherInformation = endOfServiceReport.furtherInformation,
-        outcomes = endOfServiceReport.outcomes.map { EndOfServiceReportOutcomeDTO.from(it) }.toMutableSet(),
-      )
-    }
+    fun from(endOfServiceReport: EndOfServiceReport): EndOfServiceReportDTO = EndOfServiceReportDTO(
+      id = endOfServiceReport.id,
+      referralId = endOfServiceReport.referral.id,
+      createdAt = endOfServiceReport.createdAt,
+      createdBy = AuthUserDTO.from(endOfServiceReport.createdBy),
+      submittedAt = endOfServiceReport.submittedAt,
+      submittedBy = endOfServiceReport.submittedBy?.let { AuthUserDTO.from(it) },
+      furtherInformation = endOfServiceReport.furtherInformation,
+      outcomes = endOfServiceReport.outcomes.map { EndOfServiceReportOutcomeDTO.from(it) }.toMutableSet(),
+    )
   }
 }
 data class EndOfServiceReportOutcomeDTO(
@@ -38,13 +36,11 @@ data class EndOfServiceReportOutcomeDTO(
   val additionalTaskComments: String? = null,
 ) {
   companion object {
-    fun from(endOfServiceReportOutcome: EndOfServiceReportOutcome): EndOfServiceReportOutcomeDTO {
-      return EndOfServiceReportOutcomeDTO(
-        desiredOutcome = DesiredOutcomeDTO.from(endOfServiceReportOutcome.desiredOutcome),
-        achievementLevel = endOfServiceReportOutcome.achievementLevel,
-        progressionComments = endOfServiceReportOutcome.progressionComments,
-        additionalTaskComments = endOfServiceReportOutcome.additionalTaskComments,
-      )
-    }
+    fun from(endOfServiceReportOutcome: EndOfServiceReportOutcome): EndOfServiceReportOutcomeDTO = EndOfServiceReportOutcomeDTO(
+      desiredOutcome = DesiredOutcomeDTO.from(endOfServiceReportOutcome.desiredOutcome),
+      achievementLevel = endOfServiceReportOutcome.achievementLevel,
+      progressionComments = endOfServiceReportOutcome.progressionComments,
+      additionalTaskComments = endOfServiceReportOutcome.additionalTaskComments,
+    )
   }
 }

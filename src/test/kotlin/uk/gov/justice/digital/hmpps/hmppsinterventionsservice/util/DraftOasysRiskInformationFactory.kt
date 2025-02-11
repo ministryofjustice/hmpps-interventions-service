@@ -20,21 +20,19 @@ class DraftOasysRiskInformationFactory(em: TestEntityManager? = null) : EntityFa
     riskToSelfHostelSetting: String?,
     riskToSelfVulnerability: String?,
     additionalInformation: String?,
-  ): DraftOasysRiskInformation {
-    return save(
-      DraftOasysRiskInformation(
-        referralId,
-        updatedAt,
-        updatedBy,
-        riskSummaryWhoIsAtRisk,
-        riskSummaryNatureOfRisk,
-        riskSummaryRiskImminence,
-        riskToSelfSuicide,
-        riskToSelfSelfHarm,
-        riskToSelfHostelSetting,
-        riskToSelfVulnerability,
-        additionalInformation,
-      ),
-    )
-  }
+  ): DraftOasysRiskInformation = save(
+    DraftOasysRiskInformation(
+      referralId,
+      updatedAt,
+      updatedBy,
+      riskSummaryWhoIsAtRisk,
+      riskSummaryNatureOfRisk,
+      riskSummaryRiskImminence,
+      riskToSelfSuicide,
+      riskToSelfSelfHarm,
+      riskToSelfHostelSetting,
+      riskToSelfVulnerability,
+      additionalInformation,
+    ),
+  )
 }

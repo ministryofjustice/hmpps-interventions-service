@@ -62,21 +62,15 @@ class SingleReferralEndpoints : IntegrationTestBase() {
   companion object {
     @Suppress("UNUSED")
     @JvmStatic
-    fun draftReferralRequests(): List<Request> {
-      return listOf(Request.GetDraftReferral, Request.UpdateDraftReferral, Request.SendDraftReferral)
-    }
+    fun draftReferralRequests(): List<Request> = listOf(Request.GetDraftReferral, Request.UpdateDraftReferral, Request.SendDraftReferral)
 
     @Suppress("UNUSED")
     @JvmStatic
-    fun sentReferralRequests(): List<Request> {
-      return listOf(Request.GetSentReferral, Request.AssignSentReferral, Request.EndSentReferral)
-    }
+    fun sentReferralRequests(): List<Request> = listOf(Request.GetSentReferral, Request.AssignSentReferral, Request.EndSentReferral)
 
     @Suppress("UNUSED")
     @JvmStatic
-    fun allReferralRequests(): List<Request> {
-      return draftReferralRequests() + sentReferralRequests()
-    }
+    fun allReferralRequests(): List<Request> = draftReferralRequests() + sentReferralRequests()
   }
 
   private fun setUserGroups(user: AuthUser, groups: List<String>?) {
@@ -94,13 +88,9 @@ class SingleReferralEndpoints : IntegrationTestBase() {
     }
   }
 
-  private fun createSentReferral(contract: DynamicFrameworkContract): Referral {
-    return setupAssistant.createSentReferral(intervention = setupAssistant.createIntervention(dynamicFrameworkContract = contract))
-  }
+  private fun createSentReferral(contract: DynamicFrameworkContract): Referral = setupAssistant.createSentReferral(intervention = setupAssistant.createIntervention(dynamicFrameworkContract = contract))
 
-  private fun createEncodedTokenForUser(user: AuthUser, roles: List<String> = listOf("ROLE_PROBATION", "ROLE_CRS_PROVIDER")): String {
-    return tokenFactory.createEncodedToken(userID = user.id, userName = user.userName, authSource = user.authSource, roles = roles)
-  }
+  private fun createEncodedTokenForUser(user: AuthUser, roles: List<String> = listOf("ROLE_PROBATION", "ROLE_CRS_PROVIDER")): String = tokenFactory.createEncodedToken(userID = user.id, userName = user.userName, authSource = user.authSource, roles = roles)
 
   @ParameterizedTest(name = "{displayName} ({argumentsWithNames})")
   @MethodSource("draftReferralRequests")

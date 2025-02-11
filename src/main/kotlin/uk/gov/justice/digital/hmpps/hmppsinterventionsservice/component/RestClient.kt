@@ -75,16 +75,12 @@ class RestClient(
       .withAuth(customAuthentication)
   }
 
-  private fun WebClient.RequestHeadersSpec<*>.withDefaultHeaders(): WebClient.RequestHeadersSpec<*> {
-    return this
-      .accept(MediaType.APPLICATION_JSON)
-      .acceptCharset(StandardCharsets.UTF_8)
-  }
+  private fun WebClient.RequestHeadersSpec<*>.withDefaultHeaders(): WebClient.RequestHeadersSpec<*> = this
+    .accept(MediaType.APPLICATION_JSON)
+    .acceptCharset(StandardCharsets.UTF_8)
 
-  private fun WebClient.RequestHeadersSpec<*>.withAuth(authentication: JwtAuthenticationToken?): WebClient.RequestHeadersSpec<*> {
-    return authentication?.let {
-      this.header("Authorization", "Bearer ${it.token.tokenValue}")
-    }
-      ?: this.attributes(ServletOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId(oauth2ClientRegistrationId))
+  private fun WebClient.RequestHeadersSpec<*>.withAuth(authentication: JwtAuthenticationToken?): WebClient.RequestHeadersSpec<*> = authentication?.let {
+    this.header("Authorization", "Bearer ${it.token.tokenValue}")
   }
+    ?: this.attributes(ServletOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId(oauth2ClientRegistrationId))
 }

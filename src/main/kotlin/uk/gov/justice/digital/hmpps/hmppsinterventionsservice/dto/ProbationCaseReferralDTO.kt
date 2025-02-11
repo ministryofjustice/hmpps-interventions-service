@@ -23,46 +23,42 @@ data class ProbationCaseReferralDTO(
   val isDraft: Boolean,
 ) {
   companion object {
-    fun from(referral: Referral, responsibleOfficer: ResponsibleProbationPractitioner, serviceProviderUser: UserDetail?, referringOfficer: UserDetail): ProbationCaseReferralDTO {
-      return ProbationCaseReferralDTO(
-        id = referral.id.toString(),
-        referenceNumber = referral.referenceNumber,
-        serviceCategories = referral.selectedServiceCategories?.map { it.name },
-        contractType = referral.intervention.dynamicFrameworkContract.contractType.name,
-        referralCreatedAt = referral.createdAt,
-        referralSentAt = referral.sentAt,
-        referralConcludedAt = referral.concludedAt,
-        interventionTitle = referral.intervention.title,
-        referringOfficer = "${referringOfficer.firstName} ${referringOfficer.lastName}",
-        responsibleOfficer = "${responsibleOfficer.firstName} ${responsibleOfficer.lastName}",
-        serviceProviderUser = serviceProviderUser?.let { "${serviceProviderUser.firstName} ${serviceProviderUser.lastName}" },
-        serviceProviderLocation = if (referral.intervention.dynamicFrameworkContract.pccRegion != null) {
-          referral.intervention.dynamicFrameworkContract.pccRegion?.name
-        } else {
-          referral.intervention.dynamicFrameworkContract.npsRegion!!.name
-        },
-        serviceProviderName = referral.intervention.dynamicFrameworkContract.primeProvider.name,
-        isDraft = false,
-      )
-    }
+    fun from(referral: Referral, responsibleOfficer: ResponsibleProbationPractitioner, serviceProviderUser: UserDetail?, referringOfficer: UserDetail): ProbationCaseReferralDTO = ProbationCaseReferralDTO(
+      id = referral.id.toString(),
+      referenceNumber = referral.referenceNumber,
+      serviceCategories = referral.selectedServiceCategories?.map { it.name },
+      contractType = referral.intervention.dynamicFrameworkContract.contractType.name,
+      referralCreatedAt = referral.createdAt,
+      referralSentAt = referral.sentAt,
+      referralConcludedAt = referral.concludedAt,
+      interventionTitle = referral.intervention.title,
+      referringOfficer = "${referringOfficer.firstName} ${referringOfficer.lastName}",
+      responsibleOfficer = "${responsibleOfficer.firstName} ${responsibleOfficer.lastName}",
+      serviceProviderUser = serviceProviderUser?.let { "${serviceProviderUser.firstName} ${serviceProviderUser.lastName}" },
+      serviceProviderLocation = if (referral.intervention.dynamicFrameworkContract.pccRegion != null) {
+        referral.intervention.dynamicFrameworkContract.pccRegion?.name
+      } else {
+        referral.intervention.dynamicFrameworkContract.npsRegion!!.name
+      },
+      serviceProviderName = referral.intervention.dynamicFrameworkContract.primeProvider.name,
+      isDraft = false,
+    )
 
-    fun from(referral: DraftReferral, referringOfficer: UserDetail): ProbationCaseReferralDTO {
-      return ProbationCaseReferralDTO(
-        id = referral.id.toString(),
-        referenceNumber = null,
-        serviceCategories = referral.selectedServiceCategories?.map { it.name },
-        contractType = referral.intervention.dynamicFrameworkContract.contractType.name,
-        referralCreatedAt = referral.createdAt,
-        referralConcludedAt = null,
-        referralSentAt = null,
-        interventionTitle = referral.intervention.title,
-        referringOfficer = "${referringOfficer.firstName} ${referringOfficer.lastName}",
-        responsibleOfficer = null,
-        serviceProviderUser = null,
-        serviceProviderLocation = null,
-        serviceProviderName = null,
-        isDraft = true,
-      )
-    }
+    fun from(referral: DraftReferral, referringOfficer: UserDetail): ProbationCaseReferralDTO = ProbationCaseReferralDTO(
+      id = referral.id.toString(),
+      referenceNumber = null,
+      serviceCategories = referral.selectedServiceCategories?.map { it.name },
+      contractType = referral.intervention.dynamicFrameworkContract.contractType.name,
+      referralCreatedAt = referral.createdAt,
+      referralConcludedAt = null,
+      referralSentAt = null,
+      interventionTitle = referral.intervention.title,
+      referringOfficer = "${referringOfficer.firstName} ${referringOfficer.lastName}",
+      responsibleOfficer = null,
+      serviceProviderUser = null,
+      serviceProviderLocation = null,
+      serviceProviderName = null,
+      isDraft = true,
+    )
   }
 }

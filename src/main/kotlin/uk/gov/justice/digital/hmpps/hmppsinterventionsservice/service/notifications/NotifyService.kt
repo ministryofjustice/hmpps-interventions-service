@@ -17,9 +17,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appoint
 import java.net.URI
 
 interface NotifyService {
-  fun generateResourceUrl(baseURL: String, path: String, vararg args: Any): URI {
-    return UriComponentsBuilder.fromHttpUrl(baseURL).path(path).buildAndExpand(*args).toUri()
-  }
+  fun generateResourceUrl(baseURL: String, path: String, vararg args: Any): URI = UriComponentsBuilder.fromHttpUrl(baseURL).path(path).buildAndExpand(*args).toUri()
 }
 
 interface ContactablePerson {
@@ -38,7 +36,8 @@ class NotifyActionPlanService(
   private val emailSender: EmailSender,
   private val hmppsAuthService: HMPPSAuthService,
   private val referralService: ReferralService,
-) : ApplicationListener<ActionPlanEvent>, NotifyService {
+) : ApplicationListener<ActionPlanEvent>,
+  NotifyService {
 
   @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: ActionPlanEvent) {
@@ -87,7 +86,8 @@ class NotifyEndOfServiceReportService(
   @Value("\${interventions-ui.locations.probation-practitioner.end-of-service-report}") private val ppEndOfServiceReportLocation: String,
   private val emailSender: EmailSender,
   private val referralService: ReferralService,
-) : ApplicationListener<EndOfServiceReportEvent>, NotifyService {
+) : ApplicationListener<EndOfServiceReportEvent>,
+  NotifyService {
 
   @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: EndOfServiceReportEvent) {
@@ -126,7 +126,8 @@ class NotifyAppointmentService(
   @Value("\${interventions-ui.locations.probation-practitioner.session-feedback}") private val ppSessionFeedbackLocation: String,
   private val emailSender: EmailSender,
   private val referralService: ReferralService,
-) : ApplicationListener<AppointmentEvent>, NotifyService {
+) : ApplicationListener<AppointmentEvent>,
+  NotifyService {
   companion object : KLogging()
 
   @AsyncEventExceptionHandling

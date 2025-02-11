@@ -140,16 +140,12 @@ class ReferralController(
   }
 
   @GetMapping("/service-category/{id}")
-  fun getServiceCategoryByID(@PathVariable id: UUID): ServiceCategoryFullDTO {
-    return serviceCategoryService.getServiceCategoryByID(id)
-      ?.let { ServiceCategoryFullDTO.from(it) }
-      ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "service category not found [id=$id]")
-  }
+  fun getServiceCategoryByID(@PathVariable id: UUID): ServiceCategoryFullDTO = serviceCategoryService.getServiceCategoryByID(id)
+    ?.let { ServiceCategoryFullDTO.from(it) }
+    ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "service category not found [id=$id]")
 
   @GetMapping("/referral-cancellation-reasons")
-  fun getCancellationReasons(): List<CancellationReason> {
-    return referralService.getCancellationReasons()
-  }
+  fun getCancellationReasons(): List<CancellationReason> = referralService.getCancellationReasons()
 
   @GetMapping("sent-referral/{id}/supplier-assessment")
   fun getSupplierAssessmentAppointment(
@@ -183,20 +179,17 @@ class ReferralController(
     } ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "no updatable values present in request")
   }
 
-  private fun getSupplierAssessment(sentReferral: Referral): SupplierAssessment {
-    return sentReferral.supplierAssessment ?: throw ResponseStatusException(
-      HttpStatus.NOT_FOUND,
-      "Supplier assessment does not exist for referral[id=${sentReferral.id}]",
-    )
-  }
+  private fun getSupplierAssessment(sentReferral: Referral): SupplierAssessment = sentReferral.supplierAssessment ?: throw ResponseStatusException(
+    HttpStatus.NOT_FOUND,
+    "Supplier assessment does not exist for referral[id=${sentReferral.id}]",
+  )
 
-  private fun getSentReferralAuthenticatedRequest(authentication: JwtAuthenticationToken, id: UUID) =
-    if (clientApiAccessChecker.isClientRequestWithReadAllRole(authentication)) {
-      referralService.getSentReferral(id)
-        ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "sent referral not found [id=$id]")
-    } else {
-      getSentReferralForAuthenticatedUser(authentication, id)
-    }
+  private fun getSentReferralAuthenticatedRequest(authentication: JwtAuthenticationToken, id: UUID) = if (clientApiAccessChecker.isClientRequestWithReadAllRole(authentication)) {
+    referralService.getSentReferral(id)
+      ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "sent referral not found [id=$id]")
+  } else {
+    getSentReferralForAuthenticatedUser(authentication, id)
+  }
 
   private fun getSentReferralForAuthenticatedUser(authentication: JwtAuthenticationToken, id: UUID): Referral {
     val user = userMapper.fromToken(authentication)

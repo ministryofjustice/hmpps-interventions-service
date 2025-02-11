@@ -63,9 +63,7 @@ class CommunityApiCallError(val httpStatus: HttpStatusCode, causeMessage: String
     }
   }
 
-  private fun errorCategoryByRemovingIdentifiers(message: String): String {
-    return message
-      .let { uuidRegex.replace(it, "_") }
-      .let { identifiersRegex.replace(it, "_") }
-  }
+  private fun errorCategoryByRemovingIdentifiers(message: String): String = message
+    .let { uuidRegex.replace(it, "_") }
+    .let { identifiersRegex.replace(it, "_") }
 }

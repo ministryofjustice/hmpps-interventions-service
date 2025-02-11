@@ -14,24 +14,18 @@ class ReferralReferenceGenerator(
     Pair("8", "B"),
   )
 
-  fun generate(categoryName: String): String {
-    return generateSequence { newReference(categoryName) }
-      .filterNot { ambiguous(it) }
-      .first()
-  }
+  fun generate(categoryName: String): String = generateSequence { newReference(categoryName) }
+    .filterNot { ambiguous(it) }
+    .first()
 
-  private fun newReference(categoryName: String): String {
-    return buildString {
-      append(prefix())
-      append(numbers())
-      append(categoryName.take(2))
-    }.toUpperCase()
-  }
+  private fun newReference(categoryName: String): String = buildString {
+    append(prefix())
+    append(numbers())
+    append(categoryName.take(2))
+  }.uppercase()
 
   private fun prefix(): String = buildString { while (length < 2) append(prefixChars.random()) }
   private fun numbers(): String = buildString { while (length < 4) append(numbers.random()) }
 
-  private fun ambiguous(candidate: String): Boolean {
-    return ambiguousPairs.any { pair -> candidate.contains(pair.first) && candidate.contains(pair.second) }
-  }
+  private fun ambiguous(candidate: String): Boolean = ambiguousPairs.any { pair -> candidate.contains(pair.first) && candidate.contains(pair.second) }
 }

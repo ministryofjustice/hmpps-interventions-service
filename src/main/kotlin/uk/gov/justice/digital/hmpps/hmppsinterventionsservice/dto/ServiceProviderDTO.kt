@@ -7,8 +7,6 @@ class ServiceProviderDTO(
   val id: String,
 ) {
   companion object {
-    fun from(serviceProvider: ServiceProvider): ServiceProviderDTO {
-      return ServiceProviderDTO(name = serviceProvider.name, id = serviceProvider.id)
-    }
+    fun from(serviceProvider: ServiceProvider): ServiceProviderDTO = ServiceProviderDTO(name = serviceProvider.name, id = serviceProvider.id)
   }
 }

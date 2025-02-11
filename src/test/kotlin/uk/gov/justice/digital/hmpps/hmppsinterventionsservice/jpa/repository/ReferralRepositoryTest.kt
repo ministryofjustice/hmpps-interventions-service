@@ -470,38 +470,33 @@ class ReferralRepositoryTest @Autowired constructor(
     return entityManager.refresh(referral)
   }
 
-  private fun random(length: Int): String {
-    return RandomStringUtils.randomAlphabetic(length)
+  private fun random(length: Int): String = RandomStringUtils.randomAlphabetic(length)
+
+  private fun contains(summaries: List<ServiceProviderSentReferralSummary>, summary: ServiceProviderSentReferralSummary): Boolean = summaries.any {
+    it.referralId == summary.referralId.toString() &&
+      it.sentAt == summary.sentAt &&
+      it.referenceNumber == summary.referenceNumber &&
+      it.interventionTitle == summary.interventionTitle &&
+      it.dynamicFrameWorkContractId == summary.dynamicFrameWorkContractId &&
+      it.assignedToUserName == summary.assignedToUserName &&
+      it.serviceUserFirstName == summary.serviceUserFirstName &&
+      it.serviceUserLastName == summary.serviceUserLastName &&
+      it.endOfServiceReportId == summary.endOfServiceReportId &&
+      it.endOfServiceReportSubmittedAt == summary.endOfServiceReportSubmittedAt
   }
 
-  private fun contains(summaries: List<ServiceProviderSentReferralSummary>, summary: ServiceProviderSentReferralSummary): Boolean {
-    return summaries.any {
-      it.referralId == summary.referralId.toString() &&
-        it.sentAt == summary.sentAt &&
-        it.referenceNumber == summary.referenceNumber &&
-        it.interventionTitle == summary.interventionTitle &&
-        it.dynamicFrameWorkContractId == summary.dynamicFrameWorkContractId &&
-        it.assignedToUserName == summary.assignedToUserName &&
-        it.serviceUserFirstName == summary.serviceUserFirstName &&
-        it.serviceUserLastName == summary.serviceUserLastName &&
-        it.endOfServiceReportId == summary.endOfServiceReportId &&
-        it.endOfServiceReportSubmittedAt == summary.endOfServiceReportSubmittedAt
-    }
-  }
-
-  private fun expectedSummary(referral: Referral) =
-    ServiceProviderSentReferralSummary(
-      referral.id.toString(),
-      referral.sentAt!!.toInstant(),
-      referral.referenceNumber!!,
-      referral.intervention.title,
-      referral.intervention.dynamicFrameworkContract.id.toString(),
-      referral.currentAssignee?.id,
-      referral.serviceUserData!!.firstName,
-      referral.serviceUserData!!.lastName,
-      referral.endOfServiceReport?.id,
-      referral.endOfServiceReport?.submittedAt?.toInstant(),
-    )
+  private fun expectedSummary(referral: Referral) = ServiceProviderSentReferralSummary(
+    referral.id.toString(),
+    referral.sentAt!!.toInstant(),
+    referral.referenceNumber!!,
+    referral.intervention.title,
+    referral.intervention.dynamicFrameworkContract.id.toString(),
+    referral.currentAssignee?.id,
+    referral.serviceUserData!!.firstName,
+    referral.serviceUserData!!.lastName,
+    referral.endOfServiceReport?.id,
+    referral.endOfServiceReport?.submittedAt?.toInstant(),
+  )
 
   @Test
   fun `service provider report sanity check`() {

@@ -8,7 +8,5 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 class LoggingPidConverter : ClassicConverter() {
   private val pid: String = ProcessHandle.current().pid().toString()
 
-  override fun convert(event: ILoggingEvent): String {
-    return pid
-  }
+  override fun convert(event: ILoggingEvent): String = pid
 }

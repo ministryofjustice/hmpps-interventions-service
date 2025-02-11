@@ -9,9 +9,7 @@ data class DesiredOutcomeDTO(
   val description: String,
 ) {
   companion object {
-    fun from(desiredOutcome: DesiredOutcome): DesiredOutcomeDTO {
-      return DesiredOutcomeDTO(desiredOutcome.id, desiredOutcome.description)
-    }
+    fun from(desiredOutcome: DesiredOutcome): DesiredOutcomeDTO = DesiredOutcomeDTO(desiredOutcome.id, desiredOutcome.description)
   }
 }
 
@@ -28,14 +26,12 @@ data class ServiceCategoryFullDTO(
   val desiredOutcomes: List<DesiredOutcomeDTO>,
 ) {
   companion object {
-    fun from(serviceCategory: ServiceCategory): ServiceCategoryFullDTO {
-      return ServiceCategoryFullDTO(
-        id = serviceCategory.id,
-        name = serviceCategory.name,
-        complexityLevels = serviceCategory.complexityLevels.map { ComplexityLevelDTO(it.id, it.title, it.description) },
-        desiredOutcomes = serviceCategory.desiredOutcomes.map { DesiredOutcomeDTO(it.id, it.description) },
-      )
-    }
+    fun from(serviceCategory: ServiceCategory): ServiceCategoryFullDTO = ServiceCategoryFullDTO(
+      id = serviceCategory.id,
+      name = serviceCategory.name,
+      complexityLevels = serviceCategory.complexityLevels.map { ComplexityLevelDTO(it.id, it.title, it.description) },
+      desiredOutcomes = serviceCategory.desiredOutcomes.map { DesiredOutcomeDTO(it.id, it.description) },
+    )
   }
 }
 
@@ -44,11 +40,9 @@ data class ServiceCategoryDTO(
   val name: String,
 ) {
   companion object {
-    fun from(serviceCategory: ServiceCategory): ServiceCategoryDTO {
-      return ServiceCategoryDTO(
-        id = serviceCategory.id,
-        name = serviceCategory.name,
-      )
-    }
+    fun from(serviceCategory: ServiceCategory): ServiceCategoryDTO = ServiceCategoryDTO(
+      id = serviceCategory.id,
+      name = serviceCategory.name,
+    )
   }
 }

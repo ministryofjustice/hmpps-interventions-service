@@ -35,9 +35,7 @@ class DraftOasysRiskInformationService(
     return draftOasysRiskInformationRepository.save(draftOasysRiskInformation)
   }
 
-  fun getDraftOasysRiskInformation(id: UUID): DraftOasysRiskInformation? {
-    return draftOasysRiskInformationRepository.findByIdOrNull(id)
-  }
+  fun getDraftOasysRiskInformation(id: UUID): DraftOasysRiskInformation? = draftOasysRiskInformationRepository.findByIdOrNull(id)
 
   fun deleteDraftOasysRiskInformation(id: UUID) {
     if (draftOasysRiskInformationRepository.existsById(id)) {

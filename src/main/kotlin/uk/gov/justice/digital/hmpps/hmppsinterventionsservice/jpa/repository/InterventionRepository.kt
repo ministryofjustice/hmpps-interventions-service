@@ -5,7 +5,9 @@ import org.springframework.data.jpa.repository.Query
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
 import java.util.UUID
 
-interface InterventionRepository : JpaRepository<Intervention, UUID>, InterventionFilterRepository {
+interface InterventionRepository :
+  JpaRepository<Intervention, UUID>,
+  InterventionFilterRepository {
   fun findByDynamicFrameworkContractPrimeProviderId(id: String): List<Intervention>
   fun findByDynamicFrameworkContractIdIn(ids: Iterable<UUID>): List<Intervention>
 

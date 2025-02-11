@@ -8,13 +8,11 @@ class WithdrawReasonFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     id: String = "MIS",
     description: String = "Referral was made by mistake",
     grouping: String = "AAA",
-  ): WithdrawalReason {
-    return save(
-      WithdrawalReason(
-        code = id,
-        description = description,
-        grouping = grouping,
-      ),
-    )
-  }
+  ): WithdrawalReason = save(
+    WithdrawalReason(
+      code = id,
+      description = description,
+      grouping = grouping,
+    ),
+  )
 }

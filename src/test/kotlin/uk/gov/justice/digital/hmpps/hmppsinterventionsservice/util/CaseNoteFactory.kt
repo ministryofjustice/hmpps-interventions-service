@@ -18,16 +18,14 @@ class CaseNoteFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     body: String,
     sentAt: OffsetDateTime = OffsetDateTime.now(),
     sentBy: AuthUser = authUserFactory.create(),
-  ): CaseNote {
-    return save(
-      CaseNote(
-        id = id,
-        referral = referral,
-        subject = subject,
-        body = body,
-        sentAt = sentAt,
-        sentBy = sentBy,
-      ),
-    )
-  }
+  ): CaseNote = save(
+    CaseNote(
+      id = id,
+      referral = referral,
+      subject = subject,
+      body = body,
+      sentAt = sentAt,
+      sentBy = sentBy,
+    ),
+  )
 }

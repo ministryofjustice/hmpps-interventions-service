@@ -18,7 +18,8 @@ class ReferralEndingListener(
   @Value("\${interventions-ui.baseurl}") private val interventionsUIBaseURL: String,
   @Value("\${interventions-ui.locations.probation-practitioner.referral-details}") private val ppReferralDetailsLocation: String,
   private val snsPublisher: SNSPublisher,
-) : ApplicationListener<ReferralEndingEvent>, CommunityAPIService {
+) : ApplicationListener<ReferralEndingEvent>,
+  CommunityAPIService {
   override fun onApplicationEvent(event: ReferralEndingEvent) {
     sendDomainEvent(event)
   }
@@ -43,12 +44,10 @@ class ReferralEndingListener(
 
   // TODO code smell: we are guessing at what happened by looking at data
   // Better would be to emit "ReferralCancelledEvent" and "ReferralCompletedEvent" and listen to them to create this domain event
-  private fun endedTime(event: ReferralEndingEvent): OffsetDateTime =
-    event.referral.concludedAt ?: event.referral.endRequestedAt ?: OffsetDateTime.now()
+  private fun endedTime(event: ReferralEndingEvent): OffsetDateTime = event.referral.concludedAt ?: event.referral.endRequestedAt ?: OffsetDateTime.now()
 
-  private fun referralDetailsUrl(referralId: UUID) =
-    UriComponentsBuilder.fromHttpUrl(interventionsUIBaseURL)
-      .path(ppReferralDetailsLocation)
-      .buildAndExpand(referralId)
-      .toString()
+  private fun referralDetailsUrl(referralId: UUID) = UriComponentsBuilder.fromHttpUrl(interventionsUIBaseURL)
+    .path(ppReferralDetailsLocation)
+    .buildAndExpand(referralId)
+    .toString()
 }

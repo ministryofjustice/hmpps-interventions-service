@@ -8,12 +8,10 @@ class ServiceProviderFactory(em: TestEntityManager? = null) : EntityFactory(em) 
   fun create(
     id: AuthGroupID = "HARMONY_LIVING",
     name: String = "Harmony Living",
-  ): ServiceProvider {
-    return save(
-      ServiceProvider(
-        id = id,
-        name = name,
-      ),
-    )
-  }
+  ): ServiceProvider = save(
+    ServiceProvider(
+      id = id,
+      name = name,
+    ),
+  )
 }

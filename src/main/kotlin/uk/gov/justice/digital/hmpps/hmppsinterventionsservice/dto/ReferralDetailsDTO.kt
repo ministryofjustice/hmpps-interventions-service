@@ -33,18 +33,16 @@ data class ReferralDetailsDTO(
   val probationOffice: String? = null,
 ) {
   companion object {
-    fun from(referralDetails: ReferralDetails): ReferralDetailsDTO {
-      return ReferralDetailsDTO(
-        referralId = referralDetails.referralId,
-        maximumEnforceableDays = referralDetails.maximumEnforceableDays,
-        completionDeadline = referralDetails.completionDeadline,
-        furtherInformation = referralDetails.furtherInformation,
-        reasonForChange = referralDetails.reasonForChange,
-        createdById = referralDetails.createdByUserId,
-        createdAt = referralDetails.createdAt,
-        reasonForReferral = referralDetails.reasonForReferral,
-        reasonForReferralFurtherInformation = referralDetails.reasonForReferralFurtherInformation,
-      )
-    }
+    fun from(referralDetails: ReferralDetails): ReferralDetailsDTO = ReferralDetailsDTO(
+      referralId = referralDetails.referralId,
+      maximumEnforceableDays = referralDetails.maximumEnforceableDays,
+      completionDeadline = referralDetails.completionDeadline,
+      furtherInformation = referralDetails.furtherInformation,
+      reasonForChange = referralDetails.reasonForChange,
+      createdById = referralDetails.createdByUserId,
+      createdAt = referralDetails.createdAt,
+      reasonForReferral = referralDetails.reasonForReferral,
+      reasonForReferralFurtherInformation = referralDetails.reasonForReferralFurtherInformation,
+    )
   }
 }

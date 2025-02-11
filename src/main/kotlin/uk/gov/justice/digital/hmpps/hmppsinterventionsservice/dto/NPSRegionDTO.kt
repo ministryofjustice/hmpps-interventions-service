@@ -7,11 +7,9 @@ class NPSRegionDTO(
   val name: String,
 ) {
   companion object {
-    fun from(npsRegion: NPSRegion): NPSRegionDTO {
-      return NPSRegionDTO(
-        id = npsRegion.id,
-        name = npsRegion.name,
-      )
-    }
+    fun from(npsRegion: NPSRegion): NPSRegionDTO = NPSRegionDTO(
+      id = npsRegion.id,
+      name = npsRegion.name,
+    )
   }
 }

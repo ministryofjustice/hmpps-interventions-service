@@ -5,11 +5,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUse
 
 @Component
 class UserTypeChecker {
-  fun isServiceProviderUser(user: AuthUser): Boolean {
-    return user.authSource == "auth"
-  }
+  fun isServiceProviderUser(user: AuthUser): Boolean = user.authSource == "auth"
 
-  fun isProbationPractitionerUser(user: AuthUser): Boolean {
-    return user.authSource == "delius"
-  }
+  fun isProbationPractitionerUser(user: AuthUser): Boolean = user.authSource == "delius"
 }

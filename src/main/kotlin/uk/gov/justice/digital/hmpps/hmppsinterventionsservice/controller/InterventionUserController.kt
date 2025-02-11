@@ -12,7 +12,5 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AuthUserDTO
 class InterventionUserController(private val userMapper: UserMapper) {
 
   @PostMapping("/intervention/user")
-  fun createNewUserFromToken(authenticationToken: JwtAuthenticationToken): AuthUserDTO {
-    return AuthUserDTO.from(userMapper.fromToken(authenticationToken))
-  }
+  fun createNewUserFromToken(authenticationToken: JwtAuthenticationToken): AuthUserDTO = AuthUserDTO.from(userMapper.fromToken(authenticationToken))
 }

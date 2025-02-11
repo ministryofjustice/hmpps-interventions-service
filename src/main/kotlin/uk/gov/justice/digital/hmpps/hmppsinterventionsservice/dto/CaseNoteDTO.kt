@@ -13,9 +13,7 @@ data class CaseNoteDTO(
   val sentAt: OffsetDateTime,
 ) {
   companion object {
-    fun from(caseNote: CaseNote): CaseNoteDTO {
-      return CaseNoteDTO(id = caseNote.id, referralId = caseNote.referral.id, subject = caseNote.subject, body = caseNote.body, sentAt = caseNote.sentAt, sentBy = AuthUserDTO.from(caseNote.sentBy))
-    }
+    fun from(caseNote: CaseNote): CaseNoteDTO = CaseNoteDTO(id = caseNote.id, referralId = caseNote.referral.id, subject = caseNote.subject, body = caseNote.body, sentAt = caseNote.sentAt, sentBy = AuthUserDTO.from(caseNote.sentBy))
   }
 }
 

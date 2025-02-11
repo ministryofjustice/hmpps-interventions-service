@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.oneoff.transferreferrals.DeleteOldDraftReferralsProcessor
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.routine.transferreferrals.DeleteOldDraftReferralsProcessor
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftOasysRiskInformationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftReferralRepository
@@ -25,9 +25,7 @@ internal class DeleteOldDraftReferralsProcessorTest @Autowired constructor(
     draftReferralRepository,
   )
 
-  fun createOldDraftReferrals(): DraftReferral {
-    return setupAssistant.createDraftReferral(createdAt = OffsetDateTime.now().minusDays(100))
-  }
+  fun createOldDraftReferrals(): DraftReferral = setupAssistant.createDraftReferral(createdAt = OffsetDateTime.now().minusDays(100))
 
   @Test
   fun `process referrals that is older than 90 days`() {

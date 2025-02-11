@@ -13,17 +13,15 @@ data class DraftOasysRiskInformationDTO(
   val additionalInformation: String?,
 ) {
   companion object {
-    fun from(draftOasysRiskInformation: DraftOasysRiskInformation): DraftOasysRiskInformationDTO {
-      return DraftOasysRiskInformationDTO(
-        riskSummaryWhoIsAtRisk = draftOasysRiskInformation.riskSummaryWhoIsAtRisk,
-        riskSummaryNatureOfRisk = draftOasysRiskInformation.riskSummaryNatureOfRisk,
-        riskSummaryRiskImminence = draftOasysRiskInformation.riskSummaryRiskImminence,
-        riskToSelfSuicide = draftOasysRiskInformation.riskToSelfSuicide,
-        riskToSelfSelfHarm = draftOasysRiskInformation.riskToSelfSelfHarm,
-        riskToSelfHostelSetting = draftOasysRiskInformation.riskToSelfHostelSetting,
-        riskToSelfVulnerability = draftOasysRiskInformation.riskToSelfVulnerability,
-        additionalInformation = draftOasysRiskInformation.additionalInformation,
-      )
-    }
+    fun from(draftOasysRiskInformation: DraftOasysRiskInformation): DraftOasysRiskInformationDTO = DraftOasysRiskInformationDTO(
+      riskSummaryWhoIsAtRisk = draftOasysRiskInformation.riskSummaryWhoIsAtRisk,
+      riskSummaryNatureOfRisk = draftOasysRiskInformation.riskSummaryNatureOfRisk,
+      riskSummaryRiskImminence = draftOasysRiskInformation.riskSummaryRiskImminence,
+      riskToSelfSuicide = draftOasysRiskInformation.riskToSelfSuicide,
+      riskToSelfSelfHarm = draftOasysRiskInformation.riskToSelfSelfHarm,
+      riskToSelfHostelSetting = draftOasysRiskInformation.riskToSelfHostelSetting,
+      riskToSelfVulnerability = draftOasysRiskInformation.riskToSelfVulnerability,
+      additionalInformation = draftOasysRiskInformation.additionalInformation,
+    )
   }
 }

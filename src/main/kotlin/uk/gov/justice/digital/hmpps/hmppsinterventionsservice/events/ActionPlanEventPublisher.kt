@@ -13,9 +13,7 @@ enum class ActionPlanEventType {
 }
 
 class ActionPlanEvent(source: Any, val type: ActionPlanEventType, val actionPlan: ActionPlan, val detailUrl: String) : ApplicationEvent(source) {
-  override fun toString(): String {
-    return "ActionPlanEvent(type=$type, actionPlanId=${actionPlan.id}, detailUrl='$detailUrl', source=$source)"
-  }
+  override fun toString(): String = "ActionPlanEvent(type=$type, actionPlanId=${actionPlan.id}, detailUrl='$detailUrl', source=$source)"
 }
 
 @Component

@@ -7,7 +7,5 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Service
 @Component
 class EligibleProviderMapper {
   // get the service providers who are eligible to access this referral
-  fun fromReferral(dynamicFrameworkContract: DynamicFrameworkContract): List<ServiceProvider> {
-    return listOf(dynamicFrameworkContract.primeProvider) + dynamicFrameworkContract.subcontractorProviders.toList()
-  }
+  fun fromReferral(dynamicFrameworkContract: DynamicFrameworkContract): List<ServiceProvider> = listOf(dynamicFrameworkContract.primeProvider) + dynamicFrameworkContract.subcontractorProviders.toList()
 }

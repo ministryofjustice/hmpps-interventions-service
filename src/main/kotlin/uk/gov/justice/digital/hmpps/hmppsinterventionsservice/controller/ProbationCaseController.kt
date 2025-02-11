@@ -35,7 +35,5 @@ class ProbationCaseController(
   fun getAppointmentLocationByCrn(
     @PathVariable crn: String,
     authentication: JwtAuthenticationToken,
-  ): ReferralAppointmentDetailsDTO {
-    return ReferralAppointmentDetailsDTO.from(crn, probationCaseService.getAppointmentLocationDetails(crn))
-  }
+  ): ReferralAppointmentDetailsDTO = ReferralAppointmentDetailsDTO.from(crn, probationCaseService.getAppointmentLocationDetails(crn))
 }

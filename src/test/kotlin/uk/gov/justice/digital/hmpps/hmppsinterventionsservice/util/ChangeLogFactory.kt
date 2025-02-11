@@ -19,18 +19,16 @@ class ChangeLogFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     reasonForChange: String = "the value needs changing",
     changedAt: OffsetDateTime = OffsetDateTime.now(),
     changedBy: AuthUser = AuthUserFactory().create(),
-  ): Changelog {
-    return save(
-      Changelog(
-        id = id,
-        topic = topic,
-        referralId = referralId,
-        oldVal = oldVal,
-        newVal = newVal,
-        reasonForChange = reasonForChange,
-        changedAt = changedAt,
-        changedBy = changedBy,
-      ),
-    )
-  }
+  ): Changelog = save(
+    Changelog(
+      id = id,
+      topic = topic,
+      referralId = referralId,
+      oldVal = oldVal,
+      newVal = newVal,
+      reasonForChange = reasonForChange,
+      changedAt = changedAt,
+      changedBy = changedBy,
+    ),
+  )
 }

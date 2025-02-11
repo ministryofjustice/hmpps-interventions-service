@@ -32,25 +32,23 @@ class DynamicFrameworkContractFactory(em: TestEntityManager? = null) : EntityFac
     subcontractorProviders: MutableSet<ServiceProvider> = mutableSetOf(),
     referralStartDate: LocalDate = LocalDate.of(2021, 6, 1),
     referralEndAt: OffsetDateTime? = null,
-  ): DynamicFrameworkContract {
-    return save(
-      DynamicFrameworkContract(
-        id = id,
-        contractType = contractType,
-        primeProvider = primeProvider,
-        startDate = startDate,
-        endDate = endDate,
-        minimumAge = minimumAge,
-        maximumAge = maximumAge,
-        allowsMale = allowsMale,
-        allowsFemale = allowsFemale,
-        npsRegion = npsRegion,
-        pccRegion = pccRegion,
-        contractReference = contractReference,
-        subcontractorProviders = subcontractorProviders,
-        referralStartDate = referralStartDate,
-        referralEndAt = referralEndAt,
-      ),
-    )
-  }
+  ): DynamicFrameworkContract = save(
+    DynamicFrameworkContract(
+      id = id,
+      contractType = contractType,
+      primeProvider = primeProvider,
+      startDate = startDate,
+      endDate = endDate,
+      minimumAge = minimumAge,
+      maximumAge = maximumAge,
+      allowsMale = allowsMale,
+      allowsFemale = allowsFemale,
+      npsRegion = npsRegion,
+      pccRegion = pccRegion,
+      contractReference = contractReference,
+      subcontractorProviders = subcontractorProviders,
+      referralStartDate = referralStartDate,
+      referralEndAt = referralEndAt,
+    ),
+  )
 }

@@ -62,9 +62,7 @@ class CaseNoteController(
   }
 
   @GetMapping("/case-note/{id}")
-  fun getCaseNote(@PathVariable id: UUID, authentication: JwtAuthenticationToken): CaseNoteDTO {
-    return caseNoteService.getCaseNoteForUser(id, userMapper.fromToken(authentication))
-      ?.let { CaseNoteDTO.from(it) }
-      ?: throw EntityNotFoundException("case note not found [id=$id]")
-  }
+  fun getCaseNote(@PathVariable id: UUID, authentication: JwtAuthenticationToken): CaseNoteDTO = caseNoteService.getCaseNoteForUser(id, userMapper.fromToken(authentication))
+    ?.let { CaseNoteDTO.from(it) }
+    ?: throw EntityNotFoundException("case note not found [id=$id]")
 }

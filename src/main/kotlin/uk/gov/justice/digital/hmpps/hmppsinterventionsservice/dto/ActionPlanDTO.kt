@@ -18,20 +18,18 @@ data class ActionPlanDTO(
   val approvedAt: OffsetDateTime?,
 ) {
   companion object {
-    fun from(actionPlan: ActionPlan): ActionPlanDTO {
-      return ActionPlanDTO(
-        id = actionPlan.id,
-        referralId = actionPlan.referral.id,
-        numberOfSessions = actionPlan.numberOfSessions,
-        activities = actionPlan.activities.map { ActionPlanActivityDTO.from(it) },
-        createdBy = AuthUserDTO.from(actionPlan.createdBy),
-        createdAt = actionPlan.createdAt,
-        submittedBy = actionPlan.submittedBy?.let { AuthUserDTO.from(it) },
-        submittedAt = actionPlan.submittedAt,
-        approvedBy = actionPlan.approvedBy?.let { AuthUserDTO.from(it) },
-        approvedAt = actionPlan.approvedAt,
-      )
-    }
+    fun from(actionPlan: ActionPlan): ActionPlanDTO = ActionPlanDTO(
+      id = actionPlan.id,
+      referralId = actionPlan.referral.id,
+      numberOfSessions = actionPlan.numberOfSessions,
+      activities = actionPlan.activities.map { ActionPlanActivityDTO.from(it) },
+      createdBy = AuthUserDTO.from(actionPlan.createdBy),
+      createdAt = actionPlan.createdAt,
+      submittedBy = actionPlan.submittedBy?.let { AuthUserDTO.from(it) },
+      submittedAt = actionPlan.submittedAt,
+      approvedBy = actionPlan.approvedBy?.let { AuthUserDTO.from(it) },
+      approvedAt = actionPlan.approvedAt,
+    )
   }
 }
 
@@ -41,13 +39,11 @@ data class ActionPlanActivityDTO(
   val createdAt: OffsetDateTime,
 ) {
   companion object {
-    fun from(actionPlanActivity: ActionPlanActivity): ActionPlanActivityDTO {
-      return ActionPlanActivityDTO(
-        id = actionPlanActivity.id,
-        description = actionPlanActivity.description,
-        createdAt = actionPlanActivity.createdAt,
-      )
-    }
+    fun from(actionPlanActivity: ActionPlanActivity): ActionPlanActivityDTO = ActionPlanActivityDTO(
+      id = actionPlanActivity.id,
+      description = actionPlanActivity.description,
+      createdAt = actionPlanActivity.createdAt,
+    )
   }
 }
 
@@ -72,15 +68,11 @@ data class ActionPlanSummaryDTO(
   val submittedAt: OffsetDateTime?,
 ) {
   companion object {
-    fun from(actionPlan: ActionPlan): ActionPlanSummaryDTO {
-      return ActionPlanSummaryDTO(
-        id = actionPlan.id,
-        approvedAt = actionPlan.approvedAt,
-        submittedAt = actionPlan.submittedAt,
-      )
-    }
-    fun from(actionPlans: List<ActionPlan>): List<ActionPlanSummaryDTO> {
-      return actionPlans.map { from(it) }
-    }
+    fun from(actionPlan: ActionPlan): ActionPlanSummaryDTO = ActionPlanSummaryDTO(
+      id = actionPlan.id,
+      approvedAt = actionPlan.approvedAt,
+      submittedAt = actionPlan.submittedAt,
+    )
+    fun from(actionPlans: List<ActionPlan>): List<ActionPlanSummaryDTO> = actionPlans.map { from(it) }
   }
 }

@@ -10,5 +10,4 @@ interface ActionPlanRepository : JpaRepository<ActionPlan, UUID> {
   fun findTopByReferralIdAndApprovedAtIsNotNullOrderByApprovedAtDesc(referralId: UUID): ActionPlan?
 }
 
-fun ActionPlanRepository.findLatestApprovedActionPlan(referralId: UUID): ActionPlan? =
-  findTopByReferralIdAndApprovedAtIsNotNullOrderByApprovedAtDesc(referralId)
+fun ActionPlanRepository.findLatestApprovedActionPlan(referralId: UUID): ActionPlan? = findTopByReferralIdAndApprovedAtIsNotNullOrderByApprovedAtDesc(referralId)

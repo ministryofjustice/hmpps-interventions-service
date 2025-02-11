@@ -36,15 +36,13 @@ class NotifyEndOfServiceReportTest {
     "http://localhost:8080/end-of-service-report/42c7d267-0776-4272-a8e8-a673bfe30d0d",
   )
 
-  private fun notifyService(): NotifyEndOfServiceReportService {
-    return NotifyEndOfServiceReportService(
-      "template",
-      "http://example.com",
-      "/end-of-service-report/{id}",
-      emailSender,
-      referralService,
-    )
-  }
+  private fun notifyService(): NotifyEndOfServiceReportService = NotifyEndOfServiceReportService(
+    "template",
+    "http://example.com",
+    "/end-of-service-report/{id}",
+    emailSender,
+    referralService,
+  )
 
   @Test
   fun `end of service report submitted event does not send email when user details are not available`() {

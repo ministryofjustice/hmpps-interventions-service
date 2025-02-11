@@ -32,13 +32,9 @@ class ListReferralEndpoints : IntegrationTestBase() {
     whenever(mockHmppsAuthService.getUserGroups(user)).thenReturn(groups)
   }
 
-  private fun createSentReferral(contract: DynamicFrameworkContract): Referral {
-    return setupAssistant.createSentReferral(intervention = setupAssistant.createIntervention(dynamicFrameworkContract = contract))
-  }
+  private fun createSentReferral(contract: DynamicFrameworkContract): Referral = setupAssistant.createSentReferral(intervention = setupAssistant.createIntervention(dynamicFrameworkContract = contract))
 
-  private fun createEncodedTokenForUser(user: AuthUser): String {
-    return tokenFactory.createEncodedToken(userID = user.id, userName = user.userName, authSource = user.authSource, roles = listOf("ROLE_PROBATION", "ROLE_CRS_PROVIDER", "ROLE_INTERVENTIONS_API_READ_ALL"))
-  }
+  private fun createEncodedTokenForUser(user: AuthUser): String = tokenFactory.createEncodedToken(userID = user.id, userName = user.userName, authSource = user.authSource, roles = listOf("ROLE_PROBATION", "ROLE_CRS_PROVIDER", "ROLE_INTERVENTIONS_API_READ_ALL"))
 
   @Test
   fun `sp user works for prime provider and has all required contract groups`() {

@@ -129,23 +129,21 @@ class SentReferralSummariesFactory(em: TestEntityManager? = null) : BaseReferral
   fun getReferralSummary(
     referral: Referral,
     endOfServiceReport: EndOfServiceReport? = null,
-  ): SentReferralSummary {
-    return SentReferralSummary(
-      id = referral.id,
-      serviceUserCRN = referral.serviceUserCRN,
-      createdBy = referral.createdBy,
-      intervention = referral.intervention,
-      sentAt = referral.sentAt!!,
-      sentBy = referral.sentBy!!,
-      referenceNumber = referral.referenceNumber!!,
-      concludedAt = referral.concludedAt,
-      assignments = referral.assignments,
-      endRequestedAt = referral.endRequestedAt,
-      endOfServiceReport = referral.endOfServiceReport ?: endOfServiceReport,
-      serviceUserData = referral.serviceUserData,
-      actionPlans = referral.actionPlans,
-      referralLocation = referral.referralLocation,
-      probationPractitionerDetails = referral.probationPractitionerDetails,
-    )
-  }
+  ): SentReferralSummary = SentReferralSummary(
+    id = referral.id,
+    serviceUserCRN = referral.serviceUserCRN,
+    createdBy = referral.createdBy,
+    intervention = referral.intervention,
+    sentAt = referral.sentAt!!,
+    sentBy = referral.sentBy!!,
+    referenceNumber = referral.referenceNumber!!,
+    concludedAt = referral.concludedAt,
+    assignments = referral.assignments,
+    endRequestedAt = referral.endRequestedAt,
+    endOfServiceReport = referral.endOfServiceReport ?: endOfServiceReport,
+    serviceUserData = referral.serviceUserData,
+    actionPlans = referral.actionPlans,
+    referralLocation = referral.referralLocation,
+    probationPractitionerDetails = referral.probationPractitionerDetails,
+  )
 }

@@ -53,7 +53,5 @@ enum class AppointmentReason(
   DELIVERY("delivery"),
   ;
 
-  override fun toString(): String {
-    return value
-  }
+  override fun toString(): String = value
 }

@@ -13,14 +13,12 @@ class ContractTypeFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     name: String = "Accommodation",
     code: String = "ACC",
     serviceCategories: Set<ServiceCategory> = setOf(serviceCategoryFactory.create(name = "accommodation")),
-  ): ContractType {
-    return save(
-      ContractType(
-        id = id,
-        name = name,
-        code = code,
-        serviceCategories = serviceCategories,
-      ),
-    )
-  }
+  ): ContractType = save(
+    ContractType(
+      id = id,
+      name = name,
+      code = code,
+      serviceCategories = serviceCategories,
+    ),
+  )
 }

@@ -451,36 +451,28 @@ WHERE  assigned_at_desc_seq = 1
     return customCriteria.toString()
   }
 
-  private fun constructPPQuery(): String {
-    return "and (r.created_by_id = :createdById or r.service_usercrn in :serviceUserCrns) "
+  private fun constructPPQuery(): String = "and (r.created_by_id = :createdById or r.service_usercrn in :serviceUserCrns) "
+
+  private fun constructSPQuery(contracts: Set<DynamicFrameworkContract>): String = if (contracts.any { it.npsRegion != null } && contracts.any { it.pccRegion != null }) {
+    "and ( dfc.prime_provider_id in :serviceProviders or dfcsc.subcontractor_provider_id in :serviceProviders ) and (dfc.nps_region_id in :npsRegions or dfc.pcc_region_id in :pccRegions) and dfc.contract_reference in :contractReferences "
+  } else if (contracts.any { it.npsRegion != null }) {
+    "and ( dfc.prime_provider_id in :serviceProviders or dfcsc.subcontractor_provider_id in :serviceProviders ) and dfc.nps_region_id in :npsRegions and dfc.contract_reference in :contractReferences "
+  } else {
+    "and ( dfc.prime_provider_id in :serviceProviders or dfcsc.subcontractor_provider_id in :serviceProviders ) and dfc.pcc_region_id in :pccRegions and dfc.contract_reference in :contractReferences "
   }
 
-  private fun constructSPQuery(contracts: Set<DynamicFrameworkContract>): String {
-    return if (contracts.any { it.npsRegion != null } && contracts.any { it.pccRegion != null }) {
-      "and ( dfc.prime_provider_id in :serviceProviders or dfcsc.subcontractor_provider_id in :serviceProviders ) and (dfc.nps_region_id in :npsRegions or dfc.pcc_region_id in :pccRegions) and dfc.contract_reference in :contractReferences "
-    } else if (contracts.any { it.npsRegion != null }) {
-      "and ( dfc.prime_provider_id in :serviceProviders or dfcsc.subcontractor_provider_id in :serviceProviders ) and dfc.nps_region_id in :npsRegions and dfc.contract_reference in :contractReferences "
-    } else {
-      "and ( dfc.prime_provider_id in :serviceProviders or dfcsc.subcontractor_provider_id in :serviceProviders ) and dfc.pcc_region_id in :pccRegions and dfc.contract_reference in :contractReferences "
-    }
+  private fun searchQuery(searchText: String): String = if (searchText.matches(Regex("[A-Z]{2}[0-9]{4}[A-Z]{2}"))) {
+    "and r.reference_number= :searchText "
+  } else {
+    "and concat(UPPER(rsud.first_name), ' ', UPPER(rsud.last_name)) = :searchText "
   }
 
-  private fun searchQuery(searchText: String): String {
-    return if (searchText.matches(Regex("[A-Z]{2}[0-9]{4}[A-Z]{2}"))) {
-      "and r.reference_number= :searchText "
-    } else {
-      "and concat(UPPER(rsud.first_name), ' ', UPPER(rsud.last_name)) = :searchText "
-    }
-  }
-
-  private fun constructCustomCriteria(dashboardType: DashboardType?): String? {
-    return when (dashboardType) {
-      DashboardType.MyCases -> "and assignedToUserName = :username and concludedAt is null "
-      DashboardType.OpenCases -> "and concludedAt is null "
-      DashboardType.UnassignedCases -> "and assignedToUserName is null and concludedAt is null"
-      DashboardType.CompletedCases -> "and concludedAt is not null "
-      null -> null
-    }
+  private fun constructCustomCriteria(dashboardType: DashboardType?): String? = when (dashboardType) {
+    DashboardType.MyCases -> "and assignedToUserName = :username and concludedAt is null "
+    DashboardType.OpenCases -> "and concludedAt is null "
+    DashboardType.UnassignedCases -> "and assignedToUserName is null and concludedAt is null"
+    DashboardType.CompletedCases -> "and concludedAt is not null "
+    null -> null
   }
 
   private fun instantToOffsetNotNull(instant: Instant?): OffsetDateTime {

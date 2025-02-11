@@ -141,19 +141,17 @@ class HMPPSAuthServiceRetryTest : LoggingSpyTest(HMPPSAuthService::class, Level.
     val dispatcher = mockWebServer.dispatcher
 
     mockWebServer.dispatcher = object : Dispatcher() {
-      override fun dispatch(request: RecordedRequest): MockResponse {
-        return when (request.path) {
-          "/user/email" -> {
-            MockResponse()
-              .setHeader("content-type", "application/json")
-              .setBody(
-                emailBody,
-              )
-          }
-          "/user/detail" ->
-            MockResponse().setSocketPolicy(NO_RESPONSE)
-          else -> MockResponse().setResponseCode(404)
+      override fun dispatch(request: RecordedRequest): MockResponse = when (request.path) {
+        "/user/email" -> {
+          MockResponse()
+            .setHeader("content-type", "application/json")
+            .setBody(
+              emailBody,
+            )
         }
+        "/user/detail" ->
+          MockResponse().setSocketPolicy(NO_RESPONSE)
+        else -> MockResponse().setResponseCode(404)
       }
     }
     try {
@@ -232,23 +230,13 @@ class TestRetrySignal constructor(
   private val retryContext: ContextView = Context.empty(),
 ) : RetrySignal {
 
-  override fun totalRetries(): Long {
-    return failureTotalIndex
-  }
+  override fun totalRetries(): Long = failureTotalIndex
 
-  override fun totalRetriesInARow(): Long {
-    return failureSubsequentIndex
-  }
+  override fun totalRetriesInARow(): Long = failureSubsequentIndex
 
-  override fun failure(): Throwable {
-    return failure
-  }
+  override fun failure(): Throwable = failure
 
-  override fun retryContextView(): ContextView {
-    return retryContext
-  }
+  override fun retryContextView(): ContextView = retryContext
 
-  override fun copy(): RetrySignal {
-    return this
-  }
+  override fun copy(): RetrySignal = this
 }

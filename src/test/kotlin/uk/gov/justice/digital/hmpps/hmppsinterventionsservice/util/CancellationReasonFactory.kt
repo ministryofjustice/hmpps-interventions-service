@@ -7,12 +7,10 @@ class CancellationReasonFactory(em: TestEntityManager? = null) : EntityFactory(e
   fun create(
     id: String = "MIS",
     description: String = "Referral was made by mistake",
-  ): CancellationReason {
-    return save(
-      CancellationReason(
-        code = id,
-        description = description,
-      ),
-    )
-  }
+  ): CancellationReason = save(
+    CancellationReason(
+      code = id,
+      description = description,
+    ),
+  )
 }

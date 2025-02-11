@@ -39,14 +39,12 @@ internal class ReferralMetricsListenerTest @Autowired constructor(
     return referralFactory.createSent(serviceUserCRN = crn, intervention = intervention, sentAt = newTime)
   }
 
-  fun createEvent(referral: Referral): ReferralEvent {
-    return ReferralEvent(
-      this,
-      ReferralEventType.SENT,
-      referral,
-      "irrelevant-for-this-test",
-    )
-  }
+  fun createEvent(referral: Referral): ReferralEvent = ReferralEvent(
+    this,
+    ReferralEventType.SENT,
+    referral,
+    "irrelevant-for-this-test",
+  )
 
   @Test
   fun `re-referring a person to the same intervention measures elapsed time as repeated referral`() {

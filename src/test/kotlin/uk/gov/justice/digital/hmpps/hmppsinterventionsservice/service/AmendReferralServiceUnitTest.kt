@@ -86,7 +86,7 @@ class AmendReferralServiceUnitTest {
   )
 
   @Nested
-  inner class UpdateDraftReferralDesiredOutcomes() {
+  inner class UpdateDraftReferralDesiredOutcomes {
     val authUser = AuthUser("CRN123", "auth", "user")
 
     @Test
@@ -321,7 +321,7 @@ class AmendReferralServiceUnitTest {
   }
 
   @Nested
-  inner class UpdateComplexityLevelId() {
+  inner class UpdateComplexityLevelId {
 
     val authUser = AuthUser("CRN123", "auth", "user")
 
@@ -406,7 +406,7 @@ class AmendReferralServiceUnitTest {
   }
 
   @Nested
-  inner class UpdateNeedsAndRequirementsCaringOrEmploymentResponsibilities() {
+  inner class UpdateNeedsAndRequirementsCaringOrEmploymentResponsibilities {
 
     val authUser = AuthUser("CRN123", "auth", "user")
 
@@ -531,7 +531,7 @@ class AmendReferralServiceUnitTest {
   }
 
   @Nested
-  inner class UpdateNeedsAndRequirementsInterpreterRequired() {
+  inner class UpdateNeedsAndRequirementsInterpreterRequired {
 
     val authUser = AuthUser("CRN123", "auth", "user")
 
@@ -598,7 +598,7 @@ class AmendReferralServiceUnitTest {
   }
 
   @Nested
-  inner class UpdatePrisonEstablishment() {
+  inner class UpdatePrisonEstablishment {
 
     val authUser = AuthUser("CRN123", "auth", "user")
 
@@ -657,7 +657,7 @@ class AmendReferralServiceUnitTest {
   }
 
   @Nested
-  inner class UpdateExpectedReleaseDate() {
+  inner class UpdateExpectedReleaseDate {
 
     val authUser = AuthUser("CRN123", "auth", "user")
 

@@ -39,9 +39,7 @@ class SNSPublisher(
     sendCustomEvent(referralId, actor, event.eventType)
   }
 
-  fun publish(referralId: UUID, actor: AuthUser, event: EventDTO) {
-    return publish(referralId, AuthUserDTO.from(actor), event)
-  }
+  fun publish(referralId: UUID, actor: AuthUser, event: EventDTO) = publish(referralId, AuthUserDTO.from(actor), event)
 
   private fun sendCustomEvent(referralId: UUID, actor: AuthUserDTO, eventType: String) {
     telemetryClient.trackEvent(

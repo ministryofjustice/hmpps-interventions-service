@@ -38,9 +38,7 @@ internal class RamDeliusAPIOffenderServiceTest {
     )
   }
 
-  private fun offenderServiceFactory(restClient: RestClient): RamDeliusAPIOffenderService {
-    return RamDeliusAPIOffenderService(responsibleOfficerLocation, restClient, telemetryService)
-  }
+  private fun offenderServiceFactory(restClient: RestClient): RamDeliusAPIOffenderService = RamDeliusAPIOffenderService(responsibleOfficerLocation, restClient, telemetryService)
 
   @Test
   fun `getResponsibleOfficerDetails returns when there are is a responsible officer`() {

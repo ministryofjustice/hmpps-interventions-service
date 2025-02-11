@@ -29,10 +29,8 @@ class ProviderSetupTasklet @Autowired constructor(
     return RepeatStatus.FINISHED
   }
 
-  private fun upsertProvider(code: String, name: String): ServiceProvider {
-    return providerRepository.findById(code).getOrElse {
-      logger.info("Creating missing provider $code")
-      ServiceProvider(code, name)
-    }
+  private fun upsertProvider(code: String, name: String): ServiceProvider = providerRepository.findById(code).getOrElse {
+    logger.info("Creating missing provider $code")
+    ServiceProvider(code, name)
   }
 }

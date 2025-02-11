@@ -21,32 +21,24 @@ class DataSourceConfig(
 
   @Bean(name = ["mainDataSource", "dataSource"])
   @Primary
-  fun dataSource(): DataSource {
-    return DataSourceBuilder.create()
-      .driverClassName("org.postgresql.Driver")
-      .url(dataSourceUrl)
-      .username(dataSourceUserName)
-      .password(dataSourcePassword)
-      .build()
-  }
+  fun dataSource(): DataSource = DataSourceBuilder.create()
+    .driverClassName("org.postgresql.Driver")
+    .url(dataSourceUrl)
+    .username(dataSourceUserName)
+    .password(dataSourcePassword)
+    .build()
 
   @Bean("memoryDataSource")
-  fun memoryDataSource(): DataSource {
-    return EmbeddedDatabaseBuilder()
-      .setType(EmbeddedDatabaseType.H2)
-      .addScript("/org/springframework/batch/core/schema-drop-h2.sql")
-      .addScript("/org/springframework/batch/core/schema-h2.sql")
-      .build()
-  }
+  fun memoryDataSource(): DataSource = EmbeddedDatabaseBuilder()
+    .setType(EmbeddedDatabaseType.H2)
+    .addScript("/org/springframework/batch/core/schema-drop-h2.sql")
+    .addScript("/org/springframework/batch/core/schema-h2.sql")
+    .build()
 
   @Bean("batchTransactionManager")
-  fun batchTransactionManager(@Qualifier("memoryDataSource") dataSource: DataSource): PlatformTransactionManager {
-    return JpaTransactionManager()
-  }
+  fun batchTransactionManager(@Qualifier("memoryDataSource") dataSource: DataSource): PlatformTransactionManager = JpaTransactionManager()
 
   @Bean("transactionManager")
   @Primary
-  fun transactionManager(): PlatformTransactionManager {
-    return JpaTransactionManager()
-  }
+  fun transactionManager(): PlatformTransactionManager = JpaTransactionManager()
 }

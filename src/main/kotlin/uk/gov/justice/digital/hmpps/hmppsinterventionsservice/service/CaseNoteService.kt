@@ -38,9 +38,7 @@ class CaseNoteService(
     }
   }
 
-  fun findByReferral(referralId: UUID, pageable: Pageable?): Page<CaseNote> {
-    return caseNoteRepository.findAllByReferralId(referralId, pageable)
-  }
+  fun findByReferral(referralId: UUID, pageable: Pageable?): Page<CaseNote> = caseNoteRepository.findAllByReferralId(referralId, pageable)
 
   fun getCaseNoteForUser(id: UUID, user: AuthUser): CaseNote? {
     val caseNote = caseNoteRepository.findByIdOrNull(id)

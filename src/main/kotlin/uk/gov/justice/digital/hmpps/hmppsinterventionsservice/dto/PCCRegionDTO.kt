@@ -9,12 +9,10 @@ class PCCRegionDTO(
   val npsRegion: NPSRegionDTO,
 ) {
   companion object {
-    fun from(pccRegion: PCCRegion): PCCRegionDTO {
-      return PCCRegionDTO(
-        id = pccRegion.id,
-        name = pccRegion.name,
-        npsRegion = NPSRegionDTO.from(pccRegion.npsRegion),
-      )
-    }
+    fun from(pccRegion: PCCRegion): PCCRegionDTO = PCCRegionDTO(
+      id = pccRegion.id,
+      name = pccRegion.name,
+      npsRegion = NPSRegionDTO.from(pccRegion.npsRegion),
+    )
   }
 }

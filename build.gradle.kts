@@ -2,10 +2,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   kotlin("plugin.spring") version "2.0.10"
   id("org.jetbrains.kotlin.plugin.jpa") version "2.0.10"
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.9"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "7.0.0"
   id("jacoco")
   id("project-report")
 }
+
+ext["hibernate.version"] = "6.5.3.Final"
 
 configurations {
   testImplementation {
@@ -18,14 +20,14 @@ jacoco {
 }
 
 java {
-  sourceCompatibility = JavaVersion.VERSION_17
-  targetCompatibility = JavaVersion.VERSION_17
+  sourceCompatibility = JavaVersion.VERSION_21
+  targetCompatibility = JavaVersion.VERSION_21
 }
 
 tasks {
   withType<KotlinCompile> {
     kotlinOptions {
-      jvmTarget = JavaVersion.VERSION_17.toString()
+      jvmTarget = JavaVersion.VERSION_21.toString()
     }
   }
   test {

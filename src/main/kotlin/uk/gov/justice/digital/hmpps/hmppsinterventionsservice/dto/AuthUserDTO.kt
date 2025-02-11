@@ -8,12 +8,10 @@ data class AuthUserDTO(
   val userId: String,
 ) {
   companion object {
-    fun from(user: AuthUser): AuthUserDTO {
-      return AuthUserDTO(
-        username = user.userName,
-        authSource = user.authSource,
-        userId = user.id,
-      )
-    }
+    fun from(user: AuthUser): AuthUserDTO = AuthUserDTO(
+      username = user.userName,
+      authSource = user.authSource,
+      userId = user.id,
+    )
   }
 }

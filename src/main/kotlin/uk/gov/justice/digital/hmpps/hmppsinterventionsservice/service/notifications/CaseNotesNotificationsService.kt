@@ -26,7 +26,8 @@ class CaseNotesNotificationsService(
   private val emailSender: EmailSender,
   private val referralService: ReferralService,
   private val hmppsAuthService: HMPPSAuthService,
-) : ApplicationListener<CreateCaseNoteEvent>, NotifyService {
+) : ApplicationListener<CreateCaseNoteEvent>,
+  NotifyService {
   companion object : KLogging()
 
   @AsyncEventExceptionHandling

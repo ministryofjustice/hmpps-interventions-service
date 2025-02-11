@@ -37,14 +37,10 @@ class S3Configuration(
   private val buckets: S3Buckets,
 ) {
   @Bean
-  fun storageS3Bucket(): S3Bucket {
-    return bucketFactory(buckets.storage)
-  }
+  fun storageS3Bucket(): S3Bucket = bucketFactory(buckets.storage)
 
   @Bean
-  fun ndmisS3Bucket(): S3Bucket {
-    return bucketFactory(buckets.ndmis)
-  }
+  fun ndmisS3Bucket(): S3Bucket = bucketFactory(buckets.ndmis)
 
   private fun bucketFactory(config: S3BucketConfiguration): S3Bucket {
     val builder = S3Client.builder()

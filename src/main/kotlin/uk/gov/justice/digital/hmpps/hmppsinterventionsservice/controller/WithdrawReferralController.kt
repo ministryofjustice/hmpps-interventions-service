@@ -27,9 +27,7 @@ class WithdrawReferralController(
 ) {
 
   @GetMapping("/referral-withdrawal-reasons")
-  fun getWithdrawalReasons(): List<WithdrawalReason> {
-    return referralService.getWithdrawalReasons()
-  }
+  fun getWithdrawalReasons(): List<WithdrawalReason> = referralService.getWithdrawalReasons()
 
   @PostMapping("/sent-referral/{id}/withdraw-referral")
   fun submitWithdrawalReasons(

@@ -48,7 +48,8 @@ class ReferralNotificationService(
   private val hmppsAuthService: HMPPSAuthService,
   private val authUserRepository: AuthUserRepository,
   private val referralService: ReferralService,
-) : ApplicationListener<ReferralEvent>, NotifyService {
+) : ApplicationListener<ReferralEvent>,
+  NotifyService {
 
   companion object : KLogging()
 
@@ -370,7 +371,5 @@ class ReferralNotificationService(
     )
   }
 
-  private fun formatDate(date: LocalDate): String {
-    return "${date.dayOfMonth} ${date.month.getDisplayName(TextStyle.FULL, Locale.UK)} ${date.year}"
-  }
+  private fun formatDate(date: LocalDate): String = "${date.dayOfMonth} ${date.month.getDisplayName(TextStyle.FULL, Locale.UK)} ${date.year}"
 }

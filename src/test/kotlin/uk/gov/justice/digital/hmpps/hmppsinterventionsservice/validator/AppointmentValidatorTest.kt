@@ -68,9 +68,7 @@ internal class AppointmentValidatorTest {
       @Nested
       inner class PostCodeValidation {
 
-        private fun createUpdateAppointmentDTO(postCode: String): UpdateAppointmentDTO {
-          return UpdateAppointmentDTO(appointmentTime = OffsetDateTime.now().plusHours(1), durationInMinutes = 1, appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_OTHER, sessionType = AppointmentSessionType.ONE_TO_ONE, appointmentDeliveryAddress = AddressDTO("firstline", "secondLine", "town", "county", postCode))
-        }
+        private fun createUpdateAppointmentDTO(postCode: String): UpdateAppointmentDTO = UpdateAppointmentDTO(appointmentTime = OffsetDateTime.now().plusHours(1), durationInMinutes = 1, appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_OTHER, sessionType = AppointmentSessionType.ONE_TO_ONE, appointmentDeliveryAddress = AddressDTO("firstline", "secondLine", "town", "county", postCode))
 
         @Test
         fun `can request valid non nps office appointment for various postcodes`() {

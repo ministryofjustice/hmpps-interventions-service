@@ -59,9 +59,8 @@ internal class DeliverySessionsServiceTest {
     referralRepository,
   )
 
-  private fun createActor(userName: String = "action_plan_session_test"): AuthUser =
-    authUserFactory.create(userName = userName)
-      .also { whenever(authUserRepository.save(it)).thenReturn(it) }
+  private fun createActor(userName: String = "action_plan_session_test"): AuthUser = authUserFactory.create(userName = userName)
+    .also { whenever(authUserRepository.save(it)).thenReturn(it) }
 
   @Test
   fun `create unscheduled sessions creates one for each action plan session`() {

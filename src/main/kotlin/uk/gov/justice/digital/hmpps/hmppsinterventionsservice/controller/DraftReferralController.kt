@@ -92,9 +92,7 @@ class DraftReferralController(
   }
 
   @GetMapping("/draft-referral/{id}")
-  fun getDraftReferralByID(@PathVariable id: UUID, authentication: JwtAuthenticationToken): DraftReferralDTO {
-    return DraftReferralDTO.from(getDraftReferralForAuthenticatedUser(authentication, id))
-  }
+  fun getDraftReferralByID(@PathVariable id: UUID, authentication: JwtAuthenticationToken): DraftReferralDTO = DraftReferralDTO.from(getDraftReferralForAuthenticatedUser(authentication, id))
 
   @PatchMapping("/draft-referral/{id}")
   fun patchDraftReferralByID(@PathVariable id: UUID, @RequestBody partialUpdate: DraftReferralDTO, authentication: JwtAuthenticationToken): DraftReferralDTO {

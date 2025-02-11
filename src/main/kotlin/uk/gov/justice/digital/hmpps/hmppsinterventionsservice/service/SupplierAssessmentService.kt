@@ -181,14 +181,10 @@ class SupplierAssessmentService(
     return appointment
   }
 
-  fun getReferral(referralId: UUID): Referral {
-    return referralRepository.findById(referralId).orElseThrow {
-      throw EntityNotFoundException("Referral not found [id=$referralId]")
-    }
+  fun getReferral(referralId: UUID): Referral = referralRepository.findById(referralId).orElseThrow {
+    throw EntityNotFoundException("Referral not found [id=$referralId]")
   }
 
-  fun getSupplierAssessmentById(supplierAssessmentId: UUID): SupplierAssessment {
-    return supplierAssessmentRepository.findByIdOrNull(supplierAssessmentId)
-      ?: throw EntityNotFoundException("Supplier Assessment not found [id=$supplierAssessmentId]")
-  }
+  fun getSupplierAssessmentById(supplierAssessmentId: UUID): SupplierAssessment = supplierAssessmentRepository.findByIdOrNull(supplierAssessmentId)
+    ?: throw EntityNotFoundException("Supplier Assessment not found [id=$supplierAssessmentId]")
 }

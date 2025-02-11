@@ -103,9 +103,7 @@ data class Appointment(
     return id == other.id
   }
 
-  override fun hashCode(): Int {
-    return id.hashCode()
-  }
+  override fun hashCode(): Int = id.hashCode()
 }
 
 enum class Attended {
@@ -115,9 +113,7 @@ enum class Attended {
   ;
 
   @JsonValue
-  open fun toLower(): String? {
-    return this.toString().lowercase()
-  }
+  open fun toLower(): String? = this.toString().lowercase()
 }
 
 enum class NoSessionReasonType {

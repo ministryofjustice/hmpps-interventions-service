@@ -20,17 +20,15 @@ class ActionPlanFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     createdBy: AuthUser = authUserFactory.create(),
     submittedAt: OffsetDateTime? = createdAt,
     submittedBy: AuthUser? = createdBy,
-  ): ActionPlan {
-    return create(
-      id = id,
-      referral = referral,
-      numberOfSessions = numberOfSessions,
-      createdAt = createdAt,
-      createdBy = createdBy,
-      submittedAt = submittedAt,
-      submittedBy = submittedBy,
-    )
-  }
+  ): ActionPlan = create(
+    id = id,
+    referral = referral,
+    numberOfSessions = numberOfSessions,
+    createdAt = createdAt,
+    createdBy = createdBy,
+    submittedAt = submittedAt,
+    submittedBy = submittedBy,
+  )
 
   fun createApproved(
     id: UUID = UUID.randomUUID(),
@@ -43,20 +41,18 @@ class ActionPlanFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     approvedAt: OffsetDateTime? = submittedAt,
     approvedBy: AuthUser? = authUserFactory.create(authSource = "delius"),
     activities: MutableList<ActionPlanActivity> = mutableListOf(),
-  ): ActionPlan {
-    return create(
-      id = id,
-      referral = referral,
-      numberOfSessions = numberOfSessions,
-      createdAt = createdAt,
-      createdBy = createdBy,
-      submittedAt = submittedAt,
-      submittedBy = submittedBy,
-      approvedAt = approvedAt,
-      approvedBy = approvedBy,
-      activities = activities,
-    )
-  }
+  ): ActionPlan = create(
+    id = id,
+    referral = referral,
+    numberOfSessions = numberOfSessions,
+    createdAt = createdAt,
+    createdBy = createdBy,
+    submittedAt = submittedAt,
+    submittedBy = submittedBy,
+    approvedAt = approvedAt,
+    approvedBy = approvedBy,
+    activities = activities,
+  )
 
   fun create(
     id: UUID = UUID.randomUUID(),
@@ -69,20 +65,18 @@ class ActionPlanFactory(em: TestEntityManager? = null) : EntityFactory(em) {
     approvedAt: OffsetDateTime? = null,
     approvedBy: AuthUser? = null,
     activities: MutableList<ActionPlanActivity> = mutableListOf(),
-  ): ActionPlan {
-    return save(
-      ActionPlan(
-        id = id,
-        referral = referral,
-        numberOfSessions = numberOfSessions,
-        createdAt = createdAt,
-        createdBy = createdBy,
-        submittedAt = submittedAt,
-        submittedBy = submittedBy,
-        approvedAt = approvedAt,
-        approvedBy = approvedBy,
-        activities = activities,
-      ),
-    )
-  }
+  ): ActionPlan = save(
+    ActionPlan(
+      id = id,
+      referral = referral,
+      numberOfSessions = numberOfSessions,
+      createdAt = createdAt,
+      createdBy = createdBy,
+      submittedAt = submittedAt,
+      submittedBy = submittedBy,
+      approvedAt = approvedAt,
+      approvedBy = approvedBy,
+      activities = activities,
+    ),
+  )
 }

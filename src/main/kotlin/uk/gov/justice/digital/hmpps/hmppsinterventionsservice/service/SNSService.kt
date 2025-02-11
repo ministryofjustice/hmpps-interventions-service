@@ -26,7 +26,8 @@ class SNSActionPlanService(
   private val snsPublisher: SNSPublisher,
   @Value("\${interventions-ui.baseurl}") private val interventionsUiBaseUrl: String,
   @Value("\${interventions-ui.locations.probation-practitioner.action-plan}") private val actionPlanLocation: String,
-) : ApplicationListener<ActionPlanEvent>, SNSService {
+) : ApplicationListener<ActionPlanEvent>,
+  SNSService {
 
   @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: ActionPlanEvent) {
@@ -81,7 +82,8 @@ class SNSActionPlanService(
 @Service
 class SNSReferralService(
   private val snsPublisher: SNSPublisher,
-) : ApplicationListener<ReferralEvent>, SNSService {
+) : ApplicationListener<ReferralEvent>,
+  SNSService {
 
   @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: ReferralEvent) {
@@ -120,7 +122,8 @@ class SNSAppointmentService(
   @Value("\${interventions-ui.baseurl}") private val interventionsUiBaseUrl: String,
   @Value("\${interventions-ui.locations.probation-practitioner.supplier-assessment-feedback}") private val saFeedbackLocation: String,
   @Value("\${interventions-ui.locations.probation-practitioner.session-feedback}") private val ppSessionFeedbackLocation: String,
-) : ApplicationListener<AppointmentEvent>, SNSService {
+) : ApplicationListener<AppointmentEvent>,
+  SNSService {
 
   @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: AppointmentEvent) {
@@ -196,7 +199,8 @@ class SNSAppointmentService(
 @Service
 class SNSEndOfServiceReportService(
   private val snsPublisher: SNSPublisher,
-) : ApplicationListener<EndOfServiceReportEvent>, SNSService {
+) : ApplicationListener<EndOfServiceReportEvent>,
+  SNSService {
 
   @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: EndOfServiceReportEvent) {

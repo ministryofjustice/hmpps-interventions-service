@@ -10,13 +10,11 @@ data class SupplierAssessmentDTO(
   val referralId: UUID,
 ) {
   companion object {
-    fun from(supplierAssessment: SupplierAssessment): SupplierAssessmentDTO {
-      return SupplierAssessmentDTO(
-        id = supplierAssessment.id,
-        appointments = AppointmentDTO.from(supplierAssessment.appointments.toMutableSet()),
-        currentAppointmentId = supplierAssessment.currentAppointment?.id,
-        referralId = supplierAssessment.referral.id,
-      )
-    }
+    fun from(supplierAssessment: SupplierAssessment): SupplierAssessmentDTO = SupplierAssessmentDTO(
+      id = supplierAssessment.id,
+      appointments = AppointmentDTO.from(supplierAssessment.appointments.toMutableSet()),
+      currentAppointmentId = supplierAssessment.currentAppointment?.id,
+      referralId = supplierAssessment.referral.id,
+    )
   }
 }

@@ -18,16 +18,14 @@ class DeliverySessionFactory(em: TestEntityManager? = null) : EntityFactory(em) 
     referral: Referral = referralFactory.createSent(),
     sessionNumber: Int = 1,
     appointments: MutableSet<Appointment> = mutableSetOf(),
-  ): DeliverySession {
-    return save(
-      DeliverySession(
-        id = id,
-        referral = referral,
-        sessionNumber = sessionNumber,
-        appointments = appointments,
-      ),
-    )
-  }
+  ): DeliverySession = save(
+    DeliverySession(
+      id = id,
+      referral = referral,
+      sessionNumber = sessionNumber,
+      appointments = appointments,
+    ),
+  )
 
   fun createScheduled(
     id: UUID = UUID.randomUUID(),
@@ -117,14 +115,12 @@ class DeliverySessionFactory(em: TestEntityManager? = null) : EntityFactory(em) 
     referral: Referral,
     sessionNumber: Int = 1,
     appointment: MutableSet<Appointment> = mutableSetOf(),
-  ): DeliverySession {
-    return save(
-      DeliverySession(
-        id = id,
-        referral = referral,
-        sessionNumber = sessionNumber,
-        appointments = appointment,
-      ),
-    )
-  }
+  ): DeliverySession = save(
+    DeliverySession(
+      id = id,
+      referral = referral,
+      sessionNumber = sessionNumber,
+      appointments = appointment,
+    ),
+  )
 }

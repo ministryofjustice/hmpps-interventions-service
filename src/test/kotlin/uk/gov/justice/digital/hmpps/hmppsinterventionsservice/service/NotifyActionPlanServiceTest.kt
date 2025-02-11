@@ -67,18 +67,16 @@ class NotifyActionPlanServiceTest {
     "http://localhost:8080/referrals/42c7d267-0776-4272-a8e8-a673bfe30d0d",
   )
 
-  private fun notifyService(): NotifyActionPlanService {
-    return NotifyActionPlanService(
-      "template",
-      "template",
-      "http://example.com",
-      "/pp/referrals/{id}/action-plan",
-      "/sp/referrals/{id}/action-plan",
-      emailSender,
-      hmppsAuthService,
-      referralService,
-    )
-  }
+  private fun notifyService(): NotifyActionPlanService = NotifyActionPlanService(
+    "template",
+    "template",
+    "http://example.com",
+    "/pp/referrals/{id}/action-plan",
+    "/sp/referrals/{id}/action-plan",
+    emailSender,
+    hmppsAuthService,
+    referralService,
+  )
 
   @Test
   fun `action plan submitted event does not send email when user details are not available`() {

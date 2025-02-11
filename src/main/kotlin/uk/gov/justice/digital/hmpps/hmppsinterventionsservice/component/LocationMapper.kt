@@ -17,20 +17,16 @@ class LocationMapper(
   // This method appends the path onto the end of the current requests URL
   // e.g. current request URL http://interventions.go.uk/draft-referral + path referral/{id}
   //      returns http://interventions.go.uk/draft-referral/referral/1123456
-  fun expandPathToCurrentRequestUrl(path: String, vararg uriVariableValues: Any): URI {
-    return ServletUriComponentsBuilder.fromCurrentRequestUri().path(path).buildAndExpand(*uriVariableValues).toUri()
-  }
+  fun expandPathToCurrentRequestUrl(path: String, vararg uriVariableValues: Any): URI = ServletUriComponentsBuilder.fromCurrentRequestUri().path(path).buildAndExpand(*uriVariableValues).toUri()
 
   // This method appends the path onto the end of the current requests context path
   // e.g. current request URL http://interventions.go.uk/draft-referral + path referral/{id}
   //      returns http://interventions.go.uk/referral/1123456
-  fun expandPathToCurrentContextPathUrl(path: String, vararg uriVariableValues: Any): URI {
-    return UriComponentsBuilder
-      .fromHttpUrl(interventionsApiBaseUrl)
-      .path(path)
-      .buildAndExpand(*uriVariableValues)
-      .toUri()
-  }
+  fun expandPathToCurrentContextPathUrl(path: String, vararg uriVariableValues: Any): URI = UriComponentsBuilder
+    .fromHttpUrl(interventionsApiBaseUrl)
+    .path(path)
+    .buildAndExpand(*uriVariableValues)
+    .toUri()
 
   fun getPathFromControllerMethod(method: KFunction<*>): String {
     val annotation = method.findAnnotation<GetMapping>()

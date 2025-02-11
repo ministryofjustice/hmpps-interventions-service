@@ -23,25 +23,23 @@ class ProbationPractitionerDetailsFactory(em: TestEntityManager? = null) : Entit
     ndeliusTeamPhoneNumber: String? = "020-32352323213",
     ppPhoneNumber: String? = "073232324233",
     ppTeamTelephoneNumber: String? = "020-32352323212",
-  ): ProbationPractitionerDetails {
-    return save(
-      ProbationPractitionerDetails(
-        id = id ?: UUID.randomUUID(),
-        referral = referral,
-        nDeliusName = nDeliusName,
-        nDeliusEmailAddress = nDeliusEmailAddress,
-        nDeliusPDU = nDeliusPdu,
-        name = name,
-        emailAddress = emailAddress,
-        pdu = pdu,
-        probationOffice = probationOffice,
-        roleOrJobTitle = roleOrJobTitle,
-        establishment = ppEstablishment,
-        nDeliusPPTelephoneNumber = ndeliusPhoneNumber,
-        nDeliusPPTeamTelephoneNumber = ndeliusTeamPhoneNumber,
-        ppPhoneNumber = ppPhoneNumber,
-        ppTeamTelephoneNumber = ppTeamTelephoneNumber,
-      ),
-    )
-  }
+  ): ProbationPractitionerDetails = save(
+    ProbationPractitionerDetails(
+      id = id ?: UUID.randomUUID(),
+      referral = referral,
+      nDeliusName = nDeliusName,
+      nDeliusEmailAddress = nDeliusEmailAddress,
+      nDeliusPDU = nDeliusPdu,
+      name = name,
+      emailAddress = emailAddress,
+      pdu = pdu,
+      probationOffice = probationOffice,
+      roleOrJobTitle = roleOrJobTitle,
+      establishment = ppEstablishment,
+      nDeliusPPTelephoneNumber = ndeliusPhoneNumber,
+      nDeliusPPTeamTelephoneNumber = ndeliusTeamPhoneNumber,
+      ppPhoneNumber = ppPhoneNumber,
+      ppTeamTelephoneNumber = ppTeamTelephoneNumber,
+    ),
+  )
 }

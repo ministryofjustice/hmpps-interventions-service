@@ -41,9 +41,7 @@ class ActionPlanAppointmentEvent(
     }
   }
 
-  override fun toString(): String {
-    return "ActionPlanAppointmentEvent(type=$type, deliverySessionId=${deliverySession.id}, detailUrl='$detailUrl', source=$source)"
-  }
+  override fun toString(): String = "ActionPlanAppointmentEvent(type=$type, deliverySessionId=${deliverySession.id}, detailUrl='$detailUrl', source=$source)"
 }
 
 @Component
