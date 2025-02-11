@@ -87,7 +87,7 @@ class NdmisAppointmentPerformanceReportJobConfiguration(
     val validator = DefaultJobParametersValidator()
     validator.setRequiredKeys(arrayOf("timestamp", "outputPath"))
 
-    return JobBuilder("ndmisAppointmentJob", jobRepository)
+    return JobBuilder("ndmisAppointmentPerformanceReportJob", jobRepository)
       .incrementer { parameters -> OutputPathIncrementer().getNext(TimestampIncrementer().getNext(parameters)) }
       .validator(validator)
       .start(ndmisWriteAppointmentToCsvStep)

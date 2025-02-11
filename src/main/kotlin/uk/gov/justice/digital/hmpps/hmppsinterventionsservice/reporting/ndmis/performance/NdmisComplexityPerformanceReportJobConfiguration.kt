@@ -87,7 +87,7 @@ class NdmisComplexityPerformanceReportJobConfiguration(
     val validator = DefaultJobParametersValidator()
     validator.setRequiredKeys(arrayOf("timestamp", "outputPath"))
 
-    return JobBuilder("ndmisComplexityJob", jobRepository)
+    return JobBuilder("ndmisComplexityPerformanceReportJob", jobRepository)
       .incrementer { parameters -> OutputPathIncrementer().getNext(TimestampIncrementer().getNext(parameters)) }
       .validator(validator)
       .start(ndmisWriteComplexityToCsvStep)

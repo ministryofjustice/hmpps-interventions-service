@@ -87,7 +87,7 @@ class NdmisReferralPerformanceReportJobConfiguration(
     val validator = DefaultJobParametersValidator()
     validator.setRequiredKeys(arrayOf("timestamp", "outputPath"))
 
-    return JobBuilder("ndmisReferralJob", jobRepository)
+    return JobBuilder("ndmisReferralPerformanceReportJob", jobRepository)
       .incrementer { parameters -> OutputPathIncrementer().getNext(TimestampIncrementer().getNext(parameters)) }
       .validator(validator)
       .start(ndmisWriteReferralToCsvStep)
