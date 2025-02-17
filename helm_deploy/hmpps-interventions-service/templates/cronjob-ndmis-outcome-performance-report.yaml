@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: generate-ndmis-outcome-performance-report
 spec:
-  schedule: "15 18 * * SAT"
+  schedule: "15 19 * * FRI"
   jobTemplate:
     spec:
       template:
