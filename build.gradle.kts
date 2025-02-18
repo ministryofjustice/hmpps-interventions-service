@@ -73,7 +73,7 @@ tasks {
 
 dependencyManagement {
   dependencies {
-    dependency("net.minidev:json-smart:2.5.1")
+    dependency("net.minidev:json-smart:2.5.2")
   }
 }
 
