@@ -1,11 +1,11 @@
 {
-  "internal_contract_id": "92231bb6-75c7-4d3d-97a4-d05ce00d2d28",
-  "contract_reference": "PRJ_14252",
+  "internal_contract_id": "47b5ba7b-3cdf-4b77-8db4-0f13e3c98e81",
+  "contract_reference": "PRJ_14255",
   "contract_type_id": "DNR-SW",
-  "incoming_distribution_email": "withyou.weston@nhs.net",
+  "incoming_distribution_email": "BCPCriminalJusticeTeam@wearewithyou.org.uk",
   "region": {
     "nps_region_code": null,
-    "pcc_region_code": "avon-and-somerset"
+    "pcc_region_code": "dorset"
   },
   "eligibility": {
     "allows_female": false,
@@ -22,33 +22,33 @@
     "subcontractor_codes": [
     ]
   },
-  "internal_intervention_id": "d9715b0a-ffc6-434c-994e-10dfaf9b3070",
-  "intervention_title": "Dependency and Recovery Services in North Somerset",
-  "short_description": "Dependency services include counselling, therapy, and support groups to help individuals understand the root causes of their addiction and develop coping strategies. The goal is to reduce the harmful effects of substance misuse, promote healthier behaviours, and improve overall well-being. Recovery services focus on helping individuals maintain long-term recovery and rebuild their lives after overcoming dependency. These services provide ongoing support through various interventions, such as individual and group therapy, life skills training, and relapse prevention programs and address the physical, psychological, and social aspects of dependency, providing a comprehensive approach to treatment and recovery.\n\nPractitioners are requested to utilise the Substance Misuse Screening Tool to inform referrals. This can be located via the SW intranet search function. \n\nServices are available for all adult males on probation in North Somerset, who are not subject to an Alcohol Community Treatment Requirement and/or a Drug Community Treatment Requirement and are either: \n\n- on a Community Sentence or Suspended Sentence Order and subject to a Rehabilitation Activity Requirement (RAR) whereby a specified number of RAR Activity Days will be allocated.\n\n- pre-release to people who are convicted. For most cases a pre-release referral will be beneficial to support the person prior to release, by building and maintaining relationships to maximise engagement once released, develop close working relationships with treatment providers and support post release appointments with local substance misuse teams.\n\n- released on licence and post-sentence supervision.\n\nAny Sessions delivered as part of a RAR Activity Day or as a mandated Licence or Post Sentence Supervision appointment will be Enforceable.\n\nServices are offered as either Low, Medium or High complexity.",
+  "internal_intervention_id": "d60641d8-4416-4dc7-864f-c08d102425b8",
+  "intervention_title": "Dependency and Recovery Services in Bournemouth, Christchurch and Poole",
+  "short_description": "Dependency services include counselling, therapy, and support groups to help individuals understand the root causes of their addiction and develop coping strategies. The goal is to reduce the harmful effects of substance misuse, promote healthier behaviours, and improve overall well-being. Recovery services focus on helping individuals maintain long-term recovery and rebuild their lives after overcoming dependency. These services provide ongoing support through various interventions, such as individual and group therapy, life skills training, and relapse prevention programs and address the physical, psychological, and social aspects of dependency, providing a comprehensive approach to treatment and recovery.\n\nPractitioners are requested to utilise the Substance Misuse Screening Tool to inform referrals. This can be located via the SW intranet search function. \n\nServices are available for all adult males on probation in Bournemouth, Christchurch and Poole, who are not subject to an Alcohol Community Treatment Requirement and/or a Drug Community Treatment Requirement and are either: \n\n- on a Community Sentence or Suspended Sentence Order and subject to a Rehabilitation Activity Requirement (RAR) whereby a specified number of RAR Activity Days will be allocated.\n\n- pre-release to people who are convicted. For most cases a pre-release referral will be beneficial to support the person prior to release, by building and maintaining relationships to maximise engagement once released, develop close working relationships with treatment providers and support post release appointments with local substance misuse teams.\n\n- released on licence and post-sentence supervision.\n\nAny Sessions delivered as part of a RAR Activity Day or as a mandated Licence or Post Sentence Supervision appointment will be Enforceable. \n\nServices are offered as either Low, Medium or High complexity.",
   "activities": [
     {
       "need_area": "Dependency & Recovery",
       "activity": "Harm Reduction\nThe service emphasizes harm reduction, focusing on keeping individuals safe and minimizing risks associated with substance misuse.\n\nThis includes providing education on safer drug use, overdose prevention, and the prevention of blood-borne infections.\n\nThe service also supports access to injecting equipment and other harm reduction initiatives to ensure individuals are equipped with the knowledge and tools to reduce the immediate dangers of substance misuse.",
       "delivery_method": "One to one/Groupwork",
-      "delivery_location": "Weston-Super-Mare"
+      "delivery_location": "Bournemouth, Christchurch, Poole, Boscombe"
     },
     {
       "need_area": "Dependency & Recovery",
       "activity": "Motivational Interviewing and Brief Interventions\nThese interventions are key components of the service and include befriending, goal setting, and life skills workshops. They aim to support individuals in making positive changes in their lives and reducing substance misuse. By fostering a supportive and non-judgmental environment, these interventions help individuals build motivation and confidence to pursue recovery.",
       "delivery_method": "One to one/Groupwork",
-      "delivery_location": "Weston-Super-Mare"
+      "delivery_location": "Bournemouth, Christchurch, Poole, Boscombe"
     },
     {
       "need_area": "Dependency & Recovery",
       "activity": "Psychosocial Interventions\nThe service offers structured psychosocial interventions that address issues such as intra/inter-personal skill development, life skills, social skills, personal development, and relapse prevention. These interventions are designed to help individuals build the skills and resilience needed to maintain recovery and lead fulfilling lives. By focusing on skill development and personal growth, the service empowers individuals to take control of their recovery journey. Delivered in both one-to-one and group settings, these interventions include low, medium, and high-intensity interventions based on the presenting need.  By offering a range of intensity levels, the service ensures that individuals receive the appropriate level of support based on their unique circumstances and needs.",
       "delivery_method": "One to one/Groupwork",
-      "delivery_location": "Weston-Super-Mare"
+      "delivery_location": "Bournemouth, Christchurch, Poole, Boscombe"
     },
     {
       "need_area": "Dependency & Recovery",
       "activity": "Digital Services\nUtilising digital platforms to provide accessible support and resources for individuals in recovery.",
       "delivery_method": "One to one/Groupwork",
-      "delivery_location": "Weston-Super-Mare"
+      "delivery_location": "Bournemouth, Christchurch, Poole, Boscombe"
     }
   ]
 }
