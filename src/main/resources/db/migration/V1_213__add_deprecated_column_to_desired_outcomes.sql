@@ -1,0 +1,1 @@
+ALTER TABLE desired_outcome ADD COLUMN deprecated_at timestamp with time zone null;
