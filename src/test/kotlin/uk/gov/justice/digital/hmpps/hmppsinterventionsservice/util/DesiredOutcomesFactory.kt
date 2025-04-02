@@ -11,6 +11,6 @@ class DesiredOutcomesFactory(em: TestEntityManager? = null) : EntityFactory(em) 
     serviceCategory: ServiceCategory = serviceCategoryFactory.create(),
     number: Int,
   ): List<DesiredOutcome> = (1..number).map {
-    save(DesiredOutcome(id = UUID.randomUUID(), "", serviceCategoryId = serviceCategory.id))
+    save(DesiredOutcome(id = UUID.randomUUID(), "", serviceCategoryId = serviceCategory.id, deprecatedAt = null))
   }
 }

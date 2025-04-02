@@ -10,7 +10,5 @@ import java.util.UUID
 @Service
 @Transactional
 class ServiceCategoryService(val repository: ServiceCategoryRepository) {
-  fun getServiceCategoryByID(id: UUID): ServiceCategory? {
-    val result = repository.findAllByIdAndDesiredOutcomesDeprecatedAtIsNotNull(id)
-    return repository.findByIdOrNull(id) }
+  fun getServiceCategoryByID(id: UUID): ServiceCategory? = repository.findByIdOrNull(id)
 }

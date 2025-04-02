@@ -112,8 +112,8 @@ class AmendReferralServiceTest @Autowired constructor(
     val someoneElse = userFactory.create("helper_pp_user", "delius")
     val user = userFactory.create("pp_user_1", "delius")
     val serviceCategoryId = UUID.randomUUID()
-    val desiredOutcome1 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId)
-    val desiredOutcome2 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId)
+    val desiredOutcome1 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId, deprecatedAt = null)
+    val desiredOutcome2 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId, deprecatedAt = null)
 
     val serviceCategory = serviceCategoryFactory.create(
       id = serviceCategoryId,
@@ -632,8 +632,8 @@ class AmendReferralServiceTest @Autowired constructor(
     val someoneElse = userFactory.create("helper_pp_user", "delius")
     val user = userFactory.create("pp_user_1", "delius")
     val serviceCategoryId = UUID.randomUUID()
-    val desiredOutcome1 = DesiredOutcome(UUID.randomUUID(), "desiredOutcome1", serviceCategoryId = serviceCategoryId)
-    val desiredOutcome2 = DesiredOutcome(UUID.randomUUID(), "desiredOutcome2", serviceCategoryId = serviceCategoryId)
+    val desiredOutcome1 = DesiredOutcome(UUID.randomUUID(), "desiredOutcome1", serviceCategoryId = serviceCategoryId, deprecatedAt = null)
+    val desiredOutcome2 = DesiredOutcome(UUID.randomUUID(), "desiredOutcome2", serviceCategoryId = serviceCategoryId, deprecatedAt = null)
 
     val serviceCategory = serviceCategoryFactory.create(
       id = serviceCategoryId,

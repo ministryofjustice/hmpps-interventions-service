@@ -162,7 +162,7 @@ class AmendReferralServiceUnitTest {
     @Test
     fun `cant set desired outcome when the action plan is approved`() {
       val serviceCategoryId = UUID.randomUUID()
-      val desiredOutcome = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId)
+      val desiredOutcome = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId, deprecatedAt = null)
       val serviceCategory = serviceCategoryFactory.create(
         id = serviceCategoryId,
         desiredOutcomes = listOf(desiredOutcome),
@@ -189,7 +189,7 @@ class AmendReferralServiceUnitTest {
     @Test
     fun `cant set desired outcomes when its invalid for the service category`() {
       val serviceCategoryId = UUID.randomUUID()
-      val desiredOutcome = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId)
+      val desiredOutcome = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId, deprecatedAt = null)
       val serviceCategory =
         serviceCategoryFactory.create(id = serviceCategoryId, desiredOutcomes = listOf(desiredOutcome))
       val referral = referralFactory.createSent(selectedServiceCategories = mutableSetOf(serviceCategory))
@@ -212,8 +212,8 @@ class AmendReferralServiceUnitTest {
     @Test
     fun `can update an already selected desired outcome for service category`() {
       val serviceCategoryId = UUID.randomUUID()
-      val desiredOutcome1 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId)
-      val desiredOutcome2 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId)
+      val desiredOutcome1 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId, deprecatedAt = null)
+      val desiredOutcome2 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId, deprecatedAt = null)
       val serviceCategory = serviceCategoryFactory.create(
         id = serviceCategoryId,
         desiredOutcomes = listOf(desiredOutcome1, desiredOutcome2),
@@ -264,10 +264,10 @@ class AmendReferralServiceUnitTest {
     @Test
     fun `can update multiple selected desired outcome for a service category`() {
       val serviceCategoryId1 = UUID.randomUUID()
-      val desiredOutcome1 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId1)
-      val desiredOutcome2 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId1)
-      val desiredOutcome3 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId1)
-      val desiredOutcome4 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId1)
+      val desiredOutcome1 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId1, deprecatedAt = null)
+      val desiredOutcome2 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId1, deprecatedAt = null)
+      val desiredOutcome3 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId1, deprecatedAt = null)
+      val desiredOutcome4 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId1, deprecatedAt = null)
       val serviceCategory =
         serviceCategoryFactory.create(id = serviceCategoryId1, desiredOutcomes = listOf(desiredOutcome1, desiredOutcome2, desiredOutcome3, desiredOutcome4))
 

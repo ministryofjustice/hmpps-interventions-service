@@ -17,7 +17,7 @@ internal class OutcomeProcessorTest {
 
   @Test
   fun `referral with single selected desired outcome correctly returns a outcomeData object`() {
-    val desiredOutcome = DesiredOutcome(UUID.randomUUID(), "Outcome 1", UUID.randomUUID())
+    val desiredOutcome = DesiredOutcome(UUID.randomUUID(), "Outcome 1", UUID.randomUUID(), deprecatedAt = null)
     val endOfServiceReport = endOfServiceReportFactory.create(
       outcomes = mutableSetOf(
         EndOfServiceReportOutcome(desiredOutcome, AchievementLevel.ACHIEVED),
@@ -38,8 +38,8 @@ internal class OutcomeProcessorTest {
 
   @Test
   fun `referral with multiple selected service category correctly returns a outcomeData object`() {
-    val desiredOutcome1 = DesiredOutcome(UUID.randomUUID(), "Outcome 1", UUID.randomUUID())
-    val desiredOutcome2 = DesiredOutcome(UUID.randomUUID(), "Outcome 2", UUID.randomUUID())
+    val desiredOutcome1 = DesiredOutcome(UUID.randomUUID(), "Outcome 1", UUID.randomUUID(), deprecatedAt = null)
+    val desiredOutcome2 = DesiredOutcome(UUID.randomUUID(), "Outcome 2", UUID.randomUUID(), deprecatedAt = null)
     val endOfServiceReport = endOfServiceReportFactory.create(
       outcomes = mutableSetOf(
         EndOfServiceReportOutcome(desiredOutcome1, AchievementLevel.ACHIEVED),

@@ -27,9 +27,9 @@ class ServiceCategoryServiceTest @Autowired constructor(
     val idToFind = UUID.randomUUID()
 
     val desiredOutcomes = listOf(
-      DesiredOutcome(id = UUID.randomUUID(), "Outcome 1", idToFind),
-      DesiredOutcome(id = UUID.randomUUID(), "Outcome 2", idToFind),
-      DesiredOutcome(id = UUID.randomUUID(), "Outcome 3", idToFind),
+      DesiredOutcome(id = UUID.randomUUID(), "Outcome 1", idToFind, deprecatedAt = null),
+      DesiredOutcome(id = UUID.randomUUID(), "Outcome 2", idToFind, deprecatedAt = null),
+      DesiredOutcome(id = UUID.randomUUID(), "Outcome 3", idToFind, deprecatedAt = null),
     )
 
     serviceCategoryFactory.create(id = idToFind, desiredOutcomes = desiredOutcomes)

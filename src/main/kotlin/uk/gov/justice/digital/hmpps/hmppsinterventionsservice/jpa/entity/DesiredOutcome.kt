@@ -17,5 +17,5 @@ data class DesiredOutcome(
   val serviceCategoryId: UUID,
   @Nullable
   @Column(name = "deprecated_at")
-  val deprecatedAt: OffsetDateTime?
+  val deprecatedAt: OffsetDateTime?,
 )

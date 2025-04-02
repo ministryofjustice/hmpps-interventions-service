@@ -77,7 +77,7 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
     val desiredOutcomeUUID = UUID.fromString("5a9d6e60-c314-4bf9-bf1e-b42b366b9398")
     val referral = referralFactory.createDraft(
       complexityLevelIds = mutableMapOf(serviceCategory.id to complexityLevelUUID),
-      desiredOutcomes = listOf(DesiredOutcome(desiredOutcomeUUID, "", serviceCategory.id)),
+      desiredOutcomes = listOf(DesiredOutcome(desiredOutcomeUUID, "", serviceCategory.id, deprecatedAt = null)),
       selectedServiceCategories = mutableSetOf(serviceCategory),
     )
 
@@ -229,13 +229,13 @@ class DraftReferralDTOTest(@Autowired private val json: JacksonTester<DraftRefer
 
     @Test
     fun `desired outcomes are always in the same order`() {
-      val desiredOutcome1 = DesiredOutcome(id = uuid1, "", serviceCategoryId = uuid1)
-      val desiredOutcome2 = DesiredOutcome(id = uuid2, "", serviceCategoryId = uuid1)
-      val desiredOutcome3 = DesiredOutcome(id = uuid3, "", serviceCategoryId = uuid1)
+      val desiredOutcome1 = DesiredOutcome(id = uuid1, "", serviceCategoryId = uuid1, deprecatedAt = null)
+      val desiredOutcome2 = DesiredOutcome(id = uuid2, "", serviceCategoryId = uuid1, deprecatedAt = null)
+      val desiredOutcome3 = DesiredOutcome(id = uuid3, "", serviceCategoryId = uuid1, deprecatedAt = null)
 
-      val desiredOutcome4 = DesiredOutcome(id = uuid4, "", serviceCategoryId = uuid2)
-      val desiredOutcome5 = DesiredOutcome(id = uuid5, "", serviceCategoryId = uuid2)
-      val desiredOutcome6 = DesiredOutcome(id = uuid6, "", serviceCategoryId = uuid2)
+      val desiredOutcome4 = DesiredOutcome(id = uuid4, "", serviceCategoryId = uuid2, deprecatedAt = null)
+      val desiredOutcome5 = DesiredOutcome(id = uuid5, "", serviceCategoryId = uuid2, deprecatedAt = null)
+      val desiredOutcome6 = DesiredOutcome(id = uuid6, "", serviceCategoryId = uuid2, deprecatedAt = null)
       val referral = referralFactory.createDraft(desiredOutcomes = listOf(desiredOutcome5, desiredOutcome3, desiredOutcome4, desiredOutcome2, desiredOutcome1, desiredOutcome6))
       val referralDTO = DraftReferralDTO.from(referral)
 

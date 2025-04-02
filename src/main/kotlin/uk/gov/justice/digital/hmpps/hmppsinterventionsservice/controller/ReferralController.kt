@@ -28,6 +28,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralDetail
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SentReferralDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SentReferralSummariesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ServiceCategoryFullDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ServiceCategoryWithActiveOutcomesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SupplierAssessmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.Views
@@ -42,8 +43,8 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralSe
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ServiceCategoryService
 import java.util.UUID
 
+ @PreAuthorize("hasRole('ROLE_PROBATION') or hasRole('ROLE_CRS_PROVIDER') or hasRole('ROLE_INTERVENTIONS_API_READ_ALL')")
 @RestController
-@PreAuthorize("hasRole('ROLE_PROBATION') or hasRole('ROLE_CRS_PROVIDER') or hasRole('ROLE_INTERVENTIONS_API_READ_ALL')")
 class ReferralController(
   private val referralService: ReferralService,
   private val referralConcluder: ReferralConcluder,
@@ -141,7 +142,7 @@ class ReferralController(
 
   @GetMapping("/service-category/{id}")
   fun getServiceCategoryByID(@PathVariable id: UUID): ServiceCategoryFullDTO = serviceCategoryService.getServiceCategoryByID(id)
-    ?.let { ServiceCategoryFullDTO.from(it) }
+    ?.let { ServiceCategoryWithActiveOutcomesDTO.from(it) }
     ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "service category not found [id=$id]")
 
   @GetMapping("/referral-cancellation-reasons")
