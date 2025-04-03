@@ -121,7 +121,7 @@ class ContractDetailsSetupTasklet @Autowired constructor(
       desiredOutComes.forEach {
         newDesiredOutcomes.add(
           desiredOutcomeRepository.save(
-            DesiredOutcome(id = UUID.randomUUID(), description = it, serviceCategoryId = serviceCategoryId),
+            DesiredOutcome(id = UUID.randomUUID(), description = it, serviceCategoryId = serviceCategoryId, null),
           ),
         )
       }

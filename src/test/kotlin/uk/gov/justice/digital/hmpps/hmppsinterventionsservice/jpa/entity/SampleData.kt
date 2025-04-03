@@ -318,7 +318,7 @@ class SampleData {
       id: UUID = UUID.randomUUID(),
       description: String = "Outcome 1",
       serviceCategoryId: UUID = UUID.randomUUID(),
-    ): DesiredOutcome = DesiredOutcome(id, description, serviceCategoryId)
+    ): DesiredOutcome = DesiredOutcome(id, description, serviceCategoryId, deprecatedAt = null)
 
     fun sampleAuthUser(
       id: String = "CRN123",

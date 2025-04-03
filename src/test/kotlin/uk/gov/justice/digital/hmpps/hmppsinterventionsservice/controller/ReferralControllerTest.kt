@@ -19,9 +19,11 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.Clie
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller.mappers.CancellationReasonMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AuthUserDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DesiredOutcomeDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAssignmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DraftOasysRiskInformationService
@@ -33,9 +35,12 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ServiceCat
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ActionPlanFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DesiredOutcomesFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAssessmentFactory
+import java.time.OffsetDateTime
 import java.util.UUID
 
 internal class ReferralControllerTest {
@@ -66,6 +71,8 @@ internal class ReferralControllerTest {
   private val supplierAssessmentFactory = SupplierAssessmentFactory()
   private val appointmentsFactory = AppointmentFactory()
   private val actionPlanFactory = ActionPlanFactory()
+  private val serviceCategoryFactory = ServiceCategoryFactory()
+  private val desiredOutcomeFactory = DesiredOutcomesFactory()
 
   @Nested
   inner class GetSentReferralForUser {
@@ -421,5 +428,34 @@ internal class ReferralControllerTest {
     val response = referralController.getReferralApprovedActionPlans(referralId)
 
     assertThat(response.size).isEqualTo(2)
+  }
+
+  @Nested
+  inner class GetServiceCategory {
+    @Test
+    fun `returns service category with only desired outcomes that are not deprecated`() {
+      val serviceCategoryId = UUID.randomUUID()
+      val desiredOutcomeId1 = UUID.randomUUID()
+      val desiredOutcomeId2 = UUID.randomUUID()
+      val desiredOutcomeId3 = UUID.randomUUID()
+      val desiredOutcomeId4 = UUID.randomUUID()
+
+      val desiredOutcomes = listOf(
+        DesiredOutcome(id = desiredOutcomeId1, serviceCategoryId = serviceCategoryId, description = "description 1", deprecatedAt = OffsetDateTime.now().minusDays(10)),
+        DesiredOutcome(id = desiredOutcomeId2, serviceCategoryId = serviceCategoryId, description = "description 2", deprecatedAt = OffsetDateTime.now().minusDays(10)),
+        DesiredOutcome(id = desiredOutcomeId3, serviceCategoryId = serviceCategoryId, description = "description 3", deprecatedAt = null),
+        DesiredOutcome(id = desiredOutcomeId4, serviceCategoryId = serviceCategoryId, description = "description 4", deprecatedAt = null),
+      )
+
+      val serviceCategory = serviceCategoryFactory.create(id = serviceCategoryId, desiredOutcomes = desiredOutcomes)
+
+      whenever(serviceCategoryService.getServiceCategoryByID(serviceCategoryId)).thenReturn(serviceCategory)
+      val response = referralController.getServiceCategoryByID(serviceCategoryId)
+      val expectedResponse = listOf(DesiredOutcomeDTO(desiredOutcomeId3, "description 3"), DesiredOutcomeDTO(desiredOutcomeId4, "description 4"))
+
+      assertThat(response.id).isEqualTo(serviceCategoryId)
+      assertThat(response.desiredOutcomes.size).isEqualTo(2)
+      assertThat(response.desiredOutcomes).isEqualTo(expectedResponse)
+    }
   }
 }

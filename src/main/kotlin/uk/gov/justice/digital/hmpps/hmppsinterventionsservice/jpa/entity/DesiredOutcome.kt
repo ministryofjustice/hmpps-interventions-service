@@ -1,9 +1,11 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
+import jakarta.annotation.Nullable
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.validation.constraints.NotNull
+import java.time.OffsetDateTime
 import java.util.UUID
 
 @Entity
@@ -13,4 +15,7 @@ data class DesiredOutcome(
   @NotNull
   @Column(name = "service_category_id")
   val serviceCategoryId: UUID,
+  @Nullable
+  @Column(name = "deprecated_at")
+  val deprecatedAt: OffsetDateTime?,
 )
