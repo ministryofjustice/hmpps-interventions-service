@@ -110,7 +110,17 @@ class ReferralController(
     @PageableDefault(page = 0, size = 50, sort = ["sentAt"]) page: Pageable,
   ): Page<SentReferralSummariesDTO> {
     val user = userMapper.fromToken(authentication)
-    return (referralService.getSentReferralSummaryForUser(user, completed, cancelled, unassigned, assignedToUserId, page, searchText) as Page<ReferralSummary>).map { SentReferralSummariesDTO.from(it) }.also {
+    return (
+      referralService.getSentReferralSummaryForUser(
+        user,
+        completed,
+        cancelled,
+        unassigned,
+        assignedToUserId,
+        page,
+        searchText,
+      ) as Page<ReferralSummary>
+      ).map { SentReferralSummariesDTO.from(it) }.also {
       telemetryClient.trackEvent(
         "PagedDashboardRequest",
         null,
