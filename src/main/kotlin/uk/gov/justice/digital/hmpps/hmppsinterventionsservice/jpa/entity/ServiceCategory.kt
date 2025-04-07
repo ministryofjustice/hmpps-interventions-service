@@ -20,5 +20,5 @@ data class ServiceCategory(
   val complexityLevels: List<ComplexityLevel>,
   @OneToMany
   @JoinColumn(name = "service_category_id")
-  val desiredOutcomes: List<DesiredOutcome>,
+  var desiredOutcomes: List<DesiredOutcome>,
 )
