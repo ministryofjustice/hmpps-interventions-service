@@ -713,8 +713,8 @@ class DraftReferralServiceTest @Autowired constructor(
   fun `ensure that desired outcomes are actually removed via orphan removal`() {
     val serviceCategoryId1 = UUID.randomUUID()
     val serviceCategoryId2 = UUID.randomUUID()
-    val desiredOutcome1 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId1, deprecatedAt = null)
-    val desiredOutcome2 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId2, deprecatedAt = null)
+    val desiredOutcome1 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId1, deprecatedAt = null, desiredOutcomeFilterRules = mutableSetOf())
+    val desiredOutcome2 = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId2, deprecatedAt = null, desiredOutcomeFilterRules = mutableSetOf())
     val serviceCategory1 =
       serviceCategoryFactory.create(id = serviceCategoryId1, desiredOutcomes = mutableListOf(desiredOutcome1))
     val serviceCategory2 =
@@ -742,7 +742,7 @@ class DraftReferralServiceTest @Autowired constructor(
   @Test
   fun `ensure that service categories constraint is not thrown when service categories is reselected with an already selected desired outcome`() {
     val serviceCategoryId = UUID.randomUUID()
-    val desiredOutcome = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId, deprecatedAt = null)
+    val desiredOutcome = DesiredOutcome(UUID.randomUUID(), "title", serviceCategoryId = serviceCategoryId, deprecatedAt = null, desiredOutcomeFilterRules = mutableSetOf())
     val serviceCategory =
       serviceCategoryFactory.create(id = serviceCategoryId, desiredOutcomes = mutableListOf(desiredOutcome))
 

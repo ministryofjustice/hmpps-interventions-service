@@ -23,7 +23,7 @@ class EndOfServiceReportOutcomeMapperTest {
     val createEndOfServiceReportOutcomeDTO =
       CreateEndOfServiceReportOutcomeDTO(desiredOutcomeId, AchievementLevel.ACHIEVED, null, null)
 
-    val desiredOutcome = DesiredOutcome(desiredOutcomeId, "desire", UUID.randomUUID(), deprecatedAt = null)
+    val desiredOutcome = DesiredOutcome(desiredOutcomeId, "desire", UUID.randomUUID(), deprecatedAt = null, desiredOutcomeFilterRules = mutableSetOf())
     whenever(desiredOutcomeRepository.findById(desiredOutcomeId)).thenReturn(Optional.of(desiredOutcome))
 
     val mappedEndOfServiceReportOutcome =

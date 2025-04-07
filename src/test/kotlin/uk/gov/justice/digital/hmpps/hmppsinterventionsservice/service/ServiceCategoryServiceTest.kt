@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcomeFilterRule
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.RuleType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ServiceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
@@ -27,9 +29,9 @@ class ServiceCategoryServiceTest @Autowired constructor(
     val idToFind = UUID.randomUUID()
 
     val desiredOutcomes = listOf(
-      DesiredOutcome(id = UUID.randomUUID(), "Outcome 1", idToFind, deprecatedAt = null),
-      DesiredOutcome(id = UUID.randomUUID(), "Outcome 2", idToFind, deprecatedAt = null),
-      DesiredOutcome(id = UUID.randomUUID(), "Outcome 3", idToFind, deprecatedAt = null),
+      DesiredOutcome(id = UUID.randomUUID(), "Outcome 1", idToFind, deprecatedAt = null, mutableSetOf()),
+      DesiredOutcome(id = UUID.randomUUID(), "Outcome 2", idToFind, deprecatedAt = null, mutableSetOf()),
+      DesiredOutcome(id = UUID.randomUUID(), "Outcome 3", idToFind, deprecatedAt = null, mutableSetOf()),
     )
 
     serviceCategoryFactory.create(id = idToFind, desiredOutcomes = desiredOutcomes)
@@ -38,5 +40,32 @@ class ServiceCategoryServiceTest @Autowired constructor(
     val serviceCategory = serviceCategoryService.getServiceCategoryByID(idToFind)
     assertThat(serviceCategory).isNotNull
     assertThat(serviceCategory!!.desiredOutcomes.count()).isEqualTo(3)
+  }
+
+  @Test
+  fun `filter service categories`() {
+    val serviceCategoryId = UUID.randomUUID()
+    val contractReference = "abc123"
+
+    val desiredOutcomeId1 = UUID.randomUUID()
+    val desiredOutcomeId2 = UUID.randomUUID()
+    val desiredOutcomeId3 = UUID.randomUUID()
+
+    val filterRule = DesiredOutcomeFilterRule(UUID.randomUUID(), desiredOutcomeId1,RuleType.EXCLUDE,"contract", mutableListOf(contractReference))
+
+    val desiredOutcomes = listOf(
+      DesiredOutcome(id = desiredOutcomeId1, "Outcome 1", serviceCategoryId, deprecatedAt = null, mutableSetOf(filterRule)),
+      DesiredOutcome(id = desiredOutcomeId2, "Outcome 2", serviceCategoryId, deprecatedAt = null, mutableSetOf()),
+      DesiredOutcome(id = desiredOutcomeId3, "Outcome 3", serviceCategoryId, deprecatedAt = null, mutableSetOf()),
+    )
+
+    serviceCategoryFactory.create(id = serviceCategoryId, desiredOutcomes = desiredOutcomes)
+    serviceCategoryFactory.create(id = UUID.randomUUID())
+
+    val result = serviceCategoryService.getServiceCategoryByIDAndContractReference(serviceCategoryId, contractReference)
+    assertThat(result).isNotNull
+    assertThat(result!!.id).isEqualTo(serviceCategoryId)
+    assertThat(result.desiredOutcomes.count()).isEqualTo(2)
+    result.desiredOutcomes.forEach { assertThat(it.id !== desiredOutcomeId1) }
   }
 }

@@ -13,14 +13,10 @@ import java.util.UUID
 @Transactional
 class ServiceCategoryService(val repository: ServiceCategoryRepository) {
   fun getServiceCategoryByID(id: UUID): ServiceCategory? = repository.findByIdOrNull(id)
-  fun getServiceCategoryByIDAndContractReference(id: UUID): ServiceCategory? {
+  fun getServiceCategoryByIDAndContractReference(id: UUID, contractReference: String): ServiceCategory? {
     val serviceCategory = repository.findByIdOrNull(id)
 
-val contractReference = "ABC123"
-
-
     serviceCategory?.desiredOutcomes = serviceCategory?.desiredOutcomes?.filter { shouldWeKeepDesiredOutcome(it, contractReference)}.orEmpty()
-
 
     return serviceCategory
   }

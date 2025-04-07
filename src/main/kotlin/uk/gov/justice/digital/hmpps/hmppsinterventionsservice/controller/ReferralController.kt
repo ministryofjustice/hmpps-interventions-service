@@ -43,7 +43,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralSe
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ServiceCategoryService
 import java.util.UUID
 
-//@PreAuthorize("hasRole('ROLE_PROBATION') or hasRole('ROLE_CRS_PROVIDER') or hasRole('ROLE_INTERVENTIONS_API_READ_ALL')")
+@PreAuthorize("hasRole('ROLE_PROBATION') or hasRole('ROLE_CRS_PROVIDER') or hasRole('ROLE_INTERVENTIONS_API_READ_ALL')")
 @RestController
 class ReferralController(
   private val referralService: ReferralService,
@@ -156,8 +156,8 @@ class ReferralController(
     ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "service category not found [id=$id]")
 
   @GetMapping("/service-category/{id}/contract-reference/{contractReference}")
-  fun getServiceCategoryByIDAndContractReference(@PathVariable id: UUID, @PathVariable contractReference: UUID): ServiceCategoryFullDTO {
-    val abc = serviceCategoryService.getServiceCategoryByIDAndContractReference(id)
+  fun getServiceCategoryByIDAndContractReference(@PathVariable id: UUID, @PathVariable contractReference: String): ServiceCategoryFullDTO {
+    val abc = serviceCategoryService.getServiceCategoryByIDAndContractReference(id, contractReference)
       return abc?.let { ServiceCategoryWithActiveOutcomesDTO.from(it) }
       ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "service category not found [id=$id]")
   }
