@@ -9,17 +9,7 @@ VALUES
      '428ee70f-3001-4399-95a6-ad25eaaede16', '2025-10-10 00:00:00.000000 +00:00'),
     ('efe6463f-20da-4ab3-b1b4-74b785be8e5d',
      'Service User makes progress towards obtaining accommodation, through removal of barriers or active steps to secure accommodation.',
-     '428ee70f-3001-4399-95a6-ad25eaaede16', '2025-10-10 00:00:00.000000 +00:00'),
-    -- Dependence and Recovery
-    ('9e2662d0-3e83-45a3-a946-2fc5fe3c26d7',
-     'Service User has a minimised risk of overdose following release from prison.',
-     '76bcdb97-1dea-41c1-a4f8-899d88e5d679'),
-    ('cf36e690-6c85-47b5-9d2b-1c58f00637f2',
-     'Service User accesses appropriate support, on release from custody or in the community.',
-     '76bcdb97-1dea-41c1-a4f8-899d88e5d679'),
-    ('35a3f115-5359-48ac-b09e-18c8e623b575',
-     'Service User achieves non-dependent or non-problematic substance misuse.',
-     '76bcdb97-1dea-41c1-a4f8-899d88e5d679');
+     '428ee70f-3001-4399-95a6-ad25eaaede16', '2025-10-10 00:00:00.000000 +00:00');
 
 -- Un-deprecates new outcomes
 UPDATE desired_outcome
