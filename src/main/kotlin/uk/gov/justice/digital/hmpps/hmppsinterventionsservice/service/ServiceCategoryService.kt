@@ -11,4 +11,8 @@ import java.util.UUID
 @Transactional
 class ServiceCategoryService(val repository: ServiceCategoryRepository) {
   fun getServiceCategoryByID(id: UUID): ServiceCategory? = repository.findByIdOrNull(id)
+  fun getServiceCategoryByIDAndContractReference(id: UUID): ServiceCategory? {
+    val serviceCategory = repository.findByIdOrNull(id)
+    return serviceCategory
+  }
 }

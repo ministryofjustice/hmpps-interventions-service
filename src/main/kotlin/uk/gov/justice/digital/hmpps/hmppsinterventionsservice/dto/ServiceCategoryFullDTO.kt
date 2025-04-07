@@ -1,15 +1,17 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto
 
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcomeFilterRule
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
 import java.util.UUID
 
 data class DesiredOutcomeDTO(
   val id: UUID,
   val description: String,
+  val filterRules: MutableSet<DesiredOutcomeFilterRule> = mutableSetOf(),
 ) {
   companion object {
-    fun from(desiredOutcome: DesiredOutcome): DesiredOutcomeDTO = DesiredOutcomeDTO(desiredOutcome.id, desiredOutcome.description)
+    fun from(desiredOutcome: DesiredOutcome): DesiredOutcomeDTO = DesiredOutcomeDTO(desiredOutcome.id, desiredOutcome.description, desiredOutcome.desiredOutcomeFilterRules)
   }
 }
 
