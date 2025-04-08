@@ -18,6 +18,8 @@ create table desired_outcome_filter_rule_match_data(
                                  constraint fk__referral_desired_outcome__referral foreign key (desired_outcome_filter_rule_id) references desired_outcome_filter_rule
 );
 
+COMMENT ON TABLE desired_outcome_filter_rule IS 'stores rules about when a desired outcome should be filtered out.';
+COMMENT ON TABLE desired_outcome_filter_rule_match_data IS 'stored the data that should be matched against when filtering.';
 
 INSERT INTO metadata (table_name, column_name, sensitive, domain_data) VALUES ('desired_outcome_filter_rule','id', FALSE, TRUE);
 INSERT INTO metadata (table_name, column_name, sensitive, domain_data) VALUES ('desired_outcome_filter_rule','desired_outcome_id', FALSE, TRUE);
