@@ -17,3 +17,11 @@ create table desired_outcome_filter_rule_match_data(
                                  unique(desired_outcome_filter_rule_id , match_data),
                                  constraint fk__referral_desired_outcome__referral foreign key (desired_outcome_filter_rule_id) references desired_outcome_filter_rule
 );
+
+
+INSERT INTO metadata (table_name, column_name, sensitive, domain_data) VALUES ('desired_outcome_filter_rule','id', FALSE, TRUE);
+INSERT INTO metadata (table_name, column_name, sensitive, domain_data) VALUES ('desired_outcome_filter_rule','desired_outcome_id', FALSE, TRUE);
+INSERT INTO metadata (table_name, column_name, sensitive, domain_data) VALUES ('desired_outcome_filter_rule','rule_type', FALSE, TRUE);
+INSERT INTO metadata (table_name, column_name, sensitive, domain_data) VALUES ('desired_outcome_filter_rule','match_type', FALSE, TRUE);
+INSERT INTO metadata (table_name, column_name, sensitive, domain_data) VALUES ('desired_outcome_filter_rule_match_data','desired_outcome_filter_rule_id', FALSE, TRUE);
+INSERT INTO metadata (table_name, column_name, sensitive, domain_data) VALUES ('desired_outcome_filter_rule_match_data','match_data', FALSE, TRUE);
