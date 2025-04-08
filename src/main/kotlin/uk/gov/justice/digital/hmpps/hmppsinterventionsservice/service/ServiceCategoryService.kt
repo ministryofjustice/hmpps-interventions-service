@@ -14,25 +14,22 @@ import java.util.UUID
 class ServiceCategoryService(val repository: ServiceCategoryRepository) {
   fun getServiceCategoryByID(id: UUID): ServiceCategory? = repository.findByIdOrNull(id)
   fun getServiceCategoryByIDAndContractReference(id: UUID, contractReference: String): ServiceCategory? {
-    val serviceCategory = repository.findByIdOrNull(id)
+    val serviceCategoryWithAllDesiredOutcomes = repository.findByIdOrNull(id)
+    val serviceCategoryWithFilteredOutcomes = serviceCategoryWithAllDesiredOutcomes?.copy()
+    serviceCategoryWithFilteredOutcomes?.desiredOutcomes = serviceCategoryWithFilteredOutcomes?.desiredOutcomes?.filter { isDesiredOutcomeValidForContract(it, contractReference) }.orEmpty()
 
-    serviceCategory?.desiredOutcomes = serviceCategory?.desiredOutcomes?.filter { shouldWeKeepDesiredOutcome(it, contractReference) }.orEmpty()
-
-    return serviceCategory
+    return serviceCategoryWithFilteredOutcomes
   }
 
-  fun shouldWeKeepDesiredOutcome(desiredOutcome: DesiredOutcome, contractReference: String): Boolean {
-    if (desiredOutcome.desiredOutcomeFilterRules.size > 0) {
-      desiredOutcome.desiredOutcomeFilterRules.forEach {
-        if (it.ruleType == RuleType.EXCLUDE) {
-          if (it.matchData.contains(contractReference)) {
-            return false
-          }
-        }
-//        if(it.ruleType == RuleType.INCLUDE){
-//          if(it.matchData.contains(contractReference)){
-//            return true
-//          }
+  fun isDesiredOutcomeValidForContract(desiredOutcome: DesiredOutcome, contractReference: String): Boolean {
+    if (desiredOutcome.deprecatedAt != null) {
+      return false
+    }
+
+    desiredOutcome.desiredOutcomeFilterRules.forEach {
+      return when (it.ruleType) {
+        RuleType.INCLUDE -> it.matchData.contains(contractReference)
+        RuleType.EXCLUDE -> !it.matchData.contains(contractReference)
       }
     }
     return true

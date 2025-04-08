@@ -23,6 +23,4 @@ data class DesiredOutcome(
   @OneToMany
   @JoinColumn(name = "desired_outcome_id")
   val desiredOutcomeFilterRules: MutableSet<DesiredOutcomeFilterRule>,
-) {
-//  override fun toString(): String = "ActionPlanAppointmentEvent(t)"
-}
+)

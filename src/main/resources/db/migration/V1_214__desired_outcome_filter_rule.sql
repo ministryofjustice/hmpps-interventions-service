@@ -14,6 +14,7 @@ create table desired_outcome_filter_rule_match_data(
                                  desired_outcome_filter_rule_id uuid not null,
                                  match_data text not null,
 
+                                 primary key (desired_outcome_filter_rule_id, match_data),
                                  unique(desired_outcome_filter_rule_id , match_data),
                                  constraint fk__referral_desired_outcome__referral foreign key (desired_outcome_filter_rule_id) references desired_outcome_filter_rule
 );
