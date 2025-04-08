@@ -51,7 +51,7 @@ class ServiceCategoryServiceTest @Autowired constructor(
     val desiredOutcomeId2 = UUID.randomUUID()
     val desiredOutcomeId3 = UUID.randomUUID()
 
-    val filterRule = DesiredOutcomeFilterRule(UUID.randomUUID(), desiredOutcomeId1,RuleType.EXCLUDE,"contract", mutableListOf(contractReference))
+    val filterRule = DesiredOutcomeFilterRule(UUID.randomUUID(), desiredOutcomeId1, RuleType.EXCLUDE, "contract", mutableListOf(contractReference))
 
     val desiredOutcomes = listOf(
       DesiredOutcome(id = desiredOutcomeId1, "Outcome 1", serviceCategoryId, deprecatedAt = null, mutableSetOf(filterRule)),

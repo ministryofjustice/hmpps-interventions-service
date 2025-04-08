@@ -441,8 +441,12 @@ internal class ReferralControllerTest {
       val desiredOutcomeId4 = UUID.randomUUID()
 
       val desiredOutcomes = listOf(
-        DesiredOutcome(id = desiredOutcomeId1, serviceCategoryId = serviceCategoryId, description = "description 1", deprecatedAt = OffsetDateTime.now().minusDays(10),
-          desiredOutcomeFilterRules = mutableSetOf()
+        DesiredOutcome(
+          id = desiredOutcomeId1,
+          serviceCategoryId = serviceCategoryId,
+          description = "description 1",
+          deprecatedAt = OffsetDateTime.now().minusDays(10),
+          desiredOutcomeFilterRules = mutableSetOf(),
         ),
         DesiredOutcome(id = desiredOutcomeId2, serviceCategoryId = serviceCategoryId, description = "description 2", deprecatedAt = OffsetDateTime.now().minusDays(10), desiredOutcomeFilterRules = mutableSetOf()),
         DesiredOutcome(id = desiredOutcomeId3, serviceCategoryId = serviceCategoryId, description = "description 3", deprecatedAt = null, desiredOutcomeFilterRules = mutableSetOf()),

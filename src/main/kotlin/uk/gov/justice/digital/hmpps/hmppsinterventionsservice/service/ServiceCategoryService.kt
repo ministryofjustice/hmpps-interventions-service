@@ -16,16 +16,16 @@ class ServiceCategoryService(val repository: ServiceCategoryRepository) {
   fun getServiceCategoryByIDAndContractReference(id: UUID, contractReference: String): ServiceCategory? {
     val serviceCategory = repository.findByIdOrNull(id)
 
-    serviceCategory?.desiredOutcomes = serviceCategory?.desiredOutcomes?.filter { shouldWeKeepDesiredOutcome(it, contractReference)}.orEmpty()
+    serviceCategory?.desiredOutcomes = serviceCategory?.desiredOutcomes?.filter { shouldWeKeepDesiredOutcome(it, contractReference) }.orEmpty()
 
     return serviceCategory
   }
 
   fun shouldWeKeepDesiredOutcome(desiredOutcome: DesiredOutcome, contractReference: String): Boolean {
-    if(desiredOutcome.desiredOutcomeFilterRules.size > 0){
+    if (desiredOutcome.desiredOutcomeFilterRules.size > 0) {
       desiredOutcome.desiredOutcomeFilterRules.forEach {
-        if(it.ruleType == RuleType.EXCLUDE){
-          if(it.matchData.contains(contractReference)){
+        if (it.ruleType == RuleType.EXCLUDE) {
+          if (it.matchData.contains(contractReference)) {
             return false
           }
         }
@@ -37,5 +37,4 @@ class ServiceCategoryService(val repository: ServiceCategoryRepository) {
     }
     return true
   }
-
 }
