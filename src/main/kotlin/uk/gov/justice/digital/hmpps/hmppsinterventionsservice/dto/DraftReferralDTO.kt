@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto
 
 import com.fasterxml.jackson.annotation.JsonView
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DynamicFrameworkContract
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import java.time.LocalDate
@@ -77,6 +78,7 @@ data class DraftReferralDTO(
   val expectedProbationOffice: String? = null,
   val expectedProbationOfficeUnKnownReason: String? = null,
   val reasonForReferralCreationBeforeAllocation: String? = null,
+  val dynamicFrameworkContractReference: String? = null,
 ) {
   companion object {
     fun from(referral: DraftReferral): DraftReferralDTO {
@@ -141,6 +143,7 @@ data class DraftReferralDTO(
         expectedProbationOffice = referral.expectedProbationOffice,
         expectedProbationOfficeUnKnownReason = referral.expectedProbationOfficeUnknownReason,
         reasonForReferralCreationBeforeAllocation = referral.referralDetails?.reasonForReferralCreationBeforeAllocation,
+        dynamicFrameworkContractReference = contract.contractReference
       )
     }
 
