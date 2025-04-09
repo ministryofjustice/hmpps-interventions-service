@@ -8,10 +8,9 @@ import java.util.UUID
 data class DesiredOutcomeDTO(
   val id: UUID,
   val description: String,
-  val filterRules: MutableSet<DesiredOutcomeFilterRule> = mutableSetOf(),
 ) {
   companion object {
-    fun from(desiredOutcome: DesiredOutcome): DesiredOutcomeDTO = DesiredOutcomeDTO(desiredOutcome.id, desiredOutcome.description, desiredOutcome.desiredOutcomeFilterRules)
+    fun from(desiredOutcome: DesiredOutcome): DesiredOutcomeDTO = DesiredOutcomeDTO(desiredOutcome.id, desiredOutcome.description)
   }
 }
 
