@@ -155,6 +155,13 @@ class ReferralController(
     ?.let { ServiceCategoryWithActiveOutcomesDTO.from(it) }
     ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "service category not found [id=$id]")
 
+  @GetMapping("/service-category/{id}/contract-reference/{contractReference}")
+  fun getServiceCategoryByIDAndContractReference(@PathVariable id: UUID, @PathVariable contractReference: String): ServiceCategoryFullDTO {
+    val serviceCategory = serviceCategoryService.getServiceCategoryByIDAndContractReference(id, contractReference)
+    return serviceCategory?.let { ServiceCategoryWithActiveOutcomesDTO.from(it) }
+      ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "service category not found [id=$id]")
+  }
+
   @GetMapping("/referral-cancellation-reasons")
   fun getCancellationReasons(): List<CancellationReason> = referralService.getCancellationReasons()
 

@@ -191,7 +191,7 @@ class SetupAssistant(
 
   fun getDesiredOutcome(desiredOutcomeId: UUID): DesiredOutcome = desiredOutcomeRepository.findByIdOrNull(desiredOutcomeId)!!
 
-  fun createDesiredOutcome(id: UUID, description: String, serviceCategoryId: UUID): DesiredOutcome = desiredOutcomeRepository.save(DesiredOutcome(id, description, serviceCategoryId, deprecatedAt = null))
+  fun createDesiredOutcome(id: UUID, description: String, serviceCategoryId: UUID): DesiredOutcome = desiredOutcomeRepository.save(DesiredOutcome(id, description, serviceCategoryId, deprecatedAt = null, desiredOutcomeFilterRules = mutableSetOf()))
 
   fun createPPUser(id: String = "8751622134"): AuthUser {
     val user = AuthUser(id, "delius", "BERNARD.BEAKS")

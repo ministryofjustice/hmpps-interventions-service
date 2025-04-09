@@ -4,6 +4,8 @@ import jakarta.annotation.Nullable
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.OneToMany
 import jakarta.validation.constraints.NotNull
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -18,4 +20,7 @@ data class DesiredOutcome(
   @Nullable
   @Column(name = "deprecated_at")
   val deprecatedAt: OffsetDateTime?,
+  @OneToMany
+  @JoinColumn(name = "desired_outcome_id")
+  val desiredOutcomeFilterRules: MutableSet<DesiredOutcomeFilterRule>,
 )
