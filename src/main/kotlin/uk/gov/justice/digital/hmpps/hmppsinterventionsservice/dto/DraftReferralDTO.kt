@@ -212,6 +212,7 @@ data class DraftReferralDTO(
         hasMainPointOfContactDetails = referral.probationPractitionerDetails?.let {
           it.name != null || it.roleOrJobTitle != null || it.emailAddress != null
         },
+        dynamicFrameworkContractReference = contract.contractReference,
       )
     }
   }
