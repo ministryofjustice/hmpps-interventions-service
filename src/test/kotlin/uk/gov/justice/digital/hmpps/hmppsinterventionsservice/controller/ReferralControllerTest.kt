@@ -464,4 +464,38 @@ internal class ReferralControllerTest {
       assertThat(response.desiredOutcomes).isEqualTo(expectedResponse)
     }
   }
+
+  @Nested
+  inner class GetServiceCategoryByIDAndContractReference {
+    @Test
+    fun `returns service category with only desired outcomes`() {
+      val serviceCategoryId = UUID.randomUUID()
+      val desiredOutcomeId1 = UUID.randomUUID()
+      val desiredOutcomeId2 = UUID.randomUUID()
+
+      val desiredOutcomes = listOf(
+        DesiredOutcome(
+          id = desiredOutcomeId1,
+          serviceCategoryId = serviceCategoryId,
+          description = "description 1",
+          deprecatedAt = null,
+          desiredOutcomeFilterRules = mutableSetOf(),
+        ),
+        DesiredOutcome(id = desiredOutcomeId2, serviceCategoryId = serviceCategoryId, description = "description 2", deprecatedAt = null, desiredOutcomeFilterRules = mutableSetOf()),
+      )
+
+      val serviceCategory = serviceCategoryFactory.create(id = serviceCategoryId, desiredOutcomes = desiredOutcomes)
+
+      whenever(serviceCategoryService.getServiceCategoryByIDAndContractReference(serviceCategoryId, "ABC123")).thenReturn(serviceCategory)
+      val response = referralController.getServiceCategoryByIDAndContractReference(serviceCategoryId, "ABC123")
+      val expectedResponse = listOf(
+        DesiredOutcomeDTO(desiredOutcomeId1, "description 1"),
+        DesiredOutcomeDTO(desiredOutcomeId2, "description 2"),
+      )
+
+      assertThat(response.id).isEqualTo(serviceCategoryId)
+      assertThat(response.desiredOutcomes.size).isEqualTo(2)
+      assertThat(response.desiredOutcomes).isEqualTo(expectedResponse)
+    }
+  }
 }
