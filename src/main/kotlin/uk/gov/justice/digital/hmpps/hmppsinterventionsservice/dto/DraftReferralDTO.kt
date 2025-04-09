@@ -77,6 +77,7 @@ data class DraftReferralDTO(
   val expectedProbationOffice: String? = null,
   val expectedProbationOfficeUnKnownReason: String? = null,
   val reasonForReferralCreationBeforeAllocation: String? = null,
+  val dynamicFrameworkContractReference: String? = null,
 ) {
   companion object {
     fun from(referral: DraftReferral): DraftReferralDTO {
@@ -141,6 +142,7 @@ data class DraftReferralDTO(
         expectedProbationOffice = referral.expectedProbationOffice,
         expectedProbationOfficeUnKnownReason = referral.expectedProbationOfficeUnknownReason,
         reasonForReferralCreationBeforeAllocation = referral.referralDetails?.reasonForReferralCreationBeforeAllocation,
+        dynamicFrameworkContractReference = contract.contractReference,
       )
     }
 
