@@ -106,6 +106,21 @@ VALUES
  '9556a399-3529-4993-8030-41db2090555e', '2025-10-10 00:00:00.000000 +00:00'),
 ('04442985-3395-476f-93b7-6150bc78174e', 'Service User engages with voluntary or statutory family services.',
  '9556a399-3529-4993-8030-41db2090555e', '2025-10-10 00:00:00.000000 +00:00'),
+
+-- Family and Significant Others (GM)
+('7e6c886d-e23b-4a48-8709-2114aad951b0',
+ 'Family and significant others are supported to help service users comply with their licence or community order.',
+ '9232541b-6b1c-455d-8153-ab2784bf4593', '2025-10-10 00:00:00.000000 +00:00'),
+('1ba4a36e-c295-4316-aa74-cd6bc73b1f56', 'Service User demonstrates confident and responsible parenting behaviours.',
+ '9232541b-6b1c-455d-8153-ab2784bf4593', '2025-10-10 00:00:00.000000 +00:00'),
+('50053ce6-34ab-40f8-a0f3-db2470185760', 'Service User improves relationships with family and/or significant others.',
+ '9232541b-6b1c-455d-8153-ab2784bf4593', '2025-10-10 00:00:00.000000 +00:00'),
+('36136463-8334-42e6-b24d-8257dc6ed260',
+ 'Service User demonstrates ability to respond to breakdown of family and other relationships.',
+ '9232541b-6b1c-455d-8153-ab2784bf4593', '2025-10-10 00:00:00.000000 +00:00'),
+('ab0da71b-34e9-459c-a20b-d561c807dae9', 'Service User engages with voluntary or statutory family services.',
+ '9232541b-6b1c-455d-8153-ab2784bf4593', '2025-10-10 00:00:00.000000 +00:00'),
+
 -- Service Pathway: Finance, Benefit and Debt,
 ('edf4d13c-5a15-4789-83de-1a1eec1f3c99',
  'Service User addresses debt and financial management issues (Community - and Custody where available in your region)',
@@ -220,7 +235,13 @@ where id IN ('4e53936c-6c70-4352-8a18-c055c995820d', '4d1b5e71-08d1-41cd-bc58-88
              '507c0599-9bc1-4661-9d05-023a3a7fc79a', 'da5f8d6d-6be1-4549-9adf-db794072eb06',
              '75280c9b-477d-4836-9fa8-c53c45888b76', '3e13f375-0947-4313-8f71-4e74db24c17c',
              'd0d077f9-9832-41ac-ad89-fc4a915dee0f', 'f7908f5e-ec66-43a1-8a1b-a36081efed04',
-             '5dd9534e-df08-46be-b4f8-13d93feacf72');
+             '5dd9534e-df08-46be-b4f8-13d93feacf72', '7e6c886d-e23b-4a48-8709-2114aad951b0',
+             '1ba4a36e-c295-4316-aa74-cd6bc73b1f56', '50053ce6-34ab-40f8-a0f3-db2470185760',
+             '36136463-8334-42e6-b24d-8257dc6ed260', 'ab0da71b-34e9-459c-a20b-d561c807dae9'
+            );
+
+
+
 
 UPDATE desired_outcome
 SET deprecated_at = '2025-04-03 00:00:00.000000 +00:00'
