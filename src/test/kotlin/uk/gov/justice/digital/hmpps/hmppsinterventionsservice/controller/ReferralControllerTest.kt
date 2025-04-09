@@ -490,7 +490,7 @@ internal class ReferralControllerTest {
       val response = referralController.getServiceCategoryByIDAndContractReference(serviceCategoryId, "ABC123")
       val expectedResponse = listOf(
         DesiredOutcomeDTO(desiredOutcomeId1, "description 1"),
-        DesiredOutcomeDTO(desiredOutcomeId2, "description 2")
+        DesiredOutcomeDTO(desiredOutcomeId2, "description 2"),
       )
 
       assertThat(response.id).isEqualTo(serviceCategoryId)
