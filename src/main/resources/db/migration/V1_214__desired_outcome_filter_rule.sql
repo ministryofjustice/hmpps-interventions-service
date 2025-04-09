@@ -20,7 +20,14 @@ create table desired_outcome_filter_rule_match_data(
 );
 
 COMMENT ON TABLE desired_outcome_filter_rule IS 'stores rules about when a desired outcome should be filtered out.';
+COMMENT ON COLUMN desired_outcome_filter_rule.id IS 'the desired outcome filter rule unique identifier';
+COMMENT ON COLUMN desired_outcome_filter_rule.desired_outcome_id IS 'the id of the desired outcome the filter rule is for';
+COMMENT ON COLUMN desired_outcome_filter_rule.rule_type IS 'the type of rule the desired outcome is for. EXCLUSION or INCLUSION';
+COMMENT ON COLUMN desired_outcome_filter_rule.match_type IS 'the type of data that the rule should be compared against. Commonly contract-reference';
 COMMENT ON TABLE desired_outcome_filter_rule_match_data IS 'stored the data that should be matched against when filtering.';
+COMMENT ON COLUMN desired_outcome_filter_rule_match_data.desired_outcome_filter_rule_id IS 'the id of the desired outcome filter rule the match data is for';
+COMMENT ON COLUMN desired_outcome_filter_rule_match_data.match_data IS 'the exact data the rule is matching against';
+
 
 INSERT INTO metadata (table_name, column_name, sensitive, domain_data) VALUES ('desired_outcome_filter_rule','id', FALSE, TRUE);
 INSERT INTO metadata (table_name, column_name, sensitive, domain_data) VALUES ('desired_outcome_filter_rule','desired_outcome_id', FALSE, TRUE);
