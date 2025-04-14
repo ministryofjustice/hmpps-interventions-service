@@ -15,7 +15,7 @@ parameters:
     default: refer-and-monitor-an-intervention
 
 orbs:
-  hmpps: ministryofjustice/hmpps@10.3.0
+  hmpps: ministryofjustice/hmpps@11.0.0
   gradle: circleci/gradle@3.0.0
   mem: circleci/rememborb@0.0.2
 
