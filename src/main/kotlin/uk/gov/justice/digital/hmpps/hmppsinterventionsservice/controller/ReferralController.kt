@@ -28,7 +28,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralDetail
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SentReferralDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SentReferralSummariesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ServiceCategoryFullDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ServiceCategoryWithActiveOutcomesDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SupplierAssessmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.Views
@@ -152,7 +151,7 @@ class ReferralController(
 
   @GetMapping("/service-category/{id}")
   fun getServiceCategoryByID(@PathVariable id: UUID): ServiceCategoryFullDTO = serviceCategoryService.getServiceCategoryByID(id)
-    ?.let { ServiceCategoryWithActiveOutcomesDTO.from(it) }
+    ?.let { ServiceCategoryFullDTO.from(it) }
     ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "service category not found [id=$id]")
 
   @GetMapping("/service-category/{id}/contract-reference/{contractReference}")
