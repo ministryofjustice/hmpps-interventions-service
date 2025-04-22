@@ -152,7 +152,7 @@ class ReferralController(
 
   @GetMapping("/service-category/{id}")
   fun getServiceCategoryByID(@PathVariable id: UUID): ServiceCategoryFullDTO = serviceCategoryService.getServiceCategoryByID(id)
-    ?.let { ServiceCategoryWithActiveOutcomesDTO.from(it) }
+    ?.let { ServiceCategoryFullDTO.from(it) }
     ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "service category not found [id=$id]")
 
   @GetMapping("/service-category/{id}/contract-reference/{contractReference}")
