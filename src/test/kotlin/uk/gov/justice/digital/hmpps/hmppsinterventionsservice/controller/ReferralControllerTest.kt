@@ -433,7 +433,7 @@ internal class ReferralControllerTest {
   @Nested
   inner class GetServiceCategory {
     @Test
-    fun `returns service category with only desired outcomes that are not deprecated`() {
+    fun `returns service category with desired outcomes that are both deprecated and not deprecated`() {
       val serviceCategoryId = UUID.randomUUID()
       val desiredOutcomeId1 = UUID.randomUUID()
       val desiredOutcomeId2 = UUID.randomUUID()
@@ -457,10 +457,15 @@ internal class ReferralControllerTest {
 
       whenever(serviceCategoryService.getServiceCategoryByID(serviceCategoryId)).thenReturn(serviceCategory)
       val response = referralController.getServiceCategoryByID(serviceCategoryId)
-      val expectedResponse = listOf(DesiredOutcomeDTO(desiredOutcomeId3, "description 3"), DesiredOutcomeDTO(desiredOutcomeId4, "description 4"))
+      val expectedResponse = listOf(
+        DesiredOutcomeDTO(desiredOutcomeId1, "description 1"),
+        DesiredOutcomeDTO(desiredOutcomeId2, "description 2"),
+        DesiredOutcomeDTO(desiredOutcomeId3, "description 3"),
+        DesiredOutcomeDTO(desiredOutcomeId4, "description 4"),
+      )
 
       assertThat(response.id).isEqualTo(serviceCategoryId)
-      assertThat(response.desiredOutcomes.size).isEqualTo(2)
+      assertThat(response.desiredOutcomes.size).isEqualTo(4)
       assertThat(response.desiredOutcomes).isEqualTo(expectedResponse)
     }
   }
