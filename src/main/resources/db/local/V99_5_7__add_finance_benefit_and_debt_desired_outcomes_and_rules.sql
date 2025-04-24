@@ -1,0 +1,149 @@
+-- Service Pathway: Finance Benefit and Debt
+
+INSERT INTO desired_outcome (id, description, service_category_id, deprecated_at)
+VALUES
+    ('a66016fd-eac3-403b-8630-75b78e36e067','Service User addresses debt and financial management issues (Community - and Custody where available in your region).','561981f5-8a2e-4e71-a19b-41e0b3dcc66a', NULL),
+    ('d4b85604-524a-4ca0-a8fa-23e5d6c5fa4a','Service User addresses debt and financial management issues (Community - and Custody where available in your region).','f2c40b64-d5ef-4ce4-993e-039d509d903d', NULL),
+    ('897ad744-59cb-479f-be20-e68a0c9e6e30','Service User addresses debt and financial management issues (Community - and Custody where available in your region).','f2b00cea-a4f7-4919-b2ab-d8b6fc970c80', NULL),
+    ('d42a1ce4-6203-43ac-b298-f568da43c1eb','Service User addresses debt and financial management issues (Community - and Custody where available in your region).','64bc7502-7cec-410d-af7d-d3bae65b47ad', NULL),
+    ('c8aeb40f-0010-41b1-8e95-f75143160869','Service User addresses debt and financial management issues (Community - and Custody where available in your region).','2b6bfd96-6838-4f1f-81b3-fe4a11696575', NULL),
+    ('043e37d7-d793-4495-a20a-6c7daf303913','Service User addresses debt and financial management issues (Community - and Custody where available in your region).','cd362970-3fa5-4096-9f51-82dfd7dd8efb', NULL),
+    ('bab9c8bf-73c1-4ebb-bae4-32771af2f6ea','Service User addresses debt and financial management issues (Community - and Custody where available in your region).','53563c71-de95-484c-992b-9d76de8089f7', NULL),
+    ('258541d0-ec72-4017-ac31-27c8a2e90629','Service User addresses debt and financial management issues (Community - and Custody where available in your region).','7f8148ca-d07a-4769-a512-0b66284ef793', NULL),
+    ('85129ddb-3897-45ab-ae74-871e3ad76542','Service User addresses debt and financial management issues (Community - and Custody where available in your region).','45f21165-1108-4945-b16a-69fd79658628', NULL),
+    ('d13c3a97-b700-42c7-b3c6-3047a5681025','Service User addresses debt and financial management issues (Community - and Custody where available in your region).','1426a44a-bb12-4117-97cd-46afcbff7f3f', NULL),
+    ('c52563cd-9231-4668-acd3-3bd6d2acd365','Service User addresses debt and financial management issues (Community - and Custody where available in your region).','17c514b3-947c-439c-b7cb-b2779429feb8', NULL),
+    ('d26dd073-51a2-442f-8309-8ce9bbfa6b88','Service User addresses debt and financial management issues (Community - and Custody where available in your region).','68084e67-064a-4a19-8244-ec37e99a4fd4', NULL),
+    ('237ae4ae-93d7-4b6c-9fca-e3dd623eaad3','Service User addresses debt and financial management issues (Community - and Custody where available in your region).','c61f93f1-99b5-45a7-b470-24a6d981692a', NULL),
+    ('67aa4197-acad-43e7-8945-5d2e382dcac4','Service User addresses debt and financial management issues (Community - and Custody where available in your region).','40251185-a6d4-4107-b3d3-cfef2db71e37', NULL),
+    ('d2afcd19-8ba6-444d-879f-92d60db2149e','Service User addresses debt and financial management issues (Community - and Custody where available in your region).','cf2946a3-6bf2-4f0c-9154-190c2b2f899f', NULL),
+    ('d92781aa-9370-42ef-b61c-d887121f9f42','Service User addresses debt and financial management issues (Community - and Custody where available in your region).','93283d91-f87a-43d2-83a5-6a6a27f5965e', NULL),
+    ('312cb03d-d815-4c6e-bafe-15a1e882c52c','Service User addresses debt and financial management issues (Community - and Custody where available in your region).','c7c9416f-e83a-41fa-bc56-8429907cdd9f', NULL),
+    ('4bc15c13-5b3b-46cf-bef6-e3dcfdabfd39','Service User addresses debt and financial management issues (Community - and Custody where available in your region).','6c1541c1-13c4-4cc1-b7d6-d59671dd6954', NULL),
+    ('7e39b31f-3849-4681-8f7f-6c6142332612','Service User addresses debt and financial management issues (Community - and Custody where available in your region).','07e92c9c-51a6-43bb-81a9-226f518dd5ad', NULL),
+    ('590bf9e0-5f1e-450b-b0f7-20d40830af3e','Service User addresses debt and financial management issues (Community - and Custody where available in your region).','96a63c39-4371-4f17-a6ec-265755f0cf7b', NULL);
+
+INSERT INTO desired_outcome (id, description, service_category_id, deprecated_at)
+VALUES
+    ('12681a93-a41f-47fd-86f2-2983f1b6d2ff','Service User develops skills to manage finances and debts.','561981f5-8a2e-4e71-a19b-41e0b3dcc66a', NULL),
+    ('ff10c5dc-3fcf-403d-8de6-bcd040687551','Service User develops skills to manage finances and debts.','f2c40b64-d5ef-4ce4-993e-039d509d903d', NULL),
+    ('e6455972-e789-4c6f-bba1-13c0c8efa94a','Service User develops skills to manage finances and debts.','f2b00cea-a4f7-4919-b2ab-d8b6fc970c80', NULL),
+    ('16e383a5-5504-4ccd-a493-6c74e7694a8c','Service User develops skills to manage finances and debts.','64bc7502-7cec-410d-af7d-d3bae65b47ad', NULL),
+    ('549557e9-ab0a-4e96-9e13-7b3a6c2dbba1','Service User develops skills to manage finances and debts.','2b6bfd96-6838-4f1f-81b3-fe4a11696575', NULL),
+    ('45428466-558c-41a8-8242-845212de989c','Service User develops skills to manage finances and debts.','cd362970-3fa5-4096-9f51-82dfd7dd8efb', NULL),
+    ('d925f3ee-4da2-477e-80c1-a5197a2ed5ed','Service User develops skills to manage finances and debts.','53563c71-de95-484c-992b-9d76de8089f7', NULL),
+    ('c93b3f33-8e1f-4af2-b932-df2d469275ab','Service User develops skills to manage finances and debts.','7f8148ca-d07a-4769-a512-0b66284ef793', NULL),
+    ('821b05fa-f235-4f88-a32a-1b32ec9d442d','Service User develops skills to manage finances and debts.','45f21165-1108-4945-b16a-69fd79658628', NULL),
+    ('593c07fd-95f0-4ea9-9154-d6f30ccd79e8','Service User develops skills to manage finances and debts.','1426a44a-bb12-4117-97cd-46afcbff7f3f', NULL),
+    ('09c944b8-e9a2-4965-82c6-40f62cc848f5','Service User develops skills to manage finances and debts.','17c514b3-947c-439c-b7cb-b2779429feb8', NULL),
+    ('4d7d936f-5227-48c5-a5d0-c7c27170d483','Service User develops skills to manage finances and debts.','68084e67-064a-4a19-8244-ec37e99a4fd4', NULL),
+    ('85baead3-4df6-4028-86de-0d36b581bd83','Service User develops skills to manage finances and debts.','c61f93f1-99b5-45a7-b470-24a6d981692a', NULL),
+    ('b4eb7d22-678c-45f1-b0e0-c5a645c51f75','Service User develops skills to manage finances and debts.','40251185-a6d4-4107-b3d3-cfef2db71e37', NULL),
+    ('2115e3e2-c343-47ef-988c-115b7f2f8b91','Service User develops skills to manage finances and debts.','cf2946a3-6bf2-4f0c-9154-190c2b2f899f', NULL),
+    ('0187ee77-d7b4-4c5e-8d34-a05c9c64c080','Service User develops skills to manage finances and debts.','93283d91-f87a-43d2-83a5-6a6a27f5965e', NULL),
+    ('3b0861cf-9af3-430b-9c18-c425fd9b42f8','Service User develops skills to manage finances and debts.','c7c9416f-e83a-41fa-bc56-8429907cdd9f', NULL),
+    ('e3c3296b-ee33-4ec6-a5be-96ffbb00ad0d','Service User develops skills to manage finances and debts.','6c1541c1-13c4-4cc1-b7d6-d59671dd6954', NULL),
+    ('f2b58269-fb9d-43e2-aefd-15d6c95a6e80','Service User develops skills to manage finances and debts.','07e92c9c-51a6-43bb-81a9-226f518dd5ad', NULL),
+    ('f0321cd4-607e-4dc6-890c-0f2bed4e6a21','Service User develops skills to manage finances and debts.','96a63c39-4371-4f17-a6ec-265755f0cf7b', NULL);
+
+INSERT INTO desired_outcome (id, description, service_category_id, deprecated_at)
+VALUES
+    ('ebc96c7f-ae38-4ef9-afd4-128f5fd56053','Service User accesses relevant benefit entitlements.','561981f5-8a2e-4e71-a19b-41e0b3dcc66a', NULL),
+    ('c97233d2-e4e9-4ae4-9c4c-dffb99c49d95','Service User accesses relevant benefit entitlements.','f2c40b64-d5ef-4ce4-993e-039d509d903d', NULL),
+    ('0ecd13be-8745-42ac-879d-961150bff934','Service User accesses relevant benefit entitlements.','f2b00cea-a4f7-4919-b2ab-d8b6fc970c80', NULL),
+    ('3eea4f32-00d1-4523-8323-db8327437a3c','Service User accesses relevant benefit entitlements.','64bc7502-7cec-410d-af7d-d3bae65b47ad', NULL),
+    ('c875988f-9aa6-4b8b-ae1c-da67d91433e7','Service User accesses relevant benefit entitlements.','2b6bfd96-6838-4f1f-81b3-fe4a11696575', NULL),
+    ('4fc5837d-9906-4144-a049-4ec2ad5ca5cd','Service User accesses relevant benefit entitlements.','cd362970-3fa5-4096-9f51-82dfd7dd8efb', NULL),
+    ('0c9e96b3-6087-4374-9f51-55fdedc46b99','Service User accesses relevant benefit entitlements.','53563c71-de95-484c-992b-9d76de8089f7', NULL),
+    ('a9bc8171-f25b-4e2a-a97d-2aa6703e92c2','Service User accesses relevant benefit entitlements.','7f8148ca-d07a-4769-a512-0b66284ef793', NULL),
+    ('cfef8b3f-aa17-4109-8e00-c43f6ebf4db0','Service User accesses relevant benefit entitlements.','45f21165-1108-4945-b16a-69fd79658628', NULL),
+    ('0c9e44b7-9dcd-465e-a612-5c0034927d15','Service User accesses relevant benefit entitlements.','1426a44a-bb12-4117-97cd-46afcbff7f3f', NULL),
+    ('4a6d8032-f2d1-49d9-8a85-32acdb65f000','Service User accesses relevant benefit entitlements.','17c514b3-947c-439c-b7cb-b2779429feb8', NULL),
+    ('26fb74ec-5091-441a-bc13-7b837e726c79','Service User accesses relevant benefit entitlements.','68084e67-064a-4a19-8244-ec37e99a4fd4', NULL),
+    ('642e1e3f-d7e7-4850-802e-aae1ca2ac2b7','Service User accesses relevant benefit entitlements.','c61f93f1-99b5-45a7-b470-24a6d981692a', NULL),
+    ('80cde57c-3af6-4f7b-bb75-d0176df76a35','Service User accesses relevant benefit entitlements.','40251185-a6d4-4107-b3d3-cfef2db71e37', NULL),
+    ('71b1cb25-240f-4ab7-8c18-144d9e059349','Service User accesses relevant benefit entitlements.','cf2946a3-6bf2-4f0c-9154-190c2b2f899f', NULL),
+    ('c2c3fe3e-faa2-4668-a301-28cab5fc7ac6','Service User accesses relevant benefit entitlements.','93283d91-f87a-43d2-83a5-6a6a27f5965e', NULL),
+    ('65efcb03-c856-4df5-94e4-e1115d9572be','Service User accesses relevant benefit entitlements.','c7c9416f-e83a-41fa-bc56-8429907cdd9f', NULL),
+    ('0e8d5c95-20d5-4602-860c-1ec1d659a746','Service User accesses relevant benefit entitlements.','6c1541c1-13c4-4cc1-b7d6-d59671dd6954', NULL),
+    ('f0b97ca9-53c4-433a-94d2-d62095d59d17','Service User accesses relevant benefit entitlements.','07e92c9c-51a6-43bb-81a9-226f518dd5ad', NULL),
+    ('0060a243-a8d7-46f5-b61d-470d8ed1f0a3','Service User accesses relevant benefit entitlements.','96a63c39-4371-4f17-a6ec-265755f0cf7b', NULL);
+
+
+UPDATE desired_outcome
+SET deprecated_at = '2025-04-03 00:00:00.000000 +00:00'
+where id IN (
+        '018e8ef3-9645-4712-898e-c913e2bb5bd9', '947c597f-abcd-43bb-8499-8a6f2fdf6725', '22a9ed05-3396-4ee8-bfad-61c16c824bc7', '367217eb-9799-4f77-bc2c-5a8fd51d5f51', '3e2942c6-bdf8-4f47-a057-f76a7c276009','7cb320dc-3ebd-45fc-9a4f-dd9900a81d68',
+        '8955e0a0-e7ee-469a-be1a-2561d39f65cd', 'd825be6a-1f54-4b9a-ae03-1a110da8daa7', '675bc288-dc86-4036-b1b8-1827f9137a2a', '18450e99-694b-4d0d-a118-d3764fcccc21', 'bbc5e9c1-1a11-4cf9-98d3-f98c785156d1','31cbc6f9-c5c2-4da5-ad0d-7b72e41d4175',
+        '716229b3-ca55-4779-8e0f-759d5a67fa17', '101f2dd9-1e54-4b05-9ab0-732c2d4786ec', '20c0df29-4e0e-42ef-9f19-b7d90d06a420', 'aeaa9ada-284e-4bec-b76c-c19ed9f9b4b1', '23134544-6134-4e0a-afa7-89b6d82f638e','73e5a8e7-0f14-4d76-91b0-886864e2aca5',
+        '9b47bdfa-8c1b-428f-9e7d-aa5441394ec0', 'da54ceca-50a7-4a22-8791-44b23ab00ad8', 'af754368-3d86-4c6e-90f1-760b03b6fa59', '58537270-8396-4872-8b54-31f40a8bf2f2', '38eb026e-3476-4ae5-b8d2-1b6c82bf1aa6','bf1cc07c-465d-4d81-ba51-00c7a492866e',
+        '5524a64c-3ff4-48fe-b32f-9d61131e2289', '6c7d0537-d855-4e87-9270-ea5cd6a136c8', 'a1d1d743-158c-4b13-b370-397f247484da', '54234005-c5ab-44ef-9bfc-453a7df46cb2', '6e29931a-727b-4c26-b1bf-036f1b3a88f7','f0d45043-988a-4077-aa66-cf5c53f7c43a',
+        '6bc1dc66-77c4-4dc6-b38a-21d5c3929822', 'ec9b60e2-7732-4747-94c7-f3904d5fb3d4', 'aa8da6a3-c633-483d-a0e0-6716c990975b', 'b07fde92-0501-44da-a2ab-4f8f9c74bbab', '0fcedd00-03e0-478c-bf25-c0f341e1132c','7a1a74f1-9a92-4239-9b11-c58486f92159',
+        'bb483995-efae-47f7-b33a-0a1ab453d543', 'ba5c6553-f2c5-4b2b-8a2f-7f6aec266aa2', '39393e5f-48d2-4981-84d1-e23d762f65b8', '561cccf4-7e6c-4bd2-b8ea-b90b158ddbcc', '3bf11b73-3147-4506-a824-fc7e85920124','077d6f3b-b2e2-4896-9542-5cfb48af3432',
+        '92633936-af55-4e05-87ab-745b65fb75bc', '8e40c026-b7b5-4d20-bbc9-891f697a70fa', 'a0e18ea2-9982-43c5-9155-8a07ec88fe75', 'a1d5d4de-9e9b-4e63-be3b-db189b275499', 'de35d1de-e51b-49ba-bb75-ad8bceb9f0ec','b2bf616f-4ea4-488b-9880-57c7661e8d4c',
+        'c8fe5ad7-01a6-41a5-a3fb-950554e8c0f4', '95370c1b-e4db-403d-b595-d22105f9c479', '04aef3ac-35ee-4959-b1a1-8fa4bb1e047d', '4f0a6594-be62-4850-992f-8b4767ca37e8', '7555ba2c-5f30-41a1-b484-e048d9342e1f','8762515a-c31c-4912-9f61-9c78223acb2a',
+        '88ec4638-70c6-4e70-b543-bf7877ad5718', 'a670adae-9e36-434d-8c4d-1ebdda3f7b15', 'a4221a12-5989-4dc7-9680-4e2a39b4eb53', 'a004998f-2831-4f92-ac4e-68e3a31a01d0', '2fdc490e-8bb4-47f0-8c32-71d1a8c22bc9','3b036246-836c-42f1-a398-34e44d3b8849',
+        'cd457ebc-004d-4933-a7ee-747a1b231512', '6ba59e39-6c9d-4aaf-bf45-76b55f151a3f', '41356df0-6901-44d4-9d28-10c41cfe530f', 'c5b93ac0-d771-4140-b14f-f582c3c4c43b', '697c7d26-6bbf-4be8-bfdd-76121b1f876c','cfb61a7b-3ad4-45d2-abd0-fbd0552fad63',
+        '6ce29ec1-b568-482b-863b-bc43a81b8e30', '715c533a-ce87-4f0a-8d63-67fdca4df3db', 'bac8e3f5-b900-4649-b4b9-e8ef89fc5726', '9792c2da-9f44-4b33-b38c-8390522d77df', '6e7c9af2-0152-4338-8a08-5cd8d771bd80','f2f0a848-ab55-484e-b6a0-d98443b22e6a',
+        'a5041cd8-7200-4f84-8c59-3c2990153ab8', '2054a511-7f9c-484b-a80d-512e489c1cc5', '07c9acfd-7ede-47a0-9870-d4188b79486a', '6e330caf-1447-4614-b9ad-f3e921f7de13', '0315a204-d502-49e4-9926-d32a4aaabd6b','a9848b4a-39f5-4677-aff8-98b3197654c7',
+        '98f0c533-2c40-4d01-9913-2febadf4f7e4', 'a1352f1d-16a5-47b4-a9d3-fbdb25831ea0', '6b0cd832-8bad-4990-909b-69ae15da0e07', '9353db63-c9e8-4d0c-b201-06319b6fc4f0', '62dee38e-237e-4876-ac88-002de8f3e535','5ce1d006-4b45-4b0f-b92d-76dbbcbacd6d',
+        '94bfc9b6-a65f-46db-8227-3685dfb18a09', 'df778b16-8d84-47af-8e34-0c4e680e9f0a', 'b536d3c1-f5ca-4c5c-bfd6-da23c9551225', '464e7bce-0120-4698-b766-78dbcff270f3', '12fe144b-3367-4a81-a3e5-e3265cdc8b28',
+        'cb40474b-a6fa-4fed-a7d2-bf6b40cbae64', 'bf74188a-117a-473b-bb79-970f88b2805c', '78c09661-cd66-4cad-96e9-d6517db48c26', '242631bc-1bc4-4c73-9c69-6ca7063e113e', 'ceb24103-c6e5-44b8-92c2-fa5eb0240438',
+        'fc1f5ddd-ff7e-4fb2-b1e2-2fd4ab47f7b3', 'c79d1449-6032-4570-adc9-abd39a54030d', '8ef254ae-9558-4bac-932f-9caab6cda7d3', 'c4fe4504-c5d2-4be5-a35d-a1964364f716', '74f720f2-f7cb-4705-95aa-9533d4fdcb0a',
+        'ae992142-dc45-4225-9c6a-078ca5dd3624', '711e87e5-8b26-4f76-b047-181d915c8332', '13915d53-db18-4cf0-881c-bbfac3b0a170', 'd5c318e6-91de-43f3-b25e-b3210f6ed9f9', 'c3fc3847-f9a4-4008-8a61-a2df6d7431c8',
+        '38f41ce0-d0e4-4334-8b56-3eac1531bf18', 'fc35b932-3bab-4c9d-89cd-b43dcf00a925', '55fc73e6-5482-41b5-956e-6105ddb5fc0d', 'b3799c87-41f0-427b-ab6a-5f9271258644', 'e83ea864-571c-4c86-9597-9f063a660402',
+        '21e4ea2f-9aa6-4f3a-96ae-b278e99fd9db', 'c8e5e3e7-743b-4783-9961-7fc7845d77d0', '3b72f74a-83a4-4545-8052-71053d650ad5', 'd9bc8922-3ee7-419f-9889-74c7c8e81ef9', '167812d0-e720-4229-af46-999a6564b3d6'
+);
+
+-- -- Uncomment to roll back to original state
+-- DELETE
+-- FROM desired_outcome
+-- where id in
+--       (
+--        'a66016fd-eac3-403b-8630-75b78e36e067', '12681a93-a41f-47fd-86f2-2983f1b6d2ff', 'ebc96c7f-ae38-4ef9-afd4-128f5fd56053',
+--        'd4b85604-524a-4ca0-a8fa-23e5d6c5fa4a', 'ff10c5dc-3fcf-403d-8de6-bcd040687551', 'c97233d2-e4e9-4ae4-9c4c-dffb99c49d95',
+--        '897ad744-59cb-479f-be20-e68a0c9e6e30', 'e6455972-e789-4c6f-bba1-13c0c8efa94a', '0ecd13be-8745-42ac-879d-961150bff934',
+--        'd42a1ce4-6203-43ac-b298-f568da43c1eb', '16e383a5-5504-4ccd-a493-6c74e7694a8c', '3eea4f32-00d1-4523-8323-db8327437a3c',
+--        'c8aeb40f-0010-41b1-8e95-f75143160869', '549557e9-ab0a-4e96-9e13-7b3a6c2dbba1', 'c875988f-9aa6-4b8b-ae1c-da67d91433e7',
+--        '043e37d7-d793-4495-a20a-6c7daf303913', '45428466-558c-41a8-8242-845212de989c', '4fc5837d-9906-4144-a049-4ec2ad5ca5cd',
+--        'bab9c8bf-73c1-4ebb-bae4-32771af2f6ea', 'd925f3ee-4da2-477e-80c1-a5197a2ed5ed', '0c9e96b3-6087-4374-9f51-55fdedc46b99',
+--        '258541d0-ec72-4017-ac31-27c8a2e90629', 'c93b3f33-8e1f-4af2-b932-df2d469275ab', 'a9bc8171-f25b-4e2a-a97d-2aa6703e92c2',
+--        '85129ddb-3897-45ab-ae74-871e3ad76542', '821b05fa-f235-4f88-a32a-1b32ec9d442d', 'cfef8b3f-aa17-4109-8e00-c43f6ebf4db0',
+--        'd13c3a97-b700-42c7-b3c6-3047a5681025', '593c07fd-95f0-4ea9-9154-d6f30ccd79e8', '0c9e44b7-9dcd-465e-a612-5c0034927d15',
+--        'c52563cd-9231-4668-acd3-3bd6d2acd365', '09c944b8-e9a2-4965-82c6-40f62cc848f5', '4a6d8032-f2d1-49d9-8a85-32acdb65f000',
+--        'd26dd073-51a2-442f-8309-8ce9bbfa6b88', '4d7d936f-5227-48c5-a5d0-c7c27170d483', '26fb74ec-5091-441a-bc13-7b837e726c79',
+--        '237ae4ae-93d7-4b6c-9fca-e3dd623eaad3', '85baead3-4df6-4028-86de-0d36b581bd83', '642e1e3f-d7e7-4850-802e-aae1ca2ac2b7',
+--        '67aa4197-acad-43e7-8945-5d2e382dcac4', 'b4eb7d22-678c-45f1-b0e0-c5a645c51f75', '80cde57c-3af6-4f7b-bb75-d0176df76a35',
+--        'd2afcd19-8ba6-444d-879f-92d60db2149e', '2115e3e2-c343-47ef-988c-115b7f2f8b91', '71b1cb25-240f-4ab7-8c18-144d9e059349',
+--        'd92781aa-9370-42ef-b61c-d887121f9f42', '0187ee77-d7b4-4c5e-8d34-a05c9c64c080', 'c2c3fe3e-faa2-4668-a301-28cab5fc7ac6',
+--        '312cb03d-d815-4c6e-bafe-15a1e882c52c', '3b0861cf-9af3-430b-9c18-c425fd9b42f8', '65efcb03-c856-4df5-94e4-e1115d9572be',
+--        '4bc15c13-5b3b-46cf-bef6-e3dcfdabfd39', 'e3c3296b-ee33-4ec6-a5be-96ffbb00ad0d', '0e8d5c95-20d5-4602-860c-1ec1d659a746',
+--        '7e39b31f-3849-4681-8f7f-6c6142332612', 'f2b58269-fb9d-43e2-aefd-15d6c95a6e80', 'f0b97ca9-53c4-433a-94d2-d62095d59d17',
+--        '590bf9e0-5f1e-450b-b0f7-20d40830af3e', 'f0321cd4-607e-4dc6-890c-0f2bed4e6a21', '0060a243-a8d7-46f5-b61d-470d8ed1f0a3'
+--           );
+--
+-- UPDATE desired_outcome
+-- SET deprecated_at = null
+-- where id IN
+-- (
+--     '018e8ef3-9645-4712-898e-c913e2bb5bd9', '947c597f-abcd-43bb-8499-8a6f2fdf6725', '22a9ed05-3396-4ee8-bfad-61c16c824bc7', '367217eb-9799-4f77-bc2c-5a8fd51d5f51', '3e2942c6-bdf8-4f47-a057-f76a7c276009','7cb320dc-3ebd-45fc-9a4f-dd9900a81d68',
+--     '8955e0a0-e7ee-469a-be1a-2561d39f65cd', 'd825be6a-1f54-4b9a-ae03-1a110da8daa7', '675bc288-dc86-4036-b1b8-1827f9137a2a', '18450e99-694b-4d0d-a118-d3764fcccc21', 'bbc5e9c1-1a11-4cf9-98d3-f98c785156d1','31cbc6f9-c5c2-4da5-ad0d-7b72e41d4175',
+--     '716229b3-ca55-4779-8e0f-759d5a67fa17', '101f2dd9-1e54-4b05-9ab0-732c2d4786ec', '20c0df29-4e0e-42ef-9f19-b7d90d06a420', 'aeaa9ada-284e-4bec-b76c-c19ed9f9b4b1', '23134544-6134-4e0a-afa7-89b6d82f638e','73e5a8e7-0f14-4d76-91b0-886864e2aca5',
+--     '9b47bdfa-8c1b-428f-9e7d-aa5441394ec0', 'da54ceca-50a7-4a22-8791-44b23ab00ad8', 'af754368-3d86-4c6e-90f1-760b03b6fa59', '58537270-8396-4872-8b54-31f40a8bf2f2', '38eb026e-3476-4ae5-b8d2-1b6c82bf1aa6','bf1cc07c-465d-4d81-ba51-00c7a492866e',
+--     '5524a64c-3ff4-48fe-b32f-9d61131e2289', '6c7d0537-d855-4e87-9270-ea5cd6a136c8', 'a1d1d743-158c-4b13-b370-397f247484da', '54234005-c5ab-44ef-9bfc-453a7df46cb2', '6e29931a-727b-4c26-b1bf-036f1b3a88f7','f0d45043-988a-4077-aa66-cf5c53f7c43a',
+--     '6bc1dc66-77c4-4dc6-b38a-21d5c3929822', 'ec9b60e2-7732-4747-94c7-f3904d5fb3d4', 'aa8da6a3-c633-483d-a0e0-6716c990975b', 'b07fde92-0501-44da-a2ab-4f8f9c74bbab', '0fcedd00-03e0-478c-bf25-c0f341e1132c','7a1a74f1-9a92-4239-9b11-c58486f92159',
+--     'bb483995-efae-47f7-b33a-0a1ab453d543', 'ba5c6553-f2c5-4b2b-8a2f-7f6aec266aa2', '39393e5f-48d2-4981-84d1-e23d762f65b8', '561cccf4-7e6c-4bd2-b8ea-b90b158ddbcc', '3bf11b73-3147-4506-a824-fc7e85920124','077d6f3b-b2e2-4896-9542-5cfb48af3432',
+--     '92633936-af55-4e05-87ab-745b65fb75bc', '8e40c026-b7b5-4d20-bbc9-891f697a70fa', 'a0e18ea2-9982-43c5-9155-8a07ec88fe75', 'a1d5d4de-9e9b-4e63-be3b-db189b275499', 'de35d1de-e51b-49ba-bb75-ad8bceb9f0ec','b2bf616f-4ea4-488b-9880-57c7661e8d4c',
+--     'c8fe5ad7-01a6-41a5-a3fb-950554e8c0f4', '95370c1b-e4db-403d-b595-d22105f9c479', '04aef3ac-35ee-4959-b1a1-8fa4bb1e047d', '4f0a6594-be62-4850-992f-8b4767ca37e8', '7555ba2c-5f30-41a1-b484-e048d9342e1f','8762515a-c31c-4912-9f61-9c78223acb2a',
+--     '88ec4638-70c6-4e70-b543-bf7877ad5718', 'a670adae-9e36-434d-8c4d-1ebdda3f7b15', 'a4221a12-5989-4dc7-9680-4e2a39b4eb53', 'a004998f-2831-4f92-ac4e-68e3a31a01d0', '2fdc490e-8bb4-47f0-8c32-71d1a8c22bc9','3b036246-836c-42f1-a398-34e44d3b8849',
+--     'cd457ebc-004d-4933-a7ee-747a1b231512', '6ba59e39-6c9d-4aaf-bf45-76b55f151a3f', '41356df0-6901-44d4-9d28-10c41cfe530f', 'c5b93ac0-d771-4140-b14f-f582c3c4c43b', '697c7d26-6bbf-4be8-bfdd-76121b1f876c','cfb61a7b-3ad4-45d2-abd0-fbd0552fad63',
+--     '6ce29ec1-b568-482b-863b-bc43a81b8e30', '715c533a-ce87-4f0a-8d63-67fdca4df3db', 'bac8e3f5-b900-4649-b4b9-e8ef89fc5726', '9792c2da-9f44-4b33-b38c-8390522d77df', '6e7c9af2-0152-4338-8a08-5cd8d771bd80','f2f0a848-ab55-484e-b6a0-d98443b22e6a',
+--     'a5041cd8-7200-4f84-8c59-3c2990153ab8', '2054a511-7f9c-484b-a80d-512e489c1cc5', '07c9acfd-7ede-47a0-9870-d4188b79486a', '6e330caf-1447-4614-b9ad-f3e921f7de13', '0315a204-d502-49e4-9926-d32a4aaabd6b','a9848b4a-39f5-4677-aff8-98b3197654c7',
+--     '98f0c533-2c40-4d01-9913-2febadf4f7e4', 'a1352f1d-16a5-47b4-a9d3-fbdb25831ea0', '6b0cd832-8bad-4990-909b-69ae15da0e07', '9353db63-c9e8-4d0c-b201-06319b6fc4f0', '62dee38e-237e-4876-ac88-002de8f3e535','5ce1d006-4b45-4b0f-b92d-76dbbcbacd6d',
+--     '94bfc9b6-a65f-46db-8227-3685dfb18a09', 'df778b16-8d84-47af-8e34-0c4e680e9f0a', 'b536d3c1-f5ca-4c5c-bfd6-da23c9551225', '464e7bce-0120-4698-b766-78dbcff270f3', '12fe144b-3367-4a81-a3e5-e3265cdc8b28',
+--     'cb40474b-a6fa-4fed-a7d2-bf6b40cbae64', 'bf74188a-117a-473b-bb79-970f88b2805c', '78c09661-cd66-4cad-96e9-d6517db48c26', '242631bc-1bc4-4c73-9c69-6ca7063e113e', 'ceb24103-c6e5-44b8-92c2-fa5eb0240438',
+--     'fc1f5ddd-ff7e-4fb2-b1e2-2fd4ab47f7b3', 'c79d1449-6032-4570-adc9-abd39a54030d', '8ef254ae-9558-4bac-932f-9caab6cda7d3', 'c4fe4504-c5d2-4be5-a35d-a1964364f716', '74f720f2-f7cb-4705-95aa-9533d4fdcb0a',
+--     'ae992142-dc45-4225-9c6a-078ca5dd3624', '711e87e5-8b26-4f76-b047-181d915c8332', '13915d53-db18-4cf0-881c-bbfac3b0a170', 'd5c318e6-91de-43f3-b25e-b3210f6ed9f9', 'c3fc3847-f9a4-4008-8a61-a2df6d7431c8',
+--     '38f41ce0-d0e4-4334-8b56-3eac1531bf18', 'fc35b932-3bab-4c9d-89cd-b43dcf00a925', '55fc73e6-5482-41b5-956e-6105ddb5fc0d', 'b3799c87-41f0-427b-ab6a-5f9271258644', 'e83ea864-571c-4c86-9597-9f063a660402',
+--     '21e4ea2f-9aa6-4f3a-96ae-b278e99fd9db', 'c8e5e3e7-743b-4783-9961-7fc7845d77d0', '3b72f74a-83a4-4545-8052-71053d650ad5', 'd9bc8922-3ee7-419f-9889-74c7c8e81ef9', '167812d0-e720-4229-af46-999a6564b3d6'
+--     );
