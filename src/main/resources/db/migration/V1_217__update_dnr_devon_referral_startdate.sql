@@ -1,0 +1,1 @@
+update dynamic_framework_contract set referral_start_date = '2025-06-01', start_date = '2025-06-01' where id='4c3fd541-66fd-4ca1-a462-600724ed6c54';
