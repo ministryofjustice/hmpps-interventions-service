@@ -9,7 +9,7 @@ VALUES ('be2cb69b-389c-457e-87d8-d756826abd82',
 -- Exceptions: Greater Manchester only,
        ('73732960-b654-4856-a32c-a12d9511a17b',
         'Service User who is not NFA or at immediate risk of homelessness is supported to secure and maintain suitable accommodation.',
-        '8221a81c-08b2-4262-9c1a-0ab3c82cec8c', NULL),
+        '8221a81c-08b2-4262-9c1a-0ab3c82cec8c', NULL);
 
 INSERT INTO desired_outcome_filter_rule(id, desired_outcome_id, rule_type, match_type)
 VALUES ('281bff3c-cf1a-4c33-bb81-3d219dd0dd9f', '73732960-b654-4856-a32c-a12d9511a17b', 'INCLUDE',
@@ -34,7 +34,18 @@ VALUES ('281bff3c-cf1a-4c33-bb81-3d219dd0dd9f', 'DN671065_BOLTON_PWB'),
        ('281bff3c-cf1a-4c33-bb81-3d219dd0dd9f', 'DN547952_6'),
        ('281bff3c-cf1a-4c33-bb81-3d219dd0dd9f', 'DN547952_7'),
        ('281bff3c-cf1a-4c33-bb81-3d219dd0dd9f', 'DN547952_8'),
-       ('281bff3c-cf1a-4c33-bb81-3d219dd0dd9f', 'DN547952_9'),
+       ('281bff3c-cf1a-4c33-bb81-3d219dd0dd9f', 'DN547952_9');
+
+UPDATE desired_outcome
+SET deprecated_at = '2025-04-03 00:00:00.000000 +00:00'
+where id IN (
+             '52a658f6-622b-491e-8085-cea58c9b015b',
+             '2b6e54d3-1cf7-4fc7-aae2-2f338085feda',
+             '4fc163c9-f8fb-4cfd-b107-2cb13583ebf0',
+             'ce7a55cc-d179-49d8-b7ab-6e8d93024ead',
+             '117832ca-f65e-4cce-9cdd-bdf666e740ea',
+             '6277c89b-28ca-49bd-8411-bf3d461a96f2'
+    );
 
 
 -- -- Uncomment to roll back to original state
