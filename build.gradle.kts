@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   kotlin("plugin.spring") version "2.1.20"
@@ -26,8 +27,8 @@ java {
 
 tasks {
   withType<KotlinCompile> {
-    kotlinOptions {
-      jvmTarget = JavaVersion.VERSION_21.toString()
+    compilerOptions {
+      jvmTarget.set(JvmTarget.JVM_21)
     }
   }
   test {
@@ -115,6 +116,8 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux:3.4.4")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.4.4")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.4.4")
+  // Override vulnerable dependency. Remove it when we upgrade org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.4.4
+  implementation("org.springframework.security:spring-security-crypto:6.4.5")
   implementation("com.nimbusds:oauth2-oidc-sdk:11.23.1")
 
   // database
