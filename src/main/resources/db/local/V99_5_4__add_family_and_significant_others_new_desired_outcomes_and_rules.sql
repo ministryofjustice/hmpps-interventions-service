@@ -26,7 +26,7 @@ VALUES
         'Service User demonstrates ability to respond to breakdown of family and other relationships.',
         '9232541b-6b1c-455d-8153-ab2784bf4593', NULL),
        ('ab0da71b-34e9-459c-a20b-d561c807dae9', 'Service User engages with voluntary or statutory family services.',
-        '9232541b-6b1c-455d-8153-ab2784bf4593', NULL),
+        '9232541b-6b1c-455d-8153-ab2784bf4593', NULL);
 
 
 INSERT INTO desired_outcome_filter_rule(id, desired_outcome_id, rule_type, match_type)
@@ -58,6 +58,23 @@ VALUES ('3fd616f3-805c-4b32-afa3-f7514d3629d2', 'DN547952_1'),
        ('3fd616f3-805c-4b32-afa3-f7514d3629d2', 'DN547952_7'),
        ('3fd616f3-805c-4b32-afa3-f7514d3629d2', 'DN547952_8'),
        ('3fd616f3-805c-4b32-afa3-f7514d3629d2', 'DN547952_9');
+
+UPDATE desired_outcome
+SET deprecated_at = '2025-04-03 00:00:00.000000 +00:00'
+where id IN (
+             '518c70c3-8f42-4ad6-a50d-f9e92d366059',
+        '9823356e-ff3b-4b29-9d6e-bc3065b067c1',
+        'bcb7309f-62a8-49ba-894d-3e627f0993e0',
+        '6f97a384-457d-4fc9-aa09-e30dad38d6bc',
+        '169824c2-ae25-4392-bf59-c74ae4591e30',
+        'd2df75af-0850-4e65-bd86-22b8f34067d3',
+        '1ffe903f-0aea-4ad0-8fe2-6e58b7ec0324',
+        '868f713a-5c53-4a18-b20f-ff8f118e9c30',
+        'dd7e2bb6-4374-405a-9524-432aefd63a70',
+        'fdf33edf-dd73-4649-88d5-330805124dd7',
+        'f2a1026d-dcb7-4d8b-a227-3f6615ca3b80'
+    );
+
 
 
 -- -- Uncomment to roll back to original state
