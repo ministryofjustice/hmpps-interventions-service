@@ -13,7 +13,7 @@ VALUES ('be2cb69b-389c-457e-87d8-d756826abd82',
 
 INSERT INTO desired_outcome_filter_rule(id, desired_outcome_id, rule_type, match_type)
 VALUES ('281bff3c-cf1a-4c33-bb81-3d219dd0dd9f', '73732960-b654-4856-a32c-a12d9511a17b', 'INCLUDE',
-    'contract_reference');
+        'contract_reference');
 
 INSERT INTO desired_outcome_filter_rule_match_data (desired_outcome_filter_rule_id, match_data)
 VALUES ('281bff3c-cf1a-4c33-bb81-3d219dd0dd9f', 'DN671065_BOLTON_PWB'),
@@ -46,26 +46,3 @@ where id IN (
              '117832ca-f65e-4cce-9cdd-bdf666e740ea',
              '6277c89b-28ca-49bd-8411-bf3d461a96f2'
     );
-
-
--- -- Uncomment to roll back to original state
--- DELETE
--- FROM desired_outcome
--- where id in
---       (
---        'be2cb69b-389c-457e-87d8-d756826abd82',
---        '32f14f09-7928-43da-8ac1-3b8f7e2fa307',
---        '73732960-b654-4856-a32c-a12d9511a17b',
---           );
---
--- UPDATE desired_outcome
--- SET deprecated_at = null
--- where id IN
---       (
---        '52a658f6-622b-491e-8085-cea58c9b015b',
---        '2b6e54d3-1cf7-4fc7-aae2-2f338085feda',
---        '4fc163c9-f8fb-4cfd-b107-2cb13583ebf0',
---        'ce7a55cc-d179-49d8-b7ab-6e8d93024ead',
---        '117832ca-f65e-4cce-9cdd-bdf666e740ea',
---        '6277c89b-28ca-49bd-8411-bf3d461a96f2'
---           );
