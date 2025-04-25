@@ -1,14 +1,14 @@
 -- Service Pathway: Social Inclusion,
 
 INSERT INTO desired_outcome (id, description, service_category_id, deprecated_at)
-VALUES
-    ('5dd9534e-df08-46be-b4f8-13d93feacf72', 'Service User makes a successful transition from custody to the community.',
-     'c036826e-f077-49a5-8b33-601dca7ad479', NULL);
+VALUES ('5dd9534e-df08-46be-b4f8-13d93feacf72',
+        'Service User makes a successful transition from custody to the community.',
+        'c036826e-f077-49a5-8b33-601dca7ad479', NULL);
 
 -- Excludes
 INSERT INTO desired_outcome_filter_rule(id, desired_outcome_id, rule_type, match_type)
 VALUES ('87360927-0a4b-4efd-a7b4-d5b4dd49f417', '5dd9534e-df08-46be-b4f8-13d93feacf72', 'EXCLUDE',
-    'contract_reference');
+        'contract_reference');
 
 INSERT INTO desired_outcome_filter_rule_match_data (desired_outcome_filter_rule_id, match_data)
 VALUES ('87360927-0a4b-4efd-a7b4-d5b4dd49f417', 'DN671065_BOLTON_PWB'),
@@ -33,12 +33,12 @@ VALUES ('87360927-0a4b-4efd-a7b4-d5b4dd49f417', 'DN671065_BOLTON_PWB'),
 
 --Includes
 INSERT INTO desired_outcome_filter_rule(id, desired_outcome_id, rule_type, match_type)
-VALUES('e6fa2825-19ee-4521-9d0f-36ad938054a6', 'b820cdf3-164b-427d-b78e-1fb079851ebd', 'INCLUDE',
-    'contract_reference'),
-      ('47bf7545-af25-494f-a05d-f179215be853', 'ae6c90d3-a59e-46e7-b81f-6003179611ef', 'INCLUDE',
-       'contract_reference'),
-      ('b92b37f6-cad6-44d4-9c85-a84548102555', 'ad79e9c1-3c08-4d84-9241-ffb6f06054c7', 'INCLUDE',
-       'contract_reference');
+VALUES ('e6fa2825-19ee-4521-9d0f-36ad938054a6', 'b820cdf3-164b-427d-b78e-1fb079851ebd', 'INCLUDE',
+        'contract_reference'),
+       ('47bf7545-af25-494f-a05d-f179215be853', 'ae6c90d3-a59e-46e7-b81f-6003179611ef', 'INCLUDE',
+        'contract_reference'),
+       ('b92b37f6-cad6-44d4-9c85-a84548102555', 'ad79e9c1-3c08-4d84-9241-ffb6f06054c7', 'INCLUDE',
+        'contract_reference');
 
 INSERT INTO desired_outcome_filter_rule_match_data (desired_outcome_filter_rule_id, match_data)
 VALUES ('e6fa2825-19ee-4521-9d0f-36ad938054a6', 'DN671065_BOLTON_PWB'),
@@ -100,15 +100,3 @@ VALUES ('e6fa2825-19ee-4521-9d0f-36ad938054a6', 'DN671065_BOLTON_PWB'),
        ('b92b37f6-cad6-44d4-9c85-a84548102555', 'DN547952_7'),
        ('b92b37f6-cad6-44d4-9c85-a84548102555', 'DN547952_8'),
        ('b92b37f6-cad6-44d4-9c85-a84548102555', 'DN547952_9');
-
-
-
--- -- Uncomment to roll back to original state
--- DELETE
--- FROM desired_outcome
--- where id in
---       (
---        '5dd9534e-df08-46be-b4f8-13d93feacf72';
---           );
---
-
