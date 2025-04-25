@@ -22,7 +22,8 @@ values ('17c514b3-947c-439c-b7cb-b2779429feb8', '2023-10-16 21:31:18.822156 +00:
        ('c7c9416f-e83a-41fa-bc56-8429907cdd9f', '2024-05-29 13:01:16.612203 +00:00',
         'Finance, Benefit and Debt (Wigan)'),
        ('53563c71-de95-484c-992b-9d76de8089f7', '2024-06-01 15:49:21.077348 +00:00',
-        'Finance, Benefit and Debt (Oldham)');
+        'Finance, Benefit and Debt (Oldham)')
+ON CONFLICT DO NOTHING;
 
 insert into complexity_level (id, title, description, service_category_id, complexity)
 values ('a68801b7-181f-4a13-bbf7-4ffe4de37e17', 'Low complexity',
@@ -132,7 +133,8 @@ values ('a68801b7-181f-4a13-bbf7-4ffe4de37e17', 'Low complexity',
         '53563c71-de95-484c-992b-9d76de8089f7', 'MEDIUM'),
        ('966c88da-e045-4505-89a0-639071ededbd', 'High complexity',
         'Service user has minimal or no prior experience of successfully dealing with their own finance, benefit and debt needs and does not have necessary identification documents or bank account. Service users circumstances are currently leading to extreme financial pressure and/or they have complex finance, benefit and debt-related needs which require a range of Activities to address these needs. Service user may have a poor finance history and wider complex needs, such as mental health issues, substance misuse and/or addiction issues.',
-        '53563c71-de95-484c-992b-9d76de8089f7', 'HIGH');
+        '53563c71-de95-484c-992b-9d76de8089f7', 'HIGH')
+ON CONFLICT DO NOTHING;;
 
 insert into contract_type (id, name, code)
 values ('a4f6abff-4490-44ce-8f34-d2f6f9ce2537', 'Finance, Benefit and Debt (South West)', 'FBD-SW'),
@@ -146,7 +148,8 @@ values ('a4f6abff-4490-44ce-8f34-d2f6f9ce2537', 'Finance, Benefit and Debt (Sout
        ('729402eb-573c-4b8a-acd8-778256768bbe', 'Finance, Benefit and Debt (Manchester)', 'FBD-M'),
        ('186fa304-f869-448f-b634-4b4c4b270f4f', 'Finance, Benefit and Debt (Tameside)', 'FBD-TA'),
        ('6a6848dc-b8ea-44af-ba26-4518471fccc0', 'Finance, Benefit and Debt (Wigan)', 'FBD-WI'),
-       ('93d54c46-8cc0-4792-828a-65fd8fbdde2e', 'Finance, Benefit and Debt (Oldham)', 'FBD-O');
+       ('93d54c46-8cc0-4792-828a-65fd8fbdde2e', 'Finance, Benefit and Debt (Oldham)', 'FBD-O')
+ON CONFLICT DO NOTHING;;
 
 insert into contract_type_service_category (contract_type_id, service_category_id)
 values ('a4f6abff-4490-44ce-8f34-d2f6f9ce2537', '17c514b3-947c-439c-b7cb-b2779429feb8'),
@@ -160,7 +163,8 @@ values ('a4f6abff-4490-44ce-8f34-d2f6f9ce2537', '17c514b3-947c-439c-b7cb-b277942
        ('729402eb-573c-4b8a-acd8-778256768bbe', '2b6bfd96-6838-4f1f-81b3-fe4a11696575'),
        ('186fa304-f869-448f-b634-4b4c4b270f4f', 'c61f93f1-99b5-45a7-b470-24a6d981692a'),
        ('6a6848dc-b8ea-44af-ba26-4518471fccc0', 'c7c9416f-e83a-41fa-bc56-8429907cdd9f'),
-       ('93d54c46-8cc0-4792-828a-65fd8fbdde2e', '53563c71-de95-484c-992b-9d76de8089f7');
+       ('93d54c46-8cc0-4792-828a-65fd8fbdde2e', '53563c71-de95-484c-992b-9d76de8089f7')
+ON CONFLICT DO NOTHING;;
 
 insert into desired_outcome (id, description, service_category_id)
 values ('04aef3ac-35ee-4959-b1a1-8fa4bb1e047d',
@@ -357,4 +361,5 @@ values ('04aef3ac-35ee-4959-b1a1-8fa4bb1e047d',
         '53563c71-de95-484c-992b-9d76de8089f7'),
        ('5ce1d006-4b45-4b0f-b92d-76dbbcbacd6d',
         'Service user has access to appropriate financial products, advice and/or services.',
-        '53563c71-de95-484c-992b-9d76de8089f7');
+        '53563c71-de95-484c-992b-9d76de8089f7')
+ON CONFLICT DO NOTHING;;
