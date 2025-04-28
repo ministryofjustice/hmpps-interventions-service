@@ -2,11 +2,11 @@
 
 INSERT INTO desired_outcome (id, description, service_category_id, deprecated_at)
 VALUES ('53eff054-63a4-4776-8c99-b17c942c4f6f', 'Service User increases their employability.',
-        'ca374ac3-84eb-4b91-bea7-9005398f426f', NULL),
+        'ca374ac3-84eb-4b91-bea7-9005398f426f', '2025-10-10 00:00:00.000000 +00:00'),
        ('e0d5bf23-b2ad-4753-866a-d76e072b2c09', 'Service User commences suitable Education, Training & Employment.',
-        'ca374ac3-84eb-4b91-bea7-9005398f426f', NULL),
+        'ca374ac3-84eb-4b91-bea7-9005398f426f', '2025-10-10 00:00:00.000000 +00:00'),
        ('804b586c-59cb-4fe0-80a0-34500ea24fc9', 'Service User maintains suitable Education, Training & Employment.',
-        'ca374ac3-84eb-4b91-bea7-9005398f426f', NULL);
+        'ca374ac3-84eb-4b91-bea7-9005398f426f', '2025-10-10 00:00:00.000000 +00:00');
 
 UPDATE desired_outcome
 SET deprecated_at = '2025-04-03 00:00:00.000000 +00:00'
