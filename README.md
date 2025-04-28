@@ -2,6 +2,8 @@
 
 [![API docs](https://img.shields.io/badge/API_docs-view-85EA2D.svg?logo=swagger)](https://hmpps-interventions-service-dev.apps.live-1.cloud-platform.service.justice.gov.uk/swagger-ui.html)
 
+[Open PRs](https://github.com/ministryofjustice/hmpps-interventions-service/pulls)
+
 Business/domain API to **find, arrange and monitor an intervention** for service users (offenders).
 
 ## Quickstart
