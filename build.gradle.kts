@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
   kotlin("plugin.spring") version "2.1.20"
   id("org.jetbrains.kotlin.plugin.jpa") version "2.1.20"
@@ -113,9 +114,9 @@ dependencies {
   implementation("software.amazon.awssdk:sts:2.31.5")
 
   // security
-  implementation("org.springframework.boot:spring-boot-starter-webflux:3.4.4")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.4.4")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.4.4")
+  implementation("org.springframework.boot:spring-boot-starter-webflux:3.4.5")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.4.5")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.4.5")
   // Override vulnerable dependency. Remove it when we upgrade org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.4.4
   implementation("org.springframework.security:spring-security-crypto:6.4.5")
   implementation("com.nimbusds:oauth2-oidc-sdk:11.23.1")
