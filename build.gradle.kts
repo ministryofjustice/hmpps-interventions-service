@@ -141,5 +141,5 @@ dependencies {
   testImplementation("org.mockito:mockito-inline:5.2.0")
   testImplementation("org.springframework.batch:spring-batch-test")
   testImplementation("com.github.tomakehurst:wiremock-jre8:3.0.1")
-  testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.12.2")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.11.4")
 }
