@@ -109,9 +109,9 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.31.36")
-  implementation("software.amazon.awssdk:s3:2.31.36")
-  implementation("software.amazon.awssdk:sts:2.31.36")
+  implementation("software.amazon.awssdk:sns:2.31.40")
+  implementation("software.amazon.awssdk:s3:2.31.40")
+  implementation("software.amazon.awssdk:sts:2.31.39")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux:3.4.5")
@@ -119,7 +119,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.4.5")
   // Override vulnerable dependency. Remove it when we upgrade org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.4.4
   implementation("org.springframework.security:spring-security-crypto:6.4.5")
-  implementation("com.nimbusds:oauth2-oidc-sdk:11.23.1")
+  implementation("com.nimbusds:oauth2-oidc-sdk:11.24")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -141,5 +141,5 @@ dependencies {
   testImplementation("org.mockito:mockito-inline:5.2.0")
   testImplementation("org.springframework.batch:spring-batch-test")
   testImplementation("com.github.tomakehurst:wiremock-jre8:3.0.1")
-  testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.11.4")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.12.2")
 }
