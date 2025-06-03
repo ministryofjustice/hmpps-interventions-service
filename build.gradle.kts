@@ -114,12 +114,11 @@ dependencies {
   implementation("software.amazon.awssdk:sts:2.31.36")
 
   // security
-  implementation("org.springframework.boot:spring-boot-starter-webflux:3.4.5")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.4.5")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.4.5")
-  // Override vulnerable dependency. Remove it when we upgrade org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.4.4
-  implementation("org.springframework.security:spring-security-crypto:6.4.5")
-  implementation("com.nimbusds:oauth2-oidc-sdk:11.23.1")
+  implementation("org.springframework.boot:spring-boot-starter-webflux:3.5.0")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.5.0")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.5.0")
+  implementation("org.springframework.security:spring-security-crypto:6.5.0")
+  implementation("com.nimbusds:oauth2-oidc-sdk:11.25")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
