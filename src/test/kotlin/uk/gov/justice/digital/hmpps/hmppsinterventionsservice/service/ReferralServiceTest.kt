@@ -1072,7 +1072,7 @@ class ReferralServiceTest @Autowired constructor(
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
 
     val referralDetailsReturned = referralService.updateReferralDetails(referral, updateReferralDetailsDTO, user)
-    val referralDetailsValue = referralService.getReferralDetailsById(referralDetailsReturned?.id)
+    val referralDetailsValue = referralDetailsReturned?.id?.let { referralService.getReferralDetailsById(it) }
 
     assertThat(referralDetailsValue?.referralId).isEqualTo(referral.id)
     assertThat(updateReferralDetailsDTO.furtherInformation).isEqualTo(referralDetailsValue?.furtherInformation)
