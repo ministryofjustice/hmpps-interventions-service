@@ -120,6 +120,14 @@
     "name": "Community Led Initiatives"
   },
   {
+    "code": "DEVELOPING_HEALTH_INDEPENDENCE",
+    "name": "Developing Health and Independence"
+  },
+  {
+    "code": "DEVON_PARTNERSHIP_TRUST",
+    "name": "Devon Partnership Trust"
+  },
+  {
     "code": "DVIP_RICHMOND",
     "name": "DVIP (Richmond Fellowship)"
   },
@@ -158,6 +166,10 @@
   {
     "code": "GROW",
     "name": "Grow"
+  },
+  {
+    "code": "HARBOUR",
+    "name": "Harbour"
   },
   {
     "code": "HIBISCUS_INIT",
@@ -526,9 +538,5 @@
   {
     "code": "YSS",
     "name": "YSS"
-  },
-  {
-    "code": "HARBOUR",
-    "name": "Harbour"
   }
 ]
