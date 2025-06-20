@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   kotlin("plugin.spring") version "2.1.20"
   id("org.jetbrains.kotlin.plugin.jpa") version "2.1.20"
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.2.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.3.0-beta"
   id("jacoco")
   id("project-report")
 }
@@ -139,6 +139,6 @@ dependencies {
   testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
   testImplementation("org.mockito:mockito-inline:5.2.0")
   testImplementation("org.springframework.batch:spring-batch-test")
-  testImplementation("com.github.tomakehurst:wiremock-jre8:3.0.1")
+  testImplementation("org.wiremock:wiremock:3.13.1")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.12.2")
 }
