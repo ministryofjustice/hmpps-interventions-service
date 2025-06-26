@@ -140,7 +140,7 @@ internal class ReferralConcluderTest {
 
     val actionPlan = actionPlanFactory.createApproved(numberOfSessions = totalSessions)
     val referral = referralFactory.createSent(actionPlans = mutableListOf(actionPlan))
-    whenever(deliverySessionRepository.countNumberOfAttendedSessions(referral.id))
+    whenever(deliverySessionRepository.countNumberOfAttendedSessionsIncludingRescheduledSessions(referral.id))
       .thenReturn(state.attendedOrLate)
     whenever(deliverySessionRepository.countNumberOfSessionsWithAttendanceRecord(referral.id))
       .thenReturn(state.attendedOrLate + state.notAttended)
