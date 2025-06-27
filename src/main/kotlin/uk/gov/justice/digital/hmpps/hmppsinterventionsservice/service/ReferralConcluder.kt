@@ -128,7 +128,5 @@ class ReferralConcluder(
 
   private fun countSessionsWithAttendanceRecord(referral: Referral): Int = deliverySessionRepository.countNumberOfSessionsWithAttendanceRecord(referral.id)
 
-  private fun countSessionsAttended(referral: Referral): Int = deliverySessionRepository.countNumberOfAttendedSessions(referral.id)
-
-  private fun deliveredFirstSubstantiveAppointment(referral: Referral): Boolean = countSessionsAttended(referral) > 0
+  private fun deliveredFirstSubstantiveAppointment(referral: Referral): Boolean = deliverySessionRepository.countNumberOfAttendedSessionsIncludingRescheduledSessions(referral.id) > 0
 }
