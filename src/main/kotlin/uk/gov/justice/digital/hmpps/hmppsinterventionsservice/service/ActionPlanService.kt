@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
 import jakarta.persistence.EntityNotFoundException
+import mu.KLogging
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -31,6 +32,7 @@ class ActionPlanService(
   val deliverySessionService: DeliverySessionService,
   private val deliverySessionRepository: DeliverySessionRepository,
 ) {
+  companion object : KLogging()
 
   fun createDraftActionPlan(
     referralId: UUID,
@@ -38,6 +40,7 @@ class ActionPlanService(
     activities: List<ActionPlanActivity>,
     createdByUser: AuthUser,
   ): ActionPlan {
+    logger.info { "Creating draft action plan for referral [id=$referralId] with number of sessions [$numberOfSessions] and activities [${activities.size}]" }
     val draftActionPlan = ActionPlan(
       id = randomUUID(),
       numberOfSessions = numberOfSessions,
@@ -48,6 +51,7 @@ class ActionPlanService(
     )
 
     actionPlanValidator.validateDraftActionPlanUpdate(draftActionPlan)
+    logger.info { "Draft action plan created for referral [id=$referralId] with number of sessions [$numberOfSessions] and activities [${draftActionPlan.activities.size}]" }
     return actionPlanRepository.save(draftActionPlan)
   }
 

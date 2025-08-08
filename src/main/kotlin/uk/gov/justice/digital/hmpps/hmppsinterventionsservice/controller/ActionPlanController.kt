@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller
 
+import mu.KLogging
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
@@ -30,17 +31,26 @@ class ActionPlanController(
   val userTypeChecker: UserTypeChecker,
 ) {
 
+  companion object : KLogging()
+
   @PostMapping("/draft-action-plan")
   fun createDraftActionPlan(
     @RequestBody createActionPlanDTO: CreateActionPlanDTO,
     authentication: JwtAuthenticationToken,
   ): ResponseEntity<ActionPlanDTO> {
-    val draftActionPlan = actionPlanService.createDraftActionPlan(
-      createActionPlanDTO.referralId,
-      createActionPlanDTO.numberOfSessions,
-      createActionPlanDTO.activities.map { ActionPlanActivity(description = it.description) },
-      userMapper.fromToken(authentication),
-    )
+    logger.info("Creating draft action plan for referral ${createActionPlanDTO.referralId} with activities: ${createActionPlanDTO.activities}")
+    val draftActionPlan = try {
+      actionPlanService.createDraftActionPlan(
+        createActionPlanDTO.referralId,
+        createActionPlanDTO.numberOfSessions,
+        createActionPlanDTO.activities.map { ActionPlanActivity(description = it.description) },
+        userMapper.fromToken(authentication),
+      )
+    } catch (e: Exception) {
+      logger.error("Error creating draft action plan: ${e.message}", e)
+      throw e
+    }
+    logger.info("draft action plan created ${draftActionPlan.referral.id} with number of session: ${draftActionPlan.numberOfSessions}")
 
     val actionPlanDTO = ActionPlanDTO.from(draftActionPlan)
     val location = locationMapper.expandPathToCurrentRequestUrl("/{id}", draftActionPlan.id)
