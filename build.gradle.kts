@@ -135,8 +135,8 @@ dependencies {
   implementation("org.apache.commons:commons-csv:1.14.0")
 
   testImplementation("au.com.dius.pact.provider:junit5spring:4.6.17")
-  testImplementation("com.squareup.okhttp3:okhttp:4.12.0")
-  testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+  testImplementation("com.squareup.okhttp3:okhttp:5.1.0")
+  testImplementation("com.squareup.okhttp3:mockwebserver:5.1.0")
   testImplementation("org.mockito:mockito-inline:5.2.0")
   testImplementation("org.springframework.batch:spring-batch-test")
   testImplementation("org.wiremock:wiremock:3.13.1")
