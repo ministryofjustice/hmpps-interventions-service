@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.ValidationError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AddressDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
@@ -24,7 +23,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Aut
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import java.time.OffsetDateTime
-import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 @Service
@@ -65,248 +63,6 @@ class DeliverySessionService(
     return deliverySessionRepository.save(session)
   }
 
-  fun scheduleNewDeliverySessionAppointment(
-    referralId: UUID,
-    sessionNumber: Int,
-    appointmentTime: OffsetDateTime,
-    durationInMinutes: Int,
-    createdBy: AuthUser,
-    appointmentDeliveryType: AppointmentDeliveryType,
-    appointmentSessionType: AppointmentSessionType,
-    appointmentDeliveryAddress: AddressDTO? = null,
-    npsOfficeCode: String? = null,
-    attended: Attended? = null,
-    didSessionHappen: Boolean? = null,
-    notifyProbationPractitionerOfBehaviour: Boolean? = null,
-    notifyProbationPractitionerOfConcerns: Boolean? = null,
-    late: Boolean? = null,
-    lateReason: String? = null,
-    futureSessionPlans: String? = null,
-    noAttendanceInformation: String? = null,
-    noSessionReasonType: NoSessionReasonType? = null,
-    noSessionReasonPopAcceptable: String? = null,
-    noSessionReasonPopUnacceptable: String? = null,
-    noSessionReasonLogistics: String? = null,
-    sessionSummary: String? = null,
-    sessionResponse: String? = null,
-    sessionBehaviour: String? = null,
-    sessionConcerns: String? = null,
-  ): DeliverySession {
-    val session = getDeliverySession(referralId, sessionNumber) ?: throw EntityNotFoundException("Session not found for referral [referralId=$referralId, sessionNumber=$sessionNumber]")
-    val existingAppointment = session.currentAppointment?.let {
-      if (it.appointmentTime.isAfter(appointmentTime)) {
-        throw EntityExistsException("can't schedule new appointment for session; new appointment occurs before previously scheduled appointment for session [referralId=$referralId, sessionNumber=$sessionNumber]")
-      }
-      val sentAtAtStartOfDay = getReferral(referralId).sentAt?.withHour(0)?.withMinute(0)?.withSecond(1)
-
-      if (it.appointmentTime.isBefore(sentAtAtStartOfDay)) {
-        throw ValidationError("can't schedule new appointment for session; new appointment occurs before referral creation date for session [referralId=$referralId, sessionNumber=$sessionNumber]", listOf())
-      }
-
-      val maximumDate =
-        OffsetDateTime.now().plus(6, ChronoUnit.MONTHS).withHour(23).withMinute(59).withSecond(59)
-
-      if (it.appointmentTime.isAfter(maximumDate)) {
-        throw ValidationError("can't schedule new appointment for session; new appointment occurs later than 6 months from now [referralId=$referralId, sessionNumber=$sessionNumber]", listOf())
-      }
-      it.appointmentFeedbackSubmittedAt ?: throw ValidationError("can't schedule new appointment for session; latest appointment has no feedback delivered [referralId=$referralId, sessionNumber=$sessionNumber]", listOf())
-      it
-    }
-    val appointment = Appointment(
-      id = UUID.randomUUID(),
-      createdBy = authUserRepository.save(createdBy),
-      createdAt = OffsetDateTime.now(),
-      appointmentTime = appointmentTime,
-      durationInMinutes = durationInMinutes,
-      referral = session.referral,
-    )
-    if (existingAppointment != null) {
-      existingAppointment.supersededByAppointmentId = appointment.id
-      existingAppointment.superseded = true
-      appointmentRepository.save(existingAppointment)
-    }
-    return scheduleDeliverySessionAppointment(
-      session,
-      appointment,
-      existingAppointment,
-      appointmentTime,
-      durationInMinutes,
-      appointmentDeliveryType,
-      createdBy,
-      appointmentSessionType,
-      appointmentDeliveryAddress,
-      npsOfficeCode,
-      attended,
-      didSessionHappen,
-      notifyProbationPractitionerOfBehaviour,
-      notifyProbationPractitionerOfConcerns,
-      late,
-      lateReason,
-      futureSessionPlans,
-      noAttendanceInformation,
-      noSessionReasonType,
-      noSessionReasonPopAcceptable,
-      noSessionReasonPopUnacceptable,
-      noSessionReasonLogistics,
-      sessionSummary,
-      sessionResponse,
-      sessionBehaviour,
-      sessionConcerns,
-    )
-  }
-
-  fun rescheduleDeliverySessionAppointment(
-    referralId: UUID,
-    sessionNumber: Int,
-    appointmentId: UUID,
-    appointmentTime: OffsetDateTime,
-    durationInMinutes: Int,
-    updatedBy: AuthUser,
-    appointmentDeliveryType: AppointmentDeliveryType,
-    appointmentSessionType: AppointmentSessionType? = null,
-    appointmentDeliveryAddress: AddressDTO? = null,
-    npsOfficeCode: String? = null,
-    attended: Attended? = null,
-    didSessionHappen: Boolean? = null,
-    notifyProbationPractitionerOfBehaviour: Boolean? = null,
-    notifyProbationPractitionerOfConcerns: Boolean? = null,
-    late: Boolean? = null,
-    lateReason: String? = null,
-    futureSessionPlans: String? = null,
-    noAttendanceInformation: String? = null,
-    noSessionReasonType: NoSessionReasonType? = null,
-    noSessionReasonPopAcceptable: String? = null,
-    noSessionReasonPopUnacceptable: String? = null,
-    noSessionReasonLogistics: String? = null,
-    sessionSummary: String? = null,
-    sessionResponse: String? = null,
-    sessionBehaviour: String? = null,
-    sessionConcerns: String? = null,
-  ): DeliverySession {
-    val session = getDeliverySession(referralId, sessionNumber) ?: throw EntityNotFoundException("Session not found for referral [referralId=$referralId, sessionNumber=$sessionNumber]")
-    val existingAppointment = session.currentAppointment
-    if (existingAppointment == null || existingAppointment.id !== appointmentId) {
-      throw ValidationError("can't reschedule appointment for session; no appointment exists for session [referralId=$referralId, sessionNumber=$sessionNumber, appointmentId=$appointmentId]", listOf())
-    }
-    existingAppointment.appointmentFeedbackSubmittedAt?.let { throw ValidationError("can't reschedule appointment for session; appointment feedback already supplied [referralId=$referralId, sessionNumber=$sessionNumber, appointmentId=$appointmentId]", listOf()) }
-    val appointment = Appointment(
-      id = UUID.randomUUID(),
-      createdBy = existingAppointment.createdBy,
-      createdAt = OffsetDateTime.now(),
-      appointmentTime = appointmentTime,
-      durationInMinutes = durationInMinutes,
-      referral = session.referral,
-    )
-    return scheduleDeliverySessionAppointment(
-      session,
-      appointment,
-      existingAppointment,
-      appointmentTime,
-      durationInMinutes,
-      appointmentDeliveryType,
-      updatedBy,
-      appointmentSessionType,
-      appointmentDeliveryAddress,
-      npsOfficeCode,
-      attended,
-      didSessionHappen,
-      notifyProbationPractitionerOfBehaviour,
-      notifyProbationPractitionerOfConcerns,
-      late,
-      lateReason,
-      futureSessionPlans,
-      noAttendanceInformation,
-      noSessionReasonType,
-      noSessionReasonPopAcceptable,
-      noSessionReasonPopUnacceptable,
-      noSessionReasonLogistics,
-      sessionSummary,
-      sessionResponse,
-      sessionBehaviour,
-      sessionConcerns,
-    )
-  }
-
-  private fun scheduleDeliverySessionAppointment(
-    deliverySession: DeliverySession,
-    appointmentToSchedule: Appointment,
-    latestAppointment: Appointment?,
-    appointmentTime: OffsetDateTime,
-    durationInMinutes: Int,
-    appointmentDeliveryType: AppointmentDeliveryType,
-    scheduledBy: AuthUser,
-    appointmentSessionType: AppointmentSessionType? = null,
-    appointmentDeliveryAddress: AddressDTO? = null,
-    npsOfficeCode: String? = null,
-    attended: Attended? = null,
-    didSessionHappen: Boolean? = null,
-    notifyProbationPractitionerOfBehaviour: Boolean? = null,
-    notifyProbationPractitionerOfConcerns: Boolean? = null,
-    late: Boolean?,
-    lateReason: String?,
-    futureSessionPlans: String?,
-    noAttendanceInformation: String?,
-    noSessionReasonType: NoSessionReasonType?,
-    noSessionReasonPopAcceptable: String?,
-    noSessionReasonPopUnacceptable: String?,
-    noSessionReasonLogistics: String?,
-    sessionSummary: String? = null,
-    sessionResponse: String? = null,
-    sessionBehaviour: String? = null,
-    sessionConcerns: String? = null,
-  ): DeliverySession {
-    if (appointmentTime.isBefore(OffsetDateTime.now()) && attended == null) {
-      throw IllegalArgumentException("Appointment feedback must be provided for appointments in the past.")
-    }
-    val (deliusAppointmentId, appointmentId) = communityAPIBookingService.book(
-      deliverySession.referral,
-      latestAppointment,
-      appointmentTime,
-      durationInMinutes,
-      SERVICE_DELIVERY,
-      npsOfficeCode,
-    )
-    appointmentToSchedule.appointmentTime = appointmentTime
-    appointmentToSchedule.durationInMinutes = durationInMinutes
-    appointmentToSchedule.deliusAppointmentId = deliusAppointmentId
-    val toSchedule = appointmentId?.let { appointmentToSchedule.copy(id = it) } ?: appointmentToSchedule
-    appointmentId?.also {
-      deliverySession.appointments.forEach {
-        it.superseded = true
-        it.supersededByAppointmentId = latestAppointment?.id
-        appointmentRepository.saveAndFlush(it)
-      }
-    }
-    appointmentRepository.saveAndFlush(toSchedule)
-    appointmentService.createOrUpdateAppointmentDeliveryDetails(toSchedule, appointmentDeliveryType, appointmentSessionType, appointmentDeliveryAddress, npsOfficeCode)
-    deliverySession.appointments.add(toSchedule)
-    return deliverySessionRepository.saveAndFlush(deliverySession).also {
-      // Occurring after saving the session to ensure that session has the latest appointment attached when publishing the session feedback event.
-      setAttendanceAndFeedbackIfHistoricAppointment(
-        deliverySession,
-        toSchedule,
-        attended,
-        didSessionHappen,
-        late,
-        lateReason,
-        futureSessionPlans,
-        noAttendanceInformation,
-        noSessionReasonType,
-        noSessionReasonPopAcceptable,
-        noSessionReasonPopUnacceptable,
-        noSessionReasonLogistics,
-        sessionSummary,
-        sessionResponse,
-        sessionBehaviour,
-        sessionConcerns,
-        notifyProbationPractitionerOfBehaviour,
-        notifyProbationPractitionerOfConcerns,
-        scheduledBy,
-      )
-    }
-  }
-
-  @Deprecated("superseded by scheduleNewDeliverySessionAppointment and rescheduleDeliverySessionAppointment")
   fun updateSessionAppointment(
     actionPlanId: UUID,
     sessionNumber: Int,
@@ -592,10 +348,6 @@ class DeliverySessionService(
     throw EntityNotFoundException("Referral not found [id=$referralId]")
   }
 
-  @Deprecated(
-    "looking up by action plan ID is no longer necessary",
-    ReplaceWith("getDeliverySessionOrThrowException(referralId, sessionNumber)"),
-  )
   fun getDeliverySessionByActionPlanIdOrThrowException(actionPlanId: UUID, sessionNumber: Int): DeliverySession = getDeliverySessionByActionPlanId(actionPlanId, sessionNumber)
     ?: throw EntityNotFoundException("Action plan session not found [actionPlanId=$actionPlanId, sessionNumber=$sessionNumber]")
 
@@ -604,10 +356,6 @@ class DeliverySessionService(
 
   private fun getDeliverySession(referralId: UUID, sessionNumber: Int) = deliverySessionRepository.findByReferralIdAndSessionNumber(referralId, sessionNumber)
 
-  @Deprecated(
-    "looking up by action plan ID is no longer necessary",
-    ReplaceWith("getDeliverySession(referralId, sessionNumber)"),
-  )
   private fun getDeliverySessionByActionPlanId(actionPlanId: UUID, sessionNumber: Int) = deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)
 
   private fun getDeliverySessionAppointmentOrThrowException(referralId: UUID, appointmentId: UUID): Pair<DeliverySession, Appointment> = deliverySessionRepository.findAllByReferralId(referralId)
