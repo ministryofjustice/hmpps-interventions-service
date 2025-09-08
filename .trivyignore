@@ -13,3 +13,5 @@ CVE-2022-45868
 # Suppression for tomcat vulnerability affecting jsp compilation in the default servlet
 #   can be suppressed as we do not use the default servlet and haven't configured it for write either
 CVE-2024-50379
+# Suppression for netty 4.1.124 vulnerability until migration to github actions and upgrade to gradle-spring-boot v9
+CVE-2025-58056
