@@ -111,7 +111,7 @@ class ReferralService(
   // This is required for Client API access where the authority to access ALL referrals is pre-checked in the controller
   fun getSentReferral(id: UUID): Referral? = referralRepository.findByIdAndSentAtIsNotNull(id)
 
-  fun getReferralDetailsById(id: UUID?): ReferralDetails? = referralDetailsRepository.findByIdOrNull(id)
+  fun getReferralDetailsById(id: UUID): ReferralDetails? = referralDetailsRepository.findByIdOrNull(id)
 
   fun assignSentReferral(referral: Referral, assignedBy: AuthUser, assignedTo: AuthUser): Referral {
     val assignment = ReferralAssignment(

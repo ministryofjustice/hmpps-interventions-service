@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   kotlin("plugin.spring") version "2.1.21"
   id("org.jetbrains.kotlin.plugin.jpa") version "2.1.21"
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.1.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.3.7"
   id("jacoco")
   id("project-report")
 }
@@ -114,12 +114,10 @@ dependencies {
   implementation("software.amazon.awssdk:sts:2.31.46")
 
   // security
-  implementation("org.springframework.boot:spring-boot-starter-webflux:3.4.5")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.4.5")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.4.5")
-  // Override vulnerable dependency. Remove it when we upgrade org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.4.4
-  implementation("org.springframework.security:spring-security-crypto:6.5.0")
-  implementation("com.nimbusds:oauth2-oidc-sdk:11.24")
+  implementation("org.springframework.boot:spring-boot-starter-webflux:3.5.0")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.5.0")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.5.0")
+  implementation("com.nimbusds:oauth2-oidc-sdk:11.25")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -128,7 +126,7 @@ dependencies {
   implementation("org.hibernate:hibernate-core:6.6.15.Final")
   implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.9.10")
 
-  runtimeOnly("org.postgresql:postgresql:42.7.5")
+  runtimeOnly("org.postgresql:postgresql:42.7.7")
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
   // json and csv
@@ -136,10 +134,10 @@ dependencies {
   implementation("org.apache.commons:commons-csv:1.14.0")
 
   testImplementation("au.com.dius.pact.provider:junit5spring:4.6.17")
-  testImplementation("com.squareup.okhttp3:okhttp:4.12.0")
-  testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+  testImplementation("com.squareup.okhttp3:okhttp:5.1.0")
+  testImplementation("com.squareup.okhttp3:mockwebserver:5.1.0")
   testImplementation("org.mockito:mockito-inline:5.2.0")
   testImplementation("org.springframework.batch:spring-batch-test")
-  testImplementation("com.github.tomakehurst:wiremock-jre8:3.0.1")
+  testImplementation("org.wiremock:wiremock:3.13.1")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.12.2")
 }

@@ -1,21 +1,17 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller
 
-import jakarta.persistence.EntityNotFoundException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.LocationMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AttendanceFeedbackRequestDTO
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DeliverySessionAppointmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DeliverySessionDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SessionFeedbackRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateAppointmentDTO
@@ -332,87 +328,6 @@ internal class DeliverySessionControllerTest {
       val sessionResponse = sessionsController.getSessionForActionPlanId(actionPlanId, sessionNumber)
 
       assertThat(sessionResponse).isEqualTo(DeliverySessionDTO.from(deliverySession))
-    }
-  }
-
-  @Nested
-  inner class GetDeliverySessionAppointmentForReferral {
-    val user = authUserFactory.create()
-    val userToken = jwtTokenFactory.create(user)
-
-    @Test
-    fun `can get a session by referralId and appointmentId`() {
-      val deliverySession = deliverySessionFactory.createScheduled()
-      val referralId = deliverySession.referral.id
-      val appointmentId = deliverySession.appointments.first().id
-
-      whenever(referralService.getSentReferral(referralId)).thenReturn(deliverySession.referral)
-      whenever(sessionsService.getSessions(referralId)).thenReturn(listOf(deliverySession))
-      whenever(authUserRepository.save(any())).thenReturn(user)
-
-      val sessionResponse = sessionsController.getDeliverySessionAppointment(referralId, appointmentId, userToken)
-
-      assertThat(sessionResponse).isEqualTo(DeliverySessionAppointmentDTO.from(deliverySession.sessionNumber, deliverySession.appointments.first()))
-    }
-
-    @Test
-    fun `expect bad request when referral does not exist`() {
-      val deliverySession = deliverySessionFactory.createScheduled()
-      val referralId = UUID.randomUUID()
-      val appointmentId = deliverySession.id
-
-      whenever(referralService.getSentReferral(referralId)).thenReturn(null)
-      whenever(authUserRepository.save(any())).thenReturn(user)
-
-      val e = assertThrows<ResponseStatusException> { sessionsController.getDeliverySessionAppointment(referralId, appointmentId, userToken) }
-      assertThat(e.reason).contains("sent referral not found")
-    }
-
-    @Test
-    fun `expect bad request when appointment does not exist on referral`() {
-      val deliverySession = deliverySessionFactory.createScheduled()
-      val referralId = deliverySession.referral.id
-      val otherDeliverySession = deliverySessionFactory.createScheduled()
-      val appointmentId = otherDeliverySession.appointments.first().id
-
-      whenever(referralService.getSentReferral(referralId)).thenReturn(deliverySession.referral)
-      whenever(sessionsService.getSessions(referralId)).thenReturn(listOf(deliverySession))
-      whenever(authUserRepository.save(any())).thenReturn(user)
-
-      val e = assertThrows<EntityNotFoundException> { sessionsController.getDeliverySessionAppointment(referralId, appointmentId, userToken) }
-      assertThat(e.message).contains("Delivery session appointment not found")
-    }
-  }
-
-  @Nested
-  inner class GetSessionsForReferral {
-    val user = authUserFactory.create()
-    val userToken = jwtTokenFactory.create(user)
-
-    @Test
-    fun `can get sessions by referralId`() {
-      val deliverySession = deliverySessionFactory.createScheduled()
-      val referralId = deliverySession.referral.id
-
-      whenever(referralService.getSentReferral(referralId)).thenReturn(deliverySession.referral)
-      whenever(sessionsService.getSessions(referralId)).thenReturn(listOf(deliverySession))
-      whenever(authUserRepository.save(any())).thenReturn(user)
-
-      val sessionsResponse = sessionsController.getDeliverySessionAppointments(referralId, userToken)
-
-      assertThat(sessionsResponse.size).isEqualTo(1)
-      assertThat(sessionsResponse.first()).isEqualTo(DeliverySessionAppointmentDTO.from(deliverySession.sessionNumber, deliverySession.appointments.first()))
-    }
-
-    @Test
-    fun `expect bad request when referral does not exist`() {
-      val referralId = UUID.randomUUID()
-
-      whenever(referralService.getSentReferral(referralId)).thenReturn(null)
-      whenever(authUserRepository.save(any())).thenReturn(user)
-
-      val e = assertThrows<ResponseStatusException> { sessionsController.getDeliverySessionAppointments(referralId, userToken) }
-      assertThat(e.reason).contains("sent referral not found")
     }
   }
 
