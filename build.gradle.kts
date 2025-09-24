@@ -127,6 +127,10 @@ dependencies {
   implementation("org.hibernate:hibernate-core:6.6.13.Final")
   implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.9.10")
 
+  //Temporary upgrade to resolve CVE-2025-41248
+  implementation("org.springframework.security:spring-security-core:6.5.4")
+  implementation("org.springframework.security:spring-core:6.2.11")
+
   runtimeOnly("org.postgresql:postgresql:42.7.7")
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
