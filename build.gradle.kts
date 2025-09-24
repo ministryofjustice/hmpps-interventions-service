@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   kotlin("plugin.spring") version "2.1.20"
   id("org.jetbrains.kotlin.plugin.jpa") version "2.1.20"
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.3.7"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "9.0.2"
   id("jacoco")
   id("project-report")
 }
@@ -126,10 +126,6 @@ dependencies {
   implementation("com.h2database:h2:2.3.232")
   implementation("org.hibernate:hibernate-core:6.6.13.Final")
   implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.9.10")
-
-  //Temporary upgrade to resolve CVE-2025-41248
-  implementation("org.springframework.security:spring-security-core:6.5.4")
-  implementation("org.springframework.security:spring-core:6.2.11")
 
   runtimeOnly("org.postgresql:postgresql:42.7.7")
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
