@@ -1,0 +1,389 @@
+name: Pipeline [test -> build -> deploy]
+on:
+  push:
+    branches:
+      - '**'
+  workflow_dispatch:
+    inputs:
+      only_pacts:
+        description: 'Run only the pact workflow'
+        required: false
+        default: 'false'
+      pact_consumer_tags:
+        description: 'Pact consumer tags'
+        required: false
+        default: 'main'
+env:
+  POSTGRES_DB: interventions_ci
+  POSTGRES_PASSWORD: password
+  ALERTS_SLACK_CHANNEL: interventions-dev-notifications
+  RELEASES_SLACK_CHANNEL: refer-and-monitor-an-intervention
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref == 'refs/heads/main' && github.sha || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+jobs:
+  validate:
+    name: validate
+    runs-on: ubuntu-latest
+    container:
+      image: cimg/openjdk:21.0.2
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      _JAVA_OPTIONS: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=true -Dkotlin.compiler.execution.strategy=in-process
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup flyway and psql client
+        run: |
+          wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.2/flyway-commandline-10.15.2-linux-x64.tar.gz | tar xvz
+          sudo ln -s `pwd`/flyway-10.15.2/flyway /usr/local/bin
+          sudo apt-get update -y
+          sudo apt-get install -y postgresql-client graphviz curl
+      - name: Run migrations and local seeds
+        run: |
+          flyway -cleanDisabled="false" clean -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" -user="postgres" -password="${POSTGRES_PASSWORD}"
+          flyway migrate -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" -user="postgres" -password="${POSTGRES_PASSWORD}" -locations="src/main/resources/db/migration,src/main/resources/db/local" -postgresql.transactional.lock=false
+      - name: Cache Gradle deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/build.gradle*', '**/gradle-wrapper.properties', '**/build.gradle.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Run Gradle checks
+        run: ./gradlew check jacocoTestCoverageVerification --no-daemon
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-validate
+          path: build/test-results
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-validate
+          path: |
+            build/reports/tests
+            build/reports/jacoco/test
+  validate_db:
+    name: validate_db
+    runs-on: ubuntu-latest
+    needs: validate
+    container:
+      image: cimg/openjdk:21.0.2
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup flyway and psql
+        run: |
+          wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.2/flyway-commandline-10.15.2-linux-x64.tar.gz | tar xvz
+          sudo ln -s `pwd`/flyway-10.15.2/flyway /usr/local/bin
+          sudo apt-get update -y
+          sudo apt-get install -y postgresql-client
+      - name: Run main migrations then branch migrations to detect clashes
+        env:
+          GIT_FETCH_DEPTH: 0
+        run: |
+          # ensure DB is clean
+          flyway -cleanDisabled="false" clean -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" -user="postgres" -password="${POSTGRES_PASSWORD}"
+          # ensure origin/main is present
+          git fetch --unshallow || true
+          git fetch origin main
+          git reset --hard origin/main
+          flyway migrate -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" -user="postgres" -password="${POSTGRES_PASSWORD}" -locations="src/main/resources/db/migration" -postgresql.transactional.lock=false
+          # reset to PR commit and run migrations again to detect clash
+          git reset --hard "${{ github.sha }}"
+          flyway migrate -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" -user="postgres" -password="${POSTGRES_PASSWORD}" -locations="src/main/resources/db/migration" -postgresql.transactional.lock=false
+      - name: Run migrations and local seeds (final check)
+        run: |
+          flyway -cleanDisabled="false" clean -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" -user="postgres" -password="${POSTGRES_PASSWORD}"
+          flyway migrate -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" -user="postgres" -password="${POSTGRES_PASSWORD}" -locations="src/main/resources/db/migration,src/main/resources/db/local" -postgresql.transactional.lock=false
+      - name: Validate metadata
+        run: |
+          PGPASSWORD="${POSTGRES_PASSWORD}" bash script/validate-metadata.sh
+  publish_data:
+    name: publish_data
+    runs-on: ubuntu-latest
+    needs: [validate, validate_db]
+    container:
+      image: cimg/openjdk:21.0.2
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      APP_VERSION: ${{ secrets.APP_VERSION }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install flyway
+        run: |
+          wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.2/flyway-commandline-10.15.2-linux-x64.tar.gz | tar xvz
+          sudo ln -s `pwd`/flyway-10.15.2/flyway /usr/local/bin
+      - name: Migrate the database
+        run: |
+          flyway migrate -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" -user="postgres" -password="${POSTGRES_PASSWORD}" -locations="src/main/resources/db/migration" -postgresql.transactional.lock=false
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build data dictionary & tag image
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y graphviz
+          script/build-data-dictionary.sh
+          docker build -t data-dictionary -f Dockerfile.data-dictionary . || true
+          docker tag data-dictionary ghcr.io/ministryofjustice/${{ github.event.repository.name }}:data-dictionary-${APP_VERSION}
+      - name: Push data-dictionary image (only on main or hotfix)
+        if: |
+          github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/hotfix/')
+        run: |
+          docker push ghcr.io/ministryofjustice/${{ github.event.repository.name }}:data-dictionary-${APP_VERSION}
+  pact_check_and_publish:
+    name: pact_check_and_publish
+    runs-on: ubuntu-latest
+    needs: [validate]
+    container:
+      image: cimg/openjdk:21.0.2
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      PACTBROKER_BASE: "https://pact-broker-prod.apps.live-1.cloud-platform.service.justice.gov.uk"
+      PACTBROKER_AUTH_USERNAME: interventions
+      PACTBROKER_AUTH_PASSWORD: ${{ secrets.PACT_BROKER_PASSWORD }}
+      _JAVA_OPTIONS: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false -Dkotlin.compiler.execution.strategy=in-process
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup flyway and psql
+        run: |
+          wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.2/flyway-commandline-10.15.2-linux-x64.tar.gz | tar xvz
+          sudo ln -s `pwd`/flyway-10.15.2/flyway /usr/local/bin
+          sudo apt-get update -y
+          sudo apt-get install -y postgresql-client
+      - name: Run migrations and local seeds
+        run: |
+          flyway -cleanDisabled="false" clean -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" -user="postgres" -password="${POSTGRES_PASSWORD}"
+          flyway migrate -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" -user="postgres" -password="${POSTGRES_PASSWORD}" -locations="src/main/resources/db/migration,src/main/resources/db/local" -postgresql.transactional.lock=false
+      - name: Cache Gradle deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/build.gradle*', '**/gradle-wrapper.properties', '**/build.gradle.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Run pact publish (Gradle)
+        env:
+          PACT_PROVIDER_VERSION: ${{ github.sha }}
+          PACT_PROVIDER_TAG: ${{ github.ref_name }}
+          PACTBROKER_CONSUMERVERSIONSELECTORS_TAGS: ${{ github.event.inputs.pact_consumer_tags || 'main' }}
+          PACT_PUBLISH_RESULTS: 'true'
+        run: |
+          ./gradlew pactTestPublish
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-pact
+          path: build/test-results
+      - name: Upload pact reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: pact-reports
+          path: build/reports/tests
+  tag_pact_version:
+    name: tag_pact_version
+    runs-on: ubuntu-latest
+    needs: [pact_check_and_publish]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Tag contract version with deployment
+        env:
+          PACT_BROKER_BASE_URL: "https://pact-broker-prod.apps.live-1.cloud-platform.service.justice.gov.uk"
+          PACT_BROKER_USERNAME: interventions
+          PACT_BROKER_PASSWORD: ${{ secrets.PACT_BROKER_PASSWORD }}
+          PACTICIPANT: "Interventions Service"
+          VERSION: ${{ github.sha }}
+          TAG: deployed:dev
+        run: |
+          npx --package='@pact-foundation/pact-node' pact-broker create-version-tag \
+            --pacticipant="${PACTICIPANT}" --version="${VERSION}" --tag="${TAG}" \
+            --broker-base-url="${PACT_BROKER_BASE_URL}" --broker-username="${PACT_BROKER_USERNAME}" --broker-password="${PACT_BROKER_PASSWORD}"
+  helm_lint:
+    strategy:
+      matrix:
+        environments: ['dev', 'preprod', 'prod']
+    name: helm lint
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/test_helm_lint.yml@v2 # WORKFLOW_VERSION
+    secrets: inherit
+    with:
+      environment: ${{ matrix.environments }}
+  build:
+    name: Build docker image from hmpps-github-actions
+    if: github.ref == 'refs/heads/main'
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2 # WORKFLOW_VERSION
+    needs:
+      - validate
+      - validate_db
+    with:
+      docker_registry: 'ghcr.io'
+      registry_org: 'ministryofjustice'
+      additional_docker_tag: ""
+      push: ${{ inputs.push || true }}
+      docker_multiplatform: false
+      additional_docker_build_args: ""
+  deploy_dev:
+    name: Deploy to the dev environment
+    if: github.ref == 'refs/heads/main'
+    needs:
+      - build
+      - helm_lint
+      - publish_data
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
+    secrets: inherit
+    with:
+      environment: 'dev'
+      app_version: '${{ needs.build.outputs.app_version }}'
+  tag_pact_version_dev:
+    name: tag_pact_version_dev
+    runs-on: ubuntu-latest
+    needs: deploy_dev
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node and Tag pact
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Tag contract version with deployment
+        env:
+          PACT_BROKER_BASE_URL: "https://pact-broker-prod.apps.live-1.cloud-platform.service.justice.gov.uk"
+          PACT_BROKER_USERNAME: interventions
+          PACT_BROKER_PASSWORD: ${{ secrets.PACT_BROKER_PASSWORD }}
+          PACTICIPANT: "Interventions Service"
+          VERSION: ${{ github.sha }}
+          TAG: "deployed:dev"
+        run: |
+          npx --package='@pact-foundation/pact-node' pact-broker create-version-tag \
+            --pacticipant="${PACTICIPANT}" --version="${VERSION}" --tag="${TAG}" \
+            --broker-base-url="${PACT_BROKER_BASE_URL}" --broker-username="${PACT_BROKER_USERNAME}" --broker-password="${PACT_BROKER_PASSWORD}"
+  deploy_preprod:
+    name: Deploy to the preprod environment
+    needs:
+      - build
+      - helm_lint
+      - deploy_dev
+      - tag_pact_version_dev
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
+    secrets: inherit
+    with:
+      environment: 'preprod'
+      app_version: '${{ needs.build.outputs.app_version }}'
+  tag_pact_version_preprod:
+    name: tag_pact_version_preprod
+    runs-on: ubuntu-latest
+    needs: deploy_preprod
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node and Tag pact (preprod)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Tag contract version with deployment
+        env:
+          PACT_BROKER_BASE_URL: "https://pact-broker-prod.apps.live-1.cloud-platform.service.justice.gov.uk"
+          PACT_BROKER_USERNAME: interventions
+          PACT_BROKER_PASSWORD: ${{ secrets.PACT_BROKER_PASSWORD }}
+          PACTICIPANT: "Interventions Service"
+          VERSION: ${{ github.sha }}
+          TAG: "deployed:preprod"
+        run: |
+          npx --package='@pact-foundation/pact-node' pact-broker create-version-tag \
+            --pacticipant="${PACTICIPANT}" --version="${VERSION}" --tag="${TAG}" \
+            --broker-base-url="${PACT_BROKER_BASE_URL}" --broker-username="${PACT_BROKER_USERNAME}" --broker-password="${PACT_BROKER_PASSWORD}"
+  deploy_prod:
+    name: Deploy to the prod environment
+    needs:
+      - build
+      - helm_lint
+      - deploy_preprod
+      - tag_pact_version_preprod
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
+    secrets: inherit
+    with:
+      environment: 'prod'
+      app_version: '${{ needs.build.outputs.app_version }}'
+  tag_pact_version_prod:
+    name: tag_pact_version_prod
+    runs-on: ubuntu-latest
+    needs: deploy_prod
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node and Tag pact (prod)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Tag contract version with deployment
+        env:
+          PACT_BROKER_BASE_URL: "https://pact-broker-prod.apps.live-1.cloud-platform.service.justice.gov.uk"
+          PACT_BROKER_USERNAME: interventions
+          PACT_BROKER_PASSWORD: ${{ secrets.PACT_BROKER_PASSWORD }}
+          PACTICIPANT: "Interventions Service"
+          VERSION: ${{ github.sha }}
+          TAG: "deployed:prod"
+        run: |
+          npx --package='@pact-foundation/pact-node' pact-broker create-version-tag \
+            --pacticipant="${PACTICIPANT}" --version="${VERSION}" --tag="${TAG}" \
+            --broker-base-url="${PACT_BROKER_BASE_URL}" --broker-username="${PACT_BROKER_USERNAME}" --broker-password="${PACT_BROKER_PASSWORD}"
