@@ -1,0 +1,431 @@
+name: Pipeline [test -> build -> deploy]
+on:
+  push:
+    branches:
+      - '**'
+  workflow_dispatch:
+    inputs:
+      only_pacts:
+        description: 'Run only the Pact workflow'
+        required: false
+        default: 'false'
+      pact_consumer_tags:
+        description: 'Pact consumer tags'
+        required: false
+        default: 'main'
+env:
+  POSTGRES_DB: interventions_ci
+  POSTGRES_PASSWORD: password
+  ALERTS_SLACK_CHANNEL: interventions-dev-notifications
+  RELEASES_SLACK_CHANNEL: refer-and-monitor-an-intervention
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref == 'refs/heads/main' && github.sha || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Setup Flyway and PostgreSQL client
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y postgresql-client graphviz curl
+          wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.2/flyway-commandline-10.15.2-linux-x64.tar.gz | tar xvz
+          sudo ln -s `pwd`/flyway-10.15.2/flyway /usr/local/bin
+      - name: Wait for Postgres
+        run: |
+          until pg_isready -h localhost -p 5432 -U postgres; do
+            echo "Waiting for Postgres..."
+            sleep 5
+          done
+      - name: Run migrations and local seeds
+        run: |
+          flyway -cleanDisabled="false" clean \
+            -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" \
+            -user="postgres" \
+            -password="${POSTGRES_PASSWORD}"
+          flyway migrate \
+            -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" \
+            -user="postgres" \
+            -password="${POSTGRES_PASSWORD}" \
+            -locations="src/main/resources/db/migration,src/main/resources/db/local" \
+            -postgresql.transactional.lock=false
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/build.gradle*', '**/gradle-wrapper.properties', '**/build.gradle.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Run Gradle checks
+        run: ./gradlew check jacocoTestCoverageVerification --no-daemon -Dspring.datasource.url=jdbc:postgresql://localhost:5432/${POSTGRES_DB}
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: Test results validate
+          path: build/test-results
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: Test reports validate
+          path: |
+            build/reports/tests
+            build/reports/jacoco/test
+  validate_db:
+    name: Validate DB
+    runs-on: ubuntu-latest
+    needs: validate
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      POSTGRES_DB: interventions_ci
+      POSTGRES_PASSWORD: password
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      - name: Setup Flyway and PostgreSQL client
+        run: |
+          wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.2/flyway-commandline-10.15.2-linux-x64.tar.gz | tar xvz
+          sudo ln -s `pwd`/flyway-10.15.2/flyway /usr/local/bin
+          sudo apt-get update -y
+          sudo apt-get install -y postgresql-client
+      - name: Wait for Postgres to be ready
+        run: |
+          until pg_isready -h localhost -p 5432 -U postgres; do
+            echo "Waiting for Postgres..."
+            sleep 5
+          done
+      - name: Run main migrations then branch migrations to detect clashes
+        env:
+          GIT_FETCH_DEPTH: 0
+        run: |
+          flyway -cleanDisabled="false" clean \
+            -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" \
+            -user="postgres" \
+            -password="${POSTGRES_PASSWORD}"
+          git fetch --unshallow || true
+          git fetch origin main
+          git reset --hard origin/main
+          flyway migrate \
+            -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" \
+            -user="postgres" \
+            -password="${POSTGRES_PASSWORD}" \
+            -locations="src/main/resources/db/migration" \
+            -postgresql.transactional.lock=false
+          git reset --hard "${{ github.sha }}"
+          flyway migrate \
+            -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" \
+            -user="postgres" \
+            -password="${POSTGRES_PASSWORD}" \
+            -locations="src/main/resources/db/migration" \
+            -postgresql.transactional.lock=false
+      - name: Run migrations and local seeds (final check)
+        run: |
+          flyway -cleanDisabled="false" clean \
+            -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" \
+            -user="postgres" \
+            -password="${POSTGRES_PASSWORD}"
+          flyway migrate \
+            -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" \
+            -user="postgres" \
+            -password="${POSTGRES_PASSWORD}" \
+            -locations="src/main/resources/db/migration,src/main/resources/db/local" \
+            -postgresql.transactional.lock=false
+      - name: Validate metadata
+        run: |
+          PGPASSWORD="${POSTGRES_PASSWORD}" bash script/validate-metadata.sh
+  publish_data:
+    name: Publish data
+    runs-on: ubuntu-latest
+    needs:
+      - validate
+      - validate_db
+      - set_version
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      POSTGRES_DB: interventions_ci
+      POSTGRES_PASSWORD: password
+      APP_VERSION: ${{ needs.set_version.outputs.app_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Flyway and PostgreSQL client
+        run: |
+          wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.2/flyway-commandline-10.15.2-linux-x64.tar.gz | tar xvz
+          sudo ln -s `pwd`/flyway-10.15.2/flyway /usr/local/bin
+          sudo apt-get update -y
+          sudo apt-get install -y postgresql-client graphviz
+      - name: Wait for Postgres to be ready
+        run: |
+          until pg_isready -h localhost -p 5432 -U postgres; do
+            echo "Waiting for Postgres..."
+            sleep 5
+          done
+      - name: Migrate the database
+        run: |
+          flyway migrate \
+            -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" \
+            -user="postgres" \
+            -password="${POSTGRES_PASSWORD}" \
+            -locations="src/main/resources/db/migration" \
+            -postgresql.transactional.lock=false
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build data dictionary & tag image
+        run: |
+          script/build-data-dictionary.sh
+          ls -R schema || echo "Schema folder not found"
+          docker build -t data-dictionary -f script/Dockerfile.data-dictionary .
+          docker tag data-dictionary ghcr.io/ministryofjustice/${{ github.event.repository.name }}:data-dictionary-${APP_VERSION}
+      - name: Push data-dictionary image (only on main or hotfix)
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/hotfix/')
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker push ghcr.io/ministryofjustice/${{ github.event.repository.name }}:data-dictionary-${APP_VERSION}
+  pact_check_and_publish:
+    name: Pact check and publish
+    runs-on: ubuntu-latest
+    needs: validate
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      PACTBROKER_BASE: "https://pact-broker-prod.apps.live-1.cloud-platform.service.justice.gov.uk"
+      PACTBROKER_AUTH_USERNAME: interventions
+      PACTBROKER_AUTH_PASSWORD: ${{ secrets.PACT_BROKER_PASSWORD }}
+      _JAVA_OPTIONS: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false -Dkotlin.compiler.execution.strategy=in-process
+    outputs:
+      pact_version: ${{ steps.set_pact_version.outputs.pact_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Setup Flyway and PostgreSQL client
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y postgresql-client
+          wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.2/flyway-commandline-10.15.2-linux-x64.tar.gz | tar xvz
+          sudo ln -s `pwd`/flyway-10.15.2/flyway /usr/local/bin
+      - name: Wait for Postgres to be ready
+        run: |
+          until pg_isready -h localhost -p 5432 -U postgres; do
+            echo "Waiting for Postgres..."
+            sleep 5
+          done
+      - name: Run migrations and local seeds
+        run: |
+          flyway -cleanDisabled="false" clean \
+            -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" \
+            -user="postgres" \
+            -password="${POSTGRES_PASSWORD}"
+          flyway migrate \
+            -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" \
+            -user="postgres" \
+            -password="${POSTGRES_PASSWORD}" \
+            -locations="src/main/resources/db/migration,src/main/resources/db/local" \
+            -postgresql.transactional.lock=false
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/build.gradle*', '**/gradle-wrapper.properties', '**/build.gradle.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Run Pact publish (Gradle)
+        id: set_pact_version
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          PACTBROKER_AUTH_PASSWORD: ${{ secrets.PACT_BROKER_PASSWORD }}
+        run: |
+          ./gradlew pactTestPublish -Ppact.consumer.version=${GITHUB_SHA} -PpactBrokerTags=${GITHUB_REF_NAME} -Pversion=${GITHUB_SHA}
+          echo "pact_version=${GITHUB_SHA}" >> $GITHUB_OUTPUT
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: Test results pact
+          path: build/test-results
+      - name: Upload Pact reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: Pact reports
+          path: build/reports/tests
+  helm_lint:
+    strategy:
+      matrix:
+        environments: ['dev', 'preprod', 'prod']
+    name: Helm lint
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/test_helm_lint.yml@v2
+    secrets: inherit
+    with:
+      environment: ${{ matrix.environments }}
+  build:
+    name: Build Docker image from hmpps-github-actions
+    if: github.ref == 'refs/heads/main'
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2
+    needs:
+      - validate
+      - validate_db
+    with:
+      docker_registry: 'ghcr.io'
+      registry_org: 'ministryofjustice'
+      additional_docker_tag: ""
+      push: ${{ inputs.push || true }}
+      docker_multiplatform: false
+      additional_docker_build_args: ""
+  set_version:
+    name: Set app version
+    needs: build
+    runs-on: ubuntu-latest
+    outputs:
+      app_version: ${{ steps.determine_version.outputs.app_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Determine app version
+        id: determine_version
+        run: |
+          APP_VERSION=$(git rev-parse --short HEAD)
+          echo "app_version=$APP_VERSION" >> $GITHUB_OUTPUT
+          echo "App version set to $APP_VERSION"
+  deploy_dev:
+    name: Deploy to Dev
+    if: github.ref == 'refs/heads/main'
+    needs:
+      - build
+      - set_version
+      - helm_lint
+      - publish_data
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2
+    secrets: inherit
+    with:
+      environment: 'dev'
+      app_version: ${{ needs.set_version.outputs.app_version }}
+  deploy_preprod:
+    name: Deploy to Preprod
+    needs:
+      - build
+      - set_version
+      - helm_lint
+      - deploy_dev
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2
+    secrets: inherit
+    with:
+      environment: 'preprod'
+      app_version: ${{ needs.set_version.outputs.app_version }}
+  deploy_prod:
+    name: Deploy to Prod
+    needs:
+      - build
+      - set_version
+      - helm_lint
+      - deploy_preprod
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2
+    secrets: inherit
+    with:
+      environment: 'prod'
+      app_version: ${{ needs.set_version.outputs.app_version }}
+  tag_pact_versions:
+    name: Tag Pact versions across environments
+    runs-on: ubuntu-latest
+    needs:
+      - pact_check_and_publish
+      - deploy_dev
+      - deploy_preprod
+      - deploy_prod
+    strategy:
+      matrix:
+        environment:
+        - dev
+        - preprod
+        - prod
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Tag contract version with deployment
+        env:
+          PACT_BROKER_BASE_URL: "https://pact-broker-prod.apps.live-1.cloud-platform.service.justice.gov.uk"
+          PACT_BROKER_USERNAME: interventions
+          PACT_BROKER_PASSWORD: ${{ secrets.PACT_BROKER_PASSWORD }}
+          PACTICIPANT: "Interventions Service"
+          VERSION: ${{ needs.pact_check_and_publish.outputs.pact_version }}
+          TAG: "deployed:${{ matrix.environment }}"
+        run: |
+          echo "Tagging Pact version ${VERSION} for environment: ${TAG}"
+          npx --package='@pact-foundation/pact-node' pact-broker create-version-tag \
+            --pacticipant="${PACTICIPANT}" \
+            --version="${VERSION}" \
+            --tag="${TAG}" \
+            --broker-base-url="${PACT_BROKER_BASE_URL}" \
+            --broker-username="${PACT_BROKER_USERNAME}" \
+            --broker-password="${PACT_BROKER_PASSWORD}"
