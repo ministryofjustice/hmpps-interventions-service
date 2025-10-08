@@ -1,4 +1,4 @@
 FROM bitnami/nginx:latest
 
 WORKDIR /app
-COPY script/schema/ meta/schema/
+COPY schema/ meta/schema/

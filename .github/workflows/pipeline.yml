@@ -224,9 +224,9 @@ jobs:
       - name: Build data dictionary & tag image
         run: |
           script/build-data-dictionary.sh
-          ls -R schema || echo "Schema folder not found"
-          docker build -t data-dictionary -f script/Dockerfile.data-dictionary .
           docker tag data-dictionary ghcr.io/ministryofjustice/${{ github.event.repository.name }}:data-dictionary-${APP_VERSION}
+      - name: Verify schema output
+        run: ls -R script/schema || echo "Schema folder missing"
       - name: Push data-dictionary image (only on main or hotfix)
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/hotfix/')
         run: |
