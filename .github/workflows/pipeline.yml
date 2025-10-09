@@ -220,7 +220,7 @@ jobs:
             -locations="src/main/resources/db/migration" \
             -postgresql.transactional.lock=false
       - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       - name: Build data dictionary
         run: |
           script/build-data-dictionary.sh
