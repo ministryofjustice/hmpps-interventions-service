@@ -233,10 +233,12 @@ jobs:
           if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
             docker tag data-dictionary ghcr.io/ministryofjustice/${{ github.event.repository.name }}:data-dictionary-latest
           fi
+      - name: Login to GHCR using PAT
+        run: |
+          echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Push data dictionary images
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/hotfix/')
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           docker push ghcr.io/ministryofjustice/${{ github.event.repository.name }}:data-dictionary-${APP_VERSION}
           if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
             docker push ghcr.io/ministryofjustice/${{ github.event.repository.name }}:data-dictionary-latest
@@ -244,11 +246,16 @@ jobs:
       - name: Verify pushed images
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/hotfix/')
         run: |
-          echo "Successfully built and pushed data-dictionary images:"
-          echo "ghcr.io/ministryofjustice/${{ github.event.repository.name }}:data-dictionary-${APP_VERSION}"
-          if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
-            echo "  ghcr.io/ministryofjustice/${{ github.event.repository.name }}:data-dictionary-latest"
-          fi
+          echo "Verifying images in GHCR..."
+          for tag in "data-dictionary-${APP_VERSION}" "data-dictionary-latest"; do
+            if curl -s -H "Authorization: Bearer ${{ secrets.GHCR_PAT }}" \
+               "https://ghcr.io/v2/ministryofjustice/${{ github.event.repository.name }}/manifests/$tag" | grep -q "errors"; then
+              echo "Image ghcr.io/ministryofjustice/${{ github.event.repository.name }}:$tag not found!"
+              exit 1
+            else
+              echo "Verified ghcr.io/ministryofjustice/${{ github.event.repository.name }}:$tag"
+            fi
+          done
   pact_check_and_publish:
     name: Pact check and publish
     runs-on: ubuntu-latest
