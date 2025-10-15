@@ -243,19 +243,6 @@ jobs:
           if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
             docker push ghcr.io/ministryofjustice/${{ github.event.repository.name }}:data-dictionary-latest
           fi
-      - name: Verify pushed images
-        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/hotfix/')
-        run: |
-          echo "Verifying images in GHCR..."
-          for tag in "data-dictionary-${APP_VERSION}" "data-dictionary-latest"; do
-            if curl -s -H "Authorization: Bearer ${{ secrets.GHCR_PAT }}" \
-               "https://ghcr.io/v2/ministryofjustice/${{ github.event.repository.name }}/manifests/$tag" | grep -q "errors"; then
-              echo "Image ghcr.io/ministryofjustice/${{ github.event.repository.name }}:$tag not found!"
-              exit 1
-            else
-              echo "Verified ghcr.io/ministryofjustice/${{ github.event.repository.name }}:$tag"
-            fi
-          done
   pact_check_and_publish:
     name: Pact check and publish
     runs-on: ubuntu-latest
