@@ -200,7 +200,7 @@ jobs:
       POSTGRES_PASSWORD: password
       APP_VERSION: ${{ needs.set_version.outputs.app_version }}
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
       - name: Setup Flyway and PostgreSQL client
         run: |
@@ -208,10 +208,10 @@ jobs:
           sudo ln -s `pwd`/flyway-10.15.2/flyway /usr/local/bin
           sudo apt-get update -y
           sudo apt-get install -y postgresql-client graphviz
-      - name: Wait for Postgres to be ready
+      - name: Wait for PostgreSQL to be ready
         run: |
           until pg_isready -h localhost -p 5432 -U postgres; do
-            echo "Waiting for Postgres..."
+            echo "Waiting for PostgreSQL..."
             sleep 5
           done
       - name: Migrate the database
@@ -227,25 +227,22 @@ jobs:
       - name: Build data dictionary
         run: |
           script/build-data-dictionary.sh
-      - name: Tag images
+      - name: Tag data dictionary images
         run: |
-          docker tag data-dictionary ghcr.io/ministryofjustice/${{ github.event.repository.name }}:data-dictionary-${APP_VERSION}          
+          docker tag data-dictionary ghcr.io/ministryofjustice/${{ github.event.repository.name }}:data-dictionary-${APP_VERSION}
           if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
             docker tag data-dictionary ghcr.io/ministryofjustice/${{ github.event.repository.name }}:data-dictionary-latest
           fi
-      - name: Push data-dictionary images
+      - name: Login to GHCR using PAT
+        run: |
+          echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Push data dictionary images
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/hotfix/')
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           docker push ghcr.io/ministryofjustice/${{ github.event.repository.name }}:data-dictionary-${APP_VERSION}
           if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
             docker push ghcr.io/ministryofjustice/${{ github.event.repository.name }}:data-dictionary-latest
           fi
-      - name: Verify pushed images
-        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/hotfix/')
-        run: |
-          curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            https://ghcr.io/v2/ministryofjustice/${{ github.event.repository.name }}/tags/list | jq .
   pact_check_and_publish:
     name: Pact check and publish
     runs-on: ubuntu-latest
