@@ -43,7 +43,7 @@ jobs:
           --health-retries=5
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
@@ -118,7 +118,7 @@ jobs:
       POSTGRES_PASSWORD: password
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -201,7 +201,7 @@ jobs:
       APP_VERSION: ${{ needs.set_version.outputs.app_version }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup Flyway and PostgreSQL client
         run: |
           wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.2/flyway-commandline-10.15.2-linux-x64.tar.gz | tar xvz
@@ -269,7 +269,7 @@ jobs:
       pact_version: ${{ steps.set_pact_version.outputs.pact_version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -358,7 +358,7 @@ jobs:
       app_version: ${{ steps.determine_version.outputs.app_version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Determine app version
         id: determine_version
         run: |
@@ -418,7 +418,7 @@ jobs:
         - prod
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
