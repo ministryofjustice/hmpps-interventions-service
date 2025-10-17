@@ -202,8 +202,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Setup Flyway and PostgreSQL client
         run: |
           wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.2/flyway-commandline-10.15.2-linux-x64.tar.gz | tar xvz
@@ -339,7 +337,7 @@ jobs:
       environment: ${{ matrix.environments }}
   build:
     name: Build Docker image
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/hotfix/')
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2
     needs:
       - validate
@@ -358,16 +356,29 @@ jobs:
     outputs:
       app_version: ${{ steps.determine_version.outputs.app_version }}
     steps:
-      - name: Checkout repository with full history
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Determine app version
         id: determine_version
         run: |
           APP_VERSION=$(git rev-parse --short HEAD)
           echo "app_version=$APP_VERSION" >> $GITHUB_OUTPUT
           echo "App version set to $APP_VERSION"
+  publish:
+    name: Publish Docker image
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/hotfix/')
+    needs:
+      - validate
+      - helm_lint
+      - build
+      - set_version
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_push.yml@v2
+    secrets: inherit
+    with:
+      docker_registry: 'ghcr.io'
+      registry_org: 'ministryofjustice'
+      app_version: ${{ needs.set_version.outputs.app_version }}
+      tag_latest: true
   deploy_dev:
     name: Deploy to Dev
     if: github.ref == 'refs/heads/main'
