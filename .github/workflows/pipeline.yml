@@ -202,6 +202,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Setup Flyway and PostgreSQL client
         run: |
           wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.2/flyway-commandline-10.15.2-linux-x64.tar.gz | tar xvz
@@ -336,7 +338,7 @@ jobs:
     with:
       environment: ${{ matrix.environments }}
   build:
-    name: Build Docker image from hmpps-github-actions
+    name: Build Docker image
     if: github.ref == 'refs/heads/main'
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2
     needs:
@@ -356,8 +358,10 @@ jobs:
     outputs:
       app_version: ${{ steps.determine_version.outputs.app_version }}
     steps:
-      - name: Checkout
+      - name: Checkout repository with full history
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Determine app version
         id: determine_version
         run: |
