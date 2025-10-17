@@ -245,6 +245,7 @@ jobs:
   pact_check_and_publish:
     name: Pact check and publish
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     needs: validate
     services:
       postgres:
@@ -454,3 +455,4 @@ jobs:
             --broker-base-url="${PACT_BROKER_BASE_URL}" \
             --broker-username="${PACT_BROKER_USERNAME}" \
             --broker-password="${PACT_BROKER_PASSWORD}"
+
