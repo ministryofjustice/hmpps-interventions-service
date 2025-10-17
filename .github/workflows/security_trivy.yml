@@ -1,6 +1,5 @@
 name: Security trivy dependency check
 on:
-  workflow_call:
   workflow_dispatch:
   schedule:
     - cron: "43 9 * * MON-FRI" # Every weekday at 09:43 UTC

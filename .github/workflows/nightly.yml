@@ -7,22 +7,30 @@ on:
 permissions:
   contents: read
   packages: write
-env:
-  PACT_BROKER_BASE_URL: 'https://pact-broker-prod.apps.live-1.cloud-platform.service.justice.gov.uk'
-  PACT_BROKER_USERNAME: 'interventions'
+  actions: read
+  security-events: write
 concurrency:
   group: nightly-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   veracode_policy_scan:
     name: Veracode Policy Scan
-    uses: ./.github/workflows/security_veracode_policy_scan.yml
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_veracode_policy_scan.yml@v2
     secrets: inherit
+    with:
+      channel_id: ${{ vars.SECURITY_ALERTS_SLACK_CHANNEL_ID || 'NO_SLACK' }}
   trivy_latest_scan:
     name: Trivy Latest Scan
-    uses: ./.github/workflows/security_trivy.yml
+    needs: veracode_policy_scan
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_trivy.yml@v2
     secrets: inherit
-  gradle_owasp_dependency_check:
-    name: Owasp Security Check
-    uses: ./.github/workflows/security_owasp.yml
+    with:
+      channel_id: ${{ vars.SECURITY_ALERTS_SLACK_CHANNEL_ID || 'NO_SLACK' }}
+  owasp_dependency_check:
+    name: OWASP dependency check
+    needs: trivy_latest_scan
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_owasp.yml@v2
     secrets: inherit
+    with:
+      nvd_feed_version: '2'
+      channel_id: ${{ vars.SECURITY_ALERTS_SLACK_CHANNEL_ID || 'NO_SLACK' }}

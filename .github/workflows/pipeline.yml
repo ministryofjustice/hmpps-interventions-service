@@ -245,6 +245,7 @@ jobs:
   pact_check_and_publish:
     name: Pact check and publish
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     needs: validate
     services:
       postgres:
@@ -336,8 +337,8 @@ jobs:
     with:
       environment: ${{ matrix.environments }}
   build:
-    name: Build Docker image from hmpps-github-actions
-    if: github.ref == 'refs/heads/main'
+    name: Build Docker image
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/hotfix/')
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2
     needs:
       - validate
@@ -364,6 +365,21 @@ jobs:
           APP_VERSION=$(git rev-parse --short HEAD)
           echo "app_version=$APP_VERSION" >> $GITHUB_OUTPUT
           echo "App version set to $APP_VERSION"
+  publish:
+    name: Publish Docker image
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/hotfix/')
+    needs:
+      - validate
+      - helm_lint
+      - build
+      - set_version
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_push.yml@v2
+    secrets: inherit
+    with:
+      docker_registry: 'ghcr.io'
+      registry_org: 'ministryofjustice'
+      app_version: ${{ needs.set_version.outputs.app_version }}
+      tag_latest: true
   deploy_dev:
     name: Deploy to Dev
     if: github.ref == 'refs/heads/main'
@@ -439,3 +455,4 @@ jobs:
             --broker-base-url="${PACT_BROKER_BASE_URL}" \
             --broker-username="${PACT_BROKER_USERNAME}" \
             --broker-password="${PACT_BROKER_PASSWORD}"
+
