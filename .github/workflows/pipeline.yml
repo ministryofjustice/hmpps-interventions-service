@@ -348,6 +348,7 @@ jobs:
       registry_org: 'ministryofjustice'
       additional_docker_tag: ""
       push: false
+      upload_image_artifact: true
       docker_multiplatform: false
       additional_docker_build_args: ""
   set_version:
