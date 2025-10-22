@@ -336,68 +336,69 @@ jobs:
     secrets: inherit
     with:
       environment: ${{ matrix.environments }}
-  build:
-    name: Build Docker image
+  prepare_build:
+    name: Prepare Docker build
     if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/hotfix/')
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2
     needs:
       - validate
       - validate_db
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Confirm Dockerfile presence
+        run: |
+          echo "Verifying Dockerfile..."
+          if [ ! -f ./Dockerfile ]; then
+            echo "Dockerfile not found at repo root!"
+            exit 1
+          else
+            echo "Dockerfile found."
+          fi
+  build:
+    name: Build Docker image
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/hotfix/')
+    needs: prepare_build
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2
     with:
       docker_registry: 'ghcr.io'
       registry_org: 'ministryofjustice'
       push: false
       upload_image_artifact: true
       docker_multiplatform: false
-  check_build_debug:
-    name: Debug build output and image presence
+  debug_build:
+    name: Debug Docker build output
     runs-on: ubuntu-latest
     needs: build
     if: always()
     steps:
-      - name: Show workspace and temp folder contents
-        run: |
-          echo "== Contents of workspace =="
-          ls -R . || true
-          echo
-          echo "== Contents of runner temp =="
-          ls -R ${{ runner.temp }} || true
+      - name: List workspace contents
+        run: ls -R ${{ github.workspace }} || true
+      - name: List runner temp folder
+        run: ls -R ${{ runner.temp }} || true
       - name: Show available Docker images
-        run: |
-          echo "== Docker images available on runner =="
-          docker images || true
-      - name: Print last 200 lines of build logs
-        run: |
-          echo "== Last 200 lines of build logs =="
-          mkdir -p ${{ runner.temp }}/build_logs
-          gh run download ${{ github.run_id }} --name build --dir ${{ runner.temp }}/build_logs || true
-          find ${{ runner.temp }}/build_logs -type f -name "*.txt" -exec tail -n 200 {} \; || echo "No build log artifact found"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Separator
-        run: echo "::group::==== DEBUG COMPLETE ===="
-  check_image_artifact:
-    name: Verify Docker image artifact uploaded
-    if: success() && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/hotfix/'))
-    runs-on: ubuntu-latest
-    needs:
-      - build
-      - check_build_debug
-    steps:
-      - name: Download Docker image artifact
+        run: docker images || true
+      - name: Download build_image artifact from reusable workflow
         uses: actions/download-artifact@v4
         with:
           name: build_image
           path: ${{ runner.temp }}
-      - name: List artifact contents
-        run: ls -lh ${{ runner.temp }}
-      - name: Check for Docker image tarball
+        continue-on-error: true
+      - name: Show artifact contents
         run: |
-          if [ ! -f ${{ runner.temp }}/build_image.tar ]; then
-            echo "Error: build_image.tar does not exist!"
-            exit 1
-          else
+          echo "== Artifact contents =="
+          ls -lh ${{ runner.temp }} || echo "No artifact downloaded"
+      - name: Check for Docker tarball
+        run: |
+          if [ -f ${{ runner.temp }}/build_image.tar ]; then
             echo "build_image.tar found!"
+            docker load -i ${{ runner.temp }}/build_image.tar
+            echo "Docker image loaded successfully."
+          else
+            echo "build_image.tar not found!"
+          fi
   set_version:
     name: Set app version
     needs: build
@@ -410,6 +411,23 @@ jobs:
         run: |
           APP_VERSION=$(git rev-parse --short HEAD)
           echo "app_version=$APP_VERSION" >> $GITHUB_OUTPUT
+  check_image_artifact:
+    name: Verify Docker image artifact
+    runs-on: ubuntu-latest
+    needs:
+      - debug_build
+    if: success() && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/hotfix/'))
+    steps:
+      - name: List Docker images on runner
+        run: docker images || true
+      - name: Verify Docker tarball exists
+        run: |
+          if [ ! -f ${{ runner.temp }}/build_image.tar ]; then
+            echo "build_image.tar does not exist!"
+            exit 1
+          else
+            echo "build_image.tar found!"
+          fi
   publish:
     name: Publish Docker image
     if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/hotfix/')
