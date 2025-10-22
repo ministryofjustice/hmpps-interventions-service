@@ -349,10 +349,40 @@ jobs:
       push: false
       upload_image_artifact: true
       docker_multiplatform: false
-  verify_and_upload_image:
-    name: Verify Docker image artifact
+  check_build_debug:
+    name: Debug build output and image presence
     runs-on: ubuntu-latest
     needs: build
+    if: always()
+    steps:
+      - name: Show workspace and temp folder contents
+        run: |
+          echo "== Contents of workspace =="
+          ls -R . || true
+          echo
+          echo "== Contents of runner temp =="
+          ls -R ${{ runner.temp }} || true
+      - name: Show available Docker images
+        run: |
+          echo "== Docker images available on runner =="
+          docker images || true
+      - name: Print last 200 lines of build logs
+        run: |
+          echo "== Last 200 lines of build logs =="
+          mkdir -p ${{ runner.temp }}/build_logs
+          gh run download ${{ github.run_id }} --name build --dir ${{ runner.temp }}/build_logs || true
+          find ${{ runner.temp }}/build_logs -type f -name "*.txt" -exec tail -n 200 {} \; || echo "No build log artifact found"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Separator
+        run: echo "::group::==== DEBUG COMPLETE ===="
+  check_image_artifact:
+    name: Verify Docker image artifact uploaded
+    if: success() && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/hotfix/'))
+    runs-on: ubuntu-latest
+    needs:
+      - build
+      - check_build_debug
     steps:
       - name: Download Docker image artifact
         uses: actions/download-artifact@v4
@@ -368,16 +398,6 @@ jobs:
             exit 1
           else
             echo "build_image.tar found!"
-          fi
-      - name: Load Docker image
-        run: docker load -i ${{ runner.temp }}/build_image.tar
-
-      - name: Push Docker image to GHCR
-        run: |
-          IMAGE_NAME="ghcr.io/ministryofjustice/${{ github.repository }}"
-          docker tag "${IMAGE_NAME}:latest" "${IMAGE_NAME}:${{ needs.set_version.outputs.app_version }}"
-          docker push "${IMAGE_NAME}:${{ needs.set_version.outputs.app_version }}"
-          docker push "${IMAGE_NAME}:latest"
   set_version:
     name: Set app version
     needs: build
@@ -385,21 +405,17 @@ jobs:
     outputs:
       app_version: ${{ steps.determine_version.outputs.app_version }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Determine app version
-        id: determine_version
+      - uses: actions/checkout@v4
+      - id: determine_version
         run: |
           APP_VERSION=$(git rev-parse --short HEAD)
           echo "app_version=$APP_VERSION" >> $GITHUB_OUTPUT
-          echo "App version set to $APP_VERSION"
   publish:
     name: Publish Docker image
     if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/hotfix/')
     needs:
-      - validate
       - helm_lint
-      - build
+      - check_image_artifact
       - set_version
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_push.yml@v2
     secrets: inherit
