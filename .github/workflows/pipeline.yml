@@ -133,6 +133,7 @@ jobs:
     secrets: inherit
     with:
       environment: 'dev'
+      k8s_deployment_name: hmpps-interventions-service-api
       app_version: ${{ needs.build.outputs.app_version }}
   deploy_preprod:
     name: Deploy to pre-production environment
@@ -143,6 +144,7 @@ jobs:
     secrets: inherit
     with:
       environment: 'preprod'
+      k8s_deployment_name: hmpps-interventions-service-api
       app_version: ${{ needs.build.outputs.app_version }}
   deploy_prod:
     name: Deploy to production environment
@@ -153,4 +155,5 @@ jobs:
     secrets: inherit
     with:
       environment: 'prod'
+      k8s_deployment_name: hmpps-interventions-service-api
       app_version: ${{ needs.build.outputs.app_version }}
