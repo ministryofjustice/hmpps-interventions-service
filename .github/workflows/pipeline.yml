@@ -120,9 +120,10 @@ jobs:
     with:
       docker_registry: 'ghcr.io'
       registry_org: 'ministryofjustice'
-      additional_docker_tag: ${{ github.ref_name }}-${{ github.sha }}
+      additional_docker_tag: ${{ github.ref_name }}-a9c6f42
       push: ${{ inputs.push || true }}
       docker_multiplatform: true
+      tag_latest: false
   deploy_dev:
     name: Deploy to the development environment
     needs:
