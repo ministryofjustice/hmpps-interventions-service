@@ -9,7 +9,7 @@ on:
       push:
         description: Push docker image to registry flag
         required: true
-        default: false
+        default: true
         type: boolean
       only_pacts:
         description: 'Run only the Pact workflow'
@@ -123,7 +123,7 @@ jobs:
       additional_docker_tag: ${{ github.ref_name }}-a9c6f42
       push: ${{ inputs.push || true }}
       docker_multiplatform: true
-      tag_latest: false
+      tag_latest: true
   deploy_dev:
     name: Deploy to the development environment
     needs:
