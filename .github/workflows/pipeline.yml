@@ -6,11 +6,6 @@ on:
       - '**'
   workflow_dispatch:
     inputs:
-      additional_docker_tag:
-        description: Additional docker tag that can be used to specify stable or testing tags
-        required: false
-        default: ''
-        type: string
       push:
         description: Push docker image to registry flag
         required: true
@@ -125,7 +120,7 @@ jobs:
     with:
       docker_registry: 'ghcr.io'
       registry_org: 'ministryofjustice'
-      additional_docker_tag: ${{ inputs.additional_docker_tag }}
+      additional_docker_tag: ${{ github.ref_name }}-${{ github.sha }}
       push: ${{ inputs.push || true }}
       docker_multiplatform: true
   deploy_dev:
@@ -137,7 +132,7 @@ jobs:
     secrets: inherit
     with:
       environment: 'dev'
-      app_version: '${{ needs.build.outputs.app_version }}'
+      app_version: ${{ needs.build.outputs.app_version }}
   deploy_preprod:
     name: Deploy to pre-production environment
     needs:
@@ -147,7 +142,7 @@ jobs:
     secrets: inherit
     with:
       environment: 'preprod'
-      app_version: '${{ needs.build.outputs.app_version }}'
+      app_version: ${{ needs.build.outputs.app_version }}
   deploy_prod:
     name: Deploy to production environment
     needs:
@@ -157,4 +152,4 @@ jobs:
     secrets: inherit
     with:
       environment: 'prod'
-      app_version: '${{ needs.build.outputs.app_version }}'
+      app_version: ${{ needs.build.outputs.app_version }}
