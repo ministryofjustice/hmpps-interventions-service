@@ -100,12 +100,12 @@ jobs:
       - name: Run Gradle checks
         run: ./gradlew check jacocoTestCoverageVerification --no-daemon -Dspring.datasource.url=jdbc:postgresql://localhost:5432/${POSTGRES_DB}
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Test results validate
           path: build/test-results
       - name: Upload test reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Test reports validate
           path: |
