@@ -3,7 +3,7 @@ replicaCount: 3
 nameOverride: hmpps-interventions-service
 
 image:
-  repository: quay.io/hmpps/hmpps-interventions-service
+  repository: ghcr.io/ministryofjustice/hmpps-interventions-service
   tag: latest
   ports:
     app: 8080
@@ -33,3 +33,4 @@ env:
   AWS_S3_STORAGE_ENABLED: "true"
   AWS_S3_NDMIS_ENABLED: "true"
   OVERRIDES_SHOWFUTUREINTERVENTIONS: "false"
+  ENVIRONMENT_NAME: PROD

@@ -1,0 +1,161 @@
+name: Pipeline [test -> build -> deploy]
+
+on:
+  push:
+    branches:
+      - '**'
+  workflow_dispatch:
+    inputs:
+      additional_docker_tag:
+        description: Additional docker tag that can be used to specify stable or testing tags
+        required: false
+        default: ''
+        type: string
+      push:
+        description: Push docker image to registry flag
+        required: true
+        default: true
+        type: boolean
+      only_pacts:
+        description: 'Run only the Pact workflow'
+        required: false
+        default: 'false'
+      pact_consumer_tags:
+        description: 'Pact consumer tags'
+        required: false
+        default: 'main'
+permissions:
+  contents: read
+  packages: write
+env:
+  POSTGRES_DB: interventions_ci
+  POSTGRES_PASSWORD: password
+  ALERTS_SLACK_CHANNEL: interventions-dev-notifications
+  RELEASES_SLACK_CHANNEL: refer-and-monitor-an-intervention
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref == 'refs/heads/main' && github.sha || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+jobs:
+  helm_lint:
+    strategy:
+      matrix:
+        environments: ['dev', 'preprod', 'prod']
+    name: Helm lint
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/test_helm_lint.yml@v2
+    secrets: inherit
+    with:
+      environment: ${{ matrix.environments }}
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Setup Flyway and PostgreSQL client
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y postgresql-client graphviz curl
+          wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.2/flyway-commandline-10.15.2-linux-x64.tar.gz | tar xvz
+          sudo ln -s `pwd`/flyway-10.15.2/flyway /usr/local/bin
+      - name: Wait for Postgres
+        run: |
+          until pg_isready -h localhost -p 5432 -U postgres; do
+            echo "Waiting for Postgres..."
+            sleep 5
+          done
+      - name: Run migrations and local seeds
+        run: |
+          flyway -cleanDisabled="false" clean \
+            -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" \
+            -user="postgres" \
+            -password="${POSTGRES_PASSWORD}"
+          flyway migrate \
+            -url="jdbc:postgresql://localhost:5432/${POSTGRES_DB}" \
+            -user="postgres" \
+            -password="${POSTGRES_PASSWORD}" \
+            -locations="src/main/resources/db/migration,src/main/resources/db/local" \
+            -postgresql.transactional.lock=false
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/build.gradle*', '**/gradle-wrapper.properties', '**/build.gradle.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Run Gradle checks
+        run: ./gradlew check jacocoTestCoverageVerification --no-daemon -Dspring.datasource.url=jdbc:postgresql://localhost:5432/${POSTGRES_DB}
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: Test results validate
+          path: build/test-results
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: Test reports validate
+          path: |
+            build/reports/tests
+            build/reports/jacoco/test
+  build:
+    name: Build docker image from hmpps-github-actions
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/hotfix/')
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2
+    needs:
+      - validate
+    with:
+      docker_registry: 'ghcr.io'
+      registry_org: 'ministryofjustice'
+      additional_docker_tag: ${{ inputs.additional_docker_tag }}
+      push: ${{ inputs.push || true }}
+      docker_multiplatform: true
+      tag_latest: true
+  deploy_dev:
+    name: Deploy to the development environment
+    needs:
+      - build
+      - helm_lint
+    uses: ./.github/workflows/deploy_env.yml
+    secrets: inherit
+    with:
+      environment: 'dev'
+      app_version: '${{ needs.build.outputs.app_version }}'
+  deploy_preprod:
+    name: Deploy to pre-production environment
+    needs:
+      - build
+      - deploy_dev
+    uses: ./.github/workflows/deploy_env.yml
+    secrets: inherit
+    with:
+      environment: 'preprod'
+      app_version: '${{ needs.build.outputs.app_version }}'
+  deploy_prod:
+    name: Deploy to production environment
+    needs:
+      - build
+      - deploy_preprod
+    uses: ./.github/workflows/deploy_env.yml
+    secrets: inherit
+    with:
+      environment: 'prod'
+      app_version: '${{ needs.build.outputs.app_version }}'
