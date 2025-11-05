@@ -13,6 +13,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   annotations:
+    circleci.com/project-slug: github/ministryofjustice/hmpps-interventions-service
     sentry.io/project-slug: interventions-service-prod
   name: hmpps-interventions-service
   title: Intervention service

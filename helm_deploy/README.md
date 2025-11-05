@@ -43,7 +43,7 @@ Note: replace _revision number_ with one from listed in the `history` command)
 
 __Example deploy command:__
 
-The following example is `--dry-run` mode - which will allow for testing:
+The following example is `--dry-run` mode - which will allow for testing. CircleCI normally runs this command with actual secret values (from AWS secret manager), and also updated the chart's application version to match the release version:
 
 ```sh
 helm upgrade [release name] [path to chart]. \
@@ -53,8 +53,6 @@ helm upgrade [release name] [path to chart]. \
   --values values-dev.yaml \
   --values example-secrets.yaml
 ```
-**Github Actions** now handles helm related commands via the `helm_lint` job in pipeline.yml, which points to a workflow in [hmpps-github-actions](https://github.com/ministryofjustice/hmpps-github-actions/blob/main/.github/workflows/test_helm_lint.yml).
-
 
 ### Ingress TLS certificate
 

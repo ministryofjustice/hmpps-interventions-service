@@ -1,0 +1,306 @@
+version: 2.1
+
+parameters:
+  only_pacts:
+    type: boolean
+    default: false
+  pact_consumer_tags:
+    type: string
+    default: main
+  alerts-slack-channel:
+    type: string
+    default: interventions-dev-notifications
+  releases-slack-channel:
+    type: string
+    default: refer-and-monitor-an-intervention
+
+orbs:
+  hmpps: ministryofjustice/hmpps@11.2.0
+  gradle: circleci/gradle@3.0.0
+  mem: circleci/rememborb@0.0.2
+
+_db_docker_config: &db_docker_config
+  - image: cimg/openjdk:21.0.2
+    environment:
+      POSTGRES_DB: interventions_ci
+  - image: cimg/postgres:15.0
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: interventions_ci
+
+jobs:
+  validate:
+    executor:
+      name: hmpps/java
+      tag: "21"
+    docker: *db_docker_config
+    environment:
+      _JAVA_OPTIONS: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=true -Dkotlin.compiler.execution.strategy=in-process
+    steps:
+      - checkout
+      - run:
+          name: Setup flyway and psql
+          command: |
+            wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.2/flyway-commandline-10.15.2-linux-x64.tar.gz | \
+              tar xvz && sudo ln -s `pwd`/flyway-10.15.2/flyway /usr/local/bin
+            sudo apt update
+            sudo apt install postgresql-client
+      - run:
+          name: Run migrations and local seeds
+          command: |
+            flyway -cleanDisabled="false" clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
+            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration,src/main/resources/db/local" -postgresql.transactional.lock=false
+      - gradle/with_cache:
+          deps_checksum_file: "build.gradle.kts"
+          cache_key: v2
+          steps:
+            - run: ./gradlew check jacocoTestCoverageVerification
+      - store_test_results:
+          path: build/test-results
+      - store_artifacts:
+          path: build/reports/tests
+      - store_artifacts:
+          path: build/reports/jacoco/test
+  validate_db:
+    executor:
+      name: hmpps/java
+      tag: "21"
+    docker: *db_docker_config
+    steps:
+      - checkout
+      - run:
+          name: Setup flyway and psql
+          command: |
+            wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.2/flyway-commandline-10.15.2-linux-x64.tar.gz | \
+              tar xvz && sudo ln -s `pwd`/flyway-10.15.2/flyway /usr/local/bin
+            sudo apt update
+            sudo apt install postgresql-client
+      - run:
+          name: Run main migrations then branch migrations to detect clashes
+          command: |
+            flyway -cleanDisabled="false" clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
+            git reset --hard origin/main
+            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration" -postgresql.transactional.lock=false
+            git reset --hard "$CIRCLE_SHA1"
+            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration" -postgresql.transactional.lock=false
+      - run:
+          name: Run migrations and local seeds
+          command: |
+            flyway -cleanDisabled="false" clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password"
+            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration,src/main/resources/db/local" -postgresql.transactional.lock=false
+      - run:
+          name: Validate metadata
+          command: |
+            PGPASSWORD="$POSTGRES_PASSWORD" script/validate-metadata.sh
+  publish_data:
+    executor:
+      name: hmpps/java
+      tag: "21"
+    docker: *db_docker_config
+    steps:
+      - checkout
+      - mem/recall:
+          env_var: APP_VERSION
+      - run:
+          name: Migrate the database
+          command: |
+            wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.2/flyway-commandline-10.15.2-linux-x64.tar.gz | \
+              tar xvz && sudo ln -s `pwd`/flyway-10.15.2/flyway /usr/local/bin
+            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration" -postgresql.transactional.lock=false
+      - setup_remote_docker
+      - run:
+          name: Build data dictionary
+          command: |
+            sudo apt update && sudo apt install graphviz
+            script/build-data-dictionary.sh
+      - run:
+          name: Tag docker image
+          command: |
+            docker tag data-dictionary "quay.io/hmpps/${CIRCLE_PROJECT_REPONAME}:data-dictionary-${APP_VERSION}"
+      - when:
+          condition:
+            or:
+              - equal: [ main, << pipeline.git.branch >> ]
+              - matches:
+                  pattern: "^hotfix/.+$"
+                  value: << pipeline.git.branch >>
+          steps:
+            - run:
+                name: Publish docker image
+                command: |
+                  docker login -u="${QUAYIO_USERNAME}" -p="${QUAYIO_PASSWORD}" quay.io
+                  docker push "quay.io/hmpps/${CIRCLE_PROJECT_REPONAME}:data-dictionary-${APP_VERSION}"
+  pact_check_and_publish:
+    parameters:
+      consumer_tags:
+        type: string
+    environment:
+      PACTBROKER_HOST: "pact-broker-prod.apps.live-1.cloud-platform.service.justice.gov.uk"
+      PACTBROKER_AUTH_USERNAME: "interventions"
+      _JAVA_OPTIONS: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false -Dkotlin.compiler.execution.strategy=in-process
+    executor:
+      name: hmpps/java
+      tag: "21"
+    docker: *db_docker_config
+    steps:
+      - checkout
+      - run:
+          name: Setup flyway and psql
+          command: |
+            wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.15.2/flyway-commandline-10.15.2-linux-x64.tar.gz | \
+              tar xvz && sudo ln -s `pwd`/flyway-10.15.2/flyway /usr/local/bin
+            sudo apt update
+            sudo apt install postgresql-client
+      - run:
+          name: Run migrations and local seeds
+          command: |
+            flyway -cleanDisabled="false" clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" 
+            flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="password" -locations="src/main/resources/db/migration,src/main/resources/db/local" -postgresql.transactional.lock=false
+      - gradle/with_cache:
+          deps_checksum_file: "build.gradle.kts"
+          cache_key: v2
+          steps:
+            - run:
+                command: |
+                  PACT_PROVIDER_VERSION="$CIRCLE_SHA1" \
+                    PACT_PROVIDER_TAG="$CIRCLE_BRANCH" \
+                    PACTBROKER_CONSUMERVERSIONSELECTORS_TAGS="<< parameters.consumer_tags >>" \
+                    PACT_PUBLISH_RESULTS="true" \
+                    ./gradlew pactTestPublish
+      - store_test_results:
+          path: build/test-results
+      - store_artifacts:
+          path: build/reports/tests
+
+  tag_pact_version:
+    environment:
+      PACT_BROKER_BASE_URL: "https://pact-broker-prod.apps.live-1.cloud-platform.service.justice.gov.uk"
+      PACT_BROKER_USERNAME: "interventions"
+    executor:
+      name: hmpps/node
+      tag: "16.17"
+    parameters:
+      tag:
+        type: string
+    steps:
+      - run:
+          name: Tag contract version with deployment
+          command: |
+            npx --package='@pact-foundation/pact-node' pact-broker create-version-tag \
+              --pacticipant="Interventions Service" --version="$CIRCLE_SHA1" --tag="<< parameters.tag >>" \
+              --broker-base-url="$PACT_BROKER_BASE_URL" --broker-username="$PACT_BROKER_USERNAME" --broker-password="$PACT_BROKER_PASSWORD"
+  validate_helm:
+    executor:
+      name: hmpps/default_small
+      tag: "3.10"
+    steps:
+      - checkout
+      - hmpps/k8s_setup
+      - hmpps/install_helm
+      - run:
+          name: Validate dev helm config via server dry run
+          command: |
+            wget https://github.com/mikefarah/yq/releases/download/v4.9.6/yq_linux_amd64.tar.gz -O - |\
+              tar xz && mv yq_linux_amd64 yq
+            helm dependency update "$CIRCLE_PROJECT_REPONAME"
+            helm template "$CIRCLE_PROJECT_REPONAME" "$CIRCLE_PROJECT_REPONAME" --values=values-dev.yaml | \
+              ./yq e 'select(.kind != "Service" and .kind != "Ingress")' - | \
+              kubectl apply --dry-run=server -f -
+          working_directory: helm_deploy
+
+workflows:
+  version: 2
+  pact:
+    jobs:
+      - pact_check_and_publish:
+          consumer_tags: << pipeline.parameters.pact_consumer_tags >>
+          context: [ hmpps-common-vars ]
+
+  build_test_and_deploy:
+    unless: << pipeline.parameters.only_pacts >>
+    jobs:
+      - validate
+      - validate_db
+      - publish_data:
+          requires:
+            - build_docker
+            - build_and_publish_docker
+      - validate_helm:
+          context:
+            - hmpps-interventions-dev-deploy
+      - hmpps/build_multiplatform_docker:
+          name: build_and_publish_docker
+          filters:
+            branches:
+              only:
+                - main
+                - /hotfix\/.*/
+      - hmpps/build_docker:
+          name: build_docker
+          publish: false
+          persist_container_image: true
+          filters:
+            branches:
+              ignore:
+                - main
+                - /hotfix\/.*/
+      - hmpps/deploy_env:
+          name: deploy_dev
+          env: "dev"
+          slack_notification: true
+          slack_channel_name: << pipeline.parameters.alerts-slack-channel >>
+          k8s_deployment_name: hmpps-interventions-service-api
+          filters:
+            branches:
+              only:
+                - main
+                - /hotfix\/.*/
+          requires:
+            - validate
+            - validate_db
+            - publish_data
+            - build_and_publish_docker
+            - validate_helm
+          context:
+            - hmpps-common-vars
+            - hmpps-interventions-dev-deploy
+      - tag_pact_version:
+          name: "tag_pact_version_dev"
+          tag: "deployed:dev"
+          requires: [ deploy_dev ]
+          context: [ hmpps-common-vars ]
+      - hmpps/deploy_env:
+          name: deploy_preprod
+          env: "preprod"
+          slack_notification: true
+          slack_channel_name: << pipeline.parameters.alerts-slack-channel >>
+          k8s_deployment_name: hmpps-interventions-service-api
+          requires: [ deploy_dev ]
+          context:
+            - hmpps-common-vars
+            - hmpps-interventions-preprod-deploy
+      - tag_pact_version:
+          name: "tag_pact_version_preprod"
+          tag: "deployed:preprod"
+          requires: [ deploy_preprod ]
+          context: [ hmpps-common-vars ]
+      - approve_prod:
+          type: approval
+          requires:
+            - deploy_preprod
+      - hmpps/deploy_env:
+          name: deploy_prod
+          env: "prod"
+          slack_notification: true
+          slack_channel_name: << pipeline.parameters.releases-slack-channel >>
+          k8s_deployment_name: hmpps-interventions-service-api
+          requires:
+            - approve_prod
+          context:
+            - hmpps-common-vars
+            - hmpps-interventions-prod-deploy
+      - tag_pact_version:
+          name: "tag_pact_version_prod"
+          tag: "deployed:prod"
+          requires: [ deploy_prod ]
+          context: [ hmpps-common-vars ]
