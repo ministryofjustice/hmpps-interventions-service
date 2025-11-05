@@ -1,4 +1,4 @@
-name: Nightly
+name: Weekday Security Checks
 
 on:
   schedule:
@@ -13,21 +13,21 @@ concurrency:
   group: nightly-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  veracode_policy_scan:
-    name: Veracode Policy Scan
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_veracode_policy_scan.yml@v2
+  veracode_pipeline_scan:
+    name: Veracode Pipeline Scan
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_veracode_pipeline_scan.yml@v2
     secrets: inherit
     with:
       channel_id: ${{ vars.SECURITY_ALERTS_SLACK_CHANNEL_ID || 'NO_SLACK' }}
   trivy_latest_scan:
     name: Trivy Latest Scan
-    needs: veracode_policy_scan
+    needs: veracode_pipeline_scan
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_trivy.yml@v2
     secrets: inherit
     with:
       channel_id: ${{ vars.SECURITY_ALERTS_SLACK_CHANNEL_ID || 'NO_SLACK' }}
   owasp_dependency_check:
-    name: OWASP dependency check
+    name: OWASP Dependency Check
     needs: trivy_latest_scan
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_owasp.yml@v2
     secrets: inherit

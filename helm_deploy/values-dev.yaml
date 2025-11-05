@@ -6,7 +6,7 @@ replicaCount: 2
 nameOverride: hmpps-interventions-service
 
 image:
-  repository: ghcr.io/ministryofjustice/hmpps-interventions-service
+  repository: quay.io/hmpps/hmpps-interventions-service
   tag: latest
   ports:
     app: 8080
@@ -36,4 +36,3 @@ env:
   AWS_S3_NDMIS_ENABLED: "true"
   LOGGING_LEVEL_UK_GOV_JUSTICE_DIGITAL_HMPPS_HMPPSINTERVENTIONSSERVICE: "debug"
   OVERRIDES_SHOWFUTUREINTERVENTIONS: "true"
-  ENVIRONMENT_NAME: DEV
