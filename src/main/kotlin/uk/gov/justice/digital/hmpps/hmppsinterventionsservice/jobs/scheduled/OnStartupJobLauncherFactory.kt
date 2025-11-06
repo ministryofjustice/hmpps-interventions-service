@@ -35,9 +35,7 @@ class OnStartupJobLauncherFactory(
         StringUtils.splitArrayElementsIntoProperties(args.nonOptionArgs.toTypedArray(), "="),
       )
 
-      val nextParams = job.jobParametersIncrementer?.let {
-        it.getNext(rawParams)
-      } ?: rawParams
+      val nextParams = job.jobParametersIncrementer?.getNext(rawParams) ?: rawParams
 
       val execution = jobLauncher.run(job, nextParams)
       return exitCodeMapper.intValue(execution.exitStatus.exitCode)

@@ -16,11 +16,28 @@ spec:
             - name: ndmis-referral-performance-report
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
               imagePullPolicy: Always
-              args: ["--jobName=ndmisReferralPerformanceReportJob"]
+              command: ["java"]
+              args:
+                - "-Xms2560Mi"
+                - "-Xmx2560Mi"
+                - "-XX:+AlwaysActAsServerClassMachine"
+                - "-XX:+HeapDumpOnOutOfMemoryError"
+                - "-XX:HeapDumpPath=/dumps"
+                - "-javaagent:/app/agent.jar"
+                - "-jar"
+                - "/app/app.jar"
+                - "--jobName=ndmisReferralPerformanceReportJob"
+              resources:
+                requests:
+                  cpu: "1000m"
+                  memory: "3Gi"
+                limits:
+                  cpu: "2"
+                  memory: "4Gi"
               volumeMounts:
                 - name: heap-dumps
                   mountPath: /dumps
-  {{- include "deployment.envs" . | nindent 14 }}
+  {{ include "deployment.envs" . | nindent 14 }}
           volumes:
             - name: heap-dumps
               emptyDir: {}
