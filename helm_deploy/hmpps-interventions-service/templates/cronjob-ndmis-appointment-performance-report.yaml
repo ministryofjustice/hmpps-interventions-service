@@ -18,8 +18,8 @@ spec:
               imagePullPolicy: Always
               command: [ "java" ]
               args:
-                - "-Xms2560Mi"
-                - "-Xmx2560Mi"
+                - "-Xms2560m"
+                - "-Xmx2560m"
                 - "-XX:+AlwaysActAsServerClassMachine"
                 - "-XX:+HeapDumpOnOutOfMemoryError"
                 - "-XX:HeapDumpPath=/dumps"

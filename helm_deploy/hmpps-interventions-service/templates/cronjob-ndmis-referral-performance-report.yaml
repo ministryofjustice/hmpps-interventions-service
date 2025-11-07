@@ -16,10 +16,10 @@ spec:
             - name: ndmis-referral-performance-report
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
               imagePullPolicy: Always
-              command: ["java"]
+              command: [ "java" ]
               args:
-                - "-Xms2560Mi"
-                - "-Xmx2560Mi"
+                - "-Xms2560m"
+                - "-Xmx2560m"
                 - "-XX:+AlwaysActAsServerClassMachine"
                 - "-XX:+HeapDumpOnOutOfMemoryError"
                 - "-XX:HeapDumpPath=/dumps"
