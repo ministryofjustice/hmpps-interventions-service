@@ -32,6 +32,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUtils
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.NPESkipPolicy
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.OutputPathIncrementer
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ReferralChunkProgressListener
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.S3Service
 import java.nio.file.Path
@@ -108,6 +109,7 @@ class NdmisAppointmentPerformanceReportJobConfiguration(
     .faultTolerant()
     .skipPolicy(skipPolicy)
     .transactionManager(transactionManager)
+    .listener(ReferralChunkProgressListener(entityManagerFactory, "appointment"))
     .build()
 
   @JobScope

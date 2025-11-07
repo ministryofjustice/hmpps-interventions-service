@@ -7,8 +7,6 @@ spring:
     banner-mode: off
   application:
     name: hmpps-interventions-service
-  codec:
-    max-in-memory-size: 10MB
   jackson:
     date-format: "yyyy-MM-dd HH:mm:ss"
     mapper:
@@ -53,7 +51,7 @@ spring:
     jdbc:
       initialize-schema: never # we manage the spring batch schema with our own migrations
     concurrency:
-      pool-size: 4 # run up to 4 jobs at a time...
+      pool-size: 2 # run up to 4 jobs at a time...
       queue-size: 10000 # unless the number of queued jobs exceeds this number
     table-prefix: new_schema.BATCH_
     jobs:
@@ -63,7 +61,7 @@ spring:
           page-size: 100
       ndmis:
         performance-report:
-          chunk-size: 100
+          chunk-size: 500
   data:
     web:
       pageable:
@@ -71,6 +69,9 @@ spring:
   flyway:
     postgresql:
       transactional-lock: false
+  http:
+    codecs:
+      max-in-memory-size: 10MB
 server:
   port: 8080
   servlet:

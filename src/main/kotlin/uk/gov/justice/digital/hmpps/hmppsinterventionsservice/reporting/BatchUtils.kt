@@ -1,11 +1,14 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting
 
+import jakarta.persistence.EntityManagerFactory
 import mu.KLogging
 import net.logstash.logback.argument.StructuredArguments
 import org.apache.commons.csv.CSVFormat
+import org.springframework.batch.core.ChunkListener
 import org.springframework.batch.core.JobParameters
 import org.springframework.batch.core.JobParametersBuilder
 import org.springframework.batch.core.JobParametersIncrementer
+import org.springframework.batch.core.scope.context.ChunkContext
 import org.springframework.batch.core.step.skip.SkipPolicy
 import org.springframework.batch.item.ItemProcessor
 import org.springframework.batch.item.file.FlatFileHeaderCallback
@@ -146,5 +149,48 @@ class CsvLineAggregator<T>(fieldsToExtract: List<String>) : ExtractorLineAggrega
     val out = StringBuilder()
     csvPrinter.printRecord(out, *fields)
     return out.toString()
+  }
+}
+
+class ReferralChunkProgressListener(private val entityManagerFactory: EntityManagerFactory, private val reportName: String) : ChunkListener {
+  companion object : KLogging()
+  private var totalRecords: Long? = null
+  override fun beforeChunk(context: ChunkContext) {
+    if (totalRecords == null) {
+      try {
+        val em = entityManagerFactory.createEntityManager()
+        try {
+          totalRecords = em.createQuery("select count(r) from Referral r where sentAt is not null", Long::class.java)
+            .singleResult
+          logger.info("NDMIS $reportName report: Total referral to process = {}", totalRecords)
+        } finally {
+          em.close()
+        }
+      } catch (e: Exception) {
+        logger.warn("Failed to get total referral count", e)
+      }
+    }
+  }
+
+  override fun afterChunk(context: ChunkContext) {
+    val stepExecution = context.stepContext.stepExecution
+    val readCount = stepExecution.readCount
+    val remaining = totalRecords?.let { it - readCount } ?: "unknown"
+    logger.info(
+      "NDMIS $reportName report: Processed {} referral, {} remaining",
+      readCount,
+      remaining,
+    )
+  }
+
+  override fun afterChunkError(context: ChunkContext) {
+    val stepExecution = context.stepContext.stepExecution
+    val readCount = stepExecution.readCount
+    val remaining = totalRecords?.let { it - readCount } ?: "unknown"
+    logger.warn(
+      "NDMIS $reportName report: Error after processing {} $reportName, approximately {} remaining",
+      readCount,
+      remaining,
+    )
   }
 }
