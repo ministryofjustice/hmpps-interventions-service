@@ -1,52 +1,110 @@
+
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis
 
+import jakarta.persistence.EntityManager
+import jakarta.persistence.Query
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.mockito.ArgumentMatchers.anyString
+import org.mockito.ArgumentMatchers.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.QueryLoader
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance.AppointmentProcessor
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance.AppointmentReason
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DeliverySessionService
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AppointmentFactory
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DeliverySessionFactory
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.SupplierAssessmentFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance.ReferralMetadata
+import java.time.Instant
+import java.util.*
 
 internal class AppointmentProcessorTest {
-  private val deliverySessionService = mock<DeliverySessionService>()
-  private val processor = AppointmentProcessor(deliverySessionService)
+  private val entityManager = mock<EntityManager>()
+  private val queryLoader = mock<QueryLoader>()
+  private val processor = AppointmentProcessor(entityManager, queryLoader)
 
-  private val referralFactory = ReferralFactory()
-  private val deliverySessionFactory = DeliverySessionFactory()
-  private val appointmentFactory = AppointmentFactory()
-  private val supplierAssessmentFactory = SupplierAssessmentFactory()
+  private val referralId = UUID.randomUUID()
+  private val referralReference = "REF123"
 
   @Test
   fun `referrals with multiple delivery session and saa appointments can be processed`() {
-    val referral = referralFactory.createSent()
+    val referralMetadata = ReferralMetadata(referralId, referralReference)
 
-    val appointment1 = appointmentFactory.create(referral = referral)
-    val appointment2 = appointmentFactory.create(referral = referral)
-    val deliverySession1 = deliverySessionFactory.createUnscheduled(referral = referral, appointments = mutableSetOf(appointment1, appointment2))
-
-    val appointment3 = appointmentFactory.create(referral = referral)
-    val deliverySession2 = deliverySessionFactory.createUnscheduled(referral = referral, appointments = mutableSetOf(appointment3))
-
-    val appointment4 = appointmentFactory.create(referral = referral)
-    val appointment5 = appointmentFactory.create(referral = referral)
-    val supplierAssessment = supplierAssessmentFactory.createWithMultipleAppointments(
-      referral = referral,
-      appointments = mutableSetOf(
-        appointment4,
-        appointment5,
+    val mockQuery = mock<Query>()
+    val queryString = "select * from appointment where referral_id = :referralId"
+    val now = Instant.now()
+    val appointmentResults = listOf(
+      arrayOf(
+        referralReference,
+        referralId,
+        UUID.randomUUID(),
+        now,
+        60,
+        now,
+        "YES",
+        now,
+        true,
+        "delius123",
+        "DELIVERY",
+      ),
+      arrayOf(
+        referralReference,
+        referralId,
+        UUID.randomUUID(),
+        now,
+        60,
+        now,
+        "YES",
+        now,
+        true,
+        "delius124",
+        "DELIVERY",
+      ),
+      arrayOf(
+        referralReference,
+        referralId,
+        UUID.randomUUID(),
+        now,
+        60,
+        now,
+        "NO",
+        now,
+        true,
+        "delius125",
+        "DELIVERY",
+      ),
+      arrayOf(
+        referralReference,
+        referralId,
+        UUID.randomUUID(),
+        now,
+        60,
+        now,
+        "YES",
+        now,
+        true,
+        "delius126",
+        "SAA",
+      ),
+      arrayOf(
+        referralReference,
+        referralId,
+        UUID.randomUUID(),
+        now,
+        60,
+        now,
+        "LATE",
+        now,
+        true,
+        "delius127",
+        "SAA",
       ),
     )
 
-    referral.supplierAssessment = supplierAssessment
+    whenever(queryLoader.loadQuery(anyString())).thenReturn(queryString)
+    whenever(entityManager.createNativeQuery(eq(queryString))).thenReturn(mockQuery)
+    whenever(mockQuery.setParameter("referralId", referralId)).thenReturn(mockQuery)
+    whenever(mockQuery.resultList).thenReturn(appointmentResults as List<Any>)
 
-    whenever(deliverySessionService.getSessions(referral.id)).thenReturn(listOf(deliverySession1, deliverySession2))
-
-    val result = processor.process(referral)
+    val result = processor.process(referralMetadata)
 
     assertThat(result!!.size).isEqualTo(5)
     assertThat(result[0].reasonForAppointment).isEqualTo(AppointmentReason.DELIVERY)
@@ -58,35 +116,62 @@ internal class AppointmentProcessorTest {
 
   @Test
   fun `referrals with no saa appointments and no delivery sessions can be processed`() {
-    val referral = referralFactory.createSent()
+    val referralMetadata = ReferralMetadata(referralId, referralReference)
 
-    val supplierAssessment = supplierAssessmentFactory.createWithNoAppointment(
-      referral = referral,
-    )
-    referral.supplierAssessment = supplierAssessment
+    val mockQuery = mock<Query>()
+    val queryString = "select * from appointment where referral_id = :referralId"
 
-    whenever(deliverySessionService.getSessions(referral.id)).thenReturn(emptyList())
+    whenever(queryLoader.loadQuery(anyString())).thenReturn(queryString)
+    whenever(entityManager.createNativeQuery(eq(queryString))).thenReturn(mockQuery)
+    whenever(mockQuery.setParameter("referralId", referralId)).thenReturn(mockQuery)
+    whenever(mockQuery.resultList).thenReturn(emptyList<Any>())
 
-    val result = processor.process(referral)
+    val result = processor.process(referralMetadata)
     assertThat(result).isNull()
   }
 
   @Test
   fun `referrals with saa appointments and no delivery sessions can be processed`() {
-    val referral = referralFactory.createSent()
+    val referralMetadata = ReferralMetadata(referralId, referralReference)
 
-    val appointment1 = appointmentFactory.create(referral = referral)
-    val appointment2 = appointmentFactory.create(referral = referral)
-    val supplierAssessment = supplierAssessmentFactory.createWithMultipleAppointments(
-      referral = referral,
-      appointments = mutableSetOf(appointment1, appointment2),
+    val mockQuery = mock<Query>()
+    val queryString = "select * from appointment where referral_id = :referralId"
+    val now = Instant.now()
+    val appointmentResults = listOf(
+      arrayOf(
+        referralReference,
+        referralId,
+        UUID.randomUUID(),
+        now,
+        60,
+        now,
+        "YES",
+        now,
+        true,
+        "delius128",
+        "SAA",
+      ),
+      arrayOf(
+        referralReference,
+        referralId,
+        UUID.randomUUID(),
+        now,
+        60,
+        now,
+        "YES",
+        now,
+        true,
+        "delius129",
+        "SAA",
+      ),
     )
 
-    referral.supplierAssessment = supplierAssessment
+    whenever(queryLoader.loadQuery(anyString())).thenReturn(queryString)
+    whenever(entityManager.createNativeQuery(eq(queryString))).thenReturn(mockQuery)
+    whenever(mockQuery.setParameter("referralId", referralId)).thenReturn(mockQuery)
+    whenever(mockQuery.resultList).thenReturn(appointmentResults as List<Any>)
 
-    whenever(deliverySessionService.getSessions(referral.id)).thenReturn(emptyList())
-
-    val result = processor.process(referral)
+    val result = processor.process(referralMetadata)
 
     assertThat(result!!.size).isEqualTo(2)
     assertThat(result[0].reasonForAppointment).isEqualTo(AppointmentReason.SAA)

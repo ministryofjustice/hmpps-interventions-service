@@ -1,3 +1,4 @@
+
 --Referral with action Plan sessions
 insert into draft_referral (id, intervention_id, created_at, service_usercrn, created_by_id, additional_needs_information, accessibility_needs, needs_interpreter, interpreter_language, has_additional_responsibilities, when_unavailable, draft_supplementary_risk)
 values ('6b381dc1-59fc-46ef-8e74-16daeea11c32', '08524319-7d5b-4b56-862a-bfe2c9a545f5', '2021-04-22 09:00:00.000000+00', 'X123456', '2500099998', null, null, null, null, null, null, null);
@@ -46,10 +47,31 @@ insert into appointment(id, appointment_time, duration_in_minutes, created_at, c
 values  ('219b9b73-ea25-4e37-b79a-a357cfe6cb95', '2021-04-01 12:00:00.000000+00', 120, '2021-03-12 17:51:34.235464+00', '608955ae-52ed-44cc-884c-011597a77949', 'b59d3599-0681-466a-82b2-f6f957e46190', 'YES', false, null, 'a good session', 'They responded well', null, '6c4036b7-e87d-44fb-864f-5a06c1c492f3', '2023-01-11 10:32:12.382884+00', '6c4036b7-e87d-44fb-864f-5a06c1c492f3', '2023-01-11 10:32:12.382884+00', '6c4036b7-e87d-44fb-864f-5a06c1c492f3', '2023-01-11 10:32:12.382884+00'),
         ('dba6b4fd-b6ee-4965-8014-0a6edd32639e', '2021-04-02 12:00:00.000000+00', 120, '2021-03-12 17:51:34.235464+00', '608955ae-52ed-44cc-884c-011597a77949', 'b59d3599-0681-466a-82b2-f6f957e46190', 'YES', false, null, 'a good session', 'They responded well', null, '6c4036b7-e87d-44fb-864f-5a06c1c492f3', '2023-01-11 10:32:12.382884+00', '6c4036b7-e87d-44fb-864f-5a06c1c492f3', '2023-01-11 10:32:12.382884+00', '6c4036b7-e87d-44fb-864f-5a06c1c492f3', '2023-01-11 10:32:12.382884+00');
 
-
 insert into delivery_session_appointment (delivery_session_id, appointment_id)
 values ('d6651490-0975-4237-874d-9c03fd1df6a4', '219b9b73-ea25-4e37-b79a-a357cfe6cb95'),
        ('5249bf43-c317-4650-8b1f-f8d24f8a3e0d', 'dba6b4fd-b6ee-4965-8014-0a6edd32639e');
+
+-- Additional appointment scenarios
+-- Scenario 1: Appointment with CANCELLED attended status
+insert into appointment(id, appointment_time, duration_in_minutes, created_at, created_by_id, referral_id, attended, notifyppof_attendance_behaviour, attendance_failure_information, session_summary, session_response, session_concerns, session_feedback_submitted_by_id, session_feedback_submitted_at, appointment_feedback_submitted_by_id, appointment_feedback_submitted_at, attendance_submitted_by_id, attendance_submitted_at)
+values  ('4a7c0e84-fb36-5e8f-c6e8-e44eeee3ebb7', '2021-04-06 13:00:00.000000+00', 75, '2021-03-14 10:30:00.235464+00', '608955ae-52ed-44cc-884c-011597a77949', '6b381dc1-59fc-46ef-8e74-16daeea11c32', 'LATE', false, 'Appointment cancelled by service user', null, null, null, null, null, null, null, null, null);
+
+insert into delivery_session_appointment (delivery_session_id, appointment_id)
+values ('d6651490-0975-4237-874d-9c03fd1df6a4', '4a7c0e84-fb36-5e8f-c6e8-e44eeee3ebb7');
+
+-- Scenario 2: SAA appointment with notify_probation_practitioner_of_behaviour = true
+insert into appointment(id, appointment_time, duration_in_minutes, created_at, created_by_id, referral_id, attended, notifyppof_attendance_behaviour, attendance_failure_information, session_summary, session_response, session_concerns, session_feedback_submitted_by_id, session_feedback_submitted_at, appointment_feedback_submitted_by_id, appointment_feedback_submitted_at, attendance_submitted_by_id, attendance_submitted_at, delius_appointment_id)
+values  ('d6651490-0975-4237-874d-9c03fd1df6a5', '2021-04-09 09:15:00.000000+00', 120, '2021-03-17 13:00:00.235464+00', '608955ae-52ed-44cc-884c-011597a77949', '6b381dc1-59fc-46ef-8e74-16daeea11c32', 'YES', true, null, 'good behaviour', 'Positive response', 'No concerns', '6c4036b7-e87d-44fb-864f-5a06c1c492f3', '2023-01-13 11:00:00.382884+00', '6c4036b7-e87d-44fb-864f-5a06c1c492f3', '2023-01-13 11:30:00.382884+00', '6c4036b7-e87d-44fb-864f-5a06c1c492f3', '2023-01-13 12:00:00.382884+00', 1122334455);
+
+insert into supplier_assessment_appointment(supplier_assessment_id, appointment_id)
+values ('127cdec1-8fd2-4a2b-847e-ab776f739681', 'd6651490-0975-4237-874d-9c03fd1df6a5');
+
+-- Scenario 3: Appointment with minimal data (most fields NULL)
+insert into appointment(id, appointment_time, duration_in_minutes, created_at, created_by_id, referral_id, attended, notifyppof_attendance_behaviour)
+values  ('4a7c0e84-fb36-5e8f-c6e8-e44eeee3ebb8', '2021-04-10 16:30:00.000000+00', 60, '2021-03-18 14:15:00.235464+00', '608955ae-52ed-44cc-884c-011597a77949', '6b381dc1-59fc-46ef-8e74-16daeea11c32', 'YES', false);
+
+insert into delivery_session_appointment (delivery_session_id, appointment_id)
+values ('5249bf43-c317-4650-8b1f-f8d24f8a3e0d', '4a7c0e84-fb36-5e8f-c6e8-e44eeee3ebb8');
 
 update draft_referral
 set relevant_sentence_id = '1';

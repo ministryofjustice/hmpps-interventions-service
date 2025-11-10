@@ -1,3 +1,4 @@
+
 --Referral with approved action Plan
 insert into draft_referral (id, intervention_id, created_at, service_usercrn, created_by_id, additional_needs_information, accessibility_needs, needs_interpreter, interpreter_language, has_additional_responsibilities, when_unavailable, draft_supplementary_risk)
 values ('21814763-4423-4dea-bebc-5c5eb2cb42bf', '08524319-7d5b-4b56-862a-bfe2c9a545f5', '2021-04-22 09:00:00.000000+00', 'X123456', '2500099998', null, null, null, null, null, null, null);
@@ -41,6 +42,31 @@ values ('0110201d-2ccc-41f7-9746-06bc24560388', '2c3dc03d-9108-415e-887f-73f2a7f
 insert into delivery_session (id, session_number, referral_id)
 values ('1f2609f4-b3f7-461f-bcbb-5aca518f0f50', 1, '21814763-4423-4dea-bebc-5c5eb2cb42bf'),
        ('355c813d-182b-433a-bca8-26a30c06c718', 2, '21814763-4423-4dea-bebc-5c5eb2cb42bf');
+
+insert into delivery_session_appointment (delivery_session_id, appointment_id)
+values ('1f2609f4-b3f7-461f-bcbb-5aca518f0f50', '074efba5-ae5e-4e5f-92f4-e10caef9e003');
+
+-- Additional appointment scenarios
+-- Scenario 1: Appointment with NULL attendance_submitted_at (not yet submitted)
+insert into appointment(id, appointment_time, duration_in_minutes, created_at, created_by_id, referral_id, attended, notifyppof_attendance_behaviour, attendance_failure_information, session_summary, session_response, session_concerns, session_feedback_submitted_by_id, session_feedback_submitted_at, appointment_feedback_submitted_by_id, appointment_feedback_submitted_at, attendance_submitted_by_id, attendance_submitted_at)
+values  ('185f7ba6-bf5f-5f8e-a3e5-f11dbef0f114', '2021-04-05 14:00:00.000000+00', 90, '2021-03-15 09:00:00.235464+00', '608955ae-52ed-44cc-884c-011597a77949', '21814763-4423-4dea-bebc-5c5eb2cb42bf', 'NO', true, 'Service user did not attend', null, null, null, null, null, null, null, null, null);
+
+insert into delivery_session_appointment (delivery_session_id, appointment_id)
+values ('355c813d-182b-433a-bca8-26a30c06c718', '185f7ba6-bf5f-5f8e-a3e5-f11dbef0f114');
+
+-- Scenario 2: Appointment without delius_appointment_id (NULL value)
+insert into appointment(id, appointment_time, duration_in_minutes, created_at, created_by_id, referral_id, attended, notifyppof_attendance_behaviour, attendance_failure_information, session_summary, session_response, session_concerns, session_feedback_submitted_by_id, session_feedback_submitted_at, appointment_feedback_submitted_by_id, appointment_feedback_submitted_at, attendance_submitted_by_id, attendance_submitted_at, delius_appointment_id)
+values  ('355c813d-182b-433a-bca8-26a30c06c719', '2021-04-08 10:30:00.000000+00', 60, '2021-03-16 08:00:00.235464+00', '608955ae-52ed-44cc-884c-011597a77949', '21814763-4423-4dea-bebc-5c5eb2cb42bf', 'NO', false, null, null, null, null, null, null, null, null, null, null, null);
+
+insert into delivery_session_appointment (delivery_session_id, appointment_id)
+values ('1f2609f4-b3f7-461f-bcbb-5aca518f0f50', '355c813d-182b-433a-bca8-26a30c06c719');
+
+-- Scenario 3: SAA appointment with different duration
+insert into appointment(id, appointment_time, duration_in_minutes, created_at, created_by_id, referral_id, attended, notifyppof_attendance_behaviour, attendance_failure_information, session_summary, session_response, session_concerns, session_feedback_submitted_by_id, session_feedback_submitted_at, appointment_feedback_submitted_by_id, appointment_feedback_submitted_at, attendance_submitted_by_id, attendance_submitted_at, delius_appointment_id)
+values  ('396e9db8-de7e-7e0e-c5e7-e33fddee2aa6', '2021-04-02 15:00:00.000000+00', 45, '2021-03-13 11:00:00.235464+00', '608955ae-52ed-44cc-884c-011597a77949', '21814763-4423-4dea-bebc-5c5eb2cb42bf', 'YES', false, null, null, null, null, null, null, null, null, '6c4036b7-e87d-44fb-864f-5a06c1c492f3', '2023-01-12 10:32:12.382884+00', 9876543210);
+
+insert into supplier_assessment_appointment(supplier_assessment_id, appointment_id)
+values ('d5718652-fe39-4cc6-b8d5-fd0f57c5b398', '396e9db8-de7e-7e0e-c5e7-e33fddee2aa6');
 
 update draft_referral
 set relevant_sentence_id = '1';
