@@ -160,14 +160,32 @@ class ReferralChunkProgressListener(private val entityManagerFactory: EntityMana
       try {
         val em = entityManagerFactory.createEntityManager()
         try {
-          totalRecords = em.createQuery("select count(r) from Referral r where sentAt is not null", Long::class.java)
-            .singleResult
-          logger.info("NDMIS $reportName report: Total referral to process = {}", totalRecords)
+          totalRecords = when (reportName) {
+            "appointment" -> {
+              // Count total appointments using native SQL (same logic as the report query)
+              em.createNativeQuery(
+                """
+              SELECT COUNT(*) FROM (
+                SELECT DISTINCT a.id FROM appointment a
+                INNER JOIN delivery_session_appointment ds ON a.id = ds.appointment_id
+                UNION ALL
+                SELECT DISTINCT a.id FROM appointment a
+                INNER JOIN supplier_assessment_appointment sa ON a.id = sa.appointment_id
+              ) combined_appointments
+                """.trimIndent(),
+              ).singleResult as Long
+            }
+            else -> {
+              em.createQuery("select count(r) from Referral r", Long::class.java)
+                .singleResult
+            }
+          }
+          logger.info("NDMIS $reportName report: Total records to process = {}", totalRecords)
         } finally {
           em.close()
         }
       } catch (e: Exception) {
-        logger.warn("Failed to get total referral count", e)
+        logger.warn("Failed to get total $reportName count", e)
       }
     }
   }
@@ -177,7 +195,7 @@ class ReferralChunkProgressListener(private val entityManagerFactory: EntityMana
     val readCount = stepExecution.readCount
     val remaining = totalRecords?.let { it - readCount } ?: "unknown"
     logger.info(
-      "NDMIS $reportName report: Processed {} referral, {} remaining",
+      "NDMIS $reportName report: Processed {} records, {} remaining",
       readCount,
       remaining,
     )
@@ -188,7 +206,7 @@ class ReferralChunkProgressListener(private val entityManagerFactory: EntityMana
     val readCount = stepExecution.readCount
     val remaining = totalRecords?.let { it - readCount } ?: "unknown"
     logger.warn(
-      "NDMIS $reportName report: Error after processing {} $reportName, approximately {} remaining",
+      "NDMIS $reportName report: Error after processing {} records, approximately {} remaining",
       readCount,
       remaining,
     )
