@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.p
 
 import jakarta.persistence.EntityManagerFactory
 import mu.KLogging
-import org.hibernate.SessionFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.StepContribution
@@ -13,8 +12,8 @@ import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.scope.context.ChunkContext
 import org.springframework.batch.core.step.builder.StepBuilder
-import org.springframework.batch.item.database.JpaCursorItemReader
-import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder
+import org.springframework.batch.item.database.JdbcCursorItemReader
+import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
 import org.springframework.batch.repeat.RepeatStatus
 import org.springframework.beans.factory.annotation.Qualifier
@@ -28,7 +27,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.S3Bucket
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.OnStartupJobLauncherFactory
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUtils
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.NPESkipPolicy
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.OutputPathIncrementer
@@ -36,6 +34,13 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.S3Service
 import java.nio.file.Path
+import java.util.UUID
+import javax.sql.DataSource
+
+data class ReferralMetadata(
+  val referralId: UUID,
+  val referralReference: String,
+)
 
 @Configuration
 @EnableTransactionManagement
@@ -46,6 +51,7 @@ class NdmisAppointmentPerformanceReportJobConfiguration(
   private val ndmisS3Bucket: S3Bucket,
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
   private val entityManagerFactory: EntityManagerFactory,
+  private val dataSource: DataSource,
   @Qualifier("transactionManager") private val transactionManager: PlatformTransactionManager,
   @Value("\${spring.batch.jobs.ndmis.performance-report.chunk-size}") private val chunkSize: Int,
 ) {
@@ -60,14 +66,18 @@ class NdmisAppointmentPerformanceReportJobConfiguration(
 
   @Bean("ndmisAppointmentReader")
   @JobScope
-  fun ndmisReader(
-    sessionFactory: SessionFactory,
-  ): JpaCursorItemReader<Referral> {
-    // this reader returns referral entities which need processing for the report.
-    return JpaCursorItemReaderBuilder<Referral>()
-      .name("ndmisPerformanceReportReader")
-      .entityManagerFactory(entityManagerFactory)
-      .queryString("select r from Referral r where sentAt is not null")
+  fun ndmisReader(): JdbcCursorItemReader<ReferralMetadata> {
+    // this reader returns only referral ID and reference for processing
+    return JdbcCursorItemReaderBuilder<ReferralMetadata>()
+      .name("ndmisAppointmentReportReader")
+      .dataSource(dataSource)
+      .sql("SELECT id, reference_number FROM referral")
+      .rowMapper { rs, _ ->
+        ReferralMetadata(
+          referralId = UUID.fromString(rs.getString("id")),
+          referralReference = rs.getString("reference_number"),
+        )
+      }
       .build()
   }
 
@@ -98,11 +108,11 @@ class NdmisAppointmentPerformanceReportJobConfiguration(
 
   @Bean
   fun ndmisWriteAppointmentToCsvStep(
-    @Qualifier("ndmisAppointmentReader") ndmisReader: JpaCursorItemReader<Referral>,
+    @Qualifier("ndmisAppointmentReader") ndmisReader: JdbcCursorItemReader<ReferralMetadata>,
     processor: AppointmentProcessor,
     writer: FlatFileItemWriter<Collection<AppointmentData>>,
   ): Step = StepBuilder("ndmisWriteAppointmentToCsvStep", jobRepository)
-    .chunk<Referral, List<AppointmentData>>(chunkSize, transactionManager)
+    .chunk<ReferralMetadata, List<AppointmentData>>(chunkSize, transactionManager)
     .reader(ndmisReader)
     .processor(processor)
     .writer(writer)
