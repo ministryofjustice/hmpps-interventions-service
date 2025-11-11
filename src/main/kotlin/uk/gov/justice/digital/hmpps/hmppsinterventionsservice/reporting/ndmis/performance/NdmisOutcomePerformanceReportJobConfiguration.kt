@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.p
 
 import jakarta.persistence.EntityManagerFactory
 import mu.KLogging
-import org.hibernate.SessionFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.StepContribution
@@ -13,8 +12,8 @@ import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.scope.context.ChunkContext
 import org.springframework.batch.core.step.builder.StepBuilder
-import org.springframework.batch.item.database.JpaCursorItemReader
-import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder
+import org.springframework.batch.item.database.JdbcCursorItemReader
+import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
 import org.springframework.batch.repeat.RepeatStatus
 import org.springframework.beans.factory.annotation.Qualifier
@@ -28,13 +27,17 @@ import org.springframework.transaction.annotation.EnableTransactionManagement
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.S3Bucket
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.OnStartupJobLauncherFactory
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AchievementLevel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUtils
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.NPESkipPolicy
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.OutputPathIncrementer
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.QueryLoader
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ReferralChunkProgressListener
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.S3Service
 import java.nio.file.Path
+import java.util.UUID
+import javax.sql.DataSource
 
 @Configuration
 @EnableTransactionManagement
@@ -45,6 +48,8 @@ class NdmisOutcomePerformanceReportJobConfiguration(
   private val ndmisS3Bucket: S3Bucket,
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
   private val entityManagerFactory: EntityManagerFactory,
+  private val dataSource: DataSource,
+  private val queryLoader: QueryLoader,
   @Qualifier("transactionManager") private val transactionManager: PlatformTransactionManager,
   @Value("\${spring.batch.jobs.ndmis.performance-report.chunk-size}") private val chunkSize: Int,
 ) {
@@ -59,20 +64,23 @@ class NdmisOutcomePerformanceReportJobConfiguration(
 
   @Bean("ndmisOutcomeReader")
   @JobScope
-  fun ndmisReader(
-    sessionFactory: SessionFactory,
-  ): JpaCursorItemReader<Referral> {
-    // this reader returns referral entities which need processing for the report.
-    return JpaCursorItemReaderBuilder<Referral>()
-      .name("ndmisPerformanceReportReader")
-      .entityManagerFactory(entityManagerFactory)
-      .queryString("select r from Referral r where sentAt is not null")
-      .build()
-  }
+  fun ndmisReader(): JdbcCursorItemReader<OutcomeData> = JdbcCursorItemReaderBuilder<OutcomeData>()
+    .name("ndmisOutcomeReportReader")
+    .dataSource(dataSource)
+    .sql(this.queryLoader.loadQuery("ndmis-outcomes-report.sql"))
+    .rowMapper { rs, _ ->
+      OutcomeData(
+        referralReference = rs.getString("referral_ref"),
+        referralId = UUID.fromString(rs.getString("referral_id")),
+        desiredOutcomeDescription = rs.getString("desired_outcome_description"),
+        achievementLevel = AchievementLevel.valueOf(rs.getString("achievement_level")),
+      )
+    }
+    .build()
 
   @Bean
   @StepScope
-  fun ndmisOutcomeWriter(@Value("#{jobParameters['outputPath']}") outputPath: String): FlatFileItemWriter<Collection<OutcomeData>> = batchUtils.recursiveCollectionCsvFileWriter(
+  fun ndmisOutcomeWriter(@Value("#{jobParameters['outputPath']}") outputPath: String): FlatFileItemWriter<OutcomeData> = batchUtils.csvFileWriter(
     "ndmisOutcomePerformanceReportWriter",
     FileSystemResource(Path.of(outputPath).resolve(outcomeReportFilename)),
     OutcomeData.headers,
@@ -97,17 +105,16 @@ class NdmisOutcomePerformanceReportJobConfiguration(
 
   @Bean
   fun ndmisWriteOutcomeToCsvStep(
-    @Qualifier("ndmisOutcomeReader") ndmisReader: JpaCursorItemReader<Referral>,
-    processor: OutcomeProcessor,
-    writer: FlatFileItemWriter<Collection<OutcomeData>>,
+    @Qualifier("ndmisOutcomeReader") ndmisReader: JdbcCursorItemReader<OutcomeData>,
+    writer: FlatFileItemWriter<OutcomeData>,
   ): Step = StepBuilder("ndmisWriteOutcomeToCsvStep", jobRepository)
-    .chunk<Referral, List<OutcomeData>>(chunkSize, transactionManager)
+    .chunk<OutcomeData, OutcomeData>(chunkSize, transactionManager)
     .reader(ndmisReader)
-    .processor(processor)
     .writer(writer)
     .faultTolerant()
     .skipPolicy(skipPolicy)
     .transactionManager(transactionManager)
+    .listener(ReferralChunkProgressListener(entityManagerFactory, "outcome"))
     .build()
 
   @JobScope

@@ -16,7 +16,24 @@ spec:
             - name: ndmis-complexity-performance-report
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
               imagePullPolicy: Always
-              args: ["--jobName=ndmisComplexityPerformanceReportJob"]
+              command: [ "java" ]
+              args:
+                - "-Xms2560m"
+                - "-Xmx2560m"
+                - "-XX:+AlwaysActAsServerClassMachine"
+                - "-XX:+HeapDumpOnOutOfMemoryError"
+                - "-XX:HeapDumpPath=/dumps"
+                - "-javaagent:/app/agent.jar"
+                - "-jar"
+                - "/app/app.jar"
+                - "--jobName=ndmisComplexityPerformanceReportJob"
+              resources:
+                requests:
+                  cpu: "1000m"
+                  memory: "3Gi"
+                limits:
+                  cpu: "2"
+                  memory: "4Gi"
               volumeMounts:
                 - name: heap-dumps
                   mountPath: /dumps
