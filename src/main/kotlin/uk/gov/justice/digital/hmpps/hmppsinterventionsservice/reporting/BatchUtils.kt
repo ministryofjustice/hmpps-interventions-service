@@ -165,13 +165,38 @@ class ReferralChunkProgressListener(private val entityManagerFactory: EntityMana
               // Count total appointments using native SQL (same logic as the report query)
               em.createNativeQuery(
                 """
-              SELECT COUNT(*) FROM (
-                SELECT DISTINCT a.id FROM appointment a
-                INNER JOIN delivery_session_appointment ds ON a.id = ds.appointment_id
-                UNION ALL
-                SELECT DISTINCT a.id FROM appointment a
-                INNER JOIN supplier_assessment_appointment sa ON a.id = sa.appointment_id
-              ) combined_appointments
+                SELECT count(*)
+                FROM appointment a
+                         INNER JOIN referral r ON r.id = a.referral_id
+                         LEFT JOIN delivery_session_appointment ds ON a.id = ds.appointment_id
+                         LEFT JOIN supplier_assessment_appointment sa ON a.id = sa.appointment_id
+                WHERE ds.appointment_id IS NOT NULL OR sa.appointment_id IS NOT NULL
+                """.trimIndent(),
+              ).singleResult as Long
+            }
+            "complexity" -> {
+              em.createNativeQuery(
+                """
+                  SELECT count(*)
+                  FROM referral r
+                  INNER JOIN intervention i ON r.intervention_id = i.id
+                  INNER JOIN referral_selected_service_category rssc ON r.id = rssc.referral_id
+                  INNER JOIN service_category sc ON rssc.service_category_id = sc.id
+                  LEFT JOIN referral_complexity_level_ids rcli ON r.id = rcli.referral_id 
+                    AND rcli.complexity_level_ids_key = sc.id
+                  LEFT JOIN complexity_level cl ON sc.id = cl.service_category_id 
+                    AND cl.id = rcli.complexity_level_ids
+                """.trimIndent(),
+              ).singleResult as Long
+            }
+            "outcome" -> {
+              em.createNativeQuery(
+                """
+                  SELECT count(*)
+                  FROM referral r
+                  INNER JOIN end_of_service_report eosr ON r.id = eosr.referral_id
+                  INNER JOIN end_of_service_report_outcome esor ON eosr.id = esor.end_of_service_report_id
+                  INNER JOIN desired_outcome deso ON esor.desired_outcome_id = deso.id
                 """.trimIndent(),
               ).singleResult as Long
             }
