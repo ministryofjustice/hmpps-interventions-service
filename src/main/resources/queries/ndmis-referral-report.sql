@@ -100,7 +100,7 @@ SELECT r.reference_number                               AS referral_ref,
        r.id                                             AS referral_id,
        d.contract_reference                             AS crs_contract_reference,
        ct.name                                          AS crs_contract_type,
-       d.prime_provider_id                              AS crs_provider_id,
+       sp.name                                          AS crs_provider_id,
        cau.user_name                                    AS referring_officer_id,
        r.relevant_sentence_id                           AS relevant_sentence_id,
        r.service_usercrn                                AS service_user_crn,
@@ -129,6 +129,8 @@ FROM   referral r
                            ON r.intervention_id = i.id
            LEFT OUTER JOIN dynamic_framework_contract d
                            ON d.id = i.dynamic_framework_contract_id
+           LEFT OUTER JOIN service_provider sp
+                           ON sp.id = d.prime_provider_id
            LEFT OUTER JOIN contract_type ct
                            ON ct.id = d.contract_type_id
            LEFT OUTER JOIN cte rass
