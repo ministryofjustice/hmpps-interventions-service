@@ -16,7 +16,7 @@ parameters:
 
 orbs:
   hmpps: ministryofjustice/hmpps@11.2.0
-  gradle: circleci/gradle@4.0.0
+  gradle: circleci/gradle@4.1.0
   mem: circleci/rememborb@0.0.2
 
 _db_docker_config: &db_docker_config
