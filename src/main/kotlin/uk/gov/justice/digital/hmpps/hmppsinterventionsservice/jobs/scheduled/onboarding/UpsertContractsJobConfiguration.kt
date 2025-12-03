@@ -55,7 +55,7 @@ class UpsertContractsJobConfiguration(
     processor: UpsertContractProcessor,
     platformTransactionManager: PlatformTransactionManager,
   ): Step = StepBuilder("upsertContractStep", jobRepository)
-    .chunk<ContractDefinition, Intervention>(10)
+    .chunk<ContractDefinition, Intervention>(10, platformTransactionManager)
     .reader(reader)
     .processor(processor)
     .writer {}
