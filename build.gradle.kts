@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   kotlin("plugin.spring") version "2.1.20"
   id("org.jetbrains.kotlin.plugin.jpa") version "2.1.20"
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "9.0.2"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.0.3"
   id("jacoco")
   id("project-report")
 }
