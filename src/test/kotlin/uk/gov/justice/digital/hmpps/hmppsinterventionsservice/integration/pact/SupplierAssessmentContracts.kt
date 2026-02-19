@@ -25,21 +25,21 @@ class SupplierAssessmentContracts(private val setupAssistant: SetupAssistant) {
   @State("a supplier assessment with ID 77f6c5cf-9772-4731-9a9a-97f2f53f2770 exists")
   fun createSentReferralWithSaaAndVideoCallAppointment() {
     // create a sent referral with a supplier assessment having a video call appointment
-    val supplierAssessment = setupAssistant.createSupplierAssessment(id = UUID.fromString("77f6c5cf-9772-4731-9a9a-97f2f53f2770"))
-    setupAssistant.addSupplierAssessmentAppointment(supplierAssessment!!, appointmentDeliveryType = AppointmentDeliveryType.VIDEO_CALL)
+    val referral = setupAssistant.createSentReferral(sentAt = OffsetDateTime.parse("2025-12-31T12:00:00Z"), supplierAssessmentId = UUID.fromString("77f6c5cf-9772-4731-9a9a-97f2f53f2770"))
+    setupAssistant.addSupplierAssessmentAppointment(referral.supplierAssessment!!, referral = referral, appointmentDeliveryType = AppointmentDeliveryType.VIDEO_CALL, appointmentTime = OffsetDateTime.parse("2026-01-22T12:30:00Z"))
   }
 
   @State("a supplier assessment with ID 4567945e-73be-43f0-9021-74c4a8ce49db exists")
   fun createSentReferralWithSaaAndPhoneCallAppointment() {
     // create a sent referral with a supplier assessment having a phone call appointment
-    val supplierAssessment = setupAssistant.createSupplierAssessment(id = UUID.fromString("4567945e-73be-43f0-9021-74c4a8ce49db"))
-    setupAssistant.addSupplierAssessmentAppointment(supplierAssessment!!, appointmentDeliveryType = AppointmentDeliveryType.PHONE_CALL)
+    val referral = setupAssistant.createSentReferral(sentAt = OffsetDateTime.parse("2025-12-31T12:00:00Z"), supplierAssessmentId = UUID.fromString("4567945e-73be-43f0-9021-74c4a8ce49db"))
+    setupAssistant.addSupplierAssessmentAppointment(referral.supplierAssessment!!, referral = referral, appointmentDeliveryType = AppointmentDeliveryType.PHONE_CALL, appointmentTime = OffsetDateTime.parse("2026-01-22T12:30:00Z"))
   }
 
   @State("a supplier assessment with ID fb10c5fe-12ce-482f-8ca1-104974ab21f5 exists")
   fun createSentReferralWithSaaAndLocationAppointment() {
     // create a sent referral with a supplier assessment having a location appointment
-    val supplierAssessment = setupAssistant.createSupplierAssessment(id = UUID.fromString("fb10c5fe-12ce-482f-8ca1-104974ab21f5"))
+    val referral = setupAssistant.createSentReferral(sentAt = OffsetDateTime.parse("2025-12-31T12:00:00Z"), supplierAssessmentId = UUID.fromString("fb10c5fe-12ce-482f-8ca1-104974ab21f5"))
     val addressDTO = AddressDTO(
       firstAddressLine = "Harmony Living Office, Room 4",
       secondAddressLine = "44 Bouverie Road",
@@ -47,7 +47,7 @@ class SupplierAssessmentContracts(private val setupAssistant: SetupAssistant) {
       county = "Lancashire",
       postCode = "SY40RE",
     )
-    setupAssistant.addSupplierAssessmentAppointment(supplierAssessment!!, appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_OTHER, appointmentDeliveryAddress = addressDTO)
+    setupAssistant.addSupplierAssessmentAppointment(referral.supplierAssessment!!, referral = referral, appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_OTHER, appointmentDeliveryAddress = addressDTO, appointmentTime = OffsetDateTime.parse("2026-01-22T12:30:00Z"))
   }
 
   @State("There is an existing sent referral with ID 58963698-0f2e-4d6e-a072-0e2cf351f3b2 and the supplier assessment has been booked but no feedback details have yet been submitted")

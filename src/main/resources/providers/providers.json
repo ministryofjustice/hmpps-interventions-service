@@ -324,6 +324,10 @@
     "name": "Prison Advice and Care Trust (Pact)"
   },
   {
+    "code": "PS_EOE_HOUSING_SUPPORT_SERVICE",
+    "name": "PS EoE Housing Support Service"
+  },
+  {
     "code": "PSS_UK",
     "name": "PSS UK"
   },

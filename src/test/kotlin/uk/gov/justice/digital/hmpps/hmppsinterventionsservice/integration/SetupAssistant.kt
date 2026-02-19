@@ -448,6 +448,7 @@ class SetupAssistant(
     probationPractitionerDetails: ProbationPractitionerDetails? = null,
     relevantSentenceEndDate: LocalDate? = null,
     status: Status? = null,
+    supplierAssessmentId: UUID? = null,
   ): Referral {
     createDraftReferral(
       id = id,
@@ -478,7 +479,7 @@ class SetupAssistant(
     val updatedProbationPractitionerDetails = probationPractitionerDetailsFactory.create(referral = referral)
     probationPractitionerDetailsRepository.save(updatedProbationPractitionerDetails)
     referral.probationPractitionerDetails = updatedProbationPractitionerDetails
-    referral.supplierAssessment = createSupplierAssessment(referral = referral)
+    referral.supplierAssessment = createSupplierAssessment(referral = referral, id = supplierAssessmentId ?: UUID.randomUUID())
     referralRepository.save(referral)
     return referral
   }
