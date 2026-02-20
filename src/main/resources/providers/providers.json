@@ -300,10 +300,6 @@
     "name": "PACT Futures Community Interest Company"
   },
   {
-    "code": "POPS",
-    "name": "Partners of Prisoners and Families Support Group (POPS)"
-  },
-  {
     "code": "PECAN",
     "name": "Pecan"
   },
@@ -316,6 +312,10 @@
     "name": "Petrus Community"
   },
   {
+    "code": "POPS",
+    "name": "Partners of Prisoners and Families Support Group (POPS)"
+  },
+  {
     "code": "POSITIVE_STEPS",
     "name": "Positive Steps"
   },
@@ -326,6 +326,10 @@
   {
     "code": "PS_EOE_HOUSING_SUPPORT_SERVICE",
     "name": "PS EoE Housing Support Service"
+  },
+  {
+    "code": "PS_YATH_HOUSING",
+    "name": "PS YatH Housing Support Service"
   },
   {
     "code": "PSS_UK",
