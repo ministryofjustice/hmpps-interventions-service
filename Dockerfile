@@ -1,6 +1,9 @@
-FROM --platform=${BUILDPLATFORM:-linux/amd64} eclipse-temurin:21-jre-jammy AS builder
+FROM --platform=${BUILDPLATFORM:-linux/amd64} ghcr.io/ministryofjustice/hmpps-eclipse-temurin:25-jre-jammy AS builder
 
 WORKDIR /app
+USER root
+ENV GRADLE_USER_HOME=/tmp/gradle
+RUN mkdir -p "$GRADLE_USER_HOME" && chmod -R 755 "$GRADLE_USER_HOME"
 
 ENV JAVA_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
 
