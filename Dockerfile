@@ -26,8 +26,12 @@ RUN ./gradlew assemble
 
 
 # ---
-FROM --platform=${BUILDPLATFORM:-linux/amd64} eclipse-temurin:21-jre-jammy AS final
+FROM --platform=${BUILDPLATFORM:-linux/amd64} ghcr.io/ministryofjustice/hmpps-eclipse-temurin:25-jre-jammy AS final
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
+USER root
+
+# ensure apt directories exist and are writable
+RUN mkdir -p /var/lib/apt/lists/partial
 
 # force a rebuild of `apk upgrade` below by invalidating the BUILD_NUMBER env variable on every commit
 ARG BUILD_NUMBER
@@ -43,9 +47,10 @@ RUN apt-get update && \
 ENV TZ=Europe/London
 RUN ln -snf "/usr/share/zoneinfo/$TZ" /etc/localtime && echo "$TZ" > /etc/timezone
 
-RUN addgroup --gid 2000 --system appgroup && \
-    adduser --uid 2000 --system appuser && \
-    adduser appuser appgroup
+RUN set -eux; \
+    if ! getent group appgroup >/dev/null; then addgroup --gid 2000 --system appgroup; fi; \
+    if ! id -u appuser >/dev/null 2>&1; then adduser --uid 2000 --system --ingroup appgroup appuser; fi; \
+    usermod -a -G appgroup appuser
 
 WORKDIR /app
 COPY --from=builder --chown=appuser:appgroup /app/build/libs/hmpps-interventions-service*.jar /app/app.jar
