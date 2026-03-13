@@ -120,7 +120,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux:3.5.0")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.5.0")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.5.0")
-  implementation("org.springframework.security:spring-security-crypto:6.5.0")
+  implementation("org.springframework.security:spring-security-crypto:7.0.3")
   implementation("com.nimbusds:oauth2-oidc-sdk:11.25")
 
   // database
