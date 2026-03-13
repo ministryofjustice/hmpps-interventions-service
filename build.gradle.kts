@@ -117,9 +117,9 @@ dependencies {
   implementation("software.amazon.awssdk:sts:2.31.36")
 
   // security
-  implementation("org.springframework.boot:spring-boot-starter-webflux:3.5.0")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.5.0")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.5.0")
+  implementation("org.springframework.boot:spring-boot-starter-webflux:4.0.3")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:4.0.3")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:4.0.3")
   implementation("org.springframework.security:spring-security-crypto:6.5.0")
   implementation("com.nimbusds:oauth2-oidc-sdk:11.25")
 
