@@ -25,7 +25,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY --from=build --chown=appuser:appgroup /app/build/libs/hmpps-interventions-services*.jar /app/app.jar
+COPY --from=build --chown=appuser:appgroup /app/build/libs/hmpps-interventions-service*.jar /app/app.jar
 COPY --from=build --chown=appuser:appgroup /app/build/libs/applicationinsights-agent*.jar /app/agent.jar
 COPY --from=build --chown=appuser:appgroup /app/applicationinsights.json /app
 
