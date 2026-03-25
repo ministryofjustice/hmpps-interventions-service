@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.springframework.http.HttpStatusCode
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AchievementLevel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlanActivity
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
@@ -30,8 +29,6 @@ internal class SarsDataControllerTest {
 
   @Test
   fun `retrieve referral sars data`() {
-    val jwtAuthenticationToken = JwtAuthenticationToken(mock())
-
     val id = UUID.randomUUID()
     val createdAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
 
@@ -88,11 +85,18 @@ internal class SarsDataControllerTest {
     referral.relevantSentenceId = 123456L
     referral.actionPlans = mutableListOf(actionPlan)
 
-    val sarsReferralData = listOf(SarsReferralData(referral, session1.appointments.toList() + session2.appointments.toList()))
+    val sarsReferralData = listOf(
+      SarsReferralData(
+        referral,
+        session1.appointments.toList() + session2.appointments.toList(),
+        referral.intervention.dynamicFrameworkContract,
+        emptyList(),
+      ),
+    )
 
     whenever(sarsDataService.getSarsReferralData("crn")).thenReturn(sarsReferralData)
 
-    val sarsData = sarsDataController.sarData(crn = "crn", authentication = jwtAuthenticationToken)
+    val sarsData = sarsDataController.sarData(crn = "crn")
 
     assertThat(sarsData.statusCode).isEqualTo(HttpStatusCode.valueOf(200))
     assertThat(sarsData.body?.content?.referral?.size).isEqualTo(1)
@@ -100,8 +104,6 @@ internal class SarsDataControllerTest {
 
   @Test
   fun `retrieve referral sars data when empty string dates`() {
-    val jwtAuthenticationToken = JwtAuthenticationToken(mock())
-
     val id = UUID.randomUUID()
     val createdAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
 
@@ -158,11 +160,18 @@ internal class SarsDataControllerTest {
     referral.relevantSentenceId = 123456L
     referral.actionPlans = mutableListOf(actionPlan)
 
-    val sarsReferralData = listOf(SarsReferralData(referral, session1.appointments.toList() + session2.appointments.toList()))
+    val sarsReferralData = listOf(
+      SarsReferralData(
+        referral,
+        session1.appointments.toList() + session2.appointments.toList(),
+        referral.intervention.dynamicFrameworkContract,
+        emptyList(),
+      ),
+    )
 
     whenever(sarsDataService.getSarsReferralData("crn")).thenReturn(sarsReferralData)
 
-    val sarsData = sarsDataController.sarData(crn = "crn", authentication = jwtAuthenticationToken, fromDate = "", toDate = "")
+    val sarsData = sarsDataController.sarData(crn = "crn", fromDate = "", toDate = "")
 
     assertThat(sarsData.statusCode).isEqualTo(HttpStatusCode.valueOf(200))
     assertThat(sarsData.body?.content?.referral?.size).isEqualTo(1)
@@ -170,9 +179,7 @@ internal class SarsDataControllerTest {
 
   @Test
   fun `returns 209 when crn is not passed as parameter`() {
-    val jwtAuthenticationToken = JwtAuthenticationToken(mock())
-
-    val sarsData = sarsDataController.sarData(crn = null, authentication = jwtAuthenticationToken)
+    val sarsData = sarsDataController.sarData(crn = null)
 
     assertThat(sarsData.statusCode).isEqualTo(HttpStatusCode.valueOf(209))
     assertThat(sarsData.body).isNull()
@@ -180,10 +187,9 @@ internal class SarsDataControllerTest {
 
   @Test
   fun `returns 204 when no data returned for the crn `() {
-    val jwtAuthenticationToken = JwtAuthenticationToken(mock())
     whenever(sarsDataService.getSarsReferralData("crn")).thenReturn(emptyList())
 
-    val sarsData = sarsDataController.sarData("crn", authentication = jwtAuthenticationToken)
+    val sarsData = sarsDataController.sarData("crn")
 
     assertThat(sarsData.statusCode).isEqualTo(HttpStatusCode.valueOf(204))
     assertThat(sarsData.body?.content?.crn).isEqualTo("crn")

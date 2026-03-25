@@ -8,6 +8,7 @@ import org.springframework.boot.test.json.JacksonTester
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SarDataDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AchievementLevel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlanActivity
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReportOutcome
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
@@ -28,6 +29,9 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
   fun `return sars data in the request format`() {
     val id = UUID.randomUUID()
     val createdAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
+    val sentAt = createdAt.plusDays(1)
+    val endRequestedAt = createdAt.plusDays(2)
+    val concludedAt = createdAt.plusDays(3)
 
     val referral = SampleData.sampleReferral(
       "X123456",
@@ -40,6 +44,9 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
       whenUnavailable = "tomorrow",
       endRequestedComments = "appointment needed",
       endOfServiceReport = endOfServiceReportFactory.create(
+        createdAt = createdAt,
+        submittedAt = sentAt,
+        furtherInformation = "further info",
         outcomes = mutableSetOf(
           EndOfServiceReportOutcome(
             progressionComments = "progressing level",
@@ -50,6 +57,12 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
         ),
       ),
     )
+    referral.hasAdditionalResponsibilities = true
+    referral.sentAt = sentAt
+    referral.endRequestedAt = endRequestedAt
+    referral.concludedAt = concludedAt
+    referral.additionalRiskInformationUpdatedAt = createdAt
+    referral.withdrawalComments = "withdrawn"
 
     val session1 = deliverySessionFactory.createAttended(
       referral = referral,
@@ -72,7 +85,9 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
 
     val actionPlan = actionPlanFactory.createApproved(
       referral = referral,
-      activities = mutableListOf(ActionPlanActivity(description = "action plan approved")),
+      createdAt = createdAt,
+      numberOfSessions = 3,
+      activities = mutableListOf(ActionPlanActivity(description = "action plan approved", createdAt = createdAt)),
     )
 
     referral.referenceNumber = "something"
@@ -82,7 +97,22 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
     referral.relevantSentenceId = 123456L
     referral.actionPlans = mutableListOf(actionPlan)
 
-    val sarsReferralData = SarsReferralData(referral, session1.appointments.toList() + session2.appointments.toList())
+    val caseNotes = listOf(
+      SampleData.sampleCaseNote(
+        referral = referral,
+        sentAt = createdAt,
+        subject = "subject",
+        body = "body",
+        sentBy = AuthUser("sender-id", "delius", "sender.user"),
+      ),
+    )
+
+    val sarsReferralData = SarsReferralData(
+      referral,
+      session1.appointments.toList() + session2.appointments.toList(),
+      referral.intervention.dynamicFrameworkContract,
+      caseNotes,
+    )
 
     val out = json.write(SarDataDTO.from("X123456", listOf(sarsReferralData)))
 
@@ -94,6 +124,15 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
               "referral": [
                 {
                   "referral_number": "something",
+                  "created_at": "2020-12-04T10:42:43Z",
+                  "service_user_crn": "X123456",
+                  "has_additional_responsibilities": true,
+                  "sent_at": "2020-12-05T10:42:43Z",
+                  "end_requested_at": "2020-12-06T10:42:43Z",
+                  "concluded_at": "2020-12-07T10:42:43Z",
+                  "draft_supplementary_risk_updated_at": "2020-12-04T10:42:43Z",
+                  "withdrawal_comments": "withdrawn",
+                  "status": "PRE_ICA",
                   "accessibility_needs": "wheelchair",
                   "additional_needs_information": "english",
                   "when_unavailable": "tomorrow",
@@ -114,19 +153,45 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
                       "future_session_plan": "have to invite him again"
                     }
                   ],
-                  "action_plan_activity": [
+                  "action_plans": [
                     {
-                      "description": ["action plan approved"]
+                      "number_of_sessions": 3,
+                      "created_at": "2020-12-04T10:42:43Z",
+                      "approved_by": "bernard.beaks",
+                      "action_plan_activities": [
+                        {
+                          "description": "action plan approved",
+                          "createdAt": "2020-12-04T10:42:43Z"
+                        }
+                      ]
                     }
                   ],
-                "end_of_service_report": {
-                  "end_of_service_outcomes": [
+                  "end_of_service_report": {
+                    "created_at": "2020-12-04T10:42:43Z",
+                    "submitted_at": "2020-12-05T10:42:43Z",
+                    "further_information": "further info",
+                    "end_of_service_outcomes": [
+                      {
+                        "progression_comments": "progressing level",
+                        "additional_task_comments": "he needs interview"
+                      }
+                    ]
+                  },
+                  "case_notes": [
                     {
-                      "progression_comments": "progressing level",
-                      "additional_task_comments": "he needs interview"
+                      "subject": "subject",
+                      "body": "body",
+                      "sent_at": "2020-12-04T10:42:43Z"
                     }
-                  ]
-                }
+                  ],
+                  "probation_practitioner_details": {
+                    "name": "name",
+                    "pdu": "pdu",
+                    "probation_office": "probation-office",
+                    "role_job_title": null,
+                    "establishment": null
+                  },
+                  "service_provider_name": "Provider"
                 }
               ]
             }
@@ -139,6 +204,7 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
   fun `return sars data when there is no appointment`() {
     val id = UUID.randomUUID()
     val createdAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
+    val sentAt = createdAt.plusDays(1)
 
     val referral = SampleData.sampleReferral(
       "X123456",
@@ -151,6 +217,7 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
       whenUnavailable = "tomorrow",
       endRequestedComments = "appointment needed",
       endOfServiceReport = endOfServiceReportFactory.create(
+        createdAt = createdAt,
         outcomes = mutableSetOf(
           EndOfServiceReportOutcome(
             progressionComments = "progressing level",
@@ -162,9 +229,14 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
       ),
     )
 
+    referral.hasAdditionalResponsibilities = true
+    referral.sentAt = sentAt
+
     val actionPlan = actionPlanFactory.createApproved(
       referral = referral,
-      activities = mutableListOf(ActionPlanActivity(description = "action plan approved")),
+      createdAt = createdAt,
+      numberOfSessions = 3,
+      activities = mutableListOf(ActionPlanActivity(description = "action plan approved", createdAt = createdAt)),
     )
 
     referral.referenceNumber = "something"
@@ -174,7 +246,21 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
     referral.relevantSentenceId = 123456L
     referral.actionPlans = mutableListOf(actionPlan)
 
-    val sarsReferralData = SarsReferralData(referral, emptyList())
+    val caseNotes = listOf(
+      SampleData.sampleCaseNote(
+        referral = referral,
+        sentAt = createdAt,
+        subject = "subject",
+        body = "body",
+      ),
+    )
+
+    val sarsReferralData = SarsReferralData(
+      referral,
+      emptyList(),
+      referral.intervention.dynamicFrameworkContract,
+      caseNotes,
+    )
 
     val out = json.write(SarDataDTO.from("X123456", listOf(sarsReferralData)))
 
@@ -186,26 +272,52 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
             "referral": [
               {
                 "referral_number": "something",
+                "created_at": "2020-12-04T10:42:43Z",
+                "service_user_crn": "X123456",
+                "has_additional_responsibilities": true,
+                "sent_at": "2020-12-05T10:42:43Z",
                 "accessibility_needs": "wheelchair",
                 "additional_needs_information": "english",
                 "when_unavailable": "tomorrow",
                 "end_requested_comments": "appointment needed",
                 "appointment": [],
-                "action_plan_activity": [
+                "action_plans": [
                   {
-                    "description": [
-                      "action plan approved"
+                    "number_of_sessions": 3,
+                    "created_at": "2020-12-04T10:42:43Z",
+                    "approved_by": "bernard.beaks",
+                    "action_plan_activities": [
+                      {
+                        "description": "action plan approved",
+                        "createdAt": "2020-12-04T10:42:43Z"
+                      }
                     ]
                   }
                 ],
                 "end_of_service_report": {
+                  "created_at": "2020-12-04T10:42:43Z",
                   "end_of_service_outcomes": [
                     {
                       "progression_comments": "progressing level",
                       "additional_task_comments": "he needs interview"
                     }
                   ]
-                }
+                },
+                "case_notes": [
+                  {
+                    "subject": "subject",
+                    "body": "body",
+                    "sent_at": "2020-12-04T10:42:43Z"
+                  }
+                ],
+                "probation_practitioner_details": {
+                  "name": "name",
+                  "pdu": "pdu",
+                  "probation_office": "probation-office",
+                  "role_job_title": null,
+                  "establishment": null
+                },
+                "service_provider_name": "Provider"
               }
             ]
           }
@@ -223,9 +335,51 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
             {
               "content": {
                 "crn": "X123456",
-                "referral": []
+                "referral": [],
+                "draft_referral": []
               }
             }
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun `return sars data includes draft referrals when present`() {
+    val createdAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
+
+    val draftReferral = SampleData.sampleDraftReferral(
+      crn = "X123456",
+      serviceProviderName = "Provider",
+      createdAt = createdAt,
+    )
+
+    val sarsReferralData = SarsReferralData(
+      referral = null,
+      appointments = emptyList(),
+      dynamicFrameworkContract = null,
+      caseNotes = emptyList(),
+      draftReferrals = listOf(draftReferral),
+    )
+
+    val out = json.write(SarDataDTO.from("X123456", listOf(sarsReferralData)))
+
+    assertThat(out).isEqualToJson(
+      """
+        {
+          "content": {
+            "crn": "X123456",
+            "referral": [],
+            "draft_referral": [
+              {
+                "created_at": "2020-12-04T10:42:43Z",
+                "service_user_crn": "X123456",
+                "accessibility_needs": "",
+                "additional_needs_information": "",
+                "when_unavailable": ""
+              }
+            ]
+          }
+        }
       """.trimIndent(),
     )
   }
@@ -234,6 +388,7 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
   fun `return sars data when some of the fields are not present`() {
     val id = UUID.randomUUID()
     val createdAt = OffsetDateTime.parse("2020-12-04T10:42:43+00:00")
+    val sentAt = createdAt.plusDays(1)
 
     val referral = SampleData.sampleReferral(
       "X123456",
@@ -246,6 +401,7 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
       whenUnavailable = null,
       endRequestedComments = null,
       endOfServiceReport = endOfServiceReportFactory.create(
+        createdAt = createdAt,
         outcomes = mutableSetOf(
           EndOfServiceReportOutcome(
             progressionComments = null,
@@ -256,6 +412,15 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
         ),
       ),
     )
+
+    val endRequestedAt = createdAt.plusDays(2)
+    val concludedAt = createdAt.plusDays(3)
+    referral.hasAdditionalResponsibilities = true
+    referral.sentAt = sentAt
+    referral.endRequestedAt = endRequestedAt
+    referral.concludedAt = concludedAt
+    referral.additionalRiskInformationUpdatedAt = createdAt
+    referral.withdrawalComments = "withdrawn"
 
     val session1 = deliverySessionFactory.createAttended(
       referral = referral,
@@ -278,7 +443,9 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
 
     val actionPlan = actionPlanFactory.createApproved(
       referral = referral,
-      activities = mutableListOf(ActionPlanActivity(description = "action plan approved")),
+      createdAt = createdAt,
+      numberOfSessions = 3,
+      activities = mutableListOf(ActionPlanActivity(description = "action plan approved", createdAt = createdAt)),
     )
 
     referral.referenceNumber = "something"
@@ -288,7 +455,21 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
     referral.relevantSentenceId = 123456L
     referral.actionPlans = mutableListOf(actionPlan)
 
-    val sarsReferralData = SarsReferralData(referral, session1.appointments.toList() + session2.appointments.toList())
+    val caseNotes = listOf(
+      SampleData.sampleCaseNote(
+        referral = referral,
+        sentAt = createdAt,
+        subject = "subject",
+        body = "body",
+      ),
+    )
+
+    val sarsReferralData = SarsReferralData(
+      referral,
+      session1.appointments.toList() + session2.appointments.toList(),
+      referral.intervention.dynamicFrameworkContract,
+      caseNotes,
+    )
 
     val out = json.write(SarDataDTO.from("X123456", listOf(sarsReferralData)))
 
@@ -300,6 +481,15 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
                 "referral": [
                   {
                     "referral_number": "something",
+                    "created_at": "2020-12-04T10:42:43Z",
+                    "service_user_crn": "X123456",
+                    "has_additional_responsibilities": true,
+                    "sent_at": "2020-12-05T10:42:43Z",
+                    "end_requested_at": "2020-12-06T10:42:43Z",
+                    "concluded_at": "2020-12-07T10:42:43Z",
+                    "draft_supplementary_risk_updated_at": "2020-12-04T10:42:43Z",
+                    "withdrawal_comments": "withdrawn",
+                    "status": "PRE_ICA",
                     "accessibility_needs": "",
                     "additional_needs_information": "",
                     "when_unavailable": "",
@@ -320,19 +510,43 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
                         "future_session_plan": "have to invite him again"
                       }
                     ],
-                    "action_plan_activity": [
+                    "action_plans": [
                       {
-                        "description": ["action plan approved"]
+                        "number_of_sessions": 3,
+                        "created_at": "2020-12-04T10:42:43Z",
+                        "approved_by": "bernard.beaks",
+                        "action_plan_activities": [
+                          {
+                            "description": "action plan approved",
+                            "createdAt": "2020-12-04T10:42:43Z"
+                          }
+                        ]
                       }
                     ],
-                  "end_of_service_report": {
-                    "end_of_service_outcomes":[
-                    {
-                      "progression_comments": "",
-                      "additional_task_comments": ""
-                     }
-                    ]
-                  }
+                    "end_of_service_report": {
+                      "created_at": "2020-12-04T10:42:43Z",
+                      "end_of_service_outcomes":[
+                      {
+                        "progression_comments": "",
+                        "additional_task_comments": ""
+                       }
+                      ]
+                    },
+                    "case_notes": [
+                      {
+                        "subject": "subject",
+                        "body": "body",
+                        "sent_at": "2020-12-04T10:42:43Z"
+                      }
+                    ],
+                    "probation_practitioner_details": {
+                      "name": "name",
+                      "pdu": "pdu",
+                      "probation_office": "probation-office",
+                      "role_job_title": null,
+                      "establishment": null
+                    },
+                    "service_provider_name": "Provider"
                   }
                 ]
               }

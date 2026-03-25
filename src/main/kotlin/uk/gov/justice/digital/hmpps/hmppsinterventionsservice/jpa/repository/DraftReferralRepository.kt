@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
+import java.time.OffsetDateTime
 import java.util.UUID
 
 interface DraftReferralRepository : JpaRepository<DraftReferral, UUID> {
@@ -16,4 +17,19 @@ interface DraftReferralRepository : JpaRepository<DraftReferral, UUID> {
   fun findByCreatedById(userId: String): List<DraftReferral>
 
   fun findByServiceUserCRN(crn: String): List<DraftReferral>
+
+  @Query(
+    value =
+    """select dr from DraftReferral dr where dr.serviceUserCRN = :serviceUserCRN
+      and dr.createdAt >= :from and dr.createdAt <= :to
+      and dr.id not in (select r.id from Referral r where r.serviceUserCRN = :serviceUserCRN)""",
+  )
+  fun draftReferralForSar(serviceUserCRN: String, from: OffsetDateTime, to: OffsetDateTime): List<DraftReferral>
+
+  @Query(
+    value =
+    """select dr from DraftReferral dr where dr.serviceUserCRN = :serviceUserCRN
+      and dr.id not in (select r.id from Referral r where r.serviceUserCRN = :serviceUserCRN)""",
+  )
+  fun findDraftOnlyByServiceUserCRN(serviceUserCRN: String): List<DraftReferral>
 }
