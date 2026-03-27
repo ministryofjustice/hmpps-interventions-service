@@ -14,7 +14,7 @@
   },
   "scheduling": {
     "hide_before": "2021-01-01",
-    "hide_after": null
+    "hide_after": "2026-03-27 17:00:00+00"
   },
   "providers": {
     "prime_provider_code": "SEETEC_BUS_TECH_CTR_LTD",
