@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.User
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.InterventionDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PCCRegionID
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.InterventionService
+import java.time.OffsetDateTime
 import java.util.UUID
 
 @RestController
@@ -23,9 +24,17 @@ class InterventionController(
   private val serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper,
 ) {
   @GetMapping("/intervention/{id}")
-  fun getInterventionByID(@PathVariable id: UUID): InterventionDTO = interventionService.getIntervention(id)?.let {
-    InterventionDTO.from(it, interventionService.getPCCRegions(it))
-  } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "intervention not found [id=$id]")
+  fun getInterventionByID(@PathVariable id: UUID): InterventionDTO {
+    val intervention = interventionService.getIntervention(id)
+      ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "intervention not found [id=$id]")
+
+    val referralEndAt = intervention.dynamicFrameworkContract.referralEndAt
+    if (referralEndAt != null && referralEndAt.isBefore(OffsetDateTime.now())) {
+      throw ResponseStatusException(HttpStatus.GONE, "intervention contract has expired [id=$id]")
+    }
+
+    return InterventionDTO.from(intervention, interventionService.getPCCRegions(intervention))
+  }
 
   @GetMapping("/my-interventions")
   fun getInterventionsForUser(authenticationToken: JwtAuthenticationToken): List<InterventionDTO> {
