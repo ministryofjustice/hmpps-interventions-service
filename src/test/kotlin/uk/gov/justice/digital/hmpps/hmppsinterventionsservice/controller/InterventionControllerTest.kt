@@ -30,14 +30,14 @@ internal class InterventionControllerTest {
     whenever(interventionService.getIntervention(id)).thenReturn(null)
 
     val exception = assertThrows<ResponseStatusException> {
-      interventionController.getInterventionByID(id)
+      interventionController.getInterventionByID(id, checkEndDate = false)
     }
 
     assertThat(exception.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
   }
 
   @Test
-  fun `getInterventionByID throws 410 when intervention contract has expired`() {
+  fun `getInterventionByID throws 410 when intervention contract has expired and checkEndDate is true`() {
     val id = UUID.randomUUID()
     val expiredContract = SampleData.sampleContract(
       primeProvider = SampleData.sampleServiceProvider(),
@@ -48,10 +48,28 @@ internal class InterventionControllerTest {
     whenever(interventionService.getIntervention(id)).thenReturn(intervention)
 
     val exception = assertThrows<ResponseStatusException> {
-      interventionController.getInterventionByID(id)
+      interventionController.getInterventionByID(id, checkEndDate = true)
     }
 
     assertThat(exception.statusCode).isEqualTo(HttpStatus.GONE)
+  }
+
+  @Test
+  fun `getInterventionByID returns expired intervention when checkEndDate is false`() {
+    val id = UUID.randomUUID()
+    val expiredContract = SampleData.sampleContract(
+      primeProvider = SampleData.sampleServiceProvider(),
+      npsRegion = SampleData.sampleNPSRegion(),
+      referralEndAt = OffsetDateTime.now().minusDays(1),
+    )
+    val intervention = SampleData.sampleIntervention(id = id, dynamicFrameworkContract = expiredContract)
+    val pccRegions = emptyList<uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PCCRegion>()
+    whenever(interventionService.getIntervention(id)).thenReturn(intervention)
+    whenever(interventionService.getPCCRegions(intervention)).thenReturn(pccRegions)
+
+    val result = interventionController.getInterventionByID(id, checkEndDate = false)
+
+    assertThat(result.id).isEqualTo(id)
   }
 
   @Test
@@ -67,7 +85,7 @@ internal class InterventionControllerTest {
     whenever(interventionService.getIntervention(id)).thenReturn(intervention)
     whenever(interventionService.getPCCRegions(intervention)).thenReturn(pccRegions)
 
-    val result = interventionController.getInterventionByID(id)
+    val result = interventionController.getInterventionByID(id, checkEndDate = true)
 
     assertThat(result.id).isEqualTo(id)
   }
@@ -85,7 +103,7 @@ internal class InterventionControllerTest {
     whenever(interventionService.getIntervention(id)).thenReturn(intervention)
     whenever(interventionService.getPCCRegions(intervention)).thenReturn(pccRegions)
 
-    val result = interventionController.getInterventionByID(id)
+    val result = interventionController.getInterventionByID(id, checkEndDate = true)
 
     assertThat(result.id).isEqualTo(id)
   }

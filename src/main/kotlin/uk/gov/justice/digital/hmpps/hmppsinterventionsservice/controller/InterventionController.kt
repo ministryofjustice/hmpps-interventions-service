@@ -24,13 +24,18 @@ class InterventionController(
   private val serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper,
 ) {
   @GetMapping("/intervention/{id}")
-  fun getInterventionByID(@PathVariable id: UUID): InterventionDTO {
+  fun getInterventionByID(
+    @PathVariable id: UUID,
+    @RequestParam(name = "checkEndDate", required = false, defaultValue = "false") checkEndDate: Boolean,
+  ): InterventionDTO {
     val intervention = interventionService.getIntervention(id)
       ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "intervention not found [id=$id]")
 
-    val referralEndAt = intervention.dynamicFrameworkContract.referralEndAt
-    if (referralEndAt != null && referralEndAt.isBefore(OffsetDateTime.now())) {
-      throw ResponseStatusException(HttpStatus.GONE, "intervention contract has expired [id=$id]")
+    if (checkEndDate) {
+      val referralEndAt = intervention.dynamicFrameworkContract.referralEndAt
+      if (referralEndAt != null && referralEndAt.isBefore(OffsetDateTime.now())) {
+        throw ResponseStatusException(HttpStatus.GONE, "intervention contract has expired [id=$id]")
+      }
     }
 
     return InterventionDTO.from(intervention, interventionService.getPCCRegions(intervention))
