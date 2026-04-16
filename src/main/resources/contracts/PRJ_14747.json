@@ -15,7 +15,7 @@
   },
   "scheduling": {
     "hide_before": "2025-06-01",
-    "hide_after": "2026-03-05"
+    "hide_after": "2026-03-05T23:59:00+00"
   },
   "providers": {
     "prime_provider_code": "HARBOUR",

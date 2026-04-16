@@ -14,7 +14,7 @@
   },
   "scheduling": {
     "hide_before": "2021-01-01",
-    "hide_after": "2026-03-10 23:59:00+00"
+    "hide_after": "2026-03-10T23:59:00+00"
   },
   "providers": {
     "prime_provider_code": "CHANGE_GROW_LIVE_LTD",
