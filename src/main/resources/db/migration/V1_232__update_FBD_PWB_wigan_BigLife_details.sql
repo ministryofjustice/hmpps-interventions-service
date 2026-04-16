@@ -1,4 +1,4 @@
-update intervention set incoming_referral_distribution_email='lee.waudby@rbwh.cjsm.net' and description='This is a Big Life Group service delivered by Rebuild With Hope in Wigan.
+update intervention set incoming_referral_distribution_email='lee.waudby@rbwh.cjsm.net', description='This is a Big Life Group service delivered by Rebuild With Hope in Wigan.
 
 Services are available for all adult male and female People on Probation, irrespective of risk level or complexity level, on a Community/Suspended Sentence Order with a RAR or on Licence/Post-Sentence Supervision. Any Sessions delivered as part of a RAR Activity Day or as a mandated Licence or Post Sentence Supervision appointment will be Enforceable.
 
@@ -16,9 +16,9 @@ Finance Benefits & Debt
 1:1; Wigan
 • Individual sessions delivered on a 1:1 basis covering benefits and better of calculations. Advocacy in lodging appeals and advice on how to avoid incurring sanctions.
 • Individual sessions delivered on a 1:1 basis covering budgeting, debt management, advice and guidance
-• Support and advocacy to open bank accounts and access to financial services and adhere to a debt management plan. 1:1 support to support individual with financial literacy.' where id = '9c8ef076-52d1-4133-8fae-e02e6a61d1ed'
+• Support and advocacy to open bank accounts and access to financial services and adhere to a debt management plan. 1:1 support to support individual with financial literacy.' where id = '9c8ef076-52d1-4133-8fae-e02e6a61d1ed';
 
-update intervention set incoming_referral_distribution_email='lee.waudby@rbwh.cjsm.net' and description='This is a Big Life Group service delivered by Rebuild With Hope in Wigan.
+update intervention set incoming_referral_distribution_email='lee.waudby@rbwh.cjsm.net', description='This is a Big Life Group service delivered by Rebuild With Hope in Wigan.
 
 The personal wellbeing service is a holistic service which addresses the following rehabilitative needs: Emotional Wellbeing, Family and Significant Others, Lifestyle and Associates, Social Inclusion, low level accommodation, support with addressing trauma and support for veterans.
 
@@ -58,4 +58,4 @@ Family & Significant Others
 – Offer basic mediation to address familial and relationship issues.
 – Facilitate referrals to mediation services for complex family situations.
 – Offer guidance to people on probation wishing to maintain contact with their children.
-– Facilitate communication with statutory services (such as Children Services).' where id = '90fd86f9-b0f4-496f-8082-9a44431b1f27'
+– Facilitate communication with statutory services (such as Children Services).' where id = '90fd86f9-b0f4-496f-8082-9a44431b1f27';
