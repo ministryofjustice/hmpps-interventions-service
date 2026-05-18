@@ -449,11 +449,13 @@ class SetupAssistant(
     relevantSentenceEndDate: LocalDate? = null,
     status: Status? = null,
     supplierAssessmentId: UUID? = null,
+    serviceUserCRN: String = "X123456",
   ): Referral {
     createDraftReferral(
       id = id,
       intervention = intervention,
       createdBy = ppUser,
+      serviceUserCRN = serviceUserCRN,
       personCurrentLocationType = personCurrentLocationType,
       personCustodyPrisonId = personCustodyPrisonId,
       expectedReleaseDate = expectedReleaseDate,
@@ -471,6 +473,7 @@ class SetupAssistant(
       probationPractitionerDetails = probationPractitionerDetails,
       relevantSentenceEndDate = relevantSentenceEndDate,
       status = status,
+      serviceUserCRN = serviceUserCRN,
     )
 
     referral = referralRepository.save(
