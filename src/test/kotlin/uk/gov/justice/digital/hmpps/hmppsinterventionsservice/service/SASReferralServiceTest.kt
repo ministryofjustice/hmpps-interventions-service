@@ -5,65 +5,79 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.SASReferralStatus
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.EndOfServiceReportFactory
-import java.time.OffsetDateTime
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.SASReferralNativeData
+import java.time.Instant
 import java.util.UUID
 
 internal class SASReferralServiceTest {
 
   private val referralRepository: ReferralRepository = mock()
-  private val draftReferralRepository: DraftReferralRepository = mock()
-  private val endOfServiceReportFactory = EndOfServiceReportFactory()
-
-  private val sasReferralService = SASReferralService(referralRepository, draftReferralRepository)
+  private val sasReferralService = SASReferralService(referralRepository)
 
   private val crn = "X123456"
+  private val primeProviderId = "SP_001"
+  private val primeProviderName = "TestProvider"
 
-  // sampleReferral defaults to Accommodation service category (via sampleContractType → sampleServiceCategory)
-  private fun accommodationReferral(
-    id: UUID = UUID.randomUUID(),
-    sentAt: OffsetDateTime? = OffsetDateTime.now(),
-    concludedAt: OffsetDateTime? = null,
-    endOfServiceReport: uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport? = null,
-    sentBy: uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser? = null,
-  ) = SampleData.sampleReferral(
-    crn = crn,
-    serviceProviderName = "TestProvider",
-    id = id,
+  private fun sentRow(
+    referralId: String = UUID.randomUUID().toString(),
+    sentAt: Instant = Instant.now(),
+    concludedAt: Instant? = null,
+    withdrawalReasonCode: String? = null,
+    withdrawalComments: String? = null,
+    sentByUserId: String? = null,
+    sentByAuthSource: String? = null,
+    sentByUserName: String? = null,
+    endOfServiceReportId: String? = null,
+    primeProviderId: String = this.primeProviderId,
+    primeProviderName: String = this.primeProviderName,
+    subProviderId: String? = null,
+    subProviderName: String? = null,
+  ) = SASReferralNativeData(
+    referralId = referralId,
+    isDraft = false,
     sentAt = sentAt,
     concludedAt = concludedAt,
-    endOfServiceReport = endOfServiceReport,
-    sentBy = sentBy,
+    withdrawalReasonCode = withdrawalReasonCode,
+    withdrawalComments = withdrawalComments,
+    createdAt = Instant.now(),
+    sentByUserId = sentByUserId,
+    sentByAuthSource = sentByAuthSource,
+    sentByUserName = sentByUserName,
+    endOfServiceReportId = endOfServiceReportId,
+    primeProviderId = primeProviderId,
+    primeProviderName = primeProviderName,
+    subProviderId = subProviderId,
+    subProviderName = subProviderName,
   )
 
-  // referral with a non-Accommodation service category
-  private fun nonAccommodationReferral(id: UUID = UUID.randomUUID()) = SampleData.sampleReferral(
-    crn = crn,
-    serviceProviderName = "TestProvider",
-    id = id,
-    sentAt = OffsetDateTime.now(),
-    intervention = SampleData.sampleIntervention(
-      dynamicFrameworkContract = SampleData.sampleContract(
-        primeProvider = SampleData.sampleServiceProvider(),
-        contractType = SampleData.sampleContractType(
-          name = "Education, Training and Employment",
-          code = "ETE",
-          serviceCategories = setOf(
-            SampleData.sampleServiceCategory(name = "Education, Training and Employment"),
-          ),
-        ),
-      ),
-    ),
+  private fun draftRow(
+    referralId: String = UUID.randomUUID().toString(),
+    primeProviderId: String = this.primeProviderId,
+    primeProviderName: String = this.primeProviderName,
+    subProviderId: String? = null,
+    subProviderName: String? = null,
+  ) = SASReferralNativeData(
+    referralId = referralId,
+    isDraft = true,
+    sentAt = null,
+    concludedAt = null,
+    withdrawalReasonCode = null,
+    withdrawalComments = null,
+    createdAt = Instant.now(),
+    sentByUserId = null,
+    sentByAuthSource = null,
+    sentByUserName = null,
+    endOfServiceReportId = null,
+    primeProviderId = primeProviderId,
+    primeProviderName = primeProviderName,
+    subProviderId = subProviderId,
+    subProviderName = subProviderName,
   )
 
   @Test
-  fun `returns LIVE status for a sent referral with Accommodation service category`() {
-    val referral = accommodationReferral()
-    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(listOf(referral))
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
+  fun `returns LIVE status for a sent referral`() {
+    whenever(referralRepository.getSASReferralsByCrn(crn)).thenReturn(listOf(sentRow()))
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
@@ -74,10 +88,8 @@ internal class SASReferralServiceTest {
   }
 
   @Test
-  fun `excludes sent referrals that do not have Accommodation service category`() {
-    val referral = nonAccommodationReferral()
-    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(listOf(referral))
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
+  fun `returns empty list when no referrals found`() {
+    whenever(referralRepository.getSASReferralsByCrn(crn)).thenReturn(emptyList())
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
@@ -85,76 +97,21 @@ internal class SASReferralServiceTest {
   }
 
   @Test
-  fun `excludes sent referrals with null selectedServiceCategories`() {
-    val referral = accommodationReferral()
-    referral.selectedServiceCategories = null
-    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(listOf(referral))
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
-
-    val result = sasReferralService.getReferralsByCrn(crn)
-
-    assertThat(result).isEmpty()
-  }
-
-  @Test
-  fun `excludes draft referrals without Accommodation service category`() {
-    val draftReferral = SampleData.sampleDraftReferral(
-      crn = crn,
-      serviceProviderName = "TestProvider",
-      intervention = SampleData.sampleIntervention(
-        dynamicFrameworkContract = SampleData.sampleContract(
-          primeProvider = SampleData.sampleServiceProvider(),
-          contractType = SampleData.sampleContractType(
-            name = "Education, Training and Employment",
-            code = "ETE",
-            serviceCategories = setOf(
-              SampleData.sampleServiceCategory(name = "Education, Training and Employment"),
-            ),
-          ),
-        ),
-      ),
-    )
-    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(listOf(draftReferral))
-
-    val result = sasReferralService.getReferralsByCrn(crn)
-
-    assertThat(result).isEmpty()
-  }
-
-  @Test
-  fun `includes draft referrals with Accommodation service category`() {
-    val draftReferral = SampleData.sampleDraftReferral(crn = crn, serviceProviderName = "TestProvider")
-    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(listOf(draftReferral))
+  fun `returns DRAFT status for a draft referral`() {
+    whenever(referralRepository.getSASReferralsByCrn(crn)).thenReturn(listOf(draftRow()))
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
     assertThat(result).hasSize(1)
     assertThat(result[0].status).isEqualTo(SASReferralStatus.DRAFT)
+    assertThat(result[0].sentAt).isNull()
+    assertThat(result[0].sentBy).isNull()
   }
 
   @Test
-  fun `filters mixed referrals keeping only Accommodation ones`() {
-    val accommodationRef = accommodationReferral(id = UUID.randomUUID())
-    val nonAccommodationRef = nonAccommodationReferral(id = UUID.randomUUID())
-    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(listOf(accommodationRef, nonAccommodationRef))
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
-
-    val result = sasReferralService.getReferralsByCrn(crn)
-
-    assertThat(result).hasSize(1)
-    assertThat(result[0].referral.serviceProviders.map { it.name }).contains("TestProvider")
-  }
-
-  @Test
-  fun `returns COMPLETED status for referral with concludedAt and end-of-service report`() {
-    val referral = accommodationReferral(
-      concludedAt = OffsetDateTime.now(),
-      endOfServiceReport = endOfServiceReportFactory.create(),
-    )
-    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(listOf(referral))
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
+  fun `returns COMPLETED status when concludedAt set and end-of-service report present`() {
+    val row = sentRow(concludedAt = Instant.now(), endOfServiceReportId = UUID.randomUUID().toString())
+    whenever(referralRepository.getSASReferralsByCrn(crn)).thenReturn(listOf(row))
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
@@ -163,12 +120,9 @@ internal class SASReferralServiceTest {
   }
 
   @Test
-  fun `returns WITHDRAWN status for referral with withdrawalReasonCode and withdrawalComments`() {
-    val referral = accommodationReferral()
-    referral.withdrawalReasonCode = "MIS"
-    referral.withdrawalComments = "No longer required"
-    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(listOf(referral))
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
+  fun `returns WITHDRAWN status when withdrawalReasonCode and withdrawalComments are present`() {
+    val row = sentRow(withdrawalReasonCode = "MIS", withdrawalComments = "No longer required")
+    whenever(referralRepository.getSASReferralsByCrn(crn)).thenReturn(listOf(row))
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
@@ -178,9 +132,8 @@ internal class SASReferralServiceTest {
 
   @Test
   fun `returns LIVE not COMPLETED when concludedAt set but no end-of-service report`() {
-    val referral = accommodationReferral(concludedAt = OffsetDateTime.now(), endOfServiceReport = null)
-    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(listOf(referral))
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
+    val row = sentRow(concludedAt = Instant.now(), endOfServiceReportId = null)
+    whenever(referralRepository.getSASReferralsByCrn(crn)).thenReturn(listOf(row))
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
@@ -190,22 +143,18 @@ internal class SASReferralServiceTest {
 
   @Test
   fun `returns referral with sentBy details when present`() {
-    val sentAt = OffsetDateTime.parse("2026-04-30T12:43:15Z")
-    val referral = accommodationReferral(
+    val sentAt = Instant.parse("2026-04-30T12:43:15Z")
+    val row = sentRow(
       sentAt = sentAt,
-      sentBy = uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser(
-        id = "user-id-001",
-        authSource = "delius",
-        userName = "john.smith",
-      ),
+      sentByUserId = "user-id-001",
+      sentByAuthSource = "delius",
+      sentByUserName = "john.smith",
     )
-    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(listOf(referral))
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
+    whenever(referralRepository.getSASReferralsByCrn(crn)).thenReturn(listOf(row))
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
     assertThat(result).hasSize(1)
-    assertThat(result[0].sentAt).isEqualTo(sentAt)
     assertThat(result[0].sentBy!!.username).isEqualTo("john.smith")
     assertThat(result[0].sentBy!!.authSource).isEqualTo("delius")
     assertThat(result[0].sentBy!!.userId).isEqualTo("user-id-001")
@@ -213,14 +162,8 @@ internal class SASReferralServiceTest {
 
   @Test
   fun `returns service providers including prime provider`() {
-    val referral = SampleData.sampleReferral(
-      crn = crn,
-      serviceProviderName = "PrimeProvider",
-      id = UUID.randomUUID(),
-      sentAt = OffsetDateTime.now(),
-    )
-    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(listOf(referral))
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
+    val row = sentRow(primeProviderId = "SP_PRIME", primeProviderName = "PrimeProvider")
+    whenever(referralRepository.getSASReferralsByCrn(crn)).thenReturn(listOf(row))
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
@@ -229,29 +172,40 @@ internal class SASReferralServiceTest {
   }
 
   @Test
-  fun `returns empty list when no referrals found`() {
-    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
+  fun `aggregates subcontractor providers alongside prime provider for the same referral`() {
+    val id = UUID.randomUUID().toString()
+    val row1 = sentRow(referralId = id, primeProviderId = "SP_PRIME", primeProviderName = "PrimeProvider")
+    val row2 = row1.copy(subProviderId = "SP_SUB", subProviderName = "SubProvider")
+    whenever(referralRepository.getSASReferralsByCrn(crn)).thenReturn(listOf(row1, row2))
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
-    assertThat(result).isEmpty()
+    assertThat(result).hasSize(1)
+    assertThat(result[0].referral.serviceProviders).hasSize(2)
+    assertThat(result[0].referral.serviceProviders.map { it.name }).containsExactlyInAnyOrder("PrimeProvider", "SubProvider")
   }
 
   @Test
-  fun `returns multiple Accommodation referrals for the same CRN`() {
-    val referral1 = accommodationReferral(id = UUID.randomUUID())
-    val referral2 = accommodationReferral(
-      id = UUID.randomUUID(),
-      concludedAt = OffsetDateTime.now(),
-      endOfServiceReport = endOfServiceReportFactory.create(),
-    )
-    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(listOf(referral1, referral2))
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
+  fun `returns multiple referrals for the same CRN`() {
+    val row1 = sentRow()
+    val row2 = sentRow(concludedAt = Instant.now(), endOfServiceReportId = UUID.randomUUID().toString())
+    whenever(referralRepository.getSASReferralsByCrn(crn)).thenReturn(listOf(row1, row2))
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
     assertThat(result).hasSize(2)
     assertThat(result.map { it.status }).containsExactlyInAnyOrder(SASReferralStatus.LIVE, SASReferralStatus.COMPLETED)
+  }
+
+  @Test
+  fun `returns both sent and draft referrals for the same CRN`() {
+    val sentRow = sentRow()
+    val draftRow = draftRow()
+    whenever(referralRepository.getSASReferralsByCrn(crn)).thenReturn(listOf(sentRow, draftRow))
+
+    val result = sasReferralService.getReferralsByCrn(crn)
+
+    assertThat(result).hasSize(2)
+    assertThat(result.map { it.status }).containsExactlyInAnyOrder(SASReferralStatus.LIVE, SASReferralStatus.DRAFT)
   }
 }

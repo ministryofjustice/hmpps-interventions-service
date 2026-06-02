@@ -9,4 +9,5 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralSu
 interface ReferralSummaryRepository {
   fun getSentReferralSummaries(authUser: AuthUser, serviceProviders: List<String>, dashboardType: DashboardType? = null): List<ServiceProviderSentReferralSummary>
   fun getReferralSummaries(referralSummaryQuery: ReferralSummaryQuery): Page<ReferralSummary>
+  fun getSASReferralsByCrn(crn: String): List<SASReferralNativeData>
 }
