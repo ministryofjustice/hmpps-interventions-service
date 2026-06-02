@@ -62,8 +62,8 @@ internal class SASReferralServiceTest {
   @Test
   fun `returns LIVE status for a sent referral with Accommodation service category`() {
     val referral = accommodationReferral()
-    whenever(referralRepository.findByServiceUserCRN(crn)).thenReturn(listOf(referral))
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRN(crn)).thenReturn(emptyList())
+    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(listOf(referral))
+    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
@@ -76,8 +76,8 @@ internal class SASReferralServiceTest {
   @Test
   fun `excludes sent referrals that do not have Accommodation service category`() {
     val referral = nonAccommodationReferral()
-    whenever(referralRepository.findByServiceUserCRN(crn)).thenReturn(listOf(referral))
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRN(crn)).thenReturn(emptyList())
+    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(listOf(referral))
+    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
@@ -88,8 +88,8 @@ internal class SASReferralServiceTest {
   fun `excludes sent referrals with null selectedServiceCategories`() {
     val referral = accommodationReferral()
     referral.selectedServiceCategories = null
-    whenever(referralRepository.findByServiceUserCRN(crn)).thenReturn(listOf(referral))
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRN(crn)).thenReturn(emptyList())
+    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(listOf(referral))
+    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
@@ -114,8 +114,8 @@ internal class SASReferralServiceTest {
         ),
       ),
     )
-    whenever(referralRepository.findByServiceUserCRN(crn)).thenReturn(emptyList())
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRN(crn)).thenReturn(listOf(draftReferral))
+    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
+    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(listOf(draftReferral))
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
@@ -125,8 +125,8 @@ internal class SASReferralServiceTest {
   @Test
   fun `includes draft referrals with Accommodation service category`() {
     val draftReferral = SampleData.sampleDraftReferral(crn = crn, serviceProviderName = "TestProvider")
-    whenever(referralRepository.findByServiceUserCRN(crn)).thenReturn(emptyList())
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRN(crn)).thenReturn(listOf(draftReferral))
+    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
+    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(listOf(draftReferral))
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
@@ -138,8 +138,8 @@ internal class SASReferralServiceTest {
   fun `filters mixed referrals keeping only Accommodation ones`() {
     val accommodationRef = accommodationReferral(id = UUID.randomUUID())
     val nonAccommodationRef = nonAccommodationReferral(id = UUID.randomUUID())
-    whenever(referralRepository.findByServiceUserCRN(crn)).thenReturn(listOf(accommodationRef, nonAccommodationRef))
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRN(crn)).thenReturn(emptyList())
+    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(listOf(accommodationRef, nonAccommodationRef))
+    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
@@ -153,8 +153,8 @@ internal class SASReferralServiceTest {
       concludedAt = OffsetDateTime.now(),
       endOfServiceReport = endOfServiceReportFactory.create(),
     )
-    whenever(referralRepository.findByServiceUserCRN(crn)).thenReturn(listOf(referral))
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRN(crn)).thenReturn(emptyList())
+    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(listOf(referral))
+    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
@@ -167,8 +167,8 @@ internal class SASReferralServiceTest {
     val referral = accommodationReferral()
     referral.withdrawalReasonCode = "MIS"
     referral.withdrawalComments = "No longer required"
-    whenever(referralRepository.findByServiceUserCRN(crn)).thenReturn(listOf(referral))
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRN(crn)).thenReturn(emptyList())
+    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(listOf(referral))
+    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
@@ -179,8 +179,8 @@ internal class SASReferralServiceTest {
   @Test
   fun `returns LIVE not COMPLETED when concludedAt set but no end-of-service report`() {
     val referral = accommodationReferral(concludedAt = OffsetDateTime.now(), endOfServiceReport = null)
-    whenever(referralRepository.findByServiceUserCRN(crn)).thenReturn(listOf(referral))
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRN(crn)).thenReturn(emptyList())
+    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(listOf(referral))
+    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
@@ -199,8 +199,8 @@ internal class SASReferralServiceTest {
         userName = "john.smith",
       ),
     )
-    whenever(referralRepository.findByServiceUserCRN(crn)).thenReturn(listOf(referral))
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRN(crn)).thenReturn(emptyList())
+    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(listOf(referral))
+    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
@@ -219,8 +219,8 @@ internal class SASReferralServiceTest {
       id = UUID.randomUUID(),
       sentAt = OffsetDateTime.now(),
     )
-    whenever(referralRepository.findByServiceUserCRN(crn)).thenReturn(listOf(referral))
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRN(crn)).thenReturn(emptyList())
+    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(listOf(referral))
+    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
@@ -230,8 +230,8 @@ internal class SASReferralServiceTest {
 
   @Test
   fun `returns empty list when no referrals found`() {
-    whenever(referralRepository.findByServiceUserCRN(crn)).thenReturn(emptyList())
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRN(crn)).thenReturn(emptyList())
+    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
+    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
@@ -246,8 +246,8 @@ internal class SASReferralServiceTest {
       concludedAt = OffsetDateTime.now(),
       endOfServiceReport = endOfServiceReportFactory.create(),
     )
-    whenever(referralRepository.findByServiceUserCRN(crn)).thenReturn(listOf(referral1, referral2))
-    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRN(crn)).thenReturn(emptyList())
+    whenever(referralRepository.findByServiceUserCRNForSAS(crn)).thenReturn(listOf(referral1, referral2))
+    whenever(draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)).thenReturn(emptyList())
 
     val result = sasReferralService.getReferralsByCrn(crn)
 
