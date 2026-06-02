@@ -21,13 +21,13 @@ class SASReferralService(
   fun getReferralsByCrn(crn: String): List<SASReferralDTO> {
     val results = mutableListOf<SASReferralDTO>()
 
-    referralRepository.findByServiceUserCRN(crn)
+    referralRepository.findByServiceUserCRNForSAS(crn)
       .filter { it.hasAccommodationServiceCategory() }
       .forEach { referral ->
         results.add(SASReferralDTO.from(referral, determineStatus(referral)))
       }
 
-    draftReferralRepository.findDraftOnlyByServiceUserCRN(crn)
+    draftReferralRepository.findDraftOnlyByServiceUserCRNForSAS(crn)
       .filter { it.hasAccommodationServiceCategory() }
       .forEach { draftReferral ->
         results.add(SASReferralDTO.fromDraft(draftReferral))

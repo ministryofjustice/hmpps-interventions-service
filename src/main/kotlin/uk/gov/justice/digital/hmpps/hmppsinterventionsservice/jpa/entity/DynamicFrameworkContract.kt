@@ -10,6 +10,7 @@ import jakarta.persistence.NamedAttributeNode
 import jakarta.persistence.NamedEntityGraph
 import jakarta.persistence.NamedSubgraph
 import jakarta.validation.constraints.NotNull
+import org.hibernate.annotations.BatchSize
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -79,6 +80,7 @@ data class DynamicFrameworkContract(
     joinColumns = [JoinColumn(name = "dynamic_framework_contract_id")],
     inverseJoinColumns = [JoinColumn(name = "subcontractor_provider_id")],
   )
+  @BatchSize(size = 50)
   val subcontractorProviders: MutableSet<ServiceProvider> = mutableSetOf(),
 
   @NotNull
