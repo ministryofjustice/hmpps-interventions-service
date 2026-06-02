@@ -22,6 +22,24 @@ import java.time.ZoneId
 import java.util.UUID
 import kotlin.contracts.contract
 
+data class SASReferralNativeData(
+  val referralId: String,
+  val isDraft: Boolean,
+  val sentAt: Instant?,
+  val concludedAt: Instant?,
+  val withdrawalReasonCode: String?,
+  val withdrawalComments: String?,
+  val createdAt: Instant,
+  val sentByUserId: String?,
+  val sentByAuthSource: String?,
+  val sentByUserName: String?,
+  val endOfServiceReportId: String?,
+  val primeProviderId: String,
+  val primeProviderName: String,
+  val subProviderId: String?,
+  val subProviderName: String?,
+)
+
 data class ReferralSummary(
   val referralId: UUID,
   val sentAt: OffsetDateTime,
@@ -473,6 +491,112 @@ WHERE  assigned_at_desc_seq = 1
     DashboardType.UnassignedCases -> "and assignedToUserName is null and concludedAt is null"
     DashboardType.CompletedCases -> "and concludedAt is not null "
     null -> null
+  }
+
+  override fun getSASReferralsByCrn(crn: String): List<SASReferralNativeData> {
+    val sentSql = """
+      SELECT
+        cast(r.id as varchar)                             AS referralId,
+        cast(r.sent_at as TIMESTAMP WITH TIME ZONE)       AS sentAt,
+        cast(r.concluded_at as TIMESTAMP WITH TIME ZONE)  AS concludedAt,
+        r.withdrawal_reason_code                          AS withdrawalReasonCode,
+        r.withdrawal_comments                             AS withdrawalComments,
+        cast(r.created_at as TIMESTAMP WITH TIME ZONE)    AS createdAt,
+        sb.id                                             AS sentByUserId,
+        sb.auth_source                                    AS sentByAuthSource,
+        sb.user_name                                      AS sentByUserName,
+        cast(eosr.id as varchar)                          AS endOfServiceReportId,
+        sp.id                                             AS primeProviderId,
+        sp.name                                           AS primeProviderName,
+        sp_sub.id                                         AS subProviderId,
+        sp_sub.name                                       AS subProviderName
+      FROM referral r
+        INNER JOIN intervention i          ON i.id = r.intervention_id
+        INNER JOIN dynamic_framework_contract dfc
+                                           ON dfc.id = i.dynamic_framework_contract_id
+        INNER JOIN service_provider sp     ON sp.id = dfc.prime_provider_id
+        LEFT  JOIN dynamic_framework_contract_sub_contractor dfcsc
+                                           ON dfcsc.dynamic_framework_contract_id = dfc.id
+        LEFT  JOIN service_provider sp_sub ON sp_sub.id = dfcsc.subcontractor_provider_id
+        LEFT  JOIN auth_user sb            ON sb.id = r.sent_by_id
+        LEFT  JOIN end_of_service_report eosr ON eosr.referral_id = r.id
+        INNER JOIN referral_selected_service_category rssc ON rssc.referral_id = r.id
+        INNER JOIN service_category sc     ON sc.id = rssc.service_category_id
+      WHERE r.service_usercrn = :crn
+        AND r.sent_at IS NOT NULL
+        AND sc.name = 'Accommodation'
+    """.trimIndent()
+
+    val sentQuery = entityManager.createNativeQuery(sentSql)
+    sentQuery.setParameter("crn", crn)
+    val sentResults = sentQuery.resultList as List<Array<Any>>
+    val sentRows = sentResults.map { row ->
+      SASReferralNativeData(
+        referralId = row[0] as String,
+        isDraft = false,
+        sentAt = row[1] as Instant?,
+        concludedAt = row[2] as Instant?,
+        withdrawalReasonCode = row[3] as String?,
+        withdrawalComments = row[4] as String?,
+        createdAt = row[5] as Instant,
+        sentByUserId = row[6] as String?,
+        sentByAuthSource = row[7] as String?,
+        sentByUserName = row[8] as String?,
+        endOfServiceReportId = row[9] as String?,
+        primeProviderId = row[10] as String,
+        primeProviderName = row[11] as String,
+        subProviderId = row[12] as String?,
+        subProviderName = row[13] as String?,
+      )
+    }
+
+    val draftSql = """
+      SELECT
+        cast(dr.id as varchar)                            AS referralId,
+        cast(dr.created_at as TIMESTAMP WITH TIME ZONE)   AS createdAt,
+        sp.id                                             AS primeProviderId,
+        sp.name                                           AS primeProviderName,
+        sp_sub.id                                         AS subProviderId,
+        sp_sub.name                                       AS subProviderName
+      FROM draft_referral dr
+        INNER JOIN intervention i          ON i.id = dr.intervention_id
+        INNER JOIN dynamic_framework_contract dfc
+                                           ON dfc.id = i.dynamic_framework_contract_id
+        INNER JOIN service_provider sp     ON sp.id = dfc.prime_provider_id
+        LEFT  JOIN dynamic_framework_contract_sub_contractor dfcsc
+                                           ON dfcsc.dynamic_framework_contract_id = dfc.id
+        LEFT  JOIN service_provider sp_sub ON sp_sub.id = dfcsc.subcontractor_provider_id
+        INNER JOIN referral_selected_service_category rssc ON rssc.referral_id = dr.id
+        INNER JOIN service_category sc     ON sc.id = rssc.service_category_id
+      WHERE dr.service_usercrn = :crn
+        AND NOT EXISTS (SELECT 1 FROM referral r WHERE r.id = dr.id)
+        AND sc.name = 'Accommodation'
+    """.trimIndent()
+
+    val draftQuery = entityManager.createNativeQuery(draftSql)
+    draftQuery.setParameter("crn", crn)
+    val draftResults = draftQuery.resultList as List<Array<Any>>
+    val draftRows = draftResults.map { row ->
+      SASReferralNativeData(
+        referralId = row[0] as String,
+        isDraft = true,
+        sentAt = null,
+        concludedAt = null,
+        withdrawalReasonCode = null,
+        withdrawalComments = null,
+        createdAt = row[1] as Instant,
+        sentByUserId = null,
+        sentByAuthSource = null,
+        sentByUserName = null,
+        endOfServiceReportId = null,
+        primeProviderId = row[2] as String,
+        primeProviderName = row[3] as String,
+        subProviderId = row[4] as String?,
+        subProviderName = row[5] as String?,
+      )
+    }
+
+    return sentRows + draftRows
   }
 
   private fun instantToOffsetNotNull(instant: Instant?): OffsetDateTime {
