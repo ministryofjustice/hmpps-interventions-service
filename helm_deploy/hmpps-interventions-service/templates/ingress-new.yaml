@@ -9,9 +9,9 @@ metadata:
     external-dns.alpha.kubernetes.io/set-identifier: {{ $fullName }}-new-{{ .Release.Namespace }}-{{ .Values.ingress.migration.colour }}
     external-dns.alpha.kubernetes.io/aws-weight: "100"
     nginx.ingress.kubernetes.io/custom-http-errors: "418"
-    {{- if .Values.env_details.contains_live_data }}
     nginx.ingress.kubernetes.io/enable-modsecurity: "true"
     nginx.ingress.kubernetes.io/modsecurity-transaction-id: "$request_id"
+    {{- if .Values.env_details.contains_live_data }}
     nginx.ingress.kubernetes.io/modsecurity-snippet: |
       SecRuleEngine On
       SecRuleUpdateActionById 949110 "t:none,deny,status:423,logdata:%{SERVER_NAME}"
@@ -20,13 +20,14 @@ metadata:
       # Condition Check if the request URI matches any of the specified patterns and remove the rule if it does
       SecRule REQUEST_URI "@rx /(draft-action-plan|oasys-risk-information|case-note|action-plan|post-assessment-feedback)" "id:1005,phase:1,nolog,pass,ctl:ruleRemoveById=949110"
       SecDefaultAction "phase:2,pass,log,tag:github_team=hmpps-interventions-dev"
+    {{- else }}
+    nginx.ingress.kubernetes.io/modsecurity-snippet: |
+      SecAuditEngine On
+      SecRuleEngine DetectionOnly
+      SecDefaultAction "phase:2,pass,log,tag:github_team=hmpps-interventions-dev,tag:namespace={{ .Release.Namespace }}"
     {{- end }}
 spec:
-  {{- if .Values.env_details.contains_live_data }}
   ingressClassName: modsec
-  {{- else }}
-  ingressClassName: default
-  {{- end }}
   tls:
   {{- range .Values.ingress.hosts }}
   - hosts:
