@@ -104,7 +104,7 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
   implementation("javax.xml.bind:jaxb-api:2.3.1")
   // notifications
-  implementation("uk.gov.service.notify:notifications-java-client:5.2.1-RELEASE")
+  implementation("uk.gov.service.notify:notifications-java-client:6.0.0-RELEASE")
   implementation("org.json:json") {
     version {
       strictly("20231013")
