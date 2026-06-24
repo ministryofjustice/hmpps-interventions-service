@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  kotlin("plugin.spring") version "2.1.20"
-  id("org.jetbrains.kotlin.plugin.jpa") version "2.1.20"
+  kotlin("plugin.spring") version "2.1.21"
+  id("org.jetbrains.kotlin.plugin.jpa") version "2.1.21"
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "9.0.2"
   id("jacoco")
   id("project-report")
@@ -93,8 +93,8 @@ dependencies {
 
   // monitoring and logging
   implementation("io.micrometer:micrometer-registry-prometheus")
-  implementation("io.sentry:sentry-spring-boot-starter:8.11.1")
-  implementation("io.sentry:sentry-logback:8.11.1")
+  implementation("io.sentry:sentry-spring-boot-starter:8.12.0")
+  implementation("io.sentry:sentry-logback:8.12.0")
   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
   implementation("net.logstash.logback:logstash-logback-encoder:9.0")
 
@@ -112,15 +112,14 @@ dependencies {
   }
 
   // aws
-  implementation("software.amazon.awssdk:sns:2.31.36")
-  implementation("software.amazon.awssdk:s3:2.31.36")
-  implementation("software.amazon.awssdk:sts:2.31.36")
+  implementation("software.amazon.awssdk:sns:2.31.47")
+  implementation("software.amazon.awssdk:s3:2.31.47")
+  implementation("software.amazon.awssdk:sts:2.31.46")
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux:3.5.0")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.5.0")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.5.0")
-  implementation("org.springframework.security:spring-security-crypto:6.5.0")
   implementation("com.nimbusds:oauth2-oidc-sdk:11.25")
 
   // database
