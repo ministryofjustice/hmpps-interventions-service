@@ -35,7 +35,6 @@ internal class SASReferralServiceTest {
     subProviderName: String? = null,
   ) = SASReferralNativeData(
     referralId = referralId,
-    isDraft = false,
     sentAt = sentAt,
     concludedAt = concludedAt,
     withdrawalReasonCode = withdrawalReasonCode,
@@ -45,30 +44,6 @@ internal class SASReferralServiceTest {
     sentByAuthSource = sentByAuthSource,
     sentByUserName = sentByUserName,
     endOfServiceReportId = endOfServiceReportId,
-    primeProviderId = primeProviderId,
-    primeProviderName = primeProviderName,
-    subProviderId = subProviderId,
-    subProviderName = subProviderName,
-  )
-
-  private fun draftRow(
-    referralId: String = UUID.randomUUID().toString(),
-    primeProviderId: String = this.primeProviderId,
-    primeProviderName: String = this.primeProviderName,
-    subProviderId: String? = null,
-    subProviderName: String? = null,
-  ) = SASReferralNativeData(
-    referralId = referralId,
-    isDraft = true,
-    sentAt = null,
-    concludedAt = null,
-    withdrawalReasonCode = null,
-    withdrawalComments = null,
-    createdAt = Instant.now(),
-    sentByUserId = null,
-    sentByAuthSource = null,
-    sentByUserName = null,
-    endOfServiceReportId = null,
     primeProviderId = primeProviderId,
     primeProviderName = primeProviderName,
     subProviderId = subProviderId,
@@ -94,18 +69,6 @@ internal class SASReferralServiceTest {
     val result = sasReferralService.getReferralsByCrn(crn)
 
     assertThat(result).isEmpty()
-  }
-
-  @Test
-  fun `returns DRAFT status for a draft referral`() {
-    whenever(referralRepository.getSASReferralsByCrn(crn)).thenReturn(listOf(draftRow()))
-
-    val result = sasReferralService.getReferralsByCrn(crn)
-
-    assertThat(result).hasSize(1)
-    assertThat(result[0].status).isEqualTo(SASReferralStatus.DRAFT)
-    assertThat(result[0].sentAt).isNull()
-    assertThat(result[0].sentBy).isNull()
   }
 
   @Test
@@ -195,17 +158,5 @@ internal class SASReferralServiceTest {
 
     assertThat(result).hasSize(2)
     assertThat(result.map { it.status }).containsExactlyInAnyOrder(SASReferralStatus.LIVE, SASReferralStatus.COMPLETED)
-  }
-
-  @Test
-  fun `returns both sent and draft referrals for the same CRN`() {
-    val sentRow = sentRow()
-    val draftRow = draftRow()
-    whenever(referralRepository.getSASReferralsByCrn(crn)).thenReturn(listOf(sentRow, draftRow))
-
-    val result = sasReferralService.getReferralsByCrn(crn)
-
-    assertThat(result).hasSize(2)
-    assertThat(result.map { it.status }).containsExactlyInAnyOrder(SASReferralStatus.LIVE, SASReferralStatus.DRAFT)
   }
 }

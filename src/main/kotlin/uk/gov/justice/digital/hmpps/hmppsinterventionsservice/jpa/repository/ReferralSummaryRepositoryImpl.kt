@@ -24,7 +24,6 @@ import kotlin.contracts.contract
 
 data class SASReferralNativeData(
   val referralId: String,
-  val isDraft: Boolean,
   val sentAt: Instant?,
   val concludedAt: Instant?,
   val withdrawalReasonCode: String?,
@@ -530,10 +529,9 @@ WHERE  assigned_at_desc_seq = 1
     val sentQuery = entityManager.createNativeQuery(sentSql)
     sentQuery.setParameter("crn", crn)
     val sentResults = sentQuery.resultList as List<Array<Any>>
-    val sentRows = sentResults.map { row ->
+    return sentResults.map { row ->
       SASReferralNativeData(
         referralId = row[0] as String,
-        isDraft = false,
         sentAt = row[1] as Instant?,
         concludedAt = row[2] as Instant?,
         withdrawalReasonCode = row[3] as String?,
@@ -549,54 +547,6 @@ WHERE  assigned_at_desc_seq = 1
         subProviderName = row[13] as String?,
       )
     }
-
-    val draftSql = """
-      SELECT
-        cast(dr.id as varchar)                            AS referralId,
-        cast(dr.created_at as TIMESTAMP WITH TIME ZONE)   AS createdAt,
-        sp.id                                             AS primeProviderId,
-        sp.name                                           AS primeProviderName,
-        sp_sub.id                                         AS subProviderId,
-        sp_sub.name                                       AS subProviderName
-      FROM draft_referral dr
-        INNER JOIN intervention i          ON i.id = dr.intervention_id
-        INNER JOIN dynamic_framework_contract dfc
-                                           ON dfc.id = i.dynamic_framework_contract_id
-        INNER JOIN service_provider sp     ON sp.id = dfc.prime_provider_id
-        LEFT  JOIN dynamic_framework_contract_sub_contractor dfcsc
-                                           ON dfcsc.dynamic_framework_contract_id = dfc.id
-        LEFT  JOIN service_provider sp_sub ON sp_sub.id = dfcsc.subcontractor_provider_id
-        INNER JOIN referral_selected_service_category rssc ON rssc.referral_id = dr.id
-        INNER JOIN service_category sc     ON sc.id = rssc.service_category_id
-      WHERE dr.service_usercrn = :crn
-        AND NOT EXISTS (SELECT 1 FROM referral r WHERE r.id = dr.id)
-        AND sc.name = 'Accommodation'
-    """.trimIndent()
-
-    val draftQuery = entityManager.createNativeQuery(draftSql)
-    draftQuery.setParameter("crn", crn)
-    val draftResults = draftQuery.resultList as List<Array<Any>>
-    val draftRows = draftResults.map { row ->
-      SASReferralNativeData(
-        referralId = row[0] as String,
-        isDraft = true,
-        sentAt = null,
-        concludedAt = null,
-        withdrawalReasonCode = null,
-        withdrawalComments = null,
-        createdAt = row[1] as Instant,
-        sentByUserId = null,
-        sentByAuthSource = null,
-        sentByUserName = null,
-        endOfServiceReportId = null,
-        primeProviderId = row[2] as String,
-        primeProviderName = row[3] as String,
-        subProviderId = row[4] as String?,
-        subProviderName = row[5] as String?,
-      )
-    }
-
-    return sentRows + draftRows
   }
 
   private fun instantToOffsetNotNull(instant: Instant?): OffsetDateTime {
