@@ -33,13 +33,12 @@ class SASReferralService(
       }
 
       val status = when {
-        first.isDraft -> SASReferralStatus.DRAFT
         first.withdrawalReasonCode != null && first.withdrawalComments != null -> SASReferralStatus.WITHDRAWN
         first.concludedAt != null && first.endOfServiceReportId != null -> SASReferralStatus.COMPLETED
         else -> SASReferralStatus.LIVE
       }
 
-      val sentBy = if (!first.isDraft && first.sentByUserId != null) {
+      val sentBy = if (first.sentByUserId != null) {
         AuthUserDTO(
           username = first.sentByUserName ?: "",
           authSource = first.sentByAuthSource ?: "",

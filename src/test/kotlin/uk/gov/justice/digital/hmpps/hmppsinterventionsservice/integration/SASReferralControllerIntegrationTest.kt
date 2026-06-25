@@ -54,7 +54,7 @@ class SASReferralControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `returns 200 with DRAFT status for a draft-only referral with Accommodation category`() {
+  fun `returns 404 for a draft-only referral with Accommodation category`() {
     val token = createTokenWithRole("ROLE_SAS_RM__REFERRAL_RO")
     val accommodationCategory = setupAssistant.serviceCategories["Accommodation"]!!
     setupAssistant.createDraftReferral(
@@ -66,12 +66,7 @@ class SASReferralControllerIntegrationTest : IntegrationTestBase() {
       .uri("/sas-referral-details/X100002")
       .headers { it.setBearerAuth(token) }
       .exchange()
-      .expectStatus().isOk
-      .expectBody()
-      .jsonPath("$[0].status").isEqualTo("DRAFT")
-      .jsonPath("$[0].sentAt").doesNotExist()
-      .jsonPath("$[0].sentBy").doesNotExist()
-      .jsonPath("$[0].referral.createdAt").isNotEmpty
+      .expectStatus().isNotFound
   }
 
   @Test
@@ -127,14 +122,8 @@ class SASReferralControllerIntegrationTest : IntegrationTestBase() {
   @Test
   fun `returns multiple Accommodation referrals for the same CRN`() {
     val token = createTokenWithRole("ROLE_SAS_RM__REFERRAL_RO")
-    val accommodationCategory = setupAssistant.serviceCategories["Accommodation"]!!
-    // Sent referral – set Accommodation category
     withAccommodationCategory(setupAssistant.createSentReferral(serviceUserCRN = "X100005"))
-    // Draft-only referral (different UUID) – pass Accommodation category directly
-    setupAssistant.createDraftReferral(
-      serviceUserCRN = "X100005",
-      selectedServiceCategories = mutableSetOf(accommodationCategory),
-    )
+    withAccommodationCategory(setupAssistant.createSentReferral(serviceUserCRN = "X100005"))
 
     webTestClient.get()
       .uri("/sas-referral-details/X100005")
