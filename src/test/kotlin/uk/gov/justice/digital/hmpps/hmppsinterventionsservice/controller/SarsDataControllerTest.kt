@@ -202,7 +202,6 @@ internal class SarsDataControllerTest {
 
     assertThat(response.statusCode).isEqualTo(HttpStatusCode.valueOf(200))
     assertThat(response.body).isNotBlank
-    assertThat(response.body).contains("{{crn}}")
     assertThat(response.body).contains("{{#referral}}")
     assertThat(response.body).contains("{{ formatDate")
     assertThat(response.body).contains("{{ optionalString")

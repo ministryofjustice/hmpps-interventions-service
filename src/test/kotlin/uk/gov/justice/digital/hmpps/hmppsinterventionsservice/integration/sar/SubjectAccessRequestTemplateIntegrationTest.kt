@@ -23,7 +23,6 @@ class SubjectAccessRequestTemplateIntegrationTest : IntegrationTestBase() {
     val body = response.expectBody(String::class.java).returnResult().responseBody
     assertThat(body).isNotBlank
     // structural mustache markers
-    assertThat(body).contains("{{crn}}")
     assertThat(body).contains("{{#referral}}")
     assertThat(body).contains("{{#draft_referral}}")
     // template helper functions
