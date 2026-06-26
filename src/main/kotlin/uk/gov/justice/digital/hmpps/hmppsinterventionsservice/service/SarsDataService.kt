@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CaseNote
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
@@ -26,6 +27,7 @@ class SarsDataService(
   val draftReferralRepository: DraftReferralRepository,
 ) {
 
+  @Transactional(timeout = 120, readOnly = true)
   fun getSarsReferralData(crn: String, fromDateString: String? = null, toDateString: String? = null): List<SarsReferralData> {
     var fromDate: OffsetDateTime? = null
     var toDate: OffsetDateTime? = null
