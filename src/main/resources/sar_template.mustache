@@ -8,18 +8,17 @@
   <table class="summary-list">
     <tr><td>Referral Number</td><td>{{ optionalString referral_number }}</td></tr>
     <tr><td>Status</td><td>{{ optionalString status }}</td></tr>
-    <tr><td>Service User CRN</td><td>{{ optionalString service_user_crn }}</td></tr>
     <tr><td>Service Provider</td><td>{{ optionalString service_provider_name }}</td></tr>
-    <tr><td>Created At</td><td>{{ formatDate created_at }}</td></tr>
-    <tr><td>Sent At</td><td>{{ formatDate sent_at }}</td></tr>
-    <tr><td>Assigned At</td><td>{{ formatDate assigned_at }}</td></tr>
-    <tr><td>Concluded At</td><td>{{ formatDate concluded_at }}</td></tr>
-    <tr><td>End Requested At</td><td>{{ formatDate end_requested_at }}</td></tr>
+    <tr><td>Created At</td><td>{{ optionalString created_at }}</td></tr>
+    <tr><td>Sent At</td><td>{{ optionalString sent_at }}</td></tr>
+    <tr><td>Assigned At</td><td>{{ optionalString assigned_at }}</td></tr>
+    <tr><td>Concluded At</td><td>{{ optionalString concluded_at }}</td></tr>
+    <tr><td>End Requested At</td><td>{{ optionalString end_requested_at }}</td></tr>
     <tr><td>End Requested Comments</td><td>{{ optionalValue end_requested_comments }}</td></tr>
     <tr><td>Cancellation Reason</td><td>{{ optionalString cancellation_reason }}</td></tr>
     <tr><td>Withdrawal Comments</td><td>{{ optionalString withdrawal_comments }}</td></tr>
-    <tr><td>Draft Supplementary Risk Updated At</td><td>{{ formatDate draft_supplementary_risk_updated_at }}</td></tr>
-    <tr><td>Relevant Sentence End Date</td><td>{{ formatDate relevant_sentence_end_date }}</td></tr>
+    <tr><td>Draft Supplementary Risk Updated At</td><td>{{ optionalString draft_supplementary_risk_updated_at }}</td></tr>
+    <tr><td>Relevant Sentence End Date</td><td>{{ optionalString relevant_sentence_end_date }}</td></tr>
   </table>
 
   <h3>Accessibility and Communication</h3>
@@ -37,8 +36,8 @@
   <table class="summary-list">
     <tr><td>NPS Region</td><td>{{ optionalString nps_region_id }}</td></tr>
     <tr><td>PCC Region</td><td>{{ optionalString pcc_region_id }}</td></tr>
-    <tr><td>Referral Start Date</td><td>{{ formatDate referral_start_date }}</td></tr>
-    <tr><td>Referral End Date</td><td>{{ formatDate referral_end_date }}</td></tr>
+    <tr><td>Referral Start Date</td><td>{{ optionalString referral_start_date }}</td></tr>
+    <tr><td>Referral End Date</td><td>{{ optionalString referral_end_date }}</td></tr>
   </table>
   {{/contract}}
 
@@ -56,9 +55,9 @@
   {{#referral_details}}
   <h3>Referral Details</h3>
   <table class="summary-list">
-    <tr><td>Created At</td><td>{{ formatDate created_at }}</td></tr>
+    <tr><td>Created At</td><td>{{ optionalString created_at }}</td></tr>
     <tr><td>Reason for Change</td><td>{{ optionalString reason_for_change }}</td></tr>
-    <tr><td>Completion Deadline</td><td>{{ formatDate completion_deadline }}</td></tr>
+    <tr><td>Completion Deadline</td><td>{{ optionalString completion_deadline }}</td></tr>
     <tr><td>Further Information</td><td>{{ optionalString further_information }}</td></tr>
     <tr><td>Maximum Enforceable Days</td><td>{{ optionalValue maximum_enforceable_days }}</td></tr>
     <tr><td>Reason for Referral</td><td>{{ optionalString reason_for_referral }}</td></tr>
@@ -70,7 +69,6 @@
   {{#referal_location}}
   <h3>Referral Location</h3>
   <table class="summary-list">
-    <tr><td>Referral ID</td><td>{{ optionalValue referal_id }}</td></tr>
     <tr><td>Type</td><td>{{ optionalString type }}</td></tr>
     <tr><td>Prison ID</td><td>{{ getPrisonName prison_id }}</td></tr>
     <tr><td>NOMIS Prison ID</td><td>{{ getPrisonName nomis_prison_id }}</td></tr>
@@ -83,11 +81,10 @@
   {{#end_of_service_report}}
   <h3>End of Service Report</h3>
   <table class="summary-list">
-    <tr><td>Created At</td><td>{{ formatDate created_at }}</td></tr>
-    <tr><td>Submitted At</td><td>{{ formatDate submitted_at }}</td></tr>
+    <tr><td>Created At</td><td>{{ optionalString created_at }}</td></tr>
+    <tr><td>Submitted At</td><td>{{ optionalString submitted_at }}</td></tr>
     <tr><td>Submitted By</td><td>{{ optionalString submitted_by }}</td></tr>
     <tr><td>Further Information</td><td>{{ optionalString further_information }}</td></tr>
-    <tr><td>Referral ID</td><td>{{ optionalValue referral_id }}</td></tr>
   </table>
 
   {{#end_of_service_outcomes}}
@@ -103,7 +100,7 @@
   {{#action_plans}}
   <h3>Action Plan</h3>
   <table class="summary-list">
-    <tr><td>Created At</td><td>{{ formatDate created_at }}</td></tr>
+    <tr><td>Created At</td><td>{{ optionalString created_at }}</td></tr>
     <tr><td>Number of Sessions</td><td>{{ optionalValue number_of_sessions }}</td></tr>
     <tr><td>Approved By</td><td>{{ optionalString approved_by }}</td></tr>
   </table>
@@ -112,7 +109,7 @@
   <h4>Activity</h4>
   <table class="summary-list">
     <tr><td>Description</td><td>{{ optionalString description }}</td></tr>
-    <tr><td>Created At</td><td>{{ formatDate createdAt }}</td></tr>
+    <tr><td>Created At</td><td>{{ optionalString createdAt }}</td></tr>
   </table>
   {{/action_plan_activities}}
   {{/action_plans}}
@@ -120,20 +117,18 @@
   {{#appointment}}
   <h3>Appointment</h3>
   <table class="summary-list">
-    <tr><td>ID</td><td>{{ optionalValue id }}</td></tr>
-    <tr><td>Created At</td><td>{{ formatDate created_at }}</td></tr>
+    <tr><td>Created At</td><td>{{ optionalString created_at }}</td></tr>
     <tr><td>Duration (minutes)</td><td>{{ optionalValue duration_minutes }}</td></tr>
     <tr><td>Attended</td><td>{{ optionalString attended }}</td></tr>
     <tr><td>Did Session Happen</td><td>{{ convertBoolean did_session_happen }}</td></tr>
     <tr><td>Late</td><td>{{ convertBoolean late }}</td></tr>
     <tr><td>Late Reason</td><td>{{ optionalValue late_reason }}</td></tr>
     <tr><td>Superseded</td><td>{{ convertBoolean superseded }}</td></tr>
-    <tr><td>Superseded By Appointment ID</td><td>{{ optionalValue superseded_by_appointment_id }}</td></tr>
-    <tr><td>Attendance Submitted At</td><td>{{ formatDate attendance_submitted_at }}</td></tr>
-    <tr><td>Attendance Behaviour Submitted At</td><td>{{ formatDate attendance_behaviour_submitted_at }}</td></tr>
+    <tr><td>Attendance Submitted At</td><td>{{ optionalString attendance_submitted_at }}</td></tr>
+    <tr><td>Attendance Behaviour Submitted At</td><td>{{ optionalString attendance_behaviour_submitted_at }}</td></tr>
     <tr><td>Notify PP of Attendance Behaviour</td><td>{{ convertBoolean notifyppof_attendance_behaviour }}</td></tr>
-    <tr><td>Appointment Feedback Submitted At</td><td>{{ formatDate appointment_feedback_submitted_at }}</td></tr>
-    <tr><td>Session Feedback Submitted At</td><td>{{ formatDate session_feedback_submitted_at }}</td></tr>
+    <tr><td>Appointment Feedback Submitted At</td><td>{{ optionalString appointment_feedback_submitted_at }}</td></tr>
+    <tr><td>Session Feedback Submitted At</td><td>{{ optionalString session_feedback_submitted_at }}</td></tr>
     <tr><td>Session Feedback Submitted By</td><td>{{ optionalString session_feedback_submitted_by }}</td></tr>
     <tr><td>Session Summary</td><td>{{ optionalValue session_summary }}</td></tr>
     <tr><td>Session Response</td><td>{{ optionalValue session_response }}</td></tr>
@@ -155,20 +150,12 @@
   <h4>Appointment Delivery</h4>
   <table class="summary-list">
     <tr><td>Delivery Type</td><td>{{ optionalValue appointment_delivery_type }}</td></tr>
-    <tr><td>NPS Office Code</td><td>{{ optionalString nps_office_code }}</td></tr>
+    <tr><td>NPS Office Name</td><td>{{ optionalString nps_office_name }}</td></tr>
     <tr><td>Session Type</td><td>{{ optionalString appointment_session_type }}</td></tr>
+    <tr><td>First Address Line</td><td>{{ optionalString first_address_line }}</td></tr>
   </table>
   {{/appointment_delivery_type}}
 
-  {{#appointment_delivery_address}}
-  <h4>Appointment Delivery Address</h4>
-  <table class="summary-list">
-    <tr><td>First Address Line</td><td>{{ optionalValue first_address_line }}</td></tr>
-    <tr><td>Second Address Line</td><td>{{ optionalString second_address_line }}</td></tr>
-    <tr><td>Town or City</td><td>{{ optionalValue town_or_city }}</td></tr>
-    <tr><td>Postcode</td><td>{{ optionalValue postcode }}</td></tr>
-  </table>
-  {{/appointment_delivery_address}}
   {{/appointment}}
 
   {{#case_notes}}
@@ -176,7 +163,7 @@
   <table class="summary-list">
     <tr><td>Subject</td><td>{{ optionalString subject }}</td></tr>
     <tr><td>Body</td><td>{{ optionalString body }}</td></tr>
-    <tr><td>Sent At</td><td>{{ formatDate sent_at }}</td></tr>
+    <tr><td>Sent At</td><td>{{ optionalString sent_at }}</td></tr>
   </table>
   {{/case_notes}}
 
@@ -187,8 +174,7 @@
 <div class="section">
   <h2>Draft Referral</h2>
   <table class="summary-list">
-    <tr><td>Service User CRN</td><td>{{ optionalString service_user_crn }}</td></tr>
-    <tr><td>Created At</td><td>{{ formatDate created_at }}</td></tr>
+    <tr><td>Created At</td><td>{{ optionalString created_at }}</td></tr>
     <tr><td>Accessibility Needs</td><td>{{ optionalValue accessibility_needs }}</td></tr>
     <tr><td>Additional Needs Information</td><td>{{ optionalValue additional_needs_information }}</td></tr>
     <tr><td>When Unavailable</td><td>{{ optionalValue when_unavailable }}</td></tr>
@@ -196,9 +182,9 @@
     <tr><td>Interpreting Language</td><td>{{ optionalString interpreting_language }}</td></tr>
     <tr><td>Has Additional Responsibilities</td><td>{{ convertBoolean has_additional_responsibilities }}</td></tr>
     <tr><td>Draft Supplementary Risk</td><td>{{ optionalString draft_supplementary_risk }}</td></tr>
-    <tr><td>Draft Supplementary Risk Updated At</td><td>{{ formatDate draft_supplementary_risk_updated_at }}</td></tr>
+    <tr><td>Draft Supplementary Risk Updated At</td><td>{{ optionalString draft_supplementary_risk_updated_at }}</td></tr>
     <tr><td>Person Current Location Type</td><td>{{ optionalString person_current_location_type }}</td></tr>
-    <tr><td>Person Expected Release Date</td><td>{{ formatDate person_expected_release_date }}</td></tr>
+    <tr><td>Person Expected Release Date</td><td>{{ optionalString person_expected_release_date }}</td></tr>
     <tr><td>Person Expected Release Date Missing Reason</td><td>{{ optionalString person_expected_release_date_missing_reason }}</td></tr>
     <tr><td>Referral Releasing Within 12 Weeks</td><td>{{ convertBoolean referral_releasing_12_weeks }}</td></tr>
     <tr><td>Role / Job Title</td><td>{{ optionalString role_job_title }}</td></tr>
@@ -211,8 +197,8 @@
   <table class="summary-list">
     <tr><td>NPS Region</td><td>{{ optionalString nps_region_id }}</td></tr>
     <tr><td>PCC Region</td><td>{{ optionalString pcc_region_id }}</td></tr>
-    <tr><td>Referral Start Date</td><td>{{ formatDate referral_start_date }}</td></tr>
-    <tr><td>Referral End Date</td><td>{{ formatDate referral_end_date }}</td></tr>
+    <tr><td>Referral Start Date</td><td>{{ optionalString referral_start_date }}</td></tr>
+    <tr><td>Referral End Date</td><td>{{ optionalString referral_end_date }}</td></tr>
   </table>
   {{/contract}}
 

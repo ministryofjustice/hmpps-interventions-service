@@ -124,13 +124,13 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
               "referral": [
                 {
                   "referral_number": "something",
-                  "created_at": "2020-12-04T10:42:43Z",
+                  "created_at": "4 December 2020, 10:42:43 am",
                   "service_user_crn": "X123456",
                   "has_additional_responsibilities": true,
-                  "sent_at": "2020-12-05T10:42:43Z",
-                  "end_requested_at": "2020-12-06T10:42:43Z",
-                  "concluded_at": "2020-12-07T10:42:43Z",
-                  "draft_supplementary_risk_updated_at": "2020-12-04T10:42:43Z",
+                  "sent_at": "5 December 2020, 10:42:43 am",
+                  "end_requested_at": "6 December 2020, 10:42:43 am",
+                  "concluded_at": "7 December 2020, 10:42:43 am",
+                  "draft_supplementary_risk_updated_at": "4 December 2020, 10:42:43 am",
                   "withdrawal_comments": "withdrawn",
                   "status": "PRE_ICA",
                   "accessibility_needs": "wheelchair",
@@ -156,19 +156,19 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
                   "action_plans": [
                     {
                       "number_of_sessions": 3,
-                      "created_at": "2020-12-04T10:42:43Z",
+                      "created_at": "4 December 2020, 10:42:43 am",
                       "approved_by": "bernard.beaks",
                       "action_plan_activities": [
                         {
                           "description": "action plan approved",
-                          "createdAt": "2020-12-04T10:42:43Z"
+                          "createdAt": "4 December 2020, 10:42:43 am"
                         }
                       ]
                     }
                   ],
                   "end_of_service_report": {
-                    "created_at": "2020-12-04T10:42:43Z",
-                    "submitted_at": "2020-12-05T10:42:43Z",
+                    "created_at": "4 December 2020, 10:42:43 am",
+                    "submitted_at": "5 December 2020, 10:42:43 am",
                     "further_information": "further info",
                     "end_of_service_outcomes": [
                       {
@@ -181,7 +181,7 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
                     {
                       "subject": "subject",
                       "body": "body",
-                      "sent_at": "2020-12-04T10:42:43Z"
+                      "sent_at": "4 December 2020, 10:42:43 am"
                     }
                   ],
                   "probation_practitioner_details": {
@@ -272,10 +272,10 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
             "referral": [
               {
                 "referral_number": "something",
-                "created_at": "2020-12-04T10:42:43Z",
+                "created_at": "4 December 2020, 10:42:43 am",
                 "service_user_crn": "X123456",
                 "has_additional_responsibilities": true,
-                "sent_at": "2020-12-05T10:42:43Z",
+                "sent_at": "5 December 2020, 10:42:43 am",
                 "accessibility_needs": "wheelchair",
                 "additional_needs_information": "english",
                 "when_unavailable": "tomorrow",
@@ -284,18 +284,18 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
                 "action_plans": [
                   {
                     "number_of_sessions": 3,
-                    "created_at": "2020-12-04T10:42:43Z",
+                    "created_at": "4 December 2020, 10:42:43 am",
                     "approved_by": "bernard.beaks",
                     "action_plan_activities": [
                       {
                         "description": "action plan approved",
-                        "createdAt": "2020-12-04T10:42:43Z"
+                        "createdAt": "4 December 2020, 10:42:43 am"
                       }
                     ]
                   }
                 ],
                 "end_of_service_report": {
-                  "created_at": "2020-12-04T10:42:43Z",
+                  "created_at": "4 December 2020, 10:42:43 am",
                   "end_of_service_outcomes": [
                     {
                       "progression_comments": "progressing level",
@@ -307,7 +307,7 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
                   {
                     "subject": "subject",
                     "body": "body",
-                    "sent_at": "2020-12-04T10:42:43Z"
+                    "sent_at": "4 December 2020, 10:42:43 am"
                   }
                 ],
                 "probation_practitioner_details": {
@@ -371,7 +371,7 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
             "referral": [],
             "draft_referral": [
               {
-                "created_at": "2020-12-04T10:42:43Z",
+                "created_at": "4 December 2020, 10:42:43 am",
                 "service_user_crn": "X123456",
                 "accessibility_needs": "",
                 "additional_needs_information": "",
@@ -481,13 +481,13 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
                 "referral": [
                   {
                     "referral_number": "something",
-                    "created_at": "2020-12-04T10:42:43Z",
+                    "created_at": "4 December 2020, 10:42:43 am",
                     "service_user_crn": "X123456",
                     "has_additional_responsibilities": true,
-                    "sent_at": "2020-12-05T10:42:43Z",
-                    "end_requested_at": "2020-12-06T10:42:43Z",
-                    "concluded_at": "2020-12-07T10:42:43Z",
-                    "draft_supplementary_risk_updated_at": "2020-12-04T10:42:43Z",
+                    "sent_at": "5 December 2020, 10:42:43 am",
+                    "end_requested_at": "6 December 2020, 10:42:43 am",
+                    "concluded_at": "7 December 2020, 10:42:43 am",
+                    "draft_supplementary_risk_updated_at": "4 December 2020, 10:42:43 am",
                     "withdrawal_comments": "withdrawn",
                     "status": "PRE_ICA",
                     "accessibility_needs": "",
@@ -513,18 +513,18 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
                     "action_plans": [
                       {
                         "number_of_sessions": 3,
-                        "created_at": "2020-12-04T10:42:43Z",
+                        "created_at": "4 December 2020, 10:42:43 am",
                         "approved_by": "bernard.beaks",
                         "action_plan_activities": [
                           {
                             "description": "action plan approved",
-                            "createdAt": "2020-12-04T10:42:43Z"
+                            "createdAt": "4 December 2020, 10:42:43 am"
                           }
                         ]
                       }
                     ],
                     "end_of_service_report": {
-                      "created_at": "2020-12-04T10:42:43Z",
+                      "created_at": "4 December 2020, 10:42:43 am",
                       "end_of_service_outcomes":[
                       {
                         "progression_comments": "",
@@ -536,7 +536,7 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
                       {
                         "subject": "subject",
                         "body": "body",
-                        "sent_at": "2020-12-04T10:42:43Z"
+                        "sent_at": "4 December 2020, 10:42:43 am"
                       }
                     ],
                     "probation_practitioner_details": {

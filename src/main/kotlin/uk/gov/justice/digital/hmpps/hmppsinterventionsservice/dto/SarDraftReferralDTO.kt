@@ -2,11 +2,9 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto
 
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DynamicFrameworkContract
-import java.time.LocalDate
-import java.time.OffsetDateTime
 
 class SarsDraftReferralDTO(
-  val created_at: OffsetDateTime?,
+  val created_at: String?,
   val accessibility_needs: String,
   val additional_needs_information: String,
   val when_unavailable: String,
@@ -14,9 +12,9 @@ class SarsDraftReferralDTO(
   val needs_interpreter: Boolean = false,
   val has_additional_responsibilities: Boolean? = null,
   val draft_supplementary_risk: String? = null,
-  val draft_supplementary_risk_updated_at: OffsetDateTime? = null,
+  val draft_supplementary_risk_updated_at: String? = null,
   val person_current_location_type: String? = null,
-  val person_expected_release_date: LocalDate? = null,
+  val person_expected_release_date: String? = null,
   val person_expected_release_date_missing_reason: String? = null,
   val referral_releasing_12_weeks: Boolean? = null,
   val role_job_title: String? = null,
@@ -35,12 +33,12 @@ class SarsDraftReferralDTO(
       when_unavailable = referral.whenUnavailable ?: "",
       needs_interpreter = referral.needsInterpreter ?: false,
       interpreting_language = referral.interpreterLanguage,
-      created_at = referral.createdAt,
+      created_at = referral.createdAt.toSarString(),
       has_additional_responsibilities = referral.hasAdditionalResponsibilities,
       draft_supplementary_risk = referral.additionalRiskInformation,
-      draft_supplementary_risk_updated_at = referral.additionalRiskInformationUpdatedAt,
+      draft_supplementary_risk_updated_at = referral.additionalRiskInformationUpdatedAt.toSarString(),
       person_current_location_type = referral.personCurrentLocationType?.name,
-      person_expected_release_date = referral.expectedReleaseDate,
+      person_expected_release_date = referral.expectedReleaseDate.toSarString(),
       person_expected_release_date_missing_reason = referral.expectedReleaseDateMissingReason,
       referral_releasing_12_weeks = referral.isReferralReleasingIn12Weeks,
       role_job_title = referral.roleOrJobTitle,
@@ -55,15 +53,15 @@ class SarsDraftReferralDTO(
 class SarsContractDTO(
   val nps_region_id: String? = null,
   val pcc_region_id: String? = null,
-  val referral_start_date: LocalDate? = null,
-  val referral_end_date: LocalDate? = null,
+  val referral_start_date: String? = null,
+  val referral_end_date: String? = null,
 ) {
   companion object {
     fun from(dynamicFrameworkContract: DynamicFrameworkContract): SarsContractDTO = SarsContractDTO(
       nps_region_id = dynamicFrameworkContract.npsRegion?.name,
       pcc_region_id = dynamicFrameworkContract.pccRegion?.name,
-      referral_start_date = dynamicFrameworkContract.referralStartDate,
-      referral_end_date = dynamicFrameworkContract.referralEndAt?.toLocalDate(),
+      referral_start_date = dynamicFrameworkContract.referralStartDate.toSarString(),
+      referral_end_date = dynamicFrameworkContract.referralEndAt?.toLocalDate().toSarString(),
     )
   }
 }
