@@ -26,7 +26,6 @@ class SubjectAccessRequestTemplateIntegrationTest : IntegrationTestBase() {
     assertThat(body).contains("{{#referral}}")
     assertThat(body).contains("{{#draft_referral}}")
     // template helper functions
-    assertThat(body).contains("{{ formatDate")
     assertThat(body).contains("{{ optionalString")
     assertThat(body).contains("{{ optionalValue")
     assertThat(body).contains("{{ convertBoolean")

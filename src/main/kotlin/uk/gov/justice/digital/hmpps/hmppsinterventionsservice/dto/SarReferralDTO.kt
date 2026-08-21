@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto
 
+import org.apache.commons.csv.CSVFormat
+import org.springframework.core.io.ClassPathResource
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
@@ -8,27 +10,43 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Dynamic
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import java.time.LocalDate
 import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+import java.time.temporal.ChronoField
+import java.util.Locale
 import java.util.UUID
+
+// Format: "31 January 2023, 7:57:27 pm"
+private val DATETIME_FORMATTER: DateTimeFormatter = DateTimeFormatterBuilder()
+  .appendPattern("d MMMM yyyy, h:mm:ss ")
+  .appendText(ChronoField.AMPM_OF_DAY, mapOf(0L to "am", 1L to "pm"))
+  .toFormatter(Locale.UK)
+
+// Format: "31 January 2023"
+private val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.UK)
+
+internal fun OffsetDateTime?.toSarString(): String? = this?.format(DATETIME_FORMATTER)
+internal fun LocalDate?.toSarString(): String? = this?.format(DATE_FORMATTER)
 
 class SarsReferralDTO(
   val referral_number: String?,
-  val created_at: OffsetDateTime?,
+  val created_at: String?,
   val has_additional_responsibilities: Boolean? = null,
   val service_user_crn: String? = null,
-  val sent_at: OffsetDateTime,
-  val end_requested_at: OffsetDateTime? = null,
-  val concluded_at: OffsetDateTime? = null,
-  val draft_supplementary_risk_updated_at: OffsetDateTime? = null,
+  val sent_at: String,
+  val end_requested_at: String? = null,
+  val concluded_at: String? = null,
+  val draft_supplementary_risk_updated_at: String? = null,
   val withdrawal_comments: String? = null,
   val status: String? = null,
-  val assigned_at: OffsetDateTime? = null,
+  val assigned_at: String? = null,
   val accessibility_needs: String,
   val additional_needs_information: String,
   val when_unavailable: String,
   val end_requested_comments: String,
   val interpreting_language: String? = null,
   val needs_interpreter: Boolean = false,
-  val relevant_sentence_end_date: LocalDate? = null,
+  val relevant_sentence_end_date: String? = null,
   val appointment: List<SarsAppointmentDTO>,
   val action_plans: List<SarsActionPlansDto>?,
   val contract: SarsContractDTO?,
@@ -48,30 +66,30 @@ class SarsReferralDTO(
       caseNotes: List<CaseNote>,
     ): SarsReferralDTO = SarsReferralDTO(
       referral_number = referral.referenceNumber,
-      created_at = referral.createdAt,
+      created_at = referral.createdAt.toSarString(),
       has_additional_responsibilities = referral.hasAdditionalResponsibilities,
       service_user_crn = referral.serviceUserCRN,
-      sent_at = referral.sentAt ?: referral.createdAt,
-      end_requested_at = referral.endRequestedAt,
-      concluded_at = referral.concludedAt,
-      draft_supplementary_risk_updated_at = referral.additionalRiskInformationUpdatedAt,
+      sent_at = (referral.sentAt ?: referral.createdAt).format(DATETIME_FORMATTER),
+      end_requested_at = referral.endRequestedAt.toSarString(),
+      concluded_at = referral.concludedAt.toSarString(),
+      draft_supplementary_risk_updated_at = referral.additionalRiskInformationUpdatedAt.toSarString(),
       withdrawal_comments = referral.withdrawalComments,
       status = referral.status?.name,
-      assigned_at = referral.assignments.maxByOrNull { it.assignedAt }?.assignedAt,
+      assigned_at = referral.assignments.maxByOrNull { it.assignedAt }?.assignedAt.toSarString(),
       accessibility_needs = referral.accessibilityNeeds ?: "",
       additional_needs_information = referral.additionalNeedsInformation ?: "",
       when_unavailable = referral.whenUnavailable ?: "",
       end_requested_comments = referral.endRequestedComments ?: "",
       needs_interpreter = referral.needsInterpreter ?: false,
       interpreting_language = referral.interpreterLanguage,
-      relevant_sentence_end_date = referral.relevantSentenceEndDate,
+      relevant_sentence_end_date = referral.relevantSentenceEndDate.toSarString(),
       appointment = appointments.map { SarsAppointmentDTO.from(it) },
       action_plans = referral.actionPlans?.map { SarsActionPlansDto.from(it) },
       contract = SarsContractDTO.from(dynamicFrameworkContract),
       end_of_service_report = referral.endOfServiceReport?.let {
         SarsEndOfServiceReportDTO(
-          created_at = it.createdAt,
-          submitted_at = it.submittedAt,
+          created_at = it.createdAt.toSarString(),
+          submitted_at = it.submittedAt.toSarString(),
           further_information = it.furtherInformation,
           submitted_by = it.submittedBy?.userName,
           referral_id = it.referral.id,
@@ -96,9 +114,9 @@ class SarsReferralDTO(
         )
       },
       referral_details = SarsReferralDetailsDTO(
-        created_at = referral.createdAt,
+        created_at = referral.createdAt.toSarString(),
         reason_for_change = referral.referralDetails?.reasonForChange,
-        completion_deadline = referral.referralDetails?.completionDeadline,
+        completion_deadline = referral.referralDetails?.completionDeadline.toSarString(),
         further_information = referral.referralDetails?.furtherInformation,
         maximum_enforceable_days = referral.referralDetails?.maximumEnforceableDays,
         reason_for_referral = referral.referralDetails?.reasonForReferral,
@@ -122,14 +140,14 @@ class SarsReferralDTO(
 class SarsAppointmentDTO(
   val id: UUID,
   val duration_minutes: Int? = null,
-  val created_at: OffsetDateTime? = null,
-  val attendance_submitted_at: OffsetDateTime? = null,
+  val created_at: String? = null,
+  val attendance_submitted_at: String? = null,
   val notifyppof_attendance_behaviour: Boolean? = null,
-  val attendance_behaviour_submitted_at: OffsetDateTime? = null,
-  val appointment_feedback_submitted_at: OffsetDateTime? = null,
+  val attendance_behaviour_submitted_at: String? = null,
+  val appointment_feedback_submitted_at: String? = null,
   val superseded: Boolean? = null,
   val superseded_by_appointment_id: UUID? = null,
-  val session_feedback_submitted_at: OffsetDateTime? = null,
+  val session_feedback_submitted_at: String? = null,
   val session_feedback_submitted_by: String? = null,
   val did_session_happen: Boolean? = null,
   val late: Boolean? = null,
@@ -157,14 +175,14 @@ class SarsAppointmentDTO(
     fun from(appointment: Appointment): SarsAppointmentDTO = SarsAppointmentDTO(
       id = appointment.id,
       duration_minutes = appointment.durationInMinutes,
-      created_at = appointment.createdAt,
-      attendance_submitted_at = appointment.attendanceSubmittedAt,
+      created_at = appointment.createdAt.toSarString(),
+      attendance_submitted_at = appointment.attendanceSubmittedAt.toSarString(),
       notifyppof_attendance_behaviour = appointment.notifyPPOfAttendanceBehaviour,
-      attendance_behaviour_submitted_at = appointment.attendanceBehaviourSubmittedAt,
-      appointment_feedback_submitted_at = appointment.appointmentFeedbackSubmittedAt,
+      attendance_behaviour_submitted_at = appointment.attendanceBehaviourSubmittedAt.toSarString(),
+      appointment_feedback_submitted_at = appointment.appointmentFeedbackSubmittedAt.toSarString(),
       superseded = appointment.superseded,
       superseded_by_appointment_id = appointment.supersededByAppointmentId,
-      session_feedback_submitted_at = appointment.sessionFeedbackSubmittedAt,
+      session_feedback_submitted_at = appointment.sessionFeedbackSubmittedAt.toSarString(),
       session_feedback_submitted_by = appointment.sessionFeedbackSubmittedBy?.userName,
       did_session_happen = appointment.didSessionHappen,
       late = appointment.late,
@@ -208,35 +226,50 @@ class SarsAppointmentDeliveryAddress(
 
 class SarsAppointmentDeliveryTypeDto(
   val appointment_delivery_type: String,
-  val nps_office_code: String? = null,
+  val nps_office_name: String? = null,
   val appointment_session_type: String? = null,
+  val first_address_line: String? = null,
 ) {
   companion object {
+    private val officeNameByCode: Map<String, String> by lazy {
+      val resource = ClassPathResource("reference-data/probation-offices-v0.csv")
+      resource.inputStream.bufferedReader().use { reader ->
+        CSVFormat.DEFAULT.builder()
+          .setHeader()
+          .setSkipHeaderRecord(true)
+          .get()
+          .parse(reader)
+          .associate { it.get("delius_crs_location_id") to it.get("name") }
+          .filterKeys { it.isNotBlank() }
+      }
+    }
+
     fun from(appointment: Appointment): SarsAppointmentDeliveryTypeDto = SarsAppointmentDeliveryTypeDto(
       appointment_delivery_type = appointment.appointmentDelivery?.appointmentDeliveryType?.name ?: "",
-      nps_office_code = appointment.appointmentDelivery?.npsOfficeCode,
+      nps_office_name = appointment.appointmentDelivery?.npsOfficeCode?.let { officeNameByCode[it] },
       appointment_session_type = appointment.appointmentDelivery?.appointmentSessionType?.name,
+      first_address_line = appointment.appointmentDelivery?.appointmentDeliveryAddress?.firstAddressLine,
     )
   }
 }
 
 class SarsActionPlanActivityDTO(
   val description: String?,
-  val createdAt: OffsetDateTime?,
+  val createdAt: String?,
 )
 
 class SarsActionPlansDto(
   val number_of_sessions: Int?,
-  val created_at: OffsetDateTime?,
+  val created_at: String?,
   val approved_by: String?,
   val action_plan_activities: List<SarsActionPlanActivityDTO>,
 ) {
   companion object {
     fun from(actionPlan: ActionPlan) = SarsActionPlansDto(
       number_of_sessions = actionPlan.numberOfSessions,
-      created_at = actionPlan.createdAt,
+      created_at = actionPlan.createdAt.toSarString(),
       approved_by = actionPlan.approvedBy?.userName,
-      action_plan_activities = actionPlan.activities.map { SarsActionPlanActivityDTO(it.description, it.createdAt) },
+      action_plan_activities = actionPlan.activities.map { SarsActionPlanActivityDTO(it.description, it.createdAt.toSarString()) },
     )
   }
 }
@@ -249,8 +282,8 @@ class SarsEndOfServiceReportOutcomesDTO(
 
 class SarsEndOfServiceReportDTO(
   val end_of_service_outcomes: List<SarsEndOfServiceReportOutcomesDTO>,
-  val created_at: OffsetDateTime? = null,
-  val submitted_at: OffsetDateTime? = null,
+  val created_at: String? = null,
+  val submitted_at: String? = null,
   val further_information: String? = null,
   val submitted_by: String? = null,
   val referral_id: UUID? = null,
@@ -259,13 +292,13 @@ class SarsEndOfServiceReportDTO(
 class SarsCaseNotesesDTO(
   val subject: String? = null,
   val body: String? = null,
-  val sent_at: OffsetDateTime? = null,
+  val sent_at: String? = null,
 ) {
   companion object {
     fun from(caseNote: CaseNote) = SarsCaseNotesesDTO(
       subject = caseNote.subject,
       body = caseNote.body,
-      sent_at = caseNote.sentAt,
+      sent_at = caseNote.sentAt.toSarString(),
     )
   }
 }
@@ -279,9 +312,9 @@ class SarsProbationPractitionerDetailsDTO(
 )
 
 class SarsReferralDetailsDTO(
-  val created_at: OffsetDateTime?,
+  val created_at: String?,
   val reason_for_change: String?,
-  val completion_deadline: LocalDate?,
+  val completion_deadline: String?,
   val further_information: String?,
   val maximum_enforceable_days: Int?,
   val reason_for_referral: String?,
