@@ -140,6 +140,7 @@ class SarsReferralDTO(
 class SarsAppointmentDTO(
   val id: UUID,
   val duration_minutes: Int? = null,
+  val appointment_time: String? = null,
   val created_at: String? = null,
   val attendance_submitted_at: String? = null,
   val notifyppof_attendance_behaviour: Boolean? = null,
@@ -175,6 +176,7 @@ class SarsAppointmentDTO(
     fun from(appointment: Appointment): SarsAppointmentDTO = SarsAppointmentDTO(
       id = appointment.id,
       duration_minutes = appointment.durationInMinutes,
+      appointment_time = appointment.appointmentTime.toSarString(),
       created_at = appointment.createdAt.toSarString(),
       attendance_submitted_at = appointment.attendanceSubmittedAt.toSarString(),
       notifyppof_attendance_behaviour = appointment.notifyPPOfAttendanceBehaviour,
