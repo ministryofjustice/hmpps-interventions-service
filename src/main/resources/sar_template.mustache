@@ -102,7 +102,7 @@
   <table class="summary-list">
     <tr><td>Created At</td><td>{{ optionalString created_at }}</td></tr>
     <tr><td>Number of Sessions</td><td>{{ optionalValue number_of_sessions }}</td></tr>
-    <tr><td>Approved By</td><td>{{ optionalString approved_by }}</td></tr>
+    <tr><td>Approved By</td><td>{{ getUserLastName approved_by }}</td></tr>
   </table>
 
   {{#action_plan_activities}}
@@ -119,6 +119,7 @@
   <table class="summary-list">
     <tr><td>Created At</td><td>{{ optionalString created_at }}</td></tr>
     <tr><td>Duration (minutes)</td><td>{{ optionalValue duration_minutes }}</td></tr>
+    <tr><td>Appointment Time</td><td>{{ optionalString appointment_time }}</td></tr>
     <tr><td>Attended</td><td>{{ optionalString attended }}</td></tr>
     <tr><td>Did Session Happen</td><td>{{ convertBoolean did_session_happen }}</td></tr>
     <tr><td>Late</td><td>{{ convertBoolean late }}</td></tr>

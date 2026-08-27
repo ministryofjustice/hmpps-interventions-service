@@ -206,5 +206,6 @@ internal class SarsDataControllerTest {
     assertThat(response.body).contains("{{ optionalString")
     assertThat(response.body).contains("{{ optionalValue")
     assertThat(response.body).contains("{{ convertBoolean")
+    assertThat(response.body).contains("{{ getUserLastName approved_by }}")
   }
 }

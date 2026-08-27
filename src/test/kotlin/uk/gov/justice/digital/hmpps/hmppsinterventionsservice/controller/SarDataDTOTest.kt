@@ -67,6 +67,7 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
     val session1 = deliverySessionFactory.createAttended(
       referral = referral,
       sessionNumber = 1,
+      appointmentTime = createdAt.plusHours(2),
       sessionConcerns = "some concern",
       sessionSummary = "PP attended",
       sessionResponse = "It went well",
@@ -76,6 +77,7 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
     val session2 = deliverySessionFactory.createAttended(
       referral = referral,
       sessionNumber = 2,
+      appointmentTime = createdAt.plusHours(4),
       sessionConcerns = "some other concern",
       sessionSummary = "PP did not attended",
       sessionResponse = "It didn't go well",
@@ -139,6 +141,7 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
                   "end_requested_comments": "appointment needed",
                   "appointment": [
                     {
+                      "appointment_time": "4 December 2020, 12:42:43 pm",
                       "session_summary": "PP attended",
                       "session_response": "It went well",
                       "session_concerns": "some concern",
@@ -146,6 +149,7 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
                       "future_session_plan": "have to invite him again"
                     },
                     {
+                      "appointment_time": "4 December 2020, 2:42:43 pm",
                       "session_summary": "PP did not attended",
                       "session_response": "It didn't go well",
                       "session_concerns": "some other concern",
@@ -425,6 +429,7 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
     val session1 = deliverySessionFactory.createAttended(
       referral = referral,
       sessionNumber = 1,
+      appointmentTime = createdAt.plusHours(2),
       sessionConcerns = null,
       sessionSummary = "PP attended",
       sessionResponse = "It went well",
@@ -434,6 +439,7 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
     val session2 = deliverySessionFactory.createAttended(
       referral = referral,
       sessionNumber = 2,
+      appointmentTime = createdAt.plusHours(4),
       sessionConcerns = "some other concern",
       sessionSummary = null,
       sessionResponse = null,
@@ -496,6 +502,7 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
                     "end_requested_comments": "",
                     "appointment": [
                       {
+                        "appointment_time": "4 December 2020, 12:42:43 pm",
                         "session_summary": "PP attended",
                         "session_response": "It went well",
                         "session_concerns": "",
@@ -503,6 +510,7 @@ class SarDataDTOTest(@Autowired private val json: JacksonTester<SarDataDTO>) {
                         "future_session_plan": "have to invite him again"
                       },
                       {
+                        "appointment_time": "4 December 2020, 2:42:43 pm",
                         "session_summary": "",
                         "session_response": "",
                         "session_concerns": "some other concern",
