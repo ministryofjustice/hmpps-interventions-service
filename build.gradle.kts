@@ -9,11 +9,13 @@ plugins {
   id("project-report")
 }
 
-ext["hibernate.version"] = "6.5.3.Final"
+ext["hibernate.version"] = "7.4.5.Final"
 
 configurations {
   testImplementation {
     exclude(group = "org.junit.vintage")
+    exclude(group = "org.postgresql")
+    exclude(group = "org.flywaydb", module = "flyway-database-postgresql")
   }
 }
 
@@ -128,7 +130,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("com.h2database:h2:2.3.232")
-  implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.9.10")
+  implementation("io.hypersistence:hypersistence-utils-hibernate-70:3.15.3")
 
   runtimeOnly("org.postgresql:postgresql:42.7.7")
   runtimeOnly("org.flywaydb:flyway-database-postgresql")

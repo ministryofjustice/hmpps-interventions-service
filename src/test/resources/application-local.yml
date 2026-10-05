@@ -1,0 +1,119 @@
+server:
+  shutdown: immediate
+
+management.endpoint:
+  health.cache.time-to-live: 0
+  info.cache.time-to-live: 0
+
+hmppsauth:
+  baseurl: http://localhost:8080
+
+postgres:
+  uri: localhost:5432
+  db: interventions
+  username: interventions
+  password: password
+
+aws:
+  s3:
+    storage:
+      enabled: false
+      region: eu-west-2
+      bucket:
+        name: test-bucket
+    ndmis:
+      enabled: false
+      region: eu-west-2
+      bucket:
+        name: test-ndmis-bucket
+
+community-api:
+  baseurl: http://localhost:8080
+  appointments:
+    bookings:
+      enabled: true
+    outcome:
+      enabled: true
+    office-location: CRSEXTL
+    notes-field-qualifier: 'SERVICE_DELIVERY: Service Delivery, SUPPLIER_ASSESSMENT: Supplier Assessment'
+    counts-towards-rar-days: 'SERVICE_DELIVERY: true, SUPPLIER_ASSESSMENT: false'
+
+refer-and-monitor-and-delius:
+  baseurl: http://localhost:8080
+  locations:
+    appointment-merge: /test
+    case-access: /test
+    case-identifiers: /test
+    conviction: /test
+    managed-cases: /test
+    referral-start: /test
+    responsible-officer: /test
+
+manage-users:
+  baseurl: http://localhost:8080
+  api:
+    locations:
+      auth-user-groups: /test
+      auth-user-detail: /test
+      user-detail: /test
+      user-email: /test
+
+assess-risks-and-needs:
+  baseurl: http://localhost:8080
+  locations:
+    create-supplementary-risk: /test
+
+prisoner-offender-search:
+  baseurl: http://localhost:8080
+  locations:
+    prisoner: /test
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          interventions-client:
+            provider: hmppsauth
+            client-id: test-client
+            client-secret: test-secret
+            authorization-grant-type: client_credentials
+            scope: read,write
+        provider:
+          hmppsauth:
+            token-uri: http://localhost:8080/oauth/token
+            token-request:
+              connect-timeout-ms: 500
+              read-timeout-ms: 500
+              retries: 3
+              retry-delay-ms: 500
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/issuer
+          jwk-set-uri: http://localhost:8080/.well-known/jwks.json
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate.enable_lazy_load_no_trans: true
+      hibernate.dialect: org.hibernate.dialect.H2Dialect
+  batch:
+    jobs:
+      mark-stale-appointments:
+        appointments: 82e2fbbe-1bb4-4967-8ee6-81aa072fd44b
+    jdbc:
+      initialize-schema: never
+  flyway:
+    locations: classpath:/db/migration
+    enabled: false
+
+
+
+
+
