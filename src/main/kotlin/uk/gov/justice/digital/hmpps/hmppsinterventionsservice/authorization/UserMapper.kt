@@ -32,7 +32,7 @@ class UserMapper(
       throw AccessDeniedException("could not map auth token to user: $errors")
     }
 
-    return authUserRepository.findById(userID)
-      .orElseGet { authUserRepository.save(AuthUser(id = userID, authSource = authSource, userName = userName)) }
+    return authUserRepository.findById(userID!!)
+      .orElseGet { authUserRepository.save(AuthUser(id = userID!!, authSource = authSource!!, userName = userName!!)) }
   }
 }

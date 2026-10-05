@@ -7,7 +7,7 @@ import org.springframework.batch.core.Step
 import org.springframework.batch.core.StepContribution
 import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepScope
-import org.springframework.batch.core.job.DefaultJobParametersValidator
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.CustomJobParametersValidator
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.scope.context.ChunkContext
@@ -92,8 +92,7 @@ class NdmisOutcomePerformanceReportJobConfiguration(
     ndmisWriteOutcomeToCsvStep: Step,
     pushOutcomeToS3Step: Step,
   ): Job {
-    val validator = DefaultJobParametersValidator()
-    validator.setRequiredKeys(arrayOf("timestamp", "outputPath"))
+    val validator = CustomJobParametersValidator(arrayOf("timestamp", "outputPath"))
 
     return JobBuilder("ndmisOutcomePerformanceReportJob", jobRepository)
       .incrementer { parameters -> OutputPathIncrementer().getNext(TimestampIncrementer().getNext(parameters)) }

@@ -7,7 +7,6 @@ import org.springframework.batch.core.Step
 import org.springframework.batch.core.StepContribution
 import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepScope
-import org.springframework.batch.core.job.DefaultJobParametersValidator
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.scope.context.ChunkContext
@@ -28,6 +27,7 @@ import software.amazon.awssdk.services.s3.model.ObjectCannedACL
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.S3Bucket
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.OnStartupJobLauncherFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUtils
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.CustomJobParametersValidator
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.NPESkipPolicy
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.OutputPathIncrementer
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.QueryLoader
@@ -112,8 +112,7 @@ class NdmisReferralPerformanceReportJobConfiguration(
     ndmisWriteReferralToCsvStep: Step,
     pushReferralToS3Step: Step,
   ): Job {
-    val validator = DefaultJobParametersValidator()
-    validator.setRequiredKeys(arrayOf("timestamp", "outputPath"))
+    val validator = CustomJobParametersValidator(arrayOf("timestamp", "outputPath"))
 
     return JobBuilder("ndmisReferralPerformanceReportJob", jobRepository)
       .incrementer { parameters -> OutputPathIncrementer().getNext(TimestampIncrementer().getNext(parameters)) }

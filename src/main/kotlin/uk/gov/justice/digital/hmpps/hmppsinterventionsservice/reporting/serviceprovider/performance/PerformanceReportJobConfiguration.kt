@@ -4,13 +4,12 @@ import org.hibernate.SessionFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobScope
-import org.springframework.batch.core.job.DefaultJobParametersValidator
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.step.builder.StepBuilder
 import org.springframework.batch.item.ItemProcessor
+import org.springframework.batch.item.ItemReader
 import org.springframework.batch.item.file.FlatFileItemWriter
-import org.springframework.batch.item.support.ListItemReader
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
@@ -20,6 +19,7 @@ import org.springframework.transaction.PlatformTransactionManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.OnStartupJobLauncherFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralPerformanceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUtils
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.CustomJobParametersValidator
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model.ReferralPerformanceReport
 import java.util.*
 
@@ -45,9 +45,9 @@ class PerformanceReportJobConfiguration(
     @Value("#{jobParameters['from']}") from: Date,
     @Value("#{jobParameters['to']}") to: Date,
     sessionFactory: SessionFactory,
-  ): ListItemReader<ReferralPerformanceReport> {
+  ): ItemReader<ReferralPerformanceReport> {
     // this reader returns referral entities which need processing for the report.
-    return ListItemReader<ReferralPerformanceReport>(
+    return batchUtils.listItemReader(
       referralPerformanceReportRepository.serviceProviderReportReferrals(
         batchUtils.parseDateToOffsetDateTime(from),
         batchUtils.parseDateToOffsetDateTime(to),
@@ -67,8 +67,7 @@ class PerformanceReportJobConfiguration(
 
   @Bean
   fun performanceReportJob(writeToCsvStep: Step): Job {
-    val validator = DefaultJobParametersValidator()
-    validator.setRequiredKeys(
+    val validator = CustomJobParametersValidator(
       arrayOf(
         "contractReferences",
         "user.id",
@@ -89,7 +88,7 @@ class PerformanceReportJobConfiguration(
 
   @Bean
   fun writeToCsvStep(
-    reader: ListItemReader<ReferralPerformanceReport>,
+    reader: ItemReader<ReferralPerformanceReport>,
     processor: ItemProcessor<ReferralPerformanceReport, PerformanceReportData>,
     writer: FlatFileItemWriter<PerformanceReportData>,
   ): Step = StepBuilder("writeToCsvStep", jobRepository)
