@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.tr
 
 import jakarta.persistence.EntityManagerFactory
 import org.springframework.batch.core.configuration.annotation.JobScope
-import org.springframework.batch.item.database.JpaCursorItemReader
+import org.springframework.batch.infrastructure.item.database.JpaCursorItemReader
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
@@ -12,11 +12,10 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 class TransferReferralsReader(
   @Value("#{jobParameters['fromContract']}") fromContract: String,
   entityManagerFactory: EntityManagerFactory,
-) : JpaCursorItemReader<Referral>() {
+) : JpaCursorItemReader<Referral>(entityManagerFactory) {
   private val transferSignalText = "%Authority to transfer case- On behalf of Advance Charity Ltd, I request and give permission for this referral to be transferred to Women in Prison, as of December 2022.%"
 
   init {
-    this.setEntityManagerFactory(entityManagerFactory)
     this.setName("transferReferralsReader")
     this.setQueryString(
       "SELECT r FROM Referral r JOIN CaseNote n ON n.referral = r " +

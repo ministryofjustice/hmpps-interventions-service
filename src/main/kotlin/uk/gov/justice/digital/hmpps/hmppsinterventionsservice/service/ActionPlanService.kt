@@ -70,7 +70,7 @@ class ActionPlanService(
     val actionPlan = getActionPlan(actionPlanId)
     actionPlan.activities.forEach { activity ->
       if (activity.id == activityId) {
-        description?.let { activity.description = description }
+        description?.let { activity.description = it }
       }
     }
     return actionPlanRepository.save(actionPlan)
@@ -106,13 +106,22 @@ class ActionPlanService(
   fun verifySafeForApproval(actionPlan: ActionPlan) {
     if (actionPlan.approvedAt != null) {
       throw ValidationError("Action plan has already been approved", listOf())
-    } else if (actionPlan.referral.actionPlans?.filter { it.approvedAt == null && it.submittedAt != null }?.maxByOrNull { it.submittedAt!! }?.id != actionPlan.id) {
+    }
+
+    val latestSubmittedActionPlanId = actionPlan.referral.actionPlans
+      .orEmpty()
+      .filter { it.approvedAt == null && it.submittedAt != null }
+      .maxByOrNull { it.submittedAt ?: OffsetDateTime.MIN }
+      ?.id
+
+    if (latestSubmittedActionPlanId != actionPlan.id) {
       throw ValidationError("Action plan is not the latest submitted, so cannot be approved", listOf())
     }
-    actionPlan.referral.approvedActionPlan?. let {
-      if (it.numberOfSessions!! > actionPlan.numberOfSessions!!) {
-        throw ValidationError("Action plan cannot be approved as it has less sessions than the currently approved action plan", listOf())
-      }
+
+    val approvedSessions = actionPlan.referral.approvedActionPlan?.numberOfSessions
+    val currentSessions = actionPlan.numberOfSessions
+    if (approvedSessions != null && currentSessions != null && approvedSessions > currentSessions) {
+      throw ValidationError("Action plan cannot be approved as it has less sessions than the currently approved action plan", listOf())
     }
   }
 

@@ -3,10 +3,10 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.p
 import mu.KLogging
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.springframework.batch.core.ExitStatus
-import org.springframework.batch.core.Job
-import org.springframework.batch.core.JobExecution
-import org.springframework.batch.core.JobParametersBuilder
+import org.springframework.batch.core.BatchStatus
+import org.springframework.batch.core.job.Job
+import org.springframework.batch.core.job.JobExecution
+import org.springframework.batch.core.job.parameters.JobParametersBuilder
 import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.test.JobLauncherTestUtils
@@ -150,10 +150,10 @@ class NdmisPerformanceReportJobConfigurationTest : IntegrationTestBase() {
     val execution3 = executeJob(complexityJobLauncher)
     val execution4 = executeJob(outcomeJobLauncher)
 
-    assertThat(execution1.exitStatus).isEqualTo(ExitStatus.COMPLETED)
-    assertThat(execution2.exitStatus).isEqualTo(ExitStatus.COMPLETED)
-    assertThat(execution3.exitStatus).isEqualTo(ExitStatus.COMPLETED)
-    assertThat(execution4.exitStatus).isEqualTo(ExitStatus.COMPLETED)
+    assertThat(execution1.status).isEqualTo(BatchStatus.COMPLETED)
+    assertThat(execution2.status).isEqualTo(BatchStatus.COMPLETED)
+    assertThat(execution3.status).isEqualTo(BatchStatus.COMPLETED)
+    assertThat(execution4.status).isEqualTo(BatchStatus.COMPLETED)
 
     assertThat(outputDir.resolve("crs_performance_report-v2-referrals.csv"))
       .content().contains(referral.referenceNumber)

@@ -3,8 +3,8 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.service
 import mu.KLogging
 import net.logstash.logback.argument.StructuredArguments.kv
 import org.springframework.batch.core.BatchStatus
-import org.springframework.batch.core.JobExecution
-import org.springframework.batch.core.JobExecutionListener
+import org.springframework.batch.core.job.JobExecution
+import org.springframework.batch.core.listener.JobExecutionListener
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.util.UriComponentsBuilder
@@ -30,8 +30,8 @@ class PerformanceReportJobListener(
   override fun beforeJob(jobExecution: JobExecution) {
     // create a temp file for the job to write to and store the path in the execution context
     val params = jobExecution.jobParameters
-    val id = params.getString("user.id")
-    val timestamp = params.getString("timestamp")
+    val id = requireNotNull(params.getString("user.id")) { "Missing user.id job parameter" }
+    val timestamp = requireNotNull(params.getString("timestamp")) { "Missing timestamp job parameter" }
     val path = createTempDirectory().resolve(id + "_" + timestamp + ".csv")
 
     logger.debug("creating csv file for service provider performance report {}", kv("path", path))
@@ -40,7 +40,7 @@ class PerformanceReportJobListener(
   }
 
   override fun afterJob(jobExecution: JobExecution) {
-    val path = Path(jobExecution.executionContext.getString("output.file.path"))
+    val path = Path(requireNotNull(jobExecution.executionContext.getString("output.file.path")) { "Missing output.file.path job context value" })
 
     when (jobExecution.status) {
       BatchStatus.COMPLETED -> {
@@ -53,9 +53,9 @@ class PerformanceReportJobListener(
 
         emailSender.sendEmail(
           successNotifyTemplateId,
-          jobExecution.jobParameters.getString("user.email"),
+          requireNotNull(jobExecution.jobParameters.getString("user.email")) { "Missing user.email job parameter" },
           mapOf(
-            "serviceProviderFirstName" to jobExecution.jobParameters.getString("user.firstName"),
+            "serviceProviderFirstName" to requireNotNull(jobExecution.jobParameters.getString("user.firstName")) { "Missing user.firstName job parameter" },
             "reportUrl" to reportURL,
           ),
         )
@@ -67,9 +67,9 @@ class PerformanceReportJobListener(
         )
         emailSender.sendEmail(
           failureNotifyTemplateId,
-          jobExecution.jobParameters.getString("user.email"),
+          requireNotNull(jobExecution.jobParameters.getString("user.email")) { "Missing user.email job parameter" },
           mapOf(
-            "serviceProviderFirstName" to jobExecution.jobParameters.getString("user.firstName"),
+            "serviceProviderFirstName" to requireNotNull(jobExecution.jobParameters.getString("user.firstName")) { "Missing user.firstName job parameter" },
             "jobInstanceId" to jobExecution.jobInstance.id.toString(),
           ),
         )

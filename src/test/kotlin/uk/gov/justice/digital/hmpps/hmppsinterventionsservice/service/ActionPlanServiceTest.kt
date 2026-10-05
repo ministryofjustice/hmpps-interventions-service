@@ -72,7 +72,7 @@ internal class ActionPlanServiceTest {
     whenever(referralRepository.getById(referralId)).thenReturn(referral)
     whenever(
       actionPlanRepository.save(
-        ArgumentMatchers.argThat {
+        ArgumentMatchers.argThat<ActionPlan> {
           it.numberOfSessions == numberOfSessions &&
             it.activities.size == activities.size &&
             it.activities.first() == activities.first() &&
@@ -131,10 +131,8 @@ internal class ActionPlanServiceTest {
     val updatedDraftActionPlan = draftActionPlan.copy(numberOfSessions = 5)
     whenever(
       actionPlanRepository.save(
-        ArgumentMatchers.argThat { (numberOfSessionsArg, activitiesArg, _, _, _, _, _, _) ->
-          (
-            numberOfSessionsArg == 5 && activitiesArg.size == draftActionPlan.activities.size
-            )
+        ArgumentMatchers.argThat<ActionPlan> {
+          it.numberOfSessions == 5 && it.activities.size == draftActionPlan.activities.size
         },
       ),
     ).thenReturn(updatedDraftActionPlan)
@@ -143,7 +141,7 @@ internal class ActionPlanServiceTest {
 
     assertThat(updatedDraftActionPlanResponse).isSameAs(updatedDraftActionPlan)
     assertThat(updatedDraftActionPlanResponse.numberOfSessions).isEqualTo(5)
-    verify(actionPlanValidator).validateDraftActionPlanUpdate(any())
+    verify(actionPlanValidator).validateDraftActionPlanUpdate(any<ActionPlan>())
   }
 
   @Test
@@ -156,10 +154,8 @@ internal class ActionPlanServiceTest {
 
     whenever(
       actionPlanRepository.save(
-        ArgumentMatchers.argThat { (numberOfSessionsArg, activitiesArg, _, _, _, _, _, _) ->
-          (
-            numberOfSessionsArg == 9 && activitiesArg.size == 1
-            )
+        ArgumentMatchers.argThat<ActionPlan> {
+          it.numberOfSessions == 9 && it.activities.size == 1
         },
       ),
     ).thenReturn(updatedDraftActionPlan)
@@ -202,16 +198,16 @@ internal class ActionPlanServiceTest {
     val authUser = AuthUser("CRN123", "auth", "user")
 
     whenever(actionPlanRepository.findByIdAndSubmittedAtIsNull(actionPlanId)).thenReturn(actionPlan)
-    whenever(authUserRepository.save(any())).thenReturn(SampleData.sampleAuthUser())
+    whenever(authUserRepository.save(any<AuthUser>())).thenReturn(SampleData.sampleAuthUser())
     whenever(actionPlanRepository.findById(actionPlanId)).thenReturn(of(actionPlan))
-    whenever(authUserRepository.save(any())).then(AdditionalAnswers.returnsFirstArg<AuthUser>())
-    whenever(actionPlanRepository.save(any())).then(AdditionalAnswers.returnsFirstArg<ActionPlan>())
+    whenever(authUserRepository.save(any<AuthUser>())).then(AdditionalAnswers.returnsFirstArg<AuthUser>())
+    whenever(actionPlanRepository.save(any<ActionPlan>())).then(AdditionalAnswers.returnsFirstArg<ActionPlan>())
 
     val submittedActionPlan = actionPlanService.submitDraftActionPlan(actionPlanId, authUser)
 
     assertThat(submittedActionPlan).isNotNull
-    verify(actionPlanRepository, times(2)).save(any())
-    verify(actionPlanValidator).validateSubmittedActionPlan(any())
+    verify(actionPlanRepository, times(2)).save(any<ActionPlan>())
+    verify(actionPlanValidator).validateSubmittedActionPlan(any<ActionPlan>())
     verify(actionPlanEventPublisher).actionPlanApprovedEvent(same(actionPlan))
     verify(deliverySessionService).createUnscheduledSessionsForActionPlan(same(actionPlan))
   }
@@ -225,8 +221,8 @@ internal class ActionPlanServiceTest {
     val authUser = AuthUser("CRN123", "auth", "user")
 
     whenever(actionPlanRepository.findById(actionPlanId)).thenReturn(of(actionPlan))
-    whenever(authUserRepository.save(any())).then(AdditionalAnswers.returnsFirstArg<AuthUser>())
-    whenever(actionPlanRepository.save(any())).then(AdditionalAnswers.returnsFirstArg<ActionPlan>())
+    whenever(authUserRepository.save(any<AuthUser>())).then(AdditionalAnswers.returnsFirstArg<AuthUser>())
+    whenever(actionPlanRepository.save(any<ActionPlan>())).then(AdditionalAnswers.returnsFirstArg<ActionPlan>())
 
     val approvedActionPlan = actionPlanService.approveActionPlan(actionPlanId, authUser)
     assertThat(approvedActionPlan.approvedAt).isNotNull
@@ -312,7 +308,7 @@ internal class ActionPlanServiceTest {
     val argument: ArgumentCaptor<ActionPlan> = ArgumentCaptor.forClass(ActionPlan::class.java)
 
     whenever(actionPlanRepository.findById(actionPlan.id)).thenReturn(of(actionPlan))
-    whenever(actionPlanRepository.save(any())).thenReturn(actionPlan)
+    whenever(actionPlanRepository.save(any<ActionPlan>())).thenReturn(actionPlan)
 
     actionPlanService.updateActionPlanActivity(actionPlan.id, activity1.id, updatedDescription)
 

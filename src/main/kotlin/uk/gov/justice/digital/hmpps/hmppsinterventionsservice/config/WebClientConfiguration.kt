@@ -76,9 +76,9 @@ class WebClientConfiguration(
 
   @Bean
   fun authorizedClientManager(
-    clientRegistrationRepository: ClientRegistrationRepository?,
-    clientService: OAuth2AuthorizedClientService?,
-  ): OAuth2AuthorizedClientManager? {
+    clientRegistrationRepository: ClientRegistrationRepository,
+    clientService: OAuth2AuthorizedClientService,
+  ): OAuth2AuthorizedClientManager {
     val authorizedClientProvider = OAuth2AuthorizedClientProviderBuilder.builder()
       .clientCredentials {
         it.accessTokenResponseClient(retryingClientCredentialsTokenResponseClient)

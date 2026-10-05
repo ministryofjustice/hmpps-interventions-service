@@ -12,7 +12,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.whenever
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceProviderAccessScope
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceProviderAccessScopeMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AuthUserDTO
@@ -38,17 +38,17 @@ import java.util.UUID
 @Provider("Interventions Service")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class PactTest : IntegrationTestBase() {
-  @MockBean private lateinit var communityAPIOffenderService: CommunityAPIOffenderService
+  @MockitoBean private lateinit var communityAPIOffenderService: CommunityAPIOffenderService
 
-  @MockBean private lateinit var ramDeliusAPIConvictionService: RamDeliusAPIConvictionService
+  @MockitoBean private lateinit var ramDeliusAPIConvictionService: RamDeliusAPIConvictionService
 
-  @MockBean private lateinit var ramDeliusReferralService: RamDeliusReferralService
+  @MockitoBean private lateinit var ramDeliusReferralService: RamDeliusReferralService
 
-  @MockBean private lateinit var risksAndNeedsService: RisksAndNeedsService
+  @MockitoBean private lateinit var risksAndNeedsService: RisksAndNeedsService
 
-  @MockBean private lateinit var hmppsAuthService: HMPPSAuthService
+  @MockitoBean private lateinit var hmppsAuthService: HMPPSAuthService
 
-  @MockBean private lateinit var serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper
+  @MockitoBean private lateinit var serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper
 
   private val serviceProviderFactory = ServiceProviderFactory()
   private val dynamicFrameworkContractFactory = DynamicFrameworkContractFactory()

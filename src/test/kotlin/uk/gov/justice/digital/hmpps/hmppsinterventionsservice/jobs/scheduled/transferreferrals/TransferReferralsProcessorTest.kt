@@ -48,8 +48,8 @@ internal class TransferReferralsProcessorTest {
   fun setup() {
     whenever(interventionRepository.findByDynamicFrameworkContractContractReference(originalContractCode)).thenReturn(fromIntervention)
     whenever(interventionRepository.findByDynamicFrameworkContractContractReference(targetContractCode)).thenReturn(toIntervention)
-    whenever(referralRepository.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg<Referral>())
-    whenever(caseNoteRepository.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg<CaseNote>())
+    whenever(referralRepository.save(any<Referral>())).thenAnswer(AdditionalAnswers.returnsFirstArg<Referral>())
+    whenever(caseNoteRepository.save(any<CaseNote>())).thenAnswer(AdditionalAnswers.returnsFirstArg<CaseNote>())
   }
 
   @Test

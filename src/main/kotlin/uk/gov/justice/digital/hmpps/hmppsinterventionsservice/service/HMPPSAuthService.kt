@@ -67,11 +67,13 @@ class HMPPSAuthService(
 
     return mangeUsersAuthApiClient.get(url)
       .retrieve()
-      .onStatus({ HttpStatus.NOT_FOUND == it }, { Mono.just(null) })
+      .onStatus({ HttpStatus.NOT_FOUND == it }, { Mono.error(NoSuchElementException("user groups not found")) })
       .bodyToFlux(AuthGroupResponse::class.java)
       .withRetryPolicy()
       .map { it.groupCode }
-      .collectList().block()
+      .collectList()
+      .onErrorResume(NoSuchElementException::class.java) { Mono.just(emptyList()) }
+      .block()
   }
 
   fun getUserDetail(user: AuthUser): UserDetail = getUserDetail(AuthUserDTO.from(user))
@@ -88,7 +90,7 @@ class HMPPSAuthService(
         }
         UserDetail(it.firstName, it.email, it.lastName)
       }
-      .block()
+      .block() ?: throw IllegalStateException("Expected user detail response")
   } else {
     val detailUrl = UriComponentsBuilder.fromPath(userDetailLocation).buildAndExpand(user.username).toString()
     val emailUrl = UriComponentsBuilder.fromPath(userEmailLocation).buildAndExpand(user.username).toString()
@@ -106,17 +108,17 @@ class HMPPSAuthService(
         .map { it.email },
     )
       .map { UserDetail(it.t1.first, it.t2, it.t1.second) }
-      .block()
+      .block() ?: throw IllegalStateException("Expected user detail response")
   }
 
-  fun <T> Flux<T>.withRetryPolicy(): Flux<T> = this
+  fun <T : Any> Flux<T>.withRetryPolicy(): Flux<T> = this
     .retryWhen(
       Retry.max(maxRetryAttempts)
         .filter { isTimeoutException(it) }
         .doBeforeRetry { logRetrySignal(it) },
     )
 
-  fun <T> Mono<T>.withRetryPolicy(): Mono<T> = this
+  fun <T : Any> Mono<T>.withRetryPolicy(): Mono<T> = this
     .retryWhen(
       Retry.max(maxRetryAttempts)
         .filter { isTimeoutException(it) }
