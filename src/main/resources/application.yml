@@ -41,7 +41,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-      dialect: PostgresSQLDialect
+      dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
   batch:
     job:
