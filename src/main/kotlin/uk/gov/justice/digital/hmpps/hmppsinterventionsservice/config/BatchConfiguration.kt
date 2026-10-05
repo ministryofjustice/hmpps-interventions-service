@@ -1,28 +1,25 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
-import org.springframework.batch.core.explore.JobExplorer
-import org.springframework.batch.core.explore.support.JobExplorerFactoryBean
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.launch.JobLauncher
 import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher
 import org.springframework.batch.core.repository.JobRepository
+import org.springframework.batch.core.repository.explore.JobExplorer
 import org.springframework.batch.core.step.builder.StepBuilder
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
-import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
-import javax.sql.DataSource
 
 @Configuration
-@EnableBatchProcessing(
+@EnableBatchProcessing
+@EnableJdbcJobRepository(
   dataSourceRef = "memoryDataSource",
   transactionManagerRef = "batchTransactionManager",
   databaseType = "H2",
-  isolationLevelForCreate = "ISOLATION_READ_COMMITTED",
 )
 @EnableTransactionManagement
 class BatchConfiguration(
@@ -51,14 +48,5 @@ class BatchConfiguration(
   fun batchStepBuilder(jobRepository: JobRepository): StepBuilder = StepBuilder("batchStepBuilder", jobRepository)
 
   @Bean("batchJobExplorer")
-  fun jobExplorer(
-    @Qualifier("memoryDataSource") dataSource: DataSource,
-    @Qualifier("batchTransactionManager") batchTransactionManager: PlatformTransactionManager,
-  ): JobExplorer {
-    val factory = JobExplorerFactoryBean()
-    factory.setDataSource(dataSource)
-    factory.transactionManager = batchTransactionManager
-    factory.afterPropertiesSet()
-    return factory.getObject()
-  }
+  fun jobExplorer(jobExplorer: JobExplorer): JobExplorer = jobExplorer
 }

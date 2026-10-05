@@ -20,6 +20,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appoint
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentSessionType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.NO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.YES
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Status
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
@@ -66,7 +67,7 @@ internal class DeliverySessionControllerTest {
 
       val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null)
 
-      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
+      whenever(authUserRepository.save(any<AuthUser>())).thenReturn(authUserFactory.create())
       whenever(
         sessionsService.getDeliverySessionByActionPlanIdOrThrowException(
           actionPlanId,
@@ -109,7 +110,7 @@ internal class DeliverySessionControllerTest {
       )
       val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, null, null, attendanceFeedbackRequestDTO, sessionFeedbackRequestDTO)
 
-      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
+      whenever(authUserRepository.save(any<AuthUser>())).thenReturn(authUserFactory.create())
       whenever(
         sessionsService.getDeliverySessionByActionPlanIdOrThrowException(
           actionPlanId,
@@ -168,7 +169,7 @@ internal class DeliverySessionControllerTest {
         referral = deliverySession.referral,
       )
       deliverySession.appointments.add(newAppointment)
-      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
+      whenever(authUserRepository.save(any<AuthUser>())).thenReturn(authUserFactory.create())
       whenever(sessionsService.getDeliverySessionByActionPlanIdOrThrowException(actionPlanId, sessionNumber)).thenReturn(deliverySession)
       whenever(
         sessionsService.updateSessionAppointment(
@@ -205,7 +206,7 @@ internal class DeliverySessionControllerTest {
       val attendanceFeedbackRequestDTO = AttendanceFeedbackRequestDTO(attended = YES, didSessionHappen = false)
       val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, null, null, attendanceFeedbackRequestDTO)
 
-      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
+      whenever(authUserRepository.save(any<AuthUser>())).thenReturn(authUserFactory.create())
       whenever(
         sessionsService.getDeliverySessionByActionPlanIdOrThrowException(
           actionPlanId,
@@ -245,7 +246,7 @@ internal class DeliverySessionControllerTest {
       val attendanceFeedbackRequestDTO = AttendanceFeedbackRequestDTO(attended = NO, didSessionHappen = false)
       val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, null)
 
-      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
+      whenever(authUserRepository.save(any<AuthUser>())).thenReturn(authUserFactory.create())
       whenever(
         sessionsService.getDeliverySessionByActionPlanIdOrThrowException(
           actionPlanId,
@@ -283,7 +284,7 @@ internal class DeliverySessionControllerTest {
       val attendanceFeedbackRequestDTO = AttendanceFeedbackRequestDTO(attended = NO, didSessionHappen = false)
       val updateAppointmentDTO = UpdateAppointmentDTO(OffsetDateTime.now(), 10, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, null, null, null, null, attendanceFeedbackRequestDTO)
 
-      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
+      whenever(authUserRepository.save(any<AuthUser>())).thenReturn(authUserFactory.create())
       whenever(
         sessionsService.getDeliverySessionByActionPlanIdOrThrowException(
           actionPlanId,
@@ -374,7 +375,7 @@ internal class DeliverySessionControllerTest {
       referralService.getSentReferral(referral.id),
     ).thenReturn(deliverySession.referral)
 
-    whenever(authUserRepository.save(any())).thenReturn(user)
+    whenever(authUserRepository.save(any<AuthUser>())).thenReturn(user)
 
     val sessionResponse = sessionsController.recordAttendanceFeedback(referral.id, appointment.id, request, userToken)
 

@@ -2,14 +2,15 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled
 
 import mu.KLogging
 import net.logstash.logback.argument.StructuredArguments
-import org.springframework.batch.core.Job
 import org.springframework.batch.core.converter.DefaultJobParametersConverter
+import org.springframework.batch.core.job.Job
 import org.springframework.batch.core.launch.JobLauncher
 import org.springframework.batch.core.launch.support.SimpleJvmExitCodeMapper
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.stereotype.Component
 import org.springframework.util.StringUtils
+import java.util.Properties
 import kotlin.system.exitProcess
 
 @Component
@@ -32,7 +33,7 @@ class OnStartupJobLauncherFactory(
   private fun buildEntryPoint(job: Job, jobLauncher: JobLauncher): (args: ApplicationArguments) -> Int {
     val entryPoint = fun(args: ApplicationArguments): Int {
       val rawParams = jobParametersConverter.getJobParameters(
-        StringUtils.splitArrayElementsIntoProperties(args.nonOptionArgs.toTypedArray(), "="),
+        StringUtils.splitArrayElementsIntoProperties(args.nonOptionArgs.toTypedArray(), "=") ?: Properties(),
       )
 
       val nextParams = job.jobParametersIncrementer?.getNext(rawParams) ?: rawParams

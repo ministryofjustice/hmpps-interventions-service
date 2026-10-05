@@ -4,21 +4,21 @@ import jakarta.persistence.EntityManagerFactory
 import mu.KLogging
 import net.logstash.logback.argument.StructuredArguments
 import org.apache.commons.csv.CSVFormat
-import org.springframework.batch.core.ChunkListener
-import org.springframework.batch.core.JobParameters
-import org.springframework.batch.core.JobParametersBuilder
-import org.springframework.batch.core.JobParametersIncrementer
-import org.springframework.batch.core.JobParametersValidator
+import org.springframework.batch.core.job.parameters.JobParameters
+import org.springframework.batch.core.job.parameters.JobParametersBuilder
+import org.springframework.batch.core.job.parameters.JobParametersIncrementer
+import org.springframework.batch.core.job.parameters.JobParametersValidator
+import org.springframework.batch.core.listener.ChunkListener
 import org.springframework.batch.core.scope.context.ChunkContext
 import org.springframework.batch.core.step.skip.SkipPolicy
-import org.springframework.batch.item.ItemProcessor
-import org.springframework.batch.item.ItemReader
-import org.springframework.batch.item.file.FlatFileHeaderCallback
-import org.springframework.batch.item.file.FlatFileItemWriter
-import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder
-import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor
-import org.springframework.batch.item.file.transform.ExtractorLineAggregator
-import org.springframework.batch.item.file.transform.RecursiveCollectionLineAggregator
+import org.springframework.batch.infrastructure.item.ItemProcessor
+import org.springframework.batch.infrastructure.item.ItemReader
+import org.springframework.batch.infrastructure.item.file.FlatFileHeaderCallback
+import org.springframework.batch.infrastructure.item.file.FlatFileItemWriter
+import org.springframework.batch.infrastructure.item.file.builder.FlatFileItemWriterBuilder
+import org.springframework.batch.infrastructure.item.file.transform.BeanWrapperFieldExtractor
+import org.springframework.batch.infrastructure.item.file.transform.ExtractorLineAggregator
+import org.springframework.batch.infrastructure.item.file.transform.RecursiveCollectionLineAggregator
 import org.springframework.core.io.WritableResource
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
@@ -47,7 +47,7 @@ class BatchUtils {
     return date.toInstant().atOffset(zoneOffset)
   }
 
-  private fun <T> csvFileWriterBase(
+  private fun <T : Any> csvFileWriterBase(
     name: String,
     resource: WritableResource,
     headers: List<String>,
@@ -56,7 +56,7 @@ class BatchUtils {
     .resource(resource)
     .headerCallback(HeaderWriter(headers.joinToString(",")))
 
-  fun <T> csvFileWriter(
+  fun <T : Any> csvFileWriter(
     name: String,
     resource: WritableResource,
     headers: List<String>,
@@ -65,7 +65,7 @@ class BatchUtils {
     .lineAggregator(CsvLineAggregator(fields))
     .build()
 
-  fun <T> recursiveCollectionCsvFileWriter(
+  fun <T : Any> recursiveCollectionCsvFileWriter(
     name: String,
     resource: WritableResource,
     headers: List<String>,
@@ -73,11 +73,11 @@ class BatchUtils {
   ): FlatFileItemWriter<Collection<T>> = csvFileWriterBase<Collection<T>>(name, resource, headers)
     .lineAggregator(
       RecursiveCollectionLineAggregator<T>().apply {
-        setDelegate(CsvLineAggregator(fields))
+        setDelegate(CsvLineAggregator<T>(fields))
       },
     ).build()
 
-  fun <T> listItemReader(items: List<T>): ItemReader<T> {
+  fun <T : Any> listItemReader(items: List<T>): ItemReader<T> {
     val iterator = items.iterator()
     return ItemReader {
       if (iterator.hasNext()) {
@@ -95,7 +95,7 @@ class HeaderWriter(private val header: String) : FlatFileHeaderCallback {
   }
 }
 
-interface SentReferralProcessor<T> : ItemProcessor<Referral, T> {
+interface SentReferralProcessor<T : Any> : ItemProcessor<Referral, T> {
   companion object : KLogging()
 
   fun processSentReferral(referral: Referral): T?
@@ -110,7 +110,7 @@ class TimestampIncrementer : JobParametersIncrementer {
   override fun getNext(inputParams: JobParameters?): JobParameters {
     val params = inputParams ?: JobParameters()
 
-    if (params.parameters["timestamp"] != null) {
+    if (params.getString("timestamp") != null) {
       return params
     }
 
@@ -124,7 +124,7 @@ class OutputPathIncrementer : JobParametersIncrementer {
   override fun getNext(inputParams: JobParameters?): JobParameters {
     val params = inputParams ?: JobParameters()
 
-    if (params.parameters["outputPath"] != null) {
+    if (params.getString("outputPath") != null) {
       return params
     }
 
@@ -144,12 +144,11 @@ class NPESkipPolicy : SkipPolicy {
   }
 }
 
-class CsvLineAggregator<T>(fieldsToExtract: List<String>) : ExtractorLineAggregator<T>() {
+class CsvLineAggregator<T : Any>(fieldsToExtract: List<String>) : ExtractorLineAggregator<T>() {
   init {
     setFieldExtractor(
       BeanWrapperFieldExtractor<T>().apply {
         setNames(fieldsToExtract.toTypedArray())
-        afterPropertiesSet()
       },
     )
   }
@@ -170,7 +169,7 @@ class CustomJobParametersValidator(private val requiredKeys: Array<String>) : Jo
     if (parameters == null) {
       throw IllegalArgumentException("Job parameters cannot be null")
     }
-    
+
     for (key in requiredKeys) {
       if (parameters.getString(key) == null && parameters.getLong(key) == null && parameters.getDouble(key) == null) {
         throw IllegalArgumentException("Required parameter '$key' is missing")
@@ -179,7 +178,7 @@ class CustomJobParametersValidator(private val requiredKeys: Array<String>) : Jo
   }
 }
 
-class ReferralChunkProgressListener(private val entityManagerFactory: EntityManagerFactory, private val reportName: String) : ChunkListener {
+class ReferralChunkProgressListener(private val entityManagerFactory: EntityManagerFactory, private val reportName: String) : ChunkListener<Any, Any> {
   companion object : KLogging()
   private var totalRecords: Long? = null
   override fun beforeChunk(context: ChunkContext) {

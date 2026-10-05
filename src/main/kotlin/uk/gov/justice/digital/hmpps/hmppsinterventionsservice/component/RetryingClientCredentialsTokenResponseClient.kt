@@ -55,16 +55,12 @@ class RetryingClientCredentialsTokenResponseClient(
       // If DefaultClientCredentialsTokenResponseClient is not available in Spring Security 7.1.0,
       // create a simple wrapper that delegates to RestClient
       object : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
-        override fun getTokenResponse(authorizationGrantRequest: OAuth2ClientCredentialsGrantRequest): OAuth2AccessTokenResponse {
-          throw UnsupportedOperationException("OAuth2 client credentials token response not configured. Check Spring Security version and dependencies.")
-        }
+        override fun getTokenResponse(authorizationGrantRequest: OAuth2ClientCredentialsGrantRequest): OAuth2AccessTokenResponse = throw UnsupportedOperationException("OAuth2 client credentials token response not configured. Check Spring Security version and dependencies.")
       }
     }
   }
 
-  override fun getTokenResponse(authorizationGrantRequest: OAuth2ClientCredentialsGrantRequest): OAuth2AccessTokenResponse {
-    return retryTemplate.execute<OAuth2AccessTokenResponse, Exception> {
-      delegate.getTokenResponse(authorizationGrantRequest)
-    }!!
-  }
+  override fun getTokenResponse(authorizationGrantRequest: OAuth2ClientCredentialsGrantRequest): OAuth2AccessTokenResponse = retryTemplate.execute<OAuth2AccessTokenResponse, Exception> {
+    delegate.getTokenResponse(authorizationGrantRequest)
+  }!!
 }
