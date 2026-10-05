@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.tr
 
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
-import org.springframework.batch.core.job.DefaultJobParametersValidator
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.step.builder.StepBuilder
@@ -13,6 +12,7 @@ import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.OnStartupJobLauncherFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.CustomJobParametersValidator
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
 
 @Configuration
@@ -27,8 +27,7 @@ class TransferReferralsJobConfiguration(
 
   @Bean
   fun transferReferralsJob(transferReferralToInterventionStep: Step): Job {
-    val validator = DefaultJobParametersValidator()
-    validator.setRequiredKeys(
+    val validator = CustomJobParametersValidator(
       arrayOf(
         "fromContract",
         "toContract",

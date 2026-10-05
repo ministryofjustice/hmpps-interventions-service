@@ -93,8 +93,8 @@ class RisksAndNeedsService(
       .toEntity(SupplementaryRiskResponse::class.java)
       .block()
 
-    if (response.statusCode.equals(HttpStatus.CONFLICT)) {
-      if (response.body.createdDate != riskCreatedAt.toLocalDateTime()) {
+    if (response != null && response.statusCode.equals(HttpStatus.CONFLICT)) {
+      if (response.body != null && response.body.createdDate != riskCreatedAt.toLocalDateTime()) {
         logger.error(
           "attempted to update an existing supplementary risk with new data {} {} {} {} {}",
           kv("crn", crn),
@@ -108,6 +108,6 @@ class RisksAndNeedsService(
       }
     }
 
-    return response.body.supplementaryRiskId
+    return response?.body?.supplementaryRiskId ?: throw IllegalStateException("Failed to create supplementary risk: null response")
   }
 }

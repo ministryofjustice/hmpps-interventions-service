@@ -8,9 +8,11 @@ import org.springframework.batch.core.ChunkListener
 import org.springframework.batch.core.JobParameters
 import org.springframework.batch.core.JobParametersBuilder
 import org.springframework.batch.core.JobParametersIncrementer
+import org.springframework.batch.core.JobParametersValidator
 import org.springframework.batch.core.scope.context.ChunkContext
 import org.springframework.batch.core.step.skip.SkipPolicy
 import org.springframework.batch.item.ItemProcessor
+import org.springframework.batch.item.ItemReader
 import org.springframework.batch.item.file.FlatFileHeaderCallback
 import org.springframework.batch.item.file.FlatFileItemWriter
 import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder
@@ -74,6 +76,17 @@ class BatchUtils {
         setDelegate(CsvLineAggregator(fields))
       },
     ).build()
+
+  fun <T> listItemReader(items: List<T>): ItemReader<T> {
+    val iterator = items.iterator()
+    return ItemReader {
+      if (iterator.hasNext()) {
+        iterator.next()
+      } else {
+        null
+      }
+    }
+  }
 }
 
 class HeaderWriter(private val header: String) : FlatFileHeaderCallback {
@@ -149,6 +162,20 @@ class CsvLineAggregator<T>(fieldsToExtract: List<String>) : ExtractorLineAggrega
     val out = StringBuilder()
     csvPrinter.printRecord(out, *fields)
     return out.toString()
+  }
+}
+
+class CustomJobParametersValidator(private val requiredKeys: Array<String>) : JobParametersValidator {
+  override fun validate(parameters: JobParameters?) {
+    if (parameters == null) {
+      throw IllegalArgumentException("Job parameters cannot be null")
+    }
+    
+    for (key in requiredKeys) {
+      if (parameters.getString(key) == null && parameters.getLong(key) == null && parameters.getDouble(key) == null) {
+        throw IllegalArgumentException("Required parameter '$key' is missing")
+      }
+    }
   }
 }
 
