@@ -111,7 +111,7 @@ class CommunityAPIClientTest {
 
     val response = communityAPIClient.makeSyncPostRequest("/uriValue", appointmentCreateRequest, AppointmentResponseDTO::class.java)
 
-    assertThat(response.appointmentId).isEqualTo(1234L)
+    assertThat(response!!.appointmentId).isEqualTo(1234L)
 
     verify(exchangeFunction, times(1)).exchange(any())
     val requestCaptor = argumentCaptor<ClientRequest>()

@@ -416,7 +416,7 @@ class ReferralRepositoryTest @Autowired constructor(
       assignments = assignmentsFactory.create(numberOfAssignedUsers),
     )
 
-    val draftReferral = entityManager.find(DraftReferral::class.java, referral.id)
+    val draftReferral = requireNotNull(entityManager.find(DraftReferral::class.java, referral.id))
     val serviceUser = serviceUserFactory.create(random(15), random(16), draftReferral)
     entityManager.refresh(draftReferral)
 
@@ -449,7 +449,7 @@ class ReferralRepositoryTest @Autowired constructor(
       referral.endOfServiceReport = endOfServiceReport.create(referral = referral, submittedAt = OffsetDateTime.now())
     }
 
-    val draftReferral = entityManager.find(DraftReferral::class.java, referral.id)
+    val draftReferral = requireNotNull(entityManager.find(DraftReferral::class.java, referral.id))
     val serviceUser = serviceUserFactory.create(random(15), random(16), draftReferral)
     entityManager.refresh(draftReferral)
     return entityManager.refresh(referral)

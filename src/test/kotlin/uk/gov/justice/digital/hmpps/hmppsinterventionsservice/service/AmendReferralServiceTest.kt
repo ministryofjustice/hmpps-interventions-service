@@ -25,6 +25,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AmendProbation
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAmendmentDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.UpdateReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Changelog
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Complexity
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
@@ -125,7 +126,7 @@ class AmendReferralServiceTest @Autowired constructor(
       createdBy = someoneElse,
     )
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
 
     amendReferralService.updateReferralDesiredOutcomes(
       referral.id,
@@ -158,7 +159,7 @@ class AmendReferralServiceTest @Autowired constructor(
       createdBy = someoneElse,
     )
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
 
     amendReferralService.amendCaringOrEmploymentResponsibilities(
       referral.id,
@@ -191,7 +192,7 @@ class AmendReferralServiceTest @Autowired constructor(
       createdBy = someoneElse,
     )
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
 
     amendReferralService.amendAccessibilityNeeds(
       referral.id,
@@ -219,7 +220,7 @@ class AmendReferralServiceTest @Autowired constructor(
       createdBy = someoneElse,
     )
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
 
     amendReferralService.amendIdentifyNeeds(
       referral.id,
@@ -247,7 +248,7 @@ class AmendReferralServiceTest @Autowired constructor(
       createdBy = someoneElse,
     )
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
 
     amendReferralService.amendInterpreterRequired(
       referral.id,
@@ -290,7 +291,7 @@ class AmendReferralServiceTest @Autowired constructor(
     referral.referralLocation = referralLocation
     referralRepository.saveAndFlush(referral)
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
 
     amendReferralService.amendPrisonEstablishment(
       referral.id,
@@ -333,7 +334,7 @@ class AmendReferralServiceTest @Autowired constructor(
     referral.probationPractitionerDetails = probationPractitioner
     referralRepository.saveAndFlush(referral)
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
 
     amendReferralService.amendProbationPractitionerName(
       referral.id,
@@ -374,7 +375,7 @@ class AmendReferralServiceTest @Autowired constructor(
     referral.probationPractitionerDetails = probationPractitioner
     referralRepository.saveAndFlush(referral)
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
 
     amendReferralService.amendProbationPractitionerEmail(
       referral.id,
@@ -416,7 +417,7 @@ class AmendReferralServiceTest @Autowired constructor(
     referral.probationPractitionerDetails = probationPractitioner
     referralRepository.saveAndFlush(referral)
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
 
     amendReferralService.amendProbationPractitionerPhoneNumber(
       referral.id,
@@ -458,7 +459,7 @@ class AmendReferralServiceTest @Autowired constructor(
     referral.probationPractitionerDetails = probationPractitioner
     referralRepository.saveAndFlush(referral)
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
 
     amendReferralService.amendProbationPractitionerTeamPhoneNumber(
       referral.id,
@@ -505,7 +506,7 @@ class AmendReferralServiceTest @Autowired constructor(
     referral.referralLocation = referralLocation
     referralRepository.saveAndFlush(referral)
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
 
     amendReferralService.amendExpectedReleaseDate(
       referral.id,
@@ -550,7 +551,7 @@ class AmendReferralServiceTest @Autowired constructor(
     referral.referralLocation = referralLocation
     referralRepository.saveAndFlush(referral)
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
 
     amendReferralService.amendExpectedReleaseDate(
       referral.id,
@@ -810,7 +811,7 @@ class AmendReferralServiceTest @Autowired constructor(
     )
 
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
 
     val uuid1 = UUID.randomUUID()
     val exception = assertThrows<ResponseStatusException> {
@@ -846,7 +847,7 @@ class AmendReferralServiceTest @Autowired constructor(
     val referralToUpdate = UpdateReferralDetailsDTO(20, null, "new information", null, null, "we decided 10 days wasn't enough", "some reason for making a referral", "more info", "some reason for making a referral before allocation")
 
     whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(user)
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
 
     amendReferralService.logChanges(referralDetails, referralToUpdate, user)
     val changeLogReturned = changelogRepository.findAll().filter { x -> x.referralId == id }

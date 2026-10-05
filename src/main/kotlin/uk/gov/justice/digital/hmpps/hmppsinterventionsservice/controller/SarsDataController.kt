@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller
 
 import org.apache.commons.lang3.StringUtils
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -32,7 +33,7 @@ class SarsDataController(
     @RequestParam toDate: String? = null,
   ): ResponseEntity<SarDataDTO> {
     if (crn == null) {
-      return ResponseEntity(null, null, 209)
+      return ResponseEntity<SarDataDTO>(null, HttpStatusCode.valueOf(209))
     }
 
     val from: String? = if (StringUtils.isNotBlank(fromDate)) fromDate else null
