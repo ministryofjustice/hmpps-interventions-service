@@ -31,7 +31,7 @@ class CommunityAPIClient(
       .subscribe()
   }
 
-  fun <T : Any> makeSyncPostRequest(uri: String, requestBody: Any, responseBodyClass: Class<T>): T = communityApiClient.post(uri, requestBody)
+  fun <T : Any> makeSyncPostRequest(uri: String, requestBody: Any, responseBodyClass: Class<T>): T? = communityApiClient.post(uri, requestBody)
     .retrieve()
     .bodyToMono(responseBodyClass)
     .onErrorMap { e ->

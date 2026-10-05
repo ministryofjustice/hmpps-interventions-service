@@ -46,7 +46,7 @@ class PerformanceReportJobListener(
       BatchStatus.COMPLETED -> {
         s3Service.publishFileToS3(storageS3Bucket, path, "reports/service-provider/performance/")
 
-        val reportURL = UriComponentsBuilder.fromHttpUrl(interventionsUiBaseUrl)
+        val reportURL = UriComponentsBuilder.fromUriString(interventionsUiBaseUrl)
           .path(downloadLocation)
           .buildAndExpand(path.fileName)
           .toString()
