@@ -51,5 +51,3 @@ class TestDataSourceConfig {
     disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
   }
 }
-
-
