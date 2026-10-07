@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.tr
 
 import org.springframework.batch.core.job.Job
 import org.springframework.batch.core.job.builder.JobBuilder
+import org.springframework.batch.core.job.parameters.DefaultJobParametersValidator
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.step.Step
 import org.springframework.batch.core.step.builder.StepBuilder
@@ -12,7 +13,6 @@ import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.OnStartupJobLauncherFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.CustomJobParametersValidator
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.TimestampIncrementer
 
 @Configuration
@@ -23,11 +23,12 @@ class TransferReferralsJobConfiguration(
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
 ) {
   @Bean
-  fun transferReferralsJobLauncher(transferReferralsJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(transferReferralsJob)
+  fun transferReferralsJobLauncher(transferReferralsJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(transferReferralsJob, TimestampIncrementer())
 
   @Bean
   fun transferReferralsJob(transferReferralToInterventionStep: Step): Job {
-    val validator = CustomJobParametersValidator(
+    val validator = DefaultJobParametersValidator()
+    validator.setRequiredKeys(
       arrayOf(
         "fromContract",
         "toContract",
@@ -36,7 +37,6 @@ class TransferReferralsJobConfiguration(
     )
 
     return JobBuilder("transferReferralsJob", jobRepository)
-      .incrementer(TimestampIncrementer())
       .validator(validator)
       .listener(listener)
       .start(transferReferralToInterventionStep)
@@ -50,9 +50,10 @@ class TransferReferralsJobConfiguration(
     writer: TransferReferralsWriter,
     transactionManager: PlatformTransactionManager,
   ): Step = StepBuilder("transferReferralToInterventionStep", jobRepository)
-    .chunk<Referral, Referral>(10, transactionManager)
+    .chunk<Referral, Referral>(10)
     .reader(reader)
     .processor(processor)
     .writer(writer)
+    .transactionManager(transactionManager)
     .build()
 }

@@ -7,12 +7,12 @@ import org.apache.commons.csv.CSVFormat
 import org.springframework.batch.core.job.parameters.JobParameters
 import org.springframework.batch.core.job.parameters.JobParametersBuilder
 import org.springframework.batch.core.job.parameters.JobParametersIncrementer
-import org.springframework.batch.core.job.parameters.JobParametersValidator
 import org.springframework.batch.core.listener.ChunkListener
-import org.springframework.batch.core.scope.context.ChunkContext
+import org.springframework.batch.core.listener.StepExecutionListener
+import org.springframework.batch.core.step.StepExecution
 import org.springframework.batch.core.step.skip.SkipPolicy
+import org.springframework.batch.infrastructure.item.Chunk
 import org.springframework.batch.infrastructure.item.ItemProcessor
-import org.springframework.batch.infrastructure.item.ItemReader
 import org.springframework.batch.infrastructure.item.file.FlatFileHeaderCallback
 import org.springframework.batch.infrastructure.item.file.FlatFileItemWriter
 import org.springframework.batch.infrastructure.item.file.builder.FlatFileItemWriterBuilder
@@ -76,17 +76,6 @@ class BatchUtils {
         setDelegate(CsvLineAggregator<T>(fields))
       },
     ).build()
-
-  fun <T : Any> listItemReader(items: List<T>): ItemReader<T> {
-    val iterator = items.iterator()
-    return ItemReader {
-      if (iterator.hasNext()) {
-        iterator.next()
-      } else {
-        null
-      }
-    }
-  }
 }
 
 class HeaderWriter(private val header: String) : FlatFileHeaderCallback {
@@ -110,7 +99,7 @@ class TimestampIncrementer : JobParametersIncrementer {
   override fun getNext(inputParams: JobParameters?): JobParameters {
     val params = inputParams ?: JobParameters()
 
-    if (params.getString("timestamp") != null) {
+    if (params.getParameter("timestamp") != null) {
       return params
     }
 
@@ -124,7 +113,7 @@ class OutputPathIncrementer : JobParametersIncrementer {
   override fun getNext(inputParams: JobParameters?): JobParameters {
     val params = inputParams ?: JobParameters()
 
-    if (params.getString("outputPath") != null) {
+    if (params.getParameter("outputPath") != null) {
       return params
     }
 
@@ -164,24 +153,23 @@ class CsvLineAggregator<T : Any>(fieldsToExtract: List<String>) : ExtractorLineA
   }
 }
 
-class CustomJobParametersValidator(private val requiredKeys: Array<String>) : JobParametersValidator {
-  override fun validate(parameters: JobParameters?) {
-    if (parameters == null) {
-      throw IllegalArgumentException("Job parameters cannot be null")
-    }
-
-    for (key in requiredKeys) {
-      if (parameters.getString(key) == null && parameters.getLong(key) == null && parameters.getDouble(key) == null) {
-        throw IllegalArgumentException("Required parameter '$key' is missing")
-      }
-    }
-  }
-}
-
-class ReferralChunkProgressListener(private val entityManagerFactory: EntityManagerFactory, private val reportName: String) : ChunkListener<Any, Any> {
+// logs progress through an NDMIS report step; the step bean is a singleton, so counts are reset for each run in beforeStep
+class ReferralChunkProgressListener(private val entityManagerFactory: EntityManagerFactory, private val reportName: String) :
+  ChunkListener<Any, Any>,
+  StepExecutionListener {
   companion object : KLogging()
   private var totalRecords: Long? = null
-  override fun beforeChunk(context: ChunkContext) {
+
+  // counted here rather than read from the step execution, which Spring Batch 6 only updates after afterChunk
+  private var readCount = 0L
+
+  override fun beforeStep(stepExecution: StepExecution) {
+    totalRecords = null
+    readCount = 0
+  }
+
+  override fun beforeChunk(chunk: Chunk<Any>) {
+    readCount += chunk.size()
     if (totalRecords == null) {
       try {
         val em = entityManagerFactory.createEntityManager()
@@ -241,9 +229,7 @@ class ReferralChunkProgressListener(private val entityManagerFactory: EntityMana
     }
   }
 
-  override fun afterChunk(context: ChunkContext) {
-    val stepExecution = context.stepContext.stepExecution
-    val readCount = stepExecution.readCount
+  override fun afterChunk(chunk: Chunk<Any>) {
     val remaining = totalRecords?.let { it - readCount } ?: "unknown"
     logger.info(
       "NDMIS $reportName report: Processed {} records, {} remaining",
@@ -252,9 +238,7 @@ class ReferralChunkProgressListener(private val entityManagerFactory: EntityMana
     )
   }
 
-  override fun afterChunkError(context: ChunkContext) {
-    val stepExecution = context.stepContext.stepExecution
-    val readCount = stepExecution.readCount
+  override fun onChunkError(exception: Exception, chunk: Chunk<Any>) {
     val remaining = totalRecords?.let { it - readCount } ?: "unknown"
     logger.warn(
       "NDMIS $reportName report: Error after processing {} records, approximately {} remaining",

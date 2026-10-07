@@ -1,9 +1,48 @@
 # Spring Boot 4 Migration Guide
 
-**Status**: TEST VALIDATION IN PROGRESS  
-**Date**: October 6, 2026  
-**Branch**: `no-ticket/spring-4-update`  
-**Estimated Completion**: 4-6 hours from this date
+**Status**: ALL TESTS PASSING (912/912), `./gradlew check jacocoTestCoverageVerification` green, app starts locally  
+**Date**: October 7, 2026  
+**Branch**: `no-ticket/spring-4-update`
+
+> **Read the "October 7 update" section first** – it corrects several statements further down this document.
+
+## October 7 update
+
+The earlier blocker was not OAuth2 configuration. The test suite had been moved onto H2 (via a test-only
+`application-local.yml` shadowing the real one), which cannot run this project's Postgres-specific schema,
+and it was masking several production startup bugs. Changes made:
+
+### Production fixes
+- **Flyway was missing**: Boot 4 moved Flyway auto-configuration into `spring-boot-starter-flyway`; without it migrations never ran.
+- **`WebClient.Builder` bean was missing**: added `spring-boot-starter-webclient` (Boot 4 split it out of webflux).
+- **Jackson 3**: Boot 4 only auto-configures a Jackson 3 `JsonMapper`. `SNSPublisher` and `CommunityAPIClient` now inject `tools.jackson.databind.json.JsonMapper` (previously the app would fail to start with no Jackson 2 `ObjectMapper` bean).
+- **OAuth2 client-credentials token client was a stub that always threw**: `RetryingClientCredentialsTokenResponseClient` now uses Security 7's `RestClientClientCredentialsTokenResponseClient`, keeping the configured timeouts, retries and OAuth2 error handling.
+- **Spring Batch 6**: `DefaultJobParametersValidator` and `ListItemReader` were *not* removed, only moved (`org.springframework.batch.core.job.parameters`, `org.springframework.batch.infrastructure.item.support`). The hand-written replacements, which rejected non-String parameters, were removed. The timestamp/outputPath incrementers check for parameter presence again.
+- Removed version pins that fought the Boot BOM (`spring-security-crypto:6.5.0`, `spring-batch-core:6.0.5`).
+
+### Spring Batch 6 deprecations removed
+- Chunk steps use `chunk(size)` + `.transactionManager(tm)`, which builds Batch 6's new `ChunkOrientedStep`. The transaction manager must be set explicitly – it otherwise defaults to `ResourcelessTransactionManager`.
+- `ChunkListener` callbacks taking a `ChunkContext` are no longer called by the new step; `ReferralChunkProgressListener` uses the `Chunk` callbacks and counts items itself (the step execution's read count is only updated after `afterChunk`).
+- `JobLauncher` → `JobOperator` (`asyncJobOperator` bean), `JobLauncherTestUtils` → `JobOperatorTestUtils`, unused `JobExplorer` bean removed.
+- **`JobOperator.start(job, params)` ignores `params` when the job defines an incrementer.** Jobs therefore no longer set `.incrementer(...)`; the incrementer that fills in `timestamp`/`outputPath` is passed to `OnStartupJobLauncherFactory.makeBatchLauncher` instead.
+- spring-retry in the token client replaced with Spring Framework 7's `org.springframework.core.retry`.
+
+### Test setup (restored to how `main` works)
+- Tests run against the real local Postgres (as in CI) – H2 test config, `TestDataSourceConfig`, the fake `TestEntityManager` and the Postgres classpath exclusions were removed.
+- `@DataJpaTest`, `TestEntityManager` and `@AutoConfigureTestDatabase` still exist in Boot 4, in new modules/packages (`spring-boot-starter-data-jpa-test`). `@SpringBootTest` needs `@AutoConfigureWebTestClient` (`spring-boot-starter-webflux-test`) for `WebTestClient`.
+- Hibernate 7 refuses to flush while a managed entity references a removed one. Rolled-back `@AfterEach` cleanups that never actually flushed under Hibernate 6 were removed; `@BeforeEach` blocks that clear seed data use the new `TestEntityManager.deleteAll(...)` bulk-delete helper.
+- Spring Data 4 marks `save()` non-null, so unstubbed `save` mocks now fail in Kotlin.
+
+### Running tests locally
+The local `interventions` database must be migrated with the local seeds, as CI does. The first run can do this:
+```bash
+SPRING_FLYWAY_LOCATIONS=classpath:db/migration,classpath:db/local ./gradlew test
+```
+
+### Remaining
+- Docker image build and deployment to a dev environment
+- `RestClient.Builder.messageConverters(...)` and spring-retry's `RetryListenerSupport` are deprecated; worth moving to Framework 7 equivalents later
+- Code review and merge
 
 ## Executive Summary
 

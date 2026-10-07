@@ -225,7 +225,7 @@ internal class DeliverySessionsServiceTest {
     val appointmentTime = OffsetDateTime.now()
     val durationInMinutes = 200
 
-    whenever(communityAPIBookingService.book(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(Pair(46298523523L, UUID.randomUUID()))
+    whenever(communityAPIBookingService.book(any(), isNull(), any(), any(), eq(SERVICE_DELIVERY), isNull(), eq(Attended.NO), eq(false), eq(false), eq(true), isNull(), isNull()))
       .thenReturn(Pair(46298523523L, UUID.randomUUID()))
 
     val updatedSession = deliverySessionsService.updateSessionAppointment(
@@ -268,7 +268,7 @@ internal class DeliverySessionsServiceTest {
     val newTime = OffsetDateTime.now()
     val newDuration = 200
 
-    whenever(communityAPIBookingService.book(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(Pair(23523541087L, UUID.randomUUID()))
+    whenever(communityAPIBookingService.book(any(), isNotNull(), eq(newTime), eq(newDuration), eq(SERVICE_DELIVERY), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull()))
       .thenReturn(Pair(23523541087L, UUID.randomUUID()))
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(session)
     whenever(deliverySessionRepository.saveAndFlush(any<DeliverySession>())).thenAnswer { it.arguments[0] }
@@ -653,7 +653,7 @@ internal class DeliverySessionsServiceTest {
     whenever(deliverySessionRepository.save(any<DeliverySession>())).thenReturn(session)
     whenever(appointmentService.submitAppointmentFeedback(session.currentAppointment!!, actor, SERVICE_DELIVERY, session)).thenThrow(
       ResponseStatusException(
-        HttpStatus.UNPROCESSABLE_ENTITY,
+        HttpStatus.UNPROCESSABLE_CONTENT,
         "can't submit feedback unless attendance has been recorded",
       ),
     )
@@ -681,7 +681,7 @@ internal class DeliverySessionsServiceTest {
     val exception = assertThrows(ResponseStatusException::class.java) {
       deliverySessionsService.submitAppointmentFeedback(referralId, appointmentId, actor)
     }
-    assertThat(exception.statusCode).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY)
+    assertThat(exception.statusCode).isEqualTo(HttpStatus.UNPROCESSABLE_CONTENT)
   }
 
   @Test

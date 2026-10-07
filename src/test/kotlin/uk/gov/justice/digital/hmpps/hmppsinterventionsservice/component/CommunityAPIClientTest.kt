@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component
 
 import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.LoggerContext
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
@@ -23,6 +22,7 @@ import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.ExchangeFunction
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
+import tools.jackson.databind.json.JsonMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.CommunityApiCallError
@@ -36,7 +36,7 @@ import java.util.UUID
 class CommunityAPIClientTest {
 
   private val exchangeFunction = mock<ExchangeFunction>()
-  private val objectMapper = ObjectMapper()
+  private val jsonMapper = JsonMapper()
   private lateinit var communityAPIClient: CommunityAPIClient
 
   companion object {
@@ -67,7 +67,7 @@ class CommunityAPIClientTest {
   fun `makes async post request successfully`() {
     communityAPIClient = CommunityAPIClient(
       RestClient(WebClient.builder().exchangeFunction(exchangeFunction).build(), "client-registration-id"),
-      objectMapper,
+      jsonMapper,
     )
     whenever(exchangeFunction.exchange(any())).thenReturn(Mono.empty())
 
@@ -85,7 +85,7 @@ class CommunityAPIClientTest {
   fun `error was logged on exception during async post request`() {
     communityAPIClient = CommunityAPIClient(
       RestClient(WebClient.builder().exchangeFunction(exchangeFunction).build(), "client-registration-id"),
-      objectMapper,
+      jsonMapper,
     )
     whenever(exchangeFunction.exchange(any())).thenThrow(RuntimeException("An error"))
 
@@ -100,7 +100,7 @@ class CommunityAPIClientTest {
   fun `makes sync post request successfully`() {
     communityAPIClient = CommunityAPIClient(
       RestClient(WebClient.builder().exchangeFunction(exchangeFunction).build(), "client-registration-id"),
-      objectMapper,
+      jsonMapper,
     )
     val clientResponse: ClientResponse = ClientResponse
       .create(OK)
@@ -125,7 +125,7 @@ class CommunityAPIClientTest {
   fun `error was logged on exception during sync post request`() {
     communityAPIClient = CommunityAPIClient(
       RestClient(WebClient.builder().exchangeFunction(exchangeFunction).build(), "client-registration-id"),
-      objectMapper,
+      jsonMapper,
     )
     whenever(exchangeFunction.exchange(any())).thenThrow(RuntimeException("A problem"))
 
@@ -143,7 +143,7 @@ class CommunityAPIClientTest {
   fun `propagates error response body on exception during sync post request`() {
     communityAPIClient = CommunityAPIClient(
       RestClient(WebClient.builder().exchangeFunction(exchangeFunction).build(), "client-registration-id"),
-      objectMapper,
+      jsonMapper,
     )
     val clientResponse: ClientResponse = ClientResponse
       .create(BAD_REQUEST)
@@ -170,7 +170,7 @@ class CommunityAPIClientTest {
   fun `propagates user message on exception during sync post request`() {
     communityAPIClient = CommunityAPIClient(
       RestClient(WebClient.builder().exchangeFunction(exchangeFunction).build(), "client-registration-id"),
-      objectMapper,
+      jsonMapper,
     )
     val clientResponse: ClientResponse = ClientResponse
       .create(BAD_REQUEST)
@@ -197,7 +197,7 @@ class CommunityAPIClientTest {
   fun `propagates developer message on exception during sync post request`() {
     communityAPIClient = CommunityAPIClient(
       RestClient(WebClient.builder().exchangeFunction(exchangeFunction).build(), "client-registration-id"),
-      objectMapper,
+      jsonMapper,
     )
     val clientResponse: ClientResponse = ClientResponse
       .create(BAD_REQUEST)

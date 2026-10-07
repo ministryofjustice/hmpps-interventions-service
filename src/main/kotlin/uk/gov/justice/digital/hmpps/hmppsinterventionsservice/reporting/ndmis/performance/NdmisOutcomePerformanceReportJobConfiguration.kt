@@ -6,6 +6,8 @@ import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.core.job.Job
 import org.springframework.batch.core.job.builder.JobBuilder
+import org.springframework.batch.core.job.parameters.DefaultJobParametersValidator
+import org.springframework.batch.core.job.parameters.JobParametersIncrementer
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.scope.context.ChunkContext
 import org.springframework.batch.core.step.Step
@@ -28,7 +30,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.S3Bucket
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.OnStartupJobLauncherFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AchievementLevel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUtils
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.CustomJobParametersValidator
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.NPESkipPolicy
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.OutputPathIncrementer
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.QueryLoader
@@ -60,7 +61,7 @@ class NdmisOutcomePerformanceReportJobConfiguration(
   private val skipPolicy = NPESkipPolicy()
 
   @Bean
-  fun ndmisPerformanceReportJobLauncher(ndmisOutcomePerformanceReportJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(ndmisOutcomePerformanceReportJob)
+  fun ndmisPerformanceReportJobLauncher(ndmisOutcomePerformanceReportJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(ndmisOutcomePerformanceReportJob, JobParametersIncrementer { parameters -> OutputPathIncrementer().getNext(TimestampIncrementer().getNext(parameters)) })
 
   @Bean("ndmisOutcomeReader")
   @JobScope
@@ -92,10 +93,10 @@ class NdmisOutcomePerformanceReportJobConfiguration(
     ndmisWriteOutcomeToCsvStep: Step,
     pushOutcomeToS3Step: Step,
   ): Job {
-    val validator = CustomJobParametersValidator(arrayOf("timestamp", "outputPath"))
+    val validator = DefaultJobParametersValidator()
+    validator.setRequiredKeys(arrayOf("timestamp", "outputPath"))
 
     return JobBuilder("ndmisOutcomePerformanceReportJob", jobRepository)
-      .incrementer { parameters -> OutputPathIncrementer().getNext(TimestampIncrementer().getNext(parameters)) }
       .validator(validator)
       .start(ndmisWriteOutcomeToCsvStep)
       .next(pushOutcomeToS3Step)
@@ -107,7 +108,7 @@ class NdmisOutcomePerformanceReportJobConfiguration(
     @Qualifier("ndmisOutcomeReader") ndmisReader: JdbcCursorItemReader<OutcomeData>,
     writer: FlatFileItemWriter<OutcomeData>,
   ): Step = StepBuilder("ndmisWriteOutcomeToCsvStep", jobRepository)
-    .chunk<OutcomeData, OutcomeData>(chunkSize, transactionManager)
+    .chunk<OutcomeData, OutcomeData>(chunkSize)
     .reader(ndmisReader)
     .writer(writer)
     .faultTolerant()

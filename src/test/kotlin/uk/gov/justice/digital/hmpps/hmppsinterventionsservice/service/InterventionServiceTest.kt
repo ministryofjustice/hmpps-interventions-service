@@ -3,11 +3,19 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceProviderAccessScope
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DeliverySession
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData.Companion.persistIntervention
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData.Companion.sampleContract
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData.Companion.sampleIntervention
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
@@ -23,6 +31,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.PCCRegionFact
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceProviderFactory
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.deleteAll
 import java.time.LocalDate
 
 @RepositoryTest
@@ -47,15 +56,16 @@ class InterventionServiceTest @Autowired constructor(
 
   @BeforeEach
   fun setup() {
-    deliverySessionRepository.deleteAll()
-    actionPlanRepository.deleteAll()
-    endOfServiceReportRepository.deleteAll()
-
-    entityManager.flush()
-
-    referralRepository.deleteAll()
-    interventionRepository.deleteAll()
-    authUserRepository.deleteAll()
+    entityManager.deleteAll(
+      DeliverySession::class,
+      SupplierAssessment::class,
+      Appointment::class,
+      ActionPlan::class,
+      EndOfServiceReport::class,
+      Referral::class,
+      Intervention::class,
+      AuthUser::class,
+    )
   }
 
   @Test

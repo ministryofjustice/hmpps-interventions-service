@@ -31,6 +31,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.FieldError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.ValidationError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DraftReferralDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Complexity
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
@@ -119,6 +120,8 @@ class DraftReferralServiceUnitTest {
   @BeforeEach
   fun setup() {
     whenever(referralRepository.save(any<Referral>())).thenAnswer(returnsFirstArg<Referral>())
+    // Spring Data 4 declares save() as non-null, so an unstubbed mock returning null now fails
+    whenever(authUserRepository.save(any<AuthUser>())).thenAnswer(returnsFirstArg<AuthUser>())
   }
 
   @Nested
