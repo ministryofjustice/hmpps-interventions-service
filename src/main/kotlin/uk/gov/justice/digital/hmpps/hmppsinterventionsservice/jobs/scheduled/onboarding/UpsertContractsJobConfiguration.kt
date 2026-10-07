@@ -23,11 +23,10 @@ class UpsertContractsJobConfiguration(
 ) {
 
   @Bean
-  fun upsertContractsJobLauncher(upsertContractsJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(upsertContractsJob)
+  fun upsertContractsJobLauncher(upsertContractsJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(upsertContractsJob, TimestampIncrementer())
 
   @Bean
   fun upsertContractsJob(upsertProvidersStep: Step, upsertContractStep: Step, upsertContractDetailsStep: Step): Job = JobBuilder("upsertContractsJob", jobRepository)
-    .incrementer(TimestampIncrementer())
     .start(upsertProvidersStep)
     .next(upsertContractDetailsStep)
     .next(upsertContractStep)

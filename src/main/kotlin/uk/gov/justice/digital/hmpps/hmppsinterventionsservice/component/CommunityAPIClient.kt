@@ -1,9 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component
 
-import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.databind.JsonMappingException
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ObjectNode
 import mu.KLogging
 import net.logstash.logback.argument.StructuredArguments
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
@@ -11,12 +7,15 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.web.reactive.function.client.WebClientResponseException.BadRequest
 import reactor.core.publisher.Mono
+import tools.jackson.core.JacksonException
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.databind.node.ObjectNode
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.exception.CommunityApiCallError
 
 @Component
 class CommunityAPIClient(
   private val communityApiClient: RestClient,
-  private val objectMapper: ObjectMapper,
+  private val jsonMapper: JsonMapper,
 ) {
   companion object : KLogging()
 
@@ -65,18 +64,15 @@ class CommunityAPIClient(
 
   private fun userMessageOrDeveloperMessageOrResponseBodyInThatOrder(responseBody: String): String {
     try {
-      objectMapper.readValue(responseBody, ObjectNode::class.java)?.let { node ->
+      jsonMapper.readValue(responseBody, ObjectNode::class.java)?.let { node ->
         val userMessage = node.get("userMessage") ?: run {
           val developerMessage = node.get("developerMessage")
-          return developerMessage.textValue()
+          return developerMessage.stringValue()
         }
-        return userMessage.textValue()
+        return userMessage.stringValue()
       }
       return responseBody
-    } catch (e: JsonProcessingException) {
-      // response body does not contain json
-      return responseBody
-    } catch (e: JsonMappingException) {
+    } catch (e: JacksonException) {
       // response body does not contain json
       return responseBody
     }

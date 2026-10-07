@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
@@ -10,7 +9,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
@@ -98,15 +97,6 @@ class AmendReferralServiceTest @Autowired constructor(
     userMapper,
     referralService,
   )
-
-  @AfterEach
-  fun `clear referrals`() {
-    referralRepository.deleteAll()
-    referralLocationRepository.deleteAll()
-    changelogRepository.deleteAll()
-    complexityLevelRepository.deleteAll()
-    desiredOutcomeRepository.deleteAll()
-  }
 
   @Test
   fun `amend desired outcomes of a service category for a referral`() {

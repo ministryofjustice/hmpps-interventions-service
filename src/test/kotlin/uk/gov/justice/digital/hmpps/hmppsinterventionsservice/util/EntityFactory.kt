@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util
 
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager
 
 open class EntityFactory(val em: TestEntityManager?) {
-  inline fun <reified T> save(t: T): T {
+  inline fun <reified T : Any> save(t: T): T {
     if (em == null) {
       return t
     }

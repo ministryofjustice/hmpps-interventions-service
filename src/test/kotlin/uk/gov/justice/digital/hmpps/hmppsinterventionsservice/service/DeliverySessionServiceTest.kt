@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
 import jakarta.persistence.EntityNotFoundException
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -16,7 +15,7 @@ import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager
 import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanAppointmentEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.AppointmentEventPublisher
@@ -85,15 +84,6 @@ class DeliverySessionServiceTest @Autowired constructor(
   @BeforeEach
   fun beforeEach() {
     defaultUser = userFactory.create()
-  }
-
-  @AfterEach
-  fun afterEach() {
-    appointmentRepository.deleteAll()
-    deliverySessionRepository.deleteAll()
-    actionPlanRepository.deleteAll()
-    referralRepository.deleteAll()
-    authUserRepository.deleteAll()
   }
 
   @Test

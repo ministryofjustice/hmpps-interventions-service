@@ -21,11 +21,10 @@ class ConcludeReferralsJobConfiguration(
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
 ) {
   @Bean
-  fun concludeReferralsJobLauncher(concludeReferralsJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(concludeReferralsJob)
+  fun concludeReferralsJobLauncher(concludeReferralsJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(concludeReferralsJob, TimestampIncrementer())
 
   @Bean
   fun concludeReferralsJob(concludeReferralToInterventionStep: Step): Job = JobBuilder("concludeReferralsJob", jobRepository)
-    .incrementer(TimestampIncrementer())
     .start(concludeReferralToInterventionStep)
     .build()
 
@@ -36,9 +35,10 @@ class ConcludeReferralsJobConfiguration(
     writer: ConcludeReferralsWriter,
     transactionManager: PlatformTransactionManager,
   ): Step = StepBuilder("concludeReferralToInterventionStep", jobRepository)
-    .chunk<Referral, Referral>(10, transactionManager)
+    .chunk<Referral, Referral>(10)
     .reader(reader)
     .processor(processor)
     .writer(writer)
+    .transactionManager(transactionManager)
     .build()
 }

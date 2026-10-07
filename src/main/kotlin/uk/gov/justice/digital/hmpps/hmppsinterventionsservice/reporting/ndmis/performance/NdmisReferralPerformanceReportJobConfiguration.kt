@@ -6,6 +6,8 @@ import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.core.job.Job
 import org.springframework.batch.core.job.builder.JobBuilder
+import org.springframework.batch.core.job.parameters.DefaultJobParametersValidator
+import org.springframework.batch.core.job.parameters.JobParametersIncrementer
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.scope.context.ChunkContext
 import org.springframework.batch.core.step.Step
@@ -27,7 +29,6 @@ import software.amazon.awssdk.services.s3.model.ObjectCannedACL
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.S3Bucket
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.OnStartupJobLauncherFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUtils
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.CustomJobParametersValidator
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.NPESkipPolicy
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.OutputPathIncrementer
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.QueryLoader
@@ -60,7 +61,7 @@ class NdmisReferralPerformanceReportJobConfiguration(
   private val skipPolicy = NPESkipPolicy()
 
   @Bean
-  fun ndmisReferralPerformanceReportJobLauncher(ndmisReferralPerformanceReportJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(ndmisReferralPerformanceReportJob)
+  fun ndmisReferralPerformanceReportJobLauncher(ndmisReferralPerformanceReportJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(ndmisReferralPerformanceReportJob, JobParametersIncrementer { parameters -> OutputPathIncrementer().getNext(TimestampIncrementer().getNext(parameters)) })
 
   @Bean("ndmisReferralReader")
   @JobScope
@@ -112,10 +113,10 @@ class NdmisReferralPerformanceReportJobConfiguration(
     ndmisWriteReferralToCsvStep: Step,
     pushReferralToS3Step: Step,
   ): Job {
-    val validator = CustomJobParametersValidator(arrayOf("timestamp", "outputPath"))
+    val validator = DefaultJobParametersValidator()
+    validator.setRequiredKeys(arrayOf("timestamp", "outputPath"))
 
     return JobBuilder("ndmisReferralPerformanceReportJob", jobRepository)
-      .incrementer { parameters -> OutputPathIncrementer().getNext(TimestampIncrementer().getNext(parameters)) }
       .validator(validator)
       .start(ndmisWriteReferralToCsvStep)
       .next(pushReferralToS3Step)
@@ -127,7 +128,7 @@ class NdmisReferralPerformanceReportJobConfiguration(
     @Qualifier("ndmisReferralReader") ndmisReader: JdbcCursorItemReader<ReferralsData>,
     writer: FlatFileItemWriter<ReferralsData>,
   ): Step = StepBuilder("ndmisWriteReferralToCsvStep", jobRepository)
-    .chunk<ReferralsData, ReferralsData>(chunkSize, transactionManager)
+    .chunk<ReferralsData, ReferralsData>(chunkSize)
     .reader(ndmisReader)
     .writer(writer)
     .faultTolerant()
