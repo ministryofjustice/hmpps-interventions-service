@@ -24,25 +24,31 @@
   },
   "internal_intervention_id": "d039c87e-94ab-4c45-9303-7f7a6426786c",
   "intervention_title": "Finance, Benefit & Debt in Custody in Yorkshire and the Humber",
-  "short_description": "Services are available to all adult males  pre-release who are sentenced. These services can be delivered at any point during the custodial element of the sentence and can be accessed by all people sentenced, regardless of the location they will be released to.  Interventions commenced in custody, but not completed prior to release, may continue in the community until the intervention is completed under the same referral.\n\n Any Sessions delivered as part of a mandated Licence or Post Sentence Supervision appointment will be Enforceable.\n\nServices will be offered as High complexity.\n\nDelivery methods include skills-building, support and advocacy and advice/, guidance/information.\nInterventions will be tailored to meet the specific needs of the individual to enable them to make progress towards their agreed outcomes, as identified in their Action Plan and will aim to secure one or more of the following outcomes:\n\n•\tthe person referred’s financial management skills are developed and/or enhanced, including online banking skills\n•\tthe person referred can successfully navigate the benefits system\n•\tPathways are established to help the person referred to maintain and sustain an income, safely manage money and reduce debt\n•\tthe person referred has access to appropriate financial products, advice and/or services\n•\tthe person referred gains quick access to universal credit, including pre-release referrals\n•\tthe person referred is supported to complete tasks that they would not otherwise be able to do whilst being in custody e.g. support with banking or debt management",
+  "short_description": "Services are available for all adult males within YatH prisons who are under YatH probation supervision.\n\n- on a Community Sentence or Suspended Sentence Order and subject to a Rehabilitation Activity Requirement (RAR) whereby a specified number of RAR Activity Days will be allocated.\n- pre-release to people who are sentenced\n- released on licence and post-sentence supervision.\n-to address immediate needs on Reception into Custody \n\nAny further needs can be identified and addressed through pre-release planning and continue into the community under the same referral.\n\nAny Sessions delivered as part of a mandated Licence; Post Sentence Supervision appointment and Community Order will be Enforceable.\nService will be delivered as follows.\n\nCustody [on Reception] Low Complexity\n\nCustody [Pre-Release and into the Community] Low, Medium & High Complexity\n\nCommunity Low, Medium & High Complexity-OGRS over 25 only\n\nDelivery methods include skills-building, support and advocacy and advice/ guidance/ information.\n\nInterventions will be tailored to meet the specific needs of the individual to enable them to make progress towards their agreed outcomes, as identified in their Action Plan and will aim to secure one or more of the following outcomes:\n\n• the person referred’s financial management skills are developed and/or enhanced, including online banking skills\n• the person referred can successfully navigate the benefits system\n• Pathways are established to help the person referred to maintain and sustain an income, safely manage money and reduce debt\n• the person referred has access to appropriate financial products, advice and/or services\n• the person referred gains quick access to universal credit, including pre-release referrals\n• the person referred is supported to complete tasks that they would not otherwise be able to do whilst being in custody e.g. support with banking or debt management",
   "activities": [
     {
       "need_area": "Finance, Benefit & Debt",
       "activity": "Benefits",
       "delivery_method": "One-to-one",
-      "delivery_location": "Doncaster, Hull, Leeds; Optional: Hatfield, Moorland, Lindholme, Humber, Wealstun"
+      "delivery_location": "HMP Doncaster, HMP Hull, HMP Leeds; Optional: HMP Hatfield, HMP Moorland, HMP Lindholme, HMP Humber, HMP Wealstun, HMP Millsike, Sheffield, Rotherham, Barnsley, Doncaster, Leeds, Wakefield, Bradford, Calderdale, Kirklees, York, Scarborough, Harrogate, Northallerton, Skipton, Hull, Bridlington, Goole, Beverley, Grimsby & Scunthorpe"
     },
     {
       "need_area": "Finance, Benefit & Debt",
       "activity": "ID/Bank Accounts",
       "delivery_method": "One-to-one",
-      "delivery_location": "Doncaster, Hull, Leeds; Optional: Hatfield, Moorland, Lindholme, Humber, Wealstun"
+      "delivery_location": "HMP Doncaster, HMP Hull, HMP Leeds; Optional: HMP Hatfield, HMP Moorland, HMP Lindholme, HMP Humber, HMP Wealstun, HMP Millsike, Sheffield, Rotherham, Barnsley, Doncaster, Leeds, Wakefield, Bradford, Calderdale, Kirklees, York, Scarborough, Harrogate, Northallerton, Skipton, Hull, Bridlington, Goole, Beverley, Grimsby & Scunthorpe"
     },
     {
       "need_area": "Finance, Benefit & Debt",
       "activity": "Budgeting",
       "delivery_method": "One-to-one",
-      "delivery_location": "Doncaster, Hull, Leeds; Optional: Hatfield, Moorland, Lindholme, Humber, Wealstun"
+      "delivery_location": "HMP Doncaster, HMP Hull, HMP Leeds; Optional: HMP Hatfield, HMP Moorland, HMP Lindholme, HMP Humber, HMP Wealstun, HMP Millsike, Sheffield, Rotherham, Barnsley, Doncaster, Leeds, Wakefield, Bradford, Calderdale, Kirklees, York, Scarborough, Harrogate, Northallerton, Skipton, Hull, Bridlington, Goole, Beverley, Grimsby & Scunthorpe"
+    },
+    {
+      "need_area": "Finance, Benefit & Debt",
+      "activity": "Debt Management",
+      "delivery_method": "One-to-one",
+      "delivery_location": "HMP Doncaster, HMP Hull, HMP Leeds; Optional: HMP Hatfield, HMP Moorland, HMP Lindholme, HMP Humber, HMP Wealstun, HMP Millsike, Sheffield, Rotherham, Barnsley, Doncaster, Leeds, Wakefield, Bradford, Calderdale, Kirklees, York, Scarborough, Harrogate, Northallerton, Skipton, Hull, Bridlington, Goole, Beverley, Grimsby & Scunthorpe"
     }
   ]
 }

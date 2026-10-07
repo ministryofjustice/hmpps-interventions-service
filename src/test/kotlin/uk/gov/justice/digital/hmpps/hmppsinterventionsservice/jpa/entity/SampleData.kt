@@ -170,6 +170,7 @@ class SampleData {
       pccRegion: PCCRegion? = null,
       contractReference: String = RandomStringUtils.randomAlphanumeric(8),
       referralStartDate: LocalDate = LocalDate.of(2020, 12, 1),
+      referralEndAt: OffsetDateTime? = null,
     ): DynamicFrameworkContract = DynamicFrameworkContract(
       id = id ?: UUID.randomUUID(),
       contractType = contractType ?: sampleContractType(),
@@ -184,6 +185,7 @@ class SampleData {
       pccRegion = pccRegion,
       contractReference = contractReference,
       referralStartDate = referralStartDate,
+      referralEndAt = referralEndAt,
     )
 
     fun sampleContractType(

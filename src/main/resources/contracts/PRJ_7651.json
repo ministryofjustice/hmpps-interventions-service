@@ -24,61 +24,73 @@
   },
   "internal_intervention_id": "c706771a-9561-4022-8a67-515265742362",
   "intervention_title": "Finance, Benefit and Debt Services in Thames Valley",
-  "short_description": "Services are available for all adult males on probation either on a Community Sentence or Suspended Sentence Order or released on licence.  Services can be delivered as part of a Rehabilitation Activity Requirement (RAR) whereby a specified number of RAR Activity Days will be allocated by the Probation Service for those subject to a Community Sentence or Suspended Sentence Order. Any Sessions delivered as part of a RAR Activity Day or as a mandated Licence or Post Sentence Supervision appointment will be Enforceable. \n\nServices are offered as either Low, Medium or High complexity.\n\nA range of delivery methods need to be used including:  designing and delivery, support and advocacy and advice, guidance and information.  \n\nInterventions must be tailored to meet the specific needs of each Person(s) on Probation to enable them to make progress towards  their agreed outcomes, as identified in the Person(s) on Probations Action Plan and aim to secure one or more of the following outcomes:  \n\nPerson(s) on probation has access to appropriate financial products, advice and/or services. \n\nPathways are established to help person(s) on probation maintain and sustain an income, safely manage money and reduce debt. \n\nPerson(s) on probation financial management skills are developed and/or enhanced. \n\nPerson(s) on probation can successfully navigate the benefits system, including online banking skills. \n\nPerson(s) on probation gains quick access to universal credit.",
+  "short_description": "Services are available for all adult males on probation and within specified prison establishments.  \nCRS Finance Benefit & Debt services are available for those on probation who are subject to:  \n\n    - a Community Sentence or Suspended Sentence Order and are subject to   \na Rehabilitation Activity Requirement (RAR)  \n    - released on licence and post-sentence supervision.   \n\nCRS Finance Benefit & Debt services are available for those in prison who are.  \n\n    - Sentenced  \n\nServices will include a range of delivery methods including designing and delivery, support, advocacy and advice, and guidance and information. The level of the recipient’s complexity will determine the support required which includes:  \n\n    - Community: Low, Medium, and High complexity  \n    - Custody: High complexity only  \n\nFor those on probation in the community, a specified number of RAR Activity Days will be allocated. Any Sessions delivered as part of a RAR Activity Day or as a mandated Licence or Post Sentence Supervision appointment is enforceable.  \n\nThe CRS Finance Benefit & Debt service is designed to support People on Probation and in Prison to enable them to make progress towards agreed outcomes. These are identified in their individually tailored Action Plan and aims to secure one or more of the following outcomes:  \n\n    - access to appropriate financial products, advice and/or services.  \n    - to help maintain and sustain an income, safely manage money and   \n    reduce debt.  \n    - Develop or enhance financial management skills.  \n    - successfully navigate the benefits system, including online banking skills.  \n    - gains quick access to universal credit, where applicable.",
   "activities": [
     {
       "need_area": "Finance Benefits & Debt",
-      "activity": "Looking at Banking",
+      "activity": "Banking",
       "delivery_method": "Group/One to one",
-      "delivery_location": "Andover, Basingstoke, Farnborough/Aldershot, Gosport, Havant, Isle of Wight, Lymington/New Forest, Portsmouth, Southampton, Aylesbury, Bicester, Bracknell, High Wycombe, Milton Keynes/Bletchley, Newbury, Oxford, Reading, Slough"
+      "delivery_location": "Andover, Basingstoke, Farnborough/Aldershot, Gosport, Havant, Isle of Wight, Lymington/New Forest, Portsmouth, Southampton, Aylesbury, Bicester, Bracknell, High Wycombe, Milton Keynes/Bletchley, Newbury, Oxford, Reading, Slough, HMP Winchester (HIOW) and HMP Bullingdon (TV)"
     },
     {
       "need_area": "Finance Benefits & Debt",
-      "activity": "Looking at benefits calculators",
+      "activity": "Benefits",
       "delivery_method": "Group/One to one",
-      "delivery_location": "Andover, Basingstoke, Farnborough/Aldershot, Gosport, Havant, Isle of Wight, Lymington/New Forest, Portsmouth, Southampton, Aylesbury, Bicester, Bracknell, High Wycombe, Milton Keynes/Bletchley, Newbury, Oxford, Reading, Slough"
+      "delivery_location": "Andover, Basingstoke, Farnborough/Aldershot, Gosport, Havant, Isle of Wight, Lymington/New Forest, Portsmouth, Southampton, Aylesbury, Bicester, Bracknell, High Wycombe, Milton Keynes/Bletchley, Newbury, Oxford, Reading, Slough, HMP Winchester (HIOW) and HMP Bullingdon (TV)"
     },
     {
       "need_area": "Finance Benefits & Debt",
-      "activity": "Looking at benefits",
+      "activity": "Benefit calculators",
       "delivery_method": "Group/One to one",
-      "delivery_location": "Andover, Basingstoke, Farnborough/Aldershot, Gosport, Havant, Isle of Wight, Lymington/New Forest, Portsmouth, Southampton, Aylesbury, Bicester, Bracknell, High Wycombe, Milton Keynes/Bletchley, Newbury, Oxford, Reading, Slough"
+      "delivery_location": "Andover, Basingstoke, Farnborough/Aldershot, Gosport, Havant, Isle of Wight, Lymington/New Forest, Portsmouth, Southampton, Aylesbury, Bicester, Bracknell, High Wycombe, Milton Keynes/Bletchley, Newbury, Oxford, Reading, Slough, HMP Winchester (HIOW) and HMP Bullingdon (TV)"
     },
     {
       "need_area": "Finance Benefits & Debt",
-      "activity": "Looking at budgeting",
+      "activity": "Budgeting",
       "delivery_method": "Group/One to one",
-      "delivery_location": "Andover, Basingstoke, Farnborough/Aldershot, Gosport, Havant, Isle of Wight, Lymington/New Forest, Portsmouth, Southampton, Aylesbury, Bicester, Bracknell, High Wycombe, Milton Keynes/Bletchley, Newbury, Oxford, Reading, Slough"
+      "delivery_location": "Andover, Basingstoke, Farnborough/Aldershot, Gosport, Havant, Isle of Wight, Lymington/New Forest, Portsmouth, Southampton, Aylesbury, Bicester, Bracknell, High Wycombe, Milton Keynes/Bletchley, Newbury, Oxford, Reading, Slough, HMP Winchester (HIOW) and HMP Bullingdon (TV)"
     },
     {
       "need_area": "Finance Benefits & Debt",
       "activity": "Looking at my budget",
-      "delivery_method": "One to one",
-      "delivery_location": "Andover, Basingstoke, Farnborough/Aldershot, Gosport, Havant, Isle of Wight, Lymington/New Forest, Portsmouth, Southampton, Aylesbury, Bicester, Bracknell, High Wycombe, Milton Keynes/Bletchley, Newbury, Oxford, Reading, Slough"
+      "delivery_method": "Group/One to one",
+      "delivery_location": "Andover, Basingstoke, Farnborough/Aldershot, Gosport, Havant, Isle of Wight, Lymington/New Forest, Portsmouth, Southampton, Aylesbury, Bicester, Bracknell, High Wycombe, Milton Keynes/Bletchley, Newbury, Oxford, Reading, Slough, HMP Winchester (HIOW) and HMP Bullingdon (TV)"
     },
     {
       "need_area": "Finance Benefits & Debt",
-      "activity": "Looking at debts",
+      "activity": "Debt",
       "delivery_method": "Group/One to one",
-      "delivery_location": "Andover, Basingstoke, Farnborough/Aldershot, Gosport, Havant, Isle of Wight, Lymington/New Forest, Portsmouth, Southampton, Aylesbury, Bicester, Bracknell, High Wycombe, Milton Keynes/Bletchley, Newbury, Oxford, Reading, Slough"
+      "delivery_location": "Andover, Basingstoke, Farnborough/Aldershot, Gosport, Havant, Isle of Wight, Lymington/New Forest, Portsmouth, Southampton, Aylesbury, Bicester, Bracknell, High Wycombe, Milton Keynes/Bletchley, Newbury, Oxford, Reading, Slough, HMP Winchester (HIOW) and HMP Bullingdon (TV)"
     },
     {
       "need_area": "Finance Benefits & Debt",
       "activity": "Looking at loans and sanctions",
       "delivery_method": "Group/One to one",
-      "delivery_location": "Andover, Basingstoke, Farnborough/Aldershot, Gosport, Havant, Isle of Wight, Lymington/New Forest, Portsmouth, Southampton, Aylesbury, Bicester, Bracknell, High Wycombe, Milton Keynes/Bletchley, Newbury, Oxford, Reading, Slough"
+      "delivery_location": "Andover, Basingstoke, Farnborough/Aldershot, Gosport, Havant, Isle of Wight, Lymington/New Forest, Portsmouth, Southampton, Aylesbury, Bicester, Bracknell, High Wycombe, Milton Keynes/Bletchley, Newbury, Oxford, Reading, Slough, HMP Winchester (HIOW) and HMP Bullingdon (TV)"
     },
     {
       "need_area": "Finance Benefits & Debt",
-      "activity": "Looking at financial awareness",
+      "activity": "Financial awareness",
       "delivery_method": "Group/One to one",
-      "delivery_location": "Andover, Basingstoke, Farnborough/Aldershot, Gosport, Havant, Isle of Wight, Lymington/New Forest, Portsmouth, Southampton, Aylesbury, Bicester, Bracknell, High Wycombe, Milton Keynes/Bletchley, Newbury, Oxford, Reading, Slough"
+      "delivery_location": "Andover, Basingstoke, Farnborough/Aldershot, Gosport, Havant, Isle of Wight, Lymington/New Forest, Portsmouth, Southampton, Aylesbury, Bicester, Bracknell, High Wycombe, Milton Keynes/Bletchley, Newbury, Oxford, Reading, Slough, HMP Winchester (HIOW) and HMP Bullingdon (TV)"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "Loans and sanctions",
+      "delivery_method": "Group/One to one",
+      "delivery_location": "Andover, Basingstoke, Farnborough/Aldershot, Gosport, Havant, Isle of Wight, Lymington/New Forest, Portsmouth, Southampton, Aylesbury, Bicester, Bracknell, High Wycombe, Milton Keynes/Bletchley, Newbury, Oxford, Reading, Slough, HMP Winchester (HIOW) and HMP Bullingdon (TV)"
     },
     {
       "need_area": "Finance Benefits & Debt",
       "activity": "Quantifying debt and type of debt",
       "delivery_method": "Group/One to one",
-      "delivery_location": "Andover, Basingstoke, Farnborough/Aldershot, Gosport, Havant, Isle of Wight, Lymington/New Forest, Portsmouth, Southampton, Aylesbury, Bicester, Bracknell, High Wycombe, Milton Keynes/Bletchley, Newbury, Oxford, Reading, Slough"
+      "delivery_location": "Andover, Basingstoke, Farnborough/Aldershot, Gosport, Havant, Isle of Wight, Lymington/New Forest, Portsmouth, Southampton, Aylesbury, Bicester, Bracknell, High Wycombe, Milton Keynes/Bletchley, Newbury, Oxford, Reading, Slough, HMP Winchester (HIOW) and HMP Bullingdon (TV)"
+    },
+    {
+      "need_area": "Finance Benefits & Debt",
+      "activity": "My budget",
+      "delivery_method": "Group/One to one",
+      "delivery_location": "Andover, Basingstoke, Farnborough/Aldershot, Gosport, Havant, Isle of Wight, Lymington/New Forest, Portsmouth, Southampton, Aylesbury, Bicester, Bracknell, High Wycombe, Milton Keynes/Bletchley, Newbury, Oxford, Reading, Slough, HMP Winchester (HIOW) and HMP Bullingdon (TV)"
     }
   ]
 }

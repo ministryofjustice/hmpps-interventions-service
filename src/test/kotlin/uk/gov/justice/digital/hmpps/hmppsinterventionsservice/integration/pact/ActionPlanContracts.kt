@@ -46,7 +46,7 @@ class ActionPlanContracts(private val setupAssistant: SetupAssistant) {
   )
   fun createAndEmptyDraftPlan() {
     // create an empty draft plan with 2 2 hours appointments
-    val referral = setupAssistant.createSentReferral(sentAt = OffsetDateTime.now().minusDays(1))
+    val referral = setupAssistant.createSentReferral(sentAt = OffsetDateTime.parse("2025-12-31T12:00:00Z"))
     setupAssistant.createActionPlan(
       id = UUID.fromString("345059d4-1697-467b-8914-fedec9957279"),
       numberOfSessions = 2,

@@ -31,12 +31,15 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ServiceUse
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.UserDetail
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFrameworkContractFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceProviderFactory
+import java.time.Clock
 import java.time.LocalDate
+import java.time.OffsetDateTime
 import java.util.UUID
 
 @PactBroker
 @Provider("Interventions Service")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@Import(PactTest.FixedClockConfig::class)
 class PactTest : IntegrationTestBase() {
   @MockitoBean private lateinit var communityAPIOffenderService: CommunityAPIOffenderService
 
@@ -66,7 +69,17 @@ class PactTest : IntegrationTestBase() {
 
     whenever(communityAPIOffenderService.checkIfAuthenticatedDeliusUserHasAccessToServiceUser(any(), any()))
       .thenReturn(ServiceUserAccessResult(true, emptyList()))
-    whenever(ramDeliusAPIConvictionService.getConvictionDetails(any(), any())).thenReturn(ConvictionDetails(Conviction(123456L, LocalDate.now(), Sentence("custodial", LocalDate.now()), Offence("", ""), false)))
+    whenever(ramDeliusAPIConvictionService.getConvictionDetails(any(), any())).thenReturn(
+      ConvictionDetails(
+        Conviction(
+          123456L,
+          LocalDate.parse("2020-01-01"),
+          Sentence("custodial", LocalDate.parse("2020-01-02")),
+          Offence("", ""),
+          false,
+        ),
+      ),
+    )
     // required for SP users
     whenever(hmppsAuthService.getUserDetail(any<AuthUserDTO>())).thenReturn(UserDetail("tom", "tom@tom.tom", "jones"))
     whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("tom", "tom@tom.tom", "jones"))
@@ -96,4 +109,11 @@ class PactTest : IntegrationTestBase() {
 
   @State("nothing")
   fun `noop`() {}
+
+  @TestConfiguration
+  open class FixedClockConfig {
+    @Bean
+    @Primary
+    fun pactTestClock(): Clock = Clock.fixed(OffsetDateTime.parse("2025-12-31T12:00:00Z").toInstant(), OffsetDateTime.parse("2025-12-31T12:00:00Z").offset)
+  }
 }

@@ -100,7 +100,7 @@ open class BaseReferralFactory(em: TestEntityManager? = null) : EntityFactory(em
         needsInterpreter = needsInterpreter,
         interpreterLanguage = interpreterLanguage,
         probationPractitionerDetails = probationPractitionerDetails,
-        status = status,
+        status = status ?: Status.PRE_ICA,
         referralDetailsHistory = if (referralDetails != null) {
           setOf(
             referralDetails.let {

@@ -26,4 +26,19 @@ interface ReferralRepository :
   fun referralForSar(serviceUserCRN: String, from: OffsetDateTime, to: OffsetDateTime): List<Referral>
 
   fun findByServiceUserCRN(crn: String): List<Referral>
+
+  /**
+   * SAS-specific query: eagerly fetches selectedServiceCategories and the intervention →
+   * dynamicFrameworkContract → primeProvider chain in a single query to avoid N+1 lazy-load
+   * round-trips.  subcontractorProviders is left for BatchSize-based batch loading.
+   */
+  @Query(
+    """select distinct r from Referral r
+      left join fetch r.selectedServiceCategories
+      join fetch r.intervention i
+      join fetch i.dynamicFrameworkContract dc
+      join fetch dc.primeProvider
+      where r.serviceUserCRN = :crn""",
+  )
+  fun findByServiceUserCRNForSAS(crn: String): List<Referral>
 }

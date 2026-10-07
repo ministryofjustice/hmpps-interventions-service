@@ -16,11 +16,12 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appoint
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentSessionType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NoSessionReasonType
+import java.time.Clock
 import java.time.OffsetDateTime
 
 internal class AppointmentValidatorTest {
 
-  private val deliverySessionValidator = AppointmentValidator()
+  private val deliverySessionValidator = AppointmentValidator(Clock.systemUTC())
 
   @Nested
   inner class ValidateUpdateAppointment {

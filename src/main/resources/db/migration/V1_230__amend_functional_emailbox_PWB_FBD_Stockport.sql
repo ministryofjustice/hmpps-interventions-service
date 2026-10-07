@@ -1,0 +1,1 @@
+update intervention set incoming_referral_distribution_email = 'leilah.batamuliza@blg.cjsm.net' where id in ('ca50ef72-7b4b-4545-a98b-603a47ce8fec','849ac3b6-2c42-42c4-a514-d1e6784d394d');

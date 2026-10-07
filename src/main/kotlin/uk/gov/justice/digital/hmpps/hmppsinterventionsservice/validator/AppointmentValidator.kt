@@ -16,12 +16,13 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NoSessi
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NoSessionReasonType.LOGISTICS
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NoSessionReasonType.POP_ACCEPTABLE
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NoSessionReasonType.POP_UNACCEPTABLE
+import java.time.Clock
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
 
 @Component
-class AppointmentValidator {
+class AppointmentValidator(private val clock: Clock) {
   companion object : KLogging() {
     val postCodeRegex = Regex("""^[A-Z]{1,2}\d[A-Z\d]?\d[A-Z]{2}${'$'}""")
   }
@@ -52,7 +53,7 @@ class AppointmentValidator {
     }
 
     val maximumDate =
-      OffsetDateTime.now().plus(6, ChronoUnit.MONTHS).withHour(23).withMinute(59).withSecond(59)
+      OffsetDateTime.now(clock).plus(6, ChronoUnit.MONTHS).withHour(23).withMinute(59).withSecond(59)
 
     if (referralStartDate != null && updateAppointmentDTO.appointmentTime.isAfter(maximumDate)) {
       errors.add(FieldError(field = "appointmentTime", error = Code.APPOINTMENT_TIME_TOO_FAR_IN_FUTURE))
@@ -114,7 +115,7 @@ class AppointmentValidator {
     errors: MutableList<FieldError>,
   ) {
     // if the appointment occurred today or on a date in the future, no attendance validation is required
-    if (appointmentTime.isAfter(OffsetDateTime.now().with(LocalTime.MIN))) {
+    if (appointmentTime.isAfter(OffsetDateTime.now(clock).with(LocalTime.MIN))) {
       return
     }
 

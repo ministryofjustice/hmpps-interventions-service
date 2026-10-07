@@ -138,7 +138,7 @@ class Referral(
   @Enumerated(EnumType.STRING)
   @Column(columnDefinition = "status")
   @JdbcType(PostgreSQLEnumJdbcType::class)
-  @org.jetbrains.annotations.NotNull
+  @NotNull
   var status: Status? = Status.PRE_ICA,
 ) {
   val urn: String
