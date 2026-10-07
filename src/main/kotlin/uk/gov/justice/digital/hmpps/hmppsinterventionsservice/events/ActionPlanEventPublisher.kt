@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events
 
+import jakarta.persistence.EntityManager
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
@@ -12,7 +13,11 @@ enum class ActionPlanEventType {
   APPROVED,
 }
 
-class ActionPlanEvent(source: Any, val type: ActionPlanEventType, val actionPlan: ActionPlan, val detailUrl: String) : ApplicationEvent(source) {
+class ActionPlanEvent(source: Any, val type: ActionPlanEventType, val actionPlan: ActionPlan, val detailUrl: String) :
+  ApplicationEvent(source),
+  EntityEvent {
+  override fun reloadIn(entityManager: EntityManager) = ActionPlanEvent(source, type, entityManager.reload(actionPlan), detailUrl)
+
   override fun toString(): String = "ActionPlanEvent(type=$type, actionPlanId=${actionPlan.id}, detailUrl='$detailUrl', source=$source)"
 }
 

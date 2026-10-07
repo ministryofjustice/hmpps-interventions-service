@@ -20,6 +20,17 @@ and it was masking several production startup bugs. Changes made:
 - **Spring Batch 6**: `DefaultJobParametersValidator` and `ListItemReader` were *not* removed, only moved (`org.springframework.batch.core.job.parameters`, `org.springframework.batch.infrastructure.item.support`). The hand-written replacements, which rejected non-String parameters, were removed. The timestamp/outputPath incrementers check for parameter presence again.
 - Removed version pins that fought the Boot BOM (`spring-security-crypto:6.5.0`, `spring-batch-core:6.0.5`).
 
+### Async events and Hibernate 7
+Spring events are processed asynchronously (`EventsConfiguration`), but listeners were reading lazy associations of
+entities owned by the publishing request's Hibernate session, from another thread. Hibernate sessions aren't thread-safe;
+Hibernate 7 detects this (`Illegal pop() with non-matching JdbcValuesSourceProcessingState`), intermittently failing
+the request with a 500 or failing the listener (dropping SNS/Notify events). It showed up in the Pact verification.
+
+Events carrying entities now implement `EntityEvent`. The `EntityEventMulticaster` dispatches them after the publishing
+transaction commits, and runs each of our listeners in its own transaction with a copy of the event whose entities are
+reloaded in that transaction. Behaviour changes: listeners see committed data, and events from a transaction that rolls
+back are no longer sent.
+
 ### Spring Batch 6 deprecations removed
 - Chunk steps use `chunk(size)` + `.transactionManager(tm)`, which builds Batch 6's new `ChunkOrientedStep`. The transaction manager must be set explicitly – it otherwise defaults to `ResourcelessTransactionManager`.
 - `ChunkListener` callbacks taking a `ChunkContext` are no longer called by the new step; `ReferralChunkProgressListener` uses the `Chunk` callbacks and counts items itself (the step execution's read count is only updated after `afterChunk`).
