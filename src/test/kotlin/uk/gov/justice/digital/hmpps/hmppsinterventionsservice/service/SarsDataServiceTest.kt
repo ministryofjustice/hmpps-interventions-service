@@ -1,10 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CaseNoteRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftReferralRepository
@@ -28,12 +27,6 @@ class SarsDataServiceTest @Autowired constructor(
 ) {
   private val referralFactory = ReferralFactory(entityManager)
   private val deliverySessionFactory = DeliverySessionFactory(entityManager)
-
-  @AfterEach
-  fun `clear referrals`() {
-    referralRepository.deleteAll()
-    deliverySessionRepository.deleteAll()
-  }
   private val sarsDataService = SarsDataService(referralRepository, deliverySessionRepository, interventionRepository, caseNoteRepository, draftReferralRepository)
 
   @Test

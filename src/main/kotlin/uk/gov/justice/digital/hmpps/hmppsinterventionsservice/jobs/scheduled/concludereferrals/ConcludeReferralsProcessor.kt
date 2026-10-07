@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.co
 import mu.KLogging
 import net.logstash.logback.argument.StructuredArguments.kv
 import org.springframework.batch.core.configuration.annotation.JobScope
-import org.springframework.batch.item.ItemProcessor
+import org.springframework.batch.infrastructure.item.ItemProcessor
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository

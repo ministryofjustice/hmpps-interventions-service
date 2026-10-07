@@ -15,7 +15,7 @@ import jakarta.validation.constraints.NotNull
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
 import org.hibernate.annotations.JdbcType
-import org.hibernate.dialect.PostgreSQLEnumJdbcType
+import org.hibernate.dialect.type.PostgreSQLEnumJdbcType
 import java.time.OffsetDateTime
 import java.util.UUID
 

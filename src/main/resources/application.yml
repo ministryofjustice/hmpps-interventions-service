@@ -11,8 +11,6 @@ spring:
     date-format: "yyyy-MM-dd HH:mm:ss"
     mapper:
       default-view-inclusion: true
-    serialization:
-      WRITE_DATES_AS_TIMESTAMPS: false
   security:
     oauth2:
       client:
@@ -43,7 +41,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-      dialect: PostgresSQLDialect
+      dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
   batch:
     job:

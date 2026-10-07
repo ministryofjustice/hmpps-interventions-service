@@ -17,7 +17,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -180,14 +180,9 @@ class ReferralServiceTest @Autowired constructor(
   }
 
   @AfterEach
-  fun `clear referrals`() {
+  fun `flush pending changes`() {
+    // @RepositoryTest rolls back each test; flushing surfaces any constraint violations first
     entityManager.flush()
-    interventionRepository.deleteAll()
-    referralDetailsRepository.deleteAll()
-    authUserRepository.deleteAll()
-    changelogRepository.deleteAll()
-    draftReferralRepository.deleteAll()
-    referralRepository.deleteAll()
   }
 
   @Nested

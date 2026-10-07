@@ -5,7 +5,6 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.security.oauth2.client.endpoint.OAuth2ClientCredentialsGrantRequest
 import org.springframework.security.oauth2.client.registration.ClientRegistration
 import org.springframework.security.oauth2.core.AuthorizationGrantType
@@ -20,6 +19,12 @@ class RetryingClientCredentialsTokenResponseClientTest : LoggingSpyTest(Retrying
       .tokenUri(mockWebServer.url("/oauth/token").toString())
       .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
       .build(),
+  )
+  private val tokenConfig = TokenRequestConfig(
+    connectTimeoutMs = 50,
+    readTimeoutMs = 100,
+    retries = 3,
+    retryDelayMs = 0,
   )
 
   @Test
@@ -45,16 +50,8 @@ class RetryingClientCredentialsTokenResponseClientTest : LoggingSpyTest(Retrying
         ),
     )
 
-    val tokenConfig = TokenRequestConfig(
-      connectTimeoutMs = 50,
-      readTimeoutMs = 100,
-      retries = 3,
-      retryDelayMs = 0,
-    )
-
     val client = RetryingClientCredentialsTokenResponseClient(
       tokenConfig,
-      RestTemplateBuilder(),
     )
 
     client.getTokenResponse(grantRequest)

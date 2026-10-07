@@ -169,7 +169,7 @@ class CommunityAPIBookingService(
       AppointmentType.SUPPLIER_ASSESSMENT -> ppSupplierAssessmentLocation
     }
 
-    return UriComponentsBuilder.fromHttpUrl(interventionsUIBaseURL)
+    return UriComponentsBuilder.fromUriString(interventionsUIBaseURL)
       .path(location)
       .buildAndExpand(referral.id)
       .toString()

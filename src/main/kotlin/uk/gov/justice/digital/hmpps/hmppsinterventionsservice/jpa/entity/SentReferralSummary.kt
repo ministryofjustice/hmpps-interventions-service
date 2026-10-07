@@ -19,7 +19,6 @@ import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
-import org.hibernate.annotations.Where
 import java.time.OffsetDateTime
 import java.util.UUID
 @NamedEntityGraph(
@@ -61,7 +60,6 @@ class SentReferralSummary(
   @Id val id: UUID,
   @ElementCollection
   @CollectionTable(name = "referral_assignments")
-  @Where(clause = "superseded = false")
   val assignments: MutableList<ReferralAssignment> = mutableListOf(),
   @ManyToOne
   @Fetch(FetchMode.JOIN)

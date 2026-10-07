@@ -23,7 +23,7 @@ class LocationMapper(
   // e.g. current request URL http://interventions.go.uk/draft-referral + path referral/{id}
   //      returns http://interventions.go.uk/referral/1123456
   fun expandPathToCurrentContextPathUrl(path: String, vararg uriVariableValues: Any): URI = UriComponentsBuilder
-    .fromHttpUrl(interventionsApiBaseUrl)
+    .fromUriString(interventionsApiBaseUrl)
     .path(path)
     .buildAndExpand(*uriVariableValues)
     .toUri()

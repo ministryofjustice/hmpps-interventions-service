@@ -16,6 +16,7 @@ import org.springframework.web.context.request.ServletRequestAttributes
 import org.springframework.web.server.ServerWebInputException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.CreateReferralRequestDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DraftOasysRiskInformationService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DraftReferralService
@@ -23,6 +24,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralCo
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ReferralFactory
+import java.time.OffsetDateTime
 import java.util.UUID
 
 internal class DraftReferralControllerTest {
@@ -44,10 +46,10 @@ internal class DraftReferralControllerTest {
   @Test
   fun `createDraftReferral handles EntityNotFound exceptions from InterventionsService`() {
     val token = tokenFactory.create()
-    whenever(draftReferralService.createDraftReferral(any(), any(), any(), anyOrNull(), anyOrNull())).thenThrow(
+    whenever(draftReferralService.createDraftReferral(any<AuthUser>(), any<String>(), any<UUID>(), anyOrNull<UUID>(), anyOrNull<OffsetDateTime>())).thenThrow(
       EntityNotFoundException::class.java,
     )
-    whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
+    whenever(authUserRepository.save(any<AuthUser>())).thenReturn(authUserFactory.create())
     assertThrows<ServerWebInputException> {
       draftReferralController.createDraftReferral(CreateReferralRequestDTO("CRN20", UUID.randomUUID()), token)
     }
@@ -72,13 +74,14 @@ internal class DraftReferralControllerTest {
         whenever(draftReferralService.getDraftReferralForUser(draftReferral.id, user)).thenReturn(draftReferral)
         whenever(draftReferralService.sendDraftReferral(draftReferral, user)).thenReturn(sentReferral)
         whenever(referralConcluder.requiresEndOfServiceReportCreation(sentReferral)).thenReturn(false)
-        whenever(authUserRepository.save(any())).thenReturn(user)
+        whenever(authUserRepository.save(any<AuthUser>())).thenReturn(user)
         val sentReferralResponse = draftReferralController.sendDraftReferral(
           draftReferral.id,
           token,
         )
-        assertThat(sentReferralResponse.body.id).isEqualTo(sentReferral.id)
-        assertThat(sentReferralResponse.body.endOfServiceReportCreationRequired).isFalse
+        val sentReferralBody = requireNotNull(sentReferralResponse.body)
+        assertThat(sentReferralBody.id).isEqualTo(sentReferral.id)
+        assertThat(sentReferralBody.endOfServiceReportCreationRequired).isFalse
       }
     }
 
@@ -91,8 +94,8 @@ internal class DraftReferralControllerTest {
 
       @Test
       fun `getDraftReferralByID returns a sent referral if it exists`() {
-        whenever(draftReferralService.getDraftReferralForUser(eq(referral.id), any())).thenReturn(referral)
-        whenever(authUserRepository.save(any())).thenReturn(user)
+        whenever(draftReferralService.getDraftReferralForUser(eq(referral.id), any<AuthUser>())).thenReturn(referral)
+        whenever(authUserRepository.save(any<AuthUser>())).thenReturn(user)
 
         val draftReferral = draftReferralController.getDraftReferralByID(
           referral.id,
@@ -110,8 +113,8 @@ internal class DraftReferralControllerTest {
 
       @Test
       fun `getDraftReferrals returns a list of draft referrals if they exist`() {
-        whenever(draftReferralService.getDraftReferralsForUser(any())).thenReturn(listOf(referral))
-        whenever(authUserRepository.save(any())).thenReturn(user)
+        whenever(draftReferralService.getDraftReferralsForUser(any<AuthUser>())).thenReturn(listOf(referral))
+        whenever(authUserRepository.save(any<AuthUser>())).thenReturn(user)
 
         val draftReferrals = draftReferralController.getDraftReferrals(token)
         assertThat(draftReferrals).isNotNull

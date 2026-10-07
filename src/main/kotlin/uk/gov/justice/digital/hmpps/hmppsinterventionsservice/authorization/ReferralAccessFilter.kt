@@ -13,10 +13,10 @@ class ReferralAccessFilter(
   private val serviceProviderAccessScopeMapper: ServiceProviderAccessScopeMapper,
 ) {
 
-  fun <T> serviceProviderReferrals(referralSpec: Specification<T>, user: AuthUser): Specification<T> {
+  fun <T : Any> serviceProviderReferrals(referralSpec: Specification<T>, user: AuthUser): Specification<T> {
     val userScope = serviceProviderAccessScopeMapper.fromUser(user)
     // TODO come back later and fix the bug for throwing error page
-    return referralSpec.and(ReferralSpecifications.withSPAccess(userScope.contracts))
+    return referralSpec.and(ReferralSpecifications.withSPAccess<T>(userScope.contracts))
   }
 
   fun serviceProviderReferralSummaries(referrals: List<ServiceProviderSentReferralSummary>, user: AuthUser): List<ServiceProviderSentReferralSummary> {
@@ -29,7 +29,7 @@ class ReferralAccessFilter(
     return referrals
   }
 
-  fun <T> probationPractitionerReferrals(referralSpec: Specification<T>, user: AuthUser): Specification<T> {
+  fun <T : Any> probationPractitionerReferrals(referralSpec: Specification<T>, user: AuthUser): Specification<T> {
     // todo: filter out referrals for limited access offenders (LAOs)
     return referralSpec
   }
