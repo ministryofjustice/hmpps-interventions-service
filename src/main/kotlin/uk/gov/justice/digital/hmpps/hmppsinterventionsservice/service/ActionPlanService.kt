@@ -43,7 +43,7 @@ class ActionPlanService(
       numberOfSessions = numberOfSessions,
       createdBy = authUserRepository.save(createdByUser),
       createdAt = OffsetDateTime.now(),
-      referral = referralRepository.getById(referralId),
+      referral = referralRepository.getReferenceById(referralId),
       activities = activities.toMutableList(),
     )
 

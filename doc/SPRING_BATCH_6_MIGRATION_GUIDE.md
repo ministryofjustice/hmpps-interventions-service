@@ -1,5 +1,11 @@
 # Spring Batch 6.0 Migration Guide for HMPPS Interventions Service
 
+> **Correction (October 7, 2026)**: `ListItemReader` and `DefaultJobParametersValidator` were **not removed** in Spring Batch 6 – they moved to
+> `org.springframework.batch.infrastructure.item.support.ListItemReader` and
+> `org.springframework.batch.core.job.parameters.DefaultJobParametersValidator`. The codebase now uses them directly;
+> the custom replacements described below were removed. `JobParameters.getString(key)` throws if the parameter is not a String,
+> so use `getParameter(key) != null` to check for presence.
+
 ## RESEARCH FINDINGS
 
 ### 1. ListItemReader - REMOVED in Spring Batch 6.0

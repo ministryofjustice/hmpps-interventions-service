@@ -4,13 +4,22 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager
 import org.springframework.test.util.ReflectionTestUtils
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ActionPlan
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DeliverySession
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.DynamicFrameworkContractFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.InterventionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.NPSRegionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.PCCRegionFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.deleteAll
 import java.time.LocalDate
 import java.time.OffsetDateTime
 
@@ -34,15 +43,16 @@ class InterventionFilterRepositoryImplTest @Autowired constructor(
   @BeforeEach
   fun setup() {
     ReflectionTestUtils.setField(interventionFilterRepositoryImpl, "showFutureInterventions", false)
-    deliverySessionRepository.deleteAll()
-    actionPlanRepository.deleteAll()
-    endOfServiceReportRepository.deleteAll()
-
-    entityManager.flush()
-
-    referralRepository.deleteAll()
-    interventionRepository.deleteAll()
-    authUserRepository.deleteAll()
+    entityManager.deleteAll(
+      DeliverySession::class,
+      SupplierAssessment::class,
+      Appointment::class,
+      ActionPlan::class,
+      EndOfServiceReport::class,
+      Referral::class,
+      Intervention::class,
+      AuthUser::class,
+    )
   }
 
   @Test

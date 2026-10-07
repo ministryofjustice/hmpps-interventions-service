@@ -14,8 +14,6 @@ ext["hibernate.version"] = "7.4.5.Final"
 configurations {
   testImplementation {
     exclude(group = "org.junit.vintage")
-    exclude(group = "org.postgresql")
-    exclude(group = "org.flywaydb", module = "flyway-database-postgresql")
   }
 }
 
@@ -91,7 +89,6 @@ repositories {
 dependencies {
   // batch processing
   implementation("org.springframework.boot:spring-boot-starter-batch")
-  implementation("org.springframework.batch:spring-batch-core:6.0.5")
   implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.0") // also needed runtime for AppInsights
 
   // monitoring and logging
@@ -121,9 +118,10 @@ dependencies {
 
   // security
   implementation("org.springframework.boot:spring-boot-starter-webflux")
+  implementation("org.springframework.boot:spring-boot-starter-webclient")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-  implementation("org.springframework.security:spring-security-crypto:6.5.0")
+  implementation("org.springframework.security:spring-security-crypto")
   implementation("com.nimbusds:oauth2-oidc-sdk:11.25")
 
   // database
@@ -133,12 +131,15 @@ dependencies {
   implementation("io.hypersistence:hypersistence-utils-hibernate-70:3.15.3")
 
   runtimeOnly("org.postgresql:postgresql:42.7.7")
+  implementation("org.springframework.boot:spring-boot-starter-flyway")
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
   // json and csv
   implementation("com.github.java-json-tools:json-patch:1.13")
   implementation("org.apache.commons:commons-csv:1.14.0")
 
+  testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
+  testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
   testImplementation("au.com.dius.pact.provider:junit5spring:4.6.17")
   testImplementation("com.squareup.okhttp3:okhttp:5.1.0")
   testImplementation("com.squareup.okhttp3:mockwebserver:5.1.0")

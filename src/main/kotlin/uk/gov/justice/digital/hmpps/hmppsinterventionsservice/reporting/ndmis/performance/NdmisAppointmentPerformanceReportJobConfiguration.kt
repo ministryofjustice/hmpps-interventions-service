@@ -6,6 +6,8 @@ import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.core.job.Job
 import org.springframework.batch.core.job.builder.JobBuilder
+import org.springframework.batch.core.job.parameters.DefaultJobParametersValidator
+import org.springframework.batch.core.job.parameters.JobParametersIncrementer
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.scope.context.ChunkContext
 import org.springframework.batch.core.step.Step
@@ -28,7 +30,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.S3Bucket
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.OnStartupJobLauncherFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.BatchUtils
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.CustomJobParametersValidator
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.NPESkipPolicy
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.OutputPathIncrementer
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.QueryLoader
@@ -68,7 +69,7 @@ class NdmisAppointmentPerformanceReportJobConfiguration(
   private val skipPolicy = NPESkipPolicy()
 
   @Bean
-  fun ndmisAppointmentPerformanceReportJobLauncher(ndmisAppointmentPerformanceReportJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(ndmisAppointmentPerformanceReportJob)
+  fun ndmisAppointmentPerformanceReportJobLauncher(ndmisAppointmentPerformanceReportJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(ndmisAppointmentPerformanceReportJob, JobParametersIncrementer { parameters -> OutputPathIncrementer().getNext(TimestampIncrementer().getNext(parameters)) })
 
   @Bean("ndmisAppointmentReader")
   @JobScope
@@ -107,10 +108,10 @@ class NdmisAppointmentPerformanceReportJobConfiguration(
     ndmisWriteAppointmentToCsvStep: Step,
     pushAppointmentToS3Step: Step,
   ): Job {
-    val validator = CustomJobParametersValidator(arrayOf("timestamp", "outputPath"))
+    val validator = DefaultJobParametersValidator()
+    validator.setRequiredKeys(arrayOf("timestamp", "outputPath"))
 
     return JobBuilder("ndmisAppointmentPerformanceReportJob", jobRepository)
-      .incrementer { parameters -> OutputPathIncrementer().getNext(TimestampIncrementer().getNext(parameters)) }
       .validator(validator)
       .start(ndmisWriteAppointmentToCsvStep)
       .next(pushAppointmentToS3Step)
@@ -122,7 +123,7 @@ class NdmisAppointmentPerformanceReportJobConfiguration(
     @Qualifier("ndmisAppointmentReader") ndmisReader: JdbcCursorItemReader<AppointmentData>,
     writer: FlatFileItemWriter<AppointmentData>,
   ): Step = StepBuilder("ndmisWriteAppointmentToCsvStep", jobRepository)
-    .chunk<AppointmentData, AppointmentData>(chunkSize, transactionManager)
+    .chunk<AppointmentData, AppointmentData>(chunkSize)
     .reader(ndmisReader)
     .writer(writer)
     .faultTolerant()

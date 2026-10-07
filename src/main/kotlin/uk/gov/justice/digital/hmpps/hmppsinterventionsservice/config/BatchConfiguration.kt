@@ -2,11 +2,11 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
 import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository
+import org.springframework.batch.core.configuration.support.MapJobRegistry
 import org.springframework.batch.core.job.builder.JobBuilder
-import org.springframework.batch.core.launch.JobLauncher
-import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher
+import org.springframework.batch.core.launch.JobOperator
+import org.springframework.batch.core.launch.support.TaskExecutorJobOperator
 import org.springframework.batch.core.repository.JobRepository
-import org.springframework.batch.core.repository.explore.JobExplorer
 import org.springframework.batch.core.step.builder.StepBuilder
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -27,18 +27,20 @@ class BatchConfiguration(
   @Value("\${spring.batch.concurrency.queue-size}") private val queueSize: Int,
 ) {
 
-  @Bean("asyncJobLauncher")
-  fun asyncJobLauncher(jobRepository: JobRepository): JobLauncher {
+  @Bean("asyncJobOperator")
+  fun asyncJobOperator(jobRepository: JobRepository): JobOperator {
     val taskExecutor = ThreadPoolTaskExecutor()
     taskExecutor.corePoolSize = poolSize
     taskExecutor.queueCapacity = queueSize
     taskExecutor.afterPropertiesSet()
 
-    val launcher = TaskExecutorJobLauncher()
-    launcher.setJobRepository(jobRepository)
-    launcher.setTaskExecutor(taskExecutor)
-    launcher.afterPropertiesSet()
-    return launcher
+    val operator = TaskExecutorJobOperator()
+    operator.setJobRepository(jobRepository)
+    // jobs are started by passing the Job itself, so the registry is only needed to satisfy the operator (as Batch does for its default operator)
+    operator.setJobRegistry(MapJobRegistry())
+    operator.setTaskExecutor(taskExecutor)
+    operator.afterPropertiesSet()
+    return operator
   }
 
   @Bean("batchJobBuilder")
@@ -46,7 +48,4 @@ class BatchConfiguration(
 
   @Bean("batchStepBuilder")
   fun batchStepBuilder(jobRepository: JobRepository): StepBuilder = StepBuilder("batchStepBuilder", jobRepository)
-
-  @Bean("batchJobExplorer")
-  fun jobExplorer(jobExplorer: JobExplorer): JobExplorer = jobExplorer
 }

@@ -288,7 +288,7 @@ class AppointmentService(
 
     if (appointment.attendanceSubmittedAt == null) {
       throw ResponseStatusException(
-        HttpStatus.UNPROCESSABLE_ENTITY,
+        HttpStatus.UNPROCESSABLE_CONTENT,
         "can't submit feedback unless attendance has been recorded",
       )
     }

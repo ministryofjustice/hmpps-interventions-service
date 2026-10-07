@@ -69,7 +69,7 @@ internal class ActionPlanServiceTest {
     val referral = SampleData.sampleReferral("CRN123", "Service Provider")
 
     whenever(authUserRepository.save(authUser)).thenReturn(authUser)
-    whenever(referralRepository.getById(referralId)).thenReturn(referral)
+    whenever(referralRepository.getReferenceById(referralId)).thenReturn(referral)
     whenever(
       actionPlanRepository.save(
         ArgumentMatchers.argThat<ActionPlan> {
