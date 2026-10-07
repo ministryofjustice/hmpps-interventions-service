@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events
 
+import jakarta.persistence.EntityManager
 import mu.KLogging
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationEventPublisher
@@ -36,7 +37,10 @@ class ReferralEvent(
   val referral: Referral,
   val detailUrl: String,
   val data: Map<String, Any?> = emptyMap(),
-) : ApplicationEvent(source) {
+) : ApplicationEvent(source),
+  EntityEvent {
+  override fun reloadIn(entityManager: EntityManager) = ReferralEvent(source, type, entityManager.reload(referral), detailUrl, entityManager.reloadEntities(data))
+
   override fun toString(): String = "ReferralEvent(type=$type, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
 }
 
@@ -45,7 +49,10 @@ class ReferralEndingEvent(
   val state: ReferralConcludedState,
   val referral: Referral,
   val detailUrl: String,
-) : ApplicationEvent(source) {
+) : ApplicationEvent(source),
+  EntityEvent {
+  override fun reloadIn(entityManager: EntityManager) = ReferralEndingEvent(source, state, entityManager.reload(referral), detailUrl)
+
   override fun toString(): String = "ReferralEndingEvent(state=$state, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
 }
 
@@ -55,7 +62,10 @@ class ReferralConcludedEvent(
   val referral: Referral,
   val detailUrl: String,
   val referralWithdrawalState: ReferralWithdrawalState? = null,
-) : ApplicationEvent(source) {
+) : ApplicationEvent(source),
+  EntityEvent {
+  override fun reloadIn(entityManager: EntityManager) = ReferralConcludedEvent(source, type, entityManager.reload(referral), detailUrl, referralWithdrawalState)
+
   override fun toString(): String = "ReferralConcludedEvent(type=$type, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
 }
 
