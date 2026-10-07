@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.CaseNoteRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DeliverySessionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.DraftReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
@@ -26,7 +27,7 @@ class SarsDataServiceTest @Autowired constructor(
 ) {
   private val referralFactory = ReferralFactory(entityManager)
   private val deliverySessionFactory = DeliverySessionFactory(entityManager)
-  private val sarsDataService = SarsDataService(referralRepository, deliverySessionRepository)
+  private val sarsDataService = SarsDataService(referralRepository, deliverySessionRepository, interventionRepository, caseNoteRepository, draftReferralRepository)
 
   @Test
   fun `get sars data for the given service crn`() {
