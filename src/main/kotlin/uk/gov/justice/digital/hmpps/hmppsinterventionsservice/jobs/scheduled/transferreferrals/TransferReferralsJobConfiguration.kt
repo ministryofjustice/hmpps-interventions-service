@@ -1,10 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.transferreferrals
 
-import org.springframework.batch.core.Job
-import org.springframework.batch.core.Step
-import org.springframework.batch.core.job.DefaultJobParametersValidator
+import org.springframework.batch.core.job.Job
 import org.springframework.batch.core.job.builder.JobBuilder
+import org.springframework.batch.core.job.parameters.DefaultJobParametersValidator
 import org.springframework.batch.core.repository.JobRepository
+import org.springframework.batch.core.step.Step
 import org.springframework.batch.core.step.builder.StepBuilder
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
@@ -23,7 +23,7 @@ class TransferReferralsJobConfiguration(
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
 ) {
   @Bean
-  fun transferReferralsJobLauncher(transferReferralsJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(transferReferralsJob)
+  fun transferReferralsJobLauncher(transferReferralsJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(transferReferralsJob, TimestampIncrementer())
 
   @Bean
   fun transferReferralsJob(transferReferralToInterventionStep: Step): Job {
@@ -37,7 +37,6 @@ class TransferReferralsJobConfiguration(
     )
 
     return JobBuilder("transferReferralsJob", jobRepository)
-      .incrementer(TimestampIncrementer())
       .validator(validator)
       .listener(listener)
       .start(transferReferralToInterventionStep)
@@ -51,9 +50,10 @@ class TransferReferralsJobConfiguration(
     writer: TransferReferralsWriter,
     transactionManager: PlatformTransactionManager,
   ): Step = StepBuilder("transferReferralToInterventionStep", jobRepository)
-    .chunk<Referral, Referral>(10, transactionManager)
+    .chunk<Referral, Referral>(10)
     .reader(reader)
     .processor(processor)
     .writer(writer)
+    .transactionManager(transactionManager)
     .build()
 }

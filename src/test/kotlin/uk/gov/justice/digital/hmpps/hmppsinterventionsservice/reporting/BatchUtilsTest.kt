@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
-import org.springframework.batch.item.Chunk
+import org.springframework.batch.infrastructure.item.Chunk
 import org.springframework.core.io.FileSystemResource
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.performance.NdmisDateTime
 import java.io.File

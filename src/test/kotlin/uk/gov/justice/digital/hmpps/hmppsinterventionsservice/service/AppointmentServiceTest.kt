@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appoint
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentType.SUPPLIER_ASSESSMENT
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.NO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended.YES
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NoSessionReasonType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentDeliveryRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
@@ -58,7 +59,7 @@ class AppointmentServiceTest {
 
   @BeforeEach
   fun beforeEach() {
-    whenever(authUserRepository.save(any())).thenReturn(createdByUser)
+    whenever(authUserRepository.save(any<AuthUser>())).thenReturn(createdByUser)
   }
 
   @Test
@@ -72,7 +73,7 @@ class AppointmentServiceTest {
 
     whenever(communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, npsOfficeCode))
       .thenReturn(Pair(deliusAppointmentId, UUID.randomUUID()))
-    whenever(appointmentRepository.save(any())).thenAnswer { it.arguments[0] }
+    whenever(appointmentRepository.save(any<Appointment>())).thenAnswer { it.arguments[0] }
 
     // When
     val newAppointment = appointmentService.createOrUpdateAppointment(referral, null, durationInMinutes, appointmentTime, SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE, AppointmentSessionType.ONE_TO_ONE, npsOfficeCode = npsOfficeCode)
@@ -101,7 +102,7 @@ class AppointmentServiceTest {
 
     whenever(communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null))
       .thenReturn(Pair(deliusAppointmentId, UUID.randomUUID()))
-    whenever(appointmentRepository.save(any())).thenAnswer { it.arguments[0] }
+    whenever(appointmentRepository.save(any<Appointment>())).thenAnswer { it.arguments[0] }
 
     // When
     val newAppointment = appointmentService.createOrUpdateAppointment(referral, null, durationInMinutes, appointmentTime, SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
@@ -139,7 +140,7 @@ class AppointmentServiceTest {
 
     whenever(communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null, YES, notifyProbationPractitionerOfBehaviour = false, notifyProbationPractitionerOfConcerns = false, false, NoSessionReasonType.LOGISTICS))
       .thenReturn(Pair(deliusAppointmentId, UUID.randomUUID()))
-    whenever(appointmentRepository.save(any())).thenAnswer { it.arguments[0] }
+    whenever(appointmentRepository.save(any<Appointment>())).thenAnswer { it.arguments[0] }
 
     // When
     val newAppointment = appointmentService.createOrUpdateAppointment(
@@ -203,7 +204,7 @@ class AppointmentServiceTest {
     whenever(communityAPIBookingService.book(referral, existingAppointment, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null, rescheduleRequestedBy = rescheduleRequestedBy))
       .thenReturn(Pair(rescheduledDeliusAppointmentId, UUID.randomUUID()))
 
-    whenever(appointmentRepository.saveAndFlush(any())).thenAnswer { it.arguments[0] }
+    whenever(appointmentRepository.saveAndFlush(any<Appointment>())).thenAnswer { it.arguments[0] }
 
     // When
     val updatedAppointment = appointmentService.createOrUpdateAppointment(referral, existingAppointment, durationInMinutes, appointmentTime, SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE, rescheduleRequestedBy = rescheduleRequestedBy)
@@ -248,7 +249,7 @@ class AppointmentServiceTest {
 
     whenever(communityAPIBookingService.book(referral, null, appointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null))
       .thenReturn(Pair(additionalDeliusAppointmentId, UUID.randomUUID()))
-    whenever(appointmentRepository.save(any())).thenAnswer { it.arguments[0] }
+    whenever(appointmentRepository.save(any<Appointment>())).thenAnswer { it.arguments[0] }
 
     // When
     val newAppointment = appointmentService.createOrUpdateAppointment(referral, existingAppointment, durationInMinutes, appointmentTime, SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.PHONE_CALL, AppointmentSessionType.ONE_TO_ONE)
@@ -287,7 +288,7 @@ class AppointmentServiceTest {
 
     whenever(communityAPIBookingService.book(referral, existingAppointment, pastAppointmentTime, durationInMinutes, SUPPLIER_ASSESSMENT, null, NO, notifyProbationPractitionerOfBehaviour = false, notifyProbationPractitionerOfConcerns = false, false, NoSessionReasonType.POP_ACCEPTABLE))
       .thenReturn(Pair(rescheduledDeliusAppointmentId, UUID.randomUUID()))
-    whenever(appointmentRepository.save(any())).thenAnswer { it.arguments[0] }
+    whenever(appointmentRepository.save(any<Appointment>())).thenAnswer { it.arguments[0] }
 
     // When
     val updatedAppointment = appointmentService.createOrUpdateAppointment(
@@ -397,7 +398,7 @@ class AppointmentServiceTest {
         .thenReturn(Pair(rescheduledDeliusAppointmentId, existingAppointment.id))
       savedAppointment.appointmentDelivery = AppointmentDelivery(appointmentId = savedAppointment.id, appointmentDeliveryType = AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE, AppointmentSessionType.ONE_TO_ONE, npsOfficeCode = oldNpsCode)
 
-      whenever(appointmentRepository.save(any())).thenReturn(savedAppointment)
+      whenever(appointmentRepository.save(any<Appointment>())).thenReturn(savedAppointment)
 
       // When
       val updatedAppointment = appointmentService.createOrUpdateAppointment(referral, existingAppointment, durationInMinutes, appointmentTime, SUPPLIER_ASSESSMENT, createdByUser, AppointmentDeliveryType.IN_PERSON_MEETING_PROBATION_OFFICE, AppointmentSessionType.ONE_TO_ONE, npsOfficeCode = newNpsCode)
@@ -430,8 +431,8 @@ class AppointmentServiceTest {
       val appointment = appointmentFactory.create(id = appointmentId)
       val submittedBy = authUserFactory.create()
 
-      whenever(appointmentRepository.save(any())).thenReturn(appointment)
-      whenever(authUserRepository.save(any())).thenReturn(submittedBy)
+      whenever(appointmentRepository.save(any<Appointment>())).thenReturn(appointment)
+      whenever(authUserRepository.save(any<AuthUser>())).thenReturn(submittedBy)
 
       appointmentService.recordSessionFeedback(
         appointment,
@@ -508,8 +509,8 @@ class AppointmentServiceTest {
       val appointment = appointmentFactory.create(id = appointmentId, appointmentTime = OffsetDateTime.now())
       val submittedBy = authUserFactory.create()
 
-      whenever(appointmentRepository.save(any())).thenReturn(appointment)
-      whenever(authUserRepository.save(any())).thenReturn(submittedBy)
+      whenever(appointmentRepository.save(any<Appointment>())).thenReturn(appointment)
+      whenever(authUserRepository.save(any<AuthUser>())).thenReturn(submittedBy)
 
       appointmentService.recordAppointmentAttendance(appointment, attended, true, submittedBy)
 
@@ -537,8 +538,8 @@ class AppointmentServiceTest {
       )
       val submittedBy = authUserFactory.create()
 
-      whenever(appointmentRepository.save(any())).thenReturn(appointment)
-      whenever(authUserRepository.save(any())).thenReturn(submittedBy)
+      whenever(appointmentRepository.save(any<Appointment>())).thenReturn(appointment)
+      whenever(authUserRepository.save(any<AuthUser>())).thenReturn(submittedBy)
 
       appointmentService.recordAppointmentAttendance(appointment, attended, false, submittedBy)
 
@@ -565,8 +566,8 @@ class AppointmentServiceTest {
       )
       val submittedBy = authUserFactory.create()
 
-      whenever(appointmentRepository.save(any())).thenReturn(appointment)
-      whenever(authUserRepository.save(any())).thenReturn(submittedBy)
+      whenever(appointmentRepository.save(any<Appointment>())).thenReturn(appointment)
+      whenever(authUserRepository.save(any<AuthUser>())).thenReturn(submittedBy)
 
       appointmentService.recordAppointmentAttendance(appointment, NO, false, submittedBy)
 
@@ -594,8 +595,8 @@ class AppointmentServiceTest {
       )
       val submittedBy = authUserFactory.create()
 
-      whenever(appointmentRepository.save(any())).thenReturn(appointment)
-      whenever(authUserRepository.save(any())).thenReturn(submittedBy)
+      whenever(appointmentRepository.save(any<Appointment>())).thenReturn(appointment)
+      whenever(authUserRepository.save(any<AuthUser>())).thenReturn(submittedBy)
 
       appointmentService.recordAppointmentAttendance(appointment, attended, true, submittedBy)
 
@@ -648,8 +649,8 @@ class AppointmentServiceTest {
       appointment.attendanceSubmittedAt = OffsetDateTime.now()
       appointment.attended = YES
 
-      whenever(appointmentRepository.save(any())).thenReturn(appointment)
-      whenever(authUserRepository.save(any())).thenReturn(submittedBy)
+      whenever(appointmentRepository.save(any<Appointment>())).thenReturn(appointment)
+      whenever(authUserRepository.save(any<AuthUser>())).thenReturn(submittedBy)
 
       appointmentService.submitAppointmentFeedback(appointment, submittedBy, SUPPLIER_ASSESSMENT)
 
@@ -702,8 +703,8 @@ class AppointmentServiceTest {
       appointment.notifyProbationPractitionerOfBehaviour = true
       appointment.notifyProbationPractitionerOfConcerns = true
 
-      whenever(appointmentRepository.save(any())).thenReturn(appointment)
-      whenever(authUserRepository.save(any())).thenReturn(submittedBy)
+      whenever(appointmentRepository.save(any<Appointment>())).thenReturn(appointment)
+      whenever(authUserRepository.save(any<AuthUser>())).thenReturn(submittedBy)
 
       appointmentService.submitAppointmentFeedback(appointment, submittedBy, SUPPLIER_ASSESSMENT)
 

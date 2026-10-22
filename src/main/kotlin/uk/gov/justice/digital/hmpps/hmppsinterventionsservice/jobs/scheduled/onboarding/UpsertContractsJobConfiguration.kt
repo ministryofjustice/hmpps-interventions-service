@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.onboarding
 
-import org.springframework.batch.core.Job
-import org.springframework.batch.core.Step
+import org.springframework.batch.core.job.Job
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
+import org.springframework.batch.core.step.Step
 import org.springframework.batch.core.step.builder.StepBuilder
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.ApplicationRunner
@@ -23,11 +23,10 @@ class UpsertContractsJobConfiguration(
 ) {
 
   @Bean
-  fun upsertContractsJobLauncher(upsertContractsJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(upsertContractsJob)
+  fun upsertContractsJobLauncher(upsertContractsJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(upsertContractsJob, TimestampIncrementer())
 
   @Bean
   fun upsertContractsJob(upsertProvidersStep: Step, upsertContractStep: Step, upsertContractDetailsStep: Step): Job = JobBuilder("upsertContractsJob", jobRepository)
-    .incrementer(TimestampIncrementer())
     .start(upsertProvidersStep)
     .next(upsertContractDetailsStep)
     .next(upsertContractStep)

@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.de
 
 import jakarta.persistence.EntityManagerFactory
 import org.springframework.batch.core.configuration.annotation.JobScope
-import org.springframework.batch.item.database.JpaCursorItemReader
+import org.springframework.batch.infrastructure.item.database.JpaCursorItemReader
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
 import java.time.OffsetDateTime
@@ -11,10 +11,9 @@ import java.time.OffsetDateTime
 @JobScope
 class DeleteOldDraftReferralsReader(
   entityManagerFactory: EntityManagerFactory,
-) : JpaCursorItemReader<DraftReferral>() {
+) : JpaCursorItemReader<DraftReferral>(entityManagerFactory) {
   init {
-    this.name = "deleteOldDraftReferralsReader"
-    this.setEntityManagerFactory(entityManagerFactory)
+    setName("deleteOldDraftReferralsReader")
     this.setQueryString(
       """SELECT dr FROM DraftReferral dr 
         LEFT JOIN Referral r ON dr.id = r.id  

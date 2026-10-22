@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.co
 
 import jakarta.persistence.EntityManagerFactory
 import org.springframework.batch.core.configuration.annotation.JobScope
-import org.springframework.batch.item.database.JpaCursorItemReader
+import org.springframework.batch.infrastructure.item.database.JpaCursorItemReader
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 
@@ -10,11 +10,10 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referra
 @JobScope
 class ConcludeReferralsReader(
   entityManagerFactory: EntityManagerFactory,
-) : JpaCursorItemReader<Referral>() {
+) : JpaCursorItemReader<Referral>(entityManagerFactory) {
 
   init {
     this.setName("concludeReferralsReader")
-    this.setEntityManagerFactory(entityManagerFactory)
     this.setQueryString(
       "SELECT re FROM Referral re " +
         "LEFT JOIN EndOfServiceReport e ON re.id = e.referral.id " +

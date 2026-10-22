@@ -92,7 +92,7 @@ class AmendReferralServiceUnitTest {
     @Test
     fun `cant set desired outcomes to an empty list`() {
       val referral = referralFactory.createSent()
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
       val e = assertThrows<ServerWebInputException> {
         amendReferralService.updateReferralDesiredOutcomes(
@@ -109,7 +109,7 @@ class AmendReferralServiceUnitTest {
     fun `cant set desired outcomes when no service categories have been selected`() {
       val referral = referralFactory.createSent()
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
       val e = assertThrows<ServerWebInputException> {
         amendReferralService.updateReferralDesiredOutcomes(
           referral.id,
@@ -128,7 +128,7 @@ class AmendReferralServiceUnitTest {
       val serviceCategory2 = serviceCategoryFactory.create()
       val referral = referralFactory.createSent(selectedServiceCategories = mutableSetOf(serviceCategory1))
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
       val e = assertThrows<ServerWebInputException> {
         amendReferralService.updateReferralDesiredOutcomes(
           referral.id,
@@ -142,11 +142,11 @@ class AmendReferralServiceUnitTest {
 
     @Test
     fun `cant set desired outcome when service category is not found`() {
-      whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.empty())
+      whenever(serviceCategoryRepository.findById(any<UUID>())).thenReturn(Optional.empty())
       val serviceCategory = serviceCategoryFactory.create()
       val referral = referralFactory.createSent(selectedServiceCategories = mutableSetOf(serviceCategory))
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
       val e = assertThrows<ServerWebInputException> {
         amendReferralService.updateReferralDesiredOutcomes(
           referral.id,
@@ -173,7 +173,7 @@ class AmendReferralServiceUnitTest {
         actionPlans = mutableListOf(actionPlanFactory.create(approvedAt = OffsetDateTime.now())),
       )
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
 
       val e = assertThrows<ServerWebInputException> {
         amendReferralService.updateReferralDesiredOutcomes(
@@ -195,8 +195,8 @@ class AmendReferralServiceUnitTest {
       val referral = referralFactory.createSent(selectedServiceCategories = mutableSetOf(serviceCategory))
 
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
-      whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.of(serviceCategory))
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+      whenever(serviceCategoryRepository.findById(any<UUID>())).thenReturn(Optional.of(serviceCategory))
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
 
       val e = assertThrows<ServerWebInputException> {
         amendReferralService.updateReferralDesiredOutcomes(
@@ -231,11 +231,11 @@ class AmendReferralServiceUnitTest {
         newVal = ReferralAmendmentDetails(listOf(desiredOutcome2.id.toString())),
       )
 
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
-      whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.of(serviceCategory))
-      whenever(referralRepository.save(any())).thenReturn(referral)
-      whenever(changelogRepository.save(any())).thenReturn(expectedChangeLog)
+      whenever(serviceCategoryRepository.findById(any<UUID>())).thenReturn(Optional.of(serviceCategory))
+      whenever(referralRepository.save(any<Referral>())).thenReturn(referral)
+      whenever(changelogRepository.save(any<Changelog>())).thenReturn(expectedChangeLog)
 
       amendReferralService.updateReferralDesiredOutcomes(
         oldReferral.id,
@@ -285,13 +285,13 @@ class AmendReferralServiceUnitTest {
         newVal = ReferralAmendmentDetails(listOf(desiredOutcome3.id.toString(), desiredOutcome4.id.toString())),
       )
 
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
-      whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.of(serviceCategory))
-      whenever(referralRepository.save(any())).thenReturn(referral)
-      whenever(changelogRepository.save(any())).thenReturn(expectedChangeLog)
+      whenever(serviceCategoryRepository.findById(any<UUID>())).thenReturn(Optional.of(serviceCategory))
+      whenever(referralRepository.save(any<Referral>())).thenReturn(referral)
+      whenever(changelogRepository.save(any<Changelog>())).thenReturn(expectedChangeLog)
 
-      whenever(changelogRepository.save(any())).thenReturn(expectedChangeLog)
+      whenever(changelogRepository.save(any<Changelog>())).thenReturn(expectedChangeLog)
 
       amendReferralService.updateReferralDesiredOutcomes(
         oldReferral.id,
@@ -336,13 +336,13 @@ class AmendReferralServiceUnitTest {
       val serviceCategory = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel1, complexityLevel2))
 
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
-      whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.of(serviceCategory))
+      whenever(serviceCategoryRepository.findById(any<UUID>())).thenReturn(Optional.of(serviceCategory))
 
       val referral = referralFactory.createSent(
         selectedServiceCategories = mutableSetOf(serviceCategory),
         complexityLevelIds = mutableMapOf(serviceCategory.id to complexityLevel1.id),
       )
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
 
       val updateToReferral = AmendComplexityLevelDTO(complexityLevelId1, "testing change")
 
@@ -368,7 +368,7 @@ class AmendReferralServiceUnitTest {
       val token = tokenFactory.create()
 
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(null)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(null)
 
       val e = assertThrows<ResponseStatusException> {
         amendReferralService.getSentReferralForAuthenticatedUser(referralId, token)
@@ -391,7 +391,7 @@ class AmendReferralServiceUnitTest {
         actionPlans = mutableListOf(actionPlanFactory.create(approvedAt = OffsetDateTime.now())),
       )
       whenever(userMapper.fromToken(jwtAuthenticationToken)).thenReturn(authUser)
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
 
       val e = assertThrows<ServerWebInputException> {
         amendReferralService.updateComplexityLevel(
@@ -417,8 +417,8 @@ class AmendReferralServiceUnitTest {
       val referral = referralFactory.createSent(
         hasAdditionalResponsibilities = false,
       )
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
-      whenever(referralRepository.save(any())).thenReturn(referral)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
+      whenever(referralRepository.save(any<Referral>())).thenReturn(referral)
 
       val updateToReferral = AmendNeedsAndRequirementsDTO(hasAdditionalResponsibilities = true, whenUnavailable = "9-12AM", reasonForChange = "additional responsibilities changed")
 
@@ -448,8 +448,8 @@ class AmendReferralServiceUnitTest {
         hasAdditionalResponsibilities = true,
         whenUnavailable = "9-12AM",
       )
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
-      whenever(referralRepository.save(any())).thenReturn(referral)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
+      whenever(referralRepository.save(any<Referral>())).thenReturn(referral)
 
       val updateToReferral = AmendNeedsAndRequirementsDTO(hasAdditionalResponsibilities = false, reasonForChange = "additional responsibilities changed")
 
@@ -480,8 +480,8 @@ class AmendReferralServiceUnitTest {
     val referral = referralFactory.createSent(
       accessibilityNeeds = "schools",
     )
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
-    whenever(referralRepository.save(any())).thenReturn(referral)
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
+    whenever(referralRepository.save(any<Referral>())).thenReturn(referral)
 
     val updateToReferral = AmendNeedsAndRequirementsDTO(accessibilityNeeds = "school", reasonForChange = "accessibility need changed")
 
@@ -509,8 +509,8 @@ class AmendReferralServiceUnitTest {
     val referral = referralFactory.createSent(
       additionalNeedsInformation = "schools",
     )
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
-    whenever(referralRepository.save(any())).thenReturn(referral)
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
+    whenever(referralRepository.save(any<Referral>())).thenReturn(referral)
 
     val updateToReferral = AmendNeedsAndRequirementsDTO(additionalNeedsInformation = "school", reasonForChange = "identify need changed")
 
@@ -542,8 +542,8 @@ class AmendReferralServiceUnitTest {
       val referral = referralFactory.createSent(
         needsInterpreter = false,
       )
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
-      whenever(referralRepository.save(any())).thenReturn(referral)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
+      whenever(referralRepository.save(any<Referral>())).thenReturn(referral)
 
       val updateToReferral = AmendNeedsAndRequirementsDTO(needsInterpreter = true, interpreterLanguage = "Yoruba", reasonForChange = "interpreter required changing")
 
@@ -573,8 +573,8 @@ class AmendReferralServiceUnitTest {
         needsInterpreter = true,
         interpreterLanguage = "Yoruba",
       )
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
-      whenever(referralRepository.save(any())).thenReturn(referral)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
+      whenever(referralRepository.save(any<Referral>())).thenReturn(referral)
 
       val updateToReferral = AmendNeedsAndRequirementsDTO(needsInterpreter = false, reasonForChange = "interpreter required changing")
 
@@ -618,8 +618,8 @@ class AmendReferralServiceUnitTest {
         referral = referral,
       )
       referral.referralLocation = referralLocation
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
-      whenever(referralLocationRepository.save(any())).thenReturn(referralLocation)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
+      whenever(referralLocationRepository.save(any<ReferralLocation>())).thenReturn(referralLocation)
 
       val updateToReferral = AmendPrisonEstablishmentDTO(
         personCustodyPrisonId = "COW",
@@ -678,8 +678,8 @@ class AmendReferralServiceUnitTest {
         referral = referral,
       )
       referral.referralLocation = referralLocation
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
-      whenever(referralLocationRepository.save(any())).thenReturn(referralLocation)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
+      whenever(referralLocationRepository.save(any<ReferralLocation>())).thenReturn(referralLocation)
 
       val updateToReferral = AmendExpectedReleaseDateDTO(
         expectedReleaseDate = existingExpectedReleaseDate.plusDays(2),
@@ -730,8 +730,8 @@ class AmendReferralServiceUnitTest {
         referral = referral,
       )
       referral.referralLocation = referralLocation
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
-      whenever(referralLocationRepository.save(any())).thenReturn(referralLocation)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
+      whenever(referralLocationRepository.save(any<ReferralLocation>())).thenReturn(referralLocation)
 
       val updateToReferral = AmendExpectedReleaseDateDTO(
         expectedReleaseDate = null,
@@ -782,8 +782,8 @@ class AmendReferralServiceUnitTest {
         referral = referral,
       )
       referral.referralLocation = referralLocation
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
-      whenever(referralLocationRepository.save(any())).thenReturn(referralLocation)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
+      whenever(referralLocationRepository.save(any<ReferralLocation>())).thenReturn(referralLocation)
 
       val updateToReferral = AmendExpectedReleaseDateDTO(
         expectedReleaseDate = existingExpectedReleaseDate,
@@ -813,8 +813,8 @@ class AmendReferralServiceUnitTest {
         referral = referral,
       )
       referral.referralLocation = referralLocation
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
-      whenever(referralLocationRepository.save(any())).thenReturn(referralLocation)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
+      whenever(referralLocationRepository.save(any<ReferralLocation>())).thenReturn(referralLocation)
 
       val updateToReferral = AmendExpectedReleaseDateDTO(
         expectedReleaseDate = null,
@@ -845,8 +845,8 @@ class AmendReferralServiceUnitTest {
         referral = referral,
       )
       referral.referralLocation = referralLocation
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
-      whenever(referralLocationRepository.save(any())).thenReturn(referralLocation)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
+      whenever(referralLocationRepository.save(any<ReferralLocation>())).thenReturn(referralLocation)
 
       val updateToReferral = AmendExpectedReleaseDateDTO(
         expectedReleaseDate = expectedReleaseDate,
@@ -898,8 +898,8 @@ class AmendReferralServiceUnitTest {
         referral = referral,
       )
       referral.referralLocation = referralLocation
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
-      whenever(referralLocationRepository.save(any())).thenReturn(referralLocation)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
+      whenever(referralLocationRepository.save(any<ReferralLocation>())).thenReturn(referralLocation)
 
       val updateToReferral = AmendExpectedReleaseDateDTO(
         expectedReleaseDate = null,

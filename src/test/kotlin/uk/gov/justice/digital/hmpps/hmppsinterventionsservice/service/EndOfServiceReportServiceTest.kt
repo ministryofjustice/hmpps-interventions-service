@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.EndOfServic
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AchievementLevel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.EndOfServiceReport
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SampleData
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
@@ -50,9 +51,9 @@ class EndOfServiceReportServiceTest {
 
     whenever(authUserRepository.save(authUser)).thenReturn(authUser)
     whenever(referralRepository.getReferenceById(referral.id)).thenReturn(referral)
-    whenever(endOfServiceReportRepository.save(any())).thenReturn(endOfServiceReport)
+    whenever(endOfServiceReportRepository.save(any<EndOfServiceReport>())).thenReturn(endOfServiceReport)
     whenever(endOfServiceReportRepository.findByReferralId(referralId = referral.id)).thenReturn(null)
-    whenever(referralRepository.save(any())).thenReturn(referral)
+    whenever(referralRepository.save(any<Referral>())).thenReturn(referral)
 
     val savedEndOfServiceReport = endOfServiceReportService.createEndOfServiceReport(referral.id, authUser)
 
@@ -68,11 +69,11 @@ class EndOfServiceReportServiceTest {
     whenever(authUserRepository.save(authUser)).thenReturn(authUser)
     whenever(referralRepository.getReferenceById(referral.id)).thenReturn(referral)
     whenever(endOfServiceReportRepository.findByReferralId(referralId = referral.id)).thenReturn(endOfServiceReport)
-    whenever(referralRepository.save(any())).thenReturn(referral)
+    whenever(referralRepository.save(any<Referral>())).thenReturn(referral)
 
     val savedEndOfServiceReport = endOfServiceReportService.createEndOfServiceReport(referral.id, authUser)
 
-    verify(endOfServiceReportRepository, never()).save(any())
+    verify(endOfServiceReportRepository, never()).save(any<EndOfServiceReport>())
     assertThat(savedEndOfServiceReport).isNotNull
   }
 
@@ -153,7 +154,7 @@ class EndOfServiceReportServiceTest {
     val outcome = SampleData.sampleEndOfServiceReportOutcome()
 
     whenever(endOfServiceReportRepository.findById(any())).thenReturn(of(endOfServiceReport))
-    whenever(endOfServiceReportRepository.save(any())).thenReturn(endOfServiceReport)
+    whenever(endOfServiceReportRepository.save(any<EndOfServiceReport>())).thenReturn(endOfServiceReport)
 
     val savedEndOfServiceReport =
       endOfServiceReportService.updateEndOfServiceReport(endOfServiceReportId, furtherInformation, outcome)
@@ -177,7 +178,7 @@ class EndOfServiceReportServiceTest {
     )
 
     whenever(endOfServiceReportRepository.findById(any())).thenReturn(of(endOfServiceReport))
-    whenever(endOfServiceReportRepository.save(any())).thenReturn(endOfServiceReport)
+    whenever(endOfServiceReportRepository.save(any<EndOfServiceReport>())).thenReturn(endOfServiceReport)
 
     val savedEndOfServiceReport =
       endOfServiceReportService.updateEndOfServiceReport(endOfServiceReportId, furtherInformation, outcome)
@@ -198,8 +199,8 @@ class EndOfServiceReportServiceTest {
     val endOfServiceReport = endOfServiceReportFactory.create(id = endOfServiceReportId)
 
     whenever(endOfServiceReportRepository.findById(any())).thenReturn(of(endOfServiceReport))
-    whenever(endOfServiceReportRepository.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg<EndOfServiceReport>())
-    whenever(authUserRepository.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg<AuthUser>())
+    whenever(endOfServiceReportRepository.save(any<EndOfServiceReport>())).thenAnswer(AdditionalAnswers.returnsFirstArg<EndOfServiceReport>())
+    whenever(authUserRepository.save(any<AuthUser>())).thenAnswer(AdditionalAnswers.returnsFirstArg<AuthUser>())
 
     val argumentCaptor: ArgumentCaptor<EndOfServiceReport> = ArgumentCaptor.forClass(EndOfServiceReport::class.java)
     endOfServiceReportService.submitEndOfServiceReport(endOfServiceReportId, authUser)
@@ -219,8 +220,8 @@ class EndOfServiceReportServiceTest {
     val endOfServiceReport = endOfServiceReportFactory.create(id = endOfServiceReportId)
 
     whenever(endOfServiceReportRepository.findById(any())).thenReturn(of(endOfServiceReport))
-    whenever(endOfServiceReportRepository.save(any())).thenThrow(RuntimeException("error saving"))
-    whenever(authUserRepository.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg<AuthUser>())
+    whenever(endOfServiceReportRepository.save(any<EndOfServiceReport>())).thenThrow(RuntimeException("error saving"))
+    whenever(authUserRepository.save(any<AuthUser>())).thenAnswer(AdditionalAnswers.returnsFirstArg<AuthUser>())
 
     val argumentCaptor: ArgumentCaptor<EndOfServiceReport> = ArgumentCaptor.forClass(EndOfServiceReport::class.java)
 
