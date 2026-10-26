@@ -1,0 +1,3 @@
+update desired_outcome set description = 'The service user who has achieved a sustained period of abstinence or non‑problematic gambling, drug or alcohol use is supported to develop effective relapse‑prevention strategies.' where id = 'c78b0f5b-998d-48e4-9d11-7efd8dc8f3ac';
+update desired_outcome set description = 'The service user receives clear, evidence‑based harm‑reduction information and advice to help them make safer and more informed choices.' where id = '185b485a-bc23-4e5e-b6c3-25b8981b9ab2';
+update desired_outcome set description = 'The service user with problematic gambling, drug or alcohol use is supported to recognise the need for and encouraged to engage with local authority commissioned services.' where id = '05f129e7-ba47-4486-b14c-f82a045b1a73';
