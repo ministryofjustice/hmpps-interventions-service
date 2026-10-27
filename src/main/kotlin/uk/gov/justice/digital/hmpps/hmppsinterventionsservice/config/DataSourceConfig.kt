@@ -1,7 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config
 
+import com.zaxxer.hikari.HikariDataSource
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.jdbc.DataSourceBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -21,7 +23,9 @@ class DataSourceConfig(
 
   @Bean(name = ["mainDataSource", "dataSource"])
   @Primary
+  @ConfigurationProperties("spring.datasource.hikari")
   fun dataSource(): DataSource = DataSourceBuilder.create()
+    .type(HikariDataSource::class.java)
     .driverClassName("org.postgresql.Driver")
     .url(dataSourceUrl)
     .username(dataSourceUserName)
