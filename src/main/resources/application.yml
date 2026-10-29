@@ -67,6 +67,11 @@ spring:
       ndmis:
         performance-report:
           chunk-size: 500
+  events:
+    concurrency:
+      core-pool-size: 4
+      max-pool-size: 16
+      queue-size: 500
   data:
     web:
       pageable:
@@ -241,5 +246,4 @@ hmpps:
   sar:
     template:
       path: /sar_template.mustache
-
 
