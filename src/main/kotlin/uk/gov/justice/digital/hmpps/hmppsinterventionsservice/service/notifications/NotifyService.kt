@@ -17,7 +17,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appoint
 import java.net.URI
 
 interface NotifyService {
-  fun generateResourceUrl(baseURL: String, path: String, vararg args: Any): URI = UriComponentsBuilder.fromHttpUrl(baseURL).path(path).buildAndExpand(*args).toUri()
+  fun generateResourceUrl(baseURL: String, path: String, vararg args: Any): URI = UriComponentsBuilder.fromUriString(baseURL).path(path).buildAndExpand(*args).toUri()
 }
 
 interface ContactablePerson {

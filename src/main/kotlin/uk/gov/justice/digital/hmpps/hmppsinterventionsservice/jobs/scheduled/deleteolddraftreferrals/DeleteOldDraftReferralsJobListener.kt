@@ -3,8 +3,8 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.routine.tran
 import mu.KLogging
 import net.logstash.logback.argument.StructuredArguments.kv
 import org.springframework.batch.core.BatchStatus
-import org.springframework.batch.core.JobExecution
-import org.springframework.batch.core.JobExecutionListener
+import org.springframework.batch.core.job.JobExecution
+import org.springframework.batch.core.listener.JobExecutionListener
 import org.springframework.stereotype.Component
 
 @Component

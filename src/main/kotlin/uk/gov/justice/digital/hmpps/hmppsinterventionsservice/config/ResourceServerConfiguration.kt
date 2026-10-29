@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config
 
 import com.nimbusds.jwt.JWTParser
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties
+import org.springframework.boot.security.oauth2.server.resource.autoconfigure.OAuth2ResourceServerProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
@@ -26,25 +26,31 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.TokenVer
 @EnableMethodSecurity(prePostEnabled = true)
 class ResourceServerConfiguration(private val tokenVerifier: TokenVerifier) {
   @Bean
-  fun filterChain(http: HttpSecurity): SecurityFilterChain = http
-    .sessionManagement()
-    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-    .and().csrf().disable()
-    .authorizeHttpRequests { auth ->
-      auth.requestMatchers(
-        "/health/**",
-        "/prometheus/**",
-        "/info",
-        "/v3/api-docs/**",
-        "/swagger-ui/**",
-        "/swagger-ui.html",
-      )
-        .permitAll()
-        .anyRequest().authenticated()
-    }.also {
-      it.oauth2ResourceServer().jwt().jwtAuthenticationConverter(jwtAuthenticationConverter())
-    }
-    .build()
+  fun filterChain(http: HttpSecurity): SecurityFilterChain {
+    http
+      .sessionManagement { session ->
+        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+      }
+      .csrf { csrf -> csrf.disable() }
+      .authorizeHttpRequests { auth ->
+        auth.requestMatchers(
+          "/health/**",
+          "/prometheus/**",
+          "/info",
+          "/v3/api-docs/**",
+          "/swagger-ui/**",
+          "/swagger-ui.html",
+        )
+          .permitAll()
+          .anyRequest().authenticated()
+      }
+      .oauth2ResourceServer { oauth2 ->
+        oauth2.jwt { jwt ->
+          jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())
+        }
+      }
+    return http.build()
+  }
 
   @Bean
   fun jwtAuthenticationConverter(): JwtAuthenticationConverter {
@@ -62,7 +68,7 @@ class ResourceServerConfiguration(private val tokenVerifier: TokenVerifier) {
   @Bean
   @Profile("!test")
   fun jwtDecoder(properties: OAuth2ResourceServerProperties): JwtDecoder {
-    val issuerUri = properties.jwt.issuerUri
+    val issuerUri = requireNotNull(properties.jwt.issuerUri) { "spring.security.oauth2.resourceserver.jwt.issuer-uri must be configured" }
     val jwtDecoder: NimbusJwtDecoder = JwtDecoders.fromIssuerLocation(issuerUri) as NimbusJwtDecoder
     val validator = DelegatingOAuth2TokenValidator(JwtValidators.createDefaultWithIssuer(issuerUri), tokenVerifier)
     jwtDecoder.setJwtValidator(validator)
@@ -77,7 +83,7 @@ class ResourceServerConfiguration(private val tokenVerifier: TokenVerifier) {
 internal class TestJwtDecoder : JwtDecoder {
   private val claimSetConverter = MappedJwtClaimSetConverter.withDefaults(emptyMap())
 
-  override fun decode(token: String): Jwt? {
+  override fun decode(token: String): Jwt {
     // extract headers and claims, but do not attempt to verify signature
     val jwt = JWTParser.parse(token)
     val headers = LinkedHashMap<String, Any>(jwt.header.toJSONObject())

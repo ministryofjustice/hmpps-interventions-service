@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.microsoft.applicationinsights.TelemetryClient
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -13,6 +12,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import software.amazon.awssdk.services.sns.SnsClient
 import software.amazon.awssdk.services.sns.model.PublishRequest
+import tools.jackson.databind.json.JsonMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
@@ -21,7 +21,7 @@ import java.util.UUID
 
 class SNSPublisherTest {
   private val snsClient = mock<SnsClient>()
-  private val objectMapper = ObjectMapper()
+  private val jsonMapper = JsonMapper()
   private val telemetryClient = mock<TelemetryClient>()
 
   private val aReferralId = UUID.fromString("82138d14-3835-442b-b39b-9f8a07650bbe")
@@ -36,7 +36,7 @@ class SNSPublisherTest {
     personReference = PersonReference.crn("X123456"),
   )
 
-  private fun snsPublisher(enabled: Boolean): SNSPublisher = SNSPublisher(snsClient, objectMapper, telemetryClient, enabled, "arn")
+  private fun snsPublisher(enabled: Boolean): SNSPublisher = SNSPublisher(snsClient, jsonMapper, telemetryClient, enabled, "arn")
 
   @Test
   fun `puts eventType into the message attributes so listener can use it for filtering`() {

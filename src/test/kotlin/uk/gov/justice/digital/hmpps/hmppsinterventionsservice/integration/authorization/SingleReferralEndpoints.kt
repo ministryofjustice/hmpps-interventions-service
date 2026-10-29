@@ -8,7 +8,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.CreateReferralRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
@@ -30,18 +30,18 @@ import java.util.UUID
 
 // @Suppress("UNUSED") is used for things that are only used through parameterised tests, so appear unused
 class SingleReferralEndpoints : IntegrationTestBase() {
-  @MockBean lateinit var mockHmppsAuthService: HMPPSAuthService
+  @MockitoBean lateinit var mockHmppsAuthService: HMPPSAuthService
 
-  @MockBean lateinit var mockCommunityAPIOffenderService: CommunityAPIOffenderService
+  @MockitoBean lateinit var mockCommunityAPIOffenderService: CommunityAPIOffenderService
 
-  @MockBean
+  @MockitoBean
   @Suppress("UNUSED")
   lateinit var ramDeliusReferralService: RamDeliusReferralService
 
-  @MockBean
+  @MockitoBean
   lateinit var ramDeliusAPIConvictionService: RamDeliusAPIConvictionService
 
-  @MockBean lateinit var mockRisksAndNeedsService: RisksAndNeedsService
+  @MockitoBean lateinit var mockRisksAndNeedsService: RisksAndNeedsService
 
   private lateinit var requestFactory: RequestFactory
 

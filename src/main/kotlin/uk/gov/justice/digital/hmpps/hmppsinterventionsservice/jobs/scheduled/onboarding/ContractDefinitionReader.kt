@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.on
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import mu.KLogging
-import org.springframework.batch.item.ItemReader
+import org.springframework.batch.infrastructure.item.ItemReader
 import org.springframework.stereotype.Component
 
 @Component

@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.co
 import org.assertj.core.api.Assertions.assertThat
 import org.hibernate.SessionFactory
 import org.junit.jupiter.api.Test
-import org.springframework.batch.item.ExecutionContext
+import org.springframework.batch.infrastructure.item.ExecutionContext
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.scheduled.concludereferrals.ConcludeReferralsReader

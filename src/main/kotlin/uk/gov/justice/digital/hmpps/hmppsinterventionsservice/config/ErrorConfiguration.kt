@@ -97,7 +97,7 @@ class ErrorConfiguration(private val telemetryClient: TelemetryClient) {
   fun handleResponseException(e: ResponseStatusException): ResponseEntity<ErrorResponse> {
     logger.info("internal exception", e)
     val status = HttpStatus.resolve(e.statusCode.value())
-    return errorResponse(e.statusCode, status?.reasonPhrase ?: e.reason, e.reason)
+    return errorResponse(e.statusCode, status?.reasonPhrase ?: e.reason ?: "response status exception", e.reason)
   }
 
   @ExceptionHandler(java.lang.Exception::class)
