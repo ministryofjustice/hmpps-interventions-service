@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.routine.tran
 import mu.KLogging
 import net.logstash.logback.argument.StructuredArguments.kv
 import org.springframework.batch.core.configuration.annotation.JobScope
-import org.springframework.batch.item.ItemProcessor
+import org.springframework.batch.infrastructure.item.ItemProcessor
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral

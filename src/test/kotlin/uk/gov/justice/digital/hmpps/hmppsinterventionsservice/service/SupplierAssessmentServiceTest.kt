@@ -13,10 +13,12 @@ import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentDeliveryType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentSessionType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentType.SUPPLIER_ASSESSMENT
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SupplierAssessment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AppointmentRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
@@ -50,9 +52,9 @@ class SupplierAssessmentServiceTest {
   fun `supplier assessment can be created`() {
     val referral = referralFactory.createSent()
 
-    whenever(appointmentRepository.save(any())).thenReturn(appointmentFactory.create())
-    whenever(supplierAssessmentRepository.save(any())).thenReturn(supplierAssessmentFactory.create())
-    whenever(referralRepository.save(any())).thenReturn(referral)
+    whenever(appointmentRepository.save(any<Appointment>())).thenReturn(appointmentFactory.create())
+    whenever(supplierAssessmentRepository.save(any<SupplierAssessment>())).thenReturn(supplierAssessmentFactory.create())
+    whenever(referralRepository.save(any<Referral>())).thenReturn(referral)
 
     val response = supplierAssessmentService.createSupplierAssessment(referral)
 
@@ -108,7 +110,7 @@ class SupplierAssessmentServiceTest {
           isNull(),
         ),
       ).thenReturn(appointment)
-      whenever(supplierAssessmentRepository.save(any())).thenReturn(supplierAssessment)
+      whenever(supplierAssessmentRepository.save(any<SupplierAssessment>())).thenReturn(supplierAssessment)
 
       supplierAssessmentService.createOrUpdateSupplierAssessmentAppointment(supplierAssessment, durationInMinutes, appointmentTime, createdByUser, appointmentDeliveryType, appointmentSessionType)
 
@@ -157,7 +159,7 @@ class SupplierAssessmentServiceTest {
           isNull(),
         ),
       ).thenReturn(appointment)
-      whenever(supplierAssessmentRepository.save(any())).thenReturn(supplierAssessment)
+      whenever(supplierAssessmentRepository.save(any<SupplierAssessment>())).thenReturn(supplierAssessment)
 
       supplierAssessmentService.createOrUpdateSupplierAssessmentAppointment(supplierAssessment, durationInMinutes, appointmentTime, createdByUser, appointmentDeliveryType, appointmentSessionType, npsOfficeCode = npsOfficeCode)
 
@@ -207,7 +209,7 @@ class SupplierAssessmentServiceTest {
           isNull(),
         ),
       ).thenReturn(newAppointment)
-      whenever(supplierAssessmentRepository.save(any())).thenReturn(supplierAssessment)
+      whenever(supplierAssessmentRepository.save(any<SupplierAssessment>())).thenReturn(supplierAssessment)
 
       val supplierAssessmentAppointment = supplierAssessmentService.createOrUpdateSupplierAssessmentAppointment(supplierAssessment, durationInMinutes, appointmentTime, createdByUser, appointmentDeliveryType, appointmentSessionType)
 
@@ -258,7 +260,7 @@ class SupplierAssessmentServiceTest {
           isNull(),
         ),
       ).thenReturn(newAppointment)
-      whenever(supplierAssessmentRepository.save(any())).thenReturn(supplierAssessment)
+      whenever(supplierAssessmentRepository.save(any<SupplierAssessment>())).thenReturn(supplierAssessment)
 
       val supplierAssessmentAppointment = supplierAssessmentService.createOrUpdateSupplierAssessmentAppointment(supplierAssessment, durationInMinutes, appointmentTime, createdByUser, appointmentDeliveryType, appointmentSessionType, attended = attended)
 

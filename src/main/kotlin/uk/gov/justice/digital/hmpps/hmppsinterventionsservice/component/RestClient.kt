@@ -21,7 +21,11 @@ class RestClient(
       .uri {
         it
           .path(uri)
-          .queryParams(queryParams)
+          .apply {
+            if (queryParams != null) {
+              queryParams(queryParams)
+            }
+          }
           .build()
       }
 
@@ -30,7 +34,7 @@ class RestClient(
       .withAuth(customAuthentication)
   }
 
-  fun <T> post(
+  fun <T : Any> post(
     uri: String,
     body: T,
     customAuthentication: JwtAuthenticationToken? = null,
@@ -38,14 +42,14 @@ class RestClient(
     val spec = webClient
       .post()
       .uri(uri)
-      .bodyValue(body)
+      .bodyValue(body as Any)
 
     return spec
       .withDefaultHeaders()
       .withAuth(customAuthentication)
   }
 
-  fun <T> put(
+  fun <T : Any> put(
     uri: String,
     body: T,
     customAuthentication: JwtAuthenticationToken? = null,
@@ -53,14 +57,14 @@ class RestClient(
     val spec = webClient
       .put()
       .uri(uri)
-      .bodyValue(body)
+      .bodyValue(body as Any)
 
     return spec
       .withDefaultHeaders()
       .withAuth(customAuthentication)
   }
 
-  fun <T> patch(
+  fun <T : Any> patch(
     uri: String,
     body: T,
     customAuthentication: JwtAuthenticationToken? = null,
@@ -68,7 +72,7 @@ class RestClient(
     val spec = webClient
       .patch()
       .uri(uri)
-      .bodyValue(body)
+      .bodyValue(body as Any)
 
     return spec
       .withDefaultHeaders()

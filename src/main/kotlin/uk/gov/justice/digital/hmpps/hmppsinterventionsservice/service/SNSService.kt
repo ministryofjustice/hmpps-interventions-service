@@ -31,7 +31,7 @@ class SNSActionPlanService(
 
   @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: ActionPlanEvent) {
-    val uiUrl = UriComponentsBuilder.fromHttpUrl(interventionsUiBaseUrl)
+    val uiUrl = UriComponentsBuilder.fromUriString(interventionsUiBaseUrl)
       .path(actionPlanLocation)
       .buildAndExpand(event.actionPlan.referral.id)
       .toString()
@@ -159,12 +159,12 @@ class SNSAppointmentService(
         val eventType = "intervention.$appointmentType.session-feedback-submitted"
         val url =
           if (event.appointmentType == AppointmentType.SERVICE_DELIVERY) {
-            UriComponentsBuilder.fromHttpUrl(interventionsUiBaseUrl)
+            UriComponentsBuilder.fromUriString(interventionsUiBaseUrl)
               .path(ppSessionFeedbackLocation)
               .buildAndExpand(referral.id, event.deliverySession?.sessionNumber, event.appointment.deliusAppointmentId!!)
               .toString()
           } else {
-            UriComponentsBuilder.fromHttpUrl(interventionsUiBaseUrl)
+            UriComponentsBuilder.fromUriString(interventionsUiBaseUrl)
               .path(saFeedbackLocation)
               .buildAndExpand(referral.id)
               .toString()

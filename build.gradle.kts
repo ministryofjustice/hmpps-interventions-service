@@ -2,14 +2,14 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  kotlin("plugin.spring") version "2.1.20"
-  id("org.jetbrains.kotlin.plugin.jpa") version "2.1.20"
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "9.0.2"
+  kotlin("plugin.spring") version "2.4.20"
+  id("org.jetbrains.kotlin.plugin.jpa") version "2.4.20"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.+"
   id("jacoco")
   id("project-report")
 }
 
-ext["hibernate.version"] = "6.5.3.Final"
+ext["hibernate.version"] = "7.4.5.Final"
 
 configurations {
   testImplementation {
@@ -117,30 +117,34 @@ dependencies {
   implementation("software.amazon.awssdk:sts:2.31.36")
 
   // security
-  implementation("org.springframework.boot:spring-boot-starter-webflux:3.5.0")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.5.0")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.5.0")
-  implementation("org.springframework.security:spring-security-crypto:7.1.1")
+  implementation("org.springframework.boot:spring-boot-starter-webflux")
+  implementation("org.springframework.boot:spring-boot-starter-webclient")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+  implementation("org.springframework.security:spring-security-crypto")
   implementation("com.nimbusds:oauth2-oidc-sdk:11.25")
 
   // database
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("com.h2database:h2:2.3.232")
-  implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.9.10")
+  implementation("io.hypersistence:hypersistence-utils-hibernate-70:3.15.3")
 
   runtimeOnly("org.postgresql:postgresql:42.7.7")
+  implementation("org.springframework.boot:spring-boot-starter-flyway")
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
   // json and csv
   implementation("com.github.java-json-tools:json-patch:1.13")
   implementation("org.apache.commons:commons-csv:1.14.0")
 
+  testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
+  testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
   testImplementation("au.com.dius.pact.provider:junit5spring:4.6.17")
   testImplementation("com.squareup.okhttp3:okhttp:5.1.0")
   testImplementation("com.squareup.okhttp3:mockwebserver:5.1.0")
   testImplementation("org.mockito:mockito-inline:5.2.0")
   testImplementation("org.springframework.batch:spring-batch-test")
   testImplementation("org.wiremock:wiremock:3.13.1")
-  testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.12.2")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher:6.0.3")
 }

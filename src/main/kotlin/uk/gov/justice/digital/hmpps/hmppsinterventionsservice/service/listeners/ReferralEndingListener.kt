@@ -46,7 +46,7 @@ class ReferralEndingListener(
   // Better would be to emit "ReferralCancelledEvent" and "ReferralCompletedEvent" and listen to them to create this domain event
   private fun endedTime(event: ReferralEndingEvent): OffsetDateTime = event.referral.concludedAt ?: event.referral.endRequestedAt ?: OffsetDateTime.now()
 
-  private fun referralDetailsUrl(referralId: UUID) = UriComponentsBuilder.fromHttpUrl(interventionsUIBaseURL)
+  private fun referralDetailsUrl(referralId: UUID) = UriComponentsBuilder.fromUriString(interventionsUIBaseURL)
     .path(ppReferralDetailsLocation)
     .buildAndExpand(referralId)
     .toString()
