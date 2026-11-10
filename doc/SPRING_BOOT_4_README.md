@@ -101,10 +101,10 @@ main (production)
 - Spring Boot 4: Test annotations (@MockBean → @MockitoBean)
 
 ### Test Infrastructure
-- H2 in-memory database for tests
-- Complete test configuration in `application-local.yml`
-- TestDataSourceConfig with all required beans
-- PostgreSQL driver excluded from test classpath
+- Repository and integration tests run against local PostgreSQL
+- `@RepositoryTest` disables test database replacement
+- H2 stores Spring Batch job metadata
+- PostgreSQL remains on the test runtime classpath
 
 ### Files Changed
 - 25+ files modified/created
