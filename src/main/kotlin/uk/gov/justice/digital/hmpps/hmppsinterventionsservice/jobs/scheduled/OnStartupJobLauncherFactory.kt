@@ -17,7 +17,7 @@ import kotlin.system.exitProcess
 
 @Component
 class OnStartupJobLauncherFactory(
-  @Qualifier("asyncJobOperator")
+  @Qualifier("jobOperator")
   private val jobOperator: JobOperator,
 ) {
   companion object : KLogging()
