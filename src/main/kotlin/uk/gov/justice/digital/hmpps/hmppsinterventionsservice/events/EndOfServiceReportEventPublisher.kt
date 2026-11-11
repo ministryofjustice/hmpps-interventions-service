@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events
 
-import jakarta.persistence.EntityManager
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
@@ -17,9 +16,10 @@ class EndOfServiceReportEvent(
   val type: EndOfServiceReportEventType,
   val endOfServiceReport: EndOfServiceReport,
   val detailUrl: String,
-) : ApplicationEvent(source),
-  EntityEvent {
-  override fun reloadIn(entityManager: EntityManager) = EndOfServiceReportEvent(source, type, entityManager.reload(endOfServiceReport), detailUrl)
+) : ApplicationEvent(source) {
+  // ,
+  // EntityEvent {
+  // override fun reloadIn(entityManager: EntityManager) = EndOfServiceReportEvent(source, type, entityManager.reload(endOfServiceReport), detailUrl)
 
   override fun toString(): String = "EndOfServiceReportEvent(type=$type, referralId=${endOfServiceReport.referral.id}, detailUrl='$detailUrl', source=$source)"
 }

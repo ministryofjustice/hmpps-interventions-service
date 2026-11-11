@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events
 
-import jakarta.persistence.EntityManager
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
@@ -28,20 +27,7 @@ class AppointmentEvent(
   val deliverySession: DeliverySession? = null,
   val notifyProbationPractitionerOfBehaviour: Boolean? = null,
   val notifyProbationPractitionerOfConcerns: Boolean? = null,
-) : ApplicationEvent(source),
-  EntityEvent {
-  override fun reloadIn(entityManager: EntityManager) = AppointmentEvent(
-    source,
-    type,
-    entityManager.reload(appointment),
-    detailUrl,
-    notifyPP,
-    appointmentType,
-    deliverySession?.let { entityManager.reload(it) },
-    notifyProbationPractitionerOfBehaviour,
-    notifyProbationPractitionerOfConcerns,
-  )
-
+) : ApplicationEvent(source) {
   override fun toString(): String = "AppointmentEvent(type=$type, appointmentId=${appointment.id}, detailUrl='$detailUrl', source=$source)"
 }
 

@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events
 
 import jakarta.persistence.EntityManager
 import org.hibernate.proxy.HibernateProxy
-import org.springframework.context.ApplicationEvent
 
 // An application event that carries JPA entities.
 //
@@ -10,9 +9,9 @@ import org.springframework.context.ApplicationEvent
 // publisher's Hibernate session: a session can't be used from two threads, and Hibernate 7 fails when it is.
 // The event multicaster gives each listener a copy of the event from reloadIn, with entities loaded in the
 // listener's own session, once the publishing transaction has committed.
-interface EntityEvent {
-  fun reloadIn(entityManager: EntityManager): ApplicationEvent
-}
+// interface EntityEvent {
+// fun reloadIn(entityManager: EntityManager): ApplicationEvent
+// }}
 
 // loads the current state of an entity in this entity manager, without initialising it if it's a lazy proxy
 @Suppress("UNCHECKED_CAST")
