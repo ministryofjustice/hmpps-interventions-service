@@ -100,13 +100,13 @@ class SNSReferralService(
         snsPublisher.publish(event.referral.id, event.referral.sentBy!!, snsEvent)
       }
       ReferralEventType.ASSIGNED -> {
-        val assignment = requireNotNull(event.assignment)
+        val assignment = event.referral.currentAssignment!!
         val snsEvent = EventDTO(
           "intervention.referral.assigned",
           "A referral has been assigned to a caseworker / service provider",
           event.detailUrl,
           assignment.assignedAt,
-          mapOf("referralId" to event.referral.id, "assignedTo" to assignment.assignedTo.username),
+          mapOf("referralId" to event.referral.id, "assignedTo" to (assignment.assignedTo.userName)),
           PersonReference.crn(event.referral.serviceUserCRN),
         )
         snsPublisher.publish(event.referral.id, assignment.assignedBy, snsEvent)

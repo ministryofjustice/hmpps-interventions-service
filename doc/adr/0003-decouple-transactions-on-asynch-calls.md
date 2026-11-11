@@ -23,4 +23,4 @@ This ensures that there is no unexcepted behaviour when performing a lazy-fetch 
 1. The NotificationService should have its own @Transactional annotation separate from the calling class.
 2. Objects should be re-fetched by service classes within the @Asynch class using an id passed into the @Asynch @Component.
 3. Care must be taken that when fetching the same object from the calling class that the entity manager is flushed before calling the @Asynch @Component.
-4. Event-time values must be captured as immutable snapshots and preserved when entities are reloaded for each listener. Referral assignment events retain the original assignee, actor and assignment time; reloading the referral supplies listener-local associations, not a replacement assignment.
+

@@ -11,11 +11,9 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AuthUserDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralWithdrawalState
-import java.time.OffsetDateTime
 
 enum class ReferralEventType {
   SENT,
@@ -33,34 +31,15 @@ enum class ReferralEventType {
   PROBATION_PRACTITIONER_TEAM_PHONE_NUMBER_AMENDED,
 }
 
-data class ReferralAssignmentSnapshot(
-  val assignedAt: OffsetDateTime,
-  val assignedBy: AuthUserDTO,
-  val assignedTo: AuthUserDTO,
-) {
-  companion object {
-    fun from(assignment: ReferralAssignment) = ReferralAssignmentSnapshot(
-      assignment.assignedAt,
-      AuthUserDTO.from(assignment.assignedBy),
-      AuthUserDTO.from(assignment.assignedTo),
-    )
-  }
-}
-
 class ReferralEvent(
   source: Any,
   val type: ReferralEventType,
   val referral: Referral,
   val detailUrl: String,
   val data: Map<String, Any?> = emptyMap(),
-  val assignment: ReferralAssignmentSnapshot? = if (type == ReferralEventType.ASSIGNED) {
-    ReferralAssignmentSnapshot.from(requireNotNull(referral.currentAssignment) { "Assigned referral event requires an assignment" })
-  } else {
-    null
-  },
 ) : ApplicationEvent(source),
   EntityEvent {
-  override fun reloadIn(entityManager: EntityManager) = ReferralEvent(source, type, entityManager.reload(referral), detailUrl, entityManager.reloadEntities(data), assignment)
+  override fun reloadIn(entityManager: EntityManager) = ReferralEvent(source, type, entityManager.reload(referral), detailUrl, entityManager.reloadEntities(data))
 
   override fun toString(): String = "ReferralEvent(type=$type, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
 }

@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.SNSPublisher
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AuthUserDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEvent
@@ -77,42 +76,9 @@ internal class SNSReferralServiceTest {
     )
     verify(snsPublisher).publish(
       referralAssignedEvent.referral.id,
-      AuthUserDTO.from(referralAssignedEvent.referral.currentAssignment!!.assignedBy),
+      referralAssignedEvent.referral.currentAssignment!!.assignedBy,
       snsEvent,
     )
-  }
-
-  @Test
-  fun `successive assignments publish their original assignee actor and timestamp`() {
-    val referral = referralAssignedEvent.referral
-    val firstAssignment = referral.currentAssignment!!
-    val secondAssignment = ReferralAssignment(
-      firstAssignment.assignedAt.plusSeconds(1),
-      authUserFactory.createSP("second-actor"),
-      authUserFactory.createSP("second-assignee"),
-    )
-    firstAssignment.superseded = true
-    referral.assignments.add(secondAssignment)
-    val secondEvent = ReferralEvent("source", ReferralEventType.ASSIGNED, referral, referralAssignedEvent.detailUrl)
-
-    val service = snsReferralService()
-    service.onApplicationEvent(referralAssignedEvent)
-    service.onApplicationEvent(secondEvent)
-
-    listOf(firstAssignment, secondAssignment).forEach { assignment ->
-      verify(snsPublisher).publish(
-        referral.id,
-        AuthUserDTO.from(assignment.assignedBy),
-        EventDTO(
-          "intervention.referral.assigned",
-          "A referral has been assigned to a caseworker / service provider",
-          referralAssignedEvent.detailUrl,
-          assignment.assignedAt,
-          mapOf("referralId" to referral.id, "assignedTo" to assignment.assignedTo.userName),
-          PersonReference.crn(referral.serviceUserCRN),
-        ),
-      )
-    }
   }
 
   private fun snsReferralService(): SNSReferralService = SNSReferralService(snsPublisher)

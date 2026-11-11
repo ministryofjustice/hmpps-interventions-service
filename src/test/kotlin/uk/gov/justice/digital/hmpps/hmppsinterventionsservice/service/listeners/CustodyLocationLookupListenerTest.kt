@@ -21,7 +21,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.OffenderId
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.PrimaryIdentifiersResponse
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.Prisoner
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.PrisonerOffenderSearchService
-import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AssignmentsFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.RepositoryTest
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -244,7 +243,6 @@ internal class CustodyLocationLookupListenerTest {
     referralEventType: ReferralEventType,
   ): ReferralEvent {
     val referral = Referral(
-      assignments = if (referralEventType == ReferralEventType.ASSIGNED) AssignmentsFactory().create(1).toMutableList() else mutableListOf(),
       id = referralId,
       referenceNumber = null,
       serviceUserCRN = serviceUserCRN,
