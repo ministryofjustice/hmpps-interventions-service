@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jobs.routine.transferreferrals
 
-import org.springframework.batch.core.Job
-import org.springframework.batch.core.Step
+import org.springframework.batch.core.job.Job
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
+import org.springframework.batch.core.step.Step
 import org.springframework.batch.core.step.builder.StepBuilder
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
@@ -23,11 +23,10 @@ class DeleteOldDraftReferralsJobConfiguration(
   private val onStartupJobLauncherFactory: OnStartupJobLauncherFactory,
 ) {
   @Bean
-  fun deleteOldDraftReferralsJobLauncher(deleteOldDraftReferralsJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(deleteOldDraftReferralsJob)
+  fun deleteOldDraftReferralsJobLauncher(deleteOldDraftReferralsJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(deleteOldDraftReferralsJob, TimestampIncrementer())
 
   @Bean
   fun deleteOldDraftReferralsJob(deleteOldDraftReferralsStep: Step): Job = JobBuilder("deleteOldDraftReferralsJob", jobRepository)
-    .incrementer(TimestampIncrementer())
     .listener(listener)
     .start(deleteOldDraftReferralsStep)
     .build()
@@ -39,9 +38,10 @@ class DeleteOldDraftReferralsJobConfiguration(
     writer: DeleteOldDraftReferralsWriter,
     transactionManager: PlatformTransactionManager,
   ): Step = StepBuilder("deleteOldDraftReferralsStep", jobRepository)
-    .chunk<DraftReferral, DraftReferral>(100, transactionManager)
+    .chunk<DraftReferral, DraftReferral>(100)
     .reader(reader)
     .processor(processor)
     .writer(writer)
+    .transactionManager(transactionManager)
     .build()
 }

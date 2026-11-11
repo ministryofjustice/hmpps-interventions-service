@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events
 
+import jakarta.persistence.EntityManager
 import mu.KLogging
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationEventPublisher
@@ -10,9 +11,11 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AuthUserDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralDetailsDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralDetails
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcludedState
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralWithdrawalState
+import java.time.OffsetDateTime
 
 enum class ReferralEventType {
   SENT,
@@ -30,13 +33,35 @@ enum class ReferralEventType {
   PROBATION_PRACTITIONER_TEAM_PHONE_NUMBER_AMENDED,
 }
 
+data class ReferralAssignmentSnapshot(
+  val assignedAt: OffsetDateTime,
+  val assignedBy: AuthUserDTO,
+  val assignedTo: AuthUserDTO,
+) {
+  companion object {
+    fun from(assignment: ReferralAssignment) = ReferralAssignmentSnapshot(
+      assignment.assignedAt,
+      AuthUserDTO.from(assignment.assignedBy),
+      AuthUserDTO.from(assignment.assignedTo),
+    )
+  }
+}
+
 class ReferralEvent(
   source: Any,
   val type: ReferralEventType,
   val referral: Referral,
   val detailUrl: String,
   val data: Map<String, Any?> = emptyMap(),
-) : ApplicationEvent(source) {
+  val assignment: ReferralAssignmentSnapshot? = if (type == ReferralEventType.ASSIGNED) {
+    ReferralAssignmentSnapshot.from(requireNotNull(referral.currentAssignment) { "Assigned referral event requires an assignment" })
+  } else {
+    null
+  },
+) : ApplicationEvent(source),
+  EntityEvent {
+  override fun reloadIn(entityManager: EntityManager) = ReferralEvent(source, type, entityManager.reload(referral), detailUrl, entityManager.reloadEntities(data), assignment)
+
   override fun toString(): String = "ReferralEvent(type=$type, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
 }
 
@@ -45,7 +70,10 @@ class ReferralEndingEvent(
   val state: ReferralConcludedState,
   val referral: Referral,
   val detailUrl: String,
-) : ApplicationEvent(source) {
+) : ApplicationEvent(source),
+  EntityEvent {
+  override fun reloadIn(entityManager: EntityManager) = ReferralEndingEvent(source, state, entityManager.reload(referral), detailUrl)
+
   override fun toString(): String = "ReferralEndingEvent(state=$state, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
 }
 
@@ -55,7 +83,10 @@ class ReferralConcludedEvent(
   val referral: Referral,
   val detailUrl: String,
   val referralWithdrawalState: ReferralWithdrawalState? = null,
-) : ApplicationEvent(source) {
+) : ApplicationEvent(source),
+  EntityEvent {
+  override fun reloadIn(entityManager: EntityManager) = ReferralConcludedEvent(source, type, entityManager.reload(referral), detailUrl, referralWithdrawalState)
+
   override fun toString(): String = "ReferralConcludedEvent(type=$type, referralId=${referral.id}, detailUrl='$detailUrl', source=$source)"
 }
 

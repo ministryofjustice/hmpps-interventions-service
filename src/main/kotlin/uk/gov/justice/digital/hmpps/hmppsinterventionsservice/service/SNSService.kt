@@ -31,7 +31,7 @@ class SNSActionPlanService(
 
   @AsyncEventExceptionHandling
   override fun onApplicationEvent(event: ActionPlanEvent) {
-    val uiUrl = UriComponentsBuilder.fromHttpUrl(interventionsUiBaseUrl)
+    val uiUrl = UriComponentsBuilder.fromUriString(interventionsUiBaseUrl)
       .path(actionPlanLocation)
       .buildAndExpand(event.actionPlan.referral.id)
       .toString()
@@ -100,13 +100,13 @@ class SNSReferralService(
         snsPublisher.publish(event.referral.id, event.referral.sentBy!!, snsEvent)
       }
       ReferralEventType.ASSIGNED -> {
-        val assignment = event.referral.currentAssignment!!
+        val assignment = requireNotNull(event.assignment)
         val snsEvent = EventDTO(
           "intervention.referral.assigned",
           "A referral has been assigned to a caseworker / service provider",
           event.detailUrl,
           assignment.assignedAt,
-          mapOf("referralId" to event.referral.id, "assignedTo" to (assignment.assignedTo.userName)),
+          mapOf("referralId" to event.referral.id, "assignedTo" to assignment.assignedTo.username),
           PersonReference.crn(event.referral.serviceUserCRN),
         )
         snsPublisher.publish(event.referral.id, assignment.assignedBy, snsEvent)
@@ -159,12 +159,12 @@ class SNSAppointmentService(
         val eventType = "intervention.$appointmentType.session-feedback-submitted"
         val url =
           if (event.appointmentType == AppointmentType.SERVICE_DELIVERY) {
-            UriComponentsBuilder.fromHttpUrl(interventionsUiBaseUrl)
+            UriComponentsBuilder.fromUriString(interventionsUiBaseUrl)
               .path(ppSessionFeedbackLocation)
               .buildAndExpand(referral.id, event.deliverySession?.sessionNumber, event.appointment.deliusAppointmentId!!)
               .toString()
           } else {
-            UriComponentsBuilder.fromHttpUrl(interventionsUiBaseUrl)
+            UriComponentsBuilder.fromUriString(interventionsUiBaseUrl)
               .path(saFeedbackLocation)
               .buildAndExpand(referral.id)
               .toString()

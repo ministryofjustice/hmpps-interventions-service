@@ -72,8 +72,7 @@ class ReferralNotificationService(
       }
 
       ReferralEventType.ASSIGNED -> {
-        // event payloads, e.g. ReferralAssignedEvent would make it clearer when assignee can or cannot exist
-        val userDetails = hmppsAuthService.getUserDetail(event.referral.currentAssignee!!)
+        val userDetails = hmppsAuthService.getUserDetail(requireNotNull(event.assignment).assignedTo)
         val location = generateResourceUrl(interventionsUIBaseURL, spReferralDetailsLocation, event.referral.id)
         emailSender.sendEmail(
           referralAssignedTemplateID,

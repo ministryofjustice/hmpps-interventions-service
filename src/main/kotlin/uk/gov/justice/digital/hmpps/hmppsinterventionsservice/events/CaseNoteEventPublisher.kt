@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events
 
+import jakarta.persistence.EntityManager
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
@@ -16,7 +17,10 @@ class CreateCaseNoteEvent(
   val detailUrl: String,
   val referralId: UUID,
   val sendEmail: Boolean?,
-) : ApplicationEvent(source) {
+) : ApplicationEvent(source),
+  EntityEvent {
+  override fun reloadIn(entityManager: EntityManager) = CreateCaseNoteEvent(source, caseNoteId, entityManager.reload(sentBy), detailUrl, referralId, sendEmail)
+
   override fun toString(): String = "CreateCaseNoteEvent(caseNoteId=$caseNoteId, referralId=$referralId)"
 }
 

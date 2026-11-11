@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralDetail
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEvent
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.notifications.ReferralNotificationService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AssignmentsFactory
@@ -108,13 +109,13 @@ class NotifyReferralServiceTest {
 
   @Test
   fun `referral assigned event does not swallows hmpps auth errors`() {
-    whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenThrow(UnverifiedEmailException::class.java)
+    whenever(hmppsAuthService.getUserDetail(any<AuthUserDTO>())).thenThrow(UnverifiedEmailException::class.java)
     assertThrows<UnverifiedEmailException> { notifyService().onApplicationEvent(referralAssignedEvent) }
   }
 
   @Test
   fun `referral assigned event generates valid url and sends an email`() {
-    whenever(hmppsAuthService.getUserDetail(any<AuthUser>())).thenReturn(UserDetail("tom", "tom@tom.tom", "jones"))
+    whenever(hmppsAuthService.getUserDetail(any<AuthUserDTO>())).thenReturn(UserDetail("tom", "tom@tom.tom", "jones"))
 
     notifyService().onApplicationEvent(referralAssignedEvent)
     val personalisationCaptor = argumentCaptor<Map<String, String>>()
@@ -122,6 +123,38 @@ class NotifyReferralServiceTest {
     assertThat(personalisationCaptor.firstValue["spFirstName"]).isEqualTo("tom")
     assertThat(personalisationCaptor.firstValue["referenceNumber"]).isEqualTo("AJ9871AC")
     assertThat(personalisationCaptor.firstValue["referralUrl"]).isEqualTo("http://interventions-ui.example.com/referral/42c7d267-0776-4272-a8e8-a673bfe30d0d")
+  }
+
+  @Test
+  fun `successive assignments send emails to their original assignees`() {
+    val referral = referralAssignedEvent.referral
+    val firstAssignment = referral.currentAssignment!!
+    val secondAssignee = authUserFactory.createSP("second-assignee")
+    firstAssignment.superseded = true
+    referral.assignments.add(
+      ReferralAssignment(firstAssignment.assignedAt.plusSeconds(1), secondAssignee, secondAssignee),
+    )
+    val secondEvent = ReferralEvent("source", ReferralEventType.ASSIGNED, referral, referralAssignedEvent.detailUrl)
+    whenever(hmppsAuthService.getUserDetail(AuthUserDTO.from(firstAssignment.assignedTo)))
+      .thenReturn(UserDetail("first", "first@example.com", "assignee"))
+    whenever(hmppsAuthService.getUserDetail(AuthUserDTO.from(secondAssignee)))
+      .thenReturn(UserDetail("second", "second@example.com", "assignee"))
+
+    val service = notifyService()
+    service.onApplicationEvent(referralAssignedEvent)
+    service.onApplicationEvent(secondEvent)
+
+    listOf("first", "second").forEach { name ->
+      verify(emailSender).sendEmail(
+        "referralAssignedTemplateID",
+        "$name@example.com",
+        mapOf(
+          "spFirstName" to name,
+          "referenceNumber" to "AJ9871AC",
+          "referralUrl" to "http://interventions-ui.example.com/referral/${referral.id}",
+        ),
+      )
+    }
   }
 
   @Nested

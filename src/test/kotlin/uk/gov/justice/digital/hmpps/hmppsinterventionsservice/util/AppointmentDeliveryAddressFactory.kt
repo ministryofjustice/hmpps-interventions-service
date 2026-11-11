@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util
 
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentDeliveryAddress
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentDeliveryType
 import java.util.UUID

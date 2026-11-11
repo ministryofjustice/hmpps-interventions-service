@@ -1,11 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.service
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Attended
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ActionPlanRepository
@@ -33,12 +32,6 @@ class ReferralConcludeIntegrationTest @Autowired constructor(
   private val appointmentFactory = AppointmentFactory(entityManager)
   private val deliverySessionFactory = DeliverySessionFactory(entityManager)
   private val referralEventPublisher: ReferralEventPublisher = mock()
-
-  @AfterEach
-  fun `clear referrals`() {
-    referralRepository.deleteAll()
-    deliverySessionRepository.deleteAll()
-  }
 
   @Test
   fun `an action plan number of sessions should be the same even with more than one appointment`() {

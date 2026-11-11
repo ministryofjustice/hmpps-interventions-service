@@ -118,7 +118,7 @@ class ReferralServiceUnitTest {
 
     whenever(authUserRepository.save(authUser)).thenReturn(authUser)
     whenever(withdrawalReasonRepository.findByCode("MIS")).thenReturn(withdrawalReason)
-    whenever(referralRepository.save(any())).thenReturn(referralFactory.createEnded(endRequestedComments = withdrawalComments, withdrawalReason = withdrawalReason))
+    whenever(referralRepository.save(any<Referral>())).thenReturn(referralFactory.createEnded(endRequestedComments = withdrawalComments, withdrawalReason = withdrawalReason))
 
     val endedReferral = referralService.requestReferralEnd(referral, authUser, withdrawReferralRequestDTO)
     assertThat(endedReferral.endRequestedAt).isNotNull
@@ -136,10 +136,10 @@ class ReferralServiceUnitTest {
     val cancellationComments = "comment"
     val endedReferral = referralFactory.createEnded(endRequestedComments = cancellationComments, withdrawalReason = withdrawalReason)
 
-    whenever(authUserRepository.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg<AuthUser>())
-    whenever(referralRepository.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg<Referral>())
+    whenever(authUserRepository.save(any<AuthUser>())).thenAnswer(AdditionalAnswers.returnsFirstArg<AuthUser>())
+    whenever(referralRepository.save(any<Referral>())).thenAnswer(AdditionalAnswers.returnsFirstArg<Referral>())
     whenever(withdrawalReasonRepository.findByCode("MIS")).thenReturn(withdrawalReason)
-    whenever(referralRepository.save(any())).thenReturn(endedReferral)
+    whenever(referralRepository.save(any<Referral>())).thenReturn(endedReferral)
 
     referralService.requestReferralEnd(referral, authUser, withdrawReferralRequestDTO)
 
@@ -154,8 +154,8 @@ class ReferralServiceUnitTest {
     val withdrawReferralRequestDTO = WithdrawReferralRequestDTO(withdrawalReason.code, withdrawalReason.description, ReferralWithdrawalState.PRE_ICA_WITHDRAWAL.name)
 
     whenever(withdrawalReasonRepository.findByCode("MIS")).thenReturn(null)
-    whenever(authUserRepository.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg<AuthUser>())
-    whenever(referralRepository.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg<Referral>())
+    whenever(authUserRepository.save(any<AuthUser>())).thenAnswer(AdditionalAnswers.returnsFirstArg<AuthUser>())
+    whenever(referralRepository.save(any<Referral>())).thenAnswer(AdditionalAnswers.returnsFirstArg<Referral>())
 
     val exception = assertThrows<ResponseStatusException> {
       referralService.requestReferralEnd(referral, authUser, withdrawReferralRequestDTO)
@@ -171,8 +171,8 @@ class ReferralServiceUnitTest {
     val authUser = authUserFactory.create()
     val withdrawalReason = withdrawReasonFactory.create()
     val withdrawReferralRequestDTO = WithdrawReferralRequestDTO(withdrawalReason.code, withdrawalReason.description, ReferralWithdrawalState.PRE_ICA_WITHDRAWAL.name)
-    whenever(authUserRepository.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg<AuthUser>())
-    whenever(referralRepository.save(any())).thenThrow(DataIntegrityViolationException("db error"))
+    whenever(authUserRepository.save(any<AuthUser>())).thenAnswer(AdditionalAnswers.returnsFirstArg<AuthUser>())
+    whenever(referralRepository.save(any<Referral>())).thenThrow(DataIntegrityViolationException("db error"))
 
     val exception = assertThrows<Exception> {
       referralService.requestReferralEnd(referral, authUser, withdrawReferralRequestDTO)
