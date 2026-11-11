@@ -4,6 +4,7 @@ import ch.qos.logback.classic.Level
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -18,17 +19,25 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.RestClie
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.LoggingSpyTest
+import java.net.InetAddress
 import java.time.OffsetDateTime
 import java.util.UUID
 
 internal class RisksAndNeedsServiceTest : LoggingSpyTest(RisksAndNeedsService::class, Level.ERROR) {
-  private val mockWebServer = MockWebServer()
+  private val mockWebServer = MockWebServer().apply {
+    start(InetAddress.getByName("127.0.0.1"), 0)
+  }
   private val restClient = RestClient(
-    WebClient.create(mockWebServer.url("/").toString()),
+    WebClient.create(mockWebServer.url("/").newBuilder().host("127.0.0.1").build().toString()),
     "client-registration-id",
   )
   private val authUserFactory = AuthUserFactory()
   private val jwtTokenFactory = JwtTokenFactory()
+
+  @AfterAll
+  fun stopServer() {
+    mockWebServer.shutdown()
+  }
 
   @BeforeEach
   fun `set security context`() {
