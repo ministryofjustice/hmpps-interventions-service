@@ -3,6 +3,8 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.SNSPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
@@ -199,22 +201,25 @@ class SNSAppointmentService(
 @Service
 class SNSEndOfServiceReportService(
   private val snsPublisher: SNSPublisher,
+  private val endOfServiceReportService: EndOfServiceReportService,
 ) : ApplicationListener<EndOfServiceReportEvent>,
   SNSService {
 
   @AsyncEventExceptionHandling
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   override fun onApplicationEvent(event: EndOfServiceReportEvent) {
+    val endOfServiceReport = endOfServiceReportService.getEndOfServiceReport(event.endOfServiceReportId)
     when (event.type) {
       SUBMITTED -> {
         val snsEvent = EventDTO(
           "intervention.end-of-service-report.submitted",
           "An end of service report has been submitted",
           event.detailUrl,
-          event.endOfServiceReport.submittedAt!!,
-          mapOf("endOfServiceReportId" to event.endOfServiceReport.id, "submittedBy" to (event.endOfServiceReport.submittedBy?.userName!!)),
-          PersonReference.crn(event.endOfServiceReport.referral.serviceUserCRN),
+          endOfServiceReport.submittedAt!!,
+          mapOf("endOfServiceReportId" to endOfServiceReport.id, "submittedBy" to (endOfServiceReport.submittedBy?.userName!!)),
+          PersonReference.crn(endOfServiceReport.referral.serviceUserCRN),
         )
-        snsPublisher.publish(event.endOfServiceReport.referral.id, event.endOfServiceReport.submittedBy!!, snsEvent)
+        snsPublisher.publish(endOfServiceReport.referral.id, endOfServiceReport.submittedBy!!, snsEvent)
       }
     }
   }
