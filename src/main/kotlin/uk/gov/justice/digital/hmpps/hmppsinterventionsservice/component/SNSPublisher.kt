@@ -1,8 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.microsoft.applicationinsights.TelemetryClient
 import mu.KLogging
 import org.springframework.beans.factory.annotation.Value
@@ -10,6 +7,7 @@ import org.springframework.stereotype.Component
 import software.amazon.awssdk.services.sns.SnsClient
 import software.amazon.awssdk.services.sns.model.MessageAttributeValue
 import software.amazon.awssdk.services.sns.model.PublishRequest
+import tools.jackson.databind.json.JsonMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AuthUserDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
@@ -18,17 +16,12 @@ import java.util.UUID
 @Component
 class SNSPublisher(
   private val client: SnsClient,
-  private val objectMapper: ObjectMapper,
+  private val jsonMapper: JsonMapper,
   private val telemetryClient: TelemetryClient,
   @Value("\${aws.sns.enabled}") private val enabled: Boolean,
   @Value("\${aws.sns.topic.arn}") private val arn: String,
 ) {
   companion object : KLogging()
-
-  init {
-    objectMapper.registerModule(JavaTimeModule())
-    objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-  }
 
   fun publish(referralId: UUID, actor: AuthUserDTO, event: EventDTO) {
     if (enabled) {
@@ -55,7 +48,7 @@ class SNSPublisher(
   }
 
   private fun buildRequestAndPublish(event: EventDTO) {
-    val message = objectMapper.writeValueAsString(event)
+    val message = jsonMapper.writeValueAsString(event)
     val messageAttributes = mapOf(
       "eventType" to MessageAttributeValue.builder()
         .dataType("String")

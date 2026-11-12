@@ -11,6 +11,7 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import okhttp3.mockwebserver.SocketPolicy.NO_RESPONSE
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -26,6 +27,7 @@ import reactor.util.retry.Retry.RetrySignal
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.RestClient
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.LoggingSpyTest
+import java.net.InetAddress
 import java.net.URI
 import java.time.Duration
 import java.util.concurrent.TimeUnit.SECONDS
@@ -46,7 +48,9 @@ class HMPPSAuthServiceRetryTest : LoggingSpyTest(HMPPSAuthService::class, Level.
         { "email": "tom@tom.tom" }
   """.trimIndent()
 
-  private val mockWebServer = MockWebServer()
+  private val mockWebServer = MockWebServer().apply {
+    start(InetAddress.getByName("127.0.0.1"), 0)
+  }
   private val httpClient = HttpClient.create()
     .doOnConnected {
       it
@@ -55,10 +59,15 @@ class HMPPSAuthServiceRetryTest : LoggingSpyTest(HMPPSAuthService::class, Level.
     }
     .responseTimeout(Duration.ofSeconds(2))
   private val webClient = WebClient.builder()
-    .baseUrl(mockWebServer.url("/").toString())
+    .baseUrl(mockWebServer.url("/").newBuilder().host("127.0.0.1").build().toString())
     .clientConnector(ReactorClientHttpConnector(httpClient))
     .build()
   private lateinit var hmppsAuthService: HMPPSAuthService
+
+  @AfterAll
+  fun stopServer() {
+    mockWebServer.shutdown()
+  }
 
   @BeforeEach
   fun setUp() {

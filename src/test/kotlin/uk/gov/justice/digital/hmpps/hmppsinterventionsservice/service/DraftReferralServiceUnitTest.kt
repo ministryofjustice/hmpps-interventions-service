@@ -31,6 +31,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.FieldError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.ValidationError
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DraftReferralDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEventPublisher
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Complexity
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
@@ -118,7 +119,9 @@ class DraftReferralServiceUnitTest {
 
   @BeforeEach
   fun setup() {
-    whenever(referralRepository.save(any())).thenAnswer(returnsFirstArg<Referral>())
+    whenever(referralRepository.save(any<Referral>())).thenAnswer(returnsFirstArg<Referral>())
+    // Spring Data 4 declares save() as non-null, so an unstubbed mock returning null now fails
+    whenever(authUserRepository.save(any<AuthUser>())).thenAnswer(returnsFirstArg<AuthUser>())
   }
 
   @Nested
@@ -155,7 +158,7 @@ class DraftReferralServiceUnitTest {
 
     @Test
     fun `cant set complexity level when service category is not found`() {
-      whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.empty())
+      whenever(serviceCategoryRepository.findById(any<UUID>())).thenReturn(Optional.empty())
       val serviceCategory = serviceCategoryFactory.create()
       val referral = referralFactory.createDraft(selectedServiceCategories = mutableSetOf(serviceCategory))
       val e = assertThrows<ServerWebInputException> {
@@ -175,7 +178,7 @@ class DraftReferralServiceUnitTest {
       val serviceCategory = serviceCategoryFactory.create(complexityLevels = listOf(complexityLevel))
       val referral = referralFactory.createDraft(selectedServiceCategories = mutableSetOf(serviceCategory))
 
-      whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.of(serviceCategory))
+      whenever(serviceCategoryRepository.findById(any<UUID>())).thenReturn(Optional.of(serviceCategory))
 
       val e = assertThrows<ServerWebInputException> {
         draftReferralService.updateDraftReferralComplexityLevel(
@@ -196,7 +199,7 @@ class DraftReferralServiceUnitTest {
 
       assertThat(referral.complexityLevelIds).isNull()
 
-      whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.of(serviceCategory))
+      whenever(serviceCategoryRepository.findById(any<UUID>())).thenReturn(Optional.of(serviceCategory))
       whenever(draftReferralRepository.save(referral)).thenReturn(referral)
 
       val updatedReferral = draftReferralService.updateDraftReferralComplexityLevel(
@@ -218,7 +221,7 @@ class DraftReferralServiceUnitTest {
         complexityLevelIds = mutableMapOf(serviceCategory.id to complexityLevel1.id),
       )
 
-      whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.of(serviceCategory))
+      whenever(serviceCategoryRepository.findById(any<UUID>())).thenReturn(Optional.of(serviceCategory))
       whenever(draftReferralRepository.save(referral)).thenReturn(referral)
 
       val updatedReferral = draftReferralService.updateDraftReferralComplexityLevel(
@@ -260,8 +263,8 @@ class DraftReferralServiceUnitTest {
       )
 
       val update = DraftReferralDTO(serviceCategoryIds = serviceCategoryIds)
-      whenever(draftReferralRepository.saveAndFlush(any())).thenReturn(referral)
-      whenever(draftReferralRepository.save(any())).thenReturn(referral)
+      whenever(draftReferralRepository.saveAndFlush(any<DraftReferral>())).thenReturn(referral)
+      whenever(draftReferralRepository.save(any<DraftReferral>())).thenReturn(referral)
 
       draftReferralService.updateDraftReferral(referral, update)
 
@@ -291,9 +294,9 @@ class DraftReferralServiceUnitTest {
         desiredOutcomes = listOf(desiredOutcome1),
       )
 
-      whenever(serviceCategoryRepository.findByIdIn(any())).thenReturn(setOf(serviceCategory2))
-      whenever(draftReferralRepository.saveAndFlush(any())).thenReturn(referral)
-      whenever(draftReferralRepository.save(any())).thenReturn(referral)
+      whenever(serviceCategoryRepository.findByIdIn(any<List<UUID>>())).thenReturn(setOf(serviceCategory2))
+      whenever(draftReferralRepository.saveAndFlush(any<DraftReferral>())).thenReturn(referral)
+      whenever(draftReferralRepository.save(any<DraftReferral>())).thenReturn(referral)
       val updatedReferral = draftReferralService.updateDraftReferral(referral, DraftReferralDTO(serviceCategoryIds = listOf(serviceCategoryId2)))
 
       assertThat(updatedReferral.selectedServiceCategories).hasSize(1)
@@ -318,13 +321,13 @@ class DraftReferralServiceUnitTest {
         desiredOutcomes = listOf(desiredOutcome1),
       )
 
-      whenever(serviceCategoryRepository.findByIdIn(any())).thenReturn(setOf(serviceCategory1))
-      whenever(draftReferralRepository.saveAndFlush(any())).thenReturn(referral)
-      whenever(draftReferralRepository.save(any())).thenReturn(referral)
+      whenever(serviceCategoryRepository.findByIdIn(any<List<UUID>>())).thenReturn(setOf(serviceCategory1))
+      whenever(draftReferralRepository.saveAndFlush(any<DraftReferral>())).thenReturn(referral)
+      whenever(draftReferralRepository.save(any<DraftReferral>())).thenReturn(referral)
 
       val updatedReferral = draftReferralService.updateDraftReferral(referral, DraftReferralDTO(serviceCategoryIds = listOf(serviceCategoryId1)))
 
-      verify(draftReferralRepository).save(any())
+      verify(draftReferralRepository).save(any<DraftReferral>())
       assertThat(updatedReferral.selectedServiceCategories).hasSize(1)
       assertThat(updatedReferral.selectedServiceCategories!!.elementAt(0).id).isEqualTo(serviceCategoryId1)
       assertThat(updatedReferral.selectedDesiredOutcomes).hasSize(1)
@@ -350,9 +353,9 @@ class DraftReferralServiceUnitTest {
         complexityLevelIds = mapOf(serviceCategory1.id to complexityLevel1.id).toMutableMap(),
       )
 
-      whenever(serviceCategoryRepository.findByIdIn(any())).thenReturn(setOf(serviceCategory2))
-      whenever(draftReferralRepository.saveAndFlush(any())).thenReturn(referral)
-      whenever(draftReferralRepository.save(any())).thenReturn(referral)
+      whenever(serviceCategoryRepository.findByIdIn(any<List<UUID>>())).thenReturn(setOf(serviceCategory2))
+      whenever(draftReferralRepository.saveAndFlush(any<DraftReferral>())).thenReturn(referral)
+      whenever(draftReferralRepository.save(any<DraftReferral>())).thenReturn(referral)
       val updatedReferral = draftReferralService.updateDraftReferral(referral, DraftReferralDTO(serviceCategoryIds = listOf(serviceCategory2.id)))
 
       assertThat(updatedReferral.selectedServiceCategories).hasSize(1)
@@ -376,9 +379,9 @@ class DraftReferralServiceUnitTest {
         complexityLevelIds = mapOf(serviceCategory1.id to complexityLevel1.id).toMutableMap(),
       )
 
-      whenever(serviceCategoryRepository.findByIdIn(any())).thenReturn(setOf(serviceCategory1))
-      whenever(draftReferralRepository.saveAndFlush(any())).thenReturn(referral)
-      whenever(draftReferralRepository.save(any())).thenReturn(referral)
+      whenever(serviceCategoryRepository.findByIdIn(any<List<UUID>>())).thenReturn(setOf(serviceCategory1))
+      whenever(draftReferralRepository.saveAndFlush(any<DraftReferral>())).thenReturn(referral)
+      whenever(draftReferralRepository.save(any<DraftReferral>())).thenReturn(referral)
       val updatedReferral = draftReferralService.updateDraftReferral(referral, DraftReferralDTO(serviceCategoryIds = listOf(serviceCategory1.id)))
 
       assertThat(updatedReferral.selectedServiceCategories).hasSize(1)
@@ -405,8 +408,8 @@ class DraftReferralServiceUnitTest {
       )
 
       val update = DraftReferralDTO(serviceCategoryIds = serviceCategoryIds)
-      whenever(draftReferralRepository.saveAndFlush(any())).thenReturn(referral)
-      whenever(draftReferralRepository.save(any())).thenReturn(referral)
+      whenever(draftReferralRepository.saveAndFlush(any<DraftReferral>())).thenReturn(referral)
+      whenever(draftReferralRepository.save(any<DraftReferral>())).thenReturn(referral)
 
       val exception = Assertions.assertThrows(ValidationError::class.java) {
         draftReferralService.updateDraftReferral(referral, update)
@@ -464,7 +467,7 @@ class DraftReferralServiceUnitTest {
 
     @Test
     fun `cant set desired outcome when service category is not found`() {
-      whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.empty())
+      whenever(serviceCategoryRepository.findById(any<UUID>())).thenReturn(Optional.empty())
       val serviceCategory = serviceCategoryFactory.create()
       val referral = referralFactory.createDraft(selectedServiceCategories = mutableSetOf(serviceCategory))
       val e = assertThrows<ServerWebInputException> {
@@ -486,7 +489,7 @@ class DraftReferralServiceUnitTest {
         serviceCategoryFactory.create(id = serviceCategoryId, desiredOutcomes = listOf(desiredOutcome))
       val referral = referralFactory.createDraft(selectedServiceCategories = mutableSetOf(serviceCategory))
 
-      whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.of(serviceCategory))
+      whenever(serviceCategoryRepository.findById(any<UUID>())).thenReturn(Optional.of(serviceCategory))
 
       val e = assertThrows<ServerWebInputException> {
         draftReferralService.updateDraftReferralDesiredOutcomes(
@@ -509,7 +512,7 @@ class DraftReferralServiceUnitTest {
 
       assertThat(referral.selectedDesiredOutcomes).isEmpty()
 
-      whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.of(serviceCategory))
+      whenever(serviceCategoryRepository.findById(any<UUID>())).thenReturn(Optional.of(serviceCategory))
       whenever(draftReferralRepository.save(referral)).thenReturn(referral)
 
       val updatedReferral = draftReferralService.updateDraftReferralDesiredOutcomes(
@@ -537,7 +540,7 @@ class DraftReferralServiceUnitTest {
         desiredOutcomes = mutableListOf(desiredOutcome1),
       )
 
-      whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.of(serviceCategory))
+      whenever(serviceCategoryRepository.findById(any<UUID>())).thenReturn(Optional.of(serviceCategory))
       whenever(draftReferralRepository.save(referral)).thenReturn(referral)
 
       val updatedReferral = draftReferralService.updateDraftReferralDesiredOutcomes(
@@ -568,7 +571,7 @@ class DraftReferralServiceUnitTest {
         desiredOutcomes = mutableListOf(desiredOutcome1),
       )
 
-      whenever(serviceCategoryRepository.findById(any())).thenReturn(Optional.of(serviceCategory2))
+      whenever(serviceCategoryRepository.findById(any<UUID>())).thenReturn(Optional.of(serviceCategory2))
       whenever(draftReferralRepository.save(referral)).thenReturn(referral)
 
       val updatedReferral = draftReferralService.updateDraftReferralDesiredOutcomes(
@@ -735,8 +738,8 @@ class DraftReferralServiceUnitTest {
   fun `timestamp is stored when additionalRiskInformation is updated`() {
     val referral = referralFactory.createDraft(additionalRiskInformation = "something")
 
-    whenever(draftReferralRepository.saveAndFlush(any())).thenReturn(referral)
-    whenever(draftReferralRepository.save(any())).thenReturn(referral)
+    whenever(draftReferralRepository.saveAndFlush(any<DraftReferral>())).thenReturn(referral)
+    whenever(draftReferralRepository.save(any<DraftReferral>())).thenReturn(referral)
 
     assertThat(referral.additionalRiskInformationUpdatedAt).isNull()
     draftReferralService.updateDraftReferral(referral, DraftReferralDTO(additionalRiskInformation = "risk"))
@@ -787,7 +790,7 @@ class DraftReferralServiceUnitTest {
       val referral = referralFactory.createDraft()
       val update = DraftReferralDTO(personCurrentLocationType = PersonCurrentLocationType.CUSTODY, personCustodyPrisonId = "ABC", expectedReleaseDate = LocalDate.now())
 
-      whenever(draftReferralRepository.save(any())).thenReturn(referral)
+      whenever(draftReferralRepository.save(any<DraftReferral>())).thenReturn(referral)
       draftReferralService.updateDraftReferral(referral, update)
 
       assertThat(referral.personCurrentLocationType).isEqualTo(PersonCurrentLocationType.CUSTODY)
@@ -800,7 +803,7 @@ class DraftReferralServiceUnitTest {
       val referral = referralFactory.createDraft(allocatedCommunityPP = false)
       val update = DraftReferralDTO(isReferralReleasingIn12Weeks = data, personCurrentLocationType = PersonCurrentLocationType.CUSTODY)
 
-      whenever(draftReferralRepository.save(any())).thenReturn(referral)
+      whenever(draftReferralRepository.save(any<DraftReferral>())).thenReturn(referral)
       draftReferralService.updateDraftReferral(referral, update)
 
       assertThat(referral.isReferralReleasingIn12Weeks).isEqualTo(data)
@@ -816,7 +819,7 @@ class DraftReferralServiceUnitTest {
       // there is no existing referral details for this referral id
       whenever(referralDetailsRepository.findLatestByReferralId(draftReferral.id)).thenReturn(null)
       whenever(authUserRepository.save(draftReferral.createdBy)).thenReturn(draftReferral.createdBy)
-      whenever(draftReferralRepository.save(any())).thenReturn(draftReferral)
+      whenever(draftReferralRepository.save(any<DraftReferral>())).thenReturn(draftReferral)
 
       draftReferralService.updateDraftReferral(
         draftReferral,
@@ -847,7 +850,7 @@ class DraftReferralServiceUnitTest {
         null,
       )
 
-      whenever(draftReferralRepository.save(any())).thenReturn(draftReferral)
+      whenever(draftReferralRepository.save(any<DraftReferral>())).thenReturn(draftReferral)
       whenever(referralDetailsRepository.findLatestByReferralId(draftReferral.id)).thenReturn(existingDetails)
       draftReferralService.updateDraftReferral(draftReferral, DraftReferralDTO(furtherInformation = "nothing to see here"))
 
@@ -875,7 +878,7 @@ class DraftReferralServiceUnitTest {
         null,
       )
 
-      whenever(draftReferralRepository.save(any())).thenReturn(draftReferral)
+      whenever(draftReferralRepository.save(any<DraftReferral>())).thenReturn(draftReferral)
 
       whenever(referralDetailsRepository.findLatestByReferralId(draftReferral.id)).thenReturn(existingDetails)
       draftReferralService.updateDraftReferral(draftReferral, DraftReferralDTO(maximumEnforceableDays = 22))
@@ -893,7 +896,7 @@ class DraftReferralServiceUnitTest {
       val draftReferral = referralFactory.createDraft()
 
       whenever(referralDetailsRepository.findLatestByReferralId(draftReferral.id)).thenReturn(null)
-      whenever(draftReferralRepository.save(any())).thenReturn(draftReferral)
+      whenever(draftReferralRepository.save(any<DraftReferral>())).thenReturn(draftReferral)
       whenever(authUserRepository.save(draftReferral.createdBy)).thenReturn(draftReferral.createdBy)
 
       draftReferralService.updateDraftReferral(

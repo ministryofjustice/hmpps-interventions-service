@@ -17,8 +17,7 @@ enum class AppointmentEventType {
   SCHEDULED,
 }
 
-class
-AppointmentEvent(
+class AppointmentEvent(
   source: Any,
   val type: AppointmentEventType,
   val appointment: Appointment,

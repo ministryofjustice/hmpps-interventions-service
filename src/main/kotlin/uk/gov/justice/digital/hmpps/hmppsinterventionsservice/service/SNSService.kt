@@ -3,6 +3,8 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.SNSPublisher
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.EventDTO
@@ -26,54 +28,57 @@ class SNSActionPlanService(
   private val snsPublisher: SNSPublisher,
   @Value("\${interventions-ui.baseurl}") private val interventionsUiBaseUrl: String,
   @Value("\${interventions-ui.locations.probation-practitioner.action-plan}") private val actionPlanLocation: String,
+  private val actionPlanService: ActionPlanService,
 ) : ApplicationListener<ActionPlanEvent>,
   SNSService {
 
   @AsyncEventExceptionHandling
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   override fun onApplicationEvent(event: ActionPlanEvent) {
-    val uiUrl = UriComponentsBuilder.fromHttpUrl(interventionsUiBaseUrl)
+    val actionPlan = actionPlanService.getActionPlan(event.actionPlanId)
+    val uiUrl = UriComponentsBuilder.fromUriString(interventionsUiBaseUrl)
       .path(actionPlanLocation)
-      .buildAndExpand(event.actionPlan.referral.id)
+      .buildAndExpand(actionPlan.referral.id)
       .toString()
-    val referral = event.actionPlan.referral
+    val referral = actionPlan.referral
     when (event.type) {
       ActionPlanEventType.SUBMITTED -> {
         val snsEvent = EventDTO(
           "intervention.action-plan.submitted",
           "A draft action plan has been submitted",
           event.detailUrl,
-          event.actionPlan.submittedAt!!,
+          actionPlan.submittedAt!!,
           mapOf(
-            "actionPlanId" to event.actionPlan.id,
-            "submittedBy" to (event.actionPlan.submittedBy?.userName!!),
+            "actionPlanId" to actionPlan.id,
+            "submittedBy" to (actionPlan.submittedBy?.userName!!),
             "referralId" to referral.id,
             "referralReference" to referral.referenceNumber!!,
             "contractTypeName" to referral.intervention.dynamicFrameworkContract.contractType.name,
             "primeProviderName" to referral.intervention.dynamicFrameworkContract.primeProvider.name,
             "actionPlanProbationUserUrl" to uiUrl,
           ),
-          PersonReference.crn(event.actionPlan.referral.serviceUserCRN),
+          PersonReference.crn(actionPlan.referral.serviceUserCRN),
         )
-        snsPublisher.publish(event.actionPlan.referral.id, event.actionPlan.submittedBy!!, snsEvent)
+        snsPublisher.publish(actionPlan.referral.id, actionPlan.submittedBy!!, snsEvent)
       }
       ActionPlanEventType.APPROVED -> {
         val snsEvent = EventDTO(
           "intervention.action-plan.approved",
           "An action plan has been approved",
           event.detailUrl,
-          event.actionPlan.approvedAt!!,
+          actionPlan.approvedAt!!,
           mapOf(
-            "actionPlanId" to event.actionPlan.id,
-            "approvedBy" to (event.actionPlan.approvedBy?.userName!!),
+            "actionPlanId" to actionPlan.id,
+            "approvedBy" to (actionPlan.approvedBy?.userName!!),
             "referralId" to referral.id,
             "referralReference" to referral.referenceNumber!!,
             "contractTypeName" to referral.intervention.dynamicFrameworkContract.contractType.name,
             "primeProviderName" to referral.intervention.dynamicFrameworkContract.primeProvider.name,
             "actionPlanProbationUserUrl" to uiUrl,
           ),
-          PersonReference.crn(event.actionPlan.referral.serviceUserCRN),
+          PersonReference.crn(actionPlan.referral.serviceUserCRN),
         )
-        snsPublisher.publish(event.actionPlan.referral.id, event.actionPlan.approvedBy!!, snsEvent)
+        snsPublisher.publish(actionPlan.referral.id, actionPlan.approvedBy!!, snsEvent)
       }
     }
   }
@@ -159,12 +164,12 @@ class SNSAppointmentService(
         val eventType = "intervention.$appointmentType.session-feedback-submitted"
         val url =
           if (event.appointmentType == AppointmentType.SERVICE_DELIVERY) {
-            UriComponentsBuilder.fromHttpUrl(interventionsUiBaseUrl)
+            UriComponentsBuilder.fromUriString(interventionsUiBaseUrl)
               .path(ppSessionFeedbackLocation)
               .buildAndExpand(referral.id, event.deliverySession?.sessionNumber, event.appointment.deliusAppointmentId!!)
               .toString()
           } else {
-            UriComponentsBuilder.fromHttpUrl(interventionsUiBaseUrl)
+            UriComponentsBuilder.fromUriString(interventionsUiBaseUrl)
               .path(saFeedbackLocation)
               .buildAndExpand(referral.id)
               .toString()
@@ -199,22 +204,25 @@ class SNSAppointmentService(
 @Service
 class SNSEndOfServiceReportService(
   private val snsPublisher: SNSPublisher,
+  private val endOfServiceReportService: EndOfServiceReportService,
 ) : ApplicationListener<EndOfServiceReportEvent>,
   SNSService {
 
   @AsyncEventExceptionHandling
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   override fun onApplicationEvent(event: EndOfServiceReportEvent) {
+    val endOfServiceReport = endOfServiceReportService.getEndOfServiceReport(event.endOfServiceReportId)
     when (event.type) {
       SUBMITTED -> {
         val snsEvent = EventDTO(
           "intervention.end-of-service-report.submitted",
           "An end of service report has been submitted",
           event.detailUrl,
-          event.endOfServiceReport.submittedAt!!,
-          mapOf("endOfServiceReportId" to event.endOfServiceReport.id, "submittedBy" to (event.endOfServiceReport.submittedBy?.userName!!)),
-          PersonReference.crn(event.endOfServiceReport.referral.serviceUserCRN),
+          endOfServiceReport.submittedAt!!,
+          mapOf("endOfServiceReportId" to endOfServiceReport.id, "submittedBy" to (endOfServiceReport.submittedBy?.userName!!)),
+          PersonReference.crn(endOfServiceReport.referral.serviceUserCRN),
         )
-        snsPublisher.publish(event.endOfServiceReport.referral.id, event.endOfServiceReport.submittedBy!!, snsEvent)
+        snsPublisher.publish(endOfServiceReport.referral.id, endOfServiceReport.submittedBy!!, snsEvent)
       }
     }
   }

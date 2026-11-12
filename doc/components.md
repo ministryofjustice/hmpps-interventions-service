@@ -1,5 +1,16 @@
 # Components
 
+## Action plan and end-of-service report events
+
+Action plan submission/approval and end-of-service report submission events
+contain only the plan/report ID and event metadata, not JPA entities.
+The publisher requires an active transaction and dispatches the event only after
+commit; rolled-back submissions do not send notifications. The existing event
+executor runs the email and SNS listeners asynchronously, and each listener
+reloads the plan or report within its own `REQUIRES_NEW` transaction. This also isolates
+the Hibernate session if the executor's `CallerRunsPolicy` runs a listener on the
+publishing thread.
+
 ## Jobs
 
 We use Spring Batch to create oneoff and scheduled jobs.

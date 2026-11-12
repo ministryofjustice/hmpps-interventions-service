@@ -57,7 +57,7 @@ services:
       - API_BASE_URL_OAUTH=http://hmpps-auth:8090/auth
 
   assess-risks-and-needs:
-    image: quay.io/hmpps/hmpps-assess-risks-and-needs:latest
+    image: ghcr.io/ministryofjustice/hmpps-assess-risks-and-needs:latest
     networks:
       - hmpps
     container_name: assess-risks-and-needs
