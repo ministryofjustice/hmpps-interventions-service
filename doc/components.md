@@ -1,12 +1,13 @@
 # Components
 
-## End-of-service report events
+## Action plan and end-of-service report events
 
-End-of-service report submission events contain the report ID, not JPA entities.
+Action plan submission/approval and end-of-service report submission events
+contain only the plan/report ID and event metadata, not JPA entities.
 The publisher requires an active transaction and dispatches the event only after
 commit; rolled-back submissions do not send notifications. The existing event
 executor runs the email and SNS listeners asynchronously, and each listener
-reloads the report within its own `REQUIRES_NEW` transaction. This also isolates
+reloads the plan or report within its own `REQUIRES_NEW` transaction. This also isolates
 the Hibernate session if the executor's `CallerRunsPolicy` runs a listener on the
 publishing thread.
 

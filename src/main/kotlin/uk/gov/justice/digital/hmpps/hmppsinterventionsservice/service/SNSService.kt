@@ -28,54 +28,57 @@ class SNSActionPlanService(
   private val snsPublisher: SNSPublisher,
   @Value("\${interventions-ui.baseurl}") private val interventionsUiBaseUrl: String,
   @Value("\${interventions-ui.locations.probation-practitioner.action-plan}") private val actionPlanLocation: String,
+  private val actionPlanService: ActionPlanService,
 ) : ApplicationListener<ActionPlanEvent>,
   SNSService {
 
   @AsyncEventExceptionHandling
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   override fun onApplicationEvent(event: ActionPlanEvent) {
+    val actionPlan = actionPlanService.getActionPlan(event.actionPlanId)
     val uiUrl = UriComponentsBuilder.fromUriString(interventionsUiBaseUrl)
       .path(actionPlanLocation)
-      .buildAndExpand(event.actionPlan.referral.id)
+      .buildAndExpand(actionPlan.referral.id)
       .toString()
-    val referral = event.actionPlan.referral
+    val referral = actionPlan.referral
     when (event.type) {
       ActionPlanEventType.SUBMITTED -> {
         val snsEvent = EventDTO(
           "intervention.action-plan.submitted",
           "A draft action plan has been submitted",
           event.detailUrl,
-          event.actionPlan.submittedAt!!,
+          actionPlan.submittedAt!!,
           mapOf(
-            "actionPlanId" to event.actionPlan.id,
-            "submittedBy" to (event.actionPlan.submittedBy?.userName!!),
+            "actionPlanId" to actionPlan.id,
+            "submittedBy" to (actionPlan.submittedBy?.userName!!),
             "referralId" to referral.id,
             "referralReference" to referral.referenceNumber!!,
             "contractTypeName" to referral.intervention.dynamicFrameworkContract.contractType.name,
             "primeProviderName" to referral.intervention.dynamicFrameworkContract.primeProvider.name,
             "actionPlanProbationUserUrl" to uiUrl,
           ),
-          PersonReference.crn(event.actionPlan.referral.serviceUserCRN),
+          PersonReference.crn(actionPlan.referral.serviceUserCRN),
         )
-        snsPublisher.publish(event.actionPlan.referral.id, event.actionPlan.submittedBy!!, snsEvent)
+        snsPublisher.publish(actionPlan.referral.id, actionPlan.submittedBy!!, snsEvent)
       }
       ActionPlanEventType.APPROVED -> {
         val snsEvent = EventDTO(
           "intervention.action-plan.approved",
           "An action plan has been approved",
           event.detailUrl,
-          event.actionPlan.approvedAt!!,
+          actionPlan.approvedAt!!,
           mapOf(
-            "actionPlanId" to event.actionPlan.id,
-            "approvedBy" to (event.actionPlan.approvedBy?.userName!!),
+            "actionPlanId" to actionPlan.id,
+            "approvedBy" to (actionPlan.approvedBy?.userName!!),
             "referralId" to referral.id,
             "referralReference" to referral.referenceNumber!!,
             "contractTypeName" to referral.intervention.dynamicFrameworkContract.contractType.name,
             "primeProviderName" to referral.intervention.dynamicFrameworkContract.primeProvider.name,
             "actionPlanProbationUserUrl" to uiUrl,
           ),
-          PersonReference.crn(event.actionPlan.referral.serviceUserCRN),
+          PersonReference.crn(actionPlan.referral.serviceUserCRN),
         )
-        snsPublisher.publish(event.actionPlan.referral.id, event.actionPlan.approvedBy!!, snsEvent)
+        snsPublisher.publish(actionPlan.referral.id, actionPlan.approvedBy!!, snsEvent)
       }
     }
   }

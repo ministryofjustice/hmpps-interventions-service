@@ -38,42 +38,45 @@ class NotifyActionPlanService(
   private val emailSender: EmailSender,
   private val hmppsAuthService: HMPPSAuthService,
   private val referralService: ReferralService,
+  private val actionPlanService: ActionPlanService,
 ) : ApplicationListener<ActionPlanEvent>,
   NotifyService {
 
   @AsyncEventExceptionHandling
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   override fun onApplicationEvent(event: ActionPlanEvent) {
-    val popFirstName = event.actionPlan.referral.serviceUserData!!.firstName?.lowercase()?.replaceFirstChar { it.uppercase() }
-    val popLastName = event.actionPlan.referral.serviceUserData!!.lastName?.lowercase()?.replaceFirstChar { it.uppercase() }
+    val actionPlan = actionPlanService.getActionPlan(event.actionPlanId)
+    val popFirstName = actionPlan.referral.serviceUserData!!.firstName?.lowercase()?.replaceFirstChar { it.uppercase() }
+    val popLastName = actionPlan.referral.serviceUserData!!.lastName?.lowercase()?.replaceFirstChar { it.uppercase() }
     when (event.type) {
       ActionPlanEventType.SUBMITTED -> {
-        val recipient = referralService.getResponsibleProbationPractitioner(event.actionPlan.referral)
-        val location = generateResourceUrl(interventionsUIBaseURL, ppActionPlanLocation, event.actionPlan.referral.id)
+        val recipient = referralService.getResponsibleProbationPractitioner(actionPlan.referral)
+        val location = generateResourceUrl(interventionsUIBaseURL, ppActionPlanLocation, actionPlan.referral.id)
 
         emailSender.sendEmail(
           actionPlanSubmittedTemplateID,
           recipient.email,
           mapOf(
             "submitterFirstName" to recipient.firstName,
-            "referenceNumber" to event.actionPlan.referral.referenceNumber!!,
+            "referenceNumber" to actionPlan.referral.referenceNumber!!,
             "actionPlanUrl" to location.toString(),
             "popFullName" to "$popFirstName $popLastName",
-            "crn" to event.actionPlan.referral.serviceUserCRN,
+            "crn" to actionPlan.referral.serviceUserCRN,
           ),
         )
       }
       ActionPlanEventType.APPROVED -> {
-        val recipient = hmppsAuthService.getUserDetail(event.actionPlan.submittedBy!!)
-        val location = generateResourceUrl(interventionsUIBaseURL, spActionPlanLocation, event.actionPlan.referral.id)
+        val recipient = hmppsAuthService.getUserDetail(actionPlan.submittedBy!!)
+        val location = generateResourceUrl(interventionsUIBaseURL, spActionPlanLocation, actionPlan.referral.id)
         emailSender.sendEmail(
           actionPlanApprovedTemplateID,
           recipient.email,
           mapOf(
             "submitterFirstName" to recipient.firstName,
-            "referenceNumber" to event.actionPlan.referral.referenceNumber!!,
+            "referenceNumber" to actionPlan.referral.referenceNumber!!,
             "actionPlanUrl" to location.toString(),
             "popFullName" to "$popFirstName $popLastName",
-            "crn" to event.actionPlan.referral.serviceUserCRN,
+            "crn" to actionPlan.referral.serviceUserCRN,
           ),
         )
       }
