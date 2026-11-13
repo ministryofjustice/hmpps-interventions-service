@@ -2,8 +2,13 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
+import jakarta.persistence.Query
+import mu.KLogging
+import net.logstash.logback.argument.StructuredArguments.kv
 import org.springframework.stereotype.Repository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.PerformanceReportSqlTimings
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.model.ReferralPerformanceReport
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.toPerformanceReportString
 import java.math.BigDecimal
 import java.sql.Date
 import java.sql.Timestamp
@@ -12,9 +17,13 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.time.TimeSource
 
 @Repository
-class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportRepository {
+class ReferralPerformanceReportRepositoryImpl(
+  private val sqlTimings: PerformanceReportSqlTimings,
+) : ReferralPerformanceReportRepository {
+  companion object : KLogging()
 
   @PersistenceContext
   private lateinit var entityManager: EntityManager
@@ -36,7 +45,7 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
     query.setParameter("contractReferences", contractReferences)
     query.setParameter("sent_from", Timestamp.valueOf(from.atZoneSameInstant(ZoneOffset.UTC).toLocalDateTime()))
     query.setParameter("sent_to", Timestamp.valueOf(to.atZoneSameInstant(ZoneOffset.UTC).toLocalDateTime()))
-    val result = query.resultList as List<Array<Any>>
+    val result = timedResultList(query, "performance_report", logImmediately = true) as List<Array<Any>>
     val records: MutableList<ReferralPerformanceReport> = mutableListOf()
     result.forEach { row ->
       val referralId = row[0] as UUID
@@ -99,7 +108,7 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
   override fun eosrAchievementScore(eosrId: UUID): BigDecimal {
     val query = entityManager.createNativeQuery(eosrScoreQuery())
     query.setParameter("eosrId", eosrId)
-    val result = query.resultList as ArrayList<BigDecimal?>
+    val result = timedResultList(query, "performance_report_eosr_outcome_score") as ArrayList<BigDecimal?>
     if (result != null && result.size > 0) {
       return result.get(0) ?: BigDecimal.ZERO
     } else {
@@ -110,15 +119,34 @@ class ReferralPerformanceReportRepositoryImpl : ReferralPerformanceReportReposit
   override fun firstAttendanceDate(referralId: UUID): OffsetDateTime? {
     val query = entityManager.createNativeQuery(firstAttendanceDateQuery())
     query.setParameter("referralId", referralId)
-    val result = query.resultList as ArrayList<Timestamp?>
+    val result = timedResultList(query, "performance_report_first_attendance") as ArrayList<Timestamp?>
     return timestampToOffset(result.get(0))
   }
 
   override fun attendanceCount(referralId: UUID): Integer {
     val query = entityManager.createNativeQuery(attendedAppointmentCountQuery())
     query.setParameter("referralId", referralId)
-    val result = query.resultList as ArrayList<Integer>
+    val result = timedResultList(query, "performance_report_attendances_count") as ArrayList<Integer>
     return result.get(0)
+  }
+
+  private fun timedResultList(query: Query, functionName: String, logImmediately: Boolean = false): List<*> {
+    val start = TimeSource.Monotonic.markNow()
+    val result = try {
+      query.resultList
+    } finally {
+      if (!logImmediately) {
+        sqlTimings.record(functionName, start.elapsedNow())
+      }
+    }
+
+    if (logImmediately) {
+      val elapsed = kv("elapsed", start.elapsedNow().toPerformanceReportString())
+      val function = kv("sqlFunction", functionName)
+      logger.info("Performance report SQL completed {} {} {}", function, elapsed, kv("rowCount", result.size))
+    }
+
+    return result
   }
 
   fun timestampToOffset(timestamp: Timestamp?): OffsetDateTime? {
