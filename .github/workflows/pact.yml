@@ -1,0 +1,74 @@
+name: Pact provider verification
+
+on:
+  push:
+    branches:
+      - "**"
+  workflow_dispatch: # Triggered by the pact broker webhook when a consumer contract changes
+    inputs:
+      consumer_tags:
+        description: Comma-separated consumer tags to verify
+        type: string
+        default: main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pact_check_and_publish:
+    name: Check and publish pacts
+    runs-on: ubuntu-latest
+    env:
+      POSTGRES_DB: interventions_ci
+      POSTGRES_PASSWORD: password
+      PACTBROKER_HOST: pact-broker-prod.apps.live-1.cloud-platform.service.justice.gov.uk
+      PACTBROKER_AUTH_USERNAME: interventions
+      PACTBROKER_AUTH_PASSWORD: ${{ secrets.PACTBROKER_AUTH_PASSWORD }}
+      _JAVA_OPTIONS: -Xmx2g -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false -Dkotlin.compiler.execution.strategy=in-process
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: interventions_ci
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+      - uses: ./.github/actions/setup-flyway
+      - name: Run migrations and local seeds
+        run: |
+          flyway -cleanDisabled="false" clean -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="$POSTGRES_PASSWORD"
+          flyway migrate -url="jdbc:postgresql://localhost:5432/$POSTGRES_DB" -user="postgres" -password="$POSTGRES_PASSWORD" -locations="src/main/resources/db/migration,src/main/resources/db/local" -postgresql.transactional.lock=false
+      - name: Verify and publish pacts
+        env:
+          PACT_PROVIDER_VERSION: ${{ github.sha }}
+          PACT_PROVIDER_TAG: ${{ github.ref_name }}
+          PACTBROKER_CONSUMERVERSIONSELECTORS_TAGS: ${{ inputs.consumer_tags || 'main' }}
+          PACT_PUBLISH_RESULTS: "true"
+        run: ./gradlew pactTestPublish
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: pact-test-results
+          path: |
+            build/test-results
+            build/reports/tests
+          if-no-files-found: ignore

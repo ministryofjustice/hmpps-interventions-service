@@ -1,0 +1,34 @@
+name: Tag pact version
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: Tag to apply to this provider version in the pact broker, e.g. deployed:dev
+        required: true
+        type: string
+    secrets:
+      PACTBROKER_AUTH_PASSWORD:
+        required: true
+
+permissions: {}
+
+jobs:
+  tag:
+    name: Tag pact version (${{ inputs.tag }})
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+      - name: Tag contract version with deployment
+        env:
+          PACT_BROKER_BASE_URL: https://pact-broker-prod.apps.live-1.cloud-platform.service.justice.gov.uk
+          PACT_BROKER_USERNAME: interventions
+          PACT_BROKER_PASSWORD: ${{ secrets.PACTBROKER_AUTH_PASSWORD }}
+          TAG: ${{ inputs.tag }}
+          VERSION: ${{ github.sha }}
+        run: |
+          npx --yes --package='@pact-foundation/pact-node' pact-broker create-version-tag \
+            --pacticipant="Interventions Service" --version="$VERSION" --tag="$TAG" \
+            --broker-base-url="$PACT_BROKER_BASE_URL" --broker-username="$PACT_BROKER_USERNAME" --broker-password="$PACT_BROKER_PASSWORD"
