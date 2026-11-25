@@ -46,7 +46,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-      dialect: org.hibernate.dialect.PostgreSQLDialect
+      dialect: PostgresSQLDialect
     show-sql: false
   batch:
     job:
@@ -244,4 +244,3 @@ hmpps:
   sar:
     template:
       path: /sar_template.mustache
-
