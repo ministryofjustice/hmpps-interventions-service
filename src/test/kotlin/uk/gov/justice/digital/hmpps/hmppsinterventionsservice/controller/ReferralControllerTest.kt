@@ -19,11 +19,13 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.Clie
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.controller.mappers.CancellationReasonMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.AuthUserDTO
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DashboardType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.DesiredOutcomeDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.ReferralAssignmentDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.CancellationReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.DraftOasysRiskInformationService
@@ -83,8 +85,8 @@ internal class ReferralControllerTest {
 
     @Test
     fun `getSentReferral returns not found if sent referral does not exist`() {
-      whenever(referralService.getSentReferralForUser(eq(referral.id), any())).thenReturn(null)
-      whenever(authUserRepository.save(any())).thenReturn(user)
+      whenever(referralService.getSentReferralForUser(eq(referral.id), any<AuthUser>())).thenReturn(null)
+      whenever(authUserRepository.save(any<AuthUser>())).thenReturn(user)
       val e = assertThrows<ResponseStatusException> {
         referralController.getSentReferral(
           referral.id,
@@ -97,9 +99,9 @@ internal class ReferralControllerTest {
 
     @Test
     fun `getSentReferral returns a sent referral if it exists`() {
-      whenever(referralService.getSentReferralForUser(eq(referral.id), any())).thenReturn(referral)
+      whenever(referralService.getSentReferralForUser(eq(referral.id), any<AuthUser>())).thenReturn(referral)
       whenever(referralConcluder.withdrawalState(referral)).thenReturn(ReferralWithdrawalState.PRE_ICA_WITHDRAWAL)
-      whenever(authUserRepository.save(any())).thenReturn(user)
+      whenever(authUserRepository.save(any<AuthUser>())).thenReturn(user)
       val sentReferral = referralController.getSentReferral(
         referral.id,
         token,
@@ -249,8 +251,8 @@ internal class ReferralControllerTest {
 
     @Test
     fun `can accept all defined dashboard types`() {
-      whenever(referralService.getServiceProviderSummaries(any(), any())).thenReturn(emptyList())
-      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
+      whenever(referralService.getServiceProviderSummaries(any<AuthUser>(), any<DashboardType>())).thenReturn(emptyList())
+      whenever(authUserRepository.save(any<AuthUser>())).thenReturn(authUserFactory.create())
       assertThat(
         referralController.getServiceProviderSentReferralsSummary(
           token,
@@ -282,8 +284,8 @@ internal class ReferralControllerTest {
 
     @Test
     fun `returns default list when no dashboardType provided`() {
-      whenever(referralService.getServiceProviderSummaries(any(), any())).thenReturn(emptyList())
-      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
+      whenever(referralService.getServiceProviderSummaries(any<AuthUser>(), any<DashboardType>())).thenReturn(emptyList())
+      whenever(authUserRepository.save(any<AuthUser>())).thenReturn(authUserFactory.create())
       val result = referralController.getServiceProviderSentReferralsSummary(
         token,
         null,
@@ -293,8 +295,8 @@ internal class ReferralControllerTest {
 
     @Test
     fun `throws error when invalid dashboardType provided`() {
-      whenever(referralService.getServiceProviderSummaries(any(), any())).thenReturn(emptyList())
-      whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
+      whenever(referralService.getServiceProviderSummaries(any<AuthUser>(), any<DashboardType>())).thenReturn(emptyList())
+      whenever(authUserRepository.save(any<AuthUser>())).thenReturn(authUserFactory.create())
       assertThrows<IllegalArgumentException> {
         referralController.getServiceProviderSentReferralsSummary(
           token,
@@ -306,8 +308,8 @@ internal class ReferralControllerTest {
 
   @Test
   fun `assignSentReferral returns 404 if referral does not exist`() {
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(null)
-    whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(null)
+    whenever(authUserRepository.save(any<AuthUser>())).thenReturn(authUserFactory.create())
     val e = assertThrows<ResponseStatusException> {
       referralController.assignSentReferral(
         UUID.randomUUID(),
@@ -322,9 +324,9 @@ internal class ReferralControllerTest {
   fun `assignSentReferral uses incoming jwt for 'assignedBy' argument, and request body for 'assignedTo'`() {
     val referral = referralFactory.createSent()
     val assignedToUser = authUserFactory.create(id = "to")
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
-    whenever(referralService.assignSentReferral(any(), any(), any())).thenReturn(referral)
-    whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create(id = "by"))
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
+    whenever(referralService.assignSentReferral(any<Referral>(), any<AuthUser>(), any<AuthUser>())).thenReturn(referral)
+    whenever(authUserRepository.save(any<AuthUser>())).thenReturn(authUserFactory.create(id = "by"))
     referralController.assignSentReferral(
       UUID.randomUUID(),
       ReferralAssignmentDTO(AuthUserDTO.from(assignedToUser)),
@@ -355,8 +357,8 @@ internal class ReferralControllerTest {
     referral.supplierAssessment = supplierAssessmentFactory.create()
     val token = tokenFactory.create()
 
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
-    whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
+    whenever(authUserRepository.save(any<AuthUser>())).thenReturn(authUserFactory.create())
 
     val response = referralController.getSupplierAssessmentAppointment(referral.id, token)
 
@@ -368,8 +370,8 @@ internal class ReferralControllerTest {
     val referralId = UUID.randomUUID()
     val token = tokenFactory.create()
 
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(null)
-    whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(null)
+    whenever(authUserRepository.save(any<AuthUser>())).thenReturn(authUserFactory.create())
 
     val e = assertThrows<ResponseStatusException> {
       referralController.getSupplierAssessmentAppointment(referralId, token)
@@ -386,10 +388,10 @@ internal class ReferralControllerTest {
     @Test
     fun `is set when getting a set referral`() {
       val referral = referralFactory.createSent()
-      whenever(referralService.getSentReferralForUser(eq(referral.id), any())).thenReturn(referral)
+      whenever(referralService.getSentReferralForUser(eq(referral.id), any<AuthUser>())).thenReturn(referral)
       whenever(referralConcluder.requiresEndOfServiceReportCreation(referral)).thenReturn(false)
       whenever(referralConcluder.withdrawalState(referral)).thenReturn(ReferralWithdrawalState.PRE_ICA_WITHDRAWAL)
-      whenever(authUserRepository.save(any())).thenReturn(user)
+      whenever(authUserRepository.save(any<AuthUser>())).thenReturn(user)
 
       val sentReferral = referralController.getSentReferral(
         referral.id,
@@ -403,10 +405,10 @@ internal class ReferralControllerTest {
     fun `is set after assigning a referral`() {
       val referral = referralFactory.createSent()
       val assignedToUser = authUserFactory.create(id = "to")
-      whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
-      whenever(referralService.assignSentReferral(any(), any(), any())).thenReturn(referral)
+      whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
+      whenever(referralService.assignSentReferral(any<Referral>(), any<AuthUser>(), any<AuthUser>())).thenReturn(referral)
       whenever(referralConcluder.requiresEndOfServiceReportCreation(referral)).thenReturn(false)
-      whenever(authUserRepository.save(any())).thenReturn(user)
+      whenever(authUserRepository.save(any<AuthUser>())).thenReturn(user)
 
       val assignedReferral = referralController.assignSentReferral(
         UUID.randomUUID(),

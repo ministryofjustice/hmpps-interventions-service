@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DynamicFrameworkContract
@@ -14,10 +14,10 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.HMPPSAuthS
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.JwtTokenFactory
 
 class ListReferralEndpoints : IntegrationTestBase() {
-  @MockBean
+  @MockitoBean
   lateinit var mockHmppsAuthService: HMPPSAuthService
 
-  @MockBean lateinit var mockCommunityAPIOffenderService: CommunityAPIOffenderService
+  @MockitoBean lateinit var mockCommunityAPIOffenderService: CommunityAPIOffenderService
 
   private lateinit var requestFactory: RequestFactory
 

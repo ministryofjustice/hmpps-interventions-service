@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.dto.WithdrawReferralRequestDTO
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.WithdrawalReason
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.AuthUserRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralConcluder
@@ -51,14 +52,14 @@ class WithdrawReferralControllerTest {
     val referral = referralFactory.createSent()
     val withdrawReferralRequestDTO = WithdrawReferralRequestDTO("AAA", "comment", ReferralWithdrawalState.PRE_ICA_WITHDRAWAL.name)
 
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
 
     val user = AuthUser("CRN123", "auth", "user")
     val token = tokenFactory.create(user.id, user.authSource, user.userName)
     val endedReferral = referralFactory.createEnded(endRequestedComments = "comment")
-    whenever(referralService.requestReferralEnd(any(), any(), any())).thenReturn(endedReferral)
+    whenever(referralService.requestReferralEnd(any<Referral>(), any<AuthUser>(), any<WithdrawReferralRequestDTO>())).thenReturn(endedReferral)
     whenever(referralConcluder.requiresEndOfServiceReportCreation(endedReferral)).thenReturn(true)
-    whenever(authUserRepository.save(any())).thenReturn(user)
+    whenever(authUserRepository.save(any<AuthUser>())).thenReturn(user)
 
     withdrawReferralController.submitWithdrawalReasons(referral.id, withdrawReferralRequestDTO, token)
     verify(referralService).requestReferralEnd(referral, user, withdrawReferralRequestDTO)
@@ -68,8 +69,8 @@ class WithdrawReferralControllerTest {
   fun `end referral endpoint does not find referral`() {
     val withdrawReferralRequestDTO = WithdrawReferralRequestDTO("AAA", "comment", ReferralWithdrawalState.PRE_ICA_WITHDRAWAL.name)
 
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(null)
-    whenever(authUserRepository.save(any())).thenReturn(authUserFactory.create())
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(null)
+    whenever(authUserRepository.save(any<AuthUser>())).thenReturn(authUserFactory.create())
 
     val token = tokenFactory.create()
     val e = assertThrows<ResponseStatusException> {
@@ -83,14 +84,14 @@ class WithdrawReferralControllerTest {
     val referral = referralFactory.createSent()
     val withdrawReferralRequestDTO = WithdrawReferralRequestDTO("AAA", "comment", ReferralWithdrawalState.PRE_ICA_WITHDRAWAL.name)
 
-    whenever(referralService.getSentReferralForUser(any(), any())).thenReturn(referral)
+    whenever(referralService.getSentReferralForUser(any<UUID>(), any<AuthUser>())).thenReturn(referral)
 
     val user = AuthUser("CRN123", "auth", "user")
     val token = tokenFactory.create(user.id, user.authSource, user.userName)
     val endedReferral = referralFactory.createEnded(endRequestedComments = "comment")
-    whenever(referralService.requestReferralEnd(any(), any(), any())).thenReturn(endedReferral)
+    whenever(referralService.requestReferralEnd(any<Referral>(), any<AuthUser>(), any<WithdrawReferralRequestDTO>())).thenReturn(endedReferral)
     whenever(referralConcluder.requiresEndOfServiceReportCreation(referral)).thenReturn(true)
-    whenever(authUserRepository.save(any())).thenReturn(user)
+    whenever(authUserRepository.save(any<AuthUser>())).thenReturn(user)
 
     val response = withdrawReferralController.submitWithdrawalReasons(referral.id, withdrawReferralRequestDTO, token)
   }

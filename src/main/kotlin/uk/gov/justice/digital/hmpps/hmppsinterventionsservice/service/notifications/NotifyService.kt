@@ -4,6 +4,8 @@ import mu.KLogging
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.EmailSender
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ActionPlanEvent
@@ -17,7 +19,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appoint
 import java.net.URI
 
 interface NotifyService {
-  fun generateResourceUrl(baseURL: String, path: String, vararg args: Any): URI = UriComponentsBuilder.fromHttpUrl(baseURL).path(path).buildAndExpand(*args).toUri()
+  fun generateResourceUrl(baseURL: String, path: String, vararg args: Any): URI = UriComponentsBuilder.fromUriString(baseURL).path(path).buildAndExpand(*args).toUri()
 }
 
 interface ContactablePerson {
@@ -36,42 +38,45 @@ class NotifyActionPlanService(
   private val emailSender: EmailSender,
   private val hmppsAuthService: HMPPSAuthService,
   private val referralService: ReferralService,
+  private val actionPlanService: ActionPlanService,
 ) : ApplicationListener<ActionPlanEvent>,
   NotifyService {
 
   @AsyncEventExceptionHandling
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   override fun onApplicationEvent(event: ActionPlanEvent) {
-    val popFirstName = event.actionPlan.referral.serviceUserData!!.firstName?.lowercase()?.replaceFirstChar { it.uppercase() }
-    val popLastName = event.actionPlan.referral.serviceUserData!!.lastName?.lowercase()?.replaceFirstChar { it.uppercase() }
+    val actionPlan = actionPlanService.getActionPlan(event.actionPlanId)
+    val popFirstName = actionPlan.referral.serviceUserData!!.firstName?.lowercase()?.replaceFirstChar { it.uppercase() }
+    val popLastName = actionPlan.referral.serviceUserData!!.lastName?.lowercase()?.replaceFirstChar { it.uppercase() }
     when (event.type) {
       ActionPlanEventType.SUBMITTED -> {
-        val recipient = referralService.getResponsibleProbationPractitioner(event.actionPlan.referral)
-        val location = generateResourceUrl(interventionsUIBaseURL, ppActionPlanLocation, event.actionPlan.referral.id)
+        val recipient = referralService.getResponsibleProbationPractitioner(actionPlan.referral)
+        val location = generateResourceUrl(interventionsUIBaseURL, ppActionPlanLocation, actionPlan.referral.id)
 
         emailSender.sendEmail(
           actionPlanSubmittedTemplateID,
           recipient.email,
           mapOf(
             "submitterFirstName" to recipient.firstName,
-            "referenceNumber" to event.actionPlan.referral.referenceNumber!!,
+            "referenceNumber" to actionPlan.referral.referenceNumber!!,
             "actionPlanUrl" to location.toString(),
             "popFullName" to "$popFirstName $popLastName",
-            "crn" to event.actionPlan.referral.serviceUserCRN,
+            "crn" to actionPlan.referral.serviceUserCRN,
           ),
         )
       }
       ActionPlanEventType.APPROVED -> {
-        val recipient = hmppsAuthService.getUserDetail(event.actionPlan.submittedBy!!)
-        val location = generateResourceUrl(interventionsUIBaseURL, spActionPlanLocation, event.actionPlan.referral.id)
+        val recipient = hmppsAuthService.getUserDetail(actionPlan.submittedBy!!)
+        val location = generateResourceUrl(interventionsUIBaseURL, spActionPlanLocation, actionPlan.referral.id)
         emailSender.sendEmail(
           actionPlanApprovedTemplateID,
           recipient.email,
           mapOf(
             "submitterFirstName" to recipient.firstName,
-            "referenceNumber" to event.actionPlan.referral.referenceNumber!!,
+            "referenceNumber" to actionPlan.referral.referenceNumber!!,
             "actionPlanUrl" to location.toString(),
             "popFullName" to "$popFirstName $popLastName",
-            "crn" to event.actionPlan.referral.serviceUserCRN,
+            "crn" to actionPlan.referral.serviceUserCRN,
           ),
         )
       }
@@ -86,27 +91,30 @@ class NotifyEndOfServiceReportService(
   @Value("\${interventions-ui.locations.probation-practitioner.end-of-service-report}") private val ppEndOfServiceReportLocation: String,
   private val emailSender: EmailSender,
   private val referralService: ReferralService,
+  private val endOfServiceReportService: EndOfServiceReportService,
 ) : ApplicationListener<EndOfServiceReportEvent>,
   NotifyService {
 
   @AsyncEventExceptionHandling
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   override fun onApplicationEvent(event: EndOfServiceReportEvent) {
+    val endOfServiceReport = endOfServiceReportService.getEndOfServiceReport(event.endOfServiceReportId)
     when (event.type) {
       EndOfServiceReportEventType.SUBMITTED -> {
-        val recipient = referralService.getResponsibleProbationPractitioner(event.endOfServiceReport.referral)
-        val location = generateResourceUrl(interventionsUIBaseURL, ppEndOfServiceReportLocation, event.endOfServiceReport.id)
-        val popFirstName = event.endOfServiceReport.referral.serviceUserData!!.firstName?.lowercase()?.replaceFirstChar { it.uppercase() }
-        val popLastName = event.endOfServiceReport.referral.serviceUserData!!.lastName?.lowercase()?.replaceFirstChar { it.uppercase() }
+        val recipient = referralService.getResponsibleProbationPractitioner(endOfServiceReport.referral)
+        val location = generateResourceUrl(interventionsUIBaseURL, ppEndOfServiceReportLocation, endOfServiceReport.id)
+        val popFirstName = endOfServiceReport.referral.serviceUserData!!.firstName?.lowercase()?.replaceFirstChar { it.uppercase() }
+        val popLastName = endOfServiceReport.referral.serviceUserData!!.lastName?.lowercase()?.replaceFirstChar { it.uppercase() }
 
         emailSender.sendEmail(
           endOfServiceReportSubmittedTemplateID,
           recipient.email,
           mapOf(
             "ppFirstName" to recipient.firstName,
-            "referralReference" to event.endOfServiceReport.referral.referenceNumber!!,
+            "referralReference" to endOfServiceReport.referral.referenceNumber!!,
             "endOfServiceReportLink" to location.toString(),
             "popFullName" to "$popFirstName $popLastName",
-            "crn" to event.endOfServiceReport.referral.serviceUserCRN,
+            "crn" to endOfServiceReport.referral.serviceUserCRN,
           ),
         )
       }

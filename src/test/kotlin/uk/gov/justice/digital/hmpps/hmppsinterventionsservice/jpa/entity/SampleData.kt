@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity
 
 import org.apache.commons.lang3.RandomStringUtils
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.AuthUserFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceCategoryFactory
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.ServiceProviderFactory
@@ -15,7 +15,9 @@ class SampleData {
     // there are tonnes of related tables that need to exist to successfully persist an intervention,
     // this is a helper method that persists them all
     fun persistIntervention(em: TestEntityManager, intervention: Intervention): Intervention {
-      intervention.dynamicFrameworkContract.contractType.serviceCategories.forEach {
+      // skip service categories that are already saved: merging a copy over them changes their hash code
+      // while they are in the contract type's set, which makes Hibernate 7 re-insert the join row
+      intervention.dynamicFrameworkContract.contractType.serviceCategories.filterNot { em.entityManager.contains(it) }.forEach {
         ServiceCategoryFactory(em).create(
           id = it.id,
           name = it.name,

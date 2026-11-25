@@ -18,7 +18,7 @@ interface DeliverySessionRepository : JpaRepository<DeliverySession, UUID> {
 
   @Deprecated(
     "looking up by action plan ID is no longer necessary",
-    ReplaceWith("findAllByReferralId(referralId"),
+    ReplaceWith("findAllByReferralId(referralId)"),
   )
   @Query("select ds from DeliverySession ds left join ActionPlan ap on ap.referral = ds.referral where ap.id = :actionPlanId")
   fun findAllByActionPlanId(actionPlanId: UUID): List<DeliverySession>

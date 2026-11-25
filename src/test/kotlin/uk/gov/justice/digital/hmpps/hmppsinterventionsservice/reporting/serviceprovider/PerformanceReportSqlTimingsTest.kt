@@ -5,8 +5,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import org.springframework.batch.core.BatchStatus
-import org.springframework.batch.core.JobExecution
-import org.springframework.batch.core.StepExecution
+import org.springframework.batch.core.job.JobExecution
+import org.springframework.batch.core.job.JobInstance
+import org.springframework.batch.core.job.parameters.JobParameters
+import org.springframework.batch.core.step.StepExecution
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.PerformanceReportSqlTimings
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util.LoggingMemoryAppender
 import kotlin.time.Duration.Companion.hours
@@ -33,7 +35,11 @@ class PerformanceReportSqlTimingsTest {
 
       assertThat(appender.logEvents).isEmpty()
 
-      val failedStep = StepExecution("writeToCsvStep", JobExecution(1L), 2L)
+      val failedStep = StepExecution(
+        2L,
+        "writeToCsvStep",
+        JobExecution(1L, JobInstance(1L, "performanceReportJob"), JobParameters()),
+      )
       failedStep.status = BatchStatus.FAILED
       assertThat(firstReport.afterStep(failedStep)).isNull()
       assertThat(appender.logEvents.map { it.formattedMessage }).containsExactly(
@@ -42,7 +48,13 @@ class PerformanceReportSqlTimingsTest {
       )
 
       appender.reset()
-      secondReport.afterStep(StepExecution("writeToCsvStep", JobExecution(3L), 4L))
+      secondReport.afterStep(
+        StepExecution(
+          4L,
+          "writeToCsvStep",
+          JobExecution(3L, JobInstance(3L, "performanceReportJob"), JobParameters()),
+        ),
+      )
       assertThat(appender.logEvents.map { it.formattedMessage }).containsExactly(
         "Performance report SQL summary: jobExecutionId=3, stepExecutionId=4, sqlFunction=performance_report_first_attendance, calls=1, totalElapsed=10ms",
       )

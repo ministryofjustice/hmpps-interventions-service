@@ -5,15 +5,19 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.RestClient
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
+import java.net.InetAddress
 
 class HMPPSAuthServiceTest {
-  private val mockWebServer = MockWebServer()
+  private val mockWebServer = MockWebServer().apply {
+    start(InetAddress.getByName("127.0.0.1"), 0)
+  }
   private val hmppsAuthService = HMPPSAuthService(
     "/authuser/groups",
     "/authuser/detail",
@@ -22,11 +26,16 @@ class HMPPSAuthServiceTest {
     0L,
     RestClient(
       WebClient.create(
-        mockWebServer.url("/").toString(),
+        mockWebServer.url("/").newBuilder().host("127.0.0.1").build().toString(),
       ),
       "client-registration-id",
     ),
   )
+
+  @AfterEach
+  fun stopServer() {
+    mockWebServer.shutdown()
+  }
 
   @Test
   fun `getUserDetail gets details for verified auth user`() {

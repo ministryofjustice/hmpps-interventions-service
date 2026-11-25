@@ -176,7 +176,7 @@ class ReferralService(
     throw AccessError(user, "unsupported user type", listOf("logins from ${user.authSource} are not supported"))
   }
 
-  private fun <T> applyOptionalConjunction(existingSpec: Specification<T>, predicate: Boolean?, specToJoin: Specification<T>): Specification<T> {
+  private fun <T : Any> applyOptionalConjunction(existingSpec: Specification<T>, predicate: Boolean?, specToJoin: Specification<T>): Specification<T> {
     if (predicate == null) return existingSpec
     return existingSpec.and(if (predicate) specToJoin else not(specToJoin))
   }
@@ -187,7 +187,7 @@ class ReferralService(
     return referralAccessFilter.serviceProviderReferralSummaries(referralSummaries, user)
   }
 
-  private inline fun <reified T> createSpecification(
+  private inline fun <reified T : Any> createSpecification(
     concluded: Boolean?,
     cancelled: Boolean?,
     unassigned: Boolean?,
@@ -208,20 +208,20 @@ class ReferralService(
     return findSentReferralsSpec
   }
 
-  private fun <T> searchSpec(searchText: String): Specification<T> = if (searchText.matches(Regex("[A-Z]{2}[0-9]{4}[A-Z]{2}"))) {
-    ReferralSpecifications.searchByReferenceNumber(searchText)
+  private fun <T : Any> searchSpec(searchText: String): Specification<T> = if (searchText.matches(Regex("[A-Z]{2}[0-9]{4}[A-Z]{2}"))) {
+    ReferralSpecifications.searchByReferenceNumber<T>(searchText)
   } else {
-    ReferralSpecifications.searchByPoPName(searchText)
+    ReferralSpecifications.searchByPoPName<T>(searchText)
   }
 
-  private fun <T> createSpecificationForProbationPractitionerUser(
+  private fun <T : Any> createSpecificationForProbationPractitionerUser(
     user: AuthUser,
     sentReferralFilterSpecification: Specification<T>,
   ): Specification<T> {
     var referralsForPPUser = ReferralSpecifications.createdBy<T>(user)
     try {
       val serviceUserCRNs = communityAPIOffenderService.getManagedOffendersForDeliusUser(user).map { it.crnNumber }
-      referralsForPPUser = referralsForPPUser.or(ReferralSpecifications.matchingServiceUserReferrals(serviceUserCRNs))
+      referralsForPPUser = referralsForPPUser.or(ReferralSpecifications.matchingServiceUserReferrals<T>(serviceUserCRNs))
     } catch (e: WebClientResponseException) {
       // don't stop users seeing their own referrals just because delius is not playing nice
       logger.error(

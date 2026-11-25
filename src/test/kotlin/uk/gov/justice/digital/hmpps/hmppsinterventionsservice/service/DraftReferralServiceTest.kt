@@ -15,7 +15,7 @@ import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessChecker
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ReferralAccessFilter
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.authorization.ServiceProviderAccessScopeMapper
@@ -119,14 +119,9 @@ class DraftReferralServiceTest @Autowired constructor(
   )
 
   @AfterEach
-  fun `clear referrals`() {
+  fun `flush pending changes`() {
+    // @RepositoryTest rolls back each test; flushing surfaces any constraint violations first
     entityManager.flush()
-    interventionRepository.deleteAll()
-    referralDetailsRepository.deleteAll()
-    authUserRepository.deleteAll()
-    draftReferralRepository.deleteAll()
-    referralRepository.deleteAll()
-    referralLocationRepository.deleteAll()
   }
 
   @Nested
@@ -756,7 +751,11 @@ class DraftReferralServiceTest @Autowired constructor(
       selectedServiceCategories = setOf(serviceCategory).toMutableSet(),
       desiredOutcomes = listOf(desiredOutcome).toMutableList(),
     )
-    draftReferralService.updateDraftReferral(referral, DraftReferralDTO(serviceCategoryIds = listOf(serviceCategoryId)))
+    // reload the referral as the API would, so its service categories are the same managed instances the
+    // service looks up; the factories leave detached copies, which Hibernate 7 treats as different elements
+    entityManager.clear()
+    val loadedReferral = draftReferralRepository.findById(referral.id).get()
+    draftReferralService.updateDraftReferral(loadedReferral, DraftReferralDTO(serviceCategoryIds = listOf(serviceCategoryId)))
 
     draftReferralRepository.flush()
     val updatedReferral = draftReferralRepository.findById(referral.id).get()

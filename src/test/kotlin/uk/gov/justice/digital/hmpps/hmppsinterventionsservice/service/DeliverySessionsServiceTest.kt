@@ -17,6 +17,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Appointment
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentDeliveryType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentSessionType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AppointmentType.SERVICE_DELIVERY
@@ -65,12 +66,12 @@ internal class DeliverySessionsServiceTest {
   @Test
   fun `create unscheduled sessions creates one for each action plan session`() {
     val actionPlan = actionPlanFactory.create(numberOfSessions = 3)
-    whenever(deliverySessionRepository.findByReferralIdAndSessionNumber(eq(actionPlan.referral.id), any())).thenReturn(null)
+    whenever(deliverySessionRepository.findByReferralIdAndSessionNumber(eq(actionPlan.referral.id), any<Int>())).thenReturn(null)
     whenever(authUserRepository.save(actionPlan.createdBy)).thenReturn(actionPlan.createdBy)
-    whenever(deliverySessionRepository.save(any())).thenAnswer { it.arguments[0] }
+    whenever(deliverySessionRepository.save(any<DeliverySession>())).thenAnswer { it.arguments[0] }
 
     deliverySessionsService.createUnscheduledSessionsForActionPlan(actionPlan)
-    verify(deliverySessionRepository, times(3)).save(any())
+    verify(deliverySessionRepository, times(3)).save(any<DeliverySession>())
   }
 
   @Test
@@ -81,13 +82,13 @@ internal class DeliverySessionsServiceTest {
     val newActionPlan = actionPlanFactory.createSubmitted(id = newActionPlanId, numberOfSessions = 3, referral = referral)
     referral.actionPlans = mutableListOf(previouslyApprovedActionPlan, newActionPlan)
 
-    whenever(deliverySessionRepository.findAllByActionPlanId(any())).thenReturn(listOf(deliverySessionFactory.createAttended(), deliverySessionFactory.createAttended()))
-    whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(eq(newActionPlan.id), any())).thenReturn(null)
+    whenever(deliverySessionRepository.findAllByActionPlanId(any<UUID>())).thenReturn(listOf(deliverySessionFactory.createAttended(), deliverySessionFactory.createAttended()))
+    whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(eq(newActionPlan.id), any<Int>())).thenReturn(null)
     whenever(authUserRepository.save(newActionPlan.createdBy)).thenReturn(newActionPlan.createdBy)
-    whenever(deliverySessionRepository.save(any())).thenAnswer { it.arguments[0] }
+    whenever(deliverySessionRepository.save(any<DeliverySession>())).thenAnswer { it.arguments[0] }
 
     deliverySessionsService.createUnscheduledSessionsForActionPlan(newActionPlan)
-    verify(deliverySessionRepository, times(1)).save(any())
+    verify(deliverySessionRepository, times(1)).save(any<DeliverySession>())
   }
 
   @Test
@@ -113,7 +114,7 @@ internal class DeliverySessionsServiceTest {
     val appointment = session.currentAppointment
 
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(session)
-    whenever(deliverySessionRepository.saveAndFlush(any())).thenReturn(session)
+    whenever(deliverySessionRepository.saveAndFlush(any<DeliverySession>())).thenReturn(session)
 
     whenever(communityAPIBookingService.book(session.referral, appointment, appointmentTime, durationInMinutes, SERVICE_DELIVERY, null, null, null))
       .thenReturn(Pair(73457252L, UUID.randomUUID()))
@@ -129,7 +130,7 @@ internal class DeliverySessionsServiceTest {
       null,
     )
 
-    verify(appointmentService, times(1)).createOrUpdateAppointmentDeliveryDetails(any(), eq(AppointmentDeliveryType.PHONE_CALL), eq(AppointmentSessionType.ONE_TO_ONE), isNull(), isNull())
+    verify(appointmentService, times(1)).createOrUpdateAppointmentDeliveryDetails(any<Appointment>(), eq(AppointmentDeliveryType.PHONE_CALL), eq(AppointmentSessionType.ONE_TO_ONE), isNull(), isNull())
     assertThat(updatedSession.currentAppointment?.appointmentTime).isEqualTo(appointmentTime)
     assertThat(updatedSession.currentAppointment?.durationInMinutes).isEqualTo(durationInMinutes)
     assertThat(updatedSession.currentAppointment?.createdBy?.userName).isEqualTo("scheduler")
@@ -154,7 +155,7 @@ internal class DeliverySessionsServiceTest {
     val user = createActor("scheduler")
 
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(session)
-    whenever(deliverySessionRepository.saveAndFlush(any())).thenReturn(session)
+    whenever(deliverySessionRepository.saveAndFlush(any<DeliverySession>())).thenReturn(session)
 
     val appointmentTime = OffsetDateTime.now()
     val durationInMinutes = 200
@@ -219,7 +220,7 @@ internal class DeliverySessionsServiceTest {
     val user = createActor("scheduler")
 
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(session)
-    whenever(deliverySessionRepository.saveAndFlush(any())).thenReturn(session)
+    whenever(deliverySessionRepository.saveAndFlush(any<DeliverySession>())).thenReturn(session)
 
     val appointmentTime = OffsetDateTime.now()
     val durationInMinutes = 200
@@ -270,7 +271,7 @@ internal class DeliverySessionsServiceTest {
     whenever(communityAPIBookingService.book(any(), isNotNull(), eq(newTime), eq(newDuration), eq(SERVICE_DELIVERY), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull()))
       .thenReturn(Pair(23523541087L, UUID.randomUUID()))
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(session)
-    whenever(deliverySessionRepository.saveAndFlush(any())).thenAnswer { it.arguments[0] }
+    whenever(deliverySessionRepository.saveAndFlush(any<DeliverySession>())).thenAnswer { it.arguments[0] }
 
     val updatedSession = deliverySessionsService.updateSessionAppointment(
       actionPlanId,
@@ -323,7 +324,7 @@ internal class DeliverySessionsServiceTest {
     ).thenReturn(Pair(999L, appointment?.id))
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber))
       .thenReturn(session)
-    whenever(deliverySessionRepository.saveAndFlush(any())).thenReturn(session)
+    whenever(deliverySessionRepository.saveAndFlush(any<DeliverySession>())).thenReturn(session)
 
     val updatedSession = deliverySessionsService.updateSessionAppointment(
       actionPlanId,
@@ -374,7 +375,7 @@ internal class DeliverySessionsServiceTest {
       ),
     ).thenReturn(Pair(null, null))
     whenever(deliverySessionRepository.findAllByActionPlanIdAndSessionNumber(actionPlanId, sessionNumber)).thenReturn(session)
-    whenever(deliverySessionRepository.saveAndFlush(any())).thenReturn(session)
+    whenever(deliverySessionRepository.saveAndFlush(any<DeliverySession>())).thenReturn(session)
 
     deliverySessionsService.updateSessionAppointment(
       actionPlanId,
@@ -473,7 +474,7 @@ internal class DeliverySessionsServiceTest {
     val appointmentId = existingSession.currentAppointment!!.id
 
     whenever(deliverySessionRepository.findAllByReferralId(referralId)).thenReturn(listOf(existingSession))
-    whenever(deliverySessionRepository.save(any())).thenReturn(existingSession)
+    whenever(deliverySessionRepository.save(any<DeliverySession>())).thenReturn(existingSession)
 
     val actor = createActor("attendance_submitter")
     val savedSession = deliverySessionsService.recordAttendanceFeedback(referralId, appointmentId, actor, attended, didSessionHappen)
@@ -507,7 +508,7 @@ internal class DeliverySessionsServiceTest {
     val appointment = session.currentAppointment!!
 
     whenever(deliverySessionRepository.findAllByReferralId(any())).thenReturn(listOf(session))
-    whenever(deliverySessionRepository.save(any())).thenReturn(session)
+    whenever(deliverySessionRepository.save(any<DeliverySession>())).thenReturn(session)
     whenever(
       appointmentService.recordSessionFeedback(
         appointment,
@@ -611,7 +612,7 @@ internal class DeliverySessionsServiceTest {
     val actor = createActor()
 
     whenever(deliverySessionRepository.findAllByReferralId(referralId)).thenReturn(listOf(session))
-    whenever(deliverySessionRepository.save(any())).thenReturn(session)
+    whenever(deliverySessionRepository.save(any<DeliverySession>())).thenReturn(session)
     whenever(appointmentService.submitAppointmentFeedback(session.currentAppointment!!, actor, SERVICE_DELIVERY, session)).thenThrow(ResponseStatusException(HttpStatus.CONFLICT, "appointment feedback has already been submitted"))
 
     deliverySessionsService.recordAttendanceFeedback(referralId, appointmentId, actor, Attended.YES, true)
@@ -649,10 +650,10 @@ internal class DeliverySessionsServiceTest {
 
     val actor = createActor()
     whenever(deliverySessionRepository.findAllByReferralId(referralId)).thenReturn(listOf(session))
-    whenever(deliverySessionRepository.save(any())).thenReturn(session)
+    whenever(deliverySessionRepository.save(any<DeliverySession>())).thenReturn(session)
     whenever(appointmentService.submitAppointmentFeedback(session.currentAppointment!!, actor, SERVICE_DELIVERY, session)).thenThrow(
       ResponseStatusException(
-        HttpStatus.UNPROCESSABLE_ENTITY,
+        HttpStatus.UNPROCESSABLE_CONTENT,
         "can't submit feedback unless attendance has been recorded",
       ),
     )
@@ -680,7 +681,7 @@ internal class DeliverySessionsServiceTest {
     val exception = assertThrows(ResponseStatusException::class.java) {
       deliverySessionsService.submitAppointmentFeedback(referralId, appointmentId, actor)
     }
-    assertThat(exception.statusCode).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY)
+    assertThat(exception.statusCode).isEqualTo(HttpStatus.UNPROCESSABLE_CONTENT)
   }
 
   @Test
@@ -689,7 +690,7 @@ internal class DeliverySessionsServiceTest {
     val referralId = session.referral.id
     val appointmentId = session.currentAppointment!!.id
     whenever(deliverySessionRepository.findAllByReferralId(referralId)).thenReturn(listOf(session))
-    whenever(deliverySessionRepository.save(any())).thenReturn(session)
+    whenever(deliverySessionRepository.save(any<DeliverySession>())).thenReturn(session)
 
     val actor = createActor()
     deliverySessionsService.recordAttendanceFeedback(referralId, appointmentId, actor, Attended.YES, true)
@@ -738,7 +739,7 @@ internal class DeliverySessionsServiceTest {
     whenever(deliverySessionRepository.findAllByReferralId(referral.id)).thenReturn(
       listOf(session),
     )
-    whenever(deliverySessionRepository.save(any())).thenReturn(session)
+    whenever(deliverySessionRepository.save(any<DeliverySession>())).thenReturn(session)
 
     deliverySessionsService.recordAttendanceFeedback(referral.id, appointment.id, actor, Attended.YES, true)
     deliverySessionsService.recordSessionFeedback(
@@ -853,7 +854,7 @@ internal class DeliverySessionsServiceTest {
     val referralId = session.referral.id
     val appointmentId = session.currentAppointment!!.id
     whenever(deliverySessionRepository.findAllByReferralId(referralId)).thenReturn(listOf(session))
-    whenever(deliverySessionRepository.save(any())).thenReturn(session)
+    whenever(deliverySessionRepository.save(any<DeliverySession>())).thenReturn(session)
 
     val actor = createActor()
     deliverySessionsService.recordAttendanceFeedback(referralId, appointmentId, actor, Attended.NO, true)
@@ -888,7 +889,7 @@ internal class DeliverySessionsServiceTest {
       session,
     )
     whenever(authUserRepository.save(createdByUser)).thenReturn(createdByUser)
-    whenever(deliverySessionRepository.saveAndFlush(any())).thenReturn(session)
+    whenever(deliverySessionRepository.saveAndFlush(any<DeliverySession>())).thenReturn(session)
 
     val updatedSession = deliverySessionsService.updateSessionAppointment(
       actionPlanId,

@@ -2,20 +2,21 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.ndmis.p
 
 import jakarta.persistence.EntityManagerFactory
 import mu.KLogging
-import org.springframework.batch.core.Job
-import org.springframework.batch.core.Step
-import org.springframework.batch.core.StepContribution
 import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepScope
-import org.springframework.batch.core.job.DefaultJobParametersValidator
+import org.springframework.batch.core.job.Job
 import org.springframework.batch.core.job.builder.JobBuilder
+import org.springframework.batch.core.job.parameters.DefaultJobParametersValidator
+import org.springframework.batch.core.job.parameters.JobParametersIncrementer
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.scope.context.ChunkContext
+import org.springframework.batch.core.step.Step
+import org.springframework.batch.core.step.StepContribution
 import org.springframework.batch.core.step.builder.StepBuilder
-import org.springframework.batch.item.database.JdbcCursorItemReader
-import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder
-import org.springframework.batch.item.file.FlatFileItemWriter
-import org.springframework.batch.repeat.RepeatStatus
+import org.springframework.batch.infrastructure.item.database.JdbcCursorItemReader
+import org.springframework.batch.infrastructure.item.database.builder.JdbcCursorItemReaderBuilder
+import org.springframework.batch.infrastructure.item.file.FlatFileItemWriter
+import org.springframework.batch.infrastructure.repeat.RepeatStatus
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.ApplicationRunner
@@ -68,7 +69,7 @@ class NdmisAppointmentPerformanceReportJobConfiguration(
   private val skipPolicy = NPESkipPolicy()
 
   @Bean
-  fun ndmisAppointmentPerformanceReportJobLauncher(ndmisAppointmentPerformanceReportJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(ndmisAppointmentPerformanceReportJob)
+  fun ndmisAppointmentPerformanceReportJobLauncher(ndmisAppointmentPerformanceReportJob: Job): ApplicationRunner = onStartupJobLauncherFactory.makeBatchLauncher(ndmisAppointmentPerformanceReportJob, JobParametersIncrementer { parameters -> OutputPathIncrementer().getNext(TimestampIncrementer().getNext(parameters)) })
 
   @Bean("ndmisAppointmentReader")
   @JobScope
@@ -111,7 +112,6 @@ class NdmisAppointmentPerformanceReportJobConfiguration(
     validator.setRequiredKeys(arrayOf("timestamp", "outputPath"))
 
     return JobBuilder("ndmisAppointmentPerformanceReportJob", jobRepository)
-      .incrementer { parameters -> OutputPathIncrementer().getNext(TimestampIncrementer().getNext(parameters)) }
       .validator(validator)
       .start(ndmisWriteAppointmentToCsvStep)
       .next(pushAppointmentToS3Step)
@@ -123,7 +123,7 @@ class NdmisAppointmentPerformanceReportJobConfiguration(
     @Qualifier("ndmisAppointmentReader") ndmisReader: JdbcCursorItemReader<AppointmentData>,
     writer: FlatFileItemWriter<AppointmentData>,
   ): Step = StepBuilder("ndmisWriteAppointmentToCsvStep", jobRepository)
-    .chunk<AppointmentData, AppointmentData>(chunkSize, transactionManager)
+    .chunk<AppointmentData, AppointmentData>(chunkSize)
     .reader(ndmisReader)
     .writer(writer)
     .faultTolerant()

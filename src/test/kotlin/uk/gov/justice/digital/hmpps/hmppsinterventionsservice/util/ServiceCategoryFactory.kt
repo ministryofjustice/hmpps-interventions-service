@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.util
 
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ComplexityLevel
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DesiredOutcome
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceCategory
@@ -33,6 +33,9 @@ class ServiceCategoryFactory(em: TestEntityManager? = null) : EntityFactory(em) 
     )
 
     complexityLevels.forEach { save(it) }
+    // same again for desired outcome filter rules, which have a foreign key to their desired outcome
+    desiredOutcomes.forEach { save(it.copy(desiredOutcomeFilterRules = mutableSetOf())) }
+    desiredOutcomes.flatMap { it.desiredOutcomeFilterRules }.forEach { save(it) }
     desiredOutcomes.forEach { save(it) }
 
     return save(

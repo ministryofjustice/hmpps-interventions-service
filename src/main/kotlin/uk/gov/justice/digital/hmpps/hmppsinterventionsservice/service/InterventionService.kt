@@ -38,9 +38,9 @@ class InterventionService(
   fun getPCCRegions(intervention: Intervention): List<PCCRegion> {
     val contract = intervention.dynamicFrameworkContract
     return if (contract.pccRegion != null) {
-      listOf(contract.pccRegion)
+      listOfNotNull(contract.pccRegion)
     } else {
-      pccRegionRepository.findAllByNpsRegionId(contract.npsRegion!!.id)
+      pccRegionRepository.findAllByNpsRegionId(contract.npsRegion!!.id).filterNotNull()
     }
   }
 }

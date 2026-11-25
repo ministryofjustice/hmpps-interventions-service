@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.NoSessi
 import java.time.OffsetDateTime
 import java.util.UUID
 
+@ConsistentCopyVisibility
 data class AddressDTO private constructor(
   val firstAddressLine: String,
   val secondAddressLine: String? = null,

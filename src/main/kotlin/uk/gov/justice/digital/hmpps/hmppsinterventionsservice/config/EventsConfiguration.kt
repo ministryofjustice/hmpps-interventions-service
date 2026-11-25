@@ -22,7 +22,7 @@ class EventsConfiguration(
     taskExecutor.corePoolSize = corePoolSize
     taskExecutor.maxPoolSize = maxPoolSize
     taskExecutor.queueCapacity = queueSize
-    taskExecutor.threadNamePrefix = "event-"
+    taskExecutor.setThreadNamePrefix("event-")
     taskExecutor.setRejectedExecutionHandler(ThreadPoolExecutor.CallerRunsPolicy())
     taskExecutor.afterPropertiesSet()
     eventMulticaster.setTaskExecutor(taskExecutor)

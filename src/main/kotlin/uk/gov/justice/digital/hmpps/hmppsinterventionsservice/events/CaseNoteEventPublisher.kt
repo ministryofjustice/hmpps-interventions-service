@@ -16,7 +16,10 @@ class CreateCaseNoteEvent(
   val detailUrl: String,
   val referralId: UUID,
   val sendEmail: Boolean?,
-) : ApplicationEvent(source) {
+) : ApplicationEvent(source) { // ,
+  // EntityEvent {
+  // override fun reloadIn(entityManager: EntityManager) = CreateCaseNoteEvent(source, caseNoteId, entityManager.reload(sentBy), detailUrl, referralId, sendEmail)
+
   override fun toString(): String = "CreateCaseNoteEvent(caseNoteId=$caseNoteId, referralId=$referralId)"
 }
 

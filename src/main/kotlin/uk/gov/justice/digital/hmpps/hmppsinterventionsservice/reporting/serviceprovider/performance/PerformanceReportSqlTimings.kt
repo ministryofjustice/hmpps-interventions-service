@@ -2,9 +2,9 @@ package uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.service
 
 import mu.KLogging
 import org.springframework.batch.core.ExitStatus
-import org.springframework.batch.core.StepExecution
-import org.springframework.batch.core.StepExecutionListener
 import org.springframework.batch.core.configuration.annotation.StepScope
+import org.springframework.batch.core.listener.StepExecutionListener
+import org.springframework.batch.core.step.StepExecution
 import org.springframework.stereotype.Component
 import kotlin.time.Duration
 

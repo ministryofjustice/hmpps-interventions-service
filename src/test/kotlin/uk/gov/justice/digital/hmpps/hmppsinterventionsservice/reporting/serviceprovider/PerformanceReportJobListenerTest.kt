@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.springframework.batch.core.BatchStatus
-import org.springframework.batch.core.JobExecution
-import org.springframework.batch.core.JobInstance
-import org.springframework.batch.core.JobParametersBuilder
-import org.springframework.batch.item.ExecutionContext
+import org.springframework.batch.core.job.JobExecution
+import org.springframework.batch.core.job.JobInstance
+import org.springframework.batch.core.job.parameters.JobParametersBuilder
+import org.springframework.batch.infrastructure.item.ExecutionContext
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.component.EmailSender
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.config.S3Bucket
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.reporting.serviceprovider.performance.PerformanceReportJobListener
@@ -31,6 +31,7 @@ internal class PerformanceReportJobListenerTest {
   fun `afterJob sends email with correct name and url on job completion`() {
     val jobExecution = JobExecution(
       123L,
+      JobInstance(123L, "performanceReportJob"),
       JobParametersBuilder()
         .addString("user.firstName", "tom")
         .addString("user.email", "tom@tom.tom")
@@ -52,14 +53,14 @@ internal class PerformanceReportJobListenerTest {
   fun `afterJob sends email with correct name on job failure`() {
     val jobExecution = JobExecution(
       123L,
+      JobInstance(123L, "performanceReportJob"),
       JobParametersBuilder()
         .addString("user.firstName", "tom")
         .addString("user.email", "tom@tom.tom")
         .toJobParameters(),
     )
-    jobExecution.executionContext = ExecutionContext(mapOf("output.file.path" to "/tmp/foo/tom.csv"))
+    jobExecution.executionContext.put("output.file.path", "/tmp/foo/tom.csv")
     jobExecution.status = BatchStatus.FAILED
-    jobExecution.jobInstance = JobInstance(123, "performanceReportJob")
 
     listener.afterJob(jobExecution)
 

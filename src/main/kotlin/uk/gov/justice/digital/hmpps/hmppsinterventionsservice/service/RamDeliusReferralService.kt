@@ -16,7 +16,7 @@ class RamDeliusReferralService(
   private val ramDeliusClient: RamDeliusClient,
 ) : CommunityAPIService {
   fun send(referral: Referral) {
-    val url = UriComponentsBuilder.fromHttpUrl(interventionsUiBaseUrl)
+    val url = UriComponentsBuilder.fromUriString(interventionsUiBaseUrl)
       .path(referralDetailsLocation)
       .buildAndExpand(referral.id)
       .toString()
