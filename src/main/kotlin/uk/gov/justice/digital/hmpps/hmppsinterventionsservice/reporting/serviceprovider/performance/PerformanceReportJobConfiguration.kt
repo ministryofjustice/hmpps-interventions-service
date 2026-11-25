@@ -92,11 +92,13 @@ class PerformanceReportJobConfiguration(
     reader: ListItemReader<ReferralPerformanceReport>,
     processor: ItemProcessor<ReferralPerformanceReport, PerformanceReportData>,
     writer: FlatFileItemWriter<PerformanceReportData>,
+    sqlTimings: PerformanceReportSqlTimings,
   ): Step = StepBuilder("writeToCsvStep", jobRepository)
     .chunk<ReferralPerformanceReport, PerformanceReportData>(chunkSize)
     .reader(reader)
     .processor(processor)
     .writer(writer)
+    .listener(sqlTimings)
     .transactionManager(transactionManager)
     .build()
 }
