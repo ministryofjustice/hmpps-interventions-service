@@ -35,8 +35,10 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.events.ReferralEve
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.AuthUser
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.DraftReferral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Intervention
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Referral
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralAssignment
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ReferralLocation
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.SentReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceProvider
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Status
@@ -49,6 +51,7 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.Dra
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.EndOfServiceReportRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.InterventionRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralDetailsRepository
+import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralLocationRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.repository.ReferralSummaryRepository
@@ -90,6 +93,7 @@ class ReferralServiceTest @Autowired constructor(
   val endOfServiceReportRepository: EndOfServiceReportRepository,
   val serviceCategoryRepository: ServiceCategoryRepository,
   val referralDetailsRepository: ReferralDetailsRepository,
+  val referralLocationRepository: ReferralLocationRepository,
   val changelogRepository: ChangelogRepository,
   val withdrawalReasonRepository: WithdrawalReasonRepository,
   @Qualifier("referralSummaryRepositoryImpl") val referralSummaryRepository: ReferralSummaryRepository,
@@ -218,6 +222,40 @@ class ReferralServiceTest @Autowired constructor(
       assertThat(result)
         .usingRecursiveFieldByFieldElementComparator(recursiveComparisonConfiguration)
         .containsExactlyInAnyOrderElementsOf(startedReferrals)
+    }
+
+    @Test
+    fun `maps expected release date from native query as LocalDate`() {
+      val user = userFactory.create("pp_user_1", "delius")
+      val expectedReleaseDate = LocalDate.of(2050, 11, 1)
+      val draft = referralFactory.createDraft(
+        createdBy = user,
+        personCurrentLocationType = PersonCurrentLocationType.CUSTODY,
+        expectedReleaseDate = expectedReleaseDate,
+      )
+      val referral = referralFactory.createSent(
+        id = draft.id,
+        createdBy = user,
+        intervention = draft.intervention,
+        createDraft = false,
+      )
+      referralLocationRepository.saveAndFlush(
+        ReferralLocation(
+          id = UUID.randomUUID(),
+          referral = referral,
+          type = PersonCurrentLocationType.CUSTODY,
+          prisonId = null,
+          expectedReleaseDate = expectedReleaseDate,
+          expectedReleaseDateMissingReason = null,
+          expectedProbationOffice = null,
+          expectedProbationOfficeUnknownReason = null,
+        ),
+      )
+
+      val result = referralService.getSentReferralSummaryForUser(user, null, null, null, null, pageRequest)
+        .single()
+
+      assertThat(result.expectedReleaseDate).isEqualTo(expectedReleaseDate)
     }
 
     @Test
