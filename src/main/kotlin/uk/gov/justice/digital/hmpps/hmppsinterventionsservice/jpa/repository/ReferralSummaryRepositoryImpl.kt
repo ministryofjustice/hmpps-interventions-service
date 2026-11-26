@@ -14,7 +14,6 @@ import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.Dynamic
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.PersonCurrentLocationType
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.jpa.entity.ServiceProviderSentReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsinterventionsservice.service.ReferralSummaryQuery
-import java.sql.Date
 import java.time.Instant
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -332,7 +331,7 @@ WHERE  assigned_at_desc_seq = 1
       val serviceUserLastName = row[13] as String?
       val locationType = (row[14] as String?)?.let { PersonCurrentLocationType.valueOf(it) }
       val prisonId = row[15] as String?
-      val expectedReleaseDate = (row[16] as Date?)?.toLocalDate()
+      val expectedReleaseDate = row[16] as LocalDate?
       val isReferralReleasingIn12Weeks = row[17] as Boolean?
       val probationOffice = row[18] as String?
       val pdu = row[19] as String?
