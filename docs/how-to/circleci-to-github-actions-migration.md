@@ -41,7 +41,7 @@ The job installs the runner's current Graphviz package; SchemaSpy 7.0.2 supports
 
 ## Before merging
 1. Cloud Platform: add the `cloud-platform-terraform-hmpps-template` module for `dev`, `preprod`, `prod` in cloud-platform-environments (environment names must match `values-*.yaml`; set `reviewer_teams` for prod).
-2. Repo secret `PACTBROKER_AUTH_PASSWORD` (was in CircleCI context `hmpps-common-vars`); Slack variables above if notifications are wanted.
+2. Repo secret `HMPPS_PACT_BROKER_PASSWORD` (was in CircleCI context `hmpps-common-vars`); Slack variables above if notifications are wanted.
 3. Check the ghcr package visibility allows the cluster to pull it.
 4. Repoint the Pact Broker webhook from CircleCI (`only_pacts`) to a GitHub `workflow_dispatch` on `pact.yml`.
 5. Test on a branch first (no push or deploy happens off `main`/`hotfix/*`).

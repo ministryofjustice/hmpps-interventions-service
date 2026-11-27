@@ -27,7 +27,7 @@ jobs:
       POSTGRES_PASSWORD: password
       PACTBROKER_HOST: pact-broker-prod.apps.live-1.cloud-platform.service.justice.gov.uk
       PACTBROKER_AUTH_USERNAME: interventions
-      PACTBROKER_AUTH_PASSWORD: ${{ secrets.PACTBROKER_AUTH_PASSWORD }}
+      PACTBROKER_AUTH_PASSWORD: ${{ secrets.HMPPS_PACT_BROKER_PASSWORD }}
       _JAVA_OPTIONS: -Xmx2g -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false -Dkotlin.compiler.execution.strategy=in-process
     services:
       postgres:
