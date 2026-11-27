@@ -28,6 +28,7 @@ Other changes:
 tags the image `ghcr.io/ministryofjustice/hmpps-interventions-service:data-dictionary-<app_version>` and pushes it on `main`/`hotfix/*` only.
 `deploy_dev` needs it, as in CircleCI. The chart pulls `{{ image.repository }}:data-dictionary-{{ image.tag }}`, so the app and
 dictionary images must share the repository path.
+The job installs the runner's current Graphviz package; SchemaSpy 7.0.2 supports its version format and requires Java 17 or newer.
 
 ## Deviations to be aware of
 - **Image tag:** the shared deploy action sets `generic-service.image.tag`, but this chart uses top-level `image.tag`, so `helm_additional_args: --set image.tag=<version>` is passed.

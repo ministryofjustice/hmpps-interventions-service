@@ -168,6 +168,7 @@ jobs:
       - name: Build data dictionary
         run: |
           sudo apt-get update && sudo apt-get install -y graphviz
+          dot -V
           script/build-data-dictionary.sh
       - name: Tag docker image
         run: docker tag data-dictionary "$IMAGE:data-dictionary-$APP_VERSION"
